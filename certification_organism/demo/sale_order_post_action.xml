@@ -1,0 +1,99 @@
+<odoo>
+	<!-- Confirm action -->
+    <function model="sale.order" name="action_confirm">
+        <value eval="[ref('certification_organism.sale_order_1'), ref('certification_organism.sale_order_2'), ref('certification_organism.sale_order_3'), ref('certification_organism.sale_order_4')]"/>
+    </function>
+
+    <!-- Create Invoice -->
+    <record id="certification_organism.sale_advance_payment_inv_1" model="sale.advance.payment.inv">
+        <field name="advance_payment_method" >delivered</field>
+        <field name="sale_order_ids" eval="[Command.set([ref('certification_organism.sale_order_1')])]"/>
+    </record>
+
+    <function model="sale.advance.payment.inv" name="create_invoices"
+            eval="[ref('certification_organism.sale_advance_payment_inv_1')]"/>
+
+    <record id="certification_organism.sale_advance_payment_inv_2" model="sale.advance.payment.inv">
+        <field name="advance_payment_method" >delivered</field>
+        <field name="sale_order_ids" eval="[Command.set([ref('certification_organism.sale_order_4')])]"/>
+    </record>
+
+    <function model="sale.advance.payment.inv" name="create_invoices"
+            eval="[ref('certification_organism.sale_advance_payment_inv_2')]"/>
+    
+    <!-- Confirm invoice -->
+    <function model="account.move" name="action_post">
+        <value model="account.move" eval="obj().env.ref('certification_organism.sale_order_1').invoice_ids.ids"/>
+    </function>
+
+    <function model="account.move" name="action_post">
+        <value model="account.move" eval="obj().env.ref('certification_organism.sale_order_4').invoice_ids.ids"/>
+    </function>
+
+    <!-- Create Payment of invoice -->
+    <record id="certification_organism.account_payment_register_1" model="account.payment.register">
+        <field name="line_ids" model="account.move.line" eval="[Command.set([line.id for line in obj().env.ref('certification_organism.sale_order_1').invoice_ids.line_ids if line.account_type in ('asset_receivable', 'liability_payable')])]"/>
+    </record>
+    <function model="account.payment.register" name="action_create_payments" 
+            eval="[ref('certification_organism.account_payment_register_1')]"/>
+
+    <record id="certification_organism.account_payment_register_4" model="account.payment.register">
+        <field name="line_ids" model="account.move.line" eval="[Command.set([line.id for line in obj().env.ref('certification_organism.sale_order_4').invoice_ids.line_ids if line.account_type in ('asset_receivable', 'liability_payable')])]"/>
+    </record>
+    <function model="account.payment.register" name="action_create_payments" 
+            eval="[ref('certification_organism.account_payment_register_4')]"/>
+
+    <!-- Update Task -->
+    <!-- sale order sale_order_1 -->
+    <function model="project.task" name="write">
+        <value model="sale.order" eval="obj().env.ref('certification_organism.sale_order_1').tasks_ids.ids"/>
+        <value eval="{'user_ids': [ref('base.user_admin')], 'planned_date_begin': datetime.now() - relativedelta(days=1), 'date_deadline': datetime.now(), 'stage_id': ref('planning_project_stage_1'), 'tag_ids': [ref('certification_organism.project_tags_1')]}"/>
+    </function>
+    <function model="project.task" name="write">
+        <value model="sale.order" eval="obj().env.ref('certification_organism.sale_order_1').tasks_ids.ids"/>
+        <value eval="{'stage_id': ref('planning_project_stage_2')}"/>
+    </function>
+    <function model="project.task" name="write">
+        <value model="sale.order" eval="obj().env.ref('certification_organism.sale_order_1').tasks_ids.ids"/>
+        <value eval="{'stage_id': ref('planning_project_stage_3'), 'state': '1_done'}"/>
+    </function>
+
+    <!-- sale order sale_order_2 -->
+    <function model="project.task" name="write">
+        <value model="sale.order" eval="obj().env.ref('certification_organism.sale_order_2').tasks_ids.ids"/>
+        <value eval="{'user_ids': [ref('base.user_admin')], 'planned_date_begin': datetime.now() - relativedelta(days=1), 'date_deadline': datetime.now(), 'stage_id': ref('planning_project_stage_1'), 'tag_ids': [ref('certification_organism.project_tags_1')]}"/>
+    </function>
+
+    <!-- sale order sale_order_3 -->
+    <function model="project.task" name="write">
+        <value model="sale.order" eval="obj().env.ref('certification_organism.sale_order_3').tasks_ids.ids"/>
+        <value eval="{'user_ids': [ref('base.user_admin')], 'planned_date_begin': datetime.now() - relativedelta(days=1), 'date_deadline': datetime.now(), 'stage_id': ref('planning_project_stage_1'), 'tag_ids': [ref('certification_organism.project_tags_1'), ref('certification_organism.project_tags_2')]}"/>
+    </function>
+
+    <!-- sale order sale_order_4 -->
+    <function model="project.task" name="write">
+        <value model="sale.order" eval="obj().env.ref('certification_organism.sale_order_4').tasks_ids.ids"/>
+        <value eval="{'user_ids': [ref('base.user_admin')], 'planned_date_begin': datetime.now() - relativedelta(days=1), 'date_deadline': datetime.now(), 'stage_id': ref('planning_project_stage_1')}"/>
+    </function>
+    <function model="project.task" name="write">
+        <value model="sale.order" eval="obj().env.ref('certification_organism.sale_order_4').tasks_ids.ids"/>
+        <value eval="{'stage_id': ref('planning_project_stage_2')}"/>
+    </function>
+    <function model="project.task" name="write">
+        <value model="sale.order" eval="obj().env.ref('certification_organism.sale_order_4').tasks_ids.ids"/>
+        <value eval="{'stage_id': ref('planning_project_stage_3'), 'state': '1_done'}"/>
+    </function>
+
+    <!-- Rating of project task -->
+
+    <record id="rating_task_1" model="rating.rating">
+        <field name="access_token">SO0001_line_1</field>
+        <field name="res_model_id" ref="project.model_project_task"/>
+        <field name="res_id" model="sale.order.line" eval="obj().env.ref('certification_organism.sale_order_line_1').task_id.id"/>
+        <field name="partner_id" ref="certification_organism.res_partner_8"/>
+        <field name="rated_partner_id" ref="base.partner_admin"/>
+    </record>
+    <function model="project.task" name="rating_apply"
+            eval="([obj().env.ref('certification_organism.sale_order_line_1').task_id.id], 5, 'SO0001_line_1', None, 'Highly impressed with VoltCharge Innovations service! Emily and the team were both skilled and personable. The inspection was thorough, and I now have complete peace of mind about my charging stations safety. Kudos for a fantastic job!')"/>
+
+</odoo>
