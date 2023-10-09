@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <function model="sale.order" name="action_confirm">
+        <value eval="[
+            ref('sale_order_1'),
+            ref('sale_order_2'),
+            ref('sale_order_4'),
+            ref('sale_order_5'),
+            ref('sale_order_6'),
+            ref('sale_order_7'),
+            ref('sale_order_8'),
+            ref('sale_order_9')
+        ]"/>
+    </function>
+
+    <function name="button_validate" model="stock.picking">
+        <value model="stock.picking" eval="
+            obj().search([('picking_type_code', '=', 'internal'), ('id', 'in',
+                (
+                    obj().env.ref('coal_petroleum.sale_order_1') +
+                    obj().env.ref('coal_petroleum.sale_order_4')
+                ).procurement_group_id.stock_move_ids.picking_id.ids)
+            ]).ids"/>
+    </function>
+
+    <function name="create" model="x_quality_check_worksheet_template_1_studio">
+        <value model="x_quality_check_worksheet_template_1_studio" eval="dict(
+            obj().default_get(list(obj().fields_get())),
+            **{
+                'x_quality_check_id': obj().env.ref('coal_petroleum.sale_order_1').picking_ids[1].check_ids.id,
+                'x_test_type_1': 'arb',
+                'x_net_calorific_value': 11.0,
+                'x_ash_content': 11.0,
+                'x_moisture_content': 11.0,
+                'x_test_type': 11.0,
+                'x_total_sulphur': 11.0,
+                'x_flying_substance': 11.0,
+                'x_hardgrave_grindability_index': 11.0,
+            }
+        )"/>
+    </function>
+    <function name="create" model="x_quality_check_worksheet_template_1_studio">
+        <value model="x_quality_check_worksheet_template_1_studio" eval="dict(
+            obj().default_get(list(obj().fields_get())),
+            **{
+                'x_quality_check_id': obj().env.ref('coal_petroleum.sale_order_4').picking_ids[1].check_ids.id,
+                'x_test_type_1': 'arb',
+                'x_net_calorific_value': 20.0,
+                'x_ash_content': 20.0,
+                'x_moisture_content': 20.0,
+                'x_test_type': 20.0,
+                'x_total_sulphur': 20.0,
+                'x_flying_substance': 20.0,
+                'x_hardgrave_grindability_index': 20.0,
+            }
+        )"/>
+    </function>
+
+    <function name="do_pass" model="quality.check">
+        <value model="quality.check" eval="
+            obj().search([('picking_id', 'in',(
+                obj().env.ref('coal_petroleum.sale_order_1') +
+                obj().env.ref('coal_petroleum.sale_order_4')
+            ).picking_ids.ids)]).ids"/>
+    </function>
+
+    <function name="button_validate" model="stock.picking">
+        <value model="stock.picking" eval="
+            obj().search([('picking_type_code', '=', 'outgoing'), ('id', 'in',
+                (
+                    obj().env.ref('coal_petroleum.sale_order_1') +
+                    obj().env.ref('coal_petroleum.sale_order_4')
+                ).picking_ids.ids)
+            ]).ids"/>
+    </function>
+
+    <function name="_create_invoices" model="sale.order">
+        <value eval="[ref('sale_order_1'), ref('sale_order_4')]"/>
+    </function>
+
+    <function name="action_post" model="account.move">
+        <value model="sale.order" eval="
+            (
+                obj().env.ref('coal_petroleum.sale_order_1') +
+                obj().env.ref('coal_petroleum.sale_order_4')
+            ).invoice_ids.ids
+        "/>
+    </function>
+</odoo>
