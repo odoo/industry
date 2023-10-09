@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="calculated_qty_on_transfer_server_action" model="ir.actions.server">
+        <field name="name">Calculated Qty on Transfer - Server Actions</field>
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="state">code</field>
+        <field name="base_automation_id" ref="calculated_qty_on_transfer"/>
+        <field name="code">
+            <![CDATA[
+                record.write({
+                    'x_allowed_quantity': record.product_uom_qty - (record.product_uom_qty * record.x_po_tolerance_1)
+                })
+            ]]>
+        </field>
+    </record>
+    <record id="restrict_po_tolerance_server_action" model="ir.actions.server">
+        <field name="name">Restrict Po Tolerance - Server Actions</field>
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="state">code</field>
+        <field name="base_automation_id" ref="restrict_po_tolerance"/>
+        <field name="code">
+            <![CDATA[
+                if not (0.0 <= record.x_po_tolerance_1 < 1.0):
+                    raise UserError(f'Tolerance must be between 0% and 100%')
+            ]]>
+        </field>
+    </record>
+    <record id="restrict_x_tolerance_server_action" model="ir.actions.server">
+        <field name="name">Restrict Tolerance - Server Actions</field>
+        <field name="model_id" ref="purchase.model_purchase_order_line"/>
+        <field name="state">code</field>
+        <field name="base_automation_id" ref="restrict_x_tolerance"/>
+        <field name="code">
+            <![CDATA[
+                if not (0.0 <= record.x_tolerance < 1.0):
+                    raise UserError(f'Tolerance must be between 0% and 100%')
+            ]]>
+        </field>
+    </record>
+</odoo>
