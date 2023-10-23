@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <function model="purchase.order" name="button_confirm" eval="[[ref('purchase_order_1'),
+        ref('purchase_order_2'),
+        ref('purchase_order_3'),
+        ref('purchase_order_4'),
+        ref('purchase_order_5'),
+        ref('purchase_order_6'),
+        ref('purchase_order_7'),
+        ref('purchase_order_8'),
+        ref('purchase_order_9'),
+        ref('purchase_order_11'),
+        ref('purchase_order_12'),
+        ref('purchase_order_13'),
+        ref('purchase_order_14'),
+        ref('purchase_order_15'),
+        ref('purchase_order_16'),
+        ref('purchase_order_17'),
+        ref('purchase_order_18'),
+        ref('purchase_order_19'),
+        ref('purchase_order_20')
+        ]]"/>
+    <function model="stock.picking" name="button_validate">
+        <value model="stock.picking" eval="(
+        obj().env.ref('clothing_boutique.purchase_order_1') +
+        obj().env.ref('clothing_boutique.purchase_order_2') +
+        obj().env.ref('clothing_boutique.purchase_order_3') +
+        obj().env.ref('clothing_boutique.purchase_order_4') +
+        obj().env.ref('clothing_boutique.purchase_order_5') +
+        obj().env.ref('clothing_boutique.purchase_order_6') +
+        obj().env.ref('clothing_boutique.purchase_order_7') +
+        obj().env.ref('clothing_boutique.purchase_order_8') +
+        obj().env.ref('clothing_boutique.purchase_order_9') +
+        obj().env.ref('clothing_boutique.purchase_order_11') +
+        obj().env.ref('clothing_boutique.purchase_order_12') +
+        obj().env.ref('clothing_boutique.purchase_order_13') +
+        obj().env.ref('clothing_boutique.purchase_order_14') +
+        obj().env.ref('clothing_boutique.purchase_order_15') +
+        obj().env.ref('clothing_boutique.purchase_order_16') +
+        obj().env.ref('clothing_boutique.purchase_order_17') +
+        obj().env.ref('clothing_boutique.purchase_order_18') +
+        obj().env.ref('clothing_boutique.purchase_order_19') +
+        obj().env.ref('clothing_boutique.purchase_order_20')
+        ).picking_ids.ids"/>
+    </function>
+    <function model="purchase.order" name="action_create_invoice" eval="[[ref('purchase_order_1'), ref('purchase_order_8')]]"/>
+    <function name="write" model="account.move">
+        <value model="account.move" eval="(
+            obj().env.ref('clothing_boutique.purchase_order_1') + obj().env.ref('clothing_boutique.purchase_order_8')
+            ).invoice_ids.ids"/>
+        <value eval="{'invoice_date': DateTime.now()}"/>
+    </function>
+    <function name="action_post" model="account.move">
+        <value model="account.move" eval="(
+            obj().env.ref('clothing_boutique.purchase_order_1') + obj().env.ref('clothing_boutique.purchase_order_8')
+            ).invoice_ids.ids"/>
+    </function>
+    <record id="account_payment_register_1" model="account.payment.register">
+        <field name="line_ids" model="account.move.line" eval="[Command.set([line.id for line in obj().env.ref('clothing_boutique.purchase_order_1').invoice_ids.line_ids if line.account_type in ('asset_receivable', 'liability_payable')])]"/>
+    </record>
+    <record id="account_payment_register_2" model="account.payment.register">
+        <field name="line_ids" model="account.move.line" eval="[Command.set([line.id for line in obj().env.ref('clothing_boutique.purchase_order_8').invoice_ids.line_ids if line.account_type in ('asset_receivable', 'liability_payable')])]"/>
+    </record>
+    <function model="account.payment.register" name="action_create_payments" eval="[ref('account_payment_register_1')]"/>
+    <function model="account.payment.register" name="action_create_payments" eval="[ref('account_payment_register_2')]"/>
+</odoo>
