@@ -28,7 +28,6 @@ The typical sale is a 1 year Oracle Databbase license that is purchased to Oracl
         'data/uom_category.xml',
         'data/uom_uom.xml',
         'data/planning_role.xml',
-        'data/product_template.xml',
         'data/product_product.xml',
         'data/sale_subscription_plan.xml',
         'data/sale_order_template.xml',
