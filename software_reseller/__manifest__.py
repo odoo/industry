@@ -34,7 +34,6 @@ The typical sale is a 1 year Oracle Databbase license that is purchased to Oracl
         'data/sale_order_template_line.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
-        'data/knowledge_article_member.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -43,8 +42,6 @@ The typical sale is a 1 year Oracle Databbase license that is purchased to Oracl
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
         'demo/project_task.xml',
-        'demo/purchase_order.xml',
-        'demo/purchase_order_line.xml',
         'demo/purchase_order_confirm.xml',
         'demo/planning_slot.xml',
     ],
