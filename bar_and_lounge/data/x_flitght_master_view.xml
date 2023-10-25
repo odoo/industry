@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="view_x_flight_master_tree" model="ir.ui.view">
+        <field name="name">x_flight_master.tree</field>
+        <field name="model">x_flight_master</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="x_sequence" widget="handle" />
+                <field name="x_name" string="Flight Name"/>
+                <field name="x_operators" optional="show" options="{'color_field': 'x_color'}" string="Operators Name" widget="many2many_tags" />
+            </tree>
+        </field>
+    </record>
+    <record id="view_x_flight_master_search" model="ir.ui.view">
+        <field name="name">x_flight_master.search</field>
+        <field name="model">x_flight_master</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="x_name" />
+                <separator />
+                <filter string="Archived" name="archived_x_flight_master" domain="[['x_active', '=', False]]" />
+                <separator />
+            </search>
+        </field>
+    </record>
+    <record id="view_x_flight_master_form" model="ir.ui.view">
+        <field name="name">x_flight_master.form</field>
+        <field name="model">x_flight_master</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <header />
+                <sheet string="Flight Master">
+                    <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active == True" />
+                    <field name="x_active" invisible="1" />
+                    <field name="x_avatar_image" widget="image" class="oe_avatar ml-3 mr-3" string="Flight Image" options="{'size':[0,90]}" />
+                    <div class="oe_title">
+                        <h1>
+                            <field name="x_name" required="1" placeholder="Name..." />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="x_operators" widget="many2many_tags" required="1" string="Operators" help="Airline who operates this flight" options="{'no_create': true, 'color_field': 'x_color'}" />
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter" name="oe_chatter">
+                    <field name="message_follower_ids" />
+                    <field name="message_ids" />
+                    <field name="activity_ids" />
+                </div>
+            </form>
+        </field>
+    </record>
+</odoo>
