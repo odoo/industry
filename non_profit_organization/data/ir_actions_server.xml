@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="ir_act_server_711" model="ir.actions.server">
+        <field name="name">Update pricelist of customer with ongoing membership subscription</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+PRICELIST_ID = env.ref('non_profit_organization.product_pricelist_1').id
+record.partner_id.write({'property_product_pricelist': PRICELIST_ID })
+]]></field>
+    </record>
+    <record id="ir_act_server_712" model="ir.actions.server">
+        <field name="name">Update pricelist of customer with closing subscription</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+PRICELIST_ID = env['product.pricelist'].search([('id', '!=', env.ref('non_profit_organization.product_pricelist_1').id), ('company_id', '=', record.company_id.id)], limit=1).id
+record.partner_id.write({'property_product_pricelist': PRICELIST_ID })
+]]></field>
+    </record>
+</odoo>
