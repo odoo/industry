@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="view_sale_order_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.bar_and_lounge</field>
+        <field name="model">sale.order</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="mode">extension</field>
+        <field name="priority">160</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='partner_shipping_id']" position="after">
+                    <field name="x_service_type_id" required="1" string="Service Type" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit': True}" />
+                    <field name="x_sector_of_travel" required="1" string="Sector of Travel" options="{'no_quick_create': True}" />
+                </xpath>
+                <xpath expr="//form[1]/sheet[1]/group[@name='sale_header']/group[@name='order_details']/div[2]/label[1]" position="attributes">
+                    <attribute name="string">Booking Date</attribute>
+                </xpath>
+                <xpath expr="//field[@name='payment_term_id']" position="after">
+                    <field name="x_from_airport_id" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit': True}" required="1" string="From Airport" />
+                    <field name="x_to_airport_id" required="1" string="To Airport" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit': True}" />
+                    <field name="x_airline_id" required="1" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit': True}" string="Arrival Airline" />
+                    <field name="x_flight_no" required="1" string="Flight No" />
+                    <field name="x_service_date_time" string="Service Date &amp; Time" readonly="state == 'sale'" />
+                </xpath>
+                <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+                    <page string="Guest Details" name="guest_details">
+                        <field name="x_guest_detail_ids">
+                            <tree editable="top" multi_edit="True">
+                                <field name="x_type_of_guest" optional="show" required="1" />
+                                <field optional="show" name="x_guest_gender" string="Gender" required="1" />
+                                <field name="x_guest_name" optional="show" required="1" />
+                                <field name="x_age" optional="show" required="1" />
+                                <field name="x_travel_date" optional="show" required="1" />
+                                <field optional="show" name="x_order_referance" string="Order Referance" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit': True}" />
+                            </tree>
+                            <form>
+                                <sheet string="Guest Detail">
+                                    <group>
+                                        <field name="x_type_of_guest" string="Type of Guest" help="Selection of Guest Type" required="1" />
+                                        <field name="x_guest_gender" string="Gender" help="Gender of Guest" required="1" />
+                                        <field name="x_guest_name" string="Guest Name" help="Name of the Guest" required="1" />
+                                        <field name="x_age" string="Age" required="1" />
+                                        <field name="x_travel_date" string="Travel Date" help="Date of travel" required="1" />
+                                    </group>
+                                </sheet>
+                            </form>
+                        </field>
+                    </page>
+                </xpath>
+            </data>
+        </field>
+    </record>
+</odoo>
