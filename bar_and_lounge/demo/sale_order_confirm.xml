@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!-- update sale order stages -->
+    <function model="sale.order" name="action_quotation_sent" eval="[[
+            ref('sale_order_1'),
+            ref('sale_order_4'),
+            ref('sale_order_8'),
+        ]]"
+    />
+
+    <function model="sale.order" name="action_confirm" eval="[[
+        ref('sale_order_2'),
+        ref('sale_order_3'),
+        ref('sale_order_5'),
+        ref('sale_order_9'),
+        ref('sale_order_10')]]"
+    />
+
+    <!-- create invoices -->
+    <record id="sale_advance_payment_inv_1" model="sale.advance.payment.inv">
+        <field name="advance_payment_method" >delivered</field>
+        <field name="sale_order_ids" eval="[Command.set([ref('sale_order_2')])]"/>
+    </record>
+    <function model="sale.advance.payment.inv" name="create_invoices"
+            eval="[ref('sale_advance_payment_inv_1')]"/>
+
+    <record id="sale_advance_payment_inv_2" model="sale.advance.payment.inv">
+        <field name="advance_payment_method" >delivered</field>
+        <field name="sale_order_ids" eval="[Command.set([ref('sale_order_3')])]"/>
+    </record>
+    <function model="sale.advance.payment.inv" name="create_invoices"
+            eval="[ref('sale_advance_payment_inv_2')]"/>
+
+    <record id="sale_advance_payment_inv_3" model="sale.advance.payment.inv">
+        <field name="advance_payment_method" >delivered</field>
+        <field name="sale_order_ids" eval="[Command.set([ref('sale_order_5')])]"/>
+    </record>
+    <function model="sale.advance.payment.inv" name="create_invoices"
+            eval="[ref('sale_advance_payment_inv_3')]"/>
+
+    <record id="sale_advance_payment_inv_4" model="sale.advance.payment.inv">
+        <field name="advance_payment_method" >delivered</field>
+        <field name="sale_order_ids" eval="[Command.set([ref('sale_order_9')])]"/>
+    </record>
+    <function model="sale.advance.payment.inv" name="create_invoices"
+            eval="[ref('sale_advance_payment_inv_4')]"/>
+
+    <record id="sale_advance_payment_inv_5" model="sale.advance.payment.inv">
+        <field name="advance_payment_method" >delivered</field>
+        <field name="sale_order_ids" eval="[Command.set([ref('sale_order_10')])]"/>
+    </record>
+    <function model="sale.advance.payment.inv" name="create_invoices"
+            eval="[ref('sale_advance_payment_inv_5')]"/>
+
+    <!-- confirm invoices -->
+    <function model="account.move" name="action_post">
+        <value model="account.move" eval="[
+            obj().env.ref('bar_and_lounge.sale_order_2').invoice_ids.id,
+            obj().env.ref('bar_and_lounge.sale_order_3').invoice_ids.id,
+            obj().env.ref('bar_and_lounge.sale_order_5').invoice_ids.id,
+            obj().env.ref('bar_and_lounge.sale_order_9').invoice_ids.id,
+            obj().env.ref('bar_and_lounge.sale_order_10').invoice_ids.id
+        ]"/>
+    </function>
+
+    <!-- create payment -->
+    <record id="account_payment_register_1" model="account.payment.register">
+        <field name="line_ids" model="account.move.line" eval="[Command.set([line.id for line in obj().env.ref('bar_and_lounge.sale_order_2').invoice_ids.line_ids if line.account_type in ('asset_receivable', 'liability_payable')])]"/>
+    </record>
+    <function model="account.payment.register" name="action_create_payments"
+            eval="[ref('account_payment_register_1')]"/>
+
+    <record id="account_payment_register_2" model="account.payment.register">
+        <field name="line_ids" model="account.move.line" eval="[Command.set([line.id for line in obj().env.ref('bar_and_lounge.sale_order_3').invoice_ids.line_ids if line.account_type in ('asset_receivable', 'liability_payable')])]"/>
+    </record>
+    <function model="account.payment.register" name="action_create_payments"
+            eval="[ref('account_payment_register_2')]"/>
+
+    <record id="account_payment_register_3" model="account.payment.register">
+        <field name="line_ids" model="account.move.line" eval="[Command.set([line.id for line in obj().env.ref('bar_and_lounge.sale_order_5').invoice_ids.line_ids if line.account_type in ('asset_receivable', 'liability_payable')])]"/>
+    </record>
+    <function model="account.payment.register" name="action_create_payments"
+            eval="[ref('account_payment_register_3')]"/>
+
+    <record id="account_payment_register_4" model="account.payment.register">
+        <field name="line_ids" model="account.move.line" eval="[Command.set([line.id for line in obj().env.ref('bar_and_lounge.sale_order_9').invoice_ids.line_ids if line.account_type in ('asset_receivable', 'liability_payable')])]"/>
+    </record>
+    <function model="account.payment.register" name="action_create_payments"
+            eval="[ref('account_payment_register_4')]"/>
+
+    <record id="account_payment_register_5" model="account.payment.register">
+        <field name="line_ids" model="account.move.line" eval="[Command.set([line.id for line in obj().env.ref('bar_and_lounge.sale_order_10').invoice_ids.line_ids if line.account_type in ('asset_receivable', 'liability_payable')])]"/>
+    </record>
+    <function model="account.payment.register" name="action_create_payments"
+            eval="[ref('account_payment_register_5')]"/>
+</odoo>
