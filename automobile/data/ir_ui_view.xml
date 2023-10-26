@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="view_x_brands_form" model="ir.ui.view">
+        <field name="name">x_brands.form</field>
+        <field name="model">x_brands</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet string="Brands">
+                    <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active == True" />
+                    <field name="x_active" invisible="1"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="x_name" required="1" placeholder="Name..."/>
+                        </h1>
+                    </div>
+                </sheet>
+                <div class="oe_chatter" name="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                    <field name="activity_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="view_x_brands_tree" model="ir.ui.view">
+        <field name="name">x_brands.tree</field>
+        <field name="model">x_brands</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="x_sequence" widget="handle"/>
+                <field name="x_name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_x_brands_search" model="ir.ui.view">
+        <field name="name">x_brands.search</field>
+        <field name="model">x_brands</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="x_name"/>
+                <separator/>
+                <filter string="Archived" name="archived_x_brands" domain="[['x_active', '=', False]]"/>
+                <separator/>
+            </search>
+        </field>
+    </record>
+    <record id="product_template_only_form_view_inherit_automobile" model="ir.ui.view">
+        <field name="name">product.template.product.form.inherit.automobile</field>
+        <field name="model">product.template</field>
+        <field name="priority">160</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='default_code']" position="attributes">
+                    <attribute name="string">Part Number</attribute>
+                </xpath>
+                <xpath expr="//field[@name='barcode']" position="attributes">
+                    <attribute name="string">UPC / EAN Code</attribute>
+                </xpath>
+                <xpath expr="//field[@name='barcode']" position="after">
+                    <field name="x_oem_no"/>
+                </xpath>
+                <xpath expr="//field[@name='product_tag_ids']" position="after">
+                    <field name="x_brands" string="Brands" widget="many2many_tags"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="product_search_form_view_stock_report_inherit_automobile" model="ir.ui.view">
+        <field name="name">product.product.search.stock.form.stock.report.inherit.automobile</field>
+        <field name="model">product.product</field>
+        <field name="priority">99</field>
+        <field name="inherit_id" ref="stock.product_search_form_view_stock_report"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='product_template_attribute_value_ids']" position="replace">
+                    <field name="product_tag_ids"/>
+                    <field name="all_product_tag_ids"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="view_stock_move_line_detailed_operation_tree_inherit_automobile" model="ir.ui.view">
+        <field name="name">stock.move.line.operations.tree.inherit.automobile</field>
+        <field name="model">stock.move.line</field>
+        <field name="type">tree</field>
+        <field name="mode">extension</field>
+        <field name="priority">99</field>
+        <field name="inherit_id" ref="stock.view_move_line_tree"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='location_dest_id']" position="after">
+                    <field optional="hide" name="x_expiry_date" string="Expiry Date"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="view_stock_move_tree_inherit_automobile" model="ir.ui.view">
+        <field name="name">stock.move.tree.inherit.automobile</field>
+        <field name="model">stock.move</field>
+        <field name="type">tree</field>
+        <field name="mode">extension</field>
+        <field name="inherit_id" ref="stock.view_move_tree"/>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='location_dest_id']" position="after">
+                    <field optional="show" name="x_expiry_date" invisible="1" readonly ="1" string="Expiry Date"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+</odoo>
