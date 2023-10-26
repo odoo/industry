@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="update_the_warranty__f6563e1c-89cd-4350-b2c5-0558e726fded" model="ir.actions.server">
+        <field name="name">update the Warranty Date</field>
+        <field name="model_id" ref="stock.model_stock_move_line"/>
+        <field name="state">code</field>
+        <field name="base_automation_id" ref="automobile.update_the_warranty"/>
+        <field name="code"><![CDATA[
+move_lines = records.search([("state", "=", "done"), ("picking_code", "=", "outgoing")])
+records.write({
+    'x_warranty_date': datetime.datetime.today() + datetime.timedelta(record.product_id.expiration_time)
+})
+        ]]></field>
+    </record>
+</odoo>
