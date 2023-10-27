@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="action_lead_survey_start" model="ir.actions.server">
+        <field name="name">lead survey start</field>
+        <field name="model_id" ref = "crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if len(records) > 1:
+    raise UserError("Only start survey for one Lead/Opportunity.")
+if records.x_studio_answer:
+    raise UserError("Survey alrady done, You can create new Lead/Opportunity and take new survey.")
+if not records.x_studio_survey:
+    raise UserError("Survey not selected.")
+
+user_input = records.x_studio_survey._create_answer(user=env.user)
+records.write({'x_studio_answer': user_input.id})
+action = {
+    'type': 'ir.actions.act_url',
+    'name': "Survey",
+    'target': 'new',
+    'url': user_input.get_start_url()
+}]]></field>
+    </record>
+</odoo>

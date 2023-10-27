@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="agriculture.odoo_studio_account__8a0ace7d-f9e4-4599-b5c8-006667d461e2" model="ir.ui.view">
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="mode">extension</field>
+        <field name="model">account.move</field>
+        <field name="name">Odoo Studio: account.move.form customization</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='aml_tab']/field[@name='line_ids']/tree[1]/field[@name='account_id']" position="after">
+                <field optional="show" name="x_studio_product_story" widget="image" string="Product Story"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="agriculture.odoo_studio_crm_lead_3ec59e42-1e61-4b73-b8dd-76c2673f10e0" model="ir.ui.view">
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="mode">extension</field>
+        <field name="model">crm.lead</field>
+        <field name="name">Odoo Studio: crm.lead.form customization</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='stage_id']" position="after">
+                <button name="%(action_lead_survey_start)d" string="Survey Start" class="btn btn-primary" type="action" invisible="x_studio_answer != False"/>
+            </xpath>
+            <xpath expr="//form[1]/sheet[1]/group[1]/group[not(@name)][1]/field[@name='tag_ids']" position="after">
+                <field name="x_studio_survey" string="Survey"/>
+                <field name="x_studio_answer" string="Answer" invisible="x_studio_answer == False" force_save="True" readonly="1" options="{&quot;no_create&quot;:true,&quot;no_quick_create&quot;:true,&quot;no_create_edit&quot;:true}"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="agriculture.odoo_studio_product__1213461a-4c6c-40d4-b5aa-4fc0dcf2d4eb" model="ir.ui.view">
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="mode">extension</field>
+        <field name="model">product.template</field>
+        <field name="name">Odoo Studio: product.template.product.form customization</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='uom_po_id']" position="after">
+                <field widget="image" name="x_studio_binary_field_5i7_1h7fiidlo" string="Product Making Story - QR Code "/>
+            </xpath>
+        </field>
+    </record>
+    <record id="agriculture.odoo_studio_stock_pi_2610a694-e60c-4d7b-be2d-721bc7be6b1e" model="ir.ui.view">
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="mode">extension</field>
+        <field name="model">stock.picking</field>
+        <field name="name">Odoo Studio: stock.picking.form customization</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='move_line_ids_without_package']" position="inside">
+                <tree editable="bottom" decoration-muted="(state == 'done' and is_locked == True)">
+                    <field name="product_id" required="1" context="{'default_detailed_type': 'product'}" readonly="state == 'done' or move_id != False"/>
+                    <field name="company_id" invisible="1"/>
+                    <field name="move_id" invisible="1"/>
+                    <field name="picking_id" invisible="1"/>
+                    <field name="product_uom_category_id" invisible="1"/>
+                    <field name="package_id" invisible="1"/>
+                    <field name="result_package_id" invisible="1"/>
+                    <field name="location_id" invisible="1"/>
+                    <field name="location_dest_id" invisible="1"/>
+                    <field name="location_id" options="{'no_create': True}" column_invisible="parent.picking_type_code == 'incoming'" groups="stock.group_stock_multi_locations" domain="[('id', 'child_of', parent.location_id), '|', ('company_id', '=', False), ('company_id', '=', company_id), ('usage', '!=', 'view')]"/>
+                    <field name="location_dest_id" options="{'no_create': True}" column_invisible="parent.picking_type_code == 'incoming'" groups="stock.group_stock_multi_locations" domain="[('id', 'child_of', parent.location_dest_id), '|', ('company_id', '=', False), ('company_id', '=', company_id), ('usage', '!=', 'view')]"/>
+                    <field name="package_id" groups="stock.group_tracking_lot"/>
+                    <field name="result_package_id" groups="stock.group_tracking_lot"/>
+                    <field name="lots_visible" invisible="1"/>
+                    <field name="owner_id" groups="stock.group_tracking_owner" column_invisible="parent.picking_type_code == 'incoming'"/>
+                    <field name="state" invisible="1"/>
+                    <field name="lot_id" groups="stock.group_production_lot" column_invisible="parent.show_lots_text == True" invisible="lots_visible == False" context="{'default_product_id': product_id, 'default_company_id': company_id, 'active_picking_id': picking_id}" optional="show"/>
+                    <field name="is_expired" invisible="1"/>
+                    <button class="fa fa-exclamation-triangle text-danger" title="This lot is expired." string="This lot is expired" disabled="1" invisible="is_expired == False"/>
+                    <field name="lot_name" groups="stock.group_production_lot" column_invisible="parent.show_lots_text == True" invisible="lots_visible == False" context="{'default_product_id': product_id}"/>
+                    <field name="picking_type_use_existing_lots" invisible="1"/>
+                    <field name="expiration_date" force_save="1" readonly="picking_type_use_existing_lots == True"/>
+                    <field name="is_locked" invisible="1"/>
+                    <field name="product_uom_id" force_save="1" readonly="state != 'draft' and id != False" groups="uom.group_uom"/>
+                </tree>
+            </xpath>
+        </field>
+    </record>
+</odoo>
