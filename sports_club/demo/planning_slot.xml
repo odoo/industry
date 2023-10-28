@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="planning_slot_morning" model="planning.slot">
+        <field name="name">Morning Shift</field>
+        <field name="role_id" ref="planning_role_1"/>
+        <field name="work_address_id" ref="base.main_partner" />
+        <field name="start_datetime" model="res.users" eval="
+            pytz.timezone(obj().env.ref('base.user_admin').tz or 'UTC').localize(
+                DateTime.today().date() + relativedelta(hour=8)
+            ).astimezone(pytz.UTC).replace(tzinfo=None)
+        "/>
+        <field name="end_datetime" model="res.users" eval="
+            pytz.timezone(obj().env.ref('base.user_admin').tz or 'UTC').localize(
+                DateTime.today().date() + relativedelta(hour=16)
+            ).astimezone(pytz.UTC).replace(tzinfo=None)
+        "/>
+        <field name="repeat" eval="True"/>
+        <field name="repeat_interval">1</field>
+        <field name="repeat_unit">day</field>
+    </record>
+
+    <record id="planning_slot_afternoon" model="planning.slot">
+        <field name="name">Afternoon Shift</field>
+        <field name="role_id" ref="planning_role_1"/>
+        <field name="work_address_id" ref="base.main_partner" />
+        <field name="start_datetime" model="res.users" eval="
+            pytz.timezone(obj().env.ref('base.user_admin').tz or 'UTC').localize(
+                DateTime.today().date() + relativedelta(hour=16)
+            ).astimezone(pytz.UTC).replace(tzinfo=None)
+        "/>
+        <field name="end_datetime" model="res.users" eval="
+            pytz.timezone(obj().env.ref('base.user_admin').tz or 'UTC').localize(
+                DateTime.today().date() + relativedelta(hour=23)
+            ).astimezone(pytz.UTC).replace(tzinfo=None)
+        "/>
+        <field name="repeat" eval="True"/>
+        <field name="repeat_interval">1</field>
+        <field name="repeat_unit">day</field>
+    </record>
+
+</odoo>
