@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <function model="sale.order" name="action_confirm">
+        <value eval="[
+            ref('electronic_store.sale_order_2'),
+            ref('electronic_store.sale_order_3'),
+            ref('electronic_store.sale_order_4'),
+            ref('electronic_store.sale_order_5'),
+            ref('electronic_store.sale_order_8'),
+            ref('electronic_store.sale_order_9'),
+            ref('electronic_store.sale_order_10'),
+            ref('electronic_store.sale_order_11')
+        ]" />
+    </function>
+
+    <!-- <function name="do_pass" model="quality.check">
+        <value model="quality.check" eval="
+            obj().search([('picking_id', 'in',(
+                bj().env.ref('electronic_store.sale_order_5') +
+                obj().env.ref('electronic_store.sale_order_2') +
+                obj().env.ref('electronic_store.sale_order_10') +
+                obj().env.ref('electronic_store.sale_order_11') +
+                obj().env.ref('electronic_store.sale_order_9')
+            ).picking_ids.ids)]).ids"/>
+    </function> -->
+
+    <function name="button_validate" model="stock.picking"  context="{'skip_sms': True}">
+        <value model="stock.picking" eval="(
+            obj().env.ref('electronic_store.sale_order_5') +
+            obj().env.ref('electronic_store.sale_order_2') +
+            obj().env.ref('electronic_store.sale_order_10') +
+            obj().env.ref('electronic_store.sale_order_11') +
+            obj().env.ref('electronic_store.sale_order_9')
+        ).picking_ids.ids"/>
+    </function>
+    <!-- found extra stock.picking.line -->
+    <!-- ref('electronic_store.sale_order_8') + -->
+    <!-- ref('electronic_store.sale_order_4') +  -->
+    <!-- ref('electronic_store.sale_order_3') + --> 
+
+    <function name="_create_invoices" model="sale.order">
+        <value eval="[
+            ref('electronic_store.sale_order_2'),
+            ref('electronic_store.sale_order_5')
+        ]"/>
+    </function>
+
+    <!-- in sale_order_5 account.move.line doesnt have extented warranty -->
+
+
+    <function name="action_post" model="account.move">
+        <value model="sale.order" eval="
+            (
+                obj().env.ref('electronic_store.sale_order_2')
+            ).invoice_ids.ids
+        "/>
+    </function>
+
+</odoo>
