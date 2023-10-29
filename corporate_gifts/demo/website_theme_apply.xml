@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <function model="ir.module.module" name="_theme_load" context="{'apply_new_theme': True}">
+        <value model="ir.module.module" eval="obj().env['ir.module.module'].search([('name', '=', 'theme_enark')]).ids"/>
+        <value  model="ir.module.module" eval="obj().env.ref('website.default_website')"/>
+    </function>
+
+    <function model="web_editor.assets" name="make_scss_customization" context="{'website_id': ref('website.default_website')}">
+        <value eval="'/website/static/src/scss/options/colors/user_color_palette.scss'"/>
+        <value eval="{
+                'o-color-1': '#0A58CA',
+                'o-color-2': '#d2b58a',
+                'o-color-3': '#f0f2f5',
+                'o-color-4': '#FFFFFF',
+                'o-color-5': '#141f2e',
+                'menu': 1,
+                'o-cc1-text': '&quot;o-color-5&quot;',
+                'o-cc1-btn-primary': '&quot;o-color-1&quot;',
+                'o-cc3-btn-secondary': '&quot;o-color-1&quot;',
+                'o-cc1-btn-secondary': '&quot;o-color-4&quot;',
+                'o-cc1-btn-secondary-border': '&quot;o-color-5&quot;'
+                }"/>
+    </function>
+
+    <function model="ir.ui.view" name="write">
+        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('website.default_website').id).viewref('website.homepage').ids"/>
+        <value model="ir.ui.view" eval="{'arch': obj().env.ref('corporate_gifts.homepage').arch}"/>
+    </function>
+
+    <function model="ir.ui.view" name="write">
+        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('website.default_website').id).viewref('website.contactus').id"/>
+        <value model="ir.ui.view" eval="{'arch': obj().env.ref('corporate_gifts.contactus').arch}"/>
+    </function>
+    <function model="website.menu" name="write">
+        <value model="website.menu" eval="obj().search([
+            ('website_id', '=', ref('website.default_website')),
+            ('url', '=', '/contactus'),
+        ]).id"/>
+        <value eval="{'name': 'Request a Quote'}"/>
+    </function>
+</odoo>

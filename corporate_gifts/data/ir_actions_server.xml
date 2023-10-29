@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="action_server_set_serigraphy_task" model="ir.actions.server" >
+        <field name="name">Set Serigraphy Task Ready when Logo Received</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="base_automation_id" ref="automation_set_serigraphy_task"/>
+        <field name="code"><![CDATA[
+for record in records:
+    tasks = record.sale_order_id.tasks_ids.filtered(lambda r: r.project_id.id == env.ref('corporate_gifts.project_project_2').id and r.stage_id == env.ref('corporate_gifts.project_task_type_5'))
+    tasks.write({
+        'stage_id': env.ref('corporate_gifts.project_task_type_6').id,
+        'state':'03_approved'
+    })
+]]></field>
+    </record>
+</odoo>
