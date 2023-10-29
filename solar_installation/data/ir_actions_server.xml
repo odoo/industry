@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="ir_act_server_1017" model="ir.actions.server">
+        <field name="name">Update warranty date on serial number - Server Action</field>
+        <field name="model_id" ref="stock.model_stock_move_line"/>
+        <field name="state">code</field>
+        <field name="base_automation_id" ref="base_automation_4"/>
+        <field name="code"><![CDATA[
+move_lines = env["stock.move.line"].search([("state", "=", "done"), ("picking_code", "=", "outgoing"), ("lot_id.x_warranty_date", "!=", False)])
+for line in move_lines:
+    line.lot_id.write({'x_warranty_date': datetime.datetime.today() + datetime.timedelta(line.product_id.expiration_time)})
+        ]]></field>
+    </record>
+</odoo>
