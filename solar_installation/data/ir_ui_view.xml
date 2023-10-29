@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="report_custom_x_project_task_worksheet_template_1" model="ir.ui.view">
+        <field name="name">x_project_task_worksheet_template_1_studio</field>
+        <field name="type">qweb</field>
+        <field name="arch" type="xml">
+            <t t-name="x_project_task_worksheet_template_1">
+                <div>
+                    <div class="row" style="page-break-inside: avoid">
+                        <div class="col-6" style="page-break-inside: avoid">
+                            <div class="row mb-3" style="page-break-inside: avoid">
+                                <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">Customer</div>
+                                <div string="Customer" t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-7 col-12'" t-field="worksheet.x_customer"/>
+                            </div>
+                            <div class="row mb-3" style="page-break-inside: avoid">
+                                <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">Sales Order No.</div>
+                                <div string="Sales Order No." t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-7 col-12'" t-field="worksheet.x_sales_order_no"/>
+                            </div>
+                            <div class="row mb-3" style="page-break-inside: avoid">
+                                <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">Task</div>
+                                <div string="Task" t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-7 col-12'" t-field="worksheet.x_project_task_id"/>
+                            </div>
+                        </div>
+                        <div class="col-6" style="page-break-inside: avoid">
+                            <div class="row mb-3" style="page-break-inside: avoid">
+                                <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">kW plan</div>
+                                <div string="kW plan" t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-7 col-12'" t-field="worksheet.x_kw_plan"/>
+                            </div>
+                            <div class="row mb-3" style="page-break-inside: avoid">
+                                <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">Date</div>
+                                <div string="Date" t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-7 col-12'" t-field="worksheet.x_date"/>
+                            </div>
+                            <div class="row mb-3" style="page-break-inside: avoid">
+                                <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">Completion Date &amp; Time</div>
+                                <div string="Completion Date &amp; Time" t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-7 col-12'" t-field="worksheet.x_completion_date_time"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </field>
+    </record>
+    <record id="helpdesk_ticket_form" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.form.customization</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
+        <field name="mode">extension</field>
+        <field name="priority">800</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+                <xpath expr="//field[@name='email_cc']" position="after">
+                    <field name="product_id"/>
+                    <field name="lot_id"/>
+                    <field name="x_warranty_end_date"/>
+                </xpath>
+        </field>
+    </record>
+    <record id="stock_pr_lot_form" model="ir.ui.view">
+        <field name="name">stock.production.lot.form.customization</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="mode">extension</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='removal_date']" position="after">
+                    <field name="x_warranty_date"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="x_project_task_worksheet_template_1_ir_ui_view_1" model="ir.ui.view">
+        <field name="name">template_view_Default_Worksheet</field>
+        <field name="model">x_project_task_worksheet_template_1_studio</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form create="false" duplicate="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="x_customer"/>
+                            <field name="x_sales_order_no"/>
+                            <field name="x_handover_performed_by"/>
+                            <field name="x_project_task_id" domain="[('project_id.task_ids', 'ilike', 'Solar Installation')]"/>
+                            <field name="x_task_assignees" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="x_date"/>
+                            <field name="x_commencement_date_time"/>
+                            <field name="x_completion_date_time"/>
+                            <field name="x_kw_plan"/>
+                            <field name="x_declaration" force_save="True" readonly="1"/>
+                            <field name="x_comments"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Images">
+                            <group>
+                                <group>
+                                    <field widget="image" name="x_image_1" options="{'zoom':true, 'size':[0,90]}"/>
+                                    <field widget="image" name="x_image_2" options="{'size':[0,90], 'zoom':true}"/>
+                                </group>
+                                <group>
+                                    <field widget="image" name="x_image_3" options="{'size':[0,90], 'zoom':true}"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                    <separator/>
+                    <group>
+                        <group>
+                            <field widget="signature" name="x_customer_signature" options="{'size': [0,90]}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="x_project_task_worksheet_template_1_ir_ui_view_2" model="ir.ui.view">
+        <field name="name">tree_view_Default_Worksheet</field>
+        <field name="model">x_project_task_worksheet_template_1_studio</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="create_date" widget="date"/>
+                <field name="x_name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="x_project_task_worksheet_template_1_ir_ui_view_3" model="ir.ui.view">
+        <field name="name">search_view_Default_Worksheet</field>
+        <field name="model">x_project_task_worksheet_template_1_studio</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="x_name"/>
+                <filter string="Created on" date="create_date" name="create_date"/>
+                <filter name="group_by_month" string="Created on" context="{'group_by': 'create_date:month'}"/>
+            </search>
+        </field>
+    </record>
+</odoo>
