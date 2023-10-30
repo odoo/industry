@@ -7,7 +7,7 @@
     This module insall a configuration that preset the modules and
     configuration of a law firm.
 """,
-    'author': 'Lawyer Industry',
+    'author': 'Odoo S.A.',
     'depends': [
         'documents_project',
         'hr_timesheet',

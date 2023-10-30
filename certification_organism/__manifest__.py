@@ -6,7 +6,7 @@
     'description': u"""
 This module setup your database to easily use odoo in a certification company.
 """,
-    'author': 'Odoo',
+    'author': 'Odoo S.A.',
     'depends': [
         'web_studio',
         'knowledge',
