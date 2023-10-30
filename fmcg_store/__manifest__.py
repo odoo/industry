@@ -41,6 +41,7 @@ It contains the apps created with Studio and the customizations of existing apps
         'data/product_product.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/knowledge_article_member.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
