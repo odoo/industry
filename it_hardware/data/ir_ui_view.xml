@@ -1,0 +1,1751 @@
+<odoo>
+    <record id="it_hardware.odoo_studio_crm_lead_f53a9596-735e-4ca5-82a9-a9e3dfc1212d" model="ir.ui.view">
+        <field name="name">Odoo Studio: crm.lead.form customization</field>
+        <field name="model">crm.lead</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form" />
+        <field name="mode">extension</field>
+        <field name="priority">160</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//form[1]/sheet[1]/group[1]/group[not(@name)][1]/field[@name='tag_ids']" position="after">
+                    <field name="x_studio_product" string="Product" options="{&quot;no_create&quot;:true,&quot;no_opening&quot;:true}" />
+                    <field name="x_studio_no_of_quantity" string="No Of Quantity" />
+                </xpath>
+            </data>
+        </field>
+    </record> 
+    <!-- <record id="studio_customization.odoo_studio_helpdesk_9e573606-d6bf-4434-af27-f232fe489d2a" model="ir.ui.view" context="{'studio': True}">
+        <field name="name">Odoo Studio: helpdesk.ticket.form customization</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
+        <field name="mode">extension</field>
+        <field name="priority">800</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='email_cc']" position="after">
+                    <xpath expr="//field[@name='product_id']" position="move"/>
+                    <field name="x_studio_warranty_date" string="Warranty Date" attrs="{'invisible': '[(&quot;lot_id&quot;, &quot;=&quot;, False)]', 'readonly': True}"/>
+                    <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='extra_info']/group[1]/field[@name='lot_id'][2]" position="move"/>
+                </xpath>
+                <xpath expr="//form[1]/div[1]" position="inside">
+                    <xpath expr="//field[@name='message_follower_ids']" position="move"/>
+                    <xpath expr="//field[@name='activity_ids']" position="move"/>
+                    <xpath expr="//field[@name='message_ids']" position="move"/>
+                </xpath>
+                <field name="stage_id" position="before">
+                    <button type="action" name="561" groups="stock.group_stock_user" string="Repair Return" attrs="{'invisible': [('has_partner_picking', '=', False)]}" context="{'default_ticket_id': id, 'default_company_id': company_id, 'default_picking_type_id': 8}" data-hotkey="q"/>
+                </field>
+            </data>
+        </field>
+    </record> -->
+    <record id="it_hardware.odoo_studio_product__9f35526f-5aa6-4bad-a44e-d680ff93e045" model="ir.ui.view">
+        <field name="name">Odoo Studio: product.template.product.form customization</field>
+        <field name="model">product.template</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view" />
+        <field name="mode">extension</field>
+        <field name="priority">160</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='default_code']" position="attributes">
+                    <attribute name="string">Part Code</attribute>
+                </xpath>
+                <xpath expr="//form[@name='Product Template']/sheet[@name='product_form']/notebook[1]/page[@name='inventory']/group[@name='inventory']/group[@name='expiry_and_lots']/div[4]" position="after">
+                    <label for="x_studio_warranty_date" />
+                    <div>
+                        <field name="x_studio_warranty_date" class="oe_inline" string="Warranty Date" />
+                        <span> days after delivery</span>
+                    </div>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="it_hardware.odoo_studio_repair_f_301f3e90-2bf5-424c-b3c5-46a6cb9c8f46" model="ir.ui.view">
+        <field name="name">Odoo Studio: repair.form customization</field>
+        <field name="model">repair.order</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="repair.view_repair_order_form" />
+        <field name="mode">extension</field>
+        <field name="priority">160</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='picking_id']" position="attributes">
+                    <attribute name="domain">[("picking_type_id", "in", [8])]</attribute>
+                    <attribute name="string">Repair Return</attribute>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="it_hardware.odoo_studio_stock_pi_0f0dcc7b-f399-429d-9a79-877a9f603184" model="ir.ui.view">
+        <field name="name">Odoo Studio: stock.picking.form customization</field>
+        <field name="model">stock.picking</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="stock.view_picking_form" />
+        <field name="mode">extension</field>
+        <field name="priority">160</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='move_line_ids_without_package']" position="inside">
+                    <tree editable="bottom" decoration-muted="(state == 'done' and is_locked == True)" decoration-danger="state!='done' and parent.picking_type_code != 'incoming'" decoration-success="state!='done' and not result_package_id">
+                        <field name="product_id" required="1" context="{'default_detailed_type': 'product'}" readonly="state == 'done' or move_id != False" />
+                        <field name="company_id" invisible="1" />
+                        <field name="move_id" invisible="1" />
+                        <field name="picking_id" invisible="1" />
+                        <field name="product_uom_category_id" invisible="1" />
+                        <field name="package_id" invisible="1" />
+                        <field name="result_package_id" invisible="1" />
+                        <field name="location_id" invisible="1" />
+                        <field name="location_dest_id" invisible="1" />
+                        <field name="location_id" options="{'no_create': True}" column_invisible="parent.picking_type_code == 'incoming'" groups="stock.group_stock_multi_locations" domain="[('id', 'child_of', parent.location_id), '|', ('company_id', '=', False), ('company_id', '=', company_id), ('usage', '!=', 'view')]" />
+                        <field name="location_dest_id" options="{'no_create': True}" column_invisible="parent.picking_type_code == 'outgoing'" groups="stock.group_stock_multi_locations" domain="[('id', 'child_of', parent.location_dest_id), '|', ('company_id', '=', False), ('company_id', '=', company_id), ('usage', '!=', 'view')]" />
+                        <field name="package_id" groups="stock.group_tracking_lot" />
+                        <field name="result_package_id" groups="stock.group_tracking_lot" />
+                        <field name="lots_visible" invisible="1" />
+                        <field name="owner_id" groups="stock.group_tracking_owner" column_invisible="parent.picking_type_code == 'incoming'" />
+                        <field name="state" invisible="1" />
+                        <field name="lot_id" groups="stock.group_production_lot" column_invisible="parent.show_lots_text == True" invisible="lots_visible == False" context="{'default_product_id': product_id, 'default_company_id': company_id, 'active_picking_id': picking_id}" optional="show" />
+                        <field name="is_expired" invisible="1" />
+                        <button class="fa fa-exclamation-triangle text-danger" title="This lot is expired." string="This lot is expired" disabled="1" invisible="is_expired == False" />
+                        <field name="lot_name" groups="stock.group_production_lot" column_invisible="parent.show_lots_text == False" invisible="lots_visible == False" context="{'default_product_id': product_id}" />
+                        <field name="picking_type_use_existing_lots" invisible="1" />
+                        <field name="expiration_date" force_save="1" column_invisible="parent.picking_type_code != 'incoming'" readonly="picking_type_use_existing_lots == True" />
+                        <field optional="show" name="x_studio_warranty_date" string="Warranty Date" />
+                        <field name="is_locked" invisible="1" />
+                        <field name="product_uom_id" force_save="1" readonly="state != 'draft' and id != False" groups="uom.group_uom" />
+                    </tree>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="it_hardware.odoo_studio_stock_pr_86553829-1db0-4c73-8dcb-23cc06066a9a" model="ir.ui.view">
+        <field name="name">Odoo Studio: stock.production.lot.form customization</field>
+        <field name="model">stock.lot</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form" />
+        <field name="mode">extension</field>
+        <field name="priority">160</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='removal_date']" position="after">
+                    <field name="x_studio_warranty_date" string="Warranty Date" />
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="industry_fsm_report.x_project_task_worksheet_template_1_ir_ui_view_1" model="ir.ui.view">
+        <field name="name">template_view_Default_Worksheet</field>
+        <field name="model">x_project_task_worksheet_template_1</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form create="false" duplicate="false">
+                <sheet>
+                    <h1 invisible="context.get('studio') or context.get('default_x_project_task_id')">
+                        <field name="x_project_task_id" />
+                    </h1>
+                    <group>
+                        <field name="x_comments" placeholder="Add details about your intervention..." />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="industry_fsm_report.x_project_task_worksheet_template_1_ir_ui_view_2" model="ir.ui.view">
+        <field name="name">tree_view_Default_Worksheet</field>
+        <field name="model">x_project_task_worksheet_template_1</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="create_date" widget="date" />
+                <field name="x_name" />
+            </tree>
+        </field>
+    </record>
+    <record id="industry_fsm_report.x_project_task_worksheet_template_1_ir_ui_view_3" model="ir.ui.view">
+        <field name="name">search_view_Default_Worksheet</field>
+        <field name="model">x_project_task_worksheet_template_1</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="x_name" />
+                <filter string="Created on" date="create_date" name="create_date" />
+                <filter name="group_by_month" string="Created on" context="{'group_by': 'create_date:month'}" />
+            </search>
+        </field>
+    </record>
+    <record id="ir_ui_view_1621" model="ir.ui.view">
+        <field name="name">Home</field>
+        <field name="type">qweb</field>
+        <field name="key">website.homepage</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <t name="Homepage" t-name="website.homepage">
+                <t t-call="website.layout">
+                    <t t-set="pageName" t-value="'homepage'" />
+                    <div id="wrap" class="oe_structure oe_empty">
+                        <section class="s_cover parallax bg-black-50 pt160 pb240 s_parallax_no_overflow_hidden" data-scroll-background-ratio="1" data-oe-shape-data="{&quot;shape&quot;:&quot;web_editor/Origins/02_001&quot;,&quot;flip&quot;:[]}" data-snippet="s_cover" data-name="Cover">
+                            <span class="s_parallax_bg oe_img_bg" style="background-image: url('/web/image/website.s_cover_default_image'); background-position: 50% 0;" />
+                            <div class="o_we_bg_filter bg-black-50" />
+                            <div class="o_we_shape o_web_editor_Origins_02_001 o_header_extra_shape_mapping" style="" />
+                            <div class="container s_allow_columns">
+                                <div class="row">
+                                    <div class="col col-lg-11">
+                                        <h1 style="text-align: right;">
+                                            <b>Making the difference.</b>
+                                        </h1>
+                                        <p class="lead o_default_snippet_text" style="text-align: right">
+                                        Our mission is to give customers the best experience.<br />Extensive documentation &amp;amp; guides, an active community,<br />24/7 support make it a pleasure to work with us.
+                                </p>
+                                        <p style="text-align: right">
+                                            <a class="btn btn-primary btn-lg mb-2 o_default_snippet_text" href="/contactus">Contact us</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="s_text_image pb96 pt0 o_colored_level" data-snippet="s_text_image" data-name="Text - Image" style="background-image: none; position: relative;" data-oe-shape-data="{&quot;shape&quot;:&quot;web_editor/Origins/02_001&quot;,&quot;flip&quot;:[],&quot;showOnMobile&quot;:false}">
+                            <div class="o_we_shape o_web_editor_Origins_02_001" style="" />
+                            <div class="container">
+                                <div class="row align-items-center">
+                                    <div class="pt16 pb16 col-lg-4 offset-lg-1">
+                                        <h3>Unique experiences to drive engagement</h3>
+                                        <div class="s_hr text-start pt16 pb0" data-snippet="s_hr" data-name="Separator">
+                                            <hr class="w-100 mx-auto" style="border-top-width: 1px; border-top-style: solid; border-top-color: rgba(0, 0, 0, 0) !important;" />
+                                        </div>
+                                        <p>
+                Users are looking to consume engaging content.<br />We empowers our teams to create the most relevant content.
+        </p>
+                                        <p>We have one goal in mind, the user satisfaction.</p>
+                                        <div class="s_hr text-start p0 pb32" data-snippet="s_hr" data-name="Separator">
+                                            <hr class="w-100 mx-auto" style="border-top-width: 1px; border-top-style: solid; border-top-color: var(--o-color-3) !important;" />
+                                        </div>
+                                        <p>
+                                            <a href="#" class="btn mb-2 btn-lg btn-secondary">Learn more</a>
+                                        </p>
+                                    </div>
+                                    <div class="pt16 pb16 col-lg-5 offset-lg-1">
+                                        <img src="/web/image/website.s_text_image_default_image" class="img img-fluid mx-auto" alt="" loading="lazy" style="" />
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section data-snippet="s_dynamic_snippet_products" class="s_dynamic_snippet_products s_dynamic pt32 pb32 o_colored_level s_product_product_borderless_1 o_dynamic_empty" data-name="Products" style="background-image: none; position: relative;" data-product-category-id="all" data-number-of-records="16" data-filter-id="1" data-template-key="website_sale.dynamic_filter_template_product_product_borderless_1" data-carousel-interval="5000" data-oe-shape-data="{&quot;shape&quot;:&quot;web_editor/Origins/02_001&quot;,&quot;flip&quot;:[],&quot;showOnMobile&quot;:false}">
+                            <div class="o_we_shape o_web_editor_Origins_02_001" style="" />
+                            <div class="o_not_editable container" style="">
+                                <div class="css_non_editable_mode_hidden">
+                                    <div class="missing_option_warning alert alert-info rounded-0 fade show d-none d-print-none o_default_snippet_text">
+                                                Your Dynamic Snippet will be displayed here... This message is displayed because you did not provided both a filter and a template to use.<br />
+                                        </div>
+                                </div>
+                                <div class="dynamic_snippet_template" />
+                            </div>
+                        </section>
+                        <section class="s_picture o_cc o_cc2 pb0 pt48 o_colored_level" data-oe-shape-data="{&quot;shape&quot;:&quot;web_editor/Zigs/01_001&quot;,&quot;flip&quot;:[]}" data-snippet="s_picture" data-name="Picture" style="background-image: none;">
+                            <div class="o_we_shape o_web_editor_Zigs_01_001" style="" />
+                            <div class="container">
+                                <h2 style="text-align: center;">
+                Grow with Us
+        </h2>
+                                <p style="text-align: center;">
+                Put your people at the heart of your marketing with tools that help you get to know your audience <br />and see who you should be talking to.
+        </p>
+                                <p style="text-align: center;">
+                                    <br />
+                                </p>
+                                <div class="row s_nb_column_fixed">
+                                    <div class="col-lg-10 offset-lg-1 pb24" style="text-align: center;">
+                                        <figure class="figure">
+                                            <img src="/web/image/website.s_picture_default_image" class="figure-img img-thumbnail padding-large p-0 border-0" alt="" loading="lazy" style="" />
+                                            <figcaption class="figure-caption text-muted py-3">Add a caption to enhance the meaning of this image.</figcaption>
+                                        </figure>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </t>
+            </t>
+        </field>
+    </record>
+    <record id="ir_ui_view_2749" model="ir.ui.view">
+        <field name="name">Template Header Default</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.layout" />
+        <field name="mode">extension</field>
+        <field name="key">website.template_header_default</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="active" eval="False" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.layout" name="Template Header Default" active="True">
+                <xpath expr="//header//nav" position="replace">
+                    <t t-call="website.navbar">
+                        <t t-set="_navbar_classes" t-valuef="shadow-sm" />
+                        <div id="top_menu_container" class="container justify-content-start justify-content-lg-between">
+                            
+                            <t t-call="website.placeholder_header_brand">
+                                <t t-set="_link_class" t-valuef="me-4" />
+                            </t>
+                            
+                            <div id="top_menu_collapse" class="collapse navbar-collapse order-last order-lg-0">
+                                <t t-call="website.navbar_nav">
+                                    <t t-set="_nav_class" t-valuef="flex-grow-1" />
+                                    
+                                    <t t-foreach="website.menu_id.child_id" t-as="submenu">
+                                        <t t-call="website.submenu">
+                                            <t t-set="item_class" t-valuef="nav-item" />
+                                            <t t-set="link_class" t-valuef="nav-link" />
+                                        </t>
+                                    </t>
+                                    
+                                    <t t-call="portal.placeholder_user_sign_in">
+                                        <t t-set="_item_class" t-valuef="nav-item ms-lg-auto" />
+                                        <t t-set="_link_class" t-valuef="nav-link fw-bold" />
+                                    </t>
+                                    
+                                    <t t-call="portal.user_dropdown">
+                                        <t t-set="_user_name" t-value="true" />
+                                        <t t-set="_item_class" t-valuef="nav-item dropdown ms-lg-auto" />
+                                        <t t-set="_link_class" t-valuef="nav-link fw-bold" />
+                                    </t>
+                                    
+                                    <t t-call="website.placeholder_header_language_selector">
+                                        <t t-set="_div_classes" t-valuef="nav-item my-auto ms-lg-2" />
+                                    </t>
+                                </t>
+                            </div>
+                            
+                            <t t-call="website.placeholder_header_call_to_action">
+                                <t t-set="_div_classes" t-valuef="ms-lg-4" />
+                            </t>
+                            
+                            <t t-call="website.navbar_toggler">
+                                <t t-set="_toggler_class" t-valuef="ms-auto" />
+                            </t>
+                        </div>
+                    </t>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2750" model="ir.ui.view">
+        <field name="name">template_header_default_align_center</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="ir_ui_view_2749" />
+        <field name="mode">extension</field>
+        <field name="key">website.template_header_default_align_center</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="active" eval="False" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.template_header_default" active="False">
+                <xpath expr="//t[@t-set='_nav_class']" position="replace">
+                    <t t-set="_nav_class" t-valuef="mx-auto" />
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2751" model="ir.ui.view">
+        <field name="name">template_header_default_align_right</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="ir_ui_view_2749" />
+        <field name="mode">extension</field>
+        <field name="key">website.template_header_default_align_right</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="active" eval="False" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.template_header_default" active="False">
+                <xpath expr="//t[@t-set='_nav_class']" position="replace">
+                    <t t-set="_nav_class" t-valuef="ms-auto" />
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2752" model="ir.ui.view">
+        <field name="name">template_header_default</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="ir_ui_view_2749" />
+        <field name="mode">extension</field>
+        <field name="key">website_sale.template_header_default</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.template_header_default">
+                <xpath expr="//t[@t-foreach='website.menu_id.child_id']" position="after">
+                    <t t-call="website_sale.header_cart_link">
+                        <t t-set="_icon" t-value="True" />
+                        <t t-set="_item_class" t-value="'nav-item mx-lg-3'" />
+                        <t t-set="_link_class" t-value="'nav-link'" />
+                    </t>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2753" model="ir.ui.view">
+        <field name="name">Default</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.layout" />
+        <field name="mode">extension</field>
+        <field name="key">website.footer_custom</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="active" eval="False" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.layout" name="Default" active="True">
+                <xpath expr="//div[@id='footer']" position="replace">
+                    <div id="footer" class="oe_structure oe_structure_solo" t-ignore="true" t-if="not no_footer">
+                        <section class="s_text_block pt40 pb16" data-snippet="s_text_block" data-name="Text">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-lg-2 pt24 pb24">
+                                        <h5 class="mb-3">Useful Links</h5>
+                                        <ul class="list-unstyled">
+                                            <li>
+                                                <a href="/">Home</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">About us</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">Products</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">Services</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">Legal</a>
+                                            </li>
+                                            <t t-set="configurator_footer_links" t-value="[{&quot;text&quot;: &quot;Privacy Policy&quot;, &quot;href&quot;: &quot;/privacy&quot;}, {&quot;text&quot;: &quot;Help&quot;, &quot;href&quot;: &quot;/help&quot;}]" />
+                                            <li t-foreach="configurator_footer_links" t-as="link">
+                                                <a t-att-href="link['href']" t-esc="link['text']" />
+                                            </li>
+                                            <li>
+                                                <a href="/contactus">Contact us</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-5 pt24 pb24">
+                                        <h5 class="mb-3">About us</h5>
+                                        <p>We are a team of passionate people whose goal is to improve everyone's life through disruptive products. We build great products to solve your business problems.
+                                                        <br /><br />Our products are designed for small to medium size companies willing to optimize their performance.</p>
+                                    </div>
+                                    <div id="connect" class="col-lg-4 offset-lg-1 pt24 pb24">
+                                        <h5 class="mb-3">Connect with us</h5>
+                                        <ul class="list-unstyled">
+                                            <li>
+                                                <i class="fa fa-comment fa-fw me-2" />
+                                                <span>
+                                                    <a href="/contactus">Contact us</a>
+                                                </span>
+                                            </li>
+                                            <li>
+                                                <i class="fa fa-envelope fa-fw me-2" />
+                                                <span>
+                                                    <a href="mailto:info@yourcompany.example.com">info@yourcompany.example.com</a>
+                                                </span>
+                                            </li>
+                                            <li>
+                                                <i class="fa fa-phone fa-fw me-2" />
+                                                <span class="o_force_ltr">
+                                                    <a href="tel:+1(650)555-0111">+1 (650) 555-0111</a>
+                                                </span>
+                                            </li>
+                                        </ul>
+                                        <div class="s_social_media text-start o_not_editable" data-snippet="s_social_media" data-name="Social Media" contenteditable="false">
+                                            <h5 class="s_social_media_title d-none" contenteditable="true">Follow us</h5>
+                                            <a href="/website/social/facebook" class="s_social_media_facebook" target="_blank">
+                                                <i class="fa fa-facebook rounded-circle shadow-sm" />
+                                            </a>
+                                            <a href="/website/social/twitter" class="s_social_media_twitter" target="_blank">
+                                                <i class="fa fa-twitter rounded-circle shadow-sm" />
+                                            </a>
+                                            <a href="/website/social/linkedin" class="s_social_media_linkedin" target="_blank">
+                                                <i class="fa fa-linkedin rounded-circle shadow-sm" />
+                                            </a>
+                                            <a href="/" class="text-800">
+                                                <i class="fa fa-home rounded-circle shadow-sm" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2754" model="ir.ui.view">
+        <field name="name">Graphene s_banner</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.s_banner" />
+        <field name="mode">extension</field>
+        <field name="key">theme_graphene.s_banner</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.s_banner" name="Graphene s_banner">
+                <xpath expr="//a[hasclass('btn')]" position="attributes">
+                    <attribute name="class" add="btn-lg" separator=" " />
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2755" model="ir.ui.view">
+        <field name="name">Graphene s_call_to_action</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.s_call_to_action" />
+        <field name="mode">extension</field>
+        <field name="key">theme_graphene.s_call_to_action</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.s_call_to_action" name="Graphene s_call_to_action">
+                <xpath expr="//section" position="attributes">
+                    <attribute name="class" add="o_cc5" remove="o_cc3" separator=" " />
+                </xpath>
+                <xpath expr="//h3" position="replace">
+                    <h3 style="text-align: right;"><b>50,000+ companies</b> run our software.</h3>
+                </xpath>
+                <xpath expr="//div[hasclass('col-lg-9')]" position="attributes">
+                    <attribute name="class" add="col-lg-8" remove="col-lg-9" separator=" " />
+                </xpath>
+                <xpath expr="//div[hasclass('col-lg-8')]/p" position="attributes">
+                    <attribute name="style" add="text-align: right;" separator=" " />
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2756" model="ir.ui.view">
+        <field name="name">Graphene s_carousel</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.s_carousel" />
+        <field name="mode">extension</field>
+        <field name="key">theme_graphene.s_carousel</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.s_carousel" name="Graphene s_carousel">
+                <xpath expr="//div[hasclass('carousel-inner')]/div[1]" position="attributes">
+                    <attribute name="style" add="background-position: 50% 100%;" separator=";" />
+                </xpath>
+                <xpath expr="//div[hasclass('carousel-inner')]/div[2]" position="attributes">
+                    <attribute name="style" add="background-position: 50% 100%;" separator=";" />
+                </xpath>
+                <xpath expr="//div[hasclass('carousel-inner')]/div[3]" position="attributes">
+                    <attribute name="style" add="background-position: 50% 100%;" separator=";" />
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2757" model="ir.ui.view">
+        <field name="name">Graphene s_company_team</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.s_company_team" />
+        <field name="mode">extension</field>
+        <field name="key">theme_graphene.s_company_team</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.s_company_team" name="Graphene s_company_team">
+                <xpath expr="//section" position="attributes">
+                    <attribute name="data-oe-shape-data">{"shape":"web_editor/Origins/05","flip":[]}</attribute>
+                    <attribute name="class" add="pb64" remove="pb48" separator=" " />
+                </xpath>
+                <xpath expr="//section/div[hasclass('container')]" position="before">
+                    <div class="o_we_shape o_web_editor_Origins_05" />
+                </xpath>
+                <xpath expr="//div[hasclass('s_nb_column_fixed')]/div//h4" position="replace" mode="inner">
+                Tony Fred, <small><b>CEO</b></small>
+                </xpath>
+                <xpath expr="//div[hasclass('s_nb_column_fixed')]/div//p" position="replace">
+                    <small>Founder and chief visionary, Tony is the driving force behind the company. He loves to keep his hands full by participating in the development of the software, marketing, and customer experience strategies.</small>
+                </xpath>
+                <xpath expr="//div[hasclass('s_nb_column_fixed')]/div[2]//h4" position="replace" mode="inner">
+                Mich Stark, <small><b>COO</b></small>
+                </xpath>
+                <xpath expr="//div[hasclass('s_nb_column_fixed')]/div[2]//p" position="replace" mode="inner">
+                    <small>Mich loves taking on challenges. With his multi-year experience as Commercial Director in the software industry, Mich has helped the company to get where it is today. Mich is among the best minds.</small>
+                </xpath>
+                <xpath expr="//div[hasclass('s_nb_column_fixed')]/div[3]//h4" position="replace" mode="inner">
+                Aline Turner, <small><b>CTO</b></small>
+                </xpath>
+                <xpath expr="//div[hasclass('s_nb_column_fixed')]/div[3]//p" position="replace" mode="inner">
+                    <small>Aline is one of the iconic people in life who can say they love what they do. She mentors 100+ in-house developers and looks after the community of thousands of developers.</small>
+                </xpath>
+                <xpath expr="//div[hasclass('s_nb_column_fixed')]/div[4]//h4" position="replace" mode="inner">
+                Iris Joe, <small><b>CFO</b></small>
+                </xpath>
+                <xpath expr="//div[hasclass('s_nb_column_fixed')]/div[4]//p" position="replace" mode="inner">
+                    <small>Iris, with her international experience, helps us easily understand the numbers and improves them. She is determined to drive success and delivers her professional acumen to bring the company to the next level.</small>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2758" model="ir.ui.view">
+        <field name="name">Graphene s_comparisons</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.s_comparisons" />
+        <field name="mode">extension</field>
+        <field name="key">theme_graphene.s_comparisons</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.s_comparisons" name="Graphene s_comparisons">
+                <xpath expr="//section" position="attributes">
+                    <attribute name="class" add="pb48 pt24 o_cc o_cc4" remove="pt32 pb32" separator=" " />
+                    <attribute name="data-oe-shape-data">{"shape":"web_editor/Origins/06_001","flip":["x"]}</attribute>
+                </xpath>
+                <xpath expr="//section/div[hasclass('container')]" position="before">
+                    <div class="o_we_shape o_web_editor_Origins_06_001" style="background-image: url('/web_editor/shape/web_editor/Origins/06_001.svg?c3=o-color-3&amp;c4=o-color-4&amp;flip=x'); background-position: 50% 50%;" />
+                </xpath>
+                <xpath expr="//div[hasclass('row')]/div//a" position="replace">
+                    <a href="/contactus" class="btn btn-primary mb-2">Start Now</a>
+                </xpath>
+                <xpath expr="//div[hasclass('row')]/div[2]//a" position="replace">
+                    <a href="/contactus" class="btn btn-primary mb-2">Start Now</a>
+                </xpath>
+                <xpath expr="//div[hasclass('row')]/div[2]//li[2]" position="replace">
+                    <li class="list-group-item">Access to all modules</li>
+                </xpath>
+                <xpath expr="//div[hasclass('row')]/div[3]//a" position="replace">
+                    <a href="/contactus" class="btn btn-primary mb-2">Start Now</a>
+                </xpath>
+                <xpath expr="//div[hasclass('row')]/div[3]//li[2]" position="replace">
+                    <li class="list-group-item">Access to all modules and features</li>
+                </xpath>
+                <xpath expr="//div[hasclass('row')]/div[3]//li[4]" position="replace">
+                    <li class="list-group-item">24/7 support</li>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2759" model="ir.ui.view">
+        <field name="name">Graphene s_cover</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.s_cover" />
+        <field name="mode">extension</field>
+        <field name="key">theme_graphene.s_cover</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.s_cover" name="Graphene s_cover">
+                <xpath expr="//section" position="attributes">
+                    <attribute name="class" add="pt160 pb240 s_parallax_no_overflow_hidden" remove="pt96 pb96 s_parallax_is_fixed s_parallax" separator=" " />
+                    <attribute name="data-oe-shape-data">{"shape":"web_editor/Origins/02_001","flip":[]}</attribute>
+                </xpath>
+                <xpath expr="//section/div[hasclass('container')]" position="before">
+                    <div class="o_we_shape o_web_editor_Origins_02_001" />
+                </xpath>
+                <xpath expr="//h1" position="replace" />
+                <xpath expr="//p" position="replace" />
+                <xpath expr="//p" position="replace" />
+                <xpath expr="//section/div[hasclass('container')]" position="inside">
+                    <div class="row">
+                        <div class="col col-lg-11">
+                            <h1 style="text-align: right;">
+                                <b>Making the difference.</b>
+                            </h1>
+                            <p class="lead o_default_snippet_text" style="text-align: right">
+                                        Our mission is to give customers the best experience.<br />Extensive documentation &amp; guides, an active community,<br />24/7 support make it a pleasure to work with us.
+                                </p>
+                            <p style="text-align: right">
+                                <a t-att-href="cta_btn_href" class="btn btn-primary btn-lg mb-2 o_default_snippet_text">
+                                    <t t-esc="cta_btn_text">Contact us</t>
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2760" model="ir.ui.view">
+        <field name="name">Graphene s_image_text</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.s_image_text" />
+        <field name="mode">extension</field>
+        <field name="key">theme_graphene.s_image_text</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.s_image_text" name="Graphene s_image_text">
+                <xpath expr="//div[hasclass('col-lg-6')][1]" position="attributes">
+                    <attribute name="class" add="col-lg-5 offset-lg-1" remove="col-lg-6" separator=" " />
+                </xpath>
+                <xpath expr="//div[hasclass('col-lg-6')][1]" position="attributes">
+                    <attribute name="class" add="col-lg-4 offset-lg-1" remove="col-lg-6" separator=" " />
+                </xpath>
+                <xpath expr="//h2" position="after">
+                    <div class="s_hr text-start pt16 pb0" data-snippet="s_hr" data-name="Separator">
+                        <hr class="w-100 mx-auto" style="border-top-width: 1px; border-top-style: solid; border-top-color: rgba(0, 0, 0, 0) !important;" />
+                    </div>
+                </xpath>
+                <xpath expr="//p[2]" position="after">
+                    <div class="s_hr text-start p0 pb32" data-snippet="s_hr" data-name="Separator">
+                        <hr class="w-100 mx-auto" style="border-top-width: 1px; border-top-style: solid; border-top-color: var(--o-color-3) !important;" />
+                    </div>
+                </xpath>
+                <xpath expr="//a[hasclass('btn')]" position="attributes">
+                    <attribute name="class" add="btn-lg" separator=" " />
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2761" model="ir.ui.view">
+        <field name="name">Graphene s_numbers</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.s_numbers" />
+        <field name="mode">extension</field>
+        <field name="key">theme_graphene.s_numbers</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.s_numbers" name="Graphene s_numbers">
+                <xpath expr="//section" position="attributes">
+                    <attribute name="class" add="oe_img_bg o_bg_img_center pb56 pt56 s_parallax_no_overflow_hidden parallax s_parallax_is_fixed" remove="pb24 pt24" separator=" " />
+                </xpath>
+                <xpath expr="//section/div[hasclass('container')]" position="before">
+                    <span class="s_parallax_bg oe_img_bg" style="background-image: url('/web/image/website.s_parallax_default_image'); background-position: 50% 75%;" />
+                    <div class="o_we_bg_filter bg-black-75" />
+                </xpath>
+                
+                <xpath expr="//div[hasclass('row')]/div/span" position="attributes">
+                    <attribute name="class" add="text-white" separator=" " />
+                </xpath>
+                <xpath expr="(//div[hasclass('row')]/div/span)[2]" position="attributes">
+                    <attribute name="class" add="text-white" separator=" " />
+                </xpath>
+                <xpath expr="(//div[hasclass('row')]/div/span)[3]" position="attributes">
+                    <attribute name="class" add="text-white" separator=" " />
+                </xpath>
+                <xpath expr="(//div[hasclass('row')]/div/span)[4]" position="attributes">
+                    <attribute name="class" add="text-white" separator=" " />
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2762" model="ir.ui.view">
+        <field name="name">Graphene s_picture</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.s_picture" />
+        <field name="mode">extension</field>
+        <field name="key">theme_graphene.s_picture</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.s_picture" name="Graphene s_picture">
+                <xpath expr="//section" position="attributes">
+                    <attribute name="class" add="pb0 pt48" remove="pb24 pt48" separator=" " />
+                    <attribute name="data-oe-shape-data">{"shape":"web_editor/Zigs/01_001","flip":[]}</attribute>
+                </xpath>
+                <xpath expr="//section/div[hasclass('container')]" position="before">
+                    <div class="o_we_shape o_web_editor_Zigs_01_001" />
+                </xpath>
+                
+                <xpath expr="//h2" position="replace" mode="inner">
+                Grow with Us
+                </xpath>
+                <xpath expr="//p" position="replace" mode="inner">
+                Put your people at the heart of your marketing with tools that help you get to know your audience <br />and see who you should be talking to.
+                </xpath>
+                <xpath expr="//img" position="attributes">
+                    <attribute name="class" add="p-0 border-0" separator=" " />
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2763" model="ir.ui.view">
+        <field name="name">Graphene s_process_steps</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.s_process_steps" />
+        <field name="mode">extension</field>
+        <field name="key">theme_graphene.s_process_steps</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.s_process_steps" name="Graphene s_process_steps">
+                <xpath expr="//section" position="attributes">
+                    <attribute name="data-oe-shape-data">{"shape":"web_editor/Origins/05","flip":[]}</attribute>
+                </xpath>
+                <xpath expr="//section/div[hasclass('container')]" position="before">
+                    <div class="o_we_shape o_web_editor_Origins_05" />
+                </xpath>
+                <xpath expr="//h2" position="replace" mode="inner">
+                Add to Cart
+                </xpath>
+                <xpath expr="//h2" position="replace" mode="inner">
+                Sign In
+                </xpath>
+                <xpath expr="//h2" position="replace" mode="inner">
+                Pay
+                </xpath>
+                <xpath expr="//h2" position="replace" mode="inner">
+                Get Delivered
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2764" model="ir.ui.view">
+        <field name="name">Graphene s_text_image</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.s_text_image" />
+        <field name="mode">extension</field>
+        <field name="key">theme_graphene.s_text_image</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.s_text_image" name="Graphene s_text_image">
+                <xpath expr="//section" position="attributes">
+                    <attribute name="class" add="pb96 pt0" remove="pb32 pt32" separator=" " />
+                    <attribute name="data-oe-shape-data">{"shape":"web_editor/Origins/02_001","flip":["x","y"]}</attribute>
+                </xpath>
+                <xpath expr="//section/div[hasclass('container')]" position="before">
+                    <div class="o_we_shape o_web_editor_Origins_02_001 o_second_extra_shape_mapping" style="background-image: url('/web_editor/shape/web_editor/Origins/02_001.svg?c4=o-color-3&amp;c5=rgba%280%2C%200%2C%200%2C%200%29&amp;flip=xy'); background-position: 50% 0%;" />
+                </xpath>
+                <xpath expr="//h2" position="replace">
+                    <h3>Unique experiences to drive engagement</h3>
+                    <div class="s_hr text-start pt16 pb0" data-snippet="s_hr" data-name="Separator">
+                        <hr class="w-100 mx-auto" style="border-top-width: 1px; border-top-style: solid; border-top-color: rgba(0, 0, 0, 0) !important;" />
+                    </div>
+                </xpath>
+                <xpath expr="//p[1]" position="replace" mode="inner">
+                Users are looking to consume engaging content.<br />We empowers our teams to create the most relevant content.
+                </xpath>
+                <xpath expr="//p[2]" position="replace">
+                    <p>We have one goal in mind, the user satisfaction.</p>
+                    <div class="s_hr text-start p0 pb32" data-snippet="s_hr" data-name="Separator">
+                        <hr class="w-100 mx-auto" style="border-top-width: 1px; border-top-style: solid; border-top-color: var(--o-color-3) !important;" />
+                    </div>
+                </xpath>
+                <xpath expr="//div[hasclass('col-lg-6')][1]" position="attributes">
+                    <attribute name="class" add="col-lg-4 offset-lg-1" remove="col-lg-6" separator=" " />
+                </xpath>
+                <xpath expr="//div[hasclass('col-lg-6')][1]" position="attributes">
+                    <attribute name="class" add="col-lg-5 offset-lg-1" remove="col-lg-6" separator=" " />
+                </xpath>
+                <xpath expr="//a[hasclass('btn')]" position="attributes">
+                    <attribute name="class" add="btn-lg btn-secondary" remove="btn-primary" separator=" " />
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2765" model="ir.ui.view">
+        <field name="name">Graphene s_three_columns</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.s_three_columns" />
+        <field name="mode">extension</field>
+        <field name="key">theme_graphene.s_three_columns</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.s_three_columns" name="Graphene s_three_columns">
+                <xpath expr="//div[hasclass('row')]/div//h3[1]" position="replace">
+                    <h5>Powerful API</h5>
+                    <div class="s_hr text-start pt8 pb16" data-snippet="s_hr" data-name="Separator">
+                        <hr class="w-100 mx-auto" style="border-top-width: 1px; border-top-style: solid; border-top-color: var(--o-color-3) !important;" />
+                    </div>
+                </xpath>
+                <xpath expr="//div[hasclass('row')]/div//p[1]" position="replace" mode="inner">
+                Thanks to our API, Developers report building their solutions 4x faster. Discover why and how.
+                </xpath>
+                <xpath expr="//div[hasclass('row')]/div[2]//h3[1]" position="replace">
+                    <h5>Mobile Experience</h5>
+                    <div class="s_hr text-start pt8 pb16" data-snippet="s_hr" data-name="Separator">
+                        <hr class="w-100 mx-auto" style="border-top-width: 1px; border-top-style: solid; border-top-color: var(--o-color-3) !important;" />
+                    </div>
+                </xpath>
+                <xpath expr="//div[hasclass('row')]/div[2]//p[1]" position="replace" mode="inner">
+                Probably the only CRM with a full mobile experience. Never wondered how it works? That's because it just works
+                </xpath>
+                <xpath expr="//div[hasclass('row')]/div[3]//h3[1]" position="replace">
+                    <h5>Support Team</h5>
+                    <div class="s_hr text-start pt8 pb16" data-snippet="s_hr" data-name="Separator">
+                        <hr class="w-100 mx-auto" style="border-top-width: 1px; border-top-style: solid; border-top-color: var(--o-color-3) !important;" />
+                    </div>
+                </xpath>
+                <xpath expr="//div[hasclass('row')]/div[3]//p[1]" position="replace" mode="inner">
+                We have a support team that will do everything to answer you as quickly as the voice assistants.
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2766" model="ir.ui.view">
+        <field name="name">Template Header Contact</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.layout" />
+        <field name="mode">extension</field>
+        <field name="key">website.template_header_contact</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.layout" name="Template Header Contact" active="False">
+                <xpath expr="//header//nav" position="replace">
+                    <div class="oe_structure oe_structure_solo" id="oe_structure_header_contact_1" />
+                    <t t-call="website.navbar">
+                        <t t-set="_navbar_classes" t-valuef="shadow-sm" />
+                        <div id="top_menu_container" class="container">
+                            
+                            <t t-call="website.placeholder_header_brand" />
+                            
+                            <t t-call="website.navbar_toggler" />
+                            
+                            <t t-call="website.placeholder_header_call_to_action">
+                                <t t-set="_div_classes" t-valuef="d-block d-lg-none" />
+                            </t>
+                            
+                            <div id="top_menu_collapse" class="collapse navbar-collapse ms-lg-3">
+                                <t t-call="website.navbar_nav">
+                                    <t t-set="_nav_class" t-valuef="flex-grow-1" />
+                                    
+                                    <t t-foreach="website.menu_id.child_id" t-as="submenu">
+                                        <t t-call="website.submenu">
+                                            <t t-set="item_class" t-valuef="nav-item" />
+                                            <t t-set="link_class" t-valuef="nav-link" />
+                                        </t>
+                                    </t>
+                                    
+                                    <t t-call="portal.placeholder_user_sign_in">
+                                        <t t-set="_item_class" t-valuef="nav-item ms-lg-auto" />
+                                        <t t-set="_link_class" t-valuef="nav-link" />
+                                    </t>
+                                    
+                                    <t t-call="portal.user_dropdown">
+                                        <t t-set="_user_name" t-value="True" />
+                                        <t t-set="_user_name_class" t-valuef="fw-bold" />
+                                        <t t-set="_item_class" t-valuef="nav-item dropdown ms-lg-auto" />
+                                        <t t-set="_link_class" t-valuef="nav-link" />
+                                    </t>
+                                    
+                                    <t t-call="website.placeholder_header_language_selector">
+                                        <t t-set="_div_classes" t-valuef="nav-item my-auto ms-lg-2 align-self-lg-center" />
+                                    </t>
+                                </t>
+                                
+                                <t t-call="website.placeholder_header_call_to_action">
+                                    <t t-set="_div_classes" t-valuef="d-none d-lg-block ms-3" />
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2767" model="ir.ui.view">
+        <field name="name">Template Header Contact (oe_structure_header_contact_1)</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="ir_ui_view_2766" />
+        <field name="mode">extension</field>
+        <field name="key">website.template_header_contact_oe_structure_header_contact_1</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.template_header_contact" name="Template Header Contact (oe_structure_header_contact_1)">
+                <xpath expr="//*[hasclass('oe_structure')][@id='oe_structure_header_contact_1']" position="replace">
+                    <div class="oe_structure oe_structure_solo" id="oe_structure_header_contact_1">
+                        <section class="s_text_block pt8 pb8 o_cc o_cc2" data-snippet="s_text_block" data-name="Text">
+                            <div class="container">
+                                <div class="row align-items-center">
+                                    <div class="col-lg-8">
+                                        <small>
+                                            <i class="fa fa-1x fa-fw fa-phone me-2" />
+                                            <span class="me-3">
+                                                <a href="tel:+1(650)555-0111">+1 (650) 555-0111</a>
+                                            </span>
+                                            <i class="fa fa-1x fa-fw fa-envelope me-2 d-inline" />
+                                            <span>
+                                                <a href="mailto:info@yourcompany.example.com">info@yourcompany.example.com</a>
+                                            </span>
+                                        </small>
+                                    </div>
+                                    <div class="col-lg-4 text-lg-end">
+                                        <div class="s_social_media no_icon_color o_not_editable" data-snippet="s_social_media" data-name="Social Media" contenteditable="false">
+                                            <small class="s_social_media_title text-muted d-none" contenteditable="true">
+                                                <b>Follow us</b>
+                                            </small>
+                                            <a href="/website/social/facebook" class="s_social_media_facebook" target="_blank">
+                                                <i class="fa fa-facebook m-1" />
+                                            </a>
+                                            <a href="/website/social/twitter" class="s_social_media_twitter" target="_blank">
+                                                <i class="fa fa-twitter m-1" />
+                                            </a>
+                                            <a href="/website/social/linkedin" class="s_social_media_linkedin" target="_blank">
+                                                <i class="fa fa-linkedin m-1" />
+                                            </a>
+                                            <a href="/website/social/github" class="s_social_media_github" target="_blank">
+                                                <i class="fa fa-github m-1" />
+                                            </a>
+                                            <a href="/website/social/youtube" class="s_social_media_youtube" target="_blank">
+                                                <i class="fa fa-youtube m-1" />
+                                            </a>
+                                            <a href="/website/social/instagram" class="s_social_media_instagram" target="_blank">
+                                                <i class="fa fa-instagram m-1" />
+                                            </a>
+                                            <a href="/website/social/tiktok" class="s_social_media_tiktok" target="_blank">
+                                                <i class="fa fa-tiktok m-1" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2768" model="ir.ui.view">
+        <field name="name">template_header_contact</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="ir_ui_view_2766" />
+        <field name="mode">extension</field>
+        <field name="key">website_sale.template_header_contact</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.template_header_contact">
+                <xpath expr="//t[@t-foreach='website.menu_id.child_id']" position="after">
+                    <t t-call="website_sale.header_cart_link">
+                        <t t-set="_text" t-value="True" />
+                        <t t-set="_item_class" t-value="'nav-item ms-lg-3'" />
+                        <t t-set="_link_class" t-value="'nav-link'" />
+                    </t>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2769" model="ir.ui.view">
+        <field name="name">Off-Canvas Header</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.navbar_nav" />
+        <field name="mode">extension</field>
+        <field name="key">website.option_header_off_canvas</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.navbar_nav" name="Off-Canvas Header" active="False">
+                <xpath expr="//ul[@id='top_menu']" position="attributes">
+                    <attribute name="class" separator=" " add="position-relative" />
+                </xpath>
+                <xpath expr="//ul[@id='top_menu']" position="before">
+                    <div class="o_offcanvas_menu_backdrop" data-bs-toggle="collapse" data-bs-target="#top_menu_collapse" aria-label="Toggle navigation" />
+                </xpath>
+                <xpath expr="//ul[@id='top_menu']/t" position="before">
+                    <li class="o_offcanvas_menu_toggler order-first navbar-toggler text-end border-0 o_not_editable">
+                        <a href="#top_menu_collapse" class="nav-link px-3" data-bs-toggle="collapse">
+                            <span class="fa-2x">&#215;</span>
+                        </a>
+                    </li>
+                </xpath>
+                <xpath expr="//ul[@id='top_menu']/t" position="after">
+                    <li class="o_offcanvas_logo_container order-last navbar-toggler py-4 order-1 mt-auto text-center border-0">
+                        <a href="/" class="o_offcanvas_logo text-center">My Website</a>
+                    </li>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2770" model="ir.ui.view">
+        <field name="name">Show Logo (Off-Canvas)</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="ir_ui_view_2769" />
+        <field name="mode">extension</field>
+        <field name="key">website.option_header_off_canvas_logo_show</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.option_header_off_canvas" name="Show Logo (Off-Canvas)">
+                <xpath expr="//a[hasclass('o_offcanvas_logo')]" position="replace">
+                    <a href="/" class="o_offcanvas_logo logo">
+                        <span t-field="website.logo" t-options="{'widget': 'image', 'style': 'max-width: 200px'}" role="img" t-att-aria-label="'Logo of %s' % website.name" t-att-title="website.name" />
+                    </a>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2771" model="ir.ui.view">
+        <field name="name">option_header_off_canvas_template_header_hamburger</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.template_header_hamburger" />
+        <field name="mode">extension</field>
+        <field name="priority">32</field>
+        <field name="key">website.option_header_off_canvas_template_header_hamburger</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.template_header_hamburger" active="False" priority="32">
+                <xpath expr="//div[@id='oe_structure_header_hamburger_2']" position="replace" />
+                <xpath expr="//div[@id='oe_structure_header_hamburger_3']" position="replace" />
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2772" model="ir.ui.view">
+        <field name="name">option_header_off_canvas_template_header_sidebar</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.template_header_sidebar" />
+        <field name="mode">extension</field>
+        <field name="priority">32</field>
+        <field name="key">website.option_header_off_canvas_template_header_sidebar</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.template_header_sidebar" active="False" priority="32">
+                <xpath expr="//div[@id='oe_structure_header_sidebar_1']" position="attributes">
+                    <attribute name="class" add="d-none d-lg-block" separator=" " />
+                </xpath>
+            </data>
+        </field>
+    </record>
+    
+    <record id="ir_ui_view_2774" model="ir.ui.view">
+        <field name="name">Centered</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.layout" />
+        <field name="mode">extension</field>
+        <field name="key">website.template_footer_centered</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.layout" name="Centered" active="False">
+                <xpath expr="//div[@id='footer']" position="replace">
+                    <div id="footer" class="oe_structure oe_structure_solo" t-ignore="true" t-if="not no_footer">
+                        <section class="s_text_block pt32" data-snippet="s_text_block" data-name="Text" style="background-image: none;">
+                            <div class="container s_allow_columns">
+                                <div class="s_social_media text-center mb-4 o_not_editable" data-snippet="s_social_media" data-name="Social Media">
+                                    <h5 class="s_social_media_title d-none">Follow us</h5>
+                                    <a href="/website/social/facebook" class="s_social_media_facebook" target="_blank">
+                                        <i class="fa fa-facebook rounded-circle rounded shadow-sm" contenteditable="false">&#8203;</i>
+                                    </a>
+                                    <a href="/website/social/twitter" class="s_social_media_twitter" target="_blank">
+                                        <i class="fa fa-twitter rounded-circle rounded shadow-sm" contenteditable="false">&#8203;</i>
+                                    </a>
+                                    <a href="/website/social/linkedin" class="s_social_media_linkedin" target="_blank">
+                                        <i class="fa fa-linkedin rounded-circle rounded shadow-sm" contenteditable="false">&#8203;</i>
+                                    </a>
+                                </div>
+                                <p class="text-center mb-1">250 Executive Park Blvd, Suite 3400 &#8226; San Francisco CA 94134 &#8226; United States</p>
+                                <ul class="list-inline text-center">
+                                    <li class="list-inline-item mx-3">
+                                        <i class="fa fa-1x fa-fw fa-phone me-2" contenteditable="false">&#8203;</i>
+                                        <span class="o_force_ltr">
+                                            <a href="tel:+1(650)555-0111">+1 (650) 555-0111</a>
+                                        </span>
+                                    </li>
+                                    <li class="list-inline-item mx-3">
+                                        <i class="fa fa-1x fa-fw fa-envelope me-2" contenteditable="false">&#8203;</i>
+                                        <span>
+                                            <a href="mailto:info@yourcompany.example.com">info@yourcompany.example.com</a>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="s_text_block pt16 pb16" data-snippet="s_text_block" data-name="Logo" style="background-image: none;">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-lg-2 offset-lg-5 o_colored_level">
+                                        <a href="/" class="o_footer_logo logo" data-bs-original-title="" title="">
+                                            <img src="/web/image/528-6f53f22c/computer-desktop-pc-logo-design-icon-vector-27041769.jpg" alt="" class="img-fluid mx-auto img o_we_custom_image" data-original-id="527" data-original-src="/web/image/527-8413e007/computer-desktop-pc-logo-design-icon-vector-27041769.jpg" data-mimetype="image/webp" data-resize-width="690" />
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2775" model="ir.ui.view">
+        <field name="name">Contact</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.layout" />
+        <field name="mode">extension</field>
+        <field name="key">website.template_footer_contact</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="active" eval="False" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.layout" name="Contact" active="False">
+                <xpath expr="//div[@id='footer']" position="replace">
+                    <div id="footer" class="oe_structure oe_structure_solo" t-ignore="true" t-if="not no_footer">
+                        <section class="s_text_block pt32 pb16" data-snippet="s_text_block" data-name="Text">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-lg-3 pt16 pb16">
+                                        <p class="mb-2">How can we help?</p>
+                                        <h4>Contact us anytime</h4>
+                                    </div>
+                                    <div class="col-lg-3 pt16 pb16">
+                                        <p class="mb-2">Call us</p>
+                                        <h5>
+                                            <span class="o_force_ltr">
+                                                <a href="tel:+1(650)555-0111">+1 (650) 555-0111</a>
+                                            </span>
+                                        </h5>
+                                    </div>
+                                    <div class="col-lg-3 pt16 pb16">
+                                        <p class="mb-2">Send us a message</p>
+                                        <h5>
+                                            <a href="mailto:hello@mycompany.com">hello@mycompany.com</a>
+                                        </h5>
+                                    </div>
+                                    <div class="col-lg-3 pt16 pb16">
+                                        <div class="s_social_media text-end no_icon_color o_not_editable" data-snippet="s_social_media" data-name="Social Media" contenteditable="false">
+                                            <p class="s_social_media_title d-block mb-2" contenteditable="true">Follow us</p>
+                                            <a href="/website/social/twitter" class="s_social_media_twitter" target="_blank">
+                                                <i class="fa fa-twitter m-1" />
+                                            </a>
+                                            <a href="/website/social/linkedin" class="s_social_media_linkedin" target="_blank">
+                                                <i class="fa fa-linkedin m-1" />
+                                            </a>
+                                            <a href="/website/social/instagram" class="s_social_media_instagram" target="_blank">
+                                                <i class="fa fa-instagram m-1" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="s_text_block" data-snippet="s_text_block" data-name="Text">
+                            <div class="container allow_columns">
+                                <div class="s_hr pt16 pb16">
+                                    <hr class="w-100 mx-auto" style="border-top-width: 1px; border-top-style: solid; border-color: var(--600);" />
+                                </div>
+                            </div>
+                        </section>
+                        <section class="s_text_block" data-snippet="s_text_block" data-name="Text">
+                            <div class="container">
+                                <div class="row align-items-center">
+                                    <div class="col-lg-2 pb16">
+                                        <a href="/" class="o_footer_logo logo">
+                                            <img src="/website/static/src/img/website_logo.svg" class="img-fluid" aria-label="Logo of MyCompany" title="MyCompany" role="img" />
+                                        </a>
+                                    </div>
+                                    <div class="col-lg-10 pb16 text-end">
+                                        <ul class="list-inline mb-0">
+                                            <li class="list-inline-item">
+                                                <a href="/">Home</a>
+                                            </li>
+                                            <li class="list-inline-item">&#8226;</li>
+                                            <li class="list-inline-item">
+                                                <a href="#">About us</a>
+                                            </li>
+                                            <li class="list-inline-item">&#8226;</li>
+                                            <li class="list-inline-item">
+                                                <a href="#">Products</a>
+                                            </li>
+                                            <li class="list-inline-item">&#8226;</li>
+                                            <li class="list-inline-item">
+                                                <a href="#">Terms of Services</a>
+                                            </li>
+                                            <t t-set="configurator_footer_links" t-value="[{&quot;text&quot;: &quot;Privacy Policy&quot;, &quot;href&quot;: &quot;/privacy&quot;}, {&quot;text&quot;: &quot;Help&quot;, &quot;href&quot;: &quot;/help&quot;}]" />
+                                            <t t-foreach="configurator_footer_links" t-as="link" class="list-inline-item">
+                                                <li class="list-inline-item">&#8226;</li>
+                                                <li class="list-inline-item">
+                                                    <a t-att-href="link['href']" t-esc="link['text']" />
+                                                </li>
+                                            </t>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2776" model="ir.ui.view">
+        <field name="name">Headline</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.layout" />
+        <field name="mode">extension</field>
+        <field name="key">website.template_footer_headline</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="active" eval="False" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.layout" name="Headline" active="False">
+                <xpath expr="//div[@id='footer']" position="replace">
+                    <div id="footer" class="oe_structure oe_structure_solo" t-ignore="true" t-if="not no_footer">
+                        <section class="s_text_block pt48" data-snippet="s_text_block" data-name="Text">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-lg-3 pb24">
+                                        <h4><b>Designed</b><br />for Companies</h4>
+                                    </div>
+                                    <div class="col-lg-9 pb24">
+                                        <p class="lead">We are a team of passionate people whose goal is to improve everyone's life.<br />Our services are designed for small to medium size companies.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="s_text_block" data-snippet="s_text_block" data-name="Text">
+                            <div class="container">
+                                <div class="row align-items-center">
+                                    <div class="col-lg-3 pb24">
+                                        <ul class="ps-3 mb-0">
+                                            <li>
+                                                <a href="/">Home</a>
+                                            </li>
+                                            <li>
+                                                <a href="/contactus">Contact us</a>
+                                            </li>
+                                            <t t-set="configurator_footer_links" t-value="[{&quot;text&quot;: &quot;Privacy Policy&quot;, &quot;href&quot;: &quot;/privacy&quot;}, {&quot;text&quot;: &quot;Help&quot;, &quot;href&quot;: &quot;/help&quot;}]" />
+                                            <li t-foreach="configurator_footer_links" t-as="link">
+                                                <a t-att-href="link['href']" t-esc="link['text']" />
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-6 pb24">
+                                        <ul class="list-unstyled mb-0">
+                                            <li>
+                                                <i class="fa fa-phone fa-fw me-2" />
+                                                <span class="o_force_ltr">
+                                                    <a href="tel:+1(650)555-0111">+1 (650) 555-0111</a>
+                                                </span>
+                                            </li>
+                                            <li>
+                                                <i class="fa fa-envelope fa-fw me-2" />
+                                                <span>
+                                                    <a href="mailto:info@yourcompany.example.com">info@yourcompany.example.com</a>
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-3 pb24">
+                                        <div class="s_social_media text-end o_not_editable" data-snippet="s_social_media" data-name="Social Media" contenteditable="false">
+                                            <h5 class="s_social_media_title d-none" contenteditable="true">Follow Us</h5>
+                                            <a href="/website/social/facebook" class="s_social_media_facebook" target="_blank">
+                                                <i class="fa fa-1x fa-facebook rounded-circle shadow-sm" />
+                                            </a>
+                                            <a href="/website/social/twitter" class="s_social_media_twitter" target="_blank">
+                                                <i class="fa fa-1x fa-twitter rounded-circle shadow-sm" />
+                                            </a>
+                                            <a href="/website/social/instagram" class="s_social_media_instagram" target="_blank">
+                                                <i class="fa fa-1x fa-instagram rounded-circle shadow-sm" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2777" model="ir.ui.view">
+        <field name="name">Links</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.layout" />
+        <field name="mode">extension</field>
+        <field name="key">website.template_footer_links</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="active" eval="False" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.layout" name="Links" active="False">
+                <xpath expr="//div[@id='footer']" position="replace">
+                    <div id="footer" class="oe_structure oe_structure_solo" t-ignore="true" t-if="not no_footer">
+                        <section class="s_text_block pt48 pb16" data-snippet="s_text_block" data-name="Text">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-lg-2 pb16">
+                                        <h5>Explore</h5>
+                                        <ul class="list-unstyled">
+                                            <li class="list-item py-1">
+                                                <a href="/">Home</a>
+                                            </li>
+                                            <li class="list-item py-1">
+                                                <a href="#">Our Company</a>
+                                            </li>
+                                            <li class="list-item py-1">
+                                                <a href="#">Case Studies</a>
+                                            </li>
+                                            <li class="list-item py-1">
+                                                <a href="#">Blog</a>
+                                            </li>
+                                            <t t-set="configurator_footer_links" t-value="[{&quot;text&quot;: &quot;Privacy Policy&quot;, &quot;href&quot;: &quot;/privacy&quot;}, {&quot;text&quot;: &quot;Help&quot;, &quot;href&quot;: &quot;/help&quot;}]" />
+                                            <li t-foreach="configurator_footer_links" t-as="link" class="list-item py-1">
+                                                <a t-att-href="link['href']" t-esc="link['text']" />
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-2 pb16">
+                                        <h5>Services</h5>
+                                        <ul class="list-unstyled">
+                                            <li class="py-1">
+                                                <a href="#">Documentation</a>
+                                            </li>
+                                            <li class="py-1">
+                                                <a href="#">Marketplace</a>
+                                            </li>
+                                            <li class="py-1">
+                                                <a href="#">Design</a>
+                                            </li>
+                                            <li class="py-1">
+                                                <a href="#">Resources</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-2 pb16">
+                                        <h5>Follow us</h5>
+                                        <ul class="list-unstyled">
+                                            <li class="py-1">
+                                                <i class="fa fa-1x fa-fw fa-facebook-square me-2" />
+                                                <a href="/website/social/facebook" target="_blank">Facebook</a>
+                                            </li>
+                                            <li class="py-1">
+                                                <i class="fa fa-1x fa-fw fa-twitter-square me-2" />
+                                                <a href="/website/social/twitter" target="_blank">Twitter</a>
+                                            </li>
+                                            <li class="py-1">
+                                                <i class="fa fa-1x fa-fw fa-linkedin-square me-2" />
+                                                <a href="/website/social/linkedin" target="_blank">Linkedin</a>
+                                            </li>
+                                            <li class="py-1">
+                                                <i class="fa fa-1x fa-fw fa-instagram me-2" />
+                                                <a href="/website/social/instagram" target="_blank">Instagram</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-3 pb16">
+                                        <h5>Get in touch</h5>
+                                        <ul class="list-unstyled">
+                                            <li class="py-1">
+                                                <i class="fa fa-1x fa-fw fa-envelope me-2" />
+                                                <a href="mailto:info@yourcompany.com">info@yourcompany.com</a>
+                                            </li>
+                                            <li class="py-1">
+                                                <i class="fa fa-1x fa-fw fa-phone me-2" />
+                                                <span class="o_force_ltr">
+                                                    <a href="tel:+1(650)555-0111">+1 (650) 555-0111</a>
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-3 pb16">
+                                        <h5>MyCompany</h5>
+                                        <p class="text-muted">250 Executive Park Blvd, Suite 3400 <br /> San Francisco CA 94134 <br />United States</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2778" model="ir.ui.view">
+        <field name="name">Minimalist</field>
+        <field name="type">qweb</field>
+        <field name="inherit_id" ref="website.layout" />
+        <field name="mode">extension</field>
+        <field name="key">website.template_footer_minimalist</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="active" eval="False" />
+        <field name="arch" type="xml">
+            <data inherit_id="website.layout" name="Minimalist" active="False">
+                <xpath expr="//div[@id='footer']" position="replace">
+                    <div id="footer" class="oe_structure oe_structure_solo" t-ignore="true" t-if="not no_footer">
+                        <section class="s_text_block" data-snippet="s_text_block" data-name="Text">
+                            <div class="container">
+                                <div class="row align-items-center">
+                                    <div class="col-lg-2 pt16 pb16">
+                                        <a href="/" class="o_footer_logo logo">
+                                            <img src="/website/static/src/img/website_logo.svg" class="img-fluid mx-auto" aria-label="Logo of MyCompany" title="MyCompany" role="img" />
+                                        </a>
+                                    </div>
+                                    <div class="col-lg-5 d-flex align-items-center justify-content-center justify-content-lg-start pt16 pb16">
+                                        <ul class="list-inline mb-0 ms-3">
+                                            <li class="list-inline-item">
+                                                <a href="/">Home</a>
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <a href="#">About us</a>
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <a href="#">Products</a>
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <a href="#">Services</a>
+                                            </li>
+                                            <t t-set="configurator_footer_links" t-value="[{&quot;text&quot;: &quot;Privacy Policy&quot;, &quot;href&quot;: &quot;/privacy&quot;}, {&quot;text&quot;: &quot;Help&quot;, &quot;href&quot;: &quot;/help&quot;}]" />
+                                            <li t-foreach="configurator_footer_links" t-as="link" class="list-inline-item">
+                                                <a t-att-href="link['href']" t-esc="link['text']" />
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-lg-3 pt16 pb16">
+                                        <div class="s_social_media text-end no_icon_color o_not_editable" data-snippet="s_social_media" data-name="Social Media" contenteditable="false">
+                                            <h5 class="s_social_media_title d-none" contenteditable="true">Follow us</h5>
+                                            <a href="/website/social/github" class="s_social_media_github" target="_blank">
+                                                <i class="fa fa-2x fa-github m-1" />
+                                            </a>
+                                            <a href="/website/social/twitter" class="s_social_media_twitter" target="_blank">
+                                                <i class="fa fa-2x fa-twitter m-1" />
+                                            </a>
+                                            <a href="/website/social/instagram" class="s_social_media_instagram" target="_blank">
+                                                <i class="fa fa-2x fa-instagram m-1" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 pt16 pb16">
+                                        <a href="/contactus" class="btn btn-block btn-primary">Get in touch</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="ir_ui_view_2873" model="ir.ui.view">
+        <field name="name">Bulk Order</field>
+        <field name="type">qweb</field>
+        <field name="key">website.bulk-order</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <t t-name="website.bulk-order">
+                <t t-call="website.layout">
+                    <div id="wrap" class="oe_structure oe_empty">
+                        <section class="s_website_form pt16 pb16 o_colored_level" data-vcss="001" data-snippet="s_website_form" data-name="Form" style="background-image: none;">
+                            <div class="container">
+                                <form action="/website/form/" method="post" enctype="multipart/form-data" class="o_mark_required" data-mark="*" data-pre-fill="true" data-success-mode="redirect" data-success-page="/contactus-thank-you" data-model_name="crm.lead">
+                                    <div class="s_website_form_rows row s_col_no_bgcolor">
+                                        <div data-visibility-condition="" data-visibility-between="" class="s_website_form_field mb-3 col-12 s_website_form_required col-lg-9" data-type="char" data-name="Field">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px;" for="olwptyu9ytwh">
+                                                    <span class="s_website_form_label_content">Name</span>
+                                                    <span class="s_website_form_mark">     *</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <input type="text" class="form-control s_website_form_input" name="contact_name" required="1" placeholder="" id="olwptyu9ytwh" data-fill-with="name" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="s_website_form_field mb-3 col-12 col-lg-9" data-type="tel" data-name="Field" data-visibility-condition="" data-visibility-between="">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px;" for="o19zsfx0sxif">
+                                                    <span class="s_website_form_label_content">Phone Number</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <input type="tel" class="form-control s_website_form_input" name="phone" data-fill-with="phone" id="o19zsfx0sxif" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="s_website_form_field mb-3 col-12 s_website_form_required col-lg-9" data-type="email" data-name="Field" data-visibility-condition="" data-visibility-between="">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px;" for="ox97g6rsq76d">
+                                                    <span class="s_website_form_label_content">Email</span>
+                                                    <span class="s_website_form_mark"> *</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <input type="email" class="form-control s_website_form_input" name="email_from" required="1" data-fill-with="email" id="ox97g6rsq76d" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div data-visibility-condition="" data-visibility-between="" class="s_website_form_field mb-3 col-12 s_website_form_required col-lg-9" data-type="char" data-name="Field">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px;" for="oq3raje14j2">
+                                                    <span class="s_website_form_label_content">Company Name</span>
+                                                    <span class="s_website_form_mark">             *</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <input type="text" class="form-control s_website_form_input" name="partner_name" required="1" value="" placeholder="" id="oq3raje14j2" data-fill-with="commercial_company_name" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="s_website_form_field mb-3 col-12 s_website_form_model_required col-lg-9" data-type="char" data-name="Field" data-visibility-condition="" data-visibility-between="">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px;" for="onr3i3inubk">
+                                                    <span class="s_website_form_label_content">Subject</span>
+                                                    <span class="s_website_form_mark"> *</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <input type="text" class="form-control s_website_form_input" name="name" required="true" id="onr3i3inubk" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div data-visibility-condition="" data-visibility-between="" class="s_website_form_field mb-3 col-12" data-type="many2one" data-name="Field">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="ouiin7gzxxn">
+                                                    <span class="s_website_form_label_content">Product</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <select class="form-select s_website_form_input" name="x_studio_product" id="ouiin7gzxxn" style="">
+                                                        <option value="9" selected="selected">[21CDS0LN00] ThinkPad X1 Yoga 35.56cms - 12th Gen Intel i7 (32 GB Soldered LPDDR5 5200MHz, 1 TB SSD M.2 2280 PCIe Gen4, Yes)</option>
+                                                        <option value="4">[21E8S00Y00] ThinkPad X1 Nano 33.02cms - 12th Gen Intel i7 (16 GB LPDDR5 5200 soldered, 1 TB M.2 2242 SSD, No)</option>
+                                                        <option value="12">[K160]    Wireless Keyboard (Hp)</option>
+                                                        <option value="11">[K380]    Wireless Keyboard (Logitech)</option>
+                                                        <option value="10">Mouse</option>
+                                                        <option value="16">ThinkPad X1 Carbon 35.56cms - 12th Gen Intel i7 (32 GB Soldered LPDDR5 5200MHz, 1 TB SSD M.2 2280 PCIe Gen4)</option>
+                                                        <option value="19">ThinkPad X1 Carbon 35.56cms - 12th Gen Intel i7 (16 GB LPDDR5 5200 soldered, 1 TB SSD M.2 2280 PCIe Gen4)</option>
+                                                        <option value="24">ThinkPad X1 Carbon 35.56cms - 12th Gen Intel i7 (16 GB LPDDR5 5200 soldered, 1 TB M.2 2242 SSD)</option>
+                                                        <option value="25">ThinkPad X1 Carbon 35.56cms - 12th Gen Intel i7 (32 GB Soldered LPDDR5 5200MHz, 1 TB M.2 2242 SSD)</option>
+                                                        <option value="26">ThinkPad X1 Nano 33.02cms - 12th Gen Intel i7 (32 GB Soldered LPDDR5 5200MHz, 1 TB M.2 2242 SSD, No)</option>
+                                                        <option value="27">ThinkPad X1 Nano 33.02cms - 12th Gen Intel i7 (16 GB LPDDR5 5200 soldered, 1 TB SSD M.2 2280 PCIe Gen4, No)</option>
+                                                        <option value="28">ThinkPad X1 Nano 33.02cms - 12th Gen Intel i7 (32 GB Soldered LPDDR5 5200MHz, 1 TB SSD M.2 2280 PCIe Gen4, No)</option>
+                                                        <option value="29">ThinkPad X1 Nano 33.02cms - 12th Gen Intel i7 (16 GB LPDDR5 5200 soldered, 1 TB M.2 2242 SSD, Yes)</option>
+                                                        <option value="30">ThinkPad X1 Nano 33.02cms - 12th Gen Intel i7 (16 GB LPDDR5 5200 soldered, 1 TB SSD M.2 2280 PCIe Gen4, Yes)</option>
+                                                        <option value="31">ThinkPad X1 Nano 33.02cms - 12th Gen Intel i7 (32 GB Soldered LPDDR5 5200MHz, 1 TB M.2 2242 SSD, Yes)</option>
+                                                        <option value="32">ThinkPad X1 Nano 33.02cms - 12th Gen Intel i7 (32 GB Soldered LPDDR5 5200MHz, 1 TB SSD M.2 2280 PCIe Gen4, Yes)</option>
+                                                        <option value="33">ThinkPad X1 Yoga 35.56cms - 12th Gen Intel i7 (16 GB LPDDR5 5200 soldered, 1 TB SSD M.2 2280 PCIe Gen4, Yes)</option>
+                                                        <option value="34">ThinkPad X1 Yoga 35.56cms - 12th Gen Intel i7 (16 GB LPDDR5 5200 soldered, 1 TB M.2 2242 SSD, Yes)</option>
+                                                        <option value="35">ThinkPad X1 Yoga 35.56cms - 12th Gen Intel i7 (32 GB Soldered LPDDR5 5200MHz, 1 TB M.2 2242 SSD, Yes)</option>
+                                                        <option value="36">ThinkPad X1 Yoga 35.56cms - 12th Gen Intel i7 (16 GB LPDDR5 5200 soldered, 1 TB M.2 2242 SSD, No)</option>
+                                                        <option value="37">ThinkPad X1 Yoga 35.56cms - 12th Gen Intel i7 (16 GB LPDDR5 5200 soldered, 1 TB SSD M.2 2280 PCIe Gen4, No)</option>
+                                                        <option value="38">ThinkPad X1 Yoga 35.56cms - 12th Gen Intel i7 (32 GB Soldered LPDDR5 5200MHz, 1 TB M.2 2242 SSD, No)</option>
+                                                        <option value="39">ThinkPad X1 Yoga 35.56cms - 12th Gen Intel i7 (32 GB Soldered LPDDR5 5200MHz, 1 TB SSD M.2 2280 PCIe Gen4, No)</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div data-visibility-condition="" data-visibility-between="" class="s_website_form_field mb-3 col-12 col-lg-4" data-type="float" data-name="Field">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px;" for="o15pepgfdxg8">
+                                                    <span class="s_website_form_label_content">No Of Quantity</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <input type="number" class="form-control s_website_form_input" name="x_studio_no_of_quantity" step="any" value="" placeholder="" id="o15pepgfdxg8" data-fill-with="undefined" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div data-visibility-condition="" data-visibility-between="" class="s_website_form_field mb-3 col-12 s_website_form_required col-lg-9" data-type="text" data-name="Field">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px;" for="o7emludeqy7">
+                                                    <span class="s_website_form_label_content">Description</span>
+                                                    <span class="s_website_form_mark">             *</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <textarea class="form-control s_website_form_input" name="description" required="1" placeholder="" id="o7emludeqy7" rows="3" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-0 py-2 col-12 s_website_form_submit" data-name="Submit Button">
+                                            <div style="width: 200px;" class="s_website_form_label" />
+                                            <a href="#" role="button" class="btn btn-primary btn-lg s_website_form_send o_default_snippet_text">Submit</a>
+                                            <span id="s_website_form_result" />
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </section>
+                    </div>
+                </t>
+            </t>
+        </field>
+    </record>
+    <record id="ir_ui_view_2979" model="ir.ui.view">
+        <field name="name">website_helpdesk.team_form_1</field>
+        <field name="type">qweb</field>
+        <field name="key">website_helpdesk.team_form_1</field>
+        <field name="website_id" ref="website.default_website" />
+        <field name="arch" type="xml">
+            <t name="Helpdesk: Submit a Ticket Form" t-name="website_helpdesk.ticket_submit_form">
+                <div class="container">
+                    <h2 class="text-muted">
+                                Submit a Ticket
+                                <t t-if="multiple_teams"> - <t t-out="team.name" /></t>
+                        </h2>
+                    <div class="oe_structure" id="oe_structure_whelpdesk_form_1" />
+                    <span class="hidden" data-for="helpdesk_ticket_form" t-att-data-values="{'team_id': team and team.id or ''}" />
+                    <div id="helpdesk_section" class="">
+                        <section class="s_website_form pt16 pb16 o_colored_level" data-vcss="001" data-snippet="s_website_form" data-name="Form" style="background-image: none;">
+                            <div class="container">
+                                <form id="helpdesk_ticket_form" action="/website/form/" method="post" enctype="multipart/form-data" class="o_mark_required" data-mark="*" data-pre-fill="true" data-success-mode="redirect" data-success-page="/your-ticket-has-been-submitted" data-model_name="helpdesk.ticket">
+                                    <div class="s_website_form_rows row s_col_no_bgcolor">
+                                        <div class="mb-0 py-2 s_website_form_field col-12 s_website_form_required" data-type="char" data-name="Field">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="helpdesk1">
+                                                    <span class="s_website_form_label_content">Your Name</span>
+                                                    <span class="s_website_form_mark"> *</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <input type="text" class="form-control s_website_form_input" name="partner_name" required="1" data-fill-with="name" id="helpdesk1" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-0 py-2 s_website_form_field col-12 s_website_form_required" data-type="email" data-name="Field">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="helpdesk2">
+                                                    <span class="s_website_form_label_content">Your Email</span>
+                                                    <span class="s_website_form_mark"> *</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <input type="email" class="form-control s_website_form_input" name="partner_email" required="1" data-fill-with="email" id="helpdesk2" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-0 py-2 s_website_form_field col-12 s_website_form_model_required" data-type="char" data-name="Field">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="helpdesk3">
+                                                    <span class="s_website_form_label_content">Subject</span>
+                                                    <span class="s_website_form_mark"> *</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <input type="text" class="form-control s_website_form_input" name="name" required="true" id="helpdesk3" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div data-visibility-condition="" data-visibility-between="" class="s_website_form_field mb-3 col-12" data-type="many2one" data-name="Field">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="ogvq3i6jgszt">
+                                                    <span class="s_website_form_label_content">Product</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <select class="form-select s_website_form_input" name="product_id" id="ogvq3i6jgszt" style="">
+                                                        <option value="5" selected="selected">[21CBS1RJ00] ThinkPad X1 Carbon 35.56cms - 12th Gen Intel i7</option>
+                                                        <option value="9">[21CDS0LN00] ThinkPad X1 Yoga 35.56cms - 12th Gen Intel i7</option>
+                                                        <option value="4">[21E8S00Y00] ThinkPad X1 Nano 33.02cms - 12th Gen Intel i7</option>
+                                                        <option value="1">[Delivery_007] Standard delivery</option>
+                                                        <option value="12">[K160]    Wireless Keyboard (Hp)</option>
+                                                        <option value="11">[K380]    Wireless Keyboard (Logitech)</option>
+                                                        <option value="14">CCTV Camera</option>
+                                                        <option value="10">Mouse</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div data-visibility-condition="" data-visibility-between="" class="s_website_form_field mb-3 col-12" data-type="many2one" data-name="Field">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="otq6u35ez5bi">
+                                                    <span class="s_website_form_label_content">Lot/Serial Number</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <select class="form-select s_website_form_input" name="lot_id" id="otq6u35ez5bi" style="">
+                                                        <option value="2" selected="selected">CNC012345</option>
+                                                        <option value="3">CNC012346</option>
+                                                        <option value="4">CNC012347</option>
+                                                        <option value="5">CNC012348</option>
+                                                        <option value="6">CNC012349</option>
+                                                        <option value="7">M00001</option>
+                                                        <option value="8">M00002</option>
+                                                        <option value="9">M00003</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-0 py-2 s_website_form_field col-12" data-type="char" data-name="Field">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="helpdesk4">
+                                                    <span class="s_website_form_label_content">Description</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <textarea type="text" class="form-control s_website_form_input" name="description" id="helpdesk4" rows="5" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-0 py-2 s_website_form_field col-12 s_website_form_custom" data-type="binary" data-name="Field">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label class=" col-sm-auto s_website_form_label " style="width: 200px" for="helpdesk5">
+                                                    <span class="s_website_form_label_content">Attachment</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <input type="file" class="form-control s_website_form_input" name="Attachment" id="helpdesk5" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-0 py-2 s_website_form_field col-12 s_website_form_dnone" data-name="Field" style="">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px">
+                                                    <span class="s_website_form_label_content" />
+                                                </label>
+                                                <div class="col-sm">
+                                                    <input type="hidden" class="form-control s_website_form_input" name="team_id" id="helpdesk6" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-0 py-2 col-12 s_website_form_submit" data-name="Submit Button">
+                                            <div style="width: 200px;" class="s_website_form_label" />
+                                            <a href="#" role="button" class="btn btn-primary btn-lg s_website_form_send o_default_snippet_text">Submit Ticket</a>
+                                            <span id="s_website_form_result" />
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </t>
+        </field>
+    </record>
+</odoo>
