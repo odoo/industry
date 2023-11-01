@@ -42,6 +42,7 @@ It contains the apps created with Studio and the customizations of existing apps
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_member.xml',
+        'data/res_config_settings.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -52,6 +53,7 @@ It contains the apps created with Studio and the customizations of existing apps
         'demo/stock_lot.xml',
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
+        'demo/purchase_order_post.xml'
     ],
     'application': False,
     'license': 'OPL-1',
