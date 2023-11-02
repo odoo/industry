@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="sale_order_1" model="sale.order">
+        <field name="partner_id" ref="res_partner_8"/>
+    </record>
+
+    <record id="sale_order_line_1" model="sale.order.line">
+        <field name="name">Chicken Puffs</field>
+        <field name="product_id" ref="product_product_49"/>
+        <field name="order_id" ref="sale_order_1"/>
+        <field name="price_unit">5.0</field>
+    </record>
+
+
+    <record id="sale_order_2" model="sale.order">
+        <field name="partner_id" ref="res_partner_8"/>
+    </record>
+
+    <record id="sale_order_line_2" model="sale.order.line">
+        <field name="name">Black Forest 1 kG Cake</field>
+        <field name="product_id" ref="product_product_52"/>
+        <field name="order_id" ref="sale_order_2"/>
+        <field name="price_unit">10.0</field>
+    </record>
+    <record id="sale_order_line_3" model="sale.order.line">
+        <field name="name">Chicken Cutlate</field>
+        <field name="product_id" ref="product_product_50"/>
+        <field name="order_id" ref="sale_order_2"/>
+        <field name="price_unit">7.0</field>
+    </record>
+    <record id="sale_order_line_4" model="sale.order.line">
+        <field name="name">Chicken Puffs</field>
+        <field name="product_id" ref="product_product_49"/>
+        <field name="order_id" ref="sale_order_2"/>
+        <field name="price_unit">5.0</field>
+    </record>
+
+    <function model="sale.order" name="action_confirm">
+        <value eval="[
+            ref('sale_order_1'),
+            ref('sale_order_2')]"/>
+    </function>
+
+    <function name="button_validate" model="stock.picking">
+        <value model="stock.picking" eval="(
+                obj().env.ref('cake_shop.sale_order_1') +
+                obj().env.ref('cake_shop.sale_order_2')
+            ).picking_ids.ids"/>
+    </function>
+
+    <function name="_create_invoices" model="sale.order">
+        <value eval="[ref('sale_order_1')]"/>
+    </function>
+
+    <function name="action_post" model="account.move">
+        <value model="sale.order" eval="
+            (
+                obj().env.ref('cake_shop.sale_order_1')
+            ).invoice_ids.ids
+        "/>
+    </function>
+
+
+    <record id="sale_order_3" model="sale.order">
+        <field name="partner_id" ref="res_partner_10"/>
+        <field name="carrier_id" ref="delivery.free_delivery_carrier"/>
+        <field name="state">sent</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+
+    <record id="sale_order_line_5" model="sale.order.line">
+        <field name="name">Chicken Puffs</field>
+        <field name="product_id" ref="product_product_49"/>
+        <field name="order_id" ref="sale_order_3"/>
+        <field name="price_unit">5.0</field>
+    </record>
+
+    <record id="sale_order_line_6" model="sale.order.line">
+        <field name="name">Veg Puffs</field>
+        <field name="product_id" ref="product_product_48"/>
+        <field name="order_id" ref="sale_order_3"/>
+        <field name="price_unit">4.0</field>
+    </record>
+
+    <record id="sale_order_line_7" model="sale.order.line">
+        <field name="name">Standard delivery</field>
+        <field name="product_id" ref="delivery.product_product_delivery"/>
+        <field name="order_id" ref="sale_order_3"/>
+        <field name="is_delivery" eval="True"/>
+        <field name="sequence">11</field>
+    </record>
+</odoo>
