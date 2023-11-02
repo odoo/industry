@@ -1,0 +1,323 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!-- Move sale order to PoS and confirm it -->
+    <record id="fmcg_store.pos_session_1" model="pos.session">
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="config_id" ref="point_of_sale.pos_config_main"/>
+    </record>
+
+    <!-- session 1 -->
+    <function model="pos.session" name="action_pos_session_open"
+        eval="[obj().env.ref('fmcg_store.pos_session_1').id]" />
+
+    <record id="fmcg_store.pos_order_1" model="pos.order">
+        <field name="partner_id" ref="fmcg_store.res_partner_10"/>
+        <field name="session_id" ref="fmcg_store.pos_session_1"/>
+        <field name="config_id" ref="point_of_sale.pos_config_main"/>
+        <field name="amount_return">0.0</field>
+        <field name="amount_tax">0</field>
+        <field name="amount_total">4500.00</field>
+        <field name="amount_paid">4500.00</field>
+    </record>
+
+    <record model="pos.order.line" id="pos_order_line_1">
+        <field name="full_product_name" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_10').name"/>
+        <field name="product_id" model="product.product" eval="obj().env.ref('fmcg_store.sale_order_line_10').product_id.id"/>
+        <field name="order_id" ref="fmcg_store.pos_order_1"/>
+        <field name="price_subtotal" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_10').price_subtotal"/>
+        <field name="price_subtotal_incl" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_10').price_subtotal"/>
+        <field name="sale_order_origin_id" eval="ref('sale_order_9')"/>
+    </record>
+
+    <function model="pos.order" name="action_pos_order_paid"
+        eval="[obj().env.ref('fmcg_store.pos_order_1').id]"/>
+
+    <function model="pos.order" name="action_pos_order_invoice"
+        eval="[obj().env.ref('fmcg_store.pos_order_1').id]"/>
+
+    <function model="pos.session" name="post_closing_cash_details"
+        eval="[[ref('fmcg_store.pos_session_1')], 4500.00]" />
+
+    <function model="pos.session" name="update_closing_control_state_session"
+        eval="[[ref('fmcg_store.pos_session_1')], '']" />
+
+    <function model="pos.session" name="action_pos_session_closing_control"
+        eval="[[ref('fmcg_store.pos_session_1')]]" />
+
+
+    <!-- session 2 -->
+    <record id="fmcg_store.pos_session_2" model="pos.session">
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="config_id" ref="point_of_sale.pos_config_main"/>
+    </record>
+
+    <function model="pos.session" name="action_pos_session_open"
+        eval="[obj().env.ref('fmcg_store.pos_session_2').id]" />
+
+    <record id="fmcg_store.pos_order_2" model="pos.order">
+        <field name="partner_id" ref="fmcg_store.res_partner_9"/>
+        <field name="session_id" ref="fmcg_store.pos_session_2"/>
+        <field name="config_id" ref="point_of_sale.pos_config_main"/>
+        <field name="amount_return">0.0</field>
+        <field name="amount_tax">3.00</field>
+        <field name="amount_total">108.00</field>
+        <field name="amount_paid">108.00</field>
+    </record>
+
+    <record model="pos.order.line" id="pos_order_line_2">
+        <field name="full_product_name" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_12').name"/>
+        <field name="product_id" model="product.product" eval="obj().env.ref('fmcg_store.sale_order_line_12').product_id.id"/>
+        <field name="order_id" ref="fmcg_store.pos_order_2"/>
+        <field name="price_subtotal" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_12').price_subtotal"/>
+        <field name="price_subtotal_incl" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_12').price_subtotal"/>
+        <field name="sale_order_origin_id" eval="ref('sale_order_11')"/>
+    </record>
+    <record model="pos.order.line" id="pos_order_line_3">
+        <field name="full_product_name" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_13').name" />
+        <field name="product_id" model="product.product" eval="obj().env.ref('fmcg_store.sale_order_line_13').product_id.id"/>
+        <field name="order_id" ref="fmcg_store.pos_order_2"/>
+        <field name="price_subtotal" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_13').price_subtotal"/>
+        <field name="price_subtotal_incl" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_13').price_subtotal"/>
+        <field name="sale_order_origin_id" eval="ref('sale_order_11')"/>
+    </record>
+
+    <function model="pos.order" name="action_pos_order_paid"
+        eval="[obj().env.ref('fmcg_store.pos_order_2').id]"/>
+
+    <function model="pos.session" name="post_closing_cash_details"
+        eval="[[ref('fmcg_store.pos_session_2')], 108.00]" />
+
+    <function model="pos.session" name="update_closing_control_state_session"
+        eval="[[ref('fmcg_store.pos_session_2')], '']" />
+
+    <function model="pos.session" name="action_pos_session_closing_control"
+        eval="[[ref('fmcg_store.pos_session_2')]]" />
+
+
+    <!-- session 3 -->
+    <record id="fmcg_store.pos_session_3" model="pos.session">
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="config_id" ref="point_of_sale.pos_config_main"/>
+    </record>
+
+    <function model="pos.session" name="action_pos_session_open"
+        eval="[obj().env.ref('fmcg_store.pos_session_3').id]" />
+
+    <record id="fmcg_store.pos_order_3" model="pos.order">
+        <field name="partner_id" ref="fmcg_store.res_partner_9"/>
+        <field name="session_id" ref="fmcg_store.pos_session_3"/>
+        <field name="config_id" ref="point_of_sale.pos_config_main"/>
+        <field name="amount_return">0.0</field>
+        <field name="amount_tax">1.50</field>
+        <field name="amount_total">11.50</field>
+        <field name="amount_paid">11.50</field>
+    </record>
+
+    <record model="pos.order.line" id="pos_order_line_4">
+        <field name="full_product_name" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_14').name"/>
+        <field name="product_id" model="product.product" eval="obj().env.ref('fmcg_store.sale_order_line_14').product_id.id"/>
+        <field name="order_id" ref="fmcg_store.pos_order_3"/>
+        <field name="price_subtotal" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_14').price_subtotal"/>
+        <field name="price_subtotal_incl" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_14').price_subtotal"/>
+        <field name="sale_order_origin_id" eval="ref('sale_order_12')"/>
+    </record>
+    <record model="pos.order.line" id="pos_order_line_5">
+        <field name="full_product_name" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_15').name" />
+        <field name="product_id" model="product.product" eval="obj().env.ref('fmcg_store.sale_order_line_15').product_id.id"/>
+        <field name="order_id" ref="fmcg_store.pos_order_3"/>
+        <field name="price_subtotal" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_15').price_subtotal"/>
+        <field name="price_subtotal_incl" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_15').price_subtotal"/>
+        <field name="sale_order_origin_id" eval="ref('sale_order_12')"/>
+    </record>
+
+    <function model="pos.order" name="action_pos_order_paid"
+        eval="[obj().env.ref('fmcg_store.pos_order_3').id]"/>
+
+    <function model="pos.session" name="post_closing_cash_details"
+        eval="[[ref('fmcg_store.pos_session_3')], 11.50]" />
+
+    <function model="pos.session" name="update_closing_control_state_session"
+        eval="[[ref('fmcg_store.pos_session_3')], '']" />
+
+    <function model="pos.session" name="action_pos_session_closing_control"
+        eval="[[ref('fmcg_store.pos_session_3')]]" />
+
+
+    <!-- session 4 -->
+    <record id="fmcg_store.pos_session_4" model="pos.session">
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="config_id" ref="point_of_sale.pos_config_main"/>
+    </record>
+
+    <function model="pos.session" name="action_pos_session_open"
+        eval="[obj().env.ref('fmcg_store.pos_session_4').id]" />
+
+    <record id="fmcg_store.pos_order_4" model="pos.order">
+        <field name="partner_id" ref="fmcg_store.res_partner_10"/>
+        <field name="session_id" ref="fmcg_store.pos_session_4"/>
+        <field name="config_id" ref="point_of_sale.pos_config_main"/>
+        <field name="amount_return">0.0</field>
+        <field name="amount_tax">0.60</field>
+        <field name="amount_total">17.70</field>
+        <field name="amount_paid">17.70</field>
+    </record>
+
+    <record model="pos.order.line" id="pos_order_line_6">
+        <field name="full_product_name" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_16').name"/>
+        <field name="product_id" model="product.product" eval="obj().env.ref('fmcg_store.sale_order_line_16').product_id.id"/>
+        <field name="order_id" ref="fmcg_store.pos_order_4"/>
+        <field name="price_subtotal" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_16').price_subtotal"/>
+        <field name="price_subtotal_incl" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_16').price_subtotal"/>
+        <field name="sale_order_origin_id" eval="ref('sale_order_13')"/>
+    </record>
+    <record model="pos.order.line" id="pos_order_line_7">
+        <field name="full_product_name" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_17').name" />
+        <field name="product_id" model="product.product" eval="obj().env.ref('fmcg_store.sale_order_line_17').product_id.id"/>
+        <field name="order_id" ref="fmcg_store.pos_order_4"/>
+        <field name="price_subtotal" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_17').price_subtotal"/>
+        <field name="price_subtotal_incl" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_17').price_subtotal"/>
+        <field name="sale_order_origin_id" eval="ref('sale_order_13')"/>
+    </record>
+    <record model="pos.order.line" id="pos_order_line_8">
+        <field name="full_product_name" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_18').name" />
+        <field name="product_id" model="product.product" eval="obj().env.ref('fmcg_store.sale_order_line_18').product_id.id"/>
+        <field name="order_id" ref="fmcg_store.pos_order_4"/>
+        <field name="price_subtotal" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_18').price_subtotal"/>
+        <field name="price_subtotal_incl" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_18').price_subtotal"/>
+        <field name="sale_order_origin_id" eval="ref('sale_order_13')"/>
+    </record>
+
+    <function model="pos.order" name="action_pos_order_paid"
+        eval="[obj().env.ref('fmcg_store.pos_order_4').id]"/>
+
+    <function model="pos.session" name="post_closing_cash_details"
+        eval="[[ref('fmcg_store.pos_session_4')], 17.70]" />
+
+    <function model="pos.session" name="update_closing_control_state_session"
+        eval="[[ref('fmcg_store.pos_session_4')], '']" />
+
+    <function model="pos.session" name="action_pos_session_closing_control"
+        eval="[[ref('fmcg_store.pos_session_4')]]" />
+
+
+    <!-- session 5 -->
+    <record id="fmcg_store.pos_session_5" model="pos.session">
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="config_id" ref="point_of_sale.pos_config_main"/>
+    </record>
+
+    <function model="pos.session" name="action_pos_session_open"
+        eval="[obj().env.ref('fmcg_store.pos_session_5').id]" />
+
+    <record id="fmcg_store.pos_order_5" model="pos.order">
+        <field name="partner_id" ref="fmcg_store.res_partner_10"/>
+        <field name="session_id" ref="fmcg_store.pos_session_5"/>
+        <field name="config_id" ref="point_of_sale.pos_config_main"/>
+        <field name="amount_return">0.0</field>
+        <field name="amount_tax">11.40</field>
+        <field name="amount_total">115.40</field>
+        <field name="amount_paid">115.40</field>
+    </record>
+
+    <record model="pos.order.line" id="pos_order_line_9">
+        <field name="full_product_name" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_19').name"/>
+        <field name="product_id" model="product.product" eval="obj().env.ref('fmcg_store.sale_order_line_19').product_id.id"/>
+        <field name="order_id" ref="fmcg_store.pos_order_5"/>
+        <field name="price_subtotal" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_19').price_subtotal"/>
+        <field name="price_subtotal_incl" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_19').price_subtotal"/>
+        <field name="sale_order_origin_id" eval="ref('sale_order_14')"/>
+    </record>
+    <record model="pos.order.line" id="pos_order_line_10">
+        <field name="full_product_name" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_20').name" />
+        <field name="product_id" model="product.product" eval="obj().env.ref('fmcg_store.sale_order_line_20').product_id.id"/>
+        <field name="order_id" ref="fmcg_store.pos_order_5"/>
+        <field name="price_subtotal" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_20').price_subtotal"/>
+        <field name="price_subtotal_incl" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_20').price_subtotal"/>
+        <field name="sale_order_origin_id" eval="ref('sale_order_14')"/>
+    </record>
+    <record model="pos.order.line" id="pos_order_line_11">
+        <field name="full_product_name" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_21').name" />
+        <field name="product_id" model="product.product" eval="obj().env.ref('fmcg_store.sale_order_line_21').product_id.id"/>
+        <field name="order_id" ref="fmcg_store.pos_order_5"/>
+        <field name="price_subtotal" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_21').price_subtotal"/>
+        <field name="price_subtotal_incl" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_21').price_subtotal"/>
+        <field name="sale_order_origin_id" eval="ref('sale_order_14')"/>
+    </record>
+    <record model="pos.order.line" id="pos_order_line_12">
+        <field name="full_product_name" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_22').name" />
+        <field name="product_id" model="product.product" eval="obj().env.ref('fmcg_store.sale_order_line_22').product_id.id"/>
+        <field name="order_id" ref="fmcg_store.pos_order_5"/>
+        <field name="price_subtotal" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_22').price_subtotal"/>
+        <field name="price_subtotal_incl" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_22').price_subtotal"/>
+        <field name="sale_order_origin_id" eval="ref('sale_order_14')"/>
+    </record>
+
+    <function model="pos.order" name="action_pos_order_paid"
+        eval="[obj().env.ref('fmcg_store.pos_order_5').id]"/>
+
+    <function model="pos.session" name="post_closing_cash_details"
+        eval="[[ref('fmcg_store.pos_session_5')], 115.40]" />
+
+    <function model="pos.session" name="update_closing_control_state_session"
+        eval="[[ref('fmcg_store.pos_session_5')], '']" />
+
+    <function model="pos.session" name="action_pos_session_closing_control"
+        eval="[[ref('fmcg_store.pos_session_5')]]" />
+
+
+    <!-- session 6 -->
+    <record id="fmcg_store.pos_session_6" model="pos.session">
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="config_id" ref="point_of_sale.pos_config_main"/>
+    </record>
+
+    <function model="pos.session" name="action_pos_session_open"
+        eval="[obj().env.ref('fmcg_store.pos_session_6').id]" />
+
+    <record id="fmcg_store.pos_order_6" model="pos.order">
+        <field name="partner_id" ref="fmcg_store.res_partner_9"/>
+        <field name="session_id" ref="fmcg_store.pos_session_6"/>
+        <field name="config_id" ref="point_of_sale.pos_config_main"/>
+        <field name="amount_return">0.0</field>
+        <field name="amount_tax">1.50</field>
+        <field name="amount_total">23.50</field>
+        <field name="amount_paid">23.50</field>
+    </record>
+
+    <record model="pos.order.line" id="pos_order_line_13">
+        <field name="full_product_name" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_23').name"/>
+        <field name="product_id" model="product.product" eval="obj().env.ref('fmcg_store.sale_order_line_23').product_id.id"/>
+        <field name="order_id" ref="fmcg_store.pos_order_6"/>
+        <field name="price_subtotal" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_23').price_subtotal"/>
+        <field name="price_subtotal_incl" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_23').price_subtotal"/>
+        <field name="sale_order_origin_id" eval="ref('sale_order_15')"/>
+    </record>
+    <record model="pos.order.line" id="pos_order_line_14">
+        <field name="full_product_name" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_24').name" />
+        <field name="product_id" model="product.product" eval="obj().env.ref('fmcg_store.sale_order_line_24').product_id.id"/>
+        <field name="order_id" ref="fmcg_store.pos_order_6"/>
+        <field name="price_subtotal" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_24').price_subtotal"/>
+        <field name="price_subtotal_incl" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_24').price_subtotal"/>
+        <field name="sale_order_origin_id" eval="ref('sale_order_15')"/>
+    </record>
+    <record model="pos.order.line" id="pos_order_line_15">
+        <field name="full_product_name" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_25').name" />
+        <field name="product_id" model="product.product" eval="obj().env.ref('fmcg_store.sale_order_line_25').product_id.id"/>
+        <field name="order_id" ref="fmcg_store.pos_order_6"/>
+        <field name="price_subtotal" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_25').price_subtotal"/>
+        <field name="price_subtotal_incl" model="sale.order.line" eval="obj().env.ref('fmcg_store.sale_order_line_25').price_subtotal"/>
+        <field name="sale_order_origin_id" eval="ref('sale_order_15')"/>
+    </record>
+
+    <function model="pos.order" name="action_pos_order_paid"
+        eval="[obj().env.ref('fmcg_store.pos_order_6').id]"/>
+
+    <function model="pos.session" name="post_closing_cash_details"
+        eval="[[ref('fmcg_store.pos_session_6')], 23.50]" />
+
+    <function model="pos.session" name="update_closing_control_state_session"
+        eval="[[ref('fmcg_store.pos_session_6')], '']" />
+
+    <function model="pos.session" name="action_pos_session_closing_control"
+        eval="[[ref('fmcg_store.pos_session_6')]]" />
+</odoo>
