@@ -15,7 +15,10 @@ It contains the apps created with Studio and the customizations of existing apps
         "calendar",
         "hr_hourly_cost",
         "knowledge",
+        "pos_hr",
         "pos_sale",
+        "pos_discount",
+        "loyalty",
         "product_expiry",
         "purchase_product_matrix",
         "purchase_stock",
@@ -42,6 +45,7 @@ It contains the apps created with Studio and the customizations of existing apps
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_member.xml',
+        'data/pos_config.xml',
         'data/res_config_settings.xml',
     ],
     'demo': [
@@ -53,7 +57,9 @@ It contains the apps created with Studio and the customizations of existing apps
         'demo/stock_lot.xml',
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
-        'demo/purchase_order_post.xml'
+        'demo/purchase_order_post.xml',
+        'demo/sale_order_post.xml',
+        'demo/pos_order_confirm.xml'
     ],
     'application': False,
     'license': 'OPL-1',
