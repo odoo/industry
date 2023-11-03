@@ -19,6 +19,7 @@
         'sale_planning',
         'sale_project',
         'sale_purchase',
+        'web_studio',
         'website_livechat',
         'website_partner',
         'website_sale_product_configurator',
