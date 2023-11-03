@@ -28,7 +28,8 @@ including laptops, RAM, accessories, and CCTV cameras.
         'website_helpdesk_knowledge',
         'website_sale_comparison',
         'website_sale_product_configurator',
-        'website_sale_stock'
+        'website_sale_stock',
+        'theme_graphene',
     ],
     'data': [
         'data/ir_attachment_pre.xml',
@@ -67,9 +68,11 @@ including laptops, RAM, accessories, and CCTV cameras.
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
         'demo/helpdesk_ticket.xml',
-        'demo/project_task.xml',
+        'demo/website_attachment.xml',
+        'demo/website_view.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
+        'demo/website_theme_apply.xml',
     ],
     'application': False,
     'license': 'OPL-1',
