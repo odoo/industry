@@ -23,6 +23,7 @@ including laptops, RAM, accessories, and CCTV cameras.
         'sale_crm',
         'sale_planning',
         'sale_purchase',
+        'stock_barcode',
         'website_appointment',
         'website_crm',
         'website_helpdesk_knowledge',
@@ -32,6 +33,7 @@ including laptops, RAM, accessories, and CCTV cameras.
         'theme_graphene',
     ],
     'data': [
+        'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',

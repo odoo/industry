@@ -8,12 +8,10 @@
         <field name="mode">extension</field>
         <field name="priority">160</field>
         <field name="arch" type="xml">
-            <data>
-                <xpath expr="//form[1]/sheet[1]/group[1]/group[not(@name)][1]/field[@name='tag_ids']" position="after">
-                    <field name="x_studio_product" string="Product" options="{&quot;no_create&quot;:true,&quot;no_opening&quot;:true}" />
-                    <field name="x_studio_no_of_quantity" string="No Of Quantity" />
-                </xpath>
-            </data>
+            <xpath expr="//form[1]/sheet[1]/group[1]/group[not(@name)][1]/field[@name='tag_ids']" position="after">
+                <field name="x_studio_product" string="Product" options="{&quot;no_create&quot;:true,&quot;no_opening&quot;:true}" />
+                <field name="x_studio_no_of_quantity" string="No Of Quantity" />
+            </xpath>
         </field>
     </record> 
     <record id="it_hardware.odoo_studio_helpdesk_9e573606-d6bf-4434-af27-f232fe489d2a" model="ir.ui.view">
@@ -24,13 +22,11 @@
         <field name="mode">extension</field>
         <field name="priority">800</field>
         <field name="arch" type="xml">
-            <data>
-                <xpath expr="//field[@name='email_cc']" position="after">
-                    <field name="product_id" invisible="1"/>
-                    <field name="lot_id" invisible="1"/>
-                    <field name="x_studio_warranty_date" string="Warranty Date" invisible="lot_id == False" readonly="1"/>
-                </xpath>
-            </data>
+            <xpath expr="//field[@name='email_cc']" position="after">
+                <field name="product_id" invisible="1"/>
+                <field name="lot_id" invisible="1"/>
+                <field name="x_studio_warranty_date" string="Warranty Date" invisible="lot_id == False" readonly="1"/>
+            </xpath>
         </field>
     </record>
     <record id="it_hardware.odoo_studio_product__9f35526f-5aa6-4bad-a44e-d680ff93e045" model="ir.ui.view">
@@ -41,18 +37,16 @@
         <field name="mode">extension</field>
         <field name="priority">160</field>
         <field name="arch" type="xml">
-            <data>
-                <xpath expr="//field[@name='default_code']" position="attributes">
-                    <attribute name="string">Part Code</attribute>
-                </xpath>
-                <xpath expr="//form[@name='Product Template']/sheet[@name='product_form']/notebook[1]/page[@name='inventory']/group[@name='inventory']/group[@name='expiry_and_lots']/div[4]" position="after">
-                    <label for="x_studio_warranty_date" />
-                    <div>
-                        <field name="x_studio_warranty_date" class="oe_inline" string="Warranty Date" />
-                        <span> days after delivery</span>
-                    </div>
-                </xpath>
-            </data>
+            <xpath expr="//field[@name='default_code']" position="attributes">
+                <attribute name="string">Part Code</attribute>
+            </xpath>
+            <xpath expr="//form[@name='Product Template']/sheet[@name='product_form']/notebook[1]/page[@name='inventory']/group[@name='inventory']/group[@name='expiry_and_lots']/div[4]" position="after">
+                <label for="x_studio_warranty_date" />
+                <div>
+                    <field name="x_studio_warranty_date" class="oe_inline" string="Warranty Date" />
+                    <span> days after delivery</span>
+                </div>
+            </xpath>
         </field>
     </record>
     <record id="it_hardware.odoo_studio_repair_f_301f3e90-2bf5-424c-b3c5-46a6cb9c8f46" model="ir.ui.view">
@@ -63,53 +57,10 @@
         <field name="mode">extension</field>
         <field name="priority">160</field>
         <field name="arch" type="xml">
-            <data>
-                <xpath expr="//field[@name='picking_id']" position="attributes">
-                    <attribute name="domain">[("picking_type_id", "in", [8])]</attribute>
-                    <attribute name="string">Repair Return</attribute>
-                </xpath>
-            </data>
-        </field>
-    </record>
-    <record id="it_hardware.odoo_studio_stock_pi_0f0dcc7b-f399-429d-9a79-877a9f603184" model="ir.ui.view">
-        <field name="name">Odoo Studio: stock.picking.form customization</field>
-        <field name="model">stock.picking</field>
-        <field name="type">form</field>
-        <field name="inherit_id" ref="stock.view_picking_form" />
-        <field name="mode">extension</field>
-        <field name="priority">160</field>
-        <field name="arch" type="xml">
-            <data>
-                <xpath expr="//field[@name='move_line_ids_without_package']" position="inside">
-                    <tree editable="bottom" decoration-muted="(state == 'done' and is_locked == True)" decoration-danger="state!='done' and parent.picking_type_code != 'incoming'" decoration-success="state!='done' and not result_package_id">
-                        <field name="product_id" required="1" context="{'default_detailed_type': 'product'}" readonly="state == 'done' or move_id != False" />
-                        <field name="company_id" invisible="1" />
-                        <field name="move_id" invisible="1" />
-                        <field name="picking_id" invisible="1" />
-                        <field name="product_uom_category_id" invisible="1" />
-                        <field name="package_id" invisible="1" />
-                        <field name="result_package_id" invisible="1" />
-                        <field name="location_id" invisible="1" />
-                        <field name="location_dest_id" invisible="1" />
-                        <field name="location_id" options="{'no_create': True}" column_invisible="parent.picking_type_code == 'incoming'" groups="stock.group_stock_multi_locations" domain="[('id', 'child_of', parent.location_id), '|', ('company_id', '=', False), ('company_id', '=', company_id), ('usage', '!=', 'view')]" />
-                        <field name="location_dest_id" options="{'no_create': True}" column_invisible="parent.picking_type_code == 'outgoing'" groups="stock.group_stock_multi_locations" domain="[('id', 'child_of', parent.location_dest_id), '|', ('company_id', '=', False), ('company_id', '=', company_id), ('usage', '!=', 'view')]" />
-                        <field name="package_id" groups="stock.group_tracking_lot" />
-                        <field name="result_package_id" groups="stock.group_tracking_lot" />
-                        <field name="lots_visible" invisible="1" />
-                        <field name="owner_id" groups="stock.group_tracking_owner" column_invisible="parent.picking_type_code == 'incoming'" />
-                        <field name="state" invisible="1" />
-                        <field name="lot_id" groups="stock.group_production_lot" column_invisible="parent.show_lots_text == True" invisible="lots_visible == False" context="{'default_product_id': product_id, 'default_company_id': company_id, 'active_picking_id': picking_id}" optional="show" />
-                        <field name="is_expired" invisible="1" />
-                        <button class="fa fa-exclamation-triangle text-danger" title="This lot is expired." string="This lot is expired" disabled="1" invisible="is_expired == False" />
-                        <field name="lot_name" groups="stock.group_production_lot" column_invisible="parent.show_lots_text == False" invisible="lots_visible == False" context="{'default_product_id': product_id}" />
-                        <field name="picking_type_use_existing_lots" invisible="1" />
-                        <field name="expiration_date" force_save="1" column_invisible="parent.picking_type_code != 'incoming'" readonly="picking_type_use_existing_lots == True" />
-                        <field optional="show" name="x_studio_warranty_date" string="Warranty Date" />
-                        <field name="is_locked" invisible="1" />
-                        <field name="product_uom_id" force_save="1" readonly="state != 'draft' and id != False" groups="uom.group_uom" />
-                    </tree>
-                </xpath>
-            </data>
+            <xpath expr="//field[@name='picking_id']" position="attributes">
+                <attribute name="domain">[("picking_type_id", "in", [8])]</attribute>
+                <attribute name="string">Repair Return</attribute>
+            </xpath>
         </field>
     </record>
     <record id="it_hardware.odoo_studio_stock_pr_86553829-1db0-4c73-8dcb-23cc06066a9a" model="ir.ui.view">
@@ -120,11 +71,9 @@
         <field name="mode">extension</field>
         <field name="priority">160</field>
         <field name="arch" type="xml">
-            <data>
-                <xpath expr="//field[@name='removal_date']" position="after">
-                    <field name="x_studio_warranty_date" string="Warranty Date" />
-                </xpath>
-            </data>
+            <xpath expr="//field[@name='removal_date']" position="after">
+                <field name="x_studio_warranty_date" string="Warranty Date" />
+            </xpath>
         </field>
     </record>
 </odoo>
