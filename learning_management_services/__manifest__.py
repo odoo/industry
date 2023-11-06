@@ -35,8 +35,6 @@ communication tools, certification and gamification.
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/product_category.xml',
-        # 'data/account_analytic_plan.xml',
-        # 'data/product_template.xml',
         'data/product_pricelist.xml',
         'data/product_product.xml',
         'data/loyalty_program.xml',
