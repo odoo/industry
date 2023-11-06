@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
     <function model="ir.module.module" name="_theme_load" context="{'apply_new_theme': True}">
-        <value model="ir.module.module" eval="obj().env['ir.module.module'].search([('name', '=', 'theme_clean')]).ids"/>
+        <value model="ir.module.module" eval="ref('base.module_theme_clean')"/>
         <value  model="ir.module.module" eval="obj().env.ref('website.default_website')"/>
     </function>
-    
+
     <function model="web_editor.assets" name="make_scss_customization" context="{'website_id': ref('website.default_website')}">
         <value eval="'/website/static/src/scss/options/colors/user_color_palette.scss'"/>
         <value eval="{
@@ -20,4 +20,44 @@
             }"/>
     </function>
 
+    <function model="web_editor.assets" name="make_scss_customization" context="{'website_id': ref('website.default_website')}">
+        <value eval="'/website/static/src/scss/options/user_values.scss'"/>
+        <value eval="{
+            'footer-gradient': 'linear-gradient(135deg, rgb(47, 128, 237) 0%, rgb(178, 255, 218) 100%)',
+            }"/>
+    </function>
+
+    <function model="ir.ui.view" name="write">
+        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('website.default_website').id).viewref('website.homepage').ids"/>
+        <value model="ir.ui.view" eval="{'arch': obj().env.ref('learning_management_services.homepage').arch}"/>
+    </function>
+
+    <function model="ir.ui.view" name="write">
+        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('website.default_website').id).viewref('website.contactus').ids"/>
+        <value model="ir.ui.view" eval="{'arch': obj().env.ref('learning_management_services.contactus').arch}"/>
+    </function>
+
+    <function model="ir.ui.view" name="write">
+        <value model="ir.ui.view" eval="obj().search([('key', 'in', [
+            'website.template_header_vertical',
+        ])]).ids"/>
+        <value eval="{'active': True}"/>
+    </function>
+
+    <function model="web_editor.assets" name="make_scss_customization" context="{'website_id': ref('website.default_website')}">
+        <value eval="'/website/static/src/scss/options/user_values.scss'"/>
+        <value eval="{'header-links-style': 'default'}"/>
+    </function>
+    <function model="web_editor.assets" name="make_scss_customization" context="{'website_id': ref('website.default_website')}">
+        <value eval="'/website/static/src/scss/options/user_values.scss'"/>
+        <value eval="{'header-template': '&quot;vertical&quot;'}"/>
+    </function>
+
+    <function model="website.menu" name="write">
+        <value model="website.menu" eval="obj().search([
+            ('website_id', '=', ref('website.default_website')),
+            ('url', '=', '/appointment'),
+        ]).id"/>
+        <value eval="{'url': 'appointment/' + str(ref('learning_management_services.appointment_type_1'))}"/>
+    </function>
 </odoo>
