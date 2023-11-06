@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Lawyer Industry',
+    'name': 'Lawyer',
     'version': '1.0',
     'category': 'Industry',
     'description': u"""
@@ -44,4 +44,5 @@
     ],
     'application': False,
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }
