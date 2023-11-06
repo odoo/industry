@@ -2,7 +2,7 @@
 {
     'name': 'Bar and Lounge',
     'version': '1.0',
-    'category': 'Industry',
+    'category': 'Services',
     'description': """
 ​This setup is for service companies who provides all kind of service that customer can available at the Airport like Porter Service, Buggy Service, Airport Assistance etc..
 ​This Services can be avail directly from the airport and individuals can also purchase the services from the website.

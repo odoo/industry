@@ -2,7 +2,7 @@
 {
     'name': 'Lawyer',
     'version': '1.0',
-    'category': 'Industry',
+    'category': 'Services',
     'description': u"""
     This module insall a configuration that preset the modules and
     configuration of a law firm.
