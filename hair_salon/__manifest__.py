@@ -2,7 +2,7 @@
 {
     'name': 'Hair Salon',
     'version': '1.0',
-    'category': 'Industry',
+    'category': 'Services',
     'description': """
         This module is for hair salons providing hair-related services such as hair cutting, brushing, coloring, hair and
         scalp treatments, beard and mustache shaping.

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Certification organism',
+    'name': 'Certification Auditors',
     'version': '1.0',
-    'category': 'Industry',
+    'category': 'Services',
     'description': u"""
 This module setup your database to easily use odoo in a certification company.
 """,

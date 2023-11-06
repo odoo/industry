@@ -2,12 +2,12 @@
 {
     'name': 'Surveyor',
     'version': '1.0',
-    'category': 'Industry',
+    'category': 'Services',
     'description': """
 This setup is for industrial companies who are into sureveying and measurement activities.
 It may include surveying of building properties and the measurement of completed construction activities.
 """,
-    'author': 'Odoo',
+    'author': 'Odoo S.A.',
     'depends': [
         'base_automation',
         'account',
