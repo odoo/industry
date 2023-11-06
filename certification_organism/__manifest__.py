@@ -54,4 +54,6 @@ This module setup your database to easily use odoo in a certification company.
     ],
     'application': False,
     'license': 'OPL-1',
+    'images': ['images/main.png'],
+
 }

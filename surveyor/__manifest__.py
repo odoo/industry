@@ -52,4 +52,5 @@ It may include surveying of building properties and the measurement of completed
     ],
     'application': False,
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }

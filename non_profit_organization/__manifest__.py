@@ -8,7 +8,7 @@
 
     This industry module pre-configure odoo for non profit organizations.
 """,
-    'author': 'Industry-Non Profit Organization',
+    'author': 'Odoo S.A.',
     'depends': [
         'knowledge',
         'mass_mailing',
@@ -44,4 +44,5 @@
     ],
     'application': False,
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }
