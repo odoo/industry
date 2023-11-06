@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="field_rental_start_date" model="ir.model.fields">
+        <field name="name">x_rental_start_date</field>
+        <field name="field_description">Rental Start Date</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ttype">date</field>
+    </record>
+
+    <record id="field_account_analytic_account_id" model="ir.model.fields">
+        <field name="name">x_account_analytic_account_id</field>
+        <field name="field_description">Property</field>
+        <field name="domain">[('x_is_property', '=', True)]</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">account.analytic.account</field>
+        <field name="group_expand" eval="True"/>
+    </record>
+
+    <record id="field_is_property_rental" model="ir.model.fields">
+        <field name="name">x_is_property_rental</field>
+        <field name="field_description">Is Property Rental</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ttype">boolean</field>
+        <field name="readonly" eval="True"/>
+        <field name="group_expand" eval="True"/>
+        <field name="depends">x_account_analytic_account_id</field>
+        <field name="compute">
+<![CDATA[
+for property in self:
+    property['x_is_property_rental'] = property.x_account_analytic_account_id
+]]>
+</field>
+    </record>
+
+    <record id="field_guarant_partner_id" model="ir.model.fields">
+        <field name="name">x_guarant_partner_id</field>
+        <field name="field_description">Guarant</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.partner</field>
+    </record>
+
+    <record id="field_sale_order_meter_reading_ids" model="ir.model.fields">
+        <field name="name">x_so_meter_reading_ids</field>
+        <field name="field_description">Meter Readings</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ttype">one2many</field>
+        <field name="relation">x_meter_reading</field>
+        <field name="relation_field">x_sale_order_id</field>
+    </record>
+    <record id="field_sale_order_related_building_ids" model="ir.model.fields">
+        <field name="name">x_related_building_ids</field>
+        <field name="field_description">Building</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ttype">many2many</field>
+        <field name="readonly" eval="True"/>
+        <field name="related">x_account_analytic_account_id.x_property_building</field>
+        <field name="relation">account.account.tag</field>
+    </record>
+</odoo>

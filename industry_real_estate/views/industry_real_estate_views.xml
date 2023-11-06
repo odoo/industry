@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="action_rental_contracts" model="ir.actions.act_window">
+        <field name="name">Rental Contracts</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">kanban,list,form,calendar</field>
+        <field name="domain">[('x_is_property_rental', '=', True)]</field>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('sale.view_sale_order_kanban')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('rental_form_view')}),
+        ]"/>
+    </record>
+
+    <record id="action_availability" model="ir.actions.act_window">
+        <field name="name">Availability</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">gantt,list,form</field>
+        <field name="domain">[('x_is_property_rental', '=', True)]</field>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'gantt', 'view_id': ref('rental_gantt_view')}),
+        ]"/>
+    </record>
+
+    <record id="action_properties" model="ir.actions.act_window">
+        <field name="name">Properties</field>
+        <field name="res_model">account.analytic.account</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('property_kanban_view')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('property_form_view')}),
+        ]"/>
+    </record>
+
+    <record id="action_properties_server" model="ir.actions.server">
+        <field name="name">Properties</field>
+        <field name="model_id" ref="analytic.model_account_analytic_account"/>
+        <field name="state">code</field>
+        <field name="code">
+<![CDATA[
+plan_id = env.ref('industry_real_estate.analytic_plan_properties').id
+action = env['ir.actions.actions']._for_xml_id('industry_real_estate.action_properties')
+action['domain'] = [('plan_id', '=', plan_id)]
+action['context'] = {'default_plan_id': plan_id}
+]]>
+        </field>
+    </record>
+
+    <record id="action_products" model="ir.actions.act_window">
+        <field name="name">Products</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+
+    <record id="sale_order_user_filter" model="ir.filters">
+        <field name="name">Runnnig contracts</field>
+        <field name="model_id">sale.order</field>
+        <field name="is_default" eval="True"/>
+        <field name="action_id" ref="action_rental_contracts"/>
+        <field name="context" eval="{'group_by': ['x_related_building_ids']}"/>
+    </record>
+
+    <record id="property_filter_view" model="ir.filters">
+        <field name="name">Building</field>
+        <field name="model_id">account.analytic.account</field>
+        <field name="is_default" eval="True"/>
+        <field name="action_id" ref="action_properties"/>
+        <field name="context" eval="{'group_by': ['x_property_building']}"/>
+    </record>
+
+    <menuitem id="menu_root" action="action_rental_contracts" name="Properties" sequence="10"/>
+    <record model="ir.ui.menu" id="menu_root">
+        <field name="web_icon_data" type="base64" file="industry_real_estate/static/src/binary/ir_ui_menu/property-icon.png"/>
+    </record>
+
+    <menuitem id="menu_rental_contracts" action="action_rental_contracts" parent="menu_root" name="Rental Contracts" sequence="10"/>
+
+    <menuitem id="menu_availability" action="action_availability" parent="menu_root" name="Availability" sequence="20"/>
+
+    <menuitem id="menu_properties_root" parent="menu_root" name="Properties" sequence="30"/>
+        <menuitem id="menu_properties_properties" action="action_properties_server" parent="menu_properties_root" name="Properties" sequence="10"/>
+        <menuitem id="menu_properties_products" action="action_products" parent="menu_properties_root" name="Products" sequence="20"/>
+</odoo>
