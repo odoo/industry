@@ -2,7 +2,7 @@
 {
     'name': 'The Arts & Crafts Shop',
     'version': '1.0',
-    'category': 'Industry',
+    'category': 'Retail',
     'description': """
         This modules provide a colourful array of paints, brushes, paper, beads, tools, colourful trays and other crafting (Handmade) essentials.
         They are a treasure trove for anyone seeking to express their creativity, explore new hobbies, or create beautiful handmade items.

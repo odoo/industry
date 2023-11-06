@@ -2,7 +2,7 @@
 {
     'name': 'Cake Shop',
     'version': '1.0',
-    'category': 'Industry',
+    'category': 'Retail',
     'description': """
 This setup is for bakery shop companies selling to consumers. Bakery are businesses that carry a large selection of products: puffs , cakes , pastries etc... 
 """,
@@ -42,4 +42,5 @@ This setup is for bakery shop companies selling to consumers. Bakery are busines
     ],
     'application': False,
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }

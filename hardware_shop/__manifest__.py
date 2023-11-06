@@ -2,7 +2,7 @@
 {
     'name': 'Hardware Shop',
     'version': '1.0',
-    'category': 'Industry',
+    'category': 'Retail',
     'description': """
 For Hardware shops that carry a large selection of products: plumbing, machinery, household, gardening, carpenter and electrical, etc.
 Using Point of Sale, Inventory, Sales, Purchase, Accounting, Contact, Employee, Dashboard, Barcode, and Documents and E-commerce to grow their business.
