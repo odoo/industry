@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="property_form_view" model="ir.ui.view">
+        <field name="model">account.analytic.account</field>
+        <field name="mode">primary</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <form string="Property">
+                <field name="x_is_property" invisible="1"/>
+                <field name="plan_id" invisible="1"/>
+                <field name="company_id" invisible="1"/>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object" name="action_view_invoice" icon="fa-pencil-square-o" invisible="invoice_count == 0">
+                            <field string="Invoices" name="invoice_count" widget="statinfo"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="action_view_vendor_bill" icon="fa-file-text-o" invisible="vendor_bill_count == 0">
+                            <field string="Vendor Bills" name="vendor_bill_count" widget="statinfo"/>
+                        </button>
+                        <button class="oe_stat_button" type="object" name="subscriptions_action" icon="fa-book" invisible="subscription_count == 0">
+                            <field string="Rental Contracts" name="subscription_count" widget="statinfo"/>
+                        </button>
+                    </div>
+
+                    <field name="x_property_image" widget="image" class="oe_avatar ml-3 mr-3" options="{'size': [0, 180]}"/>
+                    <div class="oe_title">
+                        <label for="name" string="Property"/>
+                        <h1>
+                            <field name="name" class="oe_inline" placeholder="e.g. Appartment Oxford Street"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="x_property_building" widget="many2many_tags" required="x_is_property == True"/>
+                            <field name="x_property_address" required="x_is_property == True"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                            <field name="x_property_type" required="x_is_property == True"/>
+                            <field name="x_is_published"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Description">
+                            <field name="x_website_description" placeholder="Describe your property here"/>
+                        </page>
+                        <page string="Gallery">
+                            <field name="x_property_attachment_image_ids" widget="many2many_binary" options="{'accepted_file_extensions': 'image/*'}" string="Add Images"/>
+                         </page>
+                        <page string="Documents">
+                            <field name="x_property_attachment_doc_ids" widget="many2many_binary"/>
+                        </page>
+                        <page string="Meter Readings">
+                            <field name="x_property_meter_reading_ids" context="{'default_x_account_analytic_account_id': id}">
+                                <tree editable="bottom">
+                                    <field name="x_date"/>
+                                    <field name="x_gas"/>
+                                    <field name="x_electricity"/>
+                                    <field name="x_water"/>
+                                    <field name="x_sale_order_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                  <field name="message_follower_ids"/>
+                  <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="property_kanban_view" model="ir.ui.view">
+        <field name="model">account.analytic.account</field>
+        <field name="mode">primary</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_kanban_record_has_image_fill">
+                            <field name="x_property_image" widget="image" options="{'size': [94, 94]}" class="m-1 o_kanban_image_fill_left"/>
+                            <div class="oe_kanban_details">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <div class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <field name="x_property_building"/>
+                                    <field name="x_property_address" class="text-muted"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+</odoo>
