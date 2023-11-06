@@ -47,4 +47,5 @@ The typical sale is a 1 year Oracle Databbase license that is purchased to Oracl
     ],
     'application': False,
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }
