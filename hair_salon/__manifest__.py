@@ -43,6 +43,7 @@
         'demo/appointment_type.xml',
         'demo/loyalty_program.xml',
         'demo/loyalty_rule.xml',
+        'demo/loyalty_reward.xml',
         'demo/calendar_event.xml',
         'demo/website_ir_attachment.xml',
         'demo/website_view.xml',
