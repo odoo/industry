@@ -21,6 +21,7 @@
         'theme_clean',
     ],
     'data': [
+        'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/documents_folder.xml',
         'data/project_project.xml',
@@ -40,7 +41,9 @@
         'demo/res_users.xml',
         'demo/appointment_type.xml',
         'demo/website.xml',
+        'demo/website_page_views.xml',
         'demo/website_page.xml',
+        'demo/website_menu.xml',
     ],
     'application': False,
     'license': 'OPL-1',
