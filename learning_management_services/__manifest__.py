@@ -8,10 +8,9 @@ This module provides the infrastructure for delivering, managing, and tracking o
 They offer features such as course creation, student enrolment, assessments, progress tracking,
 communication tools, certification and gamification.
 """,
-    'author': 'Odoo',
+    'author': 'Odoo S.A.',
     'depends': [
         'account_followup',
-        'account_online_synchronization',
         'appointment_crm',
         'base_vat',
         'knowledge',
