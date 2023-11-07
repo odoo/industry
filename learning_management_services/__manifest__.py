@@ -61,6 +61,7 @@ communication tools, certification and gamification.
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
         'demo/loyalty_card.xml',
+        'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
         'demo/website_ir_attachment.xml',
         'demo/forum_forum.xml',
