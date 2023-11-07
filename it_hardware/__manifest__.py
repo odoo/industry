@@ -46,7 +46,6 @@ including laptops, RAM, accessories, and CCTV cameras.
         'data/product_template.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
-        'data/product_pricelist.xml',
         'data/product_template_attribute_line.xml',
         'data/product_template_attribute_value.xml',
         'data/product_product.xml',
