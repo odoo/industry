@@ -2,7 +2,7 @@
 {
     'name': 'Clothing and Boutique',
     'version': '1.0',
-    'category': 'Industry',
+    'category': 'Retail',
     'description': """
 This setup if for Clothing and Boutique companies selling female clothing.""",
     'author': 'Odoo',
@@ -52,4 +52,5 @@ This setup if for Clothing and Boutique companies selling female clothing.""",
     ],
     'application': False,
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }
