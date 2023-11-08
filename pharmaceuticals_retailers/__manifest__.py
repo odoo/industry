@@ -3,16 +3,14 @@
     'name': 'Pharmaceuticals Retailers',
     'version': '1.0',
     'category': 'Retail',
-    'description': u"""
+    'description': """
 This setup is for pharmacy retail companies that purchase and sell products.
 They maintain the stock lot wise and also manage the expiry of the lots.
 """,
-    'author': 'Odoo',
+    'author': 'Odoo S.A',
     'depends': [
         'account_check_printing',
-        'account_edi_ubl_cii',
         'account_followup',
-        'account_online_synchronization',
         'calendar',
         'contacts',
         'knowledge',
@@ -53,6 +51,9 @@ They maintain the stock lot wise and also manage the expiry of the lots.
         'data/product_template_attribute_line.xml',
         'data/product_template_attribute_value.xml',
         'data/product_product.xml',
+        'data/loyalty_program.xml',
+        'data/loyalty_reward.xml',
+        'data/loyalty_rule.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_member.xml',
@@ -68,6 +69,7 @@ They maintain the stock lot wise and also manage the expiry of the lots.
         'demo/purchase_order_post.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
+        'demo/sale_loyalty_reward_wizard.xml',
         'demo/sale_order_post.xml',
         'demo/project_task.xml',
     ],
