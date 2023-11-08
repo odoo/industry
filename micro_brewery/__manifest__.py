@@ -56,7 +56,7 @@ It contains the apps created with Studio and the customizations of existing apps
         'data/product_pricelist.xml',
         'data/product_pricelist_item.xml',
         'data/pos_category.xml',
-        # 'data/pos_config.xml',
+        'data/pos_config.xml',
         'data/product_template.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
