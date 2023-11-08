@@ -42,6 +42,7 @@ It contains the apps created with Studio and the customizations of existing apps
       'theme_bistro'
     ],
     'data': [
+        'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
