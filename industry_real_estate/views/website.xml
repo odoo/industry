@@ -55,6 +55,7 @@
     </template>
 
     <template id="website_listing_details_account_analytic_account" name="Properties">
+        <t t-set="additional_title"><t t-esc="record.name"/></t>
         <t t-call="website.layout">
             <div id="o_website_record_page wrap">
             <div class="oe_structure oe_new" data-editor-message="Drag building blocks to customize the header of single record pages."/>
@@ -71,26 +72,35 @@
                 </ol>
                 <div class="d-flex flex-row my-4 flex-wrap align-items-center justify-content-between">
                     <div class="col-lg-4 mt-lg-4 col-sm-12">
-                        <h1 class="h1">
-                        <span t-field="record.display_name"/>
-                        </h1>
-                        <span class="o_website_monetary" t-field="record.sudo().x_property_building"/>
+                        <h1 class="h1"><span t-field="record.display_name"/></h1>
+                        <p class="o_website_monetary" t-field="record.sudo().x_property_building"/>
+                        <div class="o_website_html mb-3" t-field="record.x_website_description"
+                            data-editor-message="Drag building blocks to edit the website description of this record."/>
                     </div>
                     <t>
-                        <img t-if="record.x_property_image" class="o_website_image col-lg-6 mt-md-4 col-sm-12 me-2 rounded-3" style="" t-attf-src="data:image/png;base64,{{record.x_property_image}}"/>
+                        <img t-if="record.x_property_image" class="o_website_image col-lg-6 mt-md-4 col-sm-12 me-2 mw-100 rounded-3" style="" t-attf-src="data:image/png;base64,{{record.x_property_image}}"/>
                         <div t-else="" class="o_website_image bg-light col-lg-6 mt-md-4 col-sm-12 me-2 rounded-3"/>
                     </t>
                 </div>
-                <div class="o_website_html" t-field="record.x_website_description" data-editor-message="Drag building blocks to edit the website description of this record."/>
+                <t t-set="images" t-value="record.x_property_attachment_image_ids"/>
+                <section class="s_image_gallery o_spc-small pt24 pb24 o_colored_level o_grid" data-vcss="001" data-columns="4" style="overflow: hidden; background-image: none;" data-snippet="s_images_wall" data-name="Images Wall" t-if="images">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-2" t-foreach="images" t-as="image">
+                                <img class="img img-fluid d-block rounded-3" t-attf-src="/web/image/{{ image.id }}?access_token={{ image.sudo().generate_access_token()[0] }}" t-att-data-index="image_index" data-name="Image" loading="lazy" style=""/>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
             <div class="oe_structure oe_new" data-editor-message="Drag building blocks to customize the footer of single record pages."/>
             </div>
         </t>
     </template>
 
-    <!-- context="{'website_studio.create_page': True}" -->
     <record id="website_controller_page_1" model="website.controller.page">
-        <field name="page_name">Properties</field>
+        <field name="name">Properties</field> <!-- page title -->
+        <field name="page_name">Properties</field> <!-- will be used to dertermine page url (sluggified)-->
         <field name="page_type">listing</field>
         <field name="model_id" ref="analytic.model_account_analytic_account"/>
         <field name="website_id" ref="website.default_website"/>
@@ -102,7 +112,8 @@
         ]"/>
     </record>
     <record id="website_controller_page_single" model="website.controller.page">
-        <field name="page_name">Properties</field>
+        <field name="name">Property</field> <!-- page title -->
+        <field name="page_name">Properties</field> <!-- will be used to dertermine page url (sluggified)-->
         <field name="page_type">single</field>
         <field name="model_id" ref="analytic.model_account_analytic_account"/>
         <field name="website_id" ref="website.default_website"/>
