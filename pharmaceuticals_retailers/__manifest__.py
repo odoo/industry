@@ -40,7 +40,6 @@ They maintain the stock lot wise and also manage the expiry of the lots.
         'data/project_task_type.xml',
         'data/product_category.xml',
         'data/account_analytic_plan.xml',
-        'data/uom_category.xml',
         'data/uom_uom.xml',
         'data/res_partner.xml',
         'data/product_tag.xml',
