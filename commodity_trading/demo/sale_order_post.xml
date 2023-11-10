@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+
+    <function model="sale.order" name="action_confirm">
+        <value eval="[
+            ref('sale_order_1'),
+            ref('sale_order_2'),
+            ref('sale_order_3'),
+            ref('sale_order_4'),
+            ref('sale_order_5'),
+            ref('sale_order_6'),
+            ref('sale_order_7'),
+            ref('sale_order_8'),
+            ref('sale_order_9'),
+            ]"
+        />
+    </function>
+
+    <!--  DROPSHIP  -->
+    <function model="purchase.order" name="button_confirm">
+        <value model="purchase.order" eval="
+        (
+            obj().env.ref('commodity_trading.sale_order_1') +
+            obj().env.ref('commodity_trading.sale_order_3') +
+            obj().env.ref('commodity_trading.sale_order_6') +
+            obj().env.ref('commodity_trading.sale_order_9')
+        ).order_line.purchase_line_ids.order_id.ids"/>
+    </function>
+
+    <function name="write" model="stock.move.line">
+        <value model="stock.move.line" eval="obj().search([('picking_id', '=', obj().env.ref('commodity_trading.sale_order_1').picking_ids.id)]).id"/>
+        <value model="stock.lot" eval="{'lot_id': ref('commodity_trading.stock_lot_2'), 'lot_name': obj().env.ref('commodity_trading.stock_lot_2').name}"/>
+    </function>
+    <function name="button_validate" model="stock.picking">
+        <value model="stock.picking" eval="obj().env.ref('commodity_trading.sale_order_1').picking_ids.id"/>
+    </function>
+
+    <function name="_add_to_wave" model="stock.move.line" context="{'active_owner_id': ref('base.user_admin')}">
+        <value model="stock.move.line" eval="obj().search([('picking_id', 'in', obj().env.ref('commodity_trading.sale_order_3').picking_ids.ids), ('state', '!=', 'done')]).ids"/>
+    </function>
+    <function name="_add_to_wave" model="stock.move.line" context="{'active_owner_id': ref('base.user_admin')}">
+        <value model="stock.move.line" eval="obj().search([('picking_id', 'in', obj().env.ref('commodity_trading.sale_order_6').picking_ids.ids), ('state', '!=', 'done')]).ids"/>
+    </function>
+    <function name="_add_to_wave" model="stock.move.line" context="{'active_owner_id': ref('base.user_admin')}">
+        <value model="stock.move.line" eval="obj().search([('picking_id', 'in', obj().env.ref('commodity_trading.sale_order_9').picking_ids.ids), ('state', '!=', 'done')]).ids"/>
+    </function>
+
+    <function name="write" model="stock.picking.batch">
+        <value model="stock.picking.batch" eval="obj().env.ref('commodity_trading.sale_order_3').picking_ids.batch_id.id"/>
+        <value eval="{
+            'x_studio_truck_no': 'GJ27DB8161',
+            'x_studio_driver_name': 'Nishant',
+            'x_studio_gross_weight': 39,
+            'x_studio_tare_weight': 12,
+            'x_studio_weighing_receipt_number': 'ASD2342356',
+            'x_studio_weighing_scale': ref('weigh_bridge_1'),
+        }"/>
+    </function>
+    <function name="write" model="stock.picking.batch">
+        <value model="stock.picking.batch" eval="obj().env.ref('commodity_trading.sale_order_6').picking_ids.batch_id.id"/>
+        <value eval="{
+            'x_studio_truck_no': 'GJ27FS54517',
+            'x_studio_driver_name': 'Bhavin',
+            'x_studio_gross_weight': 40,
+            'x_studio_tare_weight': 25,
+            'x_studio_weighing_receipt_number': 'ASD2323322',
+            'x_studio_weighing_scale': ref('weigh_bridge_2'),
+        }"/>
+    </function>
+    <function name="write" model="stock.picking.batch">
+        <value model="stock.picking.batch" eval="obj().env.ref('commodity_trading.sale_order_9').picking_ids.batch_id.id"/>
+        <value eval="{
+            'x_studio_truck_no': 'GJ27SQ4846',
+            'x_studio_driver_name': 'Harsh',
+            'x_studio_gross_weight': 30,
+            'x_studio_tare_weight': 15,
+            'x_studio_weighing_receipt_number': 'ASD2342324',
+            'x_studio_weighing_scale': ref('weigh_bridge_1'),
+        }"/>
+    </function>
+
+    <function name="action_done" model="stock.picking.batch">
+        <value model="stock.picking.batch" eval="obj().env.ref('commodity_trading.sale_order_3').picking_ids.batch_id.id"/>
+    </function>
+    <function name="action_done" model="stock.picking.batch">
+        <value model="stock.picking.batch" eval="obj().env.ref('commodity_trading.sale_order_6').picking_ids.batch_id.id"/>
+    </function>
+    <function name="action_done" model="stock.picking.batch">
+        <value model="stock.picking.batch" eval="obj().env.ref('commodity_trading.sale_order_9').picking_ids.batch_id.id"/>
+    </function>
+
+    <!--  Normal Flow  -->
+    <function name="_add_to_wave" model="stock.move.line" context="{'active_owner_id': ref('base.user_admin')}">
+        <value model="stock.move.line" eval="obj().search([('picking_id', 'in', obj().env.ref('commodity_trading.sale_order_2').picking_ids.ids), ('state', '!=', 'done')]).ids"/>
+    </function>
+    <function name="_add_to_wave" model="stock.move.line" context="{'active_owner_id': ref('base.user_admin')}">
+        <value model="stock.move.line" eval="obj().search([('picking_id', 'in', obj().env.ref('commodity_trading.sale_order_5').picking_ids.ids), ('state', '!=', 'done')]).ids"/>
+    </function>
+    <function name="_add_to_wave" model="stock.move.line" context="{'active_owner_id': ref('base.user_admin')}">
+        <value model="stock.move.line" eval="obj().search([('picking_id', 'in', obj().env.ref('commodity_trading.sale_order_8').picking_ids.ids), ('state', '!=', 'done')]).ids"/>
+    </function>
+
+    <function name="write" model="stock.picking.batch">
+        <value model="stock.picking.batch" eval="obj().env.ref('commodity_trading.sale_order_2').picking_ids.batch_id.id"/>
+        <value eval="{
+            'x_studio_truck_no': 'GJ27DB2144',
+            'x_studio_driver_name': 'Dhrumil',
+            'x_studio_gross_weight': 50.00,
+            'x_studio_tare_weight': 23.00,
+            'x_studio_weighing_receipt_number': 'ASD9852467'
+        }"/>
+    </function>
+    <function name="write" model="stock.picking.batch">
+        <value model="stock.picking.batch" eval="obj().env.ref('commodity_trading.sale_order_5').picking_ids.batch_id.id"/>
+        <value eval="{
+            'x_studio_truck_no': 'GJ27DB4122',
+            'x_studio_driver_name': 'Vishal',
+            'x_studio_gross_weight': 40,
+            'x_studio_tare_weight': 13,
+            'x_studio_weighing_receipt_number': 'ASD2342751'
+        }"/>
+    </function>
+
+    <function name="action_done" model="stock.picking.batch">
+        <value model="stock.picking.batch" eval="obj().env.ref('commodity_trading.sale_order_2').picking_ids.batch_id.id"/>
+    </function>
+    <function name="action_done" model="stock.picking.batch">
+        <value model="stock.picking.batch" eval="obj().env.ref('commodity_trading.sale_order_5').picking_ids.batch_id.id"/>
+    </function>
+
+</odoo>
