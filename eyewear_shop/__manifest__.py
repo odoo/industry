@@ -1,19 +1,14 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Eyewear Shop',
     'version': '1.0',
-    'category': 'Industry',
+    'category': 'Retail',
     'description': """
-Welcome to Eyewear Shop, your premier destination for stylish and affordable eyewear.
-We understand that your eyes are not just a window to your soul but also a canvas for your personal style.
-That's why we've curated a stunning collection of eyeglasses and sunglasses that cater to all tastes and preferences.
+This module is for stylish and affordable eyewear. It will deal in various types of eyewear like Sunglasses, Contact Lenses, Specilaity Glasses etc.
+The sales process involves creating sale orders, managing deliveries and invoicing. Additionally, they operate an eCommerce shop for online sales in the eyewear industry.
 """,
-    'author': 'Odoo S.A.',
     'depends': [
+        'account_accountant',
         'appointment_crm',
-        'mrp',
-        'crm_iap_enrich',
-        'delivery_shiprocket',
         'knowledge',
         'sale_management',
         'purchase_stock',
@@ -24,6 +19,7 @@ That's why we've curated a stunning collection of eyeglasses and sunglasses that
         'theme_paptic',
     ],
     'data': [
+        'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
@@ -39,6 +35,9 @@ That's why we've curated a stunning collection of eyeglasses and sunglasses that
         'data/product_image.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/appointment_resource.xml',
+        'data/appointment_type.xml',
+        'data/stock_warehouse.xml',
     ],
     'demo': [
         'demo/website.xml',
@@ -47,6 +46,8 @@ That's why we've curated a stunning collection of eyeglasses and sunglasses that
         'demo/crm_team.xml',
         'demo/crm_lead.xml',
         'demo/product_supplierinfo.xml',
+        'demo/calendar_event.xml',
+        'demo/appointment_booking_line.xml',
         'demo/website_view.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
@@ -58,9 +59,8 @@ That's why we've curated a stunning collection of eyeglasses and sunglasses that
         'demo/sale_order_confirm.xml',
         'demo/stock_warehouse_orderpoint.xml',
         'demo/stock_warehouse_orderpoint_replenish.xml',
-        'demo/ir_attachment_post.xml',
         'demo/website_ir_attachment.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }
