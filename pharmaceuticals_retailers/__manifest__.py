@@ -17,6 +17,7 @@ They maintain the stock lot wise and also manage the expiry of the lots.
         'partner_autocomplete',
         'pos_sale',
         'product_expiry',
+        'product_margin',
         'project_enterprise',
         'project_sms',
         'purchase_stock',
