@@ -1,5 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+    <function model="hr.leave" name="_force_cancel">
+        <!-- Conflict with normal demo, need to cancel existing ones -->
+        <value model="hr.leave" eval="obj().env['hr.leave'].search([
+                ('date_from', '&le;', datetime.today() + relativedelta(days=14)),
+                ('date_to', '&ge;', datetime.today() + relativedelta(days=10)),
+                ('employee_id', '=', ref('hr.employee_admin')),
+            ]).ids"/>
+        <value eval="{'reason': 'Cancel Leave'}"/>
+    </function>
+
     <data noupdate="1">
         <record id="hr_leave_1" model="hr.leave">
             <field name="request_date_from" eval="DateTime.today() + relativedelta(days=10)"/>
