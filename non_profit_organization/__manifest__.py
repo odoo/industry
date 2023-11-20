@@ -34,6 +34,7 @@
     ],
     'demo': [
         'demo/event_event.xml',
+        'demo/event_event_ticket.xml',
         'demo/website.xml',
         'demo/website_page_views.xml',
         'demo/website_page.xml',
