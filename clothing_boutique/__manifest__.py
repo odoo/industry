@@ -5,7 +5,7 @@
     'category': 'Retail',
     'description': """
 This setup if for Clothing and Boutique companies selling female clothing.""",
-    'author': 'Odoo',
+    'author': 'Odoo S.A.',
     'depends': [
         'knowledge',
         'pos_sale',
