@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Car Rental',
     'version': '1.0',
-    'category': 'Industry',
+    'category': 'Service',
     'description': """
-This module is for those seeking to rent a car for either short or long-distance travel, the company specializes in providing tailored car rental services based on the customer's specific requirements.
+This module pre-configures Odoo to manage your fleet. Easily purchase a new car or rent one for short or long-distance travel. Provide also tailored car rental services based on the customer's specific requirements.
 """,
     'author': 'Odoo S.A.',
     'depends': [
@@ -44,12 +43,13 @@ This module is for those seeking to rent a car for either short or long-distance
         'data/uom_uom.xml',
         'data/product_template.xml',
         'data/product_product.xml',
+        'data/res_config_settings.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/knowledge_article_member.xml',
         'data/ir_attachment_post.xml',
     ],
     'demo': [
-        'demo/res_config_settings.xml',
         'demo/website.xml',
         'demo/res_partner.xml',
         'demo/crm_team.xml',
@@ -69,4 +69,5 @@ This module is for those seeking to rent a car for either short or long-distance
     ],
     'application': False,
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }
