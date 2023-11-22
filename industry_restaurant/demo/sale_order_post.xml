@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <function name="action_confirm" model="sale.order">
+        <value eval="[
+            ref('sale_order_1'),
+            ref('sale_order_2'),
+        ]"/>
+    </function>
+    <function name="button_validate" model="stock.picking">
+        <value model="stock.picking" eval="(
+                obj().env.ref('industry_restaurant.sale_order_1') +
+                obj().env.ref('industry_restaurant.sale_order_2')
+            ).picking_ids.ids"/>
+    </function>
+    <function name="_create_invoices" model="sale.order">
+        <value eval="[
+            ref('sale_order_1'),
+            ref('sale_order_2'),
+        ]"/>
+    </function>
+    <function model="account.move" name="action_post">
+        <value model="sale.order" eval="(
+                obj().env.ref('industry_restaurant.sale_order_1') +
+                obj().env.ref('industry_restaurant.sale_order_2')
+            ).invoice_ids.ids
+        "/>
+    </function>
+</odoo>
