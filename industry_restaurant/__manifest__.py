@@ -37,7 +37,6 @@
         'data/product_public_category.xml',
         'data/pos_category.xml',
         'data/product_category.xml',
-        'data/product_template.xml',
         'data/product_product.xml',
         'data/mrp_bom.xml',
         'data/mrp_bom_line.xml',
@@ -53,6 +52,7 @@
     'demo': [
         'demo/appointment_type.xml',
         'demo/res_partner.xml',
+        'demo/calendar_event.xml',
         'demo/product_supplierinfo.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
