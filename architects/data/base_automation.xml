@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="base_automation_1" model="base.automation">
+        <field name="name">Call when there's a new opportunity</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="trigger">on_create</field>
+    </record>
+    <record id="base_automation_2" model="base.automation">
+        <field name="name">Create activity to send quote</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('crm.field_crm_lead__stage_id')])]"/>
+        <field name="filter_pre_domain" eval="[('stage_id', 'in', [ref('crm.stage_lead1')])]"/>
+        <field name="filter_domain" eval="[('stage_id', 'in', [ref('crm_stage_5'), ref('crm.stage_lead2')])]"/>
+    </record>
+    <record id="base_automation_3" model="base.automation">
+        <field name="name">Mark as To-do when opportunity needs analysis</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('crm.field_crm_lead__stage_id')])]"/>
+        <field name="filter_domain" eval="[('stage_id', 'in', [ref('crm_stage_5')])]"/>
+    </record>
+    <record id="base_automation_4" model="base.automation">
+        <field name="name">Set a reminder when quote is sent</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('crm.field_crm_lead__stage_id')])]"/>
+        <field name="filter_domain" eval="[('stage_id', 'in', [ref('crm.stage_lead3')])]"/>
+    </record>
+</odoo>
