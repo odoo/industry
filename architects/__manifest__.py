@@ -1,31 +1,25 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Architects',
     'version': '1.0',
     'category': 'Industry',
     'description': """
-This industry is  made for architects that sell all kind of architectural services such as feasibility studies,
+This industry is made for architects that sell all kind of architectural services such as feasibility studies,
 schematic design, design development, worksite follow-up, energy efficiency assessment.
 """,
     'author': 'Odoo S.A.',
     'depends': [
         'account_followup',
         'crm_enterprise',
-        'crm_iap_enrich',
-        'crm_iap_mine',
         'documents_hr',
         'documents_product',
         'documents_project_sale',
         'documents_spreadsheet',
-        'hr_expense_predict_product',
         'iap_extract',
         'knowledge',
         'project_sms',
         'sale_crm',
         'sale_expense',
         'sale_planning',
-        'sale_product_configurator',
-        'sale_timesheet',
         'timesheet_grid',
         'website_crm',
         'website_partner',
