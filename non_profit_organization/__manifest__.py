@@ -21,7 +21,6 @@
         'data/filters.xml',
         'data/account_analytic_plan.xml',
         'data/mail_template.xml',
-        'data/product_template.xml',
         'data/product_product.xml',
         'data/product_pricelist.xml',
         'data/product_pricelist_item.xml',
