@@ -14,6 +14,7 @@
         'calendar',
         'knowledge',
         'mrp',
+        'pos_hr',
         'pos_sale',
         'purchase_stock',
         'sale_planning',
