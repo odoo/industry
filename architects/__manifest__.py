@@ -40,7 +40,6 @@ schematic design, design development, worksite follow-up, energy efficiency asse
         'data/ir_actions_act_window_view.xml',
         'data/project_task_type.xml',
         'data/project_project.xml',
-        'data/product_pricelist.xml',
         'data/product_product.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
