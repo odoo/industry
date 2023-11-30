@@ -1,27 +1,23 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Furniture Store',
     'version': '1.0',
     'category': 'Industry',
     'description': """
-This module insall a configuration that preset the modules and
- configuration of a furniture store.
+This module setup a furniture store for selling furniture like chairs, sofas, dinning tables,
+beds, cupboards etc.
 """,
     'author': 'Odoo S.A.',
     'depends': [
         'account_check_printing',
-        'crm_enterprise',
         'knowledge',
         'mrp',
         'pos_sale',
-        'sale_crm',
         'sale_margin',
         'sale_planning',
         'sale_purchase',
         'web_studio',
         'website_appointment',
         'website_crm',
-        'website_sale_product_configurator',
         'website_sale_stock',
         'theme_anelusia',
     ],
@@ -46,8 +42,8 @@ This module insall a configuration that preset the modules and
         'data/knowledge_article.xml',
         'data/knowledge_article_member.xml',
         'data/appointment_type.xml',
-    ],
-    'demo': [
+    # ],
+    # 'demo': [
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/product_supplierinfo.xml',
