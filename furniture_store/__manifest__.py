@@ -1,7 +1,7 @@
 {
     'name': 'Furniture Store',
     'version': '1.0',
-    'category': 'Industry',
+    'category': 'Retail',
     'description': """
 This module setup a furniture store for selling furniture like chairs, sofas, dinning tables,
 beds, cupboards etc.
@@ -42,8 +42,8 @@ beds, cupboards etc.
         'data/knowledge_article.xml',
         'data/knowledge_article_member.xml',
         'data/appointment_type.xml',
-    # ],
-    # 'demo': [
+    ],
+    'demo': [
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/product_supplierinfo.xml',
