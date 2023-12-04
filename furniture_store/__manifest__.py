@@ -8,14 +8,11 @@ beds, cupboards etc.
 """,
     'author': 'Odoo S.A.',
     'depends': [
-        'account_check_printing',
         'knowledge',
         'mrp',
         'pos_sale',
         'sale_margin',
-        'sale_planning',
         'sale_purchase',
-        'web_studio',
         'website_appointment',
         'website_crm',
         'website_sale_stock',
@@ -40,7 +37,6 @@ beds, cupboards etc.
         'data/pos_config.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
-        'data/knowledge_article_member.xml',
         'data/appointment_type.xml',
     ],
     'demo': [
