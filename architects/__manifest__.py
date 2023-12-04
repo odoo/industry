@@ -1,7 +1,7 @@
 {
     'name': 'Architects',
     'version': '1.0',
-    'category': 'Industry',
+    'category': 'Services',
     'description': """
 This industry is made for architects that sell all kind of architectural services such as feasibility studies,
 schematic design, design development, worksite follow-up, energy efficiency assessment.
@@ -24,14 +24,15 @@ schematic design, design development, worksite follow-up, energy efficiency asse
         'website_crm',
         'website_partner',
         'theme_real_estate',
+        'base_geolocalize',
     ],
     'data': [
-        'data/res_config_setting.xml',
+        # 'data/res_config_setting.xml',
         'data/ir_attachment_pre.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
         'data/ir_actions_act_window.xml',
-        'data/ir_actions_act_window_view.xml',
+        # 'data/ir_actions_act_window_view.xml',
         'data/project_task_type.xml',
         'data/project_project.xml',
         'data/product_product.xml',
@@ -39,7 +40,7 @@ schematic design, design development, worksite follow-up, energy efficiency asse
         'data/sale_order_template_line.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
-        'data/knowledge_article_member.xml',
+        # 'data/knowledge_article_member.xml',
     ],
     'demo': [
         'demo/website.xml',
@@ -53,7 +54,7 @@ schematic design, design development, worksite follow-up, energy efficiency asse
         'demo/website_theme_apply.xml',
         'demo/hr_expense.xml',
         'demo/hr_expense_action.xml',
-        'demo/hr_expense_sheet.xml',
+        # 'demo/hr_expense_sheet.xml',
     ],
     'application': False,
     'license': 'OPL-1',
