@@ -5,7 +5,6 @@
     'category': 'Retail',
     'description': """
 This setup if for Clothing and Boutique companies selling female clothing.""",
-    'author': 'Odoo S.A.',
     'depends': [
         'knowledge',
         'pos_sale',
@@ -50,7 +49,6 @@ This setup if for Clothing and Boutique companies selling female clothing.""",
         'demo/website_page_views.xml',
         'demo/website_theme_apply.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }

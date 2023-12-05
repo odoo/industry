@@ -7,7 +7,6 @@
         This modules provide a colourful array of paints, brushes, paper, beads, tools, colourful trays and other crafting (Handmade) essentials.
         They are a treasure trove for anyone seeking to express their creativity, explore new hobbies, or create beautiful handmade items.
     """,
-    'author': 'Odoo S.A.',
     'depends': [
         'hr_hourly_cost',
         'knowledge',
@@ -69,7 +68,6 @@
         'demo/website_theme_apply.xml',
 
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }

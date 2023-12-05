@@ -8,7 +8,6 @@ This set-up is for the automobile trading companies selling to the customers.
 The Automobile spare parts business have the more number of items for the various car brands and the parts for the Engine,
 Maintenance and accessorises etc.
     """,
-    'author': 'Odoo S.A.',
     'depends': [
         'base_automation',
         'account_check_printing',
@@ -59,7 +58,6 @@ Maintenance and accessorises etc.
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }

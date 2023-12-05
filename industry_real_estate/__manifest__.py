@@ -6,7 +6,6 @@
 Manage your long term or mid long term rental properties
 Manage your properties, create and manage rental contracts, and streamline your entire rental process. Efficient property management.
 """,
-    'author': 'Odoo S.A.',
     'depends': [
         'crm_enterprise',
         'crm_iap_enrich',
@@ -62,7 +61,6 @@ Manage your properties, create and manage rental contracts, and streamline your 
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }

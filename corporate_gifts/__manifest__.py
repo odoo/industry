@@ -6,7 +6,6 @@
     'description': u"""
 This module is for marketing companies selling and producing customized corporate gifts, like mugs and t-shirts.
 """,
-    'author': 'Odoo S.A.',
     'depends': [
         'base_automation',
         'crm_enterprise',
@@ -76,7 +75,6 @@ This module is for marketing companies selling and producing customized corporat
         'demo/planning_slot.xml',
         'demo/ir_attachment_post.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }
