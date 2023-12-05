@@ -7,7 +7,6 @@
 For Hardware shops that carry a large selection of products: plumbing, machinery, household, gardening, carpenter and electrical, etc.
 Using Point of Sale, Inventory, Sales, Purchase, Accounting, Contact, Employee, Dashboard, Barcode, and Documents and E-commerce to grow their business.
     """,
-    'author': 'Odoo S.A.',
     'depends': [
         'base_geolocalize',
         'knowledge',
@@ -59,7 +58,6 @@ Using Point of Sale, Inventory, Sales, Purchase, Accounting, Contact, Employee, 
         'demo/ir_attachment_post.xml',
         'demo/website_theme_apply.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }

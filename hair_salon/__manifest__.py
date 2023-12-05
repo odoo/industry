@@ -7,7 +7,6 @@
         This module is for hair salons providing hair-related services such as hair cutting, brushing, coloring, hair and
         scalp treatments, beard and mustache shaping.
     """,
-    'author': 'Odoo S.A.',
     'depends': [
         'account_edi_ubl_cii',
         'base_geolocalize',
@@ -51,7 +50,6 @@
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }
