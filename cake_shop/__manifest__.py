@@ -6,7 +6,6 @@
     'description': """
 This setup is for bakery shop companies selling to consumers. Bakery are businesses that carry a large selection of products: puffs , cakes , pastries etc... 
 """,
-    'author': 'Odoo S.A.',
     'depends': [
         'knowledge',
         'pos_sale',
@@ -40,7 +39,6 @@ This setup is for bakery shop companies selling to consumers. Bakery are busines
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }

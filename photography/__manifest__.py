@@ -12,7 +12,6 @@
         portfolio and services, and the pre-configured products make it easy to sell prints and other
         photography-related items.
     """,
-    'author': 'Odoo S.A.',
     'depends': [
         'crm',
         'sale_management',
@@ -47,7 +46,6 @@
         'demo/website_page.xml',
         'demo/website_menu.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }

@@ -6,7 +6,6 @@
     'description': u"""
 This module setup your database to easily use odoo in a certification company.
 """,
-    'author': 'Odoo S.A.',
     'depends': [
         'web_studio',
         'knowledge',
@@ -52,7 +51,6 @@ This module setup your database to easily use odoo in a certification company.
         'demo/website_menu.xml',
         'demo/x_control_charging_station.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 

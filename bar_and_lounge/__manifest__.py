@@ -7,7 +7,6 @@
 ​This setup is for service companies who provides all kind of service that customer can available at the Airport like Porter Service, Buggy Service, Airport Assistance etc..
 ​This Services can be avail directly from the airport and individuals can also purchase the services from the website.
 """,
-    'author': 'Odoo S.A.',
     'depends': [
         'base_geolocalize',
         'base_vat',
@@ -79,7 +78,6 @@
         'demo/planning_slot.xml',
         'demo/website_theme_apply.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }

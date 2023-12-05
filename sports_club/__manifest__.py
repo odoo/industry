@@ -7,7 +7,6 @@
         This setup is for sports clubs that rent courts to their players, handle some basic gears and have a cafeteria.
         As a small company, The Club still has quite a lot of activities to manage and does all this with Odoo.
     """,
-    'author': 'Odoo S.A.',
     'depends': [
         'appointment_crm',
         'knowledge',
@@ -53,7 +52,6 @@
         'demo/website_theme_apply.xml',
         'demo/website_ir_attachments.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }

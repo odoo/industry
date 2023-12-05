@@ -7,7 +7,6 @@
 This setup if for IT companies reselling software licenses, and consulting services.🚀 
 The typical sale is a 1 year Oracle Databbase license that is purchased to Oracle, and resold to client at a margin, with extra services to setup the database.
 """,
-    'author': 'Odoo S.A.',
     'depends': [
         'project',
         'knowledge',
@@ -45,7 +44,6 @@ The typical sale is a 1 year Oracle Databbase license that is purchased to Oracl
         'demo/purchase_order_confirm.xml',
         'demo/planning_slot.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }

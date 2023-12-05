@@ -7,7 +7,6 @@
 This setup is for industrial companies who are into sureveying and measurement activities.
 It may include surveying of building properties and the measurement of completed construction activities.
 """,
-    'author': 'Odoo S.A.',
     'depends': [
         'base_automation',
         'account',
@@ -50,7 +49,6 @@ It may include surveying of building properties and the measurement of completed
         'demo/website_theme_apply.xml',
         'demo/website_ir_attachment.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }
