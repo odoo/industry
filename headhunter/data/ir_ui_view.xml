@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="applicants_customization_tree_view" model="ir.ui.view">
+        <field name="name">Applicants customization</field>
+        <field name="model">hr.applicant</field>
+        <field name="type">tree</field>
+        <field name="inherit_id" ref="hr_recruitment.crm_case_tree_view_job" />
+        <field name="mode">extension</field>
+        <field name="priority">160</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='create_date']" position="after">
+                    <field name="x_opportunities" optional="show" />
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="crm_lead_customization_form_view" model="ir.ui.view">
+        <field name="name">crm.lead.form.customization</field>
+        <field name="model">crm.lead</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form" />
+        <field name="mode">extension</field>
+        <field name="priority">160</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//button[@name='action_redirect_to_page_views']" position="replace">
+                    <button class="oe_stat_button" icon="fa-users" type="action" name="%(headhunter_crm_case_categ0_act_job)d">
+                        <field widget="statinfo" name="x_opportunities_count" string="Applicants" />
+                    </button>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="jobs_recruitment_customization_form_view" model="ir.ui.view">
+        <field name="name">Jobs - Recruitment Form customization</field>
+        <field name="model">hr.applicant</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form" />
+        <field name="mode">extension</field>
+        <field name="priority">500</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='job_id']" position="before">
+                    <field name="x_opportunities" widget="many2many_tags"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="hr_applicant_category_customization_search_view" model="ir.ui.view">
+        <field name="name">hr.applicant.view.search.customization</field>
+        <field name="model">hr.applicant</field>
+        <field name="type">search</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_search_bis" />
+        <field name="mode">extension</field>
+        <field name="priority">160</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='partner_name']" position="before">
+                    <field name="x_opportunities" />
+                    <field name="x_stage_name"/>
+                </xpath>
+                <xpath expr="//filter[@name='reserve']" position="attributes">
+                    <attribute name="domain">['|', ('categ_ids', 'ilike', 'Reserve'), ('x_stage_name', '=', 'Reserve')]</attribute>
+                </xpath>
+                <xpath expr="//filter[@name='responsible']" position="after">
+                    <filter name="group_by_opportunities" string="Opportunities" context="{'group_by': 'x_opportunities'}" />
+                </xpath>
+            </data>
+        </field>
+    </record>
+</odoo>
