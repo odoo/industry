@@ -1,8 +1,46 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
     <record id="create_the_product" model="base.automation">
-        <field name="name">Create Product - Server Actions</field>
+        <field name="name">Create Product</field>
         <field name="model_id" ref="fleet.model_fleet_vehicle"/>
         <field name="trigger">on_create</field>
+    </record>
+    <record id="update_the_hours" model="base.automation">
+        <field name="name">Update the Hours</field>
+        <field name="model_id" ref="account.model_account_analytic_line"/>
+        <field name="trigger">on_create</field>
+    </record>
+    <record id="update_stage_when_in_service" model="base.automation">
+        <field name="name">Update Stage When In Service</field>
+        <field name="model_id" ref="fleet.model_fleet_vehicle_log_services"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">["|", ("state", "=", "new"), ("state", "=", "running")]</field>
+    </record>
+    <record id="update_stage_when_service_done" model="base.automation">
+        <field name="name">Update Stage When Service Is Done</field>
+        <field name="model_id" ref="fleet.model_fleet_vehicle_log_services"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">["|", ("state", "=", "done"), ("state", "=", "cancelled")]</field>
+    </record>
+    <record id="update_status_when_returned" model="base.automation">
+        <field name="name">Update Car Status When Returned</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_pre_domain">[("x_studio_rental_status", "=", "return")]</field>
+        <field name="filter_domain">[("x_studio_rental_status", "=", "returned")]</field>
+    </record>
+    <record id="update_stage_when_pickedup" model="base.automation">
+        <field name="name">Update Stage When Picked Up</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_pre_domain">[("x_studio_rental_status", "=", "pickup")]</field>
+        <field name="filter_domain">[("x_studio_rental_status", "=", "return")]</field>
+    </record>
+    <record id="update_status_when_booked" model="base.automation">
+        <field name="name">Update Car Status When Booked</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_pre_domain">["|", ("state", "=", "draft"), ("state", "=", "sent")]</field>
+        <field name="filter_domain">[("state", "=", "sale")]</field>
     </record>
 </odoo>
