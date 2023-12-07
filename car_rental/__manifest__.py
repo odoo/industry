@@ -5,7 +5,6 @@
     'description': """
 This module pre-configures Odoo to manage your fleet. Easily purchase a new car or rent one for short or long-distance travel. Provide also tailored car rental services based on the customer's specific requirements.
 """,
-    'author': 'Odoo S.A.',
     'depends': [
         "account_followup",
         "base_automation",
