@@ -58,4 +58,5 @@ beds, cupboards etc.
     ],
     'application': False,
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }
