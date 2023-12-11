@@ -1,17 +1,13 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'IT Hardware Sales and Support',
     'version': '1.0',
-    'category': 'industry',
+    'category': 'Services',
     'description': """
 We offer IT sales, installation, and repair services for a wide range of products,
 including laptops, RAM, accessories, and CCTV cameras.
 """,
-    'author': 'odoo S.A',
     'depends': [
-        'account_check_printing',
         'account_followup',
-        'account_online_synchronization',
         'appointment_crm',
         'helpdesk_fsm',
         'helpdesk_stock',
@@ -21,7 +17,6 @@ including laptops, RAM, accessories, and CCTV cameras.
         'purchase_stock',
         'repair',
         'sale_crm',
-        'sale_planning',
         'sale_purchase',
         'stock_barcode',
         'website_appointment',
@@ -37,7 +32,6 @@ including laptops, RAM, accessories, and CCTV cameras.
         'data/ir_attachment_pre.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
-        'data/ir_default.xml',
         'data/project_task_type.xml',
         'data/product_category.xml',
         'data/account_analytic_plan.xml',
@@ -54,8 +48,6 @@ including laptops, RAM, accessories, and CCTV cameras.
         'data/sale_order_template_line.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
-        'data/knowledge_article_member.xml',
-        'data/ir_attachment_post.xml',
     ],
     'demo': [
         'demo/website.xml',
@@ -75,6 +67,5 @@ including laptops, RAM, accessories, and CCTV cameras.
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
 }
