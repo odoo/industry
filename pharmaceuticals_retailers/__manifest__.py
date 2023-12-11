@@ -6,7 +6,6 @@
 This setup is for pharmacy retail companies that purchase and sell products.
 They maintain the stock lot wise and also manage the expiry of the lots.
 """,
-    'author': 'Odoo S.A',
     'depends': [
         'account_followup',
         'calendar',
@@ -63,7 +62,6 @@ They maintain the stock lot wise and also manage the expiry of the lots.
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }
