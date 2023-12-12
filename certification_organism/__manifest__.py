@@ -39,7 +39,6 @@ This module setup your database to easily use odoo in a certification company.
     'demo': [
         'demo/website.xml',
         'demo/res_partner.xml',
-        'demo/hr_leave.xml',
         'demo/crm_tag.xml',
         'demo/crm_lead.xml',
         'demo/project_tags.xml',
