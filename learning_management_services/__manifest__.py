@@ -8,7 +8,6 @@ This module provides the infrastructure for delivering, managing, and tracking o
 They offer features such as course creation, student enrolment, assessments, progress tracking,
 communication tools, certification and gamification.
 """,
-    'author': 'Odoo S.A.',
     'depends': [
         'account_followup',
         'appointment_crm',
@@ -24,7 +23,6 @@ communication tools, certification and gamification.
         'website_crm',
         'website_sale_wishlist',
         'website_sale_loyalty',
-        'website_sale_product_configurator',
         'website_sale_slides',
         'website_slides_forum',
         'website_slides_survey',
@@ -41,7 +39,6 @@ communication tools, certification and gamification.
         'data/loyalty_reward.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
-        'data/knowledge_article_member.xml',
         'data/survey_survey.xml',
         'data/survey_question.xml',
         'data/survey_question_answer.xml',
@@ -67,6 +64,5 @@ communication tools, certification and gamification.
         'demo/forum_forum.xml',
         'demo/forum_post.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
 }
