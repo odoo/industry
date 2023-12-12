@@ -27,6 +27,7 @@ communication tools, certification and gamification.
         'website_slides_forum',
         'website_slides_survey',
         'theme_clean',
+        'payment_demo',
     ],
     'data': [
         'data/res_config_settings.xml',
@@ -65,4 +66,5 @@ communication tools, certification and gamification.
         'demo/forum_post.xml',
     ],
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }
