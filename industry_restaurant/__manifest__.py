@@ -7,11 +7,8 @@
         This Odoo module is designed to streamline and enhance the management of your restaurant operations.
         Whether you own a fine dining establishment, a cafe, or a fast-food joints, cafés, food trucks, Cloud kitchen, and more.
     """,
-    'author': 'Odoo SA',
     'depends': [
-        'account_check_printing',
         'account_followup',
-        'account_online_synchronization',
         'hr_hourly_cost',
         'knowledge',
         'mrp_account',
@@ -27,7 +24,6 @@
         'survey',
         'website_appointment',
         'website_sale_loyalty',
-        'website_sale_product_configurator',
         'website_sale_stock'
     ],
     'data': [
@@ -42,7 +38,6 @@
         'data/mrp_bom_line.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
-        'data/knowledge_article_member.xml',
         'data/restaurant_floor.xml',
         'data/restaurant_table.xml',
         'data/pos_config.xml',
@@ -66,7 +61,6 @@
         'demo/pos_preparation_display_orderline.xml',
         'demo/pos_preparation_display_confirm.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }
