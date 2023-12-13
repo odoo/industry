@@ -3,10 +3,8 @@
     'version': '1.0',
     'category': 'Retail',
     'description': """
-This module setup a furniture store for selling furniture like chairs, sofas, dinning tables,
-beds, cupboards etc.
+This module sets up a furniture store for selling furniture like chairs, sofas, dining tables, ...
 """,
-    'author': 'Odoo S.A.',
     'depends': [
         'knowledge',
         'mrp',
@@ -23,7 +21,7 @@ beds, cupboards etc.
         'data/knowledge_attachments.xml',
         'data/product_public_category.xml',
         'data/product_category.xml',
-        'data/stock_function.xml',
+        'data/stock_route.xml',
         'data/product_template.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
@@ -56,7 +54,6 @@ beds, cupboards etc.
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }
