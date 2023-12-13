@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Learning Management Services',
     'version': '1.0',
-    'category': 'Industry',
+    'category': 'Services',
     'description': """
 This module provides the infrastructure for delivering, managing, and tracking online courses.
 They offer features such as course creation, student enrolment, assessments, progress tracking,
@@ -11,14 +10,11 @@ communication tools, certification and gamification.
     'depends': [
         'account_followup',
         'appointment_crm',
-        'base_vat',
         'knowledge',
         'project_enterprise',  
         'project_sms',
         'sale_crm',
-        'sale_planning',
         'sale_project',
-        'web_studio',
         'website_appointment',
         'website_crm',
         'website_sale_wishlist',
@@ -26,8 +22,8 @@ communication tools, certification and gamification.
         'website_sale_slides',
         'website_slides_forum',
         'website_slides_survey',
-        'theme_clean',
         'payment_demo',
+        'theme_clean'
     ],
     'data': [
         'data/res_config_settings.xml',
