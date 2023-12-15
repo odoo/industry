@@ -15,10 +15,8 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
         "pos_discount",
         "loyalty",
         "product_expiry",
-        "purchase_product_matrix",
         "purchase_stock",
         "sale_loyalty",
-        "sale_product_matrix",
         "sale_purchase",
         "sale_service",
         "stock_delivery",
@@ -57,4 +55,5 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
         'demo/sale_order_post.xml',
     ],
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }
