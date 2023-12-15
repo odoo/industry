@@ -2,9 +2,9 @@
 {
     'name': 'HeadHunter',
     'version': '1.0',
-    'category': 'Studio',
+    'category': 'Services',
     'description': """
-This setup is for Talent Acquisition Agency / Recruitment Agency / Staffing Agency. Those agencies work on two levels and with two different audiences.
+This setup is for Talent Acquisition Agency / Recruitment Agency / Staffing Agency. Those agencies work on two levels and with two different audiences, ...
 """,
     'depends': [
         'appointment_crm',
@@ -29,13 +29,13 @@ This setup is for Talent Acquisition Agency / Recruitment Agency / Staffing Agen
         'website_hr_recruitment'
     ],
     'data': [
+        'data/base_automation.xml',
+        'data/mail_template.xml',
+        'data/ir_actions_server.xml',
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
         'data/ir_actions_act_window.xml',
-        'data/mail_template.xml',
-        'data/ir_actions_server.xml',
-        'data/base_automation.xml',
         'data/ir_model_access.xml',
         'data/product_template.xml',
         'data/product_pricelist.xml',
@@ -53,8 +53,9 @@ This setup is for Talent Acquisition Agency / Recruitment Agency / Staffing Agen
         'data/ir_attachment_post.xml',
     ],
     'demo': [
-        'demo/website.xml',
         'demo/res_partner.xml',
+        'demo/calendar_event.xml',
+        'demo/website.xml',
         'demo/hr_employee.xml',
         'demo/crm_tag.xml',
         'demo/crm_stage.xml',
@@ -62,12 +63,13 @@ This setup is for Talent Acquisition Agency / Recruitment Agency / Staffing Agen
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
+        'demo/website_ir_attachment.xml',
         'demo/website_view.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
-        'demo/calendar_event.xml',
         'demo/hr_applicant.xml',
     ],
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }
