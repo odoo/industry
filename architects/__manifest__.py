@@ -9,6 +9,7 @@ schematic design, design development, worksite follow-up, energy efficiency asse
     'depends': [
         'account_followup',
         'base_automation',
+        'base_geolocalize',
         'crm_enterprise',
         'documents_hr',
         'documents_product',
@@ -21,12 +22,12 @@ schematic design, design development, worksite follow-up, energy efficiency asse
         'sale_expense',
         'sale_planning',
         'timesheet_grid',
+        'theme_real_estate',
         'website_crm',
         'website_partner',
-        'theme_real_estate',
-        'base_geolocalize',
     ],
     'data': [
+        'data/crm_stage.xml',
         'data/base_automation.xml',
         'data/ir_actions_server.xml',
         'data/ir_attachment_pre.xml',
@@ -44,7 +45,6 @@ schematic design, design development, worksite follow-up, energy efficiency asse
     'demo': [
         'demo/website.xml',
         'demo/res_partner.xml',
-        'demo/crm_stage.xml',
         'demo/crm_lead.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
