@@ -1,22 +1,17 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Electronic Store',
     'version': '1.0',
-    'category': 'Studio',
+    'category': 'Retail',
     'description': """
         This module provides essential features to manage an electronic store.
         It includes product categories, products, sales orders, and more for electronic products.
     """,
-    'author': 'Odoo S.A.',
     'depends': [
         'account_followup',
-        'account_online_synchronization',
         'appointment_crm',
         'base',
         'base_vat',
         'crm_enterprise',
-        'crm_iap_enrich',
-        'crm_iap_mine',
         'documents_fsm',
         'documents_hr',
         'documents_product',
@@ -27,7 +22,6 @@
         'industry_fsm_sale_report',
         'industry_fsm_stock',
         'knowledge',
-        'partner_autocomplete',
         'pos_sale',
         'product_expiry',
         'project_sms',
@@ -42,7 +36,6 @@
         'website_crm',
         'website_helpdesk',
         'website_sale_loyalty',
-        'website_sale_product_configurator',
         'website_sale_stock',
     ],
     'data': [
@@ -91,6 +84,6 @@
         'demo/crm_lead_post.xml',
         'demo/website_theme_apply.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }
