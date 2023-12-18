@@ -12,7 +12,6 @@ communication tools, certification and gamification.
         'appointment_crm',
         'knowledge',
         'project_enterprise',  
-        'project_sms',
         'sale_crm',
         'sale_project',
         'website_appointment',
