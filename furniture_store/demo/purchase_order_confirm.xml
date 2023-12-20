@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <function model="purchase.order" name="button_confirm">
+        <value eval="[
+            ref('purchase_order_1'),
+            ref('purchase_order_2'),
+            ref('purchase_order_3'),
+            ref('purchase_order_4'),
+            ref('purchase_order_5'),
+            ]"
+        />
+    </function>
+
+    <function name="button_validate" model="stock.picking">
+        <value model="stock.picking" eval="
+        (
+            obj().env.ref('furniture_store.purchase_order_1') +
+            obj().env.ref('furniture_store.purchase_order_2') +
+            obj().env.ref('furniture_store.purchase_order_3') +
+            obj().env.ref('furniture_store.purchase_order_4') +
+            obj().env.ref('furniture_store.purchase_order_5')
+        ).group_id.stock_move_ids.picking_id.ids"/>
+    </function>
+
+    <function name="action_create_invoice" model="purchase.order">
+        <value eval="[
+            ref('purchase_order_1'),
+            ref('purchase_order_2')
+        ]"/>
+    </function>
+
+    <function name="write" model="account.move">
+        <value model="account.move" eval="
+        (
+                obj().env.ref('furniture_store.purchase_order_1') +
+                obj().env.ref('furniture_store.purchase_order_2')
+            ).invoice_ids.ids
+        "/>
+        <value eval="{'invoice_date': DateTime.today().date()}" />
+    </function>
+
+    <function name="action_post" model="account.move">
+        <value model="purchase.order" eval="
+            (
+                obj().env.ref('furniture_store.purchase_order_1') +
+                obj().env.ref('furniture_store.purchase_order_2')
+            ).invoice_ids.ids
+        "/>
+    </function>
+</odoo>
