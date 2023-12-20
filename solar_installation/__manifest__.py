@@ -2,21 +2,16 @@
 {
     'name': 'Solar Installation',
     'version': '1.0',
-    'category': 'Industry',
+    'category': 'Service',
     'description': """
 This configuration is designed for companies specializing in solar equipment and installation services.
 They cater to both residential and commercial customers, accommodating capacities ranging from 1 kW to 100 kW, 
 ensuring the efficient installation of solar panels and associated equipment.
 """,
-    'author': 'Odoo SA',
     'depends': [
-        'account_check_printing', 
         'account_followup', 
-        'account_online_synchronization', 
         'appointment_crm', 
         'crm_enterprise', 
-        'crm_iap_enrich', 
-        'crm_iap_mine', 
         'helpdesk_fsm', 
         'helpdesk_stock', 
         'industry_fsm_sale_report', 
@@ -39,7 +34,7 @@ ensuring the efficient installation of solar panels and associated equipment.
     ],
     'data': [
         'data/ir_attachment_pre.xml',
-        'data/res_groups.xml',
+        # 'data/res_groups.xml',
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
@@ -60,7 +55,6 @@ ensuring the efficient installation of solar panels and associated equipment.
         'data/sale_order_template_line.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
-        'data/knowledge_article_member.xml',
         'data/ir_attachment_post.xml',
     ],
     'demo': [
@@ -84,6 +78,5 @@ ensuring the efficient installation of solar panels and associated equipment.
         'demo/website_theme_apply.xml',
         'demo/ir_attachment_post.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
 }
