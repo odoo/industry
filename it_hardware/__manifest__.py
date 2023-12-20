@@ -18,12 +18,10 @@ including laptops, RAM, accessories, and CCTV cameras.
         'repair',
         'sale_crm',
         'sale_purchase',
-        'stock_barcode',
         'website_appointment',
         'website_crm',
         'website_helpdesk_knowledge',
         'website_sale_comparison',
-        'website_sale_product_configurator',
         'website_sale_stock',
         'theme_graphene',
     ],
@@ -68,4 +66,5 @@ including laptops, RAM, accessories, and CCTV cameras.
         'demo/website_theme_apply.xml',
     ],
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }
