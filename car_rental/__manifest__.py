@@ -37,7 +37,6 @@ This module pre-configures Odoo to manage your fleet. Easily purchase a new car 
         'data/res_config_settings.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
-        'data/knowledge_article_member.xml',
         'data/ir_attachment_post.xml',
     ],
     'demo': [
