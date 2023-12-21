@@ -2,7 +2,7 @@
 {
     'name': 'Solar Installation',
     'version': '1.0',
-    'category': 'Service',
+    'category': 'Services',
     'description': """
 This configuration is designed for companies specializing in solar equipment and installation services.
 They cater to both residential and commercial customers, accommodating capacities ranging from 1 kW to 100 kW, 
@@ -17,20 +17,17 @@ ensuring the efficient installation of solar panels and associated equipment.
         'industry_fsm_sale_report', 
         'industry_fsm_stock', 
         'mrp_account', 
-        'partner_autocomplete', 
         'product_expiry', 
         'project_sms', 
         'repair', 
         'sale_crm', 
         'sale_planning', 
-        'sale_product_configurator', 
         'sale_purchase', 
         'stock_landed_costs', 
         'website_appointment', 
         'website_crm', 
         'website_helpdesk_knowledge', 
         'website_livechat',
-        'web_studio',
     ],
     'data': [
         'data/ir_attachment_pre.xml',
@@ -41,7 +38,7 @@ ensuring the efficient installation of solar panels and associated equipment.
         'data/ir_actions_act_window.xml',
         'data/ir_model_access.xml',
         'data/ir_rule.xml',
-        'data/ir_default.xml',
+        # 'data/ir_default.xml',
         'data/project_task_type.xml',
         'data/product_category.xml',
         'data/worksheet_template.xml',
@@ -79,4 +76,5 @@ ensuring the efficient installation of solar panels and associated equipment.
         'demo/ir_attachment_post.xml',
     ],
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }
