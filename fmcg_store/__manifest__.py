@@ -10,7 +10,6 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
         "calendar",
         "hr_hourly_cost",
         "knowledge",
-        "pos_hr",
         "pos_sale",
         "pos_discount",
         "loyalty",
