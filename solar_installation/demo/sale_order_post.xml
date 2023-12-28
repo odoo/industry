@@ -3,36 +3,48 @@
 
     <function model="sale.order" name="action_confirm">
         <value eval="[
+            ref('sale_order_20'),
             ref('sale_order_23'),
+            ref('sale_order_24'),
+            ref('sale_order_25'),
+            ref('sale_order_26'),
+            ref('sale_order_27'),
         ]"/>
     </function>
 
-    <!-- <function name="button_validate" model="stock.picking">
+    <function name="button_validate" model="stock.picking" context="{'skip_sms': True}">
         <value model="stock.picking" eval="
-            obj().search([('state', '=', 'assigned'), ('id', 'in',
-                (
-                    obj().env.ref('solar_installation.sale_order_23')
-                ).procurement_group_id.stock_move_ids.picking_id.ids)
-            ]).ids"/>
-    </function> -->
-
-    <!-- <function name="button_validate" model="stock.picking">
-        <value model="stock.picking" eval="(
-                obj().env.ref('solar_installation.sale_order_23')
-            ).picking_ids.ids"/>
+        (
+        obj().env.ref('solar_installation.sale_order_20') +
+        obj().env.ref('solar_installation.sale_order_23') +
+        obj().env.ref('solar_installation.sale_order_24') +
+        obj().env.ref('solar_installation.sale_order_25') +
+        obj().env.ref('solar_installation.sale_order_26') +
+        obj().env.ref('solar_installation.sale_order_27')
+    ).picking_ids.ids"/>
     </function>
 
-
     <function name="_create_invoices" model="sale.order">
-        <value eval="[ref('sale_order_23')]"/>
+        <value eval="[
+            ref('sale_order_20'),
+            ref('sale_order_23'),
+            ref('sale_order_24'),
+            ref('sale_order_25'),
+            ref('sale_order_26'),
+            ref('sale_order_27'),
+            ]"/>
     </function>
 
     <function name="action_post" model="account.move">
         <value model="sale.order" eval="
             (
-                obj().env.ref('solar_installation.sale_order_23')
+                obj().env.ref('solar_installation.sale_order_20') +
+                obj().env.ref('solar_installation.sale_order_23') +
+                obj().env.ref('solar_installation.sale_order_24') +
+                obj().env.ref('solar_installation.sale_order_25') +
+                obj().env.ref('solar_installation.sale_order_26') +
+                obj().env.ref('solar_installation.sale_order_27')
             ).invoice_ids.ids
         "/>
-    </function> -->
-
+    </function>
 </odoo>
