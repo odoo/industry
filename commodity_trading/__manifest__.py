@@ -3,10 +3,9 @@
     'version': '1.0',
     'category': 'Services',
     'description': """
-        Tailored for commodity traders (e.g., soybeans, wheat) with comprehensive functions,
+        Tailored for commodity traders (e.g. soybeans, wheat) with comprehensive functions,
         including CRM, quality checks, and broker involvement for product quality and commissions.
     """,
-    'author': 'Odoo S.A.',
     'depends': [
         'account_followup',
         'appointment_crm',
@@ -65,7 +64,6 @@
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }
