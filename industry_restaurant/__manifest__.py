@@ -2,7 +2,7 @@
 {
     'name': 'Restaurant (Foods & Cafes)',
     'version': '1.0',
-    'category': 'Industry',
+    'category': 'Services',
     'description': """
         This Odoo module is designed to streamline and enhance the management of your restaurant operations.
         Whether you own a fine dining establishment, a cafe, or a fast-food joints, cafés, food trucks, Cloud kitchen, and more.
