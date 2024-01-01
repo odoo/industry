@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Restaurant (Foods & Cafes)',
     'version': '1.0',
