@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Solar Installation',
     'version': '1.0',
@@ -12,8 +11,10 @@ ensuring the efficient installation of solar panels and associated equipment.
         'account_followup', 
         'appointment_crm', 
         'crm_enterprise', 
-        'helpdesk_fsm', 
-        'helpdesk_stock', 
+        'helpdesk_fsm',
+        'helpdesk_stock',
+        'helpdesk_account',
+        'helpdesk_repair',
         'industry_fsm_sale_report', 
         'industry_fsm_stock', 
         'mrp_account', 
@@ -30,6 +31,7 @@ ensuring the efficient installation of solar panels and associated equipment.
         'website_livechat',
     ],
     'data': [
+        'data/helpdesk_config.xml',
         'data/ir_attachment_pre.xml',
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
@@ -80,6 +82,8 @@ ensuring the efficient installation of solar panels and associated equipment.
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
+        'demo/helpdesk_ticket.xml',
+        'demo/stock_picking_return.xml',
         'demo/ir_attachment_post.xml',
     ],
     'license': 'OPL-1',
