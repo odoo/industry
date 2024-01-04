@@ -7,6 +7,7 @@
 This setup is for Talent Acquisition Agency / Recruitment Agency / Staffing Agency. Those agencies work on two levels and with two different audiences, ...
 """,
     'depends': [
+        'account_accountant',
         'appointment_crm',
         'appointment_hr',
         'appointment_hr_recruitment',
@@ -45,9 +46,9 @@ This setup is for Talent Acquisition Agency / Recruitment Agency / Staffing Agen
         'data/survey_question_answer.xml',
         'data/hr_recruitment_stage.xml',
         'data/utm_source.xml',
+        'data/appointment_type.xml',
         'data/hr_department.xml',
         'data/hr_job.xml',
-        'data/appointment_type.xml',
         'data/appointment_slot.xml',
         'data/ir_attachment_post.xml',
         'data/sign_template.xml',
