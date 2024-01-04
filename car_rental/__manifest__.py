@@ -1,7 +1,7 @@
 {
     'name': 'Car Rental',
     'version': '1.0',
-    'category': 'Service',
+    'category': 'Services',
     'description': """
 This module pre-configures Odoo to manage your fleet. Easily purchase a new car or rent one for short or long-distance travel. Provide also tailored car rental services based on the customer's specific requirements.
 """,
@@ -21,8 +21,8 @@ This module pre-configures Odoo to manage your fleet. Easily purchase a new car 
         "website_sale_stock",
     ],
     'data': [
-        'data/base_automation.xml',
         'data/ir_actions_server.xml',
+        'data/base_automation.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
         'data/ir_attachment_pre.xml',
@@ -57,7 +57,6 @@ This module pre-configures Odoo to manage your fleet. Easily purchase a new car 
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }
