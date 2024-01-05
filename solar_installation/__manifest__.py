@@ -54,7 +54,6 @@ ensuring the efficient installation of solar panels and associated equipment.
         'data/ir_attachment_post.xml',
         'data/mrp_bom.xml',
         'data/mrp_bom_line.xml',
-        'data/chatbot_script.xml',
         'data/chatbot_script_answer.xml',
         'data/chatbot_script_step.xml',
         'data/im_livechat_channel.xml',
