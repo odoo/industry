@@ -13,6 +13,8 @@
         'documents_project_sale',
         'helpdesk_fsm',
         'helpdesk_stock',
+        'helpdesk_account',
+        'helpdesk_repair',
         'industry_fsm_sale_report',
         'industry_fsm_stock',
         'knowledge',
@@ -30,6 +32,7 @@
         'theme_buzzy',
     ],
     'data': [
+        'data/helpdesk_config.xml',
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/ir_model_fields.xml',
@@ -56,6 +59,7 @@
         'data/knowledge_article.xml',
     ],
     'demo': [
+        'demo/helpdesk_ticket.xml',
         'demo/website_ir_attachment.xml',
         'demo/website.xml',
         'demo/res_partner.xml',
