@@ -9,7 +9,7 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='aml_tab']/field[@name='line_ids']/tree[1]/field[@name='account_id']" position="after">
-                <field optional="show" name="x_studio_product_story" widget="image" string="Product Story"/>
+                <field optional="show" name="x_product_story" widget="image" string="Product Story"/>
             </xpath>
         </field>
     </record>
@@ -22,11 +22,11 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='stage_id']" position="after">
-                <button name="%(action_lead_survey_start)d" string="Survey Start" class="btn btn-primary" type="action" invisible="x_studio_answer != False"/>
+                <button name="%(action_lead_survey_start)d" string="Survey Start" class="btn btn-primary" type="action" invisible="x_survey_answer != False"/>
             </xpath>
             <xpath expr="//form[1]/sheet[1]/group[1]/group[not(@name)][1]/field[@name='tag_ids']" position="after">
-                <field name="x_studio_survey" string="Survey"/>
-                <field name="x_studio_answer" string="Answer" invisible="x_studio_answer == False" force_save="True" readonly="1" options="{&quot;no_create&quot;:true,&quot;no_quick_create&quot;:true,&quot;no_create_edit&quot;:true}"/>
+                <field name="x_survey" string="Survey"/>
+                <field name="x_survey_answer" string="Answer" invisible="x_survey_answer == False" force_save="True" readonly="1" options="{&quot;no_create&quot;:true,&quot;no_quick_create&quot;:true,&quot;no_create_edit&quot;:true}"/>
             </xpath>
         </field>
     </record>
@@ -39,46 +39,51 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='uom_po_id']" position="after">
-                <field widget="image" name="x_studio_binary_field_5i7_1h7fiidlo" string="Product Making Story - QR Code "/>
+                <field widget="image" name="x_product_qr" string="Product Making Story - QR Code "/>
             </xpath>
         </field>
     </record>
     <record id="agriculture.odoo_studio_stock_pi_2610a694-e60c-4d7b-be2d-721bc7be6b1e" model="ir.ui.view">
-        <field name="inherit_id" ref="stock.view_picking_form"/>
-        <field name="mode">extension</field>
-        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_stock_move_line_detailed_operation_tree"/>
+        <field name="mode">primary</field>
+        <field name="name">stock.move.line.operations.tree</field>
+        <field name="model">stock.move.line</field>
         <field name="name">Odoo Studio: stock.picking.form customization</field>
-        <field name="priority">160</field>
-        <field name="type">form</field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='move_line_ids_without_package']" position="inside">
-                <tree editable="bottom" decoration-muted="(state == 'done' and is_locked == True)">
-                    <field name="product_id" required="1" context="{'default_detailed_type': 'product'}" readonly="state == 'done' or move_id != False"/>
-                    <field name="company_id" invisible="1"/>
-                    <field name="move_id" invisible="1"/>
-                    <field name="picking_id" invisible="1"/>
-                    <field name="product_uom_category_id" invisible="1"/>
-                    <field name="package_id" invisible="1"/>
-                    <field name="result_package_id" invisible="1"/>
-                    <field name="location_id" invisible="1"/>
-                    <field name="location_dest_id" invisible="1"/>
-                    <field name="location_id" options="{'no_create': True}" column_invisible="parent.picking_type_code == 'incoming'" groups="stock.group_stock_multi_locations" domain="[('id', 'child_of', parent.location_id), '|', ('company_id', '=', False), ('company_id', '=', company_id), ('usage', '!=', 'view')]"/>
-                    <field name="location_dest_id" options="{'no_create': True}" column_invisible="parent.picking_type_code == 'incoming'" groups="stock.group_stock_multi_locations" domain="[('id', 'child_of', parent.location_dest_id), '|', ('company_id', '=', False), ('company_id', '=', company_id), ('usage', '!=', 'view')]"/>
-                    <field name="package_id" groups="stock.group_tracking_lot"/>
-                    <field name="result_package_id" groups="stock.group_tracking_lot"/>
-                    <field name="lots_visible" invisible="1"/>
-                    <field name="owner_id" groups="stock.group_tracking_owner" column_invisible="parent.picking_type_code == 'incoming'"/>
-                    <field name="state" invisible="1"/>
-                    <field name="lot_id" groups="stock.group_production_lot" column_invisible="parent.show_lots_text == True" invisible="lots_visible == False" context="{'default_product_id': product_id, 'default_company_id': company_id, 'active_picking_id': picking_id}" optional="show"/>
-                    <field name="is_expired" invisible="1"/>
-                    <button class="fa fa-exclamation-triangle text-danger" title="This lot is expired." string="This lot is expired" disabled="1" invisible="is_expired == False"/>
-                    <field name="lot_name" groups="stock.group_production_lot" column_invisible="parent.show_lots_text == True" invisible="lots_visible == False" context="{'default_product_id': product_id}"/>
-                    <field name="picking_type_use_existing_lots" invisible="1"/>
-                    <field name="expiration_date" force_save="1" readonly="picking_type_use_existing_lots == True"/>
-                    <field name="is_locked" invisible="1"/>
-                    <field name="product_uom_id" force_save="1" readonly="state != 'draft' and id != False" groups="uom.group_uom"/>
-                </tree>
-            </xpath>
+            <tree editable="bottom" decoration-muted="(state == 'done' and is_locked == True)" multi_edit="1">
+                <header>
+                    <button class="btn-primary" name="action_put_in_pack" type="object" string="Put in Pack" groups="stock.group_tracking_lot"/>
+                </header>
+                <field name="product_id" context="{'default_detailed_type': 'product'}" required="1" readonly="state == 'done' or move_id"/>
+                <field name="company_id" column_invisible="True"/>
+                <field name="move_id" column_invisible="True"/>
+                <field name="picking_id" column_invisible="True"/>
+                <field name="picking_code" column_invisible="True"/>
+                <field name="picking_location_id" column_invisible="True"/>
+                <field name="picking_location_dest_id" column_invisible="True"/>
+                <field name="product_uom_category_id" column_invisible="True"/>
+                <field name="location_id" column_invisible="True"/>
+                <field name="location_dest_id" column_invisible="True"/>
+                <field name="quant_id" column_invisible="context.get('picking_code') == 'incoming'"
+                        domain="[('product_id', '=', product_id), ('location_id', 'child_of', picking_location_id)]"
+                        context="{'default_location_id': location_id, 'default_product_id': product_id, 'search_view_ref': 'stock.quant_search_view', 'tree_view_ref': 'stock.view_stock_quant_tree_simple', 'form_view_ref': 'stock.view_stock_quant_form', 'readonly_form': False}"
+                        widget="pick_from"
+                        options="{'no_open': True}"/>
+                <field name="location_dest_id" options="{'no_create': True}" column_invisible="context.get('picking_code') == 'outgoing'" groups="stock.group_stock_multi_locations" domain="[('id', 'child_of', picking_location_dest_id), '|', ('company_id', '=', False), ('company_id', '=', company_id), ('usage', '!=', 'view')]"/>
+                <field name="package_id" column_invisible="True"/>
+                <field name="result_package_id" column_invisible="True"/>
+                <field name="lot_id" column_invisible="context.get('show_lots_text')" groups="stock.group_production_lot" invisible="not lots_visible" context="{'default_product_id': product_id, 'default_company_id': company_id, 'active_picking_id': picking_id}" optional="show"/>
+                <field name="result_package_id" groups="stock.group_tracking_lot"/>
+                <field name="lots_visible" column_invisible="True"/>
+                <field name="owner_id" groups="stock.group_tracking_owner" column_invisible="context.get('picking_code') == 'incoming'"/>
+                <field name="state" column_invisible="True"/>
+                <field name="is_expired" column_invisible="True"/>
+                <button class="fa fa-exclamation-triangle text-danger" title="This lot is expired." string="This lot is expired" disabled="1" invisible="is_expired == False"/>
+                <field name="picking_type_use_existing_lots" column_invisible="True"/>
+                <field name="expiration_date" force_save="1" readonly="picking_type_use_existing_lots == True"/>
+                <field name="is_locked" column_invisible="True"/>
+                <field name="product_uom_id" force_save="1" readonly="state != 'draft' and id" groups="uom.group_uom"/>
+            </tree>
         </field>
     </record>
 </odoo>
