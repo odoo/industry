@@ -1,0 +1,67 @@
+# -*- coding: utf-8 -*-
+{
+    'name': 'Agricultural Retail',
+    'version': '1.0',
+    'category': 'Industry',
+    'description': """
+Tailored setup for agricultural retail businesses engaged in B2B and B2C sales of farming products.
+Point of Sale (POS) stores & website offer categorised items such as seeds, pesticides, plant nutrition, and farming equipment.
+
+They utilize a suite of modules including Point of Sale, Inventory, Sales, Purchase, Survey,Accounting, Contact, Dashboard, Barcode, and Documents.
+Expanding into the online realm, a website and E-commerce applications can significantly aid their growth in the agricultural retail sector.
+""",
+    'author': 'Agro Farma Industries',
+    'depends': [
+        'website_sale_loyalty',
+        'purchase',
+        'knowledge',
+        'pos_sale',
+        'product_expiry',
+        'survey',
+        'crm',
+        'sale_purchase',
+        'theme_enark',
+    ],
+    'data': [
+        'data/res_config_settings.xml',
+        'data/ir_actions_server.xml',
+        'data/ir_attachment_pre.xml',
+        'data/ir_model_fields.xml',
+        'data/ir_ui_view.xml',
+        'data/product_category.xml',
+        'data/account_analytic_plan.xml',
+        'data/product_template.xml',
+        'data/product_pricelist.xml',
+        'data/product_product.xml',
+        'data/loyalty_program.xml',
+        'data/loyalty_rule.xml',
+        'data/loyalty_reward.xml',
+        'data/knowledge_cover.xml',
+        'data/knowledge_article.xml',
+        'data/knowledge_article_member.xml',
+        'data/survey_survey.xml',
+        'data/survey_question.xml',
+        'data/survey_question_answer.xml',
+    ],
+    'demo': [
+        'demo/res_partner.xml',
+        'demo/crm_lead.xml',
+        'demo/product_supplierinfo.xml',
+        'demo/stock_lot.xml',
+        'demo/purchase_order.xml',
+        'demo/purchase_order_line.xml',
+        'demo/purchase_order_post.xml',
+        'demo/sale_order.xml',
+        'demo/sale_order_line.xml',
+        'demo/loyalty_card.xml',
+        'demo/sale_order_post.xml',
+        'demo/website.xml',
+        'demo/website_views.xml',
+        'demo/website_page.xml',
+        'demo/website_menu.xml',
+        'demo/website_theme_apply.xml',
+        'demo/website_ir_attachment.xml',
+    ],
+    'application': False,
+    'license': 'OPL-1',
+}

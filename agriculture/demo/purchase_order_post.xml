@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <function model="purchase.order" name="button_confirm">
+        <value eval="[ref('purchase_order_1'),]"/>
+    </function>
+
+    <function name="write" model="stock.move.line">
+        <value model="stock.move.line" eval="obj().search([('picking_id', '=', obj().env.ref('agriculture.purchase_order_1').picking_ids.id)]).id"/>
+        <value model="stock.lot" eval="{'lot_id': ref('agriculture.stock_lot_2'), 'lot_name': obj().env.ref('agriculture.stock_lot_2').name}"/>
+    </function>
+
+    <function name="button_validate" model="stock.picking">
+        <value model="stock.picking" eval="obj().env.ref('agriculture.purchase_order_1').group_id.stock_move_ids.picking_id.ids"/>
+    </function>
+</odoo>
