@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Agricultural Retail',
     'version': '1.0',
-    'category': 'Industry',
+    'category': 'Manufacturing',
     'description': """
 Tailored setup for agricultural retail businesses engaged in B2B and B2C sales of farming products.
 Point of Sale (POS) stores & website offer categorised items such as seeds, pesticides, plant nutrition, and farming equipment.
@@ -10,7 +9,6 @@ Point of Sale (POS) stores & website offer categorised items such as seeds, pest
 They utilize a suite of modules including Point of Sale, Inventory, Sales, Purchase, Survey,Accounting, Contact, Dashboard, Barcode, and Documents.
 Expanding into the online realm, a website and E-commerce applications can significantly aid their growth in the agricultural retail sector.
 """,
-    'author': 'Agro Farma Industries',
     'depends': [
         'website_sale_loyalty',
         'purchase',
@@ -29,7 +27,6 @@ Expanding into the online realm, a website and E-commerce applications can signi
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
         'data/product_category.xml',
-        'data/account_analytic_plan.xml',
         'data/product_template.xml',
         'data/product_pricelist.xml',
         'data/product_product.xml',
@@ -38,7 +35,6 @@ Expanding into the online realm, a website and E-commerce applications can signi
         'data/loyalty_reward.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
-        'data/knowledge_article_member.xml',
         'data/survey_survey.xml',
         'data/survey_question.xml',
         'data/survey_question_answer.xml',
@@ -62,6 +58,6 @@ Expanding into the online realm, a website and E-commerce applications can signi
         'demo/website_theme_apply.xml',
         'demo/website_ir_attachment.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }
