@@ -18,6 +18,7 @@ Expanding into the online realm, a website and E-commerce applications can signi
         'survey',
         'crm',
         'sale_purchase',
+        'purchase_requisition',
         'theme_enark',
     ],
     'data': [
@@ -50,7 +51,7 @@ Expanding into the online realm, a website and E-commerce applications can signi
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/loyalty_card.xml',
-        'demo/sale_order_post.xml',
+        # 'demo/sale_order_post.xml',
         'demo/website.xml',
         'demo/website_views.xml',
         'demo/website_page.xml',
