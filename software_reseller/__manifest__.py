@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Software Reseller',
     'version': '1.0',
     'category': 'Retail',
     'description': u"""
 This setup if for IT companies reselling software licenses, and consulting services.🚀 
-The typical sale is a 1 year Oracle Databbase license that is purchased to Oracle, and resold to client at a margin, with extra services to setup the database.
+The typical sale is a 1 year Oracle Database license that is purchased to Oracle, and resold to client at a margin, with extra services to setup the database.
 """,
     'depends': [
         'project',
