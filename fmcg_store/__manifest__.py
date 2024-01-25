@@ -15,7 +15,6 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
         "loyalty",
         "product_expiry",
         "purchase_stock",
-        "sale_loyalty",
         "sale_purchase",
         "sale_service",
         "stock_delivery",
