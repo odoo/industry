@@ -2,25 +2,25 @@
 <odoo>
 	<!-- Confirm action -->
     <function model="sale.order" name="action_confirm">
-        <value eval="[ref('certification_organism.sale_order_1'), ref('certification_organism.sale_order_2'), ref('certification_organism.sale_order_3'), ref('certification_organism.sale_order_4')]"/>
+        <value eval="[ref('sale_order_1'), ref('sale_order_2'), ref('sale_order_3'), ref('sale_order_4')]"/>
     </function>
 
     <!-- Create Invoice -->
     <record id="sale_advance_payment_inv_1" model="sale.advance.payment.inv">
         <field name="advance_payment_method" >delivered</field>
-        <field name="sale_order_ids" eval="[Command.set([ref('certification_organism.sale_order_1')])]"/>
+        <field name="sale_order_ids" eval="[Command.set([ref('sale_order_1')])]"/>
     </record>
 
     <function model="sale.advance.payment.inv" name="create_invoices"
-            eval="[ref('certification_organism.sale_advance_payment_inv_1')]"/>
+            eval="[ref('sale_advance_payment_inv_1')]"/>
 
     <record id="sale_advance_payment_inv_2" model="sale.advance.payment.inv">
         <field name="advance_payment_method" >delivered</field>
-        <field name="sale_order_ids" eval="[Command.set([ref('certification_organism.sale_order_4')])]"/>
+        <field name="sale_order_ids" eval="[Command.set([ref('sale_order_4')])]"/>
     </record>
 
     <function model="sale.advance.payment.inv" name="create_invoices"
-            eval="[ref('certification_organism.sale_advance_payment_inv_2')]"/>
+            eval="[ref('sale_advance_payment_inv_2')]"/>
     
     <!-- Confirm invoice -->
     <function model="account.move" name="action_post">
@@ -36,19 +36,19 @@
         <field name="line_ids" model="account.move.line" eval="[Command.set([line.id for line in obj().env.ref('certification_organism.sale_order_1').invoice_ids.line_ids if line.account_type in ('asset_receivable', 'liability_payable')])]"/>
     </record>
     <function model="account.payment.register" name="action_create_payments" 
-            eval="[ref('certification_organism.account_payment_register_1')]"/>
+            eval="[ref('account_payment_register_1')]"/>
 
     <record id="account_payment_register_4" model="account.payment.register">
         <field name="line_ids" model="account.move.line" eval="[Command.set([line.id for line in obj().env.ref('certification_organism.sale_order_4').invoice_ids.line_ids if line.account_type in ('asset_receivable', 'liability_payable')])]"/>
     </record>
     <function model="account.payment.register" name="action_create_payments" 
-            eval="[ref('certification_organism.account_payment_register_4')]"/>
+            eval="[ref('account_payment_register_4')]"/>
 
     <!-- Update Task -->
     <!-- sale order sale_order_1 -->
     <function model="project.task" name="write">
         <value model="sale.order" eval="obj().env.ref('certification_organism.sale_order_1').tasks_ids.ids"/>
-        <value eval="{'user_ids': [ref('base.user_admin')], 'planned_date_begin': datetime.now() - relativedelta(days=1), 'date_deadline': datetime.now(), 'stage_id': ref('planning_project_stage_1'), 'tag_ids': [ref('certification_organism.project_tags_1')]}"/>
+        <value eval="{'user_ids': [ref('base.user_admin')], 'planned_date_begin': datetime.now() - relativedelta(days=1), 'date_deadline': datetime.now(), 'stage_id': ref('planning_project_stage_1'), 'tag_ids': [ref('project_tags_1')]}"/>
     </function>
     <function model="project.task" name="write">
         <value model="sale.order" eval="obj().env.ref('certification_organism.sale_order_1').tasks_ids.ids"/>
@@ -62,13 +62,13 @@
     <!-- sale order sale_order_2 -->
     <function model="project.task" name="write">
         <value model="sale.order" eval="obj().env.ref('certification_organism.sale_order_2').tasks_ids.ids"/>
-        <value eval="{'user_ids': [ref('base.user_admin')], 'planned_date_begin': datetime.now() - relativedelta(days=1), 'date_deadline': datetime.now(), 'stage_id': ref('planning_project_stage_1'), 'tag_ids': [ref('certification_organism.project_tags_1')]}"/>
+        <value eval="{'user_ids': [ref('base.user_admin')], 'planned_date_begin': datetime.now() - relativedelta(days=1), 'date_deadline': datetime.now(), 'stage_id': ref('planning_project_stage_1'), 'tag_ids': [ref('project_tags_1')]}"/>
     </function>
 
     <!-- sale order sale_order_3 -->
     <function model="project.task" name="write">
         <value model="sale.order" eval="obj().env.ref('certification_organism.sale_order_3').tasks_ids.ids"/>
-        <value eval="{'user_ids': [ref('base.user_admin')], 'planned_date_begin': datetime.now() - relativedelta(days=1), 'date_deadline': datetime.now(), 'stage_id': ref('planning_project_stage_1'), 'tag_ids': [ref('certification_organism.project_tags_1'), ref('certification_organism.project_tags_2')]}"/>
+        <value eval="{'user_ids': [ref('base.user_admin')], 'planned_date_begin': datetime.now() - relativedelta(days=1), 'date_deadline': datetime.now(), 'stage_id': ref('planning_project_stage_1'), 'tag_ids': [ref('project_tags_1'), ref('project_tags_2')]}"/>
     </function>
 
     <!-- sale order sale_order_4 -->

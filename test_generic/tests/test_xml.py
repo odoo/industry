@@ -41,3 +41,20 @@ class TestEnv(IndustryCase):
                 "XML files should begin with the following line: %s, but %s starts with %s",
                 starts_with, file_name, first_line
             )
+
+        if count := (s.count(' id="'+module+'.') + s.count(" id='"+module+'.')):
+            _logger.warning(
+                "Defining an xmlid with the current module name is useless, module name will be "
+                "added automatically. Found %d occurence(s) of ' id=\"%s.ID' in %s.",
+                count, module, file_name
+            )
+
+        count = (s.count('ref("'+module+'.') + s.count("ref('"+module+'.')) - (
+            s.count('env.ref("'+module+'.') + s.count("env.ref('"+module+'.'))
+        if count:
+            _logger.warning(
+                "Referring to an xmlid created within the current module name is useless. If none is"
+                " provided, it will check in current module. Found %d occurence(s) of ref(\"%s.ID\")"
+                " in %s (this remark does not apply to 'env.ref(\"%s.ID\")' where it is required).",
+                count, module, file_name, module
+            )
