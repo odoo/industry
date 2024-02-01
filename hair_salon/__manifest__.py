@@ -31,7 +31,6 @@
         'data/product_template_attribute_value.xml',
         'data/product_product.xml',
         'data/knowledge_article.xml',
-        'data/knowledge_article_member.xml',
         'data/appointment_type.xml',
     ],
     'demo': [

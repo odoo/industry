@@ -52,7 +52,6 @@
         'data/mrp_bom_line.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
-        'data/knowledge_article_member.xml',
     ],
     'demo': [
         'demo/website.xml',
