@@ -33,7 +33,6 @@ This module setup your database to easily use odoo in a certification company.
         'data/project_project.xml',
         'data/product_product.xml',
         'data/knowledge_article.xml',
-        'data/knowledge_article_member.xml',
         'data/ir_attachment_post.xml',
         'data/ir_model_data.xml',
     ],
