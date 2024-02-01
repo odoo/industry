@@ -29,6 +29,8 @@
         'data/product_data.xml',
         'data/sale_order_template_data.xml',
         'data/crm_tags_data.xml',
+        "data/ir_attachment.xml",
+        "data/knowledge_cover.xml",
         "data/knowledge_article.xml",
     ],
     'demo': [
