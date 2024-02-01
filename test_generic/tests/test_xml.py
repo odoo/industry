@@ -35,6 +35,7 @@ class TestEnv(IndustryCase):
                     content = f.read().decode('utf8')
                 self._check_xml_style(content, module, file_name)
                 self._check_update_status(content, file_name)
+                self._check_useless_models(content, file_name)
 
     def _check_xml_style(self, s, module, file_name):
         s = s.strip()
@@ -99,3 +100,12 @@ class TestEnv(IndustryCase):
                     "Model %s should not be updated, please add 'noupdate=\"1\"' in the header of %s.",
                     model, filename,
                 )
+
+    def _check_useless_models(self, s, filename):
+        useless_models = {
+            "knowledge.article.member": "Model knowledge.article.member should be replaced by write"
+                " access to all users",
+        }
+        for model, warning in useless_models.items():
+            if re.search('model="'+model, s):
+                _logger.warning(warning)
