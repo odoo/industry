@@ -1,6 +1,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import logging, os
+import logging
+import os
+import re
+
 from odoo.modules.module import get_module_path
 from odoo.tests.common import tagged
 
@@ -30,9 +33,10 @@ class TestEnv(IndustryCase):
                     raise "Max file size exceeded"
                 with open(file_path, 'rb') as f:
                     content = f.read().decode('utf8')
-                self._check_xml(content, module, file_name)
+                self._check_xml_style(content, module, file_name)
+                self._check_update_status(content, file_name)
 
-    def _check_xml(self, s, module, file_name):
+    def _check_xml_style(self, s, module, file_name):
         s = s.strip()
         starts_with = "<?xml version='1.0' encoding='UTF-8'?>"
         first_line = s.split('\n')[0]
@@ -58,3 +62,40 @@ class TestEnv(IndustryCase):
                 " in %s (this remark does not apply to 'env.ref(\"%s.ID\")' where it is required).",
                 count, module, file_name, module
             )
+
+    def _check_update_status(self, s, filename):
+        models_to_update = [
+            "base.automation",
+            "ir.actions.",
+            "ir.model",
+            "ir.ui.view",
+            "knowledge.article",
+            "loyalty.generate.wizard",
+        ]
+        models_not_to_update = [
+            "ir.attachment",
+            "ir.rule",
+            "knowledge.attachment",
+            "knowledge.cover",
+            "mail.template",
+            "pos.category",
+            "pos.config",
+            "product.category",
+            "product.product",
+            "product.template",
+            "res.config.setting",
+            "uom.category",
+            "uom.uom",
+        ]
+        for model in models_to_update:
+            if re.search('model="'+model, s) and not s.count('<odoo>'):
+                _logger.warning(
+                    "Model %s should be updated, please remove 'noupdate=\"1\"' in the header of %s.",
+                    model, filename,
+                )
+        for model in models_not_to_update:
+            if re.search('model="'+model, s) and not s.count('<odoo noupdate="1">'):
+                _logger.warning(
+                    "Model %s should not be updated, please add 'noupdate=\"1\"' in the header of %s.",
+                    model, filename,
+                )
