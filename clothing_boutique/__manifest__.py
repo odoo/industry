@@ -29,6 +29,8 @@ This setup if for Clothing and Boutique companies selling female clothing.""",
         'data/product_template_attribute_line.xml',
         'data/product_product.xml',
         'data/product_image.xml',
+        'data/ir_attachment.xml',
+        'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
     ],
     'demo': [
