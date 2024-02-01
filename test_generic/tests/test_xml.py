@@ -36,6 +36,7 @@ class TestEnv(IndustryCase):
                 self._check_xml_style(content, module, file_name)
                 self._check_update_status(content, file_name)
                 self._check_useless_models(content, file_name)
+                self._check_useless_fields_on_models(content, file_name)
 
     def _check_xml_style(self, s, module, file_name):
         s = s.strip()
@@ -109,3 +110,19 @@ class TestEnv(IndustryCase):
         for model, warning in useless_models.items():
             if re.search('model="'+model, s):
                 _logger.warning(warning)
+
+    def _check_useless_fields_on_models(self, s, filename):
+        useless_model_fields = {
+            'knowledge.article': ['article_member_ids'],
+            'product.attribute': ['product_tmpl_ids'],
+            'purchase.order.line': ['name'],
+            # 'sale.order.line': ['name'],  # need to handle down payments and options & templates properly
+        }
+        for model, fields in useless_model_fields.items():
+            if re.search('model="'+model, s):
+                for field in fields:
+                    if re.search('field name="'+field, s):
+                        _logger.warning(
+                            "You shouldn't define the %s on %s (%s). Please refer to other modules for examples.",
+                            field, model, filename
+                        )
