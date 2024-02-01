@@ -36,6 +36,7 @@ The typical sale is a 1 year Oracle Database license that is purchased to Oracle
     'demo': [
         'demo/res_partner.xml',
         'demo/product_supplierinfo.xml',
+        'demo/product_product.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',

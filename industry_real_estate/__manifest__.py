@@ -31,6 +31,7 @@ Manage your properties, create and manage rental contracts, and streamline your 
         'data/account_analytic_account.xml',
         'data/product_product.xml',
         'data/sale_order_template.xml',
+        'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/ir_attachment_post.xml',
         'security/ir_model_access.xml',
