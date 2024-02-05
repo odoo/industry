@@ -30,7 +30,6 @@
         'data/sale_order_template_data.xml',
         'data/crm_tags_data.xml',
         "data/knowledge_article.xml",
-        "data/website_contactus.xml",
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -42,6 +41,7 @@
         'demo/website_ir_attachment.xml',
         "demo/website.xml",
         'demo/website_view.xml',
+        "demo/website_contactus.xml",
         "demo/website_theme_apply.xml",
         'demo/website_page.xml',
         'demo/website_menu.xml',
