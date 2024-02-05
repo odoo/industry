@@ -48,6 +48,7 @@
         'data/knowledge_article.xml',
         'data/pos_payment_method.xml',
         'data/pos_config.xml',
+        'data/ir_model_data.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
