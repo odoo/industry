@@ -42,6 +42,7 @@
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/quality_point.xml',
+        'data/ir_model_data.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
