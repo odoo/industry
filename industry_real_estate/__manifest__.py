@@ -42,6 +42,7 @@ Manage your properties, create and manage rental contracts, and streamline your 
         'views/website.xml',
         'data/website_menu.xml',
         'data/ir_filters.xml',
+        'data/ir_model_data.xml',
     ],
     'demo': [
         'demo/website.xml',
