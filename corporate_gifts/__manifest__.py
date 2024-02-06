@@ -71,7 +71,7 @@ This module is for marketing companies selling and producing customized corporat
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
         'demo/planning_slot_template.xml',
-        'demo/planning_slot.xml',
+        # 'demo/planning_slot.xml',
         'demo/ir_attachment_post.xml',
     ],
     'license': 'OPL-1',
