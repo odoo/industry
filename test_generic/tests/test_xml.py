@@ -90,13 +90,13 @@ class TestEnv(IndustryCase):
             "uom.uom",
         ]
         for model in models_to_update:
-            if re.search('model="'+model, s) and not s.count('<odoo>'):
+            if re.search('model="'+model, s) and not re.search('<field .+model="'+model, s) and not s.count('<odoo>'):
                 _logger.warning(
                     "Model %s should be updated, please remove 'noupdate=\"1\"' in the header of %s.",
                     model, filename,
                 )
         for model in models_not_to_update:
-            if re.search('model="'+model, s) and not s.count('<odoo noupdate="1">'):
+            if re.search('model="'+model, s) and not re.search('<field .+model="'+model, s) and not s.count('<odoo noupdate="1">'):
                 _logger.warning(
                     "Model %s should not be updated, please add 'noupdate=\"1\"' in the header of %s.",
                     model, filename,
