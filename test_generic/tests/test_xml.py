@@ -40,12 +40,17 @@ class TestEnv(IndustryCase):
 
     def _check_xml_style(self, s, module, file_name):
         s = s.strip()
-        starts_with = "<?xml version='1.0' encoding='UTF-8'?>"
+        starts_with = [
+            "<?xml version='1.0' encoding='UTF-8'?>",
+            "<?xml version='1.0' encoding=\"UTF-8\"?>",
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<?xml version=\"1.0\" encoding='UTF-8'?>",
+        ]
         first_line = s.split('\n')[0]
-        if first_line != starts_with:
+        if not any(first_line == start_line for start_line in starts_with):
             _logger.warning(
                 "XML files should begin with the following line: %s, but %s starts with %s",
-                starts_with, file_name, first_line
+                starts_with[0], file_name, first_line
             )
 
         if count := (s.count(' id="'+module+'.') + s.count(" id='"+module+'.')):
