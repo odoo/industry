@@ -1,5 +1,5 @@
 {
-    'name': 'FMCG Store',
+    'name': 'Grocery Store',
     'version': '1.0',
     'category': 'Retail',
     'description': """
@@ -8,7 +8,6 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
     'depends': [
         "account_followup",
         "calendar",
-        "hr_hourly_cost",
         "knowledge",
         "pos_sale",
         "pos_discount",
@@ -20,12 +19,14 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
         "stock_delivery",
     ],
     'data': [
+        'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
         'data/product_category.xml',
         'data/uom_uom.xml',
         'data/pos_category.xml',
+        'data/pos_config.xml',
         'data/product_template.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
@@ -35,8 +36,6 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
         'data/product_product.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
-        'data/pos_config.xml',
-        'data/res_config_settings.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
