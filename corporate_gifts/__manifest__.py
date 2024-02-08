@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Corporate Gifts',
     'version': '1.0',

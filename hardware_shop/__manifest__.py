@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Hardware Shop',
     'version': '1.0',
