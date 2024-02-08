@@ -27,16 +27,36 @@ class TestEnv(IndustryCase):
             for file_name in files:
                 file_path = os.path.join(root, file_name)
                 ext = os.path.splitext(file_path)[1].lower()
-                if ext != '.xml':
+                if ext not in ['.py', '.xml']:
                     continue
                 if os.path.getsize(file_path) > MAX_FILE_SIZE:
                     raise "Max file size exceeded"
                 with open(file_path, 'rb') as f:
                     content = f.read().decode('utf8')
+                if ext == '.py':
+                    if file_name != '__manifest__.py':
+                        _logger.warning(
+                            "No python file is allowed in an industry module, except __manifest__.py."
+                            " Please remove %s.", file_name
+                        )
+                    else:
+                        self._check_manifest(content, file_name)
+                    continue
                 self._check_xml_style(content, module, file_name)
                 self._check_update_status(content, file_name)
                 self._check_useless_models(content, file_name)
                 self._check_useless_fields_on_models(content, file_name)
+
+    def _check_manifest(self, s, file_name):
+        if (first_line := s.split('\n')[0]) != '{':
+            message = "First line of the manifest should be the sole symbol '{'. "
+            if not first_line:
+                message += "No need for an empty line."
+            elif "coding" in first_line:
+                message += "No need to specify the encoding since python3."
+            else:
+                message += f"Got '%s'." % first_line
+            _logger.warning(message)
 
     def _check_xml_style(self, s, module, file_name):
         s = s.strip()

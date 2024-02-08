@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Clothing and Boutique',
     'version': '1.0',

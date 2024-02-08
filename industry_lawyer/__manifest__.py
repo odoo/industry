@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Lawyer',
     'version': '1.0',
