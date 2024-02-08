@@ -164,15 +164,53 @@ class TestEnv(IndustryCase):
 
     def _check_useless_fields_on_models(self, s, filename):
         useless_model_fields = {
-            'knowledge.article': ['article_member_ids'],
+            'analytic.account.plan': ['color'],
+            'crm.lead': ['copied'],
+            'crm.tag': ['color'],
+            'hr.applicant': ['last_stage_id'],
+            'ir.model.fields': ['copied'],
+            'knowledge.article': [
+                'article_member_ids',
+                'inherited_permission',
+            ],
+            'planning.role': ['color'],
             'product.attribute': ['product_tmpl_ids'],
+            'product.attribute.value': ['color'],
+            'product.pricelist.item': [
+                'name',
+                'price',
+            ],
+            'product.template.attribute.line': ['value_count'],
+            'product.template.attribute.value': [
+                'attribute_id',
+                'color',
+                'product_tmpl_id',
+            ],
+            'project.tags': ['color'],
             'purchase.order.line': ['name'],
-            # 'sale.order.line': ['name'],  # need to handle down payments and options & templates properly
+            'res.partner': ['tz'],
+            'sale.order': [
+                'partner_invoice_id',
+                'partner_shipping_id',
+            ],
+            'sale.order.line': [
+                'is_service',
+                # 'name',  # need to handle down payments and options & templates properly
+                'order_partner_id',
+            ],
+            'sign.template': [
+                'has_sign_requests',
+                'is_sharing',
+                'name',
+                'signed_count',
+            ],
+            'stock.lot': ['product_uom_id'],
+            'worksheet.template': ['color'],
         }
         for model, fields in useless_model_fields.items():
             if re.search('model="'+model, s):
                 for field in fields:
-                    if re.search('field name="'+field, s):
+                    if re.search('field name="'+field+'"', s):
                         _logger.warning(
                             "You shouldn't define the %s on %s (%s). Please refer to other modules for examples.",
                             field, model, filename
