@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Certification Auditors',
     'version': '1.0',

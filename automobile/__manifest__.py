@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Automobile Spareparts',
     'version': '1.0',

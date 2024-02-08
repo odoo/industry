@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Photography',
     'version': '1.0',
