@@ -59,7 +59,6 @@ class TestEnv(IndustryCase):
             _logger.warning(message)
 
     def _check_xml_style(self, s, module, file_name):
-        s = s.strip()
         starts_with = [
             "<?xml version='1.0' encoding='UTF-8'?>",
             "<?xml version='1.0' encoding=\"UTF-8\"?>",
@@ -89,6 +88,11 @@ class TestEnv(IndustryCase):
                 " in %s (this remark does not apply to 'env.ref(\"%s.ID\")' where it is required).",
                 count, module, file_name, module
             )
+        end_of_file = repr(s).split('\\')
+        if 'n' not in end_of_file[-1] or len(end_of_file[-1]) > 2:
+            _logger.warning("It looks like you forgot to add an empty line at the end of %s.", file_name)
+        elif 'n' in end_of_file[-2] and len(end_of_file[-2]) <= 2:
+            _logger.warning("One empty line at the end of %s is enough, please remove others.", file_name)
 
     def _check_update_status(self, s, filename):
         models_to_update = [
