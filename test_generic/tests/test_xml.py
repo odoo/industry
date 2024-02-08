@@ -88,6 +88,8 @@ class TestEnv(IndustryCase):
                 " in %s (this remark does not apply to 'env.ref(\"%s.ID\")' where it is required).",
                 count, module, file_name, module
             )
+        if s.count("x_studio"):
+            _logger.warning("Please remove '_studio' from 'x_studio' in %s.", file_name)
         end_of_file = repr(s).split('\\')
         if 'n' not in end_of_file[-1] or len(end_of_file[-1]) > 2:
             _logger.warning("It looks like you forgot to add an empty line at the end of %s.", file_name)
