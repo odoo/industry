@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Hair Salon',
     'version': '1.0',
