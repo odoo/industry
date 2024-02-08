@@ -93,13 +93,25 @@ class TestEnv(IndustryCase):
     def _check_update_status(self, s, filename):
         models_to_update = [
             "base.automation",
-            "ir.actions.",
+            "ir.actions.act_window",
+            "ir.actions.server",
             "ir.model",
+            "ir.model.access",
+            "ir.model.fields",
             "ir.ui.view",
             "knowledge.article",
             "loyalty.generate.wizard",
         ]
         models_not_to_update = [
+            "appointment.type",
+            "calendar.event",
+            "crm.lead",
+            "crm.stage",
+            "crm.tag",
+            "hr.applicant",
+            "hr.department",
+            "hr.job",
+            "hr.recruitment.stage",
             "ir.attachment",
             "ir.rule",
             "knowledge.attachment",
@@ -107,21 +119,35 @@ class TestEnv(IndustryCase):
             "mail.template",
             "pos.category",
             "pos.config",
+            "product.attribute.value",
             "product.category",
             "product.product",
             "product.template",
+            "product.template.attribute.line",
+            "product.template.attribute.value",
             "res.config.setting",
+            "res.partner",
+            "sale.order",
+            "sale.order.line",
+            "sign.item",
+            "sign.request",
+            "sign.template",
             "uom.category",
             "uom.uom",
+            "website",
         ]
         for model in models_to_update:
-            if re.search('model="'+model, s) and not re.search('<field .+model="'+model, s) and not s.count('<odoo>'):
+            if re.search('model="'+model+'"', s) and not re.search('<field .+model="'+model, s) and not s.count('<odoo>'):
                 _logger.warning(
                     "Model %s should be updated, please remove 'noupdate=\"1\"' in the header of %s.",
                     model, filename,
                 )
         for model in models_not_to_update:
-            if re.search('model="'+model, s) and not re.search('<field .+model="'+model, s) and not s.count('<odoo noupdate="1">'):
+            if (re.search('model="'+model+'"', s)
+                and not re.search('<field .+model="'+model, s)
+                and not re.search('<function.+model="'+model, s)
+                and not s.count('<odoo noupdate="1">')
+            ):
                 _logger.warning(
                     "Model %s should not be updated, please add 'noupdate=\"1\"' in the header of %s.",
                     model, filename,
