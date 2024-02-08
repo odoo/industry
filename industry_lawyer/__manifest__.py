@@ -42,6 +42,7 @@
         'demo/website_page_views.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
+        'demo/website_theme_apply.xml',
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
