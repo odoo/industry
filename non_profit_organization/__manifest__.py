@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'Non Profit Organization',
     'version': '1.0',

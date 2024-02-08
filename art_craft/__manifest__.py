@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'The Arts & Crafts Shop',
     'version': '1.0',
