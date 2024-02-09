@@ -13,7 +13,6 @@ communication tools, certification and gamification.
         'knowledge',
         'payment_demo',
         'project_enterprise',  
-        'sale_crm',
         'sale_project',
         'website_crm',
         'website_sale_wishlist',
