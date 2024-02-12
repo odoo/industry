@@ -7,6 +7,7 @@ We offer IT sales, installation, and repair services for a wide range of product
 including laptops, RAM, accessories, and CCTV cameras.
 """,
     'depends': [
+        'stock_barcode',
         'account_followup',
         'payment_demo',
         'appointment_crm',
