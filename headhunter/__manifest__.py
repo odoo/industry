@@ -59,4 +59,5 @@ Those agencies work on two levels and with two different audiences, ...
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
+    'maintenance_loc': 1,
 }

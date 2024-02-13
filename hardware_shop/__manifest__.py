@@ -59,4 +59,5 @@ Using Point of Sale, Inventory, Sales, Purchase, Accounting, Contact, Employee, 
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
+    'maintenance_loc': 0,
 }

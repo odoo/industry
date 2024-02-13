@@ -59,4 +59,5 @@ Maintenance and accessorises etc.
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
+    'maintenance_loc': 3,
 }
