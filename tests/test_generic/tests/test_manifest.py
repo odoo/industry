@@ -2,11 +2,14 @@
 
 from ast import literal_eval
 
-from odoo.addons.test_lint.tests.test_manifests import ManifestLinter
+from odoo.addons.test_lint.tests.test_manifests import ManifestLinter, MANIFEST_KEYS
 from odoo.modules.module import module_manifest
 from odoo.tests.common import tagged
+from odoo.tools import cloc
 
 from .industry_case import IndustryCase, get_industry_path
+
+MANIFEST_KEYS |= {'maintenance_loc'}
 
 CATEGORIES = ('Services', 'Retail', 'Manufacturing', 'eCommerce', 'Public', 'NGO')
 
@@ -18,6 +21,7 @@ MANDATORY_KEYS = {
     'depends': [],
     'images': [],
     'license': '',
+    'maintenance_loc': 0,
     'name': '',
     'version': '',
 }
@@ -74,6 +78,13 @@ class ManifestTest(ManifestLinter, IndustryCase):
             elif key == 'license':
                 self.assertEqual(
                     value, 'OPL-1', "Wrong license %r in manifest, it should be 'OPL-1'" % value
+                )
+            elif key == 'maintenance_loc':
+                c = cloc.Cloc()
+                c.count_database(self.cr.dbname)
+                loc = c.code.get(module, 0)
+                self.assertEqual(
+                    loc, value, "Wrong maintenance loc, counted %d instead of %d." % (loc, value)
                 )
             elif key == 'data':
                 self.assertTrue(

@@ -76,4 +76,5 @@ This module is for marketing companies selling and producing customized corporat
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
+    'maintenance_loc': 5,
 }
