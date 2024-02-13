@@ -50,4 +50,5 @@
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
+    'maintenance_loc': 0,
 }
