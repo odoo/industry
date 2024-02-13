@@ -64,4 +64,5 @@ Manage your properties, create and manage rental contracts, and streamline your 
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
+    'maintenance_loc': 7,
 }

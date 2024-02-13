@@ -61,4 +61,5 @@ The sales process involves creating sale orders, managing deliveries and invoici
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
+    'maintenance_loc': 0,
 }
