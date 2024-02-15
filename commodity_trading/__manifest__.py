@@ -40,7 +40,6 @@
         'data/ir_rule.xml',
         'data/product_category.xml',
         'data/worksheet_template.xml',
-        'data/product_template.xml',
         'data/product_product.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
