@@ -55,6 +55,7 @@
         'demo/project_task.xml',
         'demo/x_worksheet_template.xml',
         'demo/helpdesk_ticket.xml',
+        'demo/repair_order.xml',
         'demo/website_ir_attachment.xml',
         'demo/website.xml',
         'demo/res_partner.xml',
