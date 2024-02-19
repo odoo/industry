@@ -89,7 +89,16 @@ class TestEnv(IndustryCase):
                 count, module, file_name, module
             )
         if s.count("x_studio"):
-            _logger.warning("Please remove '_studio' from 'x_studio' in %s.", file_name)
+            _logger.warning("Please remove 'studio' from 'x_studio' in %s.", file_name)
+        useless_attributes = [
+            "context.get('studio')",
+            "data-last-history-steps",
+            "context=\"{'studio'",
+        ]
+        for attr in useless_attributes:
+            if s.count(attr):
+                _logger.warning("Please remove '%s' in %s.", attr, file_name)
+
         end_of_file = repr(s).split('\\')
         if 'n' not in end_of_file[-1] or len(end_of_file[-1]) > 2:
             _logger.warning("It looks like you forgot to add an empty line at the end of %s.", file_name)
@@ -114,6 +123,7 @@ class TestEnv(IndustryCase):
             "crm.lead",
             "crm.stage",
             "crm.tag",
+            "event.event.ticket",
             "hr.applicant",
             "hr.department",
             "hr.job",
@@ -122,22 +132,29 @@ class TestEnv(IndustryCase):
             "ir.rule",
             "knowledge.attachment",
             "knowledge.cover",
+            "loyalty.program",
+            "loyalty.reward",
+            "loyalty.rule",
             "mail.template",
+            "mrp.bom",
+            "mrp.bom.line",
             "pos.category",
             "pos.config",
             "product.attribute.value",
             "product.category",
+            "product.packaging",
             "product.product",
             "product.template",
             "product.template.attribute.line",
             "product.template.attribute.value",
-            "res.config.setting",
+            "res.config.settings",
             "res.partner",
             "sale.order",
             "sale.order.line",
             "sign.item",
             "sign.request",
             "sign.template",
+            "stock.warehouse.orderpoint",
             "uom.category",
             "uom.uom",
             "website",
@@ -170,18 +187,41 @@ class TestEnv(IndustryCase):
 
     def _check_useless_fields_on_models(self, s, filename):
         useless_model_fields = {
-            'analytic.account.plan': ['color'],
+            'account.analytic.plan': ['color'],
             'crm.lead': ['copied'],
             'crm.tag': ['color'],
             'hr.applicant': ['last_stage_id'],
-            'ir.model.fields': ['copied'],
+            'ir.attachment': ['access_token'],
+            'ir.model.fields': [
+                'copied',
+                'model',
+            ],
             'knowledge.article': [
                 'article_member_ids',
                 'inherited_permission',
             ],
+            'loyalty.reward': [
+                'description',
+                'is_global_discount',
+                'program_type',
+                'reward_product_ids',
+                'reward_product_uom_id',
+            ],
+            'loyalty.rule': [
+                'company_id',
+                'currency_id',
+                'mode',
+                'program_type',
+                'promo_barcode',
+            ],
             'planning.role': ['color'],
+            'planning.slot': [
+                'access_token',
+                'sale_order_id',
+            ],
             'product.attribute': ['product_tmpl_ids'],
             'product.attribute.value': ['color'],
+            'product.packaging': ['product_uom_id'],
             'product.pricelist.item': [
                 'name',
                 'price',
@@ -196,13 +236,43 @@ class TestEnv(IndustryCase):
             'purchase.order.line': ['name'],
             'res.partner': ['tz'],
             'sale.order': [
+                'access_token',
+                'amount_tax',
+                'amount_to_invoice',
+                'amount_total',
+                'amount_untaxed',
+                'currency_rate',
+                'date_order',
+                'health',
+                'invoice_status',
+                'is_subscription',
                 'partner_invoice_id',
                 'partner_shipping_id',
+                'percentage_satisfaction',
+                'recurring_monthly',
+                'recurring_total',
+                'state',
+                'validity_date',
             ],
             'sale.order.line': [
+                'invoice_status',
                 'is_service',
                 # 'name',  # need to handle down payments and options & templates properly
                 'order_partner_id',
+                'planning_hours_planned',
+                'planning_hours_to_plan',
+                'price_reduce_taxinc',
+                'price_reduce_taxexcl',
+                'price_subtotal',
+                'price_tax',
+                'price_total',
+                'qty_delivered',
+                'qty_delivered_method',
+                'qty_invoiced',
+                'qty_to_invoice',
+                'state',
+                'untaxed_amount_invoiced',
+                'untaxed_amount_to_invoice',
             ],
             'sign.template': [
                 'has_sign_requests',
