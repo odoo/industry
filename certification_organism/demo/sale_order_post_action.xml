@@ -21,7 +21,7 @@
 
     <function model="sale.advance.payment.inv" name="create_invoices"
             eval="[ref('sale_advance_payment_inv_2')]"/>
-    
+
     <!-- Confirm invoice -->
     <function model="account.move" name="action_post">
         <value model="account.move" eval="obj().env.ref('certification_organism.sale_order_1').invoice_ids.ids"/>
@@ -35,13 +35,13 @@
     <record id="account_payment_register_1" model="account.payment.register">
         <field name="line_ids" model="account.move.line" eval="[Command.set([line.id for line in obj().env.ref('certification_organism.sale_order_1').invoice_ids.line_ids if line.account_type in ('asset_receivable', 'liability_payable')])]"/>
     </record>
-    <function model="account.payment.register" name="action_create_payments" 
+    <function model="account.payment.register" name="action_create_payments"
             eval="[ref('account_payment_register_1')]"/>
 
     <record id="account_payment_register_4" model="account.payment.register">
         <field name="line_ids" model="account.move.line" eval="[Command.set([line.id for line in obj().env.ref('certification_organism.sale_order_4').invoice_ids.line_ids if line.account_type in ('asset_receivable', 'liability_payable')])]"/>
     </record>
-    <function model="account.payment.register" name="action_create_payments" 
+    <function model="account.payment.register" name="action_create_payments"
             eval="[ref('account_payment_register_4')]"/>
 
     <!-- Update Task -->
@@ -88,13 +88,12 @@
     <!-- Rating of project task -->
 
     <record id="rating_task_1" model="rating.rating">
-        <field name="access_token">SO0001_line_1</field>
         <field name="res_model_id" ref="project.model_project_task"/>
         <field name="res_id" model="sale.order.line" eval="obj().env.ref('certification_organism.sale_order_line_1').task_id.id"/>
         <field name="partner_id" ref="res_partner_8"/>
         <field name="rated_partner_id" ref="base.partner_admin"/>
     </record>
     <function model="project.task" name="rating_apply"
-            eval="([obj().env.ref('certification_organism.sale_order_line_1').task_id.id], 5, 'SO0001_line_1', None, 'Highly impressed with VoltCharge Innovations service! Emily and the team were both skilled and personable. The inspection was thorough, and I now have complete peace of mind about my charging stations safety. Kudos for a fantastic job!')"/>
+            eval="([obj().env.ref('certification_organism.sale_order_line_1').task_id.id], 5, None, obj().env.ref('certification_organism.rating_task_1'), 'Highly impressed with VoltCharge Innovations service! Emily and the team were both skilled and personable. The inspection was thorough, and I now have complete peace of mind about my charging stations safety. Kudos for a fantastic job!')"/>
 
 </odoo>

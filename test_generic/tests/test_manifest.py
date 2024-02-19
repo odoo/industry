@@ -65,4 +65,14 @@ class ManifestTest(ManifestLinter, IndustryCase):
                 self.assertEqual(
                     value, 'OPL-1', "Wrong license %r in manifes, it should be 'OPL-1'" % value
                 )
+            elif key == 'data':
+                self.assertTrue(
+                    all(len(val.split('/')) == 2 and val.split('/')[0] == 'data' for val in value),
+                    "all data files should be in 'data/' subfolder",
+                )
+            elif key == 'demo':
+                self.assertTrue(
+                    all(len(val.split('/')) == 2 and val.split('/')[0] == 'demo' for val in value),
+                    "all demo files should be in 'demo/' subfolder",
+                )
         return res
