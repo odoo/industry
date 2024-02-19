@@ -28,6 +28,7 @@
         'data/helpdesk_config.xml',
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
+        'data/ir_model.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
         'data/ir_actions_act_window.xml',
