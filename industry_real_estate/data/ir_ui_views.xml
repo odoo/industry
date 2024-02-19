@@ -32,12 +32,12 @@
 
                     <group>
                         <group>
-                            <field name="x_property_building" widget="many2many_tags" required="x_is_property == True"/>
-                            <field name="x_property_address" required="x_is_property == True"/>
+                            <field name="x_property_building" widget="many2many_tags" required="x_is_property"/>
+                            <field name="x_property_address" required="x_is_property"/>
                         </group>
                         <group>
                             <field name="currency_id" groups="base.group_multi_currency"/>
-                            <field name="x_property_type" required="x_is_property == True"/>
+                            <field name="x_property_type" required="x_is_property"/>
                             <field name="x_is_published"/>
                         </group>
                     </group>
@@ -102,4 +102,90 @@
             </kanban>
         </field>
     </record>
+    <record id="view_crm_lead_form_inherit" model="ir.ui.view">
+        <field name="name">crm.leam.form.inherit.industry_real_estate</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//group[@name='opportunity_partner']//field[@name='lost_reason_id']" position="before">
+                    <field name="x_property_id" domain="[('x_is_property', '=', True)]"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="view_crm_lead_kanban_inherit" model="ir.ui.view">
+        <field name="name">crm.lead.kanban.inherit.industry_real_estate</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+        <field name="priority">320</field>
+        <field name="type">kanban</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//templates//field[@name='expected_revenue']" position="replace"/>
+                <xpath expr="//templates//field[@name='name']" position="after">
+                    <field name="x_property_id" display="full"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+
+    <record id="view_crm_lead_form_quick_create_inherit" model="ir.ui.view">
+        <field name="name">crm.lead.form.quick_create</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.quick_create_opportunity_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//label[@for='expected_revenue']" position="replace">
+                <label for="x_property_id"/>
+            </xpath>
+            <xpath expr="//field[@name='expected_revenue']" position="replace">
+                <field name="x_property_id" class="oe_inline me-5 o_field_highlight" placeholder="Choose a property..."/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="rental_gantt_view" model="ir.ui.view">
+        <field name="model">sale.order</field>
+        <field name="mode">primary</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <gantt date_start="x_rental_start_date" date_stop="end_date" color="partner_id" default_scale="year" display_unavailability="true" string="Availability" />
+        </field>
+    </record>
+
+    <record id="rental_form_view" model="ir.ui.view">
+        <field name="model">sale.order</field>
+        <field name="mode">primary</field>
+        <field name="priority">100</field>
+        <field name="inherit_id" ref="sale_subscription.sale_subscription_order_view_form"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="attributes">
+                <attribute name="string">Tenant</attribute>
+            </field>
+            <field name="partner_id" position="after">
+                <field name="x_account_analytic_account_id"/>
+                <field name="x_guarant_partner_id"/>
+            </field>
+            <field name="validity_date" position="before">
+                <field name="x_rental_start_date" required="x_account_analytic_account_id"/>
+            </field>
+            <page name="notes" position="after">
+                <page string="Meter Readings">
+                    <field name="x_so_meter_reading_ids" context="{'default_x_sale_order_id': id, 'default_x_account_analytic_account_id': x_account_analytic_account_id}">
+                        <tree editable="bottom">
+                            <field name="x_sale_order_id" invisible="1"/>
+                            <field name="x_account_analytic_account_id" invisible="1"/>
+                            <field name="x_date"/>
+                            <field name="x_gas"/>
+                            <field name="x_electricity"/>
+                            <field name="x_water"/>
+                        </tree>
+                    </field>
+                </page>
+            </page>
+        </field>
+    </record>
+
 </odoo>
