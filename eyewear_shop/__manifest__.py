@@ -34,6 +34,7 @@ The sales process involves creating sale orders, managing deliveries and invoici
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/appointment_type.xml',
+        'data/ir_model_data.xml',
     ],
     'demo': [
         'demo/res_config_settings.xml',
