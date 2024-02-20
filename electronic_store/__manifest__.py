@@ -53,9 +53,8 @@
         'data/knowledge_article.xml',
     ],
     'demo': [
-        'demo/project_task.xml',
         'demo/res_partner.xml',
-        'demo/x_worksheet_template.xml',
+        'demo/project_task.xml',
         'demo/helpdesk_ticket.xml',
         'demo/repair_order.xml',
         'demo/website_ir_attachment.xml',
@@ -74,6 +73,7 @@
         'demo/sale_order_post.xml',
         'demo/crm_lead_post.xml',
         'demo/website_theme_apply.xml',
+        'demo/x_worksheet_template.xml',
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
