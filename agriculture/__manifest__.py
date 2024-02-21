@@ -6,7 +6,7 @@
 Tailored setup for agricultural retail businesses engaged in B2B and B2C sales of farming products.
 Point of Sale (POS) stores & website offer categorised items such as seeds, pesticides, plant nutrition, and farming equipment.
 
-They utilize a suite of modules including Point of Sale, Inventory, Sales, Purchase, Survey,Accounting, Contact, Dashboard, Barcode, and Documents.
+They utilize a suite of modules including Point of Sale, Inventory, Sales, Purchase, Survey, Accounting, Contact and Dashboard.
 Expanding into the online realm, a website and E-commerce applications can significantly aid their growth in the agricultural retail sector.
 """,
     'depends': [

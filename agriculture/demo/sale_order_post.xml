@@ -4,16 +4,13 @@
     <function name="action_confirm" model="sale.order" eval="[[ref('sale_order_1'), ref('sale_order_2')]]"/>
 
     <function name="button_validate" model="stock.picking" context="{'skip_sms': True}">
-        <value model="stock.picking" eval="obj().env.ref('agriculture.sale_order_1').procurement_group_id.stock_move_ids.picking_id.ids"/>
+        <value model="stock.picking" eval="obj().env.ref('agriculture.sale_order_1').picking_ids.ids"/>
     </function>
 
     <!-- Create Invoice -->
-    <record id="sale_advance_payment_inv_2" model="sale.advance.payment.inv">
-        <field name="advance_payment_method">delivered</field>
-        <field name="sale_order_ids" eval="[Command.set([ref('sale_order_2')])]"/>
-    </record>
-
-    <function model="sale.advance.payment.inv" name="create_invoices" eval="[ref('sale_advance_payment_inv_2')]"/>
+    <function name="_create_invoices" model="sale.order">
+        <value eval="[ref('sale_order_2')]"/>
+    </function>
 
     <!-- Confirm invoice -->
     <function model="account.move" name="action_post">
