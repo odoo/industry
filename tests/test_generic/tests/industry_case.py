@@ -4,8 +4,11 @@ import os
 
 from odoo.tests.common import TransactionCase
 
+def get_industry_path():
+    return os.path.abspath(__file__).split('tests/test_generic/')[0]
+
 def get_modules():
-    industry_path = os.path.abspath(__file__).split('test_generic/')[0]
+    industry_path = get_industry_path()
     industries = [
         m for m in os.listdir(industry_path)
         if os.path.isdir(industry_path + m)
