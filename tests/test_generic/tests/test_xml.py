@@ -4,10 +4,9 @@ import logging
 import os
 import re
 
-from odoo.modules.module import get_module_path
 from odoo.tests.common import tagged
 
-from .industry_case import IndustryCase
+from .industry_case import IndustryCase, get_industry_path
 
 _logger = logging.getLogger(__name__)
 
@@ -17,12 +16,12 @@ MAX_FILE_SIZE = 100 * 1024 * 1024  # in megabytes
 @tagged('post_install', '-at_install')
 class TestEnv(IndustryCase):
 
-    def test_dummy(self):
+    def test_xml_files(self):
         for module in self.installed_modules:
             self._check_files_in_path(module)
 
     def _check_files_in_path(self, module):
-        path = get_module_path(module).rstrip('/')
+        path = get_industry_path() + module
         for root, dirs, files in os.walk(path):
             for file_name in files:
                 file_path = os.path.join(root, file_name)
@@ -55,7 +54,7 @@ class TestEnv(IndustryCase):
             elif "coding" in first_line:
                 message += "No need to specify the encoding since python3."
             else:
-                message += f"Got '%s'." % first_line
+                message += "Got '%s'." % first_line
             _logger.warning(message)
 
     def _check_xml_style(self, s, module, file_name):
