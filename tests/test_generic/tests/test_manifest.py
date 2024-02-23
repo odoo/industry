@@ -1,9 +1,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from ast import literal_eval
+
 from odoo.addons.test_lint.tests.test_manifests import ManifestLinter
+from odoo.modules.module import module_manifest
 from odoo.tests.common import tagged
 
-from .industry_case import IndustryCase
+from .industry_case import IndustryCase, get_industry_path
 
 CATEGORIES = ('Services', 'Retail', 'Manufacturing', 'eCommerce', 'Public', 'NGO')
 
@@ -23,6 +26,13 @@ MANDATORY_KEYS = {
 @tagged('post_install', '-at_install')
 class ManifestTest(ManifestLinter, IndustryCase):
 
+    def _load_manifest(self, module):
+        manifest_file = module_manifest(get_industry_path() + module)
+        manifest_data = {}
+        with open(manifest_file, mode='r') as f:
+            manifest_data.update(literal_eval(f.read()))
+        return manifest_data
+
     def test_manifests(self):
         for module in self.installed_modules:
             with self.subTest(module=module):
@@ -31,7 +41,7 @@ class ManifestTest(ManifestLinter, IndustryCase):
                 self._test_manifest_values(module, manifest_data)
 
     def _test_manifest_keys(self, module, manifest_data):
-        res = super()._test_manifest_keys(module, manifest_data)
+        super()._test_manifest_keys(module, manifest_data)
         for key in MANDATORY_KEYS:
             self.assertIn(key, manifest_data, "Missing key %s in manifest" % key)
 
@@ -63,7 +73,7 @@ class ManifestTest(ManifestLinter, IndustryCase):
                 )
             elif key == 'license':
                 self.assertEqual(
-                    value, 'OPL-1', "Wrong license %r in manifes, it should be 'OPL-1'" % value
+                    value, 'OPL-1', "Wrong license %r in manifest, it should be 'OPL-1'" % value
                 )
             elif key == 'data':
                 self.assertTrue(
