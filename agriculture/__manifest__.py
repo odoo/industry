@@ -1,7 +1,7 @@
 {
     'name': 'Agricultural Retail',
     'version': '1.0',
-    'category': 'Manufacturing',
+    'category': 'Retail',
     'description': """
 Tailored setup for agricultural retail businesses engaged in B2B and B2C sales of farming products.
 Point of Sale (POS) stores & website offer categorised items such as seeds, pesticides, plant nutrition, and farming equipment.
@@ -62,4 +62,5 @@ Expanding into the online realm, a website and E-commerce applications can signi
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
+    'maintenance_loc': 7,
 }

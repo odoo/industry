@@ -5,16 +5,16 @@
             ref('purchase_order_line_1')
         ]"/>
     </function>
-    <record id="cancel_alternative" model="purchase.requisition.alternative.warning">
+    <record id="purchase_requisition_alternative_1" model="purchase.requisition.alternative.warning">
         <field name="alternative_po_ids" eval="[Command.link(ref('purchase_order_2'))]"/>
     </record>
     <function name="action_cancel_alternatives" model="purchase.requisition.alternative.warning">
         <value eval="[
-            ref('cancel_alternative'),
+            ref('purchase_requisition_alternative_1'),
         ]"/>
     </function>
     <function name="button_confirm" model="purchase.order">
-        <value eval="[ref('purchase_order_1')]"/>
+        <value eval="[ref('purchase_order_1'), ref('purchase_order_3'), ref('purchase_order_4'), ref('purchase_order_5')]"/>
     </function>
 
     <function name="write" model="stock.move.line">
@@ -22,6 +22,9 @@
         <value model="stock.lot" eval="{'lot_id': ref('stock_lot_2'), 'lot_name': obj().env.ref('agriculture.stock_lot_2').name}"/>
     </function>
     <function name="button_validate" model="stock.picking">
-        <value model="stock.picking" eval="obj().env.ref('agriculture.purchase_order_1').group_id.stock_move_ids.picking_id.ids"/>
+        <value model="stock.picking" eval="obj().env.ref('agriculture.purchase_order_1').picking_ids.ids"/>
+    </function>
+    <function name="button_validate" model="stock.picking">
+        <value model="stock.picking" eval="(obj().env.ref('agriculture.purchase_order_1') + obj().env.ref('agriculture.purchase_order_3') + obj().env.ref('agriculture.purchase_order_4') + obj().env.ref('agriculture.purchase_order_5')).picking_ids.ids"/>
     </function>
 </odoo>
