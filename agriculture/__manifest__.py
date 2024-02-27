@@ -32,6 +32,7 @@ Expanding into the online realm, a website and E-commerce applications can signi
         'data/product_category.xml',
         'data/product_pricelist.xml',
         'data/product_product.xml',
+        'data/product_pricelist_item.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/survey_survey.xml',
