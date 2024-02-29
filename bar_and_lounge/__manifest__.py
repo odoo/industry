@@ -53,6 +53,7 @@
         'data/knowledge_article.xml',
     ],
     'demo': [
+        'demo/pos_config.xml',
         'demo/website.xml',
         'demo/res_partner.xml',
         'demo/hr_employee.xml',
