@@ -87,6 +87,13 @@ class TestEnv(IndustryCase):
                 " in %s (this remark does not apply to 'env.ref(\"%s.ID\")' where it is required).",
                 count, module, file_name, module
             )
+        count = (s.count('ref="'+module+'.') + s.count("ref='"+module+'.'))
+        if count:
+            _logger.warning(
+                "Referring to an xmlid created within the current module name is useless. If none is"
+                " provided, it will check in current module. Found %d occurence(s) of ref=\"%s.ID\""
+                " in %s.", count, module, file_name, module
+            )
         if s.count("x_studio"):
             _logger.warning("Please remove 'studio' from 'x_studio' in %s.", file_name)
         useless_attributes = [
@@ -117,6 +124,7 @@ class TestEnv(IndustryCase):
             "loyalty.generate.wizard",
         ]
         models_not_to_update = [
+            "account.cash.rounding",
             "appointment.type",
             "calendar.event",
             "crm.lead",
@@ -129,6 +137,7 @@ class TestEnv(IndustryCase):
             "hr.recruitment.stage",
             "ir.attachment",
             "ir.rule",
+            "knowledge.article.favorite",
             "knowledge.attachment",
             "knowledge.cover",
             "loyalty.program",
@@ -137,26 +146,48 @@ class TestEnv(IndustryCase):
             "mail.template",
             "mrp.bom",
             "mrp.bom.line",
+            "mrp.production",
+            "mrp.routing.workcenter",
+            "mrp.workcenter",
             "pos.category",
             "pos.config",
+            "pos.order",
+            "pos.order.line",
+            "pos.payment.method",
+            "pos.session",
+            "pos_preparation_display.display",
+            "pos_preparation_display.order",
+            "pos_preparation_display.orderline",
             "product.attribute.value",
             "product.category",
             "product.packaging",
+            "product.pricelist",
+            "product.pricelist.item",
             "product.product",
+            "product.public.category",
+            "product.supplierinfo",
             "product.template",
             "product.template.attribute.line",
             "product.template.attribute.value",
+            "quality.point",
             "res.config.settings",
             "res.partner",
+            "restaurant.floor",
+            "restaurant.table",
             "sale.order",
             "sale.order.line",
             "sign.item",
             "sign.request",
             "sign.template",
+            # "stock.lot",  # need to handle in functions
+            "stock.quant",
             "stock.warehouse.orderpoint",
             "uom.category",
             "uom.uom",
             "website",
+            "website.base.unit",
+            "website.menu",
+            "website.page",
         ]
         for model in models_to_update:
             if re.search('model="'+model+'"', s) and not re.search('<field .+model="'+model, s) and not s.count('<odoo>'):
@@ -187,6 +218,10 @@ class TestEnv(IndustryCase):
     def _check_useless_fields_on_models(self, s, filename):
         useless_model_fields = {
             'account.analytic.plan': ['color'],
+            'appointment.type': [
+                'has_message',
+                'resource_total_capacity',
+            ],
             'crm.lead': ['copied'],
             'crm.tag': ['color'],
             'hr.applicant': ['last_stage_id'],
@@ -212,6 +247,10 @@ class TestEnv(IndustryCase):
                 'mode',
                 'program_type',
                 'promo_barcode',
+            ],
+            'mrp.bom.byproduct': [
+                'company_id',
+                'product_uom_category_id',
             ],
             'planning.role': ['color'],
             'planning.slot': [
@@ -245,6 +284,7 @@ class TestEnv(IndustryCase):
                 'health',
                 'invoice_status',
                 'is_subscription',
+                'origin',
                 'partner_invoice_id',
                 'partner_shipping_id',
                 'percentage_satisfaction',
