@@ -50,6 +50,7 @@
         'data/ir_model_data.xml',
     ],
     'demo': [
+        'demo/pos_config.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/product_supplierinfo.xml',
