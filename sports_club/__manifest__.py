@@ -27,6 +27,7 @@
         'data/pos_category.xml',
         'data/restaurant_floor.xml',
         'data/restaurant_table.xml',
+        'data/pos_payment_method.xml',
         'data/pos_config.xml',
         'data/ir_attachment_pre.xml',
         'data/product_public_category.xml',
@@ -41,6 +42,7 @@
         'data/payment_provider_demo.xml',
     ],
     'demo': [
+        'demo/pos_config.xml',
         'demo/res_partner.xml',
         'demo/hr_employee.xml',
         'demo/crm_team.xml',
