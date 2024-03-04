@@ -25,6 +25,8 @@
         'theme_buzzy',
     ],
     'data': [
+        # 'data/base_automation.xml',
+        # 'data/ir_actions_server.xml',
         'data/helpdesk_config.xml',
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
@@ -41,7 +43,6 @@
         'data/account_analytic_plan.xml',
         'data/account_analytic_account.xml',
         'data/project_project.xml',
-        'data/project_task_type.xml',
         'data/uom_category.xml',
         'data/uom_uom.xml',
         'data/product_template.xml',
@@ -54,7 +55,6 @@
     ],
     'demo': [
         'demo/res_partner.xml',
-        'demo/project_task.xml',
         'demo/helpdesk_ticket.xml',
         'demo/repair_order.xml',
         'demo/website_ir_attachment.xml',
@@ -69,6 +69,7 @@
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/stock_lot.xml',
+        'demo/stock_warehouse.xml',
         'demo/purchase_order_post.xml',
         'demo/sale_order_post.xml',
         'demo/crm_lead_post.xml',
@@ -77,4 +78,5 @@
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
+    'maintenance_loc': 28,
 }
