@@ -25,8 +25,8 @@
         'theme_buzzy',
     ],
     'data': [
-        # 'data/base_automation.xml',
-        # 'data/ir_actions_server.xml',
+        'data/base_automation.xml',
+        'data/ir_actions_server.xml',
         'data/helpdesk_config.xml',
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
@@ -78,5 +78,5 @@
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
-    'maintenance_loc': 28,
+    'maintenance_loc': 31,
 }
