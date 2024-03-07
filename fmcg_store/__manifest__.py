@@ -16,6 +16,7 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
         "purchase_stock",
         "sale_purchase",
         "stock_delivery",
+        "stock_barcode",
     ],
     'data': [
         'data/res_config_settings.xml',
@@ -49,7 +50,13 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
         'demo/purchase_order_line.xml',
         'demo/purchase_order_post.xml',
         'demo/sale_order_post.xml',
+        'demo/pos_config.xml',
+        'demo/pos_session.xml',
+        'demo/pos_order.xml',
+        'demo/pos_order_line.xml',
+        'demo/pos_confirm.xml',
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
+    'maintenance_loc' : 0,
 }
