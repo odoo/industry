@@ -21,10 +21,12 @@ This module pre-configures Odoo to manage your fleet. Easily purchase a new car 
         "website_sale_stock",
     ],
     'data': [
-        'data/ir_actions_server.xml',
         'data/base_automation.xml',
         'data/ir_model_fields.xml',
+        'data/ir_actions_server.xml',
         'data/ir_ui_view.xml',
+        'data/fleet_vehicle_state.xml',
+        'data/fleet_vehicle.xml',
         'data/ir_attachment_pre.xml',
         'data/project_task_type.xml',
         'data/product_category.xml',
@@ -59,4 +61,5 @@ This module pre-configures Odoo to manage your fleet. Easily purchase a new car 
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
+    'maintenance_loc': 0,
 }

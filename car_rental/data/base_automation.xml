@@ -3,13 +3,12 @@
     <record id="base_automation_create_product" model="base.automation">
         <field name="name">Create Product</field>
         <field name="model_id" ref="fleet.model_fleet_vehicle"/>
-        <field name="action_server_ids" eval="[(6, 0, [ref('ir_act_create_the_product')])]"/> 
         <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[("x_product_name_fleet", "=", False)]</field>
     </record>
     <record id="base_automation_when_car_booked" model="base.automation">
         <field name="name">Update Car Status When Booked</field>
         <field name="model_id" ref="sale.model_sale_order_line"/>
-        <field name="action_server_ids" eval="[(6, 0, [ref('ir_act_update_status_when_booked')])]"/> 
         <field name="filter_domain">[("state", "=", "sale")]</field>
         <field name="filter_pre_domain">["|", ("state", "=", "draft"), ("state", "=", "sent")]</field>
         <field name="trigger">on_create_or_write</field>
@@ -18,7 +17,6 @@
     <record id="base_automation_when_picked_up" model="base.automation">
         <field name="name">Update Stage When Picked Up</field>
         <field name="model_id" ref="sale.model_sale_order_line"/>
-        <field name="action_server_ids" eval="[(6, 0, [ref('ir_act_update_stage_when_pickedup')])]"/>
         <field name="filter_domain">[("x_rental_status", "=", "return")]</field>
         <field name="filter_pre_domain">[("x_rental_status", "=", "pickup")]</field>
         <field name="trigger">on_create_or_write</field>
@@ -26,7 +24,6 @@
     <record id="base_automation_when_returned" model="base.automation">
         <field name="name">Update Car Status When Returned</field>
         <field name="model_id" ref="sale.model_sale_order_line"/>
-        <field name="action_server_ids" eval="[(6, 0, [ref('ir_act_update_status_when_returned')])]"/>
         <field name="filter_domain">[("x_rental_status", "=", "returned")]</field>
         <field name="filter_pre_domain">[("x_rental_status", "=", "return")]</field>
         <field name="trigger">on_create_or_write</field>
@@ -34,21 +31,18 @@
     <record id="base_automation_when_service_is_done" model="base.automation">
         <field name="name">Update Stage When Service Is Done</field>
         <field name="model_id" ref="fleet.model_fleet_vehicle_log_services"/>
-        <field name="action_server_ids" eval="[(6, 0, [ref('ir_act_update_stage_when_service_done')])]"/>
         <field name="filter_domain">["|", ("state", "=", "done"), ("state", "=", "cancelled")]</field>
         <field name="trigger">on_create_or_write</field>
     </record>
     <record id="base_automation_when_in_service" model="base.automation">
         <field name="name">Update Stage When In Service</field>
         <field name="model_id" ref="fleet.model_fleet_vehicle_log_services"/>
-        <field name="action_server_ids" eval="[(6, 0, [ref('ir_act_update_stage_when_in_service')])]"/>
         <field name="filter_domain">["|", ("state", "=", "new"), ("state", "=", "running")]</field>
         <field name="trigger">on_create_or_write</field>
     </record>
     <record id="base_automation_update_hours" model="base.automation">
         <field name="name">Update the Hours</field>
         <field name="model_id" ref="account.model_account_analytic_line"/>
-        <field name="action_server_ids" eval="[(6, 0, [ref('ir_act_update_the_hours')])]"/>
         <field name="trigger">on_create_or_write</field>
     </record>
 </odoo>
