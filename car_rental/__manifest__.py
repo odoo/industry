@@ -61,5 +61,5 @@ This module pre-configures Odoo to manage your fleet. Easily purchase a new car 
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
-    'maintenance_loc': 0,
+    'maintenance_loc': 18,
 }
