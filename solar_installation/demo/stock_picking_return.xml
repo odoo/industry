@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <data noupdate="1">
+        <record id="stock_return_picking_values" model="stock.return.picking">
+            <field name="partner_id" ref="res_partner_49"/>
+            <field name="ticket_id" ref="helpdesk_ticket_11"/>
+            <field name="sale_order_id" ref="sale_order_27"/>
+        </record>
+    </data>
+
+    <function name="create_returns" model="stock.return.picking">
+        <value eval="ref('stock_return_picking_values')"/>
+    </function>
+    <function name="_action_cancel" model="stock.move">
+        <value model="stock.move" eval="obj().search([
+            ('picking_id', '=', obj().env.ref('solar_installation.sale_order_27').picking_ids.filtered(lambda x: x.picking_type_code == 'incoming').id),
+            ('product_id', '!=', ref('product_product_10'))
+        ]).ids"/>
+    </function>
+    <function name="unlink" model="stock.move">
+        <value model="stock.move" eval="obj().search([
+            ('picking_id', '=', obj().env.ref('solar_installation.sale_order_27').picking_ids.filtered(lambda x: x.picking_type_code == 'incoming').id),
+            ('product_id', '!=', ref('product_product_10'))
+        ]).ids"/>
+    </function>
+    <function name="button_validate" model="stock.picking">
+        <value model="stock.picking" eval="obj().env.ref('solar_installation.sale_order_27').picking_ids[1].id"/>
+    </function>
+
+    <data noupdate="1">
+        <record id="stock_return_picking_values_1" model="stock.return.picking">
+            <field name="partner_id" ref="res_partner_49"/>
+            <field name="ticket_id" ref="helpdesk_ticket_11"/>
+            <field name="picking_id" model="stock.picking" eval="obj().env.ref('solar_installation.sale_order_27').picking_ids[1].id"/>
+        </record>
+    </data>
+
+    <function name="create_returns" model="stock.return.picking">
+        <value eval="ref('stock_return_picking_values_1')"/>
+    </function>
+    <function name="button_validate" model="stock.picking" context="{'skip_sms': True}">
+        <value model="stock.picking" eval="(obj().env.ref('solar_installation.sale_order_27')).picking_ids.ids"/>
+    </function>
+</odoo>
