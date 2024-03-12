@@ -34,8 +34,6 @@ We offer IT sales, installation, and repair services for a wide range of product
         'data/ir_ui_view.xml',
         'data/project_task_type.xml',
         'data/product_category.xml',
-        'data/account_analytic_plan.xml',
-        'data/account_analytic_account.xml',
         'data/project_project.xml',
         'data/product_template.xml',
         'data/product_attribute.xml',
@@ -52,6 +50,7 @@ We offer IT sales, installation, and repair services for a wide range of product
     'demo': [
         'demo/website.xml',
         'demo/res_partner.xml',
+        'demo/crm_lead.xml',
         'demo/product_supplierinfo.xml',
         'demo/stock_lot.xml',
         'demo/purchase_order.xml',
