@@ -66,5 +66,6 @@ focusing on accurate quoting, efficient planning, seamless execution, and excell
         'demo/planning_slot.xml',
     ],
     'license': 'OPL-1',
+    'images': ['images/main.png'],
     'maintenance_loc': 0,
 }
