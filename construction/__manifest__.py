@@ -43,6 +43,7 @@ focusing on accurate quoting, efficient planning, seamless execution, and excell
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/mail_activity_type.xml',
+        'data/hr_job.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
