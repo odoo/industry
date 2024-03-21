@@ -31,6 +31,7 @@ Moreover, the business is legally regulated in lots of countries under different
         'data/ir_actions_act_window.xml',
         'data/ir_ui_menu.xml',
         'data/ir_model_access.xml',
+        'data/project_task_type.xml',
         'data/documents_folder.xml',
         'data/account_analytic_account.xml',
         'data/project_project.xml',
