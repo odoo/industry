@@ -1,0 +1,204 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="active_units_f039de1b-54e5-4cc3-8298-32517941dd03" model="ir.model.fields">
+        <field name="name">x_active</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">Active</field>
+        <field name="model_id" ref="units_8dce8af3-5a83-4d2c-b8ba-93810b823b24"/>
+    </record>
+    <record id="color_units_tags_75e47db7-7a0c-4106-a324-076d7ddfbcb5" model="ir.model.fields">
+        <field name="name">x_color</field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Color</field>
+        <field name="model_id" ref="units_tags_32c4cc7c-312f-4954-a272-e9260039fe6e"/>
+    </record>
+    <record id="contact_units_ed41c8ed-ab2b-4ca1-be61-c3f5a5e3b77a" model="ir.model.fields">
+        <field name="name">x_partner_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Owner</field>
+        <field name="model_id" ref="units_8dce8af3-5a83-4d2c-b8ba-93810b823b24"/>
+        <field name="relation">res.partner</field>
+    </record>
+    <record id="description_units_c8b925b3-22de-4a7f-823e-d7d7463663bd" model="ir.model.fields">
+        <field name="name">x_name</field>
+        <field name="ttype">char</field>
+        <field name="field_description">Description</field>
+        <field name="model_id" ref="units_8dce8af3-5a83-4d2c-b8ba-93810b823b24"/>
+        <field name="required" eval="True"/>
+        <field name="translate" eval="True"/>
+    </record>
+    <record id="email_units_2fd4749a-f2df-4912-bd1c-77c8e5d5a4ea" model="ir.model.fields">
+        <field name="name">x_partner_email</field>
+        <field name="related">x_partner_id.email</field>
+        <field name="ttype">char</field>
+        <field name="field_description">Email</field>
+        <field name="model_id" ref="units_8dce8af3-5a83-4d2c-b8ba-93810b823b24"/>
+    </record>
+    <record id="image_units_85b45fcb-88c1-44a8-bf4a-8f9f34a03ba4" model="ir.model.fields">
+        <field name="name">x_image</field>
+        <field name="ttype">binary</field>
+        <field name="field_description">Image</field>
+        <field name="model_id" ref="units_8dce8af3-5a83-4d2c-b8ba-93810b823b24"/>
+    </record>
+    <record id="name_units_tags_9ab4d3e9-8178-49cd-bff4-4285119b4422" model="ir.model.fields">
+        <field name="name">x_name</field>
+        <field name="ttype">char</field>
+        <field name="field_description">Name</field>
+        <field name="model_id" ref="units_tags_32c4cc7c-312f-4954-a272-e9260039fe6e"/>
+        <field name="required" eval="True"/>
+    </record>
+    <record id="new_decimal_units_edee90e1-582a-4832-9456-72ef96b0c42f" model="ir.model.fields">
+        <field name="name">x_area</field>
+        <field name="ttype">float</field>
+        <field name="field_description">Area</field>
+        <field name="model_id" ref="units_8dce8af3-5a83-4d2c-b8ba-93810b823b24"/>
+    </record>
+    <record id="new_decimal_units_d89791f4-7aaf-4200-b354-d2893c9f07a5" model="ir.model.fields">
+        <field name="name">x_area_percent</field>
+        <field name="compute"><![CDATA[for record in self:
+        total_area = sum([unit.x_area for unit in record.x_condominium_id.x_condominium_units_ids])
+        if total_area != 0:
+                for unit in record.x_condominium_id.x_condominium_units_ids:
+                        unit['x_area_percent'] = unit.x_area / total_area]]></field>
+        <field name="ttype">float</field>
+        <field name="depends">x_area, x_partner_id</field>
+        <field name="field_description">Area %</field>
+        <field name="model_id" ref="units_8dce8af3-5a83-4d2c-b8ba-93810b823b24"/>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="condominium_id_field" model="ir.model.fields">
+        <field name="name">x_condominium_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Condominium</field>
+        <field name="model_id" ref="units_8dce8af3-5a83-4d2c-b8ba-93810b823b24"/>
+        <field name="relation">res.partner</field>
+    </record>
+    <record id="units_owner_ids_field" model="ir.model.fields">
+        <field name="name">x_units_owner_ids</field>
+        <field name="ttype">one2many</field>
+        <field name="field_description">Units Owner</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="relation">x_units</field>
+        <field name="relation_field">x_partner_id</field>
+    </record>
+    <record id="condominiums_ids_field" model="ir.model.fields">
+        <field name="name">x_condominiums_ids</field>
+        <field name="compute"><![CDATA[for record in self:
+        record['x_condominiums_ids'] = [(6, 0, record.x_units_owner_ids.x_condominium_id.ids)]]]></field>
+        <field name="ttype">many2many</field>
+        <field name="depends">x_units_owner_ids,x_units_owner_ids.x_condominium_id,x_units_owner_ids.x_partner_id</field>
+        <field name="field_description">Condominiums</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="readonly" eval="True"/>
+        <field name="relation">res.partner</field>
+        <field name="relation_table">x_res_partner_res_partner_rel</field>
+    </record>
+    <record id="property_id_field" model="ir.model.fields">
+        <field name="name">x_property_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Property</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="relation">x_units</field>
+    </record>
+    <record id="source_sales_order_field" model="ir.model.fields">
+        <field name="name">x_source_sales_order</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Source Sales Order</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="relation">sale.order</field>
+    </record>
+    <record id="tenant_id_field" model="ir.model.fields">
+        <field name="name">x_tenant_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Tenant</field>
+        <field name="model_id" ref="units_8dce8af3-5a83-4d2c-b8ba-93810b823b24"/>
+        <field name="relation">res.partner</field>
+    </record>
+    <record id="related_companies_ids_field" model="ir.model.fields">
+        <field name="name">x_related_companies_ids</field>
+        <field name="ttype">one2many</field>
+        <field name="field_description">Related Companies</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="relation">res.company</field>
+        <field name="relation_field">partner_id</field>
+    </record>
+    <record id="condominium_units_ids_field" model="ir.model.fields">
+        <field name="name">x_condominium_units_ids</field>
+        <field name="ttype">one2many</field>
+        <field name="field_description">Condominium Units</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="relation">x_units</field>
+        <field name="relation_field">x_condominium_id</field>
+    </record>
+    <record id="new_related_field_sa_56837597-2616-40ff-9628-59a985866172" model="ir.model.fields">
+        <field name="name">x_customer_related_companies_ids</field>
+        <field name="related">partner_id.x_related_companies_ids</field>
+        <field name="ttype">one2many</field>
+        <field name="field_description">Related Companies</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="readonly" eval="True"/>
+        <field name="relation">res.company</field>
+        <field name="relation_field">partner_id</field>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="new_related_field_sa_8f14a0ff-128f-453a-9626-550191b92c1e" model="ir.model.fields">
+        <field name="name">x_condominium_units_ids</field>
+        <field name="related">partner_id.x_condominium_units_ids</field>
+        <field name="ttype">one2many</field>
+        <field name="field_description">Condominium Units</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="readonly" eval="True"/>
+        <field name="relation">x_units</field>
+        <field name="relation_field">x_condominium_id</field>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="new_related_field_sa_c4855a3d-0820-43e5-a288-8554f960045a" model="ir.model.fields">
+        <field name="name">x_condominiums_ids</field>
+        <field name="related">partner_id.x_condominiums_ids</field>
+        <field name="ttype">many2many</field>
+        <field name="field_description">Condominiums</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="readonly" eval="True"/>
+        <field name="relation">res.partner</field>
+        <field name="relation_table">x_res_partner_sale_order_rel</field>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="notes_units_1b7d2f3a-2175-491d-9274-991e4d11b7f9" model="ir.model.fields">
+        <field name="name">x_notes</field>
+        <field name="ttype">html</field>
+        <field name="field_description">Notes</field>
+        <field name="model_id" ref="units_8dce8af3-5a83-4d2c-b8ba-93810b823b24"/>
+    </record>
+    <record id="phone_units_aa4ba5c9-e881-45a4-907a-f2406df3e779" model="ir.model.fields">
+        <field name="name">x_partner_phone</field>
+        <field name="related">x_partner_id.phone</field>
+        <field name="ttype">char</field>
+        <field name="field_description">Phone</field>
+        <field name="model_id" ref="units_8dce8af3-5a83-4d2c-b8ba-93810b823b24"/>
+    </record>
+    <record id="sequence_units_4a20ceea-98cc-48c6-9752-47037d8f0e58" model="ir.model.fields">
+        <field name="name">x_sequence</field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Sequence</field>
+        <field name="model_id" ref="units_8dce8af3-5a83-4d2c-b8ba-93810b823b24"/>
+    </record>
+    <record id="source_sales_order_c_3da3658b-2823-4c73-8e31-e59b58bdca45" model="ir.model.fields">
+        <field name="name">x_x_source_sales_order_sale_order_count</field>
+        <field name="compute"><![CDATA[
+for record in self: record['x_x_source_sales_order_sale_order_count'] = self.env['sale.order'].search_count([('x_source_sales_order', '=', record.id)])
+]]></field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Source Sales Order count</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="tags_units_4ee929b6-a34d-4d24-9756-2622d1085cb6" model="ir.model.fields">
+        <field name="name">x_tag_ids</field>
+        <field name="ttype">many2many</field>
+        <field name="field_description">Tags</field>
+        <field name="model_id" ref="units_8dce8af3-5a83-4d2c-b8ba-93810b823b24"/>
+        <field name="relation">x_units_tag</field>
+        <field name="relation_table">x_units_tag_rel</field>
+    </record>
+</odoo>
