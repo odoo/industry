@@ -9,9 +9,7 @@ It contains the apps created with Studio and the customizations of existing apps
     'author': 'Green Island Property',
     'depends': [
         'account_check_printing',
-        'account_edi_ubl_cii',
         'account_followup',
-        'account_online_synchronization',
         'appointment_account_payment',
         'contacts',
         'documents_hr',
@@ -20,8 +18,6 @@ It contains the apps created with Studio and the customizations of existing apps
         'documents_spreadsheet',
         'helpdesk_sale_timesheet',
         'hr_skills',
-        'partner_autocomplete',
-        'project_sms',
         'sale_pdf_quote_builder',
         'sale_planning',
         'sale_subscription',
@@ -61,6 +57,6 @@ It contains the apps created with Studio and the customizations of existing apps
         'demo/website_page.xml',
         'demo/website_menu.xml',
     ],
-    'application': False,
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }
