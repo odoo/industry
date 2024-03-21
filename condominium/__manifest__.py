@@ -6,7 +6,6 @@
 This industry is tailor-made for condominium businesses that aim to manage co-ownership properties. Such a business is complex because it implies managing all the aspects of the properties while fairly splitting the charges.
 Moreover, the business is legally regulated in lots of countries under different names: condo in the US, co-ownership in Canada, joint domination in the UK, property syndicate in France, syndic in Belgium, etc
 """,
-    'author': 'Green Island Property',
     'depends': [
         'account_check_printing',
         'account_followup',
