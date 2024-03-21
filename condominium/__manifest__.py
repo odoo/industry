@@ -31,12 +31,9 @@ Moreover, the business is legally regulated in lots of countries under different
         'data/ir_actions_act_window.xml',
         'data/ir_ui_menu.xml',
         'data/ir_model_access.xml',
-        'data/ir_default.xml',
-        'data/project_task_type.xml',
         'data/documents_folder.xml',
         'data/account_analytic_account.xml',
         'data/project_project.xml',
-        'data/product_template.xml',
         'data/product_pricelist.xml',
         'data/product_product.xml',
         'data/sale_order_template.xml',
@@ -52,11 +49,10 @@ Moreover, the business is legally regulated in lots of countries under different
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
         'demo/project_task.xml',
-        'demo/project_task_stage_personal.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
-    'maintenance_loc': 7
+    'maintenance_loc': 8
 }
