@@ -59,4 +59,5 @@ It contains the apps created with Studio and the customizations of existing apps
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
+    'maintenance_loc': 7
 }
