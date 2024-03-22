@@ -7,6 +7,7 @@ Manage your long term or mid long term rental properties
 Manage your properties, create and manage rental contracts, and streamline your entire rental process. Efficient property management.
 """,
     'depends': [
+        'base_automation',
         'crm_enterprise',
         'crm_iap_enrich',
         'crm_iap_mine',
@@ -26,8 +27,6 @@ Manage your properties, create and manage rental contracts, and streamline your 
         'data/crm_stages.xml',
         'data/res_config_setting.xml',
         'data/ir_attachment_pre.xml',
-        'data/account_tags.xml',
-        'data/account_analytic_account.xml',
         'data/product_product.xml',
         'data/sale_order_template.xml',
         'data/knowledge_cover.xml',
@@ -35,6 +34,7 @@ Manage your properties, create and manage rental contracts, and streamline your 
         'data/ir_attachment_post.xml',
         'data/ir_model_access.xml',
         'data/ir_rule.xml',
+        'data/base_automation.xml',
         'data/ir_actions_server.xml',
         'data/website_controller_page.xml',
         'data/ir_ui_views.xml',
@@ -42,9 +42,13 @@ Manage your properties, create and manage rental contracts, and streamline your 
         'data/menu_item.xml',
         'data/website_menu.xml',
         'data/ir_filters.xml',
+        'data/x_meters.xml',
         'data/ir_model_data.xml',
     ],
     'demo': [
+        'demo/account_tags.xml',
+        'demo/account_analytic_account.xml',
+        'demo/ir_attachment.xml',
         'demo/website.xml',
         'demo/res_partner.xml',
         'demo/crm_tag.xml',
@@ -64,5 +68,5 @@ Manage your properties, create and manage rental contracts, and streamline your 
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
-    'maintenance_loc': 7,
+    'maintenance_loc': 43,
 }
