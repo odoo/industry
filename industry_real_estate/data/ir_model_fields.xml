@@ -1,6 +1,36 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
 
+    <!-- meters -->
+    <record id="field_meters_sequence" model="ir.model.fields">
+        <field name="name">x_sequence</field>
+        <field name="field_description">Sequence</field>
+        <field name="model_id" ref="model_meters"/>
+        <field name="ttype">integer</field>
+    </record>
+
+    <record id="field_meters_name" model="ir.model.fields">
+        <field name="name">x_name</field>
+        <field name="field_description">Description</field>
+        <field name="model_id" ref="model_meters"/>
+        <field name="ttype">char</field>
+    </record>
+
+    <record id="field_meters_currency" model="ir.model.fields">
+        <field name="name">x_currency_id</field>
+        <field name="field_description">Currency</field>
+        <field name="model_id" ref="model_meters"/>
+        <field name="relation">res.currency</field>
+        <field name="ttype">many2one</field>
+    </record>
+
+    <record id="field_meters_price" model="ir.model.fields">
+        <field name="name">x_price</field>
+        <field name="field_description">Price</field>
+        <field name="model_id" ref="model_meters"/>
+        <field name="ttype">monetary</field>
+    </record>
+
     <!-- meter reading -->
     <record id="field_meter_reading_date" model="ir.model.fields">
         <field name="name">x_date</field>
@@ -10,25 +40,26 @@
         <field name="required" eval="True"/>
     </record>
 
-    <record id="field_meter_reading_gas" model="ir.model.fields">
-        <field name="name">x_gas</field>
-        <field name="field_description">Gas</field>
+    <record id="field_meter_reading_quantity" model="ir.model.fields">
+        <field name="name">x_quantity</field>
+        <field name="field_description">Quantity</field>
         <field name="model_id" ref="model_meter_reading"/>
         <field name="ttype">float</field>
     </record>
 
-    <record id="field_meter_reading_electricity" model="ir.model.fields">
-        <field name="name">x_electricity</field>
-        <field name="field_description">Electricity</field>
+    <record id="field_meter_reading_usage" model="ir.model.fields">
+        <field name="name">x_usage</field>
+        <field name="field_description">Usage</field>
         <field name="model_id" ref="model_meter_reading"/>
         <field name="ttype">float</field>
+        <field name="readonly" eval="True"/>
     </record>
 
-    <record id="field_meter_reading_water" model="ir.model.fields">
-        <field name="name">x_water</field>
-        <field name="field_description">Water</field>
+    <record id="field_meters_reading_description" model="ir.model.fields">
+        <field name="name">x_description</field>
+        <field name="field_description">Description</field>
         <field name="model_id" ref="model_meter_reading"/>
-        <field name="ttype">float</field>
+        <field name="ttype">char</field>
     </record>
 
     <record id="field_meter_reading_sale_order" model="ir.model.fields">
@@ -45,6 +76,22 @@
         <field name="field_description">Property</field>
         <field name="model_id" ref="model_meter_reading"/>
         <field name="relation">account.analytic.account</field>
+        <field name="ttype">many2one</field>
+    </record>
+
+    <record id="field_meter_reading_meter_id" model="ir.model.fields">
+        <field name="name">x_meter_id</field>
+        <field name="field_description">Meter</field>
+        <field name="model_id" ref="model_meter_reading"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">x_meters</field>
+    </record>
+
+    <record id="field_meter_reading_invoice_id" model="ir.model.fields">
+        <field name="name">x_invoice_id</field>
+        <field name="field_description">Invoice</field>
+        <field name="model_id" ref="model_meter_reading"/>
+        <field name="relation">account.move</field>
         <field name="ttype">many2one</field>
     </record>
 
@@ -80,12 +127,12 @@ for property in self:
         <field name="index" eval="True"/>
     </record>
 
-    <record id="field_property_building" model="ir.model.fields">
+    <record id="field_property_building_1" model="ir.model.fields">
         <field name="name">x_property_building</field>
         <field name="field_description">Building</field>
         <field name="model_id" ref="analytic.model_account_analytic_account"/>
         <field name="relation">account.account.tag</field>
-        <field name="ttype">many2many</field>
+        <field name="ttype">many2one</field>
     </record>
 
     <record id="field_property_address" model="ir.model.fields">
@@ -137,6 +184,43 @@ for property in self:
         <field name="ttype">many2many</field>
     </record>
 
+    <record id="field_property_rental_contract_id" model="ir.model.fields">
+        <field name="name">x_rental_contract_id</field>
+        <field name="field_description">Rental Contract</field>
+        <field name="model_id" ref="analytic.model_account_analytic_account"/>
+        <field name="relation">sale.order</field>
+        <field name="ttype">many2one</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="compute">
+<![CDATA[
+for record in self:
+    sos = self.env['sale.order'].search([('x_account_analytic_account_id', '=', record.id), ('state', '=', 'sale'), ('x_rental_start_date', '<=', datetime.date.today())], order='x_rental_start_date desc')
+    record['x_rental_contract_id'] = sos[0] if sos else None
+]]></field>
+    </record>
+
+    <record id="field_property_invoice_status" model="ir.model.fields">
+        <field name="name">x_invoice_status</field>
+        <field name="field_description">Invoice Status</field>
+        <field name="model_id" ref="analytic.model_account_analytic_account"/>
+        <field name="ttype">selection</field>
+        <field name="selection">[('no', 'Nothing to invoice'), ('invoiced', 'Already invoiced'), ('to_invoice', 'To invoice')]</field>
+        <field name="readonly" eval="True"/>
+        <field name="depends">x_property_meter_reading_ids.x_usage,x_property_meter_reading_ids.x_invoice_id</field>
+        <field name="compute">
+<![CDATA[
+for record in self:
+    meter_readings = record.x_property_meter_reading_ids.filtered(lambda l: l.x_usage > 0)
+    if not meter_readings:
+        record['x_invoice_status'] = 'no'
+    elif not meter_readings.filtered(lambda l: not l.x_invoice_id):
+        record['x_invoice_status'] = 'invoiced'
+    else:
+        record['x_invoice_status'] = 'to_invoice'
+]]></field>
+    </record>
+
     <!-- crm lead -->
     <record id="field_crm_lead_property_id" model="ir.model.fields">
         <field name="field_description">Property</field>
@@ -182,11 +266,11 @@ for property in self:
         <field name="relation_field">x_sale_order_id</field>
     </record>
 
-    <record id="field_sale_order_related_building_ids" model="ir.model.fields">
+    <record id="field_sale_order_related_building_id" model="ir.model.fields">
         <field name="name">x_related_building_ids</field>
         <field name="field_description">Building</field>
         <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="ttype">many2many</field>
+        <field name="ttype">many2one</field>
         <field name="readonly" eval="True"/>
         <field name="related">x_account_analytic_account_id.x_property_building</field>
         <field name="relation">account.account.tag</field>
