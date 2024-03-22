@@ -218,6 +218,7 @@ class TestEnv(IndustryCase):
     def _check_useless_fields_on_models(self, s, filename):
         useless_model_fields = {
             'account.analytic.plan': ['color'],
+            'account.analytic.account': ['root_plan_id'],
             'appointment.type': [
                 'has_message',
                 'resource_total_capacity',
