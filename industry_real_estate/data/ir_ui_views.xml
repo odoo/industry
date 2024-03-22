@@ -6,6 +6,9 @@
         <field name="priority">100</field>
         <field name="arch" type="xml">
             <form string="Property">
+                <header>
+                    <button name="%(action_create_invoice_meters)d" type="action" string="Create Invoice" invisible="not x_rental_contract_id or x_invoice_status != 'to_invoice'"/>
+                </header>
                 <field name="x_is_property" invisible="1"/>
                 <field name="plan_id" invisible="1"/>
                 <field name="company_id" invisible="1"/>
@@ -32,13 +35,15 @@
 
                     <group>
                         <group>
-                            <field name="x_property_building" widget="many2many_tags" required="x_is_property"/>
+                            <field name="x_rental_contract_id"/>
+                            <field name="x_property_building"/>
                             <field name="x_property_address" required="x_is_property"/>
                         </group>
                         <group>
                             <field name="currency_id" groups="base.group_multi_currency"/>
                             <field name="x_property_type" required="x_is_property"/>
                             <field name="x_is_published"/>
+                            <field name="x_invoice_status"/>
                         </group>
                     </group>
 
@@ -55,11 +60,12 @@
                         <page string="Meter Readings">
                             <field name="x_property_meter_reading_ids" context="{'default_x_account_analytic_account_id': id}">
                                 <tree editable="bottom">
+                                    <field name="x_meter_id" required="True"/>
                                     <field name="x_date"/>
-                                    <field name="x_gas"/>
-                                    <field name="x_electricity"/>
-                                    <field name="x_water"/>
-                                    <field name="x_sale_order_id"/>
+                                    <field name="x_quantity"/>
+                                    <field name="x_usage" optional="show"/>
+                                    <field name="x_description" optional="show"/>
+                                    <field name="x_invoice_id" optional="hide"/>
                                 </tree>
                             </field>
                         </page>
@@ -171,20 +177,18 @@
             <field name="validity_date" position="before">
                 <field name="x_rental_start_date" required="x_account_analytic_account_id"/>
             </field>
-            <page name="notes" position="after">
-                <page string="Meter Readings">
-                    <field name="x_so_meter_reading_ids" context="{'default_x_sale_order_id': id, 'default_x_account_analytic_account_id': x_account_analytic_account_id}">
-                        <tree editable="bottom">
-                            <field name="x_sale_order_id" invisible="1"/>
-                            <field name="x_account_analytic_account_id" invisible="1"/>
-                            <field name="x_date"/>
-                            <field name="x_gas"/>
-                            <field name="x_electricity"/>
-                            <field name="x_water"/>
-                        </tree>
-                    </field>
-                </page>
-            </page>
+        </field>
+    </record>
+    <record id="meters_list_view" model="ir.ui.view">
+        <field name="name">meter.tree.view</field>
+        <field name="model">x_meters</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="x_sequence" widget="handle"/>
+                <field name="x_name"/>
+                <field name="x_price" optional="show"/>
+            </tree>
         </field>
     </record>
 
