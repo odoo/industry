@@ -27,6 +27,7 @@ This module is for those who are seeking to rent a car for short or long-distanc
         'data/ir_actions_server.xml',
         'data/ir_ui_view.xml',
         'data/fleet_vehicle_state.xml',
+        'data/fleet_vehicle_model.xml',
         'data/fleet_vehicle.xml',
         'data/ir_attachment_pre.xml',
         'data/project_task_type.xml',
