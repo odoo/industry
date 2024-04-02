@@ -47,6 +47,7 @@ This module is for those who are seeking to rent a car for short or long-distanc
         'demo/res_partner.xml',
         'demo/crm_team.xml',
         'demo/crm_lead.xml',
+        'demo/product_pricing.xml',
         'demo/product_supplierinfo.xml',
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
