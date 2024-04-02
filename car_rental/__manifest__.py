@@ -40,6 +40,7 @@ This module is for those who are seeking to rent a car for short or long-distanc
         'data/res_config_settings.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/payment_provider_demo.xml',
         'data/ir_attachment_post.xml',
     ],
     'demo': [
