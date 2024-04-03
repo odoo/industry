@@ -248,6 +248,7 @@ class TestEnv(IndustryCase):
                 'mode',
                 'program_type',
                 'promo_barcode',
+                'valid_product_ids',
             ],
             'mrp.bom.byproduct': [
                 'company_id',
@@ -256,7 +257,11 @@ class TestEnv(IndustryCase):
             'planning.role': ['color'],
             'planning.slot': [
                 'access_token',
+                'allocated_hours',
+                'department_id',
                 'sale_order_id',
+                'work_address_id',
+                'working_days_count',
             ],
             'product.attribute': ['product_tmpl_ids'],
             'product.attribute.value': ['color'],
