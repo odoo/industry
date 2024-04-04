@@ -55,5 +55,4 @@ This setup if for Clothing and Boutique companies selling female clothing.""",
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
-    'maintenance_loc': 0,
 }
