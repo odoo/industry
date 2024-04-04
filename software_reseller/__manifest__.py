@@ -46,5 +46,4 @@ The typical sale is a 1 year Oracle Database license that is purchased to Oracle
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
-    'maintenance_loc': 0,
 }
