@@ -64,5 +64,5 @@ This module is for those who are seeking to rent a car for short or long-distanc
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
-    'maintenance_loc': 19,
+    'maintenance_loc': 20,
 }
