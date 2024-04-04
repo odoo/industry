@@ -61,5 +61,4 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
-    'maintenance_loc' : 0,
 }
