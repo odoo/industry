@@ -34,6 +34,7 @@ The sales process involves creating sale orders, managing deliveries and invoici
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/appointment_type.xml',
+        'data/payment_provider.xml',
         'data/ir_model_data.xml',
     ],
     'demo': [
@@ -58,6 +59,7 @@ The sales process involves creating sale orders, managing deliveries and invoici
         'demo/website_ir_attachment.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
+        'demo/payment_provider.xml',
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
