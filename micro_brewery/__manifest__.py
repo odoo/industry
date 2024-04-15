@@ -52,6 +52,7 @@ This module is a setup specific to support the business activities of a microbre
         'data/knowledge_article_favorite.xml',
         'data/quality_point.xml',
         'data/appointment_type.xml',
+        'data/payment_provider.xml',
     ],
     'demo': [
         'demo/website.xml',
@@ -76,6 +77,7 @@ This module is a setup specific to support the business activities of a microbre
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
+        'demo/payment_provider.xml',
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
