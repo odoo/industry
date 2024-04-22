@@ -7,9 +7,8 @@
         <field name="base_automation_id" ref="update_the_warranty"/>
         <field name="code"><![CDATA[
 move_lines = records.search([("state", "=", "done"), ("picking_code", "=", "outgoing")])
-records.write({
-    'x_warranty_date': datetime.datetime.today() + datetime.timedelta(record.product_id.expiration_time)
-})
-        ]]></field>
+for line in move_lines:
+    line.write({'x_warranty_date': datetime.datetime.today().date() + datetime.timedelta(line.product_id.expiration_time)})
+]]></field>
     </record>
 </odoo>
