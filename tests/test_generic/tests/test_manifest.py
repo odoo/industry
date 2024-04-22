@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from ast import literal_eval
+from pathlib import Path
 
 from odoo.addons.test_lint.tests.test_manifests import ManifestLinter
 from odoo.modules.module import module_manifest
@@ -28,10 +29,7 @@ class ManifestTest(ManifestLinter, IndustryCase):
 
     def _load_manifest(self, module):
         manifest_file = module_manifest(get_industry_path() + module)
-        manifest_data = {}
-        with open(manifest_file, mode='r') as f:
-            manifest_data.update(literal_eval(f.read()))
-        return manifest_data
+        return literal_eval(Path(manifest_file).read_text())
 
     def test_manifests(self):
         for module in self.installed_modules:
