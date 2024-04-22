@@ -2,6 +2,7 @@
 
 import logging
 import os
+import pathlib
 import re
 
 from odoo.tests.common import tagged
@@ -30,8 +31,7 @@ class TestEnv(IndustryCase):
                     continue
                 if os.path.getsize(file_path) > MAX_FILE_SIZE:
                     raise "Max file size exceeded"
-                with open(file_path, 'rb') as f:
-                    content = f.read().decode('utf8')
+                content = pathlib.Path(file_path).read_bytes().decode('utf8')
                 if ext == '.py':
                     if file_name != '__manifest__.py':
                         _logger.warning(
@@ -71,15 +71,15 @@ class TestEnv(IndustryCase):
                 starts_with[0], file_name, first_line
             )
 
-        if count := (s.count(' id="'+module+'.') + s.count(" id='"+module+'.')):
+        if count := (s.count(' id="' + module + '.') + s.count(" id='" + module + '.')):
             _logger.warning(
                 "Defining an xmlid with the current module name is useless, module name will be "
                 "added automatically. Found %d occurence(s) of ' id=\"%s.ID' in %s.",
                 count, module, file_name
             )
 
-        count = (s.count('ref("'+module+'.') + s.count("ref('"+module+'.')) - (
-            s.count('env.ref("'+module+'.') + s.count("env.ref('"+module+'.'))
+        count = (s.count('ref("' + module + '.') + s.count("ref('" + module + '.')) - (
+            s.count('env.ref("' + module + '.') + s.count("env.ref('" + module + '.'))
         if count:
             _logger.warning(
                 "Referring to an xmlid created within the current module name is useless. If none is"
@@ -87,12 +87,12 @@ class TestEnv(IndustryCase):
                 " in %s (this remark does not apply to 'env.ref(\"%s.ID\")' where it is required).",
                 count, module, file_name, module
             )
-        count = (s.count('ref="'+module+'.') + s.count("ref='"+module+'.'))
+        count = (s.count('ref="' + module + '.') + s.count("ref='" + module + '.'))
         if count:
             _logger.warning(
                 "Referring to an xmlid created within the current module name is useless. If none is"
                 " provided, it will check in current module. Found %d occurence(s) of ref=\"%s.ID\""
-                " in %s.", count, module, file_name, module
+                " in %s.", count, module, file_name
             )
         if s.count("x_studio"):
             _logger.warning("Please remove 'studio' from 'x_studio' in %s.", file_name)
@@ -130,7 +130,10 @@ class TestEnv(IndustryCase):
             "crm.lead",
             "crm.stage",
             "crm.tag",
+            "document.document",
+            "document.folder",
             "event.event.ticket",
+            "helpdesk.ticket",
             "hr.applicant",
             "hr.department",
             "hr.job",
@@ -169,13 +172,21 @@ class TestEnv(IndustryCase):
             "product.template",
             "product.template.attribute.line",
             "product.template.attribute.value",
+            "project.project",
+            "project.task",
+            "project.task.type",
+            "purchase.order",
+            # "purchase.order.line",  # need to handle in functions
             "quality.point",
+            "repair.order",
             "res.config.settings",
             "res.partner",
             "restaurant.floor",
             "restaurant.table",
             "sale.order",
             "sale.order.line",
+            "sale.order.template",
+            "sale.order.template.line",
             "sign.item",
             "sign.request",
             "sign.template",
@@ -190,15 +201,15 @@ class TestEnv(IndustryCase):
             "website.page",
         ]
         for model in models_to_update:
-            if re.search('model="'+model+'"', s) and not re.search('<field .+model="'+model, s) and not s.count('<odoo>'):
+            if re.search('model="' + model + '"', s) and not re.search('<field .+model="' + model, s) and not s.count('<odoo>'):
                 _logger.warning(
                     "Model %s should be updated, please remove 'noupdate=\"1\"' in the header of %s.",
                     model, filename,
                 )
         for model in models_not_to_update:
-            if (re.search('model="'+model+'"', s)
-                and not re.search('<field .+model="'+model, s)
-                and not re.search('<function.+model="'+model, s)
+            if (re.search('model="' + model + '"', s)
+                and not re.search('<field .+model="' + model, s)
+                and not re.search('<function.+model="' + model, s)
                 and not s.count('<odoo noupdate="1">')
             ):
                 _logger.warning(
@@ -212,7 +223,7 @@ class TestEnv(IndustryCase):
                 " access to all users",
         }
         for model, warning in useless_models.items():
-            if re.search('model="'+model, s):
+            if re.search('model="' + model, s):
                 _logger.warning(warning)
 
     def _check_useless_fields_on_models(self, s, filename):
@@ -277,7 +288,10 @@ class TestEnv(IndustryCase):
                 'product_tmpl_id',
             ],
             'project.tags': ['color'],
-            'purchase.order.line': ['name'],
+            'purchase.order.line': [
+                'date_order',
+                'name',
+            ],
             'res.partner': ['tz'],
             'sale.order': [
                 'access_token',
@@ -319,6 +333,7 @@ class TestEnv(IndustryCase):
                 'untaxed_amount_invoiced',
                 'untaxed_amount_to_invoice',
             ],
+            # 'sale.order.template.line': ['name'],  # check as could be meaningful and different
             'sign.template': [
                 'has_sign_requests',
                 'is_sharing',
@@ -329,9 +344,9 @@ class TestEnv(IndustryCase):
             'worksheet.template': ['color'],
         }
         for model, fields in useless_model_fields.items():
-            if re.search('model="'+model, s):
+            if re.search('model="' + model, s):
                 for field in fields:
-                    if re.search('field name="'+field+'"', s):
+                    if re.search('field name="' + field + '"', s):
                         _logger.warning(
                             "You shouldn't define the %s on %s (%s). Please refer to other modules for examples.",
                             field, model, filename
