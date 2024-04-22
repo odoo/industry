@@ -17,5 +17,5 @@ class FileTest(IndustryCase):
                 'image': '/images/main.png',
             }
             for f, path in required_files.items():
-                is_file = os.path.isfile((get_industry_path() + module + path))
+                is_file = os.path.isfile(get_industry_path() + module + path)
                 self.assertTrue(is_file, "Missing %s at %s" % (f, module + path))
