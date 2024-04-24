@@ -49,6 +49,7 @@ This module is for marketing companies selling and producing customized corporat
         'data/sale_order_template_line.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/mail_message.xml',
         'data/ir_attachment_post.xml',
     ],
     'demo': [

@@ -51,6 +51,7 @@
         'data/mrp_bom_line.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/mail_message.xml',
     ],
     'demo': [
         'demo/pos_config.xml',
