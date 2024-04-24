@@ -30,6 +30,7 @@
         'data/product_template_attribute_value.xml',
         'data/product_product.xml',
         'data/knowledge_article.xml',
+        'data/mail_message.xml',
         'data/appointment_type.xml',
     ],
     'demo': [

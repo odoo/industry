@@ -35,6 +35,7 @@
         'data/payment_provider_demo.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/mail_message.xml',
     ],
     'demo': [
         'demo/pos_payment_method.xml',
