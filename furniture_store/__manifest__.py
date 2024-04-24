@@ -37,6 +37,7 @@ This module sets up a furniture store for selling furniture like chairs, sofas, 
         'data/pos_config.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/mail_message.xml',
         'data/payment_provider_demo.xml',
     ],
     'demo': [

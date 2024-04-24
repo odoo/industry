@@ -48,6 +48,7 @@
         'data/pos_payment_method.xml',
         'data/pos_config.xml',
         'data/ir_model_data.xml',
+        'data/mail_message.xml',
     ],
     'demo': [
         'demo/pos_config.xml',
