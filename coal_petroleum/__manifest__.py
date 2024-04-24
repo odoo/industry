@@ -41,6 +41,7 @@
         'data/product_product.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/mail_message.xml',
         'data/quality_point.xml',
         'data/ir_model_data.xml',
     ],

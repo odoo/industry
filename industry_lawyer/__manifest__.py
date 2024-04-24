@@ -28,6 +28,7 @@
         'data/sale_order_template_line.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/mail_message.xml',
         'data/appointment_type.xml',
     ],
     'demo': [

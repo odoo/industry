@@ -22,6 +22,7 @@ This setup is for bakery shop companies selling to consumers. Bakery are busines
         'data/product_product.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/mail_message.xml',
         'data/mrp_bom.xml',
         'data/mrp_bom_line.xml',
         'data/res_config_settings.xml',
