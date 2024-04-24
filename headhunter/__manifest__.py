@@ -32,6 +32,7 @@ Those agencies work on two levels and with two different audiences, ...
         'data/ir_ui_view.xml',
         'data/product_product.xml',
         'data/knowledge_article.xml',
+        'data/mail_message.xml',
         'data/appointment_type.xml',
         'data/hr_department.xml',
         'data/hr_job.xml',

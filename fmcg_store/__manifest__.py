@@ -36,6 +36,7 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
         'data/product_packaging.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/mail_message.xml',
         'data/payment_provider.xml',
     ],
     'demo': [

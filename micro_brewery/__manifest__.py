@@ -49,6 +49,7 @@ This module is a setup specific to support the business activities of a microbre
         'data/sale_order_template_line.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
         'data/quality_point.xml',
         'data/appointment_type.xml',

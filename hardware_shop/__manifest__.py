@@ -41,6 +41,7 @@ Using Point of Sale, Inventory, Sales, Purchase, Accounting, Contact, Employee, 
         'data/product_image.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/mail_message.xml',
     ],
     'demo': [
         'demo/website.xml',
