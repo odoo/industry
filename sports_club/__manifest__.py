@@ -36,6 +36,7 @@
         'data/product_product.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/resource_calendar.xml',
         'data/appointment_resource.xml',

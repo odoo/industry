@@ -32,6 +32,7 @@ focusing on accurate quoting, efficient planning, seamless execution, and excell
         'data/product_product.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/mail_activity_type.xml',
         'data/hr_job.xml',

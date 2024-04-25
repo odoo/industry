@@ -45,6 +45,7 @@
         'data/product_pricelist_item.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/knowledge_article_favorite.xml',
         'data/pos_payment_method.xml',
         'data/pos_config.xml',
         'data/ir_model_data.xml',

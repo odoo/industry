@@ -27,6 +27,7 @@
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
         'data/knowledge_article.xml',
+        'data/knowledge_article_favorite.xml',
         'data/knowledge_article_attachments.xml',
         'data/mail_message.xml',
         'data/res_config_settings.xml',
