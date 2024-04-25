@@ -36,6 +36,7 @@
         'demo/hr_employee.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
+        'demo/sale_order_post.xml',
         'demo/res_users.xml',
         'demo/appointment_type.xml',
         'demo/website.xml',
