@@ -34,6 +34,7 @@ It may include surveying of building properties and the measurement of completed
         'data/sale_order_template.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
     ],
     'demo': [

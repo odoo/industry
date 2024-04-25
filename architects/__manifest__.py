@@ -40,6 +40,7 @@ schematic design, design development, worksite follow-up, energy efficiency asse
         'data/sale_order_template_line.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
     ],
     'demo': [
