@@ -31,6 +31,7 @@
         "data/ir_attachment.xml",
         "data/knowledge_cover.xml",
         "data/knowledge_article.xml",
+        "data/knowledge_article_favorite.xml",
         "data/mail_message.xml",
     ],
     'demo': [
