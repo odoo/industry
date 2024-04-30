@@ -60,6 +60,7 @@
         'demo/pos_preparation_display_confirm.xml',
         'demo/payment_provider_demo.xml',
         'demo/website_view.xml',
+        'demo/website_theme_apply.xml'
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
