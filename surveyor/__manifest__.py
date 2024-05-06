@@ -8,14 +8,13 @@ It may include surveying of building properties and the measurement of completed
 """,
     'depends': [
         'base_automation',
-        'account',
         'crm',
         'documents',
         'hr_timesheet',
         'knowledge',
-        'mail',
         'planning',
         'sale_project',
+        'web_studio',
         'theme_treehouse',
     ],
     'data': [

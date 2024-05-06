@@ -1,5 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from ast import literal_eval
 import logging
 import os
 import pathlib
@@ -23,6 +24,7 @@ class TestEnv(IndustryCase):
 
     def _check_files_in_path(self, module):
         path = get_industry_path() + module
+        is_studio_required = False
         for root, dirs, files in os.walk(path):
             for file_name in files:
                 file_path = os.path.join(root, file_name)
@@ -39,14 +41,17 @@ class TestEnv(IndustryCase):
                             " Please remove %s.", file_name
                         )
                     else:
-                        self._check_manifest(content, file_name)
+                        manifest_content = content
                     continue
                 self._check_xml_style(content, module, file_name)
                 self._check_update_status(content, file_name)
                 self._check_useless_models(content, file_name)
                 self._check_useless_fields_on_models(content, file_name)
+                if not is_studio_required and root.split('/')[-1] == 'data':
+                    is_studio_required = self._check_studio(content, file_name)
+        self._check_manifest(manifest_content, is_studio_required)
 
-    def _check_manifest(self, s, file_name):
+    def _check_manifest(self, s, need_studio):
         if (first_line := s.split('\n')[0]) != '{':
             message = "First line of the manifest should be the sole symbol '{'. "
             if not first_line:
@@ -56,6 +61,29 @@ class TestEnv(IndustryCase):
             else:
                 message += "Got '%s'." % first_line
             _logger.warning(message)
+        dependency_list = literal_eval(s)['depends']
+        base_automation = 'base_automation' in dependency_list and 'sale_subscription' not in dependency_list
+        studio_required = need_studio or base_automation
+        studio_dependency = any(studio in dependency_list for studio in ['web_studio', 'website_studio'])
+        if studio_required and not studio_dependency:
+            _logger.warning("'web_studio' is missing in the dependencies.")
+        elif not studio_required and studio_dependency:
+            _logger.warning("'web_studio' should not be in the dependencies.")
+
+    def _check_studio(self, s, file_name):
+        models_for_studio = [
+            "ir.actions.act_window",
+            "ir.actions.server",
+            "ir.model",
+            "ir.model.fields",
+            "ir.ui.menu",
+            "ir.ui.view",
+        ]
+        for model in models_for_studio:
+            if re.search('model="' + model + '"', s) and not re.search('<field .+model="' + model, s):
+                _logger.info("%s found in %s, needs studio", model, file_name)
+                return True
+        return False
 
     def _check_xml_style(self, s, module, file_name):
         starts_with = [
