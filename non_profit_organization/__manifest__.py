@@ -11,6 +11,7 @@
         'knowledge',
         'mass_mailing',
         'sale_subscription',
+        'web_studio',
         'website_crm',
         'website_event_sale',
         'theme_treehouse',
