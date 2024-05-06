@@ -17,6 +17,7 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
         'sale_purchase',
         'stock_barcode',
         'stock_delivery',
+        'web_studio',
     ],
     'data': [
         'data/res_config_settings.xml',
