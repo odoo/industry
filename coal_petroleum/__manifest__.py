@@ -19,6 +19,7 @@
         'stock_delivery',
         'stock_dropshipping',
         'stock_landed_costs',
+        'web_studio',
     ],
     'data': [
         'data/res_config_settings.xml',
