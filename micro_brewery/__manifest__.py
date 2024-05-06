@@ -15,6 +15,7 @@ This module is a setup specific to support the business activities of a microbre
         'pos_restaurant',
         'pos_sale',
         'sale_purchase',
+        'web_studio',
         'website_appointment',
         'website_sale_stock',
         'theme_bistro'

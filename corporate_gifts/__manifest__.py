@@ -22,6 +22,7 @@ This module is for marketing companies selling and producing customized corporat
         'sale_planning',
         'sale_product_matrix',
         'sale_purchase',
+        'web_studio',
         'website_crm',
         'website_sale_product_configurator',
         'website_sale_stock',

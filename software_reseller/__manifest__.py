@@ -13,6 +13,7 @@ The typical sale is a 1 year Oracle Database license that is purchased to Oracle
         'sale_timesheet',
         'sale_planning',
         'sale_subscription',
+        'web_studio',
     ],
     'data': [
         'data/ir_attachment_pre.xml',
