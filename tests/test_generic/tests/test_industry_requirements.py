@@ -3,6 +3,7 @@
 import sys
 
 from odoo.tests.common import tagged
+from odoo.tools import cloc
 
 from .industry_case import IndustryCase
 
@@ -46,3 +47,15 @@ class TestEnv(IndustryCase):
                 notif.body,
                 "The notification link should target the module-related knowledge article."
             )
+
+    def test_cloc_exclude_view(self):
+        if not sys.argv[sys.argv.index('-d') + 1].endswith('imported_no_demo'):
+            return
+        c = cloc.Cloc()
+        c.count_database(self.env.cr.dbname)
+        c.report(True)  # show details of cloc in the logs
+        for module in self.installed_modules:
+            for cloc_entry in c.modules.get(module, {}):
+                message = "The view '%s' is counted in the maintenance lines. " % cloc_entry
+                message += "Please add a '__cloc_exclude__' entry in 'ir_model_data'."
+                self.assertEqual(len(cloc_entry.split(':')), 2, message)
