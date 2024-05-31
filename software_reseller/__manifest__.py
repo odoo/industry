@@ -19,6 +19,8 @@ The typical sale is a 1 year Oracle Database license that is purchased to Oracle
         'data/ir_attachment_pre.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_ui_menu.xml',
+        'data/ir_model_fields.xml',
+        'data/ir_ui_view.xml',
         'data/project_task_type.xml',
         'data/product_category.xml',
         'data/account_analytic_plan.xml',
