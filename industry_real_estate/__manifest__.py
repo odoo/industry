@@ -13,7 +13,6 @@ Manage your properties, create and manage rental contracts, and streamline your 
         'crm_iap_mine',
         'knowledge',
         'sale_crm',
-        'sale_product_configurator',
         'sale_subscription',
         'website_crm',
         'website_studio',
