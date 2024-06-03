@@ -19,7 +19,6 @@
         'website_appointment',
         'website_crm',
         'website_sale_picking',
-        'website_sale_product_configurator',
         'website_sale_stock',
     ],
     'data': [

@@ -11,7 +11,6 @@ This setup is for bakery shop companies selling to consumers. Bakery are busines
         'purchase_stock',
         'sale_mrp',
         'sale_purchase',
-        'website_sale_product_configurator',
         'website_sale_stock',
         'theme_bistro',
     ],

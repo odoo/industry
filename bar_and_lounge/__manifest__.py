@@ -21,7 +21,6 @@ This Services can be avail directly from the airport and individuals can also pu
         'web_studio',
         'website_livechat',
         'website_partner',
-        'website_sale_product_configurator',
         'website_sale_stock',
         'theme_treehouse',
     ],
