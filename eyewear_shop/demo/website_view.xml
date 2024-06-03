@@ -179,18 +179,18 @@
                     </div>
                 </div>
                 <div t-else="" class="col-12">
-                    <h1 class="o_page_header mb32 mt32">Schedule an Appointment(Eye Test)<br/></h1>
+                    <h1 class="o_page_header mb32 mt32">Schedule an Appointment (Eye Test)<br/></h1>
                 </div>
                 <div t-foreach="appointment_types" t-as="appointment" class="col-md-6 col-lg-4 mb-4">
                     <article class="card border-1 shadow-sm h-100" itemscope="itemscope" itemtype="http://schema.org/Appointments">
                         <a t-attf-href="/appointment/#{appointment.id}?#{keep_query('filter_appointment_type_ids', 'filter_staff_user_ids', 'invite_token')}" class="text-reset text-decoration-none h-100 d-flex flex-column">
                             <header class="overflow-hidden bg-secondary rounded-top col-12">
-                                <div class="d-block h-100 w-100">
-                                    <t t-call="website.record_cover">
-                                        <t t-set="_record" t-value="appointment"/>
-                                        <small t-if="not appointment.website_published" class="o_appointment_unpublished bg-danger position-absolute w-100 text-end" groups="base.group_user"><i class="fa fa-ban me-2"/>Unpublished</small>
-                                    </t>
-                                </div>
+                                <div t-if="appointment.image_1920" t-field="appointment.image_1920" role="img"
+                                    class="o_appointment_avatar_container d-none d-md-block w-25 me-2 overflow-hidden border rounded ratio ratio-1x1"
+                                    t-options="{'widget': 'image', 'class': 'o_appointment_avatar_background o_object_fit_cover', 'preview_image': 'image_512'}"/>
+                                <small t-if="not appointment.website_published" class="o_appointment_unpublished bg-danger position-absolute w-100 text-end o_cc o_cc3" groups="base.group_user">
+                                    <i class="fa fa-ban me-2"/>Unpublished
+                                </small>
                             </header>
                             <main class="card-body d-flex flex-column">
                                 <h2 t-attf-class="fw-bold my-3">
@@ -786,27 +786,6 @@
             </section>
         </xpath>
     </template>
-
-    <record id="ir_ui_view_2899" model="ir.ui.view">
-        <field name="name">record_cover</field>
-        <field name="website_id" ref="website.default_website"/>
-        <field name="key">website.record_cover</field>
-        <field name="type">qweb</field>
-        <field name="arch" type="xml">
-            <t t-name="website.record_cover">
-                <t t-set="_cp" t-value="_cp or json.loads(_record.cover_properties)"/>
-                <t t-set="_name" t-value="_name or _record._name"/>
-                <t t-set="_id" t-value="_id or _record.id"/>
-                <t t-set="_bg" t-value="_bg or _record._get_background(height=_resize_height, width=_resize_width)"/>
-                <t t-set="default_cover_name">Cover</t>
-                <div t-att-data-name="display_opt_name or default_cover_name" t-att-style="_cp.get('background_color_style')" t-att-data-use_size="use_size" t-att-data-use_filters="use_filters" t-att-data-use_text_align="use_text_align" t-att-data-res-model="_name" t-att-data-res-id="_id" t-attf-class="o_record_cover_container d-flex flex-column h-100 o_colored_level o_cc #{_cp.get('background_color_class')} #{use_size and _cp.get('resize_class')} #{use_text_align and _cp.get('text_align_class')} #{additionnal_classes}">
-                    <div t-attf-class="o_record_cover_component o_record_cover_image #{snippet_autofocus and 'o_we_snippet_autofocus'}" t-attf-style="background-image: #{_bg};" style="background-image: url('/unsplash/AlBgcDfDG_s/texas.jpg?unique=414532f4');" class="o_record_cover_component o_record_cover_image"/>
-                    <div t-if="use_filters" t-attf-class="o_record_cover_component o_record_cover_filter oe_black" t-attf-style="opacity: #{_cp.get('opacity', 0.0)};"/>
-                    <t t-out="0"/>
-                </div>
-            </t>
-        </field>
-    </record>
     
     <record id="ir_ui_view_3118" model="ir.ui.view">
         <field name="inherit_id" ref="website_appointment.website_calendar_index"/>
