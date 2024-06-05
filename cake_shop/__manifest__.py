@@ -35,6 +35,7 @@ This setup is for bakery shop companies selling to consumers. Bakery are busines
         'demo/website.xml',
         'demo/res_partner.xml',
         'demo/product_supplierinfo.xml',
+        'demo/product_product.xml',
         'demo/purchase_order.xml',
         'demo/sale_order.xml',
         'demo/website_view.xml',
