@@ -65,6 +65,7 @@ This Services can be avail directly from the airport and individuals can also pu
         'demo/x_type_of_airport.xml',
         'demo/x_airport_master.xml',
         'demo/x_services.xml',
+        'demo/product_product.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',

@@ -56,6 +56,7 @@
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/product_supplierinfo.xml',
+        'demo/product_template.xml',
         'demo/loyalty_program.xml',
         'demo/loyalty_rule.xml',
         'demo/loyalty_reward.xml',
