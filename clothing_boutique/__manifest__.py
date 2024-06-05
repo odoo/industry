@@ -36,7 +36,6 @@ This setup if for Clothing and Boutique companies selling female clothing.""",
         'data/mail_message.xml',
     ],
     'demo': [
-        'demo/pos_config.xml',
         'demo/res_partner.xml',
         'demo/product_supplierinfo.xml',
         'demo/loyalty_program.xml',

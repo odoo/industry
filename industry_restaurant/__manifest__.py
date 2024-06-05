@@ -57,6 +57,7 @@
         'demo/pos_preparation_display_order.xml',
         'demo/pos_preparation_display_orderline.xml',
         'demo/pos_preparation_display_stage.xml',
+        'demo/pos_preparation_display_order_stage.xml',
         'demo/pos_preparation_display_confirm.xml',
         'demo/payment_provider_demo.xml',
         'demo/website_view.xml',
