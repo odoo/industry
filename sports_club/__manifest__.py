@@ -43,7 +43,6 @@
         'data/payment_provider_demo.xml',
     ],
     'demo': [
-        'demo/pos_config.xml',
         'demo/res_partner.xml',
         'demo/hr_employee.xml',
         'demo/crm_team.xml',

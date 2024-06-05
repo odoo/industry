@@ -61,7 +61,6 @@ This module is a setup specific to support the business activities of a microbre
         'demo/res_partner.xml',
         'demo/mrp_bom.xml',
         'demo/crm_lead.xml',
-        'demo/pos_config.xml',
         'demo/product_supplierinfo.xml',
         'demo/stock_lot.xml',
         'demo/stock_quant.xml',

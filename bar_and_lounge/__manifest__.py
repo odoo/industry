@@ -54,7 +54,6 @@ This Services can be avail directly from the airport and individuals can also pu
         'data/mail_message.xml',
     ],
     'demo': [
-        'demo/pos_config.xml',
         'demo/website.xml',
         'demo/res_partner.xml',
         'demo/hr_employee.xml',
