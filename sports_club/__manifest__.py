@@ -47,6 +47,8 @@
         'demo/hr_employee.xml',
         'demo/crm_team.xml',
         'demo/crm_lead.xml',
+        'demo/product_template.xml',
+        'demo/product_product.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
