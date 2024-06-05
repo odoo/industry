@@ -18,7 +18,7 @@ This module is a setup specific to support the business activities of a microbre
         'web_studio',
         'website_appointment',
         'website_sale_stock',
-        'theme_bistro'
+        'theme_bistro',
     ],
     'data': [
         'data/res_config_settings.xml',
@@ -62,7 +62,9 @@ This module is a setup specific to support the business activities of a microbre
         'demo/mrp_bom.xml',
         'demo/crm_lead.xml',
         'demo/pos_config.xml',
+        'demo/appointment_type.xml',
         'demo/product_supplierinfo.xml',
+        'demo/product_template.xml',
         'demo/stock_lot.xml',
         'demo/stock_quant.xml',
         'demo/stock_warehouse_orderpoint.xml',

@@ -44,6 +44,7 @@
         'demo/res_partner.xml',
         'demo/appointment_type.xml',
         'demo/calendar_event.xml',
+        'demo/product_product.xml',
         'demo/stock_quant.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
@@ -60,7 +61,7 @@
         'demo/pos_preparation_display_confirm.xml',
         'demo/payment_provider_demo.xml',
         'demo/website_view.xml',
-        'demo/website_theme_apply.xml'
+        'demo/website_theme_apply.xml',
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],

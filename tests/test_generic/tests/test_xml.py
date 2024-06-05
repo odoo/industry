@@ -5,6 +5,8 @@ import logging
 import os
 import pathlib
 import re
+from lxml import etree
+from collections import defaultdict
 
 from odoo.tests.common import tagged
 
@@ -38,7 +40,8 @@ class TestEnv(IndustryCase):
                     if file_name != '__manifest__.py':
                         _logger.warning(
                             "No python file is allowed in an industry module, except __manifest__.py."
-                            " Please remove %s.", file_name
+                            " Please remove %s.",
+                            file_name,
                         )
                     else:
                         manifest_content = content
@@ -47,8 +50,12 @@ class TestEnv(IndustryCase):
                 self._check_update_status(content, file_name)
                 self._check_useless_models(content, file_name)
                 self._check_useless_fields_on_models(content, file_name)
-                if not is_studio_required and root.split('/')[-1] == 'data':
-                    is_studio_required = self._check_studio(content, file_name)
+                self._check_knowledge_article_is_published(content, file_name)
+                self._check_duplicate_records(content, file_name)
+                if root.split('/')[-1] == 'data':
+                    self._check_is_published_false(module, file_name)
+                    if not is_studio_required:
+                        is_studio_required = self._check_studio(content, file_name)
         self._check_manifest(manifest_content, is_studio_required)
 
     def _check_manifest(self, s, need_studio):
@@ -62,9 +69,13 @@ class TestEnv(IndustryCase):
                 message += "Got '%s'." % first_line
             _logger.warning(message)
         dependency_list = literal_eval(s)['depends']
-        base_automation = 'base_automation' in dependency_list and 'sale_subscription' not in dependency_list
+        base_automation = (
+            'base_automation' in dependency_list and 'sale_subscription' not in dependency_list
+        )
         studio_required = need_studio or base_automation
-        studio_dependency = any(studio in dependency_list for studio in ['web_studio', 'website_studio'])
+        studio_dependency = any(
+            studio in dependency_list for studio in ['web_studio', 'website_studio']
+        )
         if studio_required and not studio_dependency:
             _logger.warning("'web_studio' is missing in the dependencies.")
         elif not studio_required and studio_dependency:
@@ -80,7 +91,9 @@ class TestEnv(IndustryCase):
             "ir.ui.view",
         ]
         for model in models_for_studio:
-            if re.search('model="' + model + '"', s) and not re.search('<field .+model="' + model, s):
+            if re.search('model="' + model + '"', s) and not re.search(
+                '<field .+model="' + model, s
+            ):
                 _logger.info("%s found in %s, needs studio", model, file_name)
                 return True
         return False
@@ -96,31 +109,42 @@ class TestEnv(IndustryCase):
         if not any(first_line == start_line for start_line in starts_with):
             _logger.warning(
                 "XML files should begin with the following line: %s, but %s starts with %s",
-                starts_with[0], file_name, first_line
+                starts_with[0],
+                file_name,
+                first_line,
             )
 
         if count := (s.count(' id="' + module + '.') + s.count(" id='" + module + '.')):
             _logger.warning(
                 "Defining an xmlid with the current module name is useless, module name will be "
                 "added automatically. Found %d occurence(s) of ' id=\"%s.ID' in %s.",
-                count, module, file_name
+                count,
+                module,
+                file_name,
             )
 
         count = (s.count('ref("' + module + '.') + s.count("ref('" + module + '.')) - (
-            s.count('env.ref("' + module + '.') + s.count("env.ref('" + module + '.'))
+            s.count('env.ref("' + module + '.') + s.count("env.ref('" + module + '.')
+        )
         if count:
             _logger.warning(
                 "Referring to an xmlid created within the current module name is useless. If none is"
                 " provided, it will check in current module. Found %d occurence(s) of ref(\"%s.ID\")"
                 " in %s (this remark does not apply to 'env.ref(\"%s.ID\")' where it is required).",
-                count, module, file_name, module
+                count,
+                module,
+                file_name,
+                module,
             )
-        count = (s.count('ref="' + module + '.') + s.count("ref='" + module + '.'))
+        count = s.count('ref="' + module + '.') + s.count("ref='" + module + '.')
         if count:
             _logger.warning(
                 "Referring to an xmlid created within the current module name is useless. If none is"
                 " provided, it will check in current module. Found %d occurence(s) of ref=\"%s.ID\""
-                " in %s.", count, module, file_name
+                " in %s.",
+                count,
+                module,
+                file_name,
             )
         if s.count("x_studio"):
             _logger.warning("Please remove 'studio' from 'x_studio' in %s.", file_name)
@@ -135,9 +159,13 @@ class TestEnv(IndustryCase):
 
         end_of_file = repr(s).split('\\')
         if 'n' not in end_of_file[-1] or len(end_of_file[-1]) > 2:
-            _logger.warning("It looks like you forgot to add an empty line at the end of %s.", file_name)
+            _logger.warning(
+                "It looks like you forgot to add an empty line at the end of %s.", file_name
+            )
         elif 'n' in end_of_file[-2] and len(end_of_file[-2]) <= 2:
-            _logger.warning("One empty line at the end of %s is enough, please remove others.", file_name)
+            _logger.warning(
+                "One empty line at the end of %s is enough, please remove others.", file_name
+            )
 
     def _check_update_status(self, s, filename):
         models_to_update = [
@@ -229,26 +257,33 @@ class TestEnv(IndustryCase):
             "website.page",
         ]
         for model in models_to_update:
-            if re.search('model="' + model + '"', s) and not re.search('<field .+model="' + model, s) and not s.count('<odoo>'):
+            if (
+                re.search('model="' + model + '"', s)
+                and not re.search('<field .+model="' + model, s)
+                and not s.count('<odoo>')
+            ):
                 _logger.warning(
                     "Model %s should be updated, please remove 'noupdate=\"1\"' in the header of %s.",
-                    model, filename,
+                    model,
+                    filename,
                 )
         for model in models_not_to_update:
-            if (re.search('model="' + model + '"', s)
+            if (
+                re.search('model="' + model + '"', s)
                 and not re.search('<field .+model="' + model, s)
                 and not re.search('<function.+model="' + model, s)
                 and not s.count('<odoo noupdate="1">')
             ):
                 _logger.warning(
                     "Model %s should not be updated, please add 'noupdate=\"1\"' in the header of %s.",
-                    model, filename,
+                    model,
+                    filename,
                 )
 
     def _check_useless_models(self, s, filename):
         useless_models = {
             "knowledge.article.member": "Model knowledge.article.member should be replaced by write"
-                " access to all users",
+            " access to all users",
         }
         for model, warning in useless_models.items():
             if re.search('model="' + model, s):
@@ -377,5 +412,40 @@ class TestEnv(IndustryCase):
                     if re.search('field name="' + field + '"', s):
                         _logger.warning(
                             "You shouldn't define the %s on %s (%s). Please refer to other modules for examples.",
-                            field, model, filename
+                            field,
+                            model,
+                            filename,
                         )
+
+    def _check_knowledge_article_is_published(self, xml_content, file_name):
+        if (
+            '<record ' in xml_content
+            and 'model="knowledge.article"' in xml_content
+            and '<field name="is_published" eval="True"/>' in xml_content
+        ):
+            _logger.warning(
+                f"Knowledge article in {file_name} should not have 'is_published' set to True."
+            )
+
+    def _check_is_published_false(self, xml_content, file_name):
+        if '<record ' in xml_content and '<field name="is_published" eval="True"/>' in xml_content:
+            _logger.warning(f"Model in {file_name} should not have 'is_published' set to True.")
+
+    def _check_duplicate_records(self, xml_content, file_name):
+        records = defaultdict(set)
+        xml_content = xml_content.encode('utf-8')
+
+        try:
+            root = etree.fromstring(xml_content)
+            for record in root.xpath("//record"):
+                record_id = record.get("id")
+                model = record.get("model")
+                fields = frozenset(field.get("name") for field in record.xpath(".//field"))
+                record_key = (record_id, model)
+                if fields & records[record_key]:
+                    _logger.warning(
+                        f"Duplicate record updates in {file_name}: {record_id} in model {model}"
+                    )
+                records[record_key] |= fields
+        except etree.XMLSyntaxError as e:
+            _logger.error("XML syntax error in file %s: %s", file_name, e)
