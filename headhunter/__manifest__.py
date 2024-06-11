@@ -43,6 +43,8 @@ Those agencies work on two levels and with two different audiences, ...
         'data/sign_request.xml',
         'data/crm_stage.xml',
         'data/crm_tag.xml',
+        'data/website_view.xml',
+        'data/ir_model_data.xml',
     ],
     'demo': [
         'demo/res_partner.xml',

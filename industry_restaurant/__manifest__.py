@@ -37,6 +37,8 @@
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
+        'data/website_view.xml',
+        'data/ir_model_data.xml',
     ],
     'demo': [
         'demo/pos_payment_method.xml',
