@@ -54,6 +54,8 @@ This module is a setup specific to support the business activities of a microbre
         'data/knowledge_article_favorite.xml',
         'data/quality_point.xml',
         'data/appointment_type.xml',
+        'data/website_view.xml',
+        'data/ir_model_data.xml',
         'data/payment_provider.xml',
     ],
     'demo': [
