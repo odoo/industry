@@ -48,8 +48,9 @@
         'data/knowledge_article_favorite.xml',
         'data/pos_payment_method.xml',
         'data/pos_config.xml',
-        'data/ir_model_data.xml',
         'data/mail_message.xml',
+        'data/website_view.xml',
+        'data/ir_model_data.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
