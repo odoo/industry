@@ -92,8 +92,10 @@ class TestEnv(IndustryCase):
             "ir.ui.view",
         ]
         for model in models_for_studio:
-            if re.search('model="' + model + '"', s) and not re.search(
-                '<field .+model="' + model, s
+            if (
+                re.search('model="' + model + '"', s)
+                and not re.search('<field .+model="' + model, s)
+                and not re.search('<function model="' + model, s)
             ):
                 _logger.info("%s found in %s, needs studio", model, file_name)
                 return True

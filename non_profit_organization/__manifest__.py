@@ -32,6 +32,8 @@
         'data/knowledge_article_attachments.xml',
         'data/mail_message.xml',
         'data/res_config_settings.xml',
+        'data/website_view.xml',
+        'data/ir_model_data.xml',
     ],
     'demo': [
         'demo/event_event.xml',
