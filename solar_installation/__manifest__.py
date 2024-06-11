@@ -55,6 +55,9 @@ ensuring the efficient installation of solar panels and associated equipment.
         'data/chatbot_script_step.xml',
         'data/crm_stage.xml',
         'data/crm_team.xml',
+        'data/website_view.xml',
+        'data/website_page.xml',
+        'data/website_menu.xml',
         'data/ir_model_data.xml',
     ],
     'demo': [
@@ -79,8 +82,6 @@ ensuring the efficient installation of solar panels and associated equipment.
         'demo/website_ir_attachment.xml',
         'demo/website.xml',
         'demo/website_view.xml',
-        'demo/website_page.xml',
-        'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
         'demo/helpdesk_ticket.xml',
         'demo/repair_order.xml',
