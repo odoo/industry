@@ -52,6 +52,7 @@ class TestEnv(IndustryCase):
                 self._check_useless_fields_on_models(content, file_name)
                 self._check_knowledge_article_is_published(content, file_name)
                 self._check_duplicate_records(content, file_name)
+                self._check_website_published_false(module, file_name)
                 if root.split('/')[-1] == 'data':
                     self._check_is_published_false(module, file_name)
                     if not is_studio_required:
@@ -429,7 +430,19 @@ class TestEnv(IndustryCase):
 
     def _check_is_published_false(self, xml_content, file_name):
         if '<record ' in xml_content and '<field name="is_published" eval="True"/>' in xml_content:
-            _logger.warning(f"Model in {file_name} should not have 'is_published' set to True.")
+            _logger.warning(
+                f"Model in {file_name} should not have 'is_published' set to True in data."
+            )
+
+    def _check_website_published_false(self, xml_content, file_name):
+        if (
+            '<record ' in xml_content
+            and '<field name="website_published" eval="True"/>' in xml_content
+            and 'model="website.controller.page"' not in xml_content
+        ):
+            _logger.warning(
+                f"Model in {file_name} should not have 'website_published' set to True, 'is_published' is preferred in demo only."
+            )
 
     def _check_duplicate_records(self, xml_content, file_name):
         records = defaultdict(set)
@@ -440,7 +453,24 @@ class TestEnv(IndustryCase):
             for record in root.xpath("//record"):
                 record_id = record.get("id")
                 model = record.get("model")
-                fields = frozenset(field.get("name") for field in record.xpath(".//field"))
+                fields_list = [
+                    (
+                        field.get("name"),
+                        field.getparent().get('id', field.getparent().tag),
+                        field.get("position", None),
+                        (
+                            field.xpath("ancestor::page[1]")[0].get("name")
+                            if field.xpath("ancestor::page[1]")
+                            else None
+                        ),
+                    )
+                    for field in record.xpath(".//field")
+                ]
+                fields = frozenset(fields_list)
+                if len(fields_list) != len(fields):
+                    _logger.warning(
+                        f"Duplicate field updates in record {record_id} of model {model} in {file_name}: {', '.join(field[0] for field in fields if fields_list.count(field) > 1)}"
+                    )
                 record_key = (record_id, model)
                 if fields & records[record_key]:
                     _logger.warning(
