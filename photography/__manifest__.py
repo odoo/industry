@@ -39,6 +39,7 @@
     'demo': [
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
+        'demo/appointment_data.xml',
         'demo/sale_order.xml',
         "demo/sale_order_confirm.xml",
         'demo/project_task.xml',
