@@ -9,7 +9,6 @@ from lxml import etree
 from collections import defaultdict
 
 from odoo.tests.common import tagged
-
 from .industry_case import IndustryCase, get_industry_path
 
 _logger = logging.getLogger(__name__)
@@ -27,10 +26,16 @@ class TestEnv(IndustryCase):
     def _check_files_in_path(self, module):
         path = get_industry_path() + module
         is_studio_required = False
+        static_files = set()
+        in_use_files = set()
         for root, dirs, files in os.walk(path):
+            # sort the directory by alphabetical order so static directory is read first.
+            dirs.sort(reverse=True)
             for file_name in files:
                 file_path = os.path.join(root, file_name)
                 ext = os.path.splitext(file_path)[1].lower()
+                if 'static/' in file_path and 'description' not in file_path:
+                    static_files.add(os.path.relpath(file_path, start=get_industry_path()))
                 if ext not in ['.py', '.xml']:
                     continue
                 if os.path.getsize(file_path) > MAX_FILE_SIZE:
@@ -46,6 +51,7 @@ class TestEnv(IndustryCase):
                     else:
                         manifest_content = content
                     continue
+
                 self._check_xml_style(content, module, file_name)
                 self._check_update_status(content, file_name)
                 self._check_useless_models(content, file_name)
@@ -53,11 +59,36 @@ class TestEnv(IndustryCase):
                 self._check_knowledge_article_is_published(content, file_name)
                 self._check_duplicate_records(content, file_name)
                 self._check_website_published_false(module, file_name)
+                self._check_static_files_usage_in_xml(content, in_use_files)
                 if root.split('/')[-1] == 'data':
                     self._check_is_published_false(module, file_name)
                     if not is_studio_required:
                         is_studio_required = self._check_studio(content, file_name)
         self._check_manifest(manifest_content, is_studio_required)
+        in_use_files = set(file.lstrip('/') for file in in_use_files)
+        for file in static_files - in_use_files:
+            _logger.warning(f"Unused static file {file}.")
+        for file in in_use_files - static_files:
+            _logger.warning(f"No reference found for this file: {file}.")
+
+    def _check_static_files_usage_in_xml(self, content, in_use_files):
+        tree = etree.fromstring(content.encode('utf8'))
+        for element in tree.iter():
+            file_names = set(
+                element.attrib.get(key) for key in ['file', 'src', 'data-original-src']
+            )
+            if element.text:
+                if element.get("name") == "cover_properties":
+                    file_names.update(re.findall(r"url\(['\"]?([^'\")]+)['\"]?\)", element.text))
+                file_names.update(re.findall(r'src="([^"]+)"', element.text))
+
+            in_use_files.update(
+                {
+                    file
+                    for file in file_names
+                    if file and not file.startswith(('web', '/web', 'https', '/unsplash'))
+                }
+            )
 
     def _check_manifest(self, s, need_studio):
         if (first_line := s.split('\n')[0]) != '{':
