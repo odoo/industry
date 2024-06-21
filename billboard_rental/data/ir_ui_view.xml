@@ -1,0 +1,306 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="report_custom_x_project_task_worksheet_template_2" model="ir.ui.view">
+        <field name="name">x_project_task_worksheet_template_2</field>
+        <field name="type">qweb</field>
+        <field name="arch" type="xml">
+            <t t-name="x_project_task_worksheet_template_2_studio">
+                <div>
+                    <div>
+                        <div>
+                            <div class="row mb-3" style="page-break-inside: avoid">
+                                <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">Done on </div>
+                                <div t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-7 col-12'" t-field="worksheet.x_done_on"/>
+                            </div>
+                            <div class="row mb-3" style="page-break-inside: avoid">
+                                <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">No trees hiding the billboard_rental</div>
+                                <i t-att-class="'col-lg-7 col-12 fa ' + ('fa-check-square' if worksheet.x_no_trees_hiding_the_billboard else 'fa-square-o')"/>
+                            </div>
+                            <div class="row mb-3" style="page-break-inside: avoid">
+                                <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">Frame in good state</div>
+                                <i t-att-class="'col-lg-7 col-12 fa ' + ('fa-check-square' if worksheet.x_frame_in_good_state else 'fa-square-o')"/>
+                            </div>
+                            <div class="row mb-3" style="page-break-inside: avoid">
+                                <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">All lights working </div>
+                                <i t-att-class="'col-lg-7 col-12 fa ' + ('fa-check-square' if worksheet.x_all_lights_working else 'fa-square-o')"/>
+                            </div>
+                            <div class="row mb-3" style="page-break-inside: avoid">
+                                <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">Extra Comments</div>
+                                <div placeholder="Add details about your intervention..." t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-7 col-12'" t-field="worksheet.x_comments"/>
+                            </div>
+                            <div class="row mb-3" style="page-break-inside: avoid">
+                                <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">Billboard Photo</div>
+                                <div widget="image" t-options-widget="'image'" t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-7 col-12'" t-field="worksheet.x_billboard_photo"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </field>
+    </record>
+    <record id="account_analytic_account_search_customization" model="ir.ui.view">
+        <field name="name">account.analytic.account.search customization</field>
+        <field name="model">account.analytic.account</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_account_search"/>
+        <field name="mode">extension</field>
+        <field name="priority">99</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <xpath expr="//search[1]/separator[1]" position="after">
+                <filter domain="[('x_is_available', '=', True)]" name="available_filter" string="Available"/>
+                <filter domain="[('x_is_available', '=', False)]" name="busy_filter" string="Busy"/>
+                <separator name="filter_separator"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="account_analytic_account_kanban_customization" model="ir.ui.view">
+        <field name="name">account.analytic.account.kanban customization</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_account_kanban"/>
+        <field name="mode">extension</field>
+        <field name="model">account.analytic.account</field>
+        <field name="priority">99</field>
+        <field name="type">kanban</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//kanban[1]/field[@name='display_name']" position="after">
+                    <field name="x_is_available" invisible="1"/>
+                    <field name="x_address" invisible="1"/>
+                </xpath>
+                <xpath expr="//kanban/templates/t//div/strong" position="before">
+                    <div class="ribbon ribbon-top-right" invisible="x_is_available and x_address" name="busy_ribbon">
+                        <span class="text-bg-danger">Busy</span>
+                    </div>
+                    <div class="ribbon ribbon-top-right" invisible="not x_is_available and x_address" name="available_ribbon">
+                        <span class="text-bg-success">Available</span>
+                    </div>
+                </xpath>
+                <xpath expr="//kanban/templates/t//div/strong/span/field[@name='display_name']" position="after">
+                    <div invisible="not x_city">
+                        <i class="fa fa-map-marker me-2" title="Location"/>
+                        <field class="d-inline" name="x_city" display="full"/>
+                    </div>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="account_analytic_account_form_customization" model="ir.ui.view">
+        <field name="name">analytic.analytic.account.form customization</field>
+        <field name="model">account.analytic.account</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_account_form"/>
+        <field name="mode">extension</field>
+        <field name="priority">400</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//div[@name='button_box']" position="after">
+                    <widget name="web_ribbon" title="Busy" bg_color="text-bg-danger" invisible="x_is_available and x_address"/>
+                    <widget name="web_ribbon" title="Available" bg_color="text-bg-success" invisible="not x_is_available and x_address"/>
+                </xpath>
+                <xpath expr="//field[@name='active']" position="after">
+                    <field name="x_address" widget="res_partner_many2one" context="{'show_address': 1}"/>
+                    <field name="x_city" string="City" invisible="True"/>
+                </xpath>
+                <xpath expr="//field[@name='plan_id']" position="before">
+                    <field name="x_is_available" string="Available"/>
+                    <xpath expr="//field[@name='partner_id']" position="move"/>
+                </xpath>
+                <xpath expr="//field[@name='plan_id']" position="after">
+                    <xpath expr="//field[@name='code']" position="move"/>
+                </xpath>
+                <xpath expr="//group[@name='main']" position="after">
+                    <notebook name="subscription_notebook">
+                        <page string="Subscription" name="subscription_page">
+                            <field name="x_orders"/>
+                        </page>
+                        <page string="Technical Details " name="technical_details_page">
+                            <group name="measurement_group">
+                                <group name="measurement_group_left">
+                                    <field name="x_width_m"/>
+                                    <field name="x_height_m"/>
+                                </group>
+                                <group name="measurement_group_right">
+                                    <field name="x_frame"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="map_view_customization" model="ir.ui.view">
+        <field name="name">map view for customization</field>
+        <field name="model">account.analytic.account</field>
+        <field name="type">map</field>
+        <field name="arch" type="xml">
+            <map res_partner="x_address">
+                <field name="x_width_m" string="Width (m)"/>
+                <field name="x_height_m" string="Height (m)"/>
+                <field name="x_frame" string="Frame"/>
+            </map>
+        </field>
+    </record>
+    <record id="project_task_form_customization" model="ir.ui.view">
+        <field name="name">project.task.form customization</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="mode">extension</field>
+        <field name="priority">9990</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='project_id']" position="after">
+                    <xpath expr="//field[@name='analytic_account_id']" position="move"/>
+                </xpath>
+                <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/field[@name='partner_id']" position="attributes">
+                    <attribute name="string">Address</attribute>
+                </xpath>
+                <xpath expr="//field[@name='analytic_account_id']" position="attributes">
+                    <attribute name="string">Billboard</attribute>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="res_partner_form_customization" model="ir.ui.view">
+        <field name="name">res.partner.form customization</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="mode">extension</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//span[@name='address_name']" position="before">
+                    <field name="x_is_a_billboard"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="sale_order_form_customization" model="ir.ui.view">
+        <field name="name">sale.order.form customization</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="mode">extension</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <xpath expr="//field[@name='analytic_account_id']" position="move"/>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="domain">[('x_is_a_billboard', '=', False)]</attribute>
+                </xpath>
+                <xpath expr="//field[@name='analytic_account_id']" position="attributes">
+                    <attribute name="domain">["&amp;", ("x_address", "!=", False), ("x_is_available", "=", True)]</attribute>
+                    <attribute name="groups"/>
+                    <attribute name="string">Billboard</attribute>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="x_project_task_worksheet_template_2_ir_ui_view_1" model="ir.ui.view">
+        <field name="name">template_view_Billboard_Worksheet</field>
+        <field name="model">x_project_task_worksheet_template_2_studio</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form create="false" duplicate="false">
+                <sheet>
+                    <h1 invisible="context.get('default_x_project_task_id')">
+                        <field name="x_project_task_id"/>
+                    </h1>
+                    <group>
+                        <field name="x_comments" placeholder="Add details about your intervention..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="template_view_billboard_customization" model="ir.ui.view">
+        <field name="name">template_view_Billboard_Worksheet customization</field>
+        <field name="model">x_project_task_worksheet_template_2_studio</field>
+        <field name="inherit_id" ref="x_project_task_worksheet_template_2_ir_ui_view_1"/>
+        <field name="mode">extension</field>
+        <field name="priority">99</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='x_comments']" position="before">
+                    <field name="x_done_on"/>
+                    <field name="x_no_trees_hiding_the_billboard"/>
+                    <field name="x_frame_in_good_state"/>
+                    <field name="x_all_lights_working"/>
+                </xpath>
+                <xpath expr="//field[@name='x_comments']" position="attributes">
+                    <attribute name="string">Extra Comments</attribute>
+                </xpath>
+                <xpath expr="//field[@name='x_comments']" position="after">
+                    <field widget="image" name="x_billboard_photo"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="x_project_task_worksheet_template_1_ir_ui_view_1" model="ir.ui.view">
+        <field name="name">template_view_Default_Worksheet</field>
+        <field name="model">x_project_task_worksheet_template_1</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form create="false" duplicate="false">
+                <sheet>
+                    <h1 invisible="context.get('default_x_project_task_id')">
+                        <field name="x_project_task_id"/>
+                    </h1>
+                    <group>
+                        <field name="x_comments" placeholder="Add details about your intervention..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="x_project_task_worksheet_template_1_ir_ui_view_2" model="ir.ui.view">
+        <field name="name">tree_view_Default_Worksheet</field>
+        <field name="model">x_project_task_worksheet_template_1</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="create_date"/>
+                <field name="x_name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="x_project_task_worksheet_template_1_ir_ui_view_3" model="ir.ui.view">
+        <field name="name">search_view_Default_Worksheet</field>
+        <field name="model">x_project_task_worksheet_template_1</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="x_name"/>
+                <filter string="Created on" date="create_date" name="create_date"/>
+                <filter name="group_by_month" string="Created on" context="{'group_by': 'create_date:month'}"/>
+            </search>
+        </field>
+    </record>
+    <record id="x_project_task_worksheet_template_2_ir_ui_view_2" model="ir.ui.view">
+        <field name="name">tree_view_Billboard_Worksheet</field>
+        <field name="model">x_project_task_worksheet_template_2_studio</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="create_date"/>
+                <field name="x_name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="x_project_task_worksheet_template_2_ir_ui_view_3" model="ir.ui.view">
+        <field name="name">search_view_Billboard_Worksheet</field>
+        <field name="model">x_project_task_worksheet_template_2_studio</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="x_name"/>
+                <filter string="Created on" date="create_date" name="create_date"/>
+                <filter name="group_by_month" string="Created on" context="{'group_by': 'create_date:month'}"/>
+            </search>
+        </field>
+    </record>
+</odoo>
