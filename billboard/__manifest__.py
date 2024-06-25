@@ -45,7 +45,6 @@ It contains the apps created with Studio and the customizations of existing apps
         'data/sale_order_template_line.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
-        'data/ir_attachment_post.xml',
     ],
     'demo': [
         'demo/website.xml',
@@ -59,6 +58,9 @@ It contains the apps created with Studio and the customizations of existing apps
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/project_task.xml',
+        'demo/website_view.xml',
+        'demo/website_theme_apply.xml',
+        'demo/website_ir_attachment.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
     ],
