@@ -1,72 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="ir_act_create_the_product" model="ir.actions.server">
-        <field name="name">Create Product - Server Actions</field>
-        <field name="model_id" ref="fleet.model_fleet_vehicle"/>
-        <field name="base_automation_id" ref="base_automation_create_product"/>
-        <field name="crud_model_id" ref="product.model_product_template"/>
-        <field name="state">object_create</field>
-        <field name="value">creation of product</field>
-        <field name="link_field_id" ref="new_one2many_vehicle_product_fleet"/>
-    </record>
-    <record id="ir_act_update_the_product" model="ir.actions.server">
-        <field name="name">Update Product - Server Actions</field>
-        <field name="model_id" ref="fleet.model_fleet_vehicle"/>
-        <field name="base_automation_id" ref="base_automation_create_product"/>
-        <field name="crud_model_id" ref="product.model_product_template"/>
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-record.x_product_name_fleet.write({
-    'name': record.display_name,
-    'detailed_type' : 'product',
-    'rent_ok': 1,
-    'sale_ok': 0,
-    'image_1920': record.x_car_image_upload
-})
-        ]]></field>
-    </record>
     <record id="ir_act_update_the_hours" model="ir.actions.server">
         <field name="name">Update the Hours - Server Actions</field>
         <field name="model_id" ref="account.model_account_analytic_line"/>
         <field name="base_automation_id" ref="base_automation_update_hours"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-record.write({
-    'unit_amount': record.x_total_km
-})
-        ]]></field>
-    </record>
-    <record id="ir_act_update_stage_when_in_service" model="ir.actions.server">
-        <field name="name">Update Stage When In Service - Server Actions</field>
-        <field name="model_id" ref="fleet.model_fleet_vehicle_log_services"/>
-        <field name="base_automation_id" ref="base_automation_when_in_service"/>
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-record.write({
-    'x_vehicle_status': env.ref('car_rental.fleet_vehicle_state_5').id
-})
-        ]]></field>
-    </record>
-    <record id="ir_act_update_stage_when_service_done" model="ir.actions.server">
-        <field name="name">Update Stage When Service Is Done - Server Actions</field>
-        <field name="model_id" ref="fleet.model_fleet_vehicle_log_services"/>
-        <field name="base_automation_id" ref="base_automation_when_service_is_done"/>
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-record.write({
-    'x_vehicle_status': env.ref('fleet.fleet_vehicle_state_registered').id
-})
-        ]]></field>
-    </record>
-    <record id="ir_act_update_status_when_returned" model="ir.actions.server">
-        <field name="name">Update Car Status When Returned - Server Actions</field>
-        <field name="model_id" ref="sale.model_sale_order_line"/>
-        <field name="base_automation_id" ref="base_automation_when_returned"/>
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-record.write({
-    'x_car_status': env.ref('fleet.fleet_vehicle_state_registered').id
-})
+record.write({'unit_amount': record.x_total_km})
         ]]></field>
     </record>
     <record id="ir_act_update_stage_when_pickedup" model="ir.actions.server">
@@ -77,17 +17,6 @@ record.write({
         <field name="code"><![CDATA[
 record.write({
     'x_car_status': env.ref('car_rental.fleet_vehicle_state_6').id
-})
-        ]]></field>
-    </record>
-    <record id="ir_act_update_status_when_booked" model="ir.actions.server">
-        <field name="name">Update Car Status When Booked - Server Actions</field>
-        <field name="model_id" ref="sale.model_sale_order_line"/>
-        <field name="base_automation_id" ref="base_automation_when_car_booked"/>
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-record.write({
-    'x_car_status': env.ref('fleet.fleet_vehicle_state_downgraded').id
 })
         ]]></field>
     </record>
