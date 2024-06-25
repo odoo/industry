@@ -8,19 +8,19 @@
                         <div>
                             <div class="row mb-3" style="page-break-inside: avoid">
                                 <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">Done on </div>
-                                <div t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-7 col-12'" t-field="worksheet.x_studio_done_on"/>
+                                <div t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-7 col-12'" t-field="worksheet.x_done_on"/>
                             </div>
                             <div class="row mb-3" style="page-break-inside: avoid">
                                 <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">No trees hiding the billboard</div>
-                                <i t-att-class="'col-lg-7 col-12 fa ' + ('fa-check-square' if worksheet.x_studio_no_trees_hiding_the_billboard else 'fa-square-o')"/>
+                                <i t-att-class="'col-lg-7 col-12 fa ' + ('fa-check-square' if worksheet.x_no_trees_hiding_the_billboard else 'fa-square-o')"/>
                             </div>
                             <div class="row mb-3" style="page-break-inside: avoid">
                                 <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">Frame in good state</div>
-                                <i t-att-class="'col-lg-7 col-12 fa ' + ('fa-check-square' if worksheet.x_studio_frame_in_good_state else 'fa-square-o')"/>
+                                <i t-att-class="'col-lg-7 col-12 fa ' + ('fa-check-square' if worksheet.x_frame_in_good_state else 'fa-square-o')"/>
                             </div>
                             <div class="row mb-3" style="page-break-inside: avoid">
                                 <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">All lights working </div>
-                                <i t-att-class="'col-lg-7 col-12 fa ' + ('fa-check-square' if worksheet.x_studio_all_lights_working else 'fa-square-o')"/>
+                                <i t-att-class="'col-lg-7 col-12 fa ' + ('fa-check-square' if worksheet.x_all_lights_working else 'fa-square-o')"/>
                             </div>
                             <div class="row mb-3" style="page-break-inside: avoid">
                                 <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">Extra Comments</div>
@@ -28,7 +28,7 @@
                             </div>
                             <div class="row mb-3" style="page-break-inside: avoid">
                                 <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-5 col-12') + ' font-weight-bold'">Billboard Photo</div>
-                                <div widget="image" t-options-widget="'image'" t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-7 col-12'" t-field="worksheet.x_studio_billboard_photo"/>
+                                <div widget="image" t-options-widget="'image'" t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-7 col-12'" t-field="worksheet.x_billboard_photo"/>
                             </div>
                         </div>
                     </div>
@@ -43,8 +43,8 @@
         <field name="arch" type="xml">
             <data>
                 <xpath expr="//search[1]/separator[1]" position="after">
-                    <filter domain="[(&quot;x_studio_state&quot;, &quot;=&quot;, True)]" name="studio_filter_4vd_1i03rt0ui" string="Available"/>
-                    <filter domain="[(&quot;x_studio_state&quot;, &quot;=&quot;, False)]" name="studio_filter_8re_1i03rtl31" string="Busy"/>
+                    <filter domain="[(&quot;x_state&quot;, &quot;=&quot;, True)]" name="studio_filter_4vd_1i03rt0ui" string="Available"/>
+                    <filter domain="[(&quot;x_state&quot;, &quot;=&quot;, False)]" name="studio_filter_8re_1i03rtl31" string="Busy"/>
                     <separator name="studio_separator_2kh_1i03rt4kp"/>
                 </xpath>
             </data>
@@ -60,24 +60,21 @@
         <field name="arch" type="xml">
             <data>
                 <xpath expr="//kanban[1]/field[@name='display_name']" position="after">
-                    <!--<div name="address" class="me2 fa fa-fw fa-map-marker" invisible="not x_studio_city" t-attf-class="#{!selection_mode ? 'text-center' : ''}">
-        <field name="x_studio_city"/>
-        </div>-->
-                    <field name="x_studio_state" invisible="1"/>
-                    <field name="x_studio_address" invisible="1"/>
+                    <field name="x_state" invisible="1"/>
+                    <field name="x_address" invisible="1"/>
                 </xpath>
                 <xpath expr="//kanban[1]/templates[1]/t[1]/div[1]/div[1]/strong[1]" position="before">
-                    <div class="ribbon ribbon-top-right" invisible="x_studio_state and x_studio_address" name="studio_div_46b54e">
+                    <div class="ribbon ribbon-top-right" invisible="x_state and x_address" name="studio_div_46b54e">
                         <span class="text-bg-danger">Busy</span>
                     </div>
-                    <div class="ribbon ribbon-top-right" invisible="not x_studio_state and x_studio_address" name="studio_div_51aef6">
+                    <div class="ribbon ribbon-top-right" invisible="not x_state and x_address" name="studio_div_51aef6">
                         <span class="text-bg-success">Available</span>
                     </div>
                 </xpath>
                 <xpath expr="//kanban[1]/templates[1]/t[1]/div[1]/div[1]/strong[1]/span[1]/field[@name='display_name']/../.." position="after">
-                    <div invisible="not x_studio_city">
+                    <div invisible="not x_city">
                         <i class="fa fa-map-marker me-2"/>
-                        <field class="d-inline" name="x_studio_city" display="full"/>
+                        <field class="d-inline" name="x_city" display="full"/>
                     </div>
                 </xpath>
             </data>
@@ -93,15 +90,15 @@
         <field name="arch" type="xml">
             <data>
                 <xpath expr="//div[@name='button_box']" position="after">
-                    <widget name="web_ribbon" title="Busy" bg_color="text-bg-danger" invisible="x_studio_state"/>
-                    <widget name="web_ribbon" title="Available" bg_color="text-bg-success" invisible="not x_studio_state and x_studio_address"/>
+                    <widget name="web_ribbon" title="Busy" bg_color="text-bg-danger" invisible="x_state"/>
+                    <widget name="web_ribbon" title="Available" bg_color="text-bg-success" invisible="not x_state and x_address"/>
                 </xpath>
                 <xpath expr="//field[@name='active']" position="after">
-                    <field name="x_studio_address" widget="res_partner_many2one" context="{'show_address': 1}"/>
-                    <field name="x_studio_city" string="City" invisible="True"/>
+                    <field name="x_address" widget="res_partner_many2one" context="{'show_address': 1}"/>
+                    <field name="x_city" string="City" invisible="True"/>
                 </xpath>
                 <xpath expr="//field[@name='plan_id']" position="before">
-                    <field name="x_studio_state" string="Available"/>
+                    <field name="x_state" string="Available"/>
                     <xpath expr="//field[@name='partner_id']" position="move"/>
                 </xpath>
                 <xpath expr="//field[@name='plan_id']" position="after">
@@ -110,16 +107,16 @@
                 <xpath expr="//group[@name='main']" position="after">
                     <notebook name="studio_notebook_2bd_1i03pderc">
                         <page string="Subscription" name="studio_page_2bd">
-                            <field name="x_studio_orders"/>
+                            <field name="x_orders"/>
                         </page>
                         <page string="Technical Details " name="studio_page_2fk_1i03pjqfk">
                             <group name="studio_group_2fk">
                                 <group name="studio_group_2fk_left">
-                                    <field name="x_studio_width_m"/>
-                                    <field name="x_studio_height_m"/>
+                                    <field name="x_width_m"/>
+                                    <field name="x_height_m"/>
                                 </group>
                                 <group name="studio_group_2fk_right">
-                                    <field name="x_studio_frame"/>
+                                    <field name="x_frame"/>
                                 </group>
                             </group>
                         </page>
@@ -143,12 +140,12 @@
         <field name="arch" type="xml">
             <data>
                 <xpath expr="//map[1]" position="attributes">
-                    <attribute name="res_partner">x_studio_address</attribute>
+                    <attribute name="res_partner">x_address</attribute>
                 </xpath>
                 <xpath expr="//map[1]" position="inside">
-                    <field name="x_studio_width_m" string="Width (m)"/>
-                    <field name="x_studio_height_m" string="Height (m)"/>
-                    <field name="x_studio_frame" string="Frame"/>
+                    <field name="x_width_m" string="Width (m)"/>
+                    <field name="x_height_m" string="Height (m)"/>
+                    <field name="x_frame" string="Frame"/>
                 </xpath>
             </data>
         </field>
@@ -184,7 +181,7 @@
         <field name="arch" type="xml">
             <data>
                 <xpath expr="//span[@name='address_name']" position="before">
-                    <field name="x_studio_is_a_billboard"/>
+                    <field name="x_is_a_billboard"/>
                 </xpath>
             </data>
         </field>
@@ -202,7 +199,7 @@
                     <xpath expr="//field[@name='analytic_account_id']" position="move"/>
                 </xpath>
                 <xpath expr="//field[@name='analytic_account_id']" position="attributes">
-                    <attribute name="domain">["&amp;", ("x_studio_address", "!=", False), ("x_studio_state", "=", True)]</attribute>
+                    <attribute name="domain">["&amp;", ("x_address", "!=", False), ("x_state", "=", True)]</attribute>
                     <attribute name="groups"/>
                     <attribute name="string">Billboard</attribute>
                 </xpath>
@@ -236,16 +233,16 @@
         <field name="arch" type="xml">
             <data>
                 <xpath expr="//field[@name='x_comments']" position="before">
-                    <field name="x_studio_done_on"/>
-                    <field name="x_studio_no_trees_hiding_the_billboard"/>
-                    <field name="x_studio_frame_in_good_state"/>
-                    <field name="x_studio_all_lights_working"/>
+                    <field name="x_done_on"/>
+                    <field name="x_no_trees_hiding_the_billboard"/>
+                    <field name="x_frame_in_good_state"/>
+                    <field name="x_all_lights_working"/>
                 </xpath>
                 <xpath expr="//field[@name='x_comments']" position="attributes">
                     <attribute name="string">Extra Comments</attribute>
                 </xpath>
                 <xpath expr="//field[@name='x_comments']" position="after">
-                    <field widget="image" name="x_studio_billboard_photo"/>
+                    <field widget="image" name="x_billboard_photo"/>
                 </xpath>
             </data>
         </field>

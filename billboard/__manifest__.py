@@ -45,6 +45,8 @@ It contains the apps created with Studio and the customizations of existing apps
         'data/sale_order_template_line.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/knowledge_article_favorite.xml',
+        'data/mail_message.xml',
     ],
     'demo': [
         'demo/website.xml',
