@@ -34,6 +34,7 @@ It contains the apps created with Studio and the customizations of existing apps
         'data/ir_rule.xml',
         'data/product_category.xml',
         'data/worksheet_template.xml',
+        'data/ir_model_data.xml',
         'data/uom_category.xml',
         'data/uom_uom.xml',
         'data/account_analytic_account.xml',
