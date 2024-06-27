@@ -21,6 +21,7 @@ It contains the apps created with Studio and the customizations of existing apps
         'worksheet',
     ],
     'data': [
+        'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/res_groups.xml',
         'data/ir_model.xml',
@@ -54,7 +55,6 @@ It contains the apps created with Studio and the customizations of existing apps
         'demo/res_partner.xml',
         'demo/account_analytic_plan.xml',
         'demo/account_analytic_account.xml',
-        'demo/project_project.xml',
         'demo/hr_employee.xml',
         'demo/crm_team.xml',
         'demo/crm_stage.xml',
