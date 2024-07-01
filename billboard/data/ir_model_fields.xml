@@ -1,22 +1,29 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="extra_comments_billb_1c9093e1-d6c6-4348-a72c-b783bda6a0b8" model="ir.model.fields">
-        <field name="ttype">html</field>
-        <field name="field_description">Extra Comments</field>
-        <field name="model_id" ref="model_worksheet_template_2"/>
+    <record id="extra_comments_field" model="ir.model.fields">
         <field name="name">x_comments</field>
+        <field name="field_description">Extra Comments</field>
+        <field name="ttype">html</field>
+        <field name="model_id" ref="model_worksheet_template_2"/>
         <field name="on_delete" eval="False"/>
     </record>
-    <record id="new_one2many_analyti_3e251572-72c8-4c3d-b15d-8b3a08d50897" model="ir.model.fields">
-        <field name="ttype">one2many</field>
-        <field name="field_description">Orders</field>
-        <field name="model_id" ref="analytic.model_account_analytic_account"/>
+    <record id="x_orders_field" model="ir.model.fields">
         <field name="name">x_orders</field>
+        <field name="field_description">Orders</field>
+        <field name="ttype">one2many</field>
+        <field name="model_id" ref="analytic.model_account_analytic_account"/>
         <field name="on_delete" eval="False"/>
         <field name="relation">sale.order</field>
         <field name="relation_field">analytic_account_id</field>
     </record>
-    <record id="new_checkbox_analyti_cbdb6eec-6151-4fc8-bf1e-d3e8846b84b2" model="ir.model.fields">
+    <record id="x_state_field" model="ir.model.fields">
+        <field name="name">x_state</field>
+        <field name="field_description">Available</field>
+        <field name="ttype">boolean</field>
+        <field name="depends">x_orders</field>
+        <field name="model_id" ref="analytic.model_account_analytic_account"/>
+        <field name="on_delete" eval="False"/>
+        <field name="readonly" eval="True"/>
         <field name="compute"><![CDATA[for record in self:
         sales_orders = self.env['sale.order'].search([('analytic_account_id', '=', record.id)])
         #account.has_ongoing_orders = any(order.subscription_state == 'ongoing' for order in sales_orders)
@@ -25,148 +32,141 @@
              record['x_state'] = False
         else:
                 record['x_state'] = True]]></field>
-        <field name="ttype">boolean</field>
-        <field name="depends">x_orders</field>
-        <field name="field_description">Available</field>
-        <field name="model_id" ref="analytic.model_account_analytic_account"/>
-        <field name="name">x_state</field>
-        <field name="on_delete" eval="False"/>
-        <field name="readonly" eval="True"/>
     </record>
-    <record id="new_checkbox_billboa_0ff373ce-97c9-49b0-8b26-b588c22b66ea" model="ir.model.fields">
-        <field name="ttype">boolean</field>
-        <field name="field_description">No trees hiding the billboard</field>
-        <field name="model_id" ref="model_worksheet_template_2"/>
+    <record id="x_no_trees_hiding_the_billboard_field" model="ir.model.fields">
         <field name="name">x_no_trees_hiding_the_billboard</field>
+        <field name="field_description">No trees hiding the billboard</field>
+        <field name="ttype">boolean</field>
+        <field name="model_id" ref="model_worksheet_template_2"/>
         <field name="on_delete" eval="False"/>
     </record>
-    <record id="new_checkbox_billboa_1b2a9ba3-5371-4ef9-a0f6-92cd0d72c5d6" model="ir.model.fields">
-        <field name="ttype">boolean</field>
-        <field name="field_description">Frame in good state</field>
-        <field name="model_id" ref="model_worksheet_template_2"/>
+    <record id="x_frame_in_good_state_field" model="ir.model.fields">
         <field name="name">x_frame_in_good_state</field>
+        <field name="field_description">Frame in good state</field>
+        <field name="ttype">boolean</field>
+        <field name="model_id" ref="model_worksheet_template_2"/>
         <field name="on_delete" eval="False"/>
     </record>
-    <record id="new_checkbox_billboa_74e474bd-3744-40ac-a311-ef527bc66986" model="ir.model.fields">
-        <field name="ttype">boolean</field>
-        <field name="field_description">All lights working </field>
-        <field name="model_id" ref="model_worksheet_template_2"/>
+    <record id="x_all_lights_working_field" model="ir.model.fields">
         <field name="name">x_all_lights_working</field>
-        <field name="on_delete" eval="False"/>
-    </record>
-    <record id="new_checkbox_contact_9b1a7498-51e1-41f8-8184-5faca24192f9" model="ir.model.fields">
+        <field name="field_description">All lights working </field>
         <field name="ttype">boolean</field>
-        <field name="field_description">Is a Billboard</field>
-        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="model_id" ref="model_worksheet_template_2"/>
+        <field name="on_delete" eval="False"/>
+    </record>
+    <record id="x_is_a_billboard_field" model="ir.model.fields">
         <field name="name">x_is_a_billboard</field>
+        <field name="field_description">Is a Billboard</field>
+        <field name="ttype">boolean</field>
+        <field name="model_id" ref="base.model_res_partner"/>
         <field name="on_delete" eval="False"/>
     </record>
-    <record id="new_datetime_billboa_90c1945a-3385-4086-8644-b0a9e060b78f" model="ir.model.fields">
-        <field name="ttype">datetime</field>
-        <field name="field_description">Done on </field>
-        <field name="model_id" ref="model_worksheet_template_2"/>
+    <record id="x_done_on_field" model="ir.model.fields">
         <field name="name">x_done_on</field>
-        <field name="on_delete" eval="False"/>
-    </record>
-    <record id="new_decimal_analytic_3402355d-378f-42e2-900e-3440c764864e" model="ir.model.fields">
-        <field name="ttype">float</field>
-        <field name="field_description">Height (m)</field>
-        <field name="model_id" ref="analytic.model_account_analytic_account"/>
-        <field name="name">x_height_m</field>
-        <field name="on_delete" eval="False"/>
-    </record>
-    <record id="new_decimal_analytic_56600be0-ff35-4d4e-9ded-2c37c4b9cb41" model="ir.model.fields">
-        <field name="ttype">float</field>
-        <field name="field_description">Width (m)</field>
-        <field name="model_id" ref="analytic.model_account_analytic_account"/>
-        <field name="name">x_width_m</field>
-        <field name="on_delete" eval="False"/>
-    </record>
-    <record id="new_image_billboard__e98f20ed-e20a-4570-b539-752e7989110b" model="ir.model.fields">
-        <field name="ttype">binary</field>
-        <field name="field_description">Billboard Photo</field>
+        <field name="field_description">Done on </field>
+        <field name="ttype">datetime</field>
         <field name="model_id" ref="model_worksheet_template_2"/>
-        <field name="name">x_billboard_photo</field>
         <field name="on_delete" eval="False"/>
     </record>
-    <record id="new_many2one_analyti_30ba4d51-5c3c-4e19-8258-0d5ad66903e7" model="ir.model.fields">
-        <field name="ttype">many2one</field>
-        <field name="field_description">Address</field>
+    <record id="x_height_m_field" model="ir.model.fields">
+        <field name="name">x_height_m</field>
+        <field name="field_description">Height (m)</field>
+        <field name="ttype">float</field>
         <field name="model_id" ref="analytic.model_account_analytic_account"/>
+        <field name="on_delete" eval="False"/>
+    </record>
+    <record id="x_width_m_field" model="ir.model.fields">
+        <field name="name">x_width_m</field>
+        <field name="field_description">Width (m)</field>
+        <field name="ttype">float</field>
+        <field name="model_id" ref="analytic.model_account_analytic_account"/>
+        <field name="on_delete" eval="False"/>
+    </record>
+    <record id="x_billboard_photo_field" model="ir.model.fields">
+        <field name="name">x_billboard_photo</field>
+        <field name="field_description">Billboard Photo</field>
+        <field name="ttype">binary</field>
+        <field name="model_id" ref="model_worksheet_template_2"/>
+        <field name="on_delete" eval="False"/>
+    </record>
+    <record id="x_address_field" model="ir.model.fields">
         <field name="name">x_address</field>
+        <field name="field_description">Address</field>
+        <field name="ttype">many2one</field>
+        <field name="model_id" ref="analytic.model_account_analytic_account"/>
         <field name="relation">res.partner</field>
     </record>
-    <record id="new_many2one_sales_o_1a502dc5-f1e1-462d-a04e-13071f06a065" model="ir.model.fields">
+    <record id="x_billboard_field" model="ir.model.fields">
+        <field name="name">x_billboard</field>
         <field name="ttype">many2one</field>
         <field name="field_description">Billboard</field>
         <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="name">x_billboard</field>
         <field name="relation">account.analytic.account</field>
     </record>
-    <record id="new_related_field_an_3b1b5d83-04e5-4218-932e-6a2d760e016a" model="ir.model.fields">
+    <record id="x_city_field" model="ir.model.fields">
+        <field name="name">x_city</field>
+        <field name="field_description">City</field>
         <field name="related">x_address.city</field>
         <field name="ttype">char</field>
-        <field name="field_description">City</field>
         <field name="model_id" ref="analytic.model_account_analytic_account"/>
-        <field name="name">x_city</field>
         <field name="on_delete" eval="False"/>
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
     </record>
-    <record id="new_selection_analyt_81bac599-19b9-4fa4-b371-a51df0007f11" model="ir.model.fields">
-        <field name="ttype">selection</field>
-        <field name="field_description">Frame</field>
-        <field name="model_id" ref="analytic.model_account_analytic_account"/>
+    <record id="x_frame_field" model="ir.model.fields">
         <field name="name">x_frame</field>
+        <field name="field_description">Frame</field>
+        <field name="ttype">selection</field>
+        <field name="model_id" ref="analytic.model_account_analytic_account"/>
         <field name="on_delete" eval="False"/>
         <field name="selection">[('Iron', 'Iron'), ('Wood', 'Wood'), ('Aluminium', 'Aluminium'), ('Plastic', 'Plastic')]</field>
     </record>
     <record id="ir_model_fields_10886" model="ir.model.fields">
-        <field name="ttype">many2one</field>
-        <field name="field_description">Task</field>
-        <field name="model_id" ref="model_worksheet_template_1"/>
         <field name="name">x_project_task_id</field>
+        <field name="field_description">Task</field>
+        <field name="ttype">many2one</field>
+        <field name="model_id" ref="model_worksheet_template_1"/>
         <field name="on_delete">cascade</field>
         <field name="relation">project.task</field>
         <field name="required" eval="True"/>
     </record>
     <record id="ir_model_fields_10887" model="ir.model.fields">
-        <field name="ttype">html</field>
-        <field name="field_description">Comments</field>
-        <field name="model_id" ref="model_worksheet_template_1"/>
         <field name="name">x_comments</field>
+        <field name="field_description">Comments</field>
+        <field name="ttype">html</field>
+        <field name="model_id" ref="model_worksheet_template_1"/>
         <field name="on_delete" eval="False"/>
     </record>
     <record id="ir_model_fields_10888" model="ir.model.fields">
+        <field name="name">x_name</field>
+        <field name="field_description">Name</field>
         <field name="related">x_project_task_id.name</field>
         <field name="ttype">char</field>
-        <field name="field_description">Name</field>
         <field name="model_id" ref="model_worksheet_template_1"/>
-        <field name="name">x_name</field>
         <field name="on_delete" eval="False"/>
     </record>
     <record id="ir_model_fields_11289" model="ir.model.fields">
-        <field name="ttype">many2one</field>
-        <field name="field_description">Billboards </field>
-        <field name="model_id" ref="analytic.model_account_analytic_line"/>
         <field name="name">x_plan2_id_1</field>
+        <field name="field_description">Billboards </field>
+        <field name="ttype">many2one</field>
+        <field name="model_id" ref="analytic.model_account_analytic_line"/>
         <field name="relation">account.analytic.account</field>
     </record>
     <record id="ir_model_fields_11305" model="ir.model.fields">
-        <field name="ttype">many2one</field>
-        <field name="field_description">Task</field>
-        <field name="model_id" ref="model_worksheet_template_2"/>
         <field name="name">x_project_task_id</field>
+        <field name="field_description">Task</field>
+        <field name="ttype">many2one</field>
+        <field name="model_id" ref="model_worksheet_template_2"/>
         <field name="on_delete">cascade</field>
         <field name="relation">project.task</field>
         <field name="required" eval="True"/>
     </record>
     <record id="ir_model_fields_11307" model="ir.model.fields">
+        <field name="name">x_name</field>
+        <field name="field_description">Name</field>
         <field name="related">x_project_task_id.name</field>
         <field name="ttype">char</field>
-        <field name="field_description">Name</field>
         <field name="model_id" ref="model_worksheet_template_2"/>
-        <field name="name">x_name</field>
         <field name="on_delete" eval="False"/>
     </record>
 </odoo>
