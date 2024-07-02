@@ -40,6 +40,7 @@ This setup is for bakery shop companies selling to consumers. Bakery are busines
         'demo/sale_order.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
+        'demo/payment_provider_demo_post.xml',
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
