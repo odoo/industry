@@ -79,6 +79,7 @@ This Services can be avail directly from the airport and individuals can also pu
         'demo/purchase_order_confirm.xml',
         'demo/planning_slot.xml',
         'demo/website_theme_apply.xml',
+        'demo/payment_provider_demo_post.xml',
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
