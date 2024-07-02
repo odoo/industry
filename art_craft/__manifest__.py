@@ -67,6 +67,7 @@
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
+        'demo/payment_provider_demo_post.xml',
         'demo/website_views.xml',
         'demo/website_ir_attachment.xml',
         'demo/website.xml',
