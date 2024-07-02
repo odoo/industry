@@ -44,6 +44,7 @@
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
         'demo/website_attachment.xml',
+        'demo/payment_provider_demo_post.xml',
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
