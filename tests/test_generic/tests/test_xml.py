@@ -101,6 +101,11 @@ class TestEnv(IndustryCase):
                 message += "Got '%s'." % first_line
             _logger.warning(message)
         dependency_list = literal_eval(s)['depends']
+        if 'payment_demo' in dependency_list:
+            _logger.warning(
+                "'payment_demo' should not be in the dependencies. Instead, call "
+                "'button_immediate_install' on 'base.module_payment_demo' in demo."
+            )
         base_automation = (
             'base_automation' in dependency_list and 'sale_subscription' not in dependency_list
         )
