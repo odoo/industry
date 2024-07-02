@@ -9,7 +9,6 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
         'account_followup',
         'knowledge',
         'loyalty',
-        'payment_demo',
         'pos_sale',
         'pos_discount',
         'product_expiry',
@@ -39,7 +38,6 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
-        'data/payment_provider.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -55,6 +53,7 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
         'demo/purchase_order_post.xml',
         'demo/sale_order_post.xml',
         'demo/pos_payment_method.xml',
+        'demo/payment_provider_demo_post.xml',
         'demo/payment_provider.xml',
         'demo/payment_method.xml',
         'demo/pos_config.xml',
