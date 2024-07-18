@@ -43,6 +43,8 @@ focusing on accurate quoting, efficient planning, seamless execution, and excell
     'demo': [
         'demo/res_partner.xml',
         'demo/hr_employee.xml',
+        'demo/fleet_cars_data.xml',
+        'demo/fleet_vehicle.xml',
         'demo/account_analytic_account.xml',
         'demo/crm_lead.xml',
         'demo/sale_order.xml',
