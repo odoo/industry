@@ -38,6 +38,7 @@ This module sets up a furniture store for selling furniture like chairs, sofas, 
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -61,6 +62,15 @@ This module sets up a furniture store for selling furniture like chairs, sofas, 
         'demo/payment_provider_demo_post.xml',
     ],
     'license': 'OPL-1',
+    'assets': {
+        'web.assets_backend': [
+            'furniture_store/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
+    ],
     'images': ['images/main.png'],
 }

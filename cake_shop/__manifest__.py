@@ -26,6 +26,7 @@ This setup is for bakery store companies selling to consumers. Bakery are busine
         'data/mrp_bom.xml',
         'data/mrp_bom_line.xml',
         'data/res_config_settings.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/ir_attachment.xml',
@@ -42,6 +43,15 @@ This setup is for bakery store companies selling to consumers. Bakery are busine
         'demo/payment_provider_demo_post.xml',
     ],
     'license': 'OPL-1',
+    'assets': {
+        'web.assets_backend': [
+            'cake_shop/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
+    ],
     'images': ['images/main.png'],
 }

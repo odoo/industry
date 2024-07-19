@@ -51,6 +51,7 @@
         'data/mail_message.xml',
         'data/website_view.xml',
         'data/ir_model_data.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -75,6 +76,15 @@
         'demo/website_theme_apply.xml',
     ],
     'license': 'OPL-1',
+    'assets': {
+        'web.assets_backend': [
+            'art_craft/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
+    ],
     'images': ['images/main.png'],
 }

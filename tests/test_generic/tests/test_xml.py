@@ -34,7 +34,7 @@ class TestEnv(IndustryCase):
             for file_name in files:
                 file_path = os.path.join(root, file_name)
                 ext = os.path.splitext(file_path)[1].lower()
-                if 'static/' in file_path:
+                if 'static/' in file_path and 'src/js' not in file_path:
                     static_files.add(os.path.relpath(file_path, start=get_industry_path()))
                 if ext not in ['.py', '.xml']:
                     continue
@@ -148,6 +148,7 @@ class TestEnv(IndustryCase):
             "<?xml version='1.0' encoding=\"UTF-8\"?>",
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
             "<?xml version=\"1.0\" encoding='UTF-8'?>",
+            "<?xml version=\"1.0\" encoding=\"utf-8\"?>",
         ]
         first_line = s.split('\n')[0]
         if not any(first_line == start_line for start_line in starts_with):

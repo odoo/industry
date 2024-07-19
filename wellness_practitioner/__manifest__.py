@@ -20,15 +20,24 @@ This module is designed for wellness practitioners, offering a complete solution
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
-        'data/ir_model_data.xml',
         'data/base_automation.xml',
         'data/mail_message.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
     ],
-    'images': ['images/main.png'],
+    'assets': {
+        'web.assets_backend': [
+            'wellness_practitioner/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
+    'images': ['images/main.png'],
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
+    ],
     'license': 'OPL-1',
 }

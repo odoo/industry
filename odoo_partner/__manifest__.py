@@ -33,8 +33,8 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/appointment_type.xml',
-        'data/ir_model_data.xml',
         'data/res_config_settings.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -48,7 +48,16 @@
         'demo/timesheet.xml',
         'demo/project_project.xml',
     ],
-    'license': 'OPL-1',
+    'assets': {
+        'web.assets_backend': [
+            'odoo_partner/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
+    ],
+    'license': 'OPL-1',
     'images': ['images/main.png'],
 }

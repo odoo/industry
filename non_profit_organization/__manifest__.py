@@ -34,6 +34,7 @@
         'data/res_config_settings.xml',
         'data/website_view.xml',
         'data/ir_model_data.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/event_event.xml',
@@ -47,6 +48,15 @@
         'demo/payment_provider_demo_post.xml',
     ],
     'license': 'OPL-1',
+    'assets': {
+        'web.assets_backend': [
+            'non_profit_organization/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
+    ],
     'images': ['images/main.png'],
 }
