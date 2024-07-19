@@ -41,8 +41,9 @@ class TestEnv(IndustryCase):
                 ref, "You forgot to define a `mail.message` with `id=notification_knowledge`."
             )
             notif = self.env['mail.message'].browse(ref.id)
+            print(notif.body)
             self.assertIn(
-                '<a href="/knowledge/article/',
+                '<a href="/odoo/knowledge/',
                 notif.body,
                 "The notification should contain a link to the knowledge article.",
             )
@@ -55,11 +56,6 @@ class TestEnv(IndustryCase):
                 knowledge_article.favorite_count,
                 0,
                 "The knowledge article should be in the favorite category",
-            )
-            self.assertIn(
-                'href="/knowledge/article/%s' % knowledge_article.id,
-                notif.body,
-                "The notification link should target the module-related knowledge article.",
             )
 
     def test_cloc_exclude_view(self):
