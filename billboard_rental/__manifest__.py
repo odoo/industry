@@ -41,6 +41,7 @@ This industry caters to billboard rental businesses, specializing in managing ou
         'data/mail_message.xml',
         'data/appointment_type.xml',
         'data/ir_model_data.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/website.xml',
@@ -55,6 +56,15 @@ This industry caters to billboard rental businesses, specializing in managing ou
         'demo/website_theme_apply.xml',
     ],
     'license': 'OPL-1',
+    'assets': {
+        'web.assets_backend': [
+            'billboard_rental/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
+    ],
     'images': ['images/main.png'],
 }

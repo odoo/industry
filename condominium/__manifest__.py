@@ -49,6 +49,7 @@ Moreover, the business is legally regulated in lots of countries under different
         'data/x_buildings_tag.xml',
         'data/x_properties_types.xml',
         'data/x_properties_tag.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/account_analytic_account.xml',
@@ -66,6 +67,15 @@ Moreover, the business is legally regulated in lots of countries under different
         'demo/helpdesk_ticket.xml',
     ],
     'license': 'OPL-1',
+    'assets': {
+        'web.assets_backend': [
+            'condominium/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
+    ],
     'images': ['images/main.png'],
 }

@@ -45,6 +45,7 @@ schematic design, design development, worksite follow-up, energy efficiency asse
         'data/website_view.xml',
         'data/website_theme_apply.xml',
         'data/ir_model_data.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/website.xml',
@@ -59,6 +60,15 @@ schematic design, design development, worksite follow-up, energy efficiency asse
         'demo/hr_expense_action.xml',
     ],
     'license': 'OPL-1',
+    'assets': {
+        'web.assets_backend': [
+            'architects/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
+    ],
     'images': ['images/main.png'],
 }

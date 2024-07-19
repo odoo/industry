@@ -33,6 +33,7 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/appointment_type.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/website.xml',
@@ -51,6 +52,15 @@
         'demo/website_theme_apply.xml',
     ],
     'license': 'OPL-1',
+    'assets': {
+        'web.assets_backend': [
+            'hair_salon/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
+    ],
     'images': ['images/main.png'],
 }

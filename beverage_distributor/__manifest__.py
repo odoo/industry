@@ -45,10 +45,10 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/delivery_carrier.xml',
-        'data/ir_model_data.xml',
         'data/ir_attachment_post.xml',
         'data/pos_config.xml',
         'data/res_config_settings.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/website.xml',
@@ -73,6 +73,15 @@
         'demo/mail_activity.xml',
         'demo/delivery_carrier.xml',
         'demo/payment_provider_demo_post.xml',
+    ],
+    'assets': {
+        'web.assets_backend': [
+            'beverage_distributor/static/src/js/my_tour.js',
+        ]
+    },
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
     ],
     'license': 'OPL-1',
     'author': 'Odoo S.A.',
