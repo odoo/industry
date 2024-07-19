@@ -30,6 +30,7 @@ This module installs a configuration that presets the modules and configure Odoo
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/appointment_type.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/ir_attachment_post.xml',
@@ -47,6 +48,15 @@ This module installs a configuration that presets the modules and configure Odoo
         'demo/website_theme_apply.xml',
     ],
     'license': 'OPL-1',
+    'assets': {
+        'web.assets_backend': [
+            'industry_lawyer/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
+    ],
     'images': ['images/main.png'],
 }

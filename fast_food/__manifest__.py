@@ -26,7 +26,7 @@
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
-        'data/ir_model_data.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/pos_payment_method.xml',
@@ -45,6 +45,15 @@
         'demo/purchase_order_line.xml',
         'demo/purchase_order_post.xml',
         'demo/planning_slot.xml',
+    ],
+    'assets': {
+        'web.assets_backend': [
+            'fast_food/static/src/js/my_tour.js',
+        ]
+    },
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
     ],
     'license': 'OPL-1',
     'author': 'Odoo S.A.',

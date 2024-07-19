@@ -37,7 +37,7 @@
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
-        'data/ir_model_data.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -53,6 +53,15 @@
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
         'demo/purchase_order_confirm.xml',
+    ],
+    'assets': {
+        'web.assets_backend': [
+            'bookstore/static/src/js/my_tour.js',
+        ]
+    },
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
     ],
     'license': 'OPL-1',
     'author': 'Odoo S.A.',

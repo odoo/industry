@@ -27,7 +27,7 @@
         'data/product_template_attribute_value.xml',
         'data/product_product.xml',
         'data/quotation_template.xml',
-        "data/ir_model_data.xml",
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -47,6 +47,15 @@
         'demo/timesheet.xml',
     ],
     'license': 'OPL-1',
+    'assets': {
+        'web.assets_backend': [
+            'gardening/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
+    ],
     'images': ['images/main.png'],
 }
