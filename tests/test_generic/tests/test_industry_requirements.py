@@ -24,6 +24,20 @@ class TestEnv(IndustryCase):
                 "Call 'button_immediate_install' on 'base.module_payment_demo' in demo."
             )
 
+    def test_welcome_article_exists(self):
+        for module in self.installed_modules:
+            ref = self.env.ref(f"{module}.welcome_article", raise_if_not_found=False)
+            self.assertTrue(
+                ref, f"You forgot to define a record with id='welcome_article' in module '{module}'."
+            )
+
+    def test_welcome_article_body_exists(self):
+        for module in self.installed_modules:
+            ref = self.env.ref(f"{module}.welcome_article_body", raise_if_not_found=False)
+            self.assertTrue(
+                ref, f"You forgot to define a template with id='welcome_article_body' in module '{module}'."
+            )
+
     def test_knowledge_article_notification(self):
         for module in self.installed_modules:
             ref = self.env.ref(module + '.notification_knowledge', raise_if_not_found=False)
@@ -32,7 +46,7 @@ class TestEnv(IndustryCase):
             )
             notif = self.env['mail.message'].browse(ref.id)
             self.assertIn(
-                '<a href="/knowledge/article/',
+                '/knowledge/article/',
                 notif.body,
                 "The notification should contain a link to the knowledge article.",
             )
@@ -47,7 +61,7 @@ class TestEnv(IndustryCase):
                 "The knowledge article should be in the favorite category",
             )
             self.assertIn(
-                'href="/knowledge/article/%s' % knowledge_article.id,
+                '/knowledge/article/%s' % knowledge_article.id,
                 notif.body,
                 "The notification link should target the module-related knowledge article.",
             )

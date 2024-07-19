@@ -65,4 +65,13 @@
     'license': 'OPL-1',
     'author': 'Odoo S.A.',
     'images': ['images/main.png'],
+    'assets': {
+        'web.assets_backend': [
+            'sports_club/static/src/js/my_tour.js',
+        ]
+    },
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
+    ],
 }

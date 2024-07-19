@@ -52,6 +52,15 @@ It may include surveying of building properties and the measurement of completed
         'demo/website_ir_attachment.xml',
     ],
     'license': 'OPL-1',
+    'assets': {
+        'web.assets_backend': [
+            'surveyor/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
     'images': ['images/main.png'],
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
+    ],
 }

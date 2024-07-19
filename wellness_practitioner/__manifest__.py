@@ -28,7 +28,15 @@ This module is designed for wellness practitioners, offering a complete solution
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
     ],
-    'images': ['images/main.png'],
+    'assets': {
+        'web.assets_backend': [
+            'wellness_practitioner/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
+    'images': ['images/main.png'],
+    "cloc_exclude": [
+        "static/src/js/my_tour.js",
+    ],
     'license': 'OPL-1',
 }

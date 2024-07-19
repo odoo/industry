@@ -60,6 +60,14 @@
         'demo/website_theme_apply.xml',
     ],
     'license': 'OPL-1',
+    'assets': {
+        'web.assets_backend': [
+            'industry_restaurant/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "static/src/js/my_tour.js",
+    ],
     'images': ['images/main.png'],
 }

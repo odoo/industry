@@ -65,6 +65,14 @@ This module is a complete solution for the bike leasing industry, simplifying le
         'demo/payment_provider_demo_post.xml',
     ],
     'license': 'OPL-1',
+    'assets': {
+        'web.assets_backend': [
+            'bike_leasing/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "static/src/js/my_tour.js",
+    ],
     'images': ['images/main.png'],
 }
