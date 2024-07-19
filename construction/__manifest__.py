@@ -36,6 +36,7 @@ focusing on accurate quoting, efficient planning, seamless execution, and excell
         'data/mail_message.xml',
         'data/mail_activity_type.xml',
         'data/hr_job.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/documents_folder.xml',
@@ -62,6 +63,15 @@ focusing on accurate quoting, efficient planning, seamless execution, and excell
         'demo/planning_slot.xml',
     ],
     'license': 'OPL-1',
+    'assets': {
+        'web.assets_backend': [
+            'construction/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
+    ],
     'images': ['images/main.png'],
 }

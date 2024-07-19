@@ -12,8 +12,10 @@ from .industry_case import IndustryCase, get_industry_path
 CATEGORIES = ('Services', 'Retail', 'Construction', 'Hospitality', 'Health and Fitness', 'Supply Chain')
 
 MANDATORY_KEYS = {
+    'assets': {},
     'author': 'Odoo S.A.',
     'category': '',
+    'cloc_exclude': [],
     'data': [],
     'demo': [],
     'description': '',
@@ -40,6 +42,7 @@ class ManifestTest(ManifestLinter, IndustryCase):
                 self._test_manifest_values(module, manifest_data)
                 self._test_files_in_manifest(module, manifest_data, 'data')
                 self._test_files_in_manifest(module, manifest_data, 'demo')
+                self._test_files_in_manifest(module, manifest_data, 'cloc_exclude')
                 self._test_dependencies(module, manifest_data)
 
     def _test_manifest_keys(self, module, manifest_data):

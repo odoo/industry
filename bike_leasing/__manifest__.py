@@ -48,6 +48,7 @@ This module is a complete solution for the bike leasing industry, simplifying le
         'data/website_view.xml',
         'data/payment_provider.xml',
         'data/ir_model_data.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/website.xml',
@@ -68,6 +69,15 @@ This module is a complete solution for the bike leasing industry, simplifying le
         'demo/helpdesk_ticket.xml',
     ],
     'license': 'OPL-1',
+    'assets': {
+        'web.assets_backend': [
+            'bike_leasing/static/src/js/my_tour.js',
+        ]
+    },
     'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
+    ],
     'images': ['images/main.png'],
 }
