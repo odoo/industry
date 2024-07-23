@@ -26,6 +26,7 @@ focusing on accurate quoting, efficient planning, seamless execution, and excell
         'data/documents_folder.xml',
         'data/res_config_settings.xml',
         'data/product_category.xml',
+        'data/project_task_type.xml',
         'data/project_project.xml',
         'data/ir_attachment_pre.xml',
         'data/uom_uom.xml',
