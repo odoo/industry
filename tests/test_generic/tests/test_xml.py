@@ -219,6 +219,7 @@ class TestEnv(IndustryCase):
         ]
         models_not_to_update = [
             "account.cash.rounding",
+            "appointment.resource",
             "appointment.type",
             "calendar.event",
             "crm.lead",
@@ -242,6 +243,7 @@ class TestEnv(IndustryCase):
             "loyalty.reward",
             "loyalty.rule",
             "mail.template",
+            "maintenance.equipment",
             "mrp.bom",
             "mrp.bom.line",
             "mrp.production",
