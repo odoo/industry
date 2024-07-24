@@ -20,6 +20,7 @@ The sales process involves creating sale orders, managing deliveries and invoici
         'theme_paptic',
     ],
     'data': [
+        'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
