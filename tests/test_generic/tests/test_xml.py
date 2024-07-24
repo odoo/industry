@@ -34,7 +34,7 @@ class TestEnv(IndustryCase):
             for file_name in files:
                 file_path = os.path.join(root, file_name)
                 ext = os.path.splitext(file_path)[1].lower()
-                if 'static/' in file_path and 'description' not in file_path:
+                if 'static/' in file_path:
                     static_files.add(os.path.relpath(file_path, start=get_industry_path()))
                 if ext not in ['.py', '.xml']:
                     continue
@@ -65,18 +65,17 @@ class TestEnv(IndustryCase):
                     if not is_studio_required:
                         is_studio_required = self._check_studio(content, file_name)
         self._check_manifest(manifest_content, is_studio_required)
-        in_use_files = set(file.lstrip('/') for file in in_use_files)
+        in_use_files = {file.lstrip('/') for file in in_use_files}
         for file in static_files - in_use_files:
-            _logger.warning(f"Unused static file {file}.")
+            if 'description' not in file:
+                _logger.warning("Unused static file: %s.", file)
         for file in in_use_files - static_files:
-            _logger.warning(f"No reference found for this file: {file}.")
+            _logger.warning("No reference found for this file: %s.", file)
 
     def _check_static_files_usage_in_xml(self, content, in_use_files):
         tree = etree.fromstring(content.encode('utf8'))
         for element in tree.iter():
-            file_names = set(
-                element.attrib.get(key) for key in ['file', 'src', 'data-original-src']
-            )
+            file_names = {element.attrib.get(key) for key in ['file', 'src', 'data-original-src']}
             if element.text:
                 if element.get("name") == "cover_properties":
                     file_names.update(re.findall(r"url\(['\"]?([^'\")]+)['\"]?\)", element.text))
