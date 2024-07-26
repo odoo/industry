@@ -13,18 +13,6 @@
     </record>
 
     <function name="create_invoices" model="sale.advance.payment.inv" eval="[ref('sale_advance_payment_inv_1')]"/>
-
-    <function name="action_post" model="account.move">
-        <value model="account.move" eval="[
-            obj().env.ref('construction.sale_order_1').invoice_ids.id,
-        ]"/>
-    </function>
-        <!-- create payment -->
-    <record id="account_payment_register_1" model="account.payment.register">
-        <field name="line_ids" model="account.move.line" eval="[Command.set([line.id for line in obj().env.ref('construction.sale_order_1').invoice_ids.line_ids if line.account_type in ('asset_receivable', 'liability_payable')])]"/>
-    </record>
-    <function name="action_create_payments" model="account.payment.register" eval="[ref('account_payment_register_1')]"/>
-
     
 
     <!-- Assign sale order 1's tasks and Tasks progress-->
