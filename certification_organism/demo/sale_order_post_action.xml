@@ -22,27 +22,6 @@
     <function model="sale.advance.payment.inv" name="create_invoices"
             eval="[ref('sale_advance_payment_inv_2')]"/>
 
-    <!-- Confirm invoice -->
-    <function model="account.move" name="action_post">
-        <value model="account.move" eval="(
-            obj().env.ref('certification_organism.sale_order_1').invoice_ids
-            | obj().env.ref('certification_organism.sale_order_4').invoice_ids
-        ).ids"/>
-    </function>
-
-    <!-- Create Payment of invoice -->
-    <record id="account_payment_register_1" model="account.payment.register">
-        <field name="line_ids" model="account.move.line" eval="[Command.set([line.id for line in obj().env.ref('certification_organism.sale_order_1').invoice_ids.line_ids if line.account_type in ('asset_receivable', 'liability_payable')])]"/>
-    </record>
-    <function model="account.payment.register" name="action_create_payments"
-            eval="[ref('account_payment_register_1')]"/>
-
-    <record id="account_payment_register_4" model="account.payment.register">
-        <field name="line_ids" model="account.move.line" eval="[Command.set([line.id for line in obj().env.ref('certification_organism.sale_order_4').invoice_ids.line_ids if line.account_type in ('asset_receivable', 'liability_payable')])]"/>
-    </record>
-    <function model="account.payment.register" name="action_create_payments"
-            eval="[ref('account_payment_register_4')]"/>
-
     <!-- Update Task -->
     <!-- sale order sale_order_1 -->
     <function model="project.task" name="write">

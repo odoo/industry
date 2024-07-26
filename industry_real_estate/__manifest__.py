@@ -63,7 +63,6 @@ Manage your properties, create and manage rental contracts, and streamline your 
         'demo/sale_order_confirm.xml',
         'demo/account_move.xml',
         'demo/account_move_line.xml',
-        'demo/account_move_confirm.xml',
         'demo/website_attachment.xml',
         'demo/website_views.xml',
         'demo/website_page.xml',
