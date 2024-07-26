@@ -7,23 +7,4 @@
     </function>
 
     <function model="purchase.order" name="action_create_invoice" eval="[ref('purchase_order_1')]"/>
-
-    <function model="account.move" name="write">
-        <value model="account.move" eval="obj().env.ref('hardware_shop.purchase_order_1').invoice_ids.ids"/>
-        <value eval="{'invoice_date': DateTime.today().date()}"/>
-    </function>
-
-    <function model="account.move" name="action_post"
-        eval="[obj().env.ref('hardware_shop.purchase_order_1').invoice_ids.ids]"/>
-
-    <record id="account_payment_register_1" model="account.payment.register">
-        <field name="line_ids" model="account.move.line" eval="[
-            Command.set([
-                line.id for line in obj().env.ref('hardware_shop.purchase_order_1').invoice_ids.line_ids
-                if line.account_type in ('asset_receivable', 'liability_payable')])
-        ]"/>
-    </record>
-    <function model="account.payment.register" name="action_create_payments"
-            eval="[ref('account_payment_register_1')]"/>
-
 </odoo>
