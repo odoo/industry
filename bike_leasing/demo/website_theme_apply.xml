@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <function name="_theme_load" model="ir.module.module" context="{'apply_new_theme': True}">
+        <value model="ir.module.module" eval="obj().env['ir.module.module'].search([('name', '=', 'theme_vehicle')]).ids"/>
+        <value model="ir.module.module" eval="obj().env.ref('website.default_website')"/>
+    </function>
+
+    <function name="write" model="ir.ui.view">
+        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('website.default_website').id).viewref('website.homepage').id"/>
+        <value model="ir.ui.view" eval="{'arch': obj().env.ref('bike_leasing.homepage').arch}"/>
+    </function>
+
+    <function model="website.menu" name="write">
+        <value model="website.menu" eval="obj().search([
+            ('website_id', '=', ref('website.default_website')),
+            ('url', '=', '/shop'),
+        ]).id"/>
+        <value eval="{'name': 'Bike Leasing'}"/>
+    </function>
+
+    <function model="website.menu" name="unlink">
+        <value model="website.menu" eval="obj().search([
+            ('website_id', '=', ref('website.default_website')),
+            ('url', '=', '/helpdesk/customer-care-1'),
+        ]).id"/>
+    </function>
+</odoo>
