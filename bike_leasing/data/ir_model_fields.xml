@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="x_auto_post_until_field" model="ir.model.fields">
+        <field name="name">x_auto_post_until</field>
+        <field name="field_description">Until</field>
+        <field name="ttype">date</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+    </record>
+    <record id="x_so_id_field" model="ir.model.fields">
+        <field name="name">x_so_id</field>
+        <field name="field_description">Sales Order</field>
+        <field name="ttype">many2one</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="relation">sale.order</field>
+    </record>
+    <record id="x_auto_post_pricelist_field" model="ir.model.fields">
+        <field name="name">x_auto_post_pricelist</field>
+        <field name="field_description">Recurring</field>
+        <field name="ttype">selection</field>
+        <field name="model_id" ref="product.model_product_pricelist"/>
+        <field name="selection">[('no', 'No'), ('monthly', 'Monthly'), ('quarterly', 'Quarterly'), ('yearly', 'Yearly')]</field>
+    </record>
+    <record id="x_auto_post_sale_order_field" model="ir.model.fields">
+        <field name="name">x_auto_post</field>
+        <field name="ttype">selection</field>
+        <field name="related">pricelist_id.x_auto_post_pricelist</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+    </record>
+    <record id="x_mrr_monetary_field" model="ir.model.fields">
+        <field name="name">x_mrr</field>
+        <field name="field_description">MRR</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="depends">order_line, pricelist_id, x_auto_post, amount_total</field>
+        <field name="ttype">monetary</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    if record.x_auto_post == 'monthly':
+        record['x_mrr'] = record.amount_untaxed
+    elif record.x_auto_post == 'quarterly':
+        record['x_mrr'] = record.amount_untaxed / 4
+    elif record.x_auto_post == 'yearly':
+        record['x_mrr'] = record.amount_untaxed / 12
+    else:
+        record['x_mrr'] = 0
+]]></field>
+        <field name="readonly" eval="True"/>
+        <field name="currency_field">currency_id</field>
+    </record>
+</odoo>
