@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="ir_act_server_601" model="ir.actions.server">
+        <field name="name">Execute Code</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for move in records:
+    if (sol := move.invoice_line_ids.sale_line_ids) and sol.order_id.pricelist_id.x_auto_post_pricelist:
+        move['auto_post'] = sol.order_id.pricelist_id.x_auto_post_pricelist
+        move['auto_post_until'] = sol.order_id.x_auto_post_until
+]]></field>
+    </record>
+    <record id="ir_act_server_730" model="ir.actions.server">
+        <field name="name">Execute Code</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for picking in records:
+    if picking.sale_id.x_auto_post_until:
+        env['mail.activity'].create([{
+            'res_model_id': env['ir.model']._get_id('stock.picking'),
+            'res_id': picking.id,
+            'activity_type_id': env.ref('mail.mail_activity_data_todo').id,
+            'summary': 'Return',
+            'date_deadline': picking.sale_id.x_auto_post_until,
+        }])
+]]></field>
+    </record>
+    <record id="ir_act_server_731" model="ir.actions.server">
+        <field name="name">Execute Code</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for move in records:
+    move['x_so_id'] = move.line_ids.filtered(lambda l: l.sale_line_ids != False)[0].sale_line_ids.order_id.id
+]]></field>
+    </record>
+</odoo>
