@@ -1,6 +1,6 @@
 {
     'name': 'Window Installation',
-    'version': '17.4',
+    'version': '1.0',
     'category': 'Services',
     'description': """
 This industry is ideal for window installation businesses proficient in managing projects from conception to completion,
@@ -16,8 +16,6 @@ focusing on accurate quoting, efficient planning, seamless execution, and excell
         'maintenance',
         'purchase_stock',
         'sale_crm',
-        'sale_margin',
-        'sale_project_forecast',
         'sign',
         'mrp',
     ],
