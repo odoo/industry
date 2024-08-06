@@ -64,6 +64,11 @@ focusing on accurate quoting, efficient planning, seamless execution, and excell
         'demo/planning_recurrency.xml',
         'demo/planning_slot.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'construction/static/src/**/*',
+        ]
+    },
     'license': 'OPL-1',
     'images': ['images/main.png'],
 }
