@@ -61,6 +61,7 @@ class TestEnv(IndustryCase):
                 self._check_website_published_false(module, file_name)
                 self._check_static_files_usage_in_xml(content, in_use_files)
                 if root.split('/')[-1] == 'data':
+                    self._check_view_active(content, file_name)
                     self._check_is_published_false(module, file_name)
                     if not is_studio_required:
                         is_studio_required = self._check_studio(content, file_name)
@@ -516,3 +517,14 @@ class TestEnv(IndustryCase):
                 records[record_key] |= fields
         except etree.XMLSyntaxError as e:
             _logger.error("XML syntax error in file %s: %s", file_name, e)
+
+    def _check_view_active(self, xml_content, file_name):
+        root = etree.fromstring(xml_content.encode('utf-8'))
+        for record in root.xpath("//record[@model='ir.ui.view']"):
+            active_field = record.xpath(".//field[@name='active']/@eval")
+            if not active_field or active_field[0] != "True":
+                _logger.warning(
+                    "You forgot to enforce active=True on ir.ui.view record (id=%s in data/%s).",
+                    record.get('id'),
+                    file_name,
+                )
