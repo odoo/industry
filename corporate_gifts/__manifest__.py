@@ -31,6 +31,8 @@ This module is for marketing companies selling and producing customized corporat
     'data': [
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
+        'data/ir_model_fields.xml',
+        'data/ir_ui_view.xml',
         'data/mail_template.xml',
         'data/product_public_category.xml',
         'data/project_task_type.xml',
