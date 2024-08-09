@@ -1,54 +1,31 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="execute_code_f7c02412-eb58-479c-a6e8-106a52106298" model="ir.actions.server">
-        <field name="code"><![CDATA[# Available variables:
-#    - env: environment on which the action is triggered
-#    - model: model of the record on which the action is triggered; is a void recordset
-#    - record: record on which the action is triggered; may be void
-#    - records: recordset of all records on which the action is triggered in multi-mode; may be void
-#    - time, datetime, dateutil, timezone: useful Python libraries
-#    - float_compare: utility function to compare floats based on specific precision
-#    - log: log(message, level='info'): logging function to record debug information in ir.logging table
-#    - _logger: _logger.info(message): logger to emit messages in server logs
-#    - UserError: exception class for raising user-facing warning messages
-#    - Command: x2many commands namespace
-# To return an action, assign: action = {...}
-
-try:
-        data = request.get_json_data()
-except:
-        data = str(request.get_http_params())
-        
-message = data["message"]
-id = data["id"]
-note = env["mail.message"].create(
-        {
-                'author_id' : 2,
-                'model' : 'sale.order',
-                'res_id' : id,
-                'body' : message,
-                'message_type' : "comment",
-                "subtype_id" : 2,
-        })
-
-]]></field>
-        <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="state">code</field>
-        <field name="name">Execute Code</field>
-    </record>
-    <record id="execute_existing_act_c80658fc-b598-4b59-95dc-f8b106948937" model="ir.actions.server">
-        <field name="model_id" ref="crm.model_crm_lead"/>
-        <field name="state">multi</field>
-        <field name="name">Execute Existing Actions</field>
-    </record>
     <record id="update_customer_pric_867fde0a-d561-443e-9924-7cf74151b36a" model="ir.actions.server">
+        <field name="name">Free courses for subs - Server Actions</field>
         <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="base_automation_id" ref="free_courses_for_sub_782390a0-2750-4f0e-b4c1-2c5ce443b3bf"/>
         <field name="crud_model_id" ref="base.model_res_partner"/>
-        <field name="name">Update Customer &gt; Pricelist</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+pricelist = env['product.pricelist'].search([('name', '=', 'Free courses')], limit=1)
+if pricelist:
+    for record in records:
+        if record.partner_id:
+            record.partner_id.write({'property_product_pricelist': pricelist.id})
+]]></field>
     </record>
     <record id="update_pricelist_f169273f-f2c9-4de3-9b59-26ee1fabc38e" model="ir.actions.server">
+        <field name="name">Cancelled subscription - Server Actions</field>
         <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="base_automation_id" ref="cancelled_subscripti_36e912d5-3aa6-40fc-a239-177de7af6eb7"/>
         <field name="crud_model_id" ref="base.model_res_partner"/>
-        <field name="name">Update Customer &gt; Pricelist</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+pricelist = env['product.pricelist'].search([('name', '=', 'Default EUR pricelist')], limit=1)
+if pricelist:
+    for record in records:
+        if record.partner_id:
+            record.partner_id.write({'property_product_pricelist': pricelist.id})
+]]></field>
     </record>
 </odoo>
