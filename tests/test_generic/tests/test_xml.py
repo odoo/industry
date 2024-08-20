@@ -231,6 +231,7 @@ class TestEnv(IndustryCase):
             "helpdesk.ticket",
             "hr.applicant",
             "hr.department",
+            "hr.employee",
             "hr.job",
             "hr.recruitment.stage",
             "ir.attachment",
@@ -272,6 +273,9 @@ class TestEnv(IndustryCase):
             "project.task.type",
             "purchase.order",
             # "purchase.order.line",  # need to handle in functions
+            "planning.recurrency",
+            "planning.role",
+            "planning.slot",
             "quality.point",
             "repair.order",
             "res.config.settings",
