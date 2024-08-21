@@ -1,7 +1,7 @@
 {
     'name': 'Corporate Gifts',
     'version': '1.0',
-    'category': 'Services',
+    'category': 'Supply Chain',
     'description': """
 This module is for marketing companies selling and producing customized corporate gifts, like mugs and t-shirts.
 """,

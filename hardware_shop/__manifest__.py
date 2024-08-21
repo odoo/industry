@@ -1,9 +1,9 @@
 {
-    'name': 'Hardware Shop',
+    'name': 'Hardware Store',
     'version': '1.0',
     'category': 'Retail',
     'description': """
-For Hardware shops that carry a large selection of products: plumbing, machinery, household, gardening, carpenter and electrical, etc.
+For Hardware Stores that carry a large selection of products: plumbing, machinery, household, gardening, carpenter and electrical, etc.
 Using Point of Sale, Inventory, Sales, Purchase, Accounting, Contact, Employee, Dashboard, Barcode, and Documents to grow their business.
     """,
     'depends': [

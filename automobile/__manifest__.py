@@ -1,5 +1,5 @@
 {
-    'name': 'Automobile Spareparts',
+    'name': 'Automobile Spare Parts',
     'version': '1.0',
     'category': 'Retail',
     'description': """

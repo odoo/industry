@@ -1,7 +1,7 @@
 {
     'name': 'Fine Dining Restaurant',
     'version': '1.0',
-    'category': 'Services',
+    'category': 'Hospitality',
     'description': """
         This Odoo module is designed to streamline and enhance the management of your restaurant operations.
     """,
