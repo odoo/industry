@@ -1,7 +1,7 @@
 {
     'name': 'Construction',
     'version': '1.0',
-    'category': 'Services',
+    'category': 'Construction',
     'description': """
 This industry is ideal for construction businesses proficient in managing projects from conception to completion,
 focusing on accurate quoting, efficient planning, seamless execution, and excellent customer service, ...

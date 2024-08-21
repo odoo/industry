@@ -9,7 +9,7 @@ from odoo.tests.common import tagged
 
 from .industry_case import IndustryCase, get_industry_path
 
-CATEGORIES = ('Services', 'Retail', 'Manufacturing', 'eCommerce', 'Public', 'NGO')
+CATEGORIES = ('Services', 'Retail', 'Construction', 'Hospitality', 'Health and Fitness', 'Supply Chain')
 
 MANDATORY_KEYS = {
     'author': 'Odoo S.A.',
@@ -71,7 +71,7 @@ class ManifestTest(ManifestLinter, IndustryCase):
                         "Wrong category %s in manifest, it should be one of the following: %s"
                         % (
                             value,
-                            ", ".join(cat for cat in CATEGORIES),
+                            ", ".join(CATEGORIES),
                         )
                     ),
                 )
