@@ -1,5 +1,5 @@
 {
-    'name': 'Agricultural Shop',
+    'name': 'Agricultural Store',
     'version': '1.0',
     'category': 'Retail',
     'description': """

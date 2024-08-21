@@ -1,7 +1,7 @@
 {
-    'name': 'Eyewear Shop',
+    'name': 'Eyewear Store',
     'version': '1.0',
-    'category': 'Retail',
+    'category': 'Health and Fitness',
     'description': """
 This module is for stylish and affordable eyewear. It will deal with various types of eyewear like Sunglasses, Contact Lenses, Specialty eyewear, etc.
 The sales process involves creating sale orders, managing deliveries and invoicing. Additionally, they operate an eCommerce shop for online sales in the eyewear industry.

@@ -1,5 +1,5 @@
 {
-    'name': 'IT Hardware Sales and Support',
+    'name': 'IT Hardware & Support',
     'version': '1.0',
     'category': 'Services',
     'description': """

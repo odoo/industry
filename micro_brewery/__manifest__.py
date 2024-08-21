@@ -1,7 +1,7 @@
 {
-    'name': 'Micro Brewery',
+    'name': 'Microbrewery',
     'version': '1.0',
-    'category': 'Manufacturing',
+    'category': 'Supply Chain',
     'description': """
 This module is a setup specific to support the business activities of a microbrewery such as Crafting Beer, Outside Sales, a local Bar, a local Shop and an ecommerce website.
 """,

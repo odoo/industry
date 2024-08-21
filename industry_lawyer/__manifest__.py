@@ -1,5 +1,5 @@
 {
-    'name': 'Lawyer',
+    'name': 'Law Firm',
     'version': '1.0',
     'category': 'Services',
     'description': """
