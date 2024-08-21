@@ -1,5 +1,5 @@
 {
-    'name': 'Headhunter',
+    'name': 'Talent Acquisition',
     'version': '1.0',
     'category': 'Services',
     'description': """

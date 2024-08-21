@@ -1,7 +1,7 @@
 {
-    'name': 'Non Profit Organization',
+    'name': 'Nonprofit Organization',
     'version': '1.0',
-    'category': 'NGO',
+    'category': 'Services',
     'description': """
     Non Profit Organization
 

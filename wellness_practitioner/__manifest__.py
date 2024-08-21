@@ -1,8 +1,8 @@
 {
     'name': 'Wellness Practitioner',
     'version': '1.0',
-    'category': 'Services',
-    'description': u"""
+    'category': 'Health and Fitness',
+    'description': """
 This module is designed for wellness practitioners, offering a complete solution to manage appointments and client relationships. It supports practitioners in providing personalized care, handling billing efficiently, and streamlining operations with integrated CRM, treatment plans, and essential tools like invoicing and appointment management. Perfect for professionals focused on holistic health and well-being services.
 """,
     'depends': [
