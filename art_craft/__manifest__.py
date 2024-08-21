@@ -1,5 +1,5 @@
 {
-    'name': 'The Arts & Crafts Shop',
+    'name': 'Arts & Crafts Store',
     'version': '1.0',
     'category': 'Retail',
     'description': """
