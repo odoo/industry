@@ -1,9 +1,9 @@
 {
-    'name': 'Cake Shop',
+    'name': 'Cake Store',
     'version': '1.0',
     'category': 'Retail',
     'description': """
-This setup is for bakery shop companies selling to consumers. Bakery are businesses that carry a large selection of products: puffs , cakes , pastries etc...
+This setup is for bakery store companies selling to consumers. Bakery are businesses that carry a large selection of products: puffs , cakes , pastries etc...
 """,
     'depends': [
         'knowledge',

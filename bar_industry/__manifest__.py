@@ -1,7 +1,7 @@
 {
     'name': 'Bar Industry',
     'version': '1.0',
-    'category': 'Services',
+    'category': 'Hospitality',
     'description': """
         This module offers a vibrant selection of cocktails, soft drinks, and other essential items for the bar and pub industry. It is an invaluable resource for anyone looking to elevate their establishment, enhance customer experience, or explore new trends in mixology and hospitality.
 """,

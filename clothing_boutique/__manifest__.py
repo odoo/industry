@@ -1,9 +1,9 @@
 {
-    'name': 'Clothing and Boutique',
+    'name': 'Clothing Store',
     'version': '1.0',
     'category': 'Retail',
     'description': """
-This setup if for Clothing and Boutique companies selling female clothing.""",
+This setup if for Clothing Store companies selling female clothing.""",
     'depends': [
         'knowledge',
         'pos_sale',
