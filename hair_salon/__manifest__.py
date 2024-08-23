@@ -17,6 +17,7 @@
         'sales_team',
         'website_appointment',
         'theme_orchid',
+        "base_automation",
     ],
     'data': [
         'data/res_config_settings.xml',
@@ -32,7 +33,11 @@
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
+        'data/ir_model_fields.xml',
         'data/appointment_type.xml',
+        'data/ir_ui_view.xml',
+        'data/ir_actions_server.xml',
+        'data/base_automation.xml',
     ],
     'demo': [
         'demo/website.xml',

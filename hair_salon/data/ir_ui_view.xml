@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="appointment.calendar_event_view_gantt_booking_user" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <gantt position="attributes">
+                <attribute name="default_group_by">user_id</attribute>
+            </gantt>
+        </field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="appointment.calendar_event_view_gantt_booking_resource"/>
+        <field name="model">calendar.event</field>
+        <field name="name">calendar.event.view.gantt.meeting.user</field>
+        <field name="type">gantt</field>
+    </record>
+    <record id="appointment_type_customization" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//form[1]/sheet[1]/group[1]/group[@name='left_details']/div[1]" position="after">
+                    <field name="x_break_start_appointment" string="Break Start" options="{&quot;human_readable&quot;:false}" widget="float_time"/>
+                    <field name="x_break_end_appointment" options="{&quot;human_readable&quot;:false}" widget="float_time"/>
+                </xpath>
+            </data>
+        </field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="appointment.appointment_type_view_form"/>
+        <field name="mode">extension</field>
+        <field name="model">appointment.type</field>
+        <field name="name">appointment.type.form customization</field>
+        <field name="priority">200</field>
+        <field name="type">form</field>
+    </record>
+    <record id="calendar_event_parent_customization" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/div[1]" position="after">
+                    <field name="x_break_start" invisible="x_linked_to" widget="float_time"/>
+                    <field name="x_break_end" invisible="x_linked_to" widget="float_time"/>
+                </xpath>
+                <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/div[2]" position="after">
+                    <field name="x_appointment_part_2" string="Part 1" invisible="not x_appointment_part_2"/>
+                    <field name="x_appointment_part_2" invisible="not x_appointment_part_2"/>
+                    <field name="x_linked_to" invisible="not x_linked_to"/>
+                </xpath>
+                <xpath expr="//field[@name='partner_ids']" position="attributes">
+                    <attribute name="force_save">0</attribute>
+                    <attribute name="readonly">False</attribute>
+                </xpath>
+            </data>
+        </field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
+        <field name="mode">extension</field>
+        <field name="model">calendar.event</field>
+        <field name="name">calendar.event.form customization</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+    </record>
+    <record id="calendar_event_children_customization" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <t name="Homepage" t-name="website.homepage">
+                <t t-call="website.layout">
+                    <t t-set="pageName" t-value="'homepage'"/>
+                    <div id="wrap" class="oe_structure oe_empty"/>
+                </t>
+            </t>
+        </field>
+        <field name="active" eval="True"/>
+        <field name="key">website.homepage</field>
+        <field name="name">Home</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+</odoo>
