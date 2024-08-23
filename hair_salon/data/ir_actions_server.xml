@@ -27,33 +27,33 @@ appointment_duration = record.duration
 
 start_time = record.start
 end_time = record.stop
+if x_break_end > 0 and x_break_start > 0 :
+        event2_vals = {
+                'name': "[PART 1]" + record.name ,
+                'start': start_time,
+                'stop': start_time + datetime.timedelta(hours=x_break_start),
+                'allday': record.allday,
+                'user_id': record.user_id.id,
+                'x_linked_to': record.id,
+                'partner_ids': [],
+                'appointment_type_id':record.appointment_type_id.id,
+                
+        }
+        part_1 = env['calendar.event'].create(event2_vals)
 
-event2_vals = {
-        'name': "[PART 1]" + record.name ,
-        'start': start_time,
-        'stop': start_time + datetime.timedelta(hours=x_break_start),
-        'allday': record.allday,
-        'user_id': record.user_id.id,
-        'x_linked_to': record.id,
-        'partner_ids': [],
-        'appointment_type_id':record.appointment_type_id.id,
-        
-}
-part_1 = env['calendar.event'].create(event2_vals)
-
-# Third event - From Break End to Original End
-event3_vals = {
-        'name': "[PART 2]" + record.name,
-        'start': start_time + datetime.timedelta(hours=x_break_end),
-        'stop': end_time,
-        'allday': record.allday,
-        'user_id': record.user_id.id,
-        'partner_ids': [],
-        'x_linked_to': record.id,
-        'appointment_type_id':record.appointment_type_id.id,
-}
-part_2 = env['calendar.event'].create(event3_vals)
-record.update({'user_id': False, 'x_appointment_part_2': part_1.id, 'x_appointment_part_2': part_2.id})
+        # Third event - From Break End to Original End
+        event3_vals = {
+                'name': "[PART 2]" + record.name,
+                'start': start_time + datetime.timedelta(hours=x_break_end),
+                'stop': end_time,
+                'allday': record.allday,
+                'user_id': record.user_id.id,
+                'partner_ids': [],
+                'x_linked_to': record.id,
+                'appointment_type_id':record.appointment_type_id.id,
+        }
+        part_2 = env['calendar.event'].create(event3_vals)
+        record.update({'user_id': False, 'x_appointment_part_2': part_1.id, 'x_appointment_part_2': part_2.id})
 
 
 
