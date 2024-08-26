@@ -30,7 +30,7 @@
         'data/product_category.xml',
         'data/pos_combo.xml',
         'data/product_product.xml',
-        'data/pos_combo_line.xml',
+        'data/pos_combo_item.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
