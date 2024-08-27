@@ -18,6 +18,7 @@
         'website_appointment',
         'theme_orchid',
         "base_automation",
+        "web_studio",
     ],
     'data': [
         'data/res_config_settings.xml',
