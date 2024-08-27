@@ -125,7 +125,6 @@ class TestEnv(IndustryCase):
             "ir.model",
             "ir.model.fields",
             "ir.ui.menu",
-            "ir.ui.view",
         ]
         for model in models_for_studio:
             if (
@@ -134,6 +133,12 @@ class TestEnv(IndustryCase):
                 and not re.search('<function model="' + model, s)
             ):
                 _logger.info("%s found in %s, needs studio", model, file_name)
+                return True
+            
+        root = etree.fromstring(s.encode('utf-8'))
+        for record in root.xpath("//record[@model='ir.ui.view']"):
+            website_id_field = record.xpath(".//field[@name='website_id']")
+            if not website_id_field:
                 return True
         return False
 
