@@ -14,12 +14,11 @@
     </record>
     <record id="appointment_type_customization" model="ir.ui.view">
         <field name="arch" type="xml">
-            <data>
                 <xpath expr="//form[1]/sheet[1]/group[1]/group[@name='left_details']/div[1]" position="after">
-                    <field name="x_break_start_appointment" string="Break Start" options="{&quot;human_readable&quot;:false}" widget="float_time"/>
-                    <field name="x_break_end_appointment" options="{&quot;human_readable&quot;:false}" widget="float_time"/>
+                    <field name="x_break" widget="boolean"/>
+                    <field name="x_break_start_appointment"  widget="float_time" invisible="not x_break"/>
+                    <field name="x_break_end_appointment"  widget="float_time" invisible="not x_break"/>
                 </xpath>
-            </data>
         </field>
         <field name="active" eval="True"/>
         <field name="inherit_id" ref="appointment.appointment_type_view_form"/>
@@ -36,34 +35,29 @@
             <field name="inherit_id" ref="appointment.calendar_event_view_form_gantt_booking"/>
             <field name="active" eval="True"/>
             <field name="arch" type="xml">
-                <data>
                     <xpath expr="//form/sheet/group/group" position="after">
-                        <div class="o_form_group o_inline">
-                            <label for="x_linked_to" invisible="not x_linked_to" string="Linked to:" class="oe_inline me-2"/>
-                            <field name="x_linked_to" invisible="not x_linked_to" options="{'no_create': True}" class="oe_inline"/>
+                        <div class="o_form_group o_inline" invisible="not x_parent_id">
+                            <label for="x_parent_id" string="Linked to:" class="oe_inline me-2"/>
+                            <field name="x_parent_id" options="{'no_create': True}" class="oe_inline"/>
                         </div>
                     </xpath>
-                </data>
             </field>
         </record>
     </odoo>    
     <record id="calendar_event_parent_customization" model="ir.ui.view">
         <field name="arch" type="xml">
-            <data>
                 <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/div[1]" position="after">
-                    <field name="x_break_start" invisible="x_linked_to" widget="float_time"/>
-                    <field name="x_break_end" invisible="x_linked_to" widget="float_time"/>
+                    <field name="x_break_start" invisible="x_parent_id" widget="float_time"/>
+                    <field name="x_break_end" invisible="x_parent_id" widget="float_time"/>
                 </xpath>
-                <xpath expr="//form[1]/sheet[1]/group[1]/group[2]/div[2]" position="after">
-                    <field name="x_appointment_part_2" string="Part 1" invisible="not x_appointment_part_2"/>
+                <xpath expr="//field[@name='location']" position="before">
                     <field name="x_appointment_part_2" invisible="not x_appointment_part_2"/>
-                    <field name="x_linked_to" invisible="not x_linked_to"/>
+                    <field name="x_parent_id" invisible="not x_parent_id"/>
                 </xpath>
                 <xpath expr="//field[@name='partner_ids']" position="attributes">
                     <attribute name="force_save">0</attribute>
                     <attribute name="readonly">False</attribute>
                 </xpath>
-            </data>
         </field>
         <field name="active" eval="True"/>
         <field name="inherit_id" ref="calendar.view_calendar_event_form"/>

@@ -1,21 +1,18 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
     <record id="break_booking_server_action" model="ir.actions.server">
-        <field name="code"><![CDATA[# Fetch related records by field 'x_appointment_part_2'
-related_records_1 = env['calendar.event'].search([('x_linked_to', '=', record.id)])
-related_records_1.unlink()]]></field>
+        <field name="code"><![CDATA[
+env['calendar.event'].search([('x_parent_id', '=', record.id)]).unlink()
+        ]]></field>
         <field name="model_id" ref="calendar.model_calendar_event"/>
         <field name="state">code</field>
         <field name="name">Execute Code</field>
     </record>
     <record id="delete_subpart_main_calendar_event_server_action" model="ir.actions.server">
         <field name="child_ids" eval="[(6, 0, [ref('break_booking_server_action')])]"/>
-        <field name="code"><![CDATA[parent_record = env['calendar.event'].search([('id', '=', record.x_linked_to.id)])
-if parent_record.x_appointment_part_2.id == record.id:
-        parent_record.x_appointment_part_2.unlink()
-else:
-        parent_record.x_appointment_part_2.unlink()
-parent_record["active"] = False]]></field>
+        <field name="code"><![CDATA[parent_record = env['calendar.event'].browse(record.x_parent_id)
+parent_record.x_appointment_part_2.unlink()
+parent_record.unlink()]]></field>
         <field name="model_id" ref="calendar.model_calendar_event"/>
         <field name="state">code</field>
         <field name="name">Execute Code</field>
@@ -27,38 +24,31 @@ appointment_duration = record.duration
 
 start_time = record.start
 end_time = record.stop
-if x_break_end > 0 and x_break_start > 0 :
-        event2_vals = {
-                'name': "[PART 1]" + record.name ,
-                'start': start_time,
-                'stop': start_time + datetime.timedelta(hours=x_break_start),
-                'allday': record.allday,
-                'user_id': record.user_id.id,
-                'x_linked_to': record.id,
-                'alarm_ids' : [],
-                'partner_ids': [record.partner_ids[0].id],
-                'appointment_type_id':record.appointment_type_id.id,
-                
-        }
-        part_1 = env['calendar.event'].create(event2_vals)
+event2_vals = {
+        'name': "[PART 1]" + record.name ,
+        'start': start_time,
+        'stop': start_time + datetime.timedelta(hours=x_break_start),
+        'user_id': record.user_id.id,
+        'x_parent_id': record.id,
+        'alarm_ids' : [],
+        'partner_ids': [record.partner_ids[0].id],
+        'appointment_type_id':record.appointment_type_id.id,   
+}
+part_1 = env['calendar.event'].create(event2_vals)
 
-        # Third event - From Break End to Original End
-        event3_vals = {
-                'name': "[PART 2]" + record.name,
-                'start': start_time + datetime.timedelta(hours=x_break_end),
-                'stop': end_time,
-                'allday': record.allday,
-                'user_id': record.user_id.id,
-                'partner_ids': [record.partner_ids[0].id],
-                'x_linked_to': record.id,
-                'alarm_ids' : [],
-                'appointment_type_id':record.appointment_type_id.id,
-        }
-        part_2 = env['calendar.event'].create(event3_vals)
-        record.write({'user_id': False, 'show_as': "free",'x_appointment_part_1': part_1.id, 'x_appointment_part_2': part_2.id})
-
-
-
+# Third event - From Break End to Original End
+event3_vals = {
+        'name': "[PART 2]" + record.name,
+        'start': start_time + datetime.timedelta(hours=x_break_end),
+        'stop': end_time,
+        'user_id': record.user_id.id,
+        'partner_ids': [record.partner_ids[0].id],
+        'x_parent_id': record.id,
+        'alarm_ids' : [],
+        'appointment_type_id':record.appointment_type_id.id,
+}
+part_2 = env['calendar.event'].create(event3_vals)
+record.write({'user_id': False, 'show_as': "free",'x_appointment_part_1': part_1.id, 'x_appointment_part_2': part_2.id})
 ]]></field>
         <field name="model_id" ref="calendar.model_calendar_event"/>
         <field name="state">code</field>

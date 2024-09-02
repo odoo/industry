@@ -1,24 +1,24 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
     <record id="break_booking_automation" model="base.automation">
-        <field name="name">Break Booking Automation</field> 
+        <field name="name">Delete Main Event</field> 
         <field name="model_id" ref="calendar.model_calendar_event"/>
         <field name="action_server_ids" eval="[(6, 0, [ref('break_booking_server_action')])]"/>
         <field name="trigger">on_unlink</field>
-        <field name="filter_domain">[("appointment_type_id", "!=", False)]</field>
+        <field name="filter_domain">[("appointment_type_id", "!=", False),("x_break_start","!=","False"),("x_break_end","!=","False")]</field>
     </record>
     <record id="delete_subpart_calendar_event" model="base.automation">
-        <field name="name">Delete Main Appointment</field> 
+        <field name="name">Break Appointment</field> 
         <field name="model_id" ref="calendar.model_calendar_event"/>
         <field name="action_server_ids" eval="[(6, 0, [ref('delete_subpart_calendar_event_server_action')])]"/>
         <field name="trigger">on_create_or_write</field>
-        <field name="filter_domain">["&amp;", ("name", "not ilike", "PART 1"), ("name", "not ilike", "PART 2"), ("user_id", "!=", False)]</field>
+        <field name="filter_domain">[("name", "not ilike", "PART 1"), ("name", "not ilike", "PART 2"), ("user_id", "!=", False)]</field>
     </record>
     <record id="delete_subpart_main_calendar_event" model="base.automation">
         <field name="name">Delete Sub Appointment</field>
         <field name="model_id" ref="calendar.model_calendar_event"/>
         <field name="action_server_ids" eval="[(6, 0, [ref('delete_subpart_main_calendar_event_server_action')])]"/>
         <field name="trigger">on_unlink</field>
-        <field name="filter_domain">["&amp;", ("name", "ilike", "PART 1"), ("user_id", "!=", False)]</field>
+        <field name="filter_domain">[("name", "ilike", "PART 1"), ("user_id", "!=", False)]</field>
     </record>
 </odoo>
