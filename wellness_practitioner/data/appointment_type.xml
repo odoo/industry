@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <record id="alarm_mail_1" model="calendar.alarm">
+        <field name="name">Follow up</field>
+        <field name="duration" eval="-1" />
+        <field name="interval">hours</field>
+        <field name="alarm_type">email</field>
+        <field name="mail_template_id" ref="booking_suggestion"/>
+    </record>
+    <record id="appointment_type_1" model="appointment.type">
+        <field name="name">Wellness Session</field>
+        <field name="appointment_tz" model="res.users" eval="obj().env.ref('base.user_admin').tz or 'UTC'"/>
+        <field name="product_id" ref="appointment_account_payment.default_booking_product"/>
+        <field name="category">recurring</field>
+        <field name="avatars_display">hide</field>
+        <field name="min_cancellation_hours">48.0</field>
+        <field name="min_schedule_hours">12.0</field>
+        <field name="event_videocall_source" eval="False"/>
+        <field name="staff_user_ids" eval="[(4, ref('base.user_admin'))]"/>
+        <field name="location_id" ref="base.main_partner"/>
+        <field name="reminder_ids" eval="[(6, 0, [ref('alarm_mail_1'),ref('calendar.alarm_notif_1'), ref('calendar.alarm_mail_1'), ref('appointment_sms.calendar_alarm_data_1h_sms')])]"/>
+        <field name="has_payment_step" eval="True"/>
+        <field name="slot_ids" eval="[
+            (0, 0, {'weekday': '1', 'start_hour': 9.0, 'end_hour': 12.0}),
+            (0, 0, {'weekday': '1', 'start_hour': 14.0, 'end_hour': 17.0}),
+            (0, 0, {'weekday': '2', 'start_hour': 9.0, 'end_hour': 12.0}),
+            (0, 0, {'weekday': '2', 'start_hour': 14.0, 'end_hour': 17.0}),
+            (0, 0, {'weekday': '3', 'start_hour': 9.0, 'end_hour': 12.0}),
+            (0, 0, {'weekday': '3', 'start_hour': 14.0, 'end_hour': 17.0}),
+            (0, 0, {'weekday': '4', 'start_hour': 9.0, 'end_hour': 12.0}),
+            (0, 0, {'weekday': '4', 'start_hour': 14.0, 'end_hour': 17.0}),
+            (0, 0, {'weekday': '5', 'start_hour': 9.0, 'end_hour': 12.0}),
+            (0, 0, {'weekday': '5', 'start_hour': 14.0, 'end_hour': 17.0}),
+            (0, 0, {'weekday': '6', 'start_hour': 9.0, 'end_hour': 17.0}),
+        ]"/>
+    </record>
+    <record id="appointment_invite_wellness_session" model="appointment.invite">
+        <field name="appointment_type_ids" eval="[(4, ref('appointment_type_1'))]" />
+        <field name="short_code">wellness_session</field>
+    </record>
+</odoo>

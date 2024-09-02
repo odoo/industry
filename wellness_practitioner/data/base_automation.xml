@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="ir_act_server_1" model="ir.actions.server">
+    <field name="name">Send Email when Qualified</field>
+    <field name="model_id" ref="crm.model_crm_lead"/>
+    <field name="state">mail_post</field>
+    <field name="template_id" ref="booking_suggestion"/>
+  </record>
+  <record id="base_automation_1" model="base.automation">
+    <field name="model_id" ref="crm.model_crm_lead"/>
+    <field name="trigger_field_ids" eval="[(6, 0, [ref('crm.field_crm_lead__stage_id')])]"/>
+    <field name="trigger">on_stage_set</field>
+    <field name="trg_field_ref" ref="crm.stage_lead2"/>
+    <field name="filter_domain">[('stage_id', '=', 2)]</field>
+    <field name="name">Stage is set to "Qualified"</field>
+    <field name="action_server_ids" eval="[(6, 0, [ref('ir_act_server_1')])]"/>
+  </record>
+</odoo>
