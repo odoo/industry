@@ -39,6 +39,7 @@ class ManifestTest(ManifestLinter, IndustryCase):
                 self._test_manifest_values(module, manifest_data)
                 self._test_files_in_manifest(module, manifest_data, 'data')
                 self._test_files_in_manifest(module, manifest_data, 'demo')
+                self._test_dependencies(module, manifest_data)
 
     def _test_manifest_keys(self, module, manifest_data):
         super()._test_manifest_keys(module, manifest_data)
@@ -128,3 +129,12 @@ class ManifestTest(ManifestLinter, IndustryCase):
                 "These files are listed in manifest %s but were not found on the disk: %s"
                 % (folder_name, ", ".join(f for f in missing_on_disk)),
             )
+
+    def _test_dependencies(self, module, manifest_data):
+        dependencies = manifest_data.get('depends', [])
+        known_dependencies = self.env['ir.module.module'].search([('name', 'in', dependencies)]).mapped('name')
+        unknown_dependencies = set(dependencies) - set(known_dependencies)
+        self.assertFalse(
+            unknown_dependencies,
+            "Unknown dependencies for %s: %s" % (module, ", ".join(unknown_dependencies))
+        )
