@@ -8,7 +8,7 @@
     'depends': [
         'account_followup',
         'contacts',
-        'hr_employee',
+        'hr',
         'knowledge',
         'planning',
         'pos_enterprise',
