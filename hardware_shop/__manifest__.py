@@ -49,5 +49,6 @@ Using Point of Sale, Inventory, Sales, Purchase, Accounting, Contact, Employee, 
         'demo/function_pickup.xml',
     ],
     'license': 'OPL-1',
+    'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }

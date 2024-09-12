@@ -63,5 +63,6 @@ Those agencies work on two levels and with two different audiences, ...
         'demo/hr_applicant.xml',
     ],
     'license': 'OPL-1',
+    'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }

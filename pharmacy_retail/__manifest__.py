@@ -70,5 +70,6 @@ They maintain the stock lot wise and also manage the expiry of the lots.
         'demo/pos_config.xml',
     ],
     'license': 'OPL-1',
+    'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }

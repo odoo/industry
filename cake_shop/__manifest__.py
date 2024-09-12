@@ -42,5 +42,6 @@ This setup is for bakery shop companies selling to consumers. Bakery are busines
         'demo/payment_provider_demo_post.xml',
     ],
     'license': 'OPL-1',
+    'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }
