@@ -59,5 +59,6 @@ schematic design, design development, worksite follow-up, energy efficiency asse
         'demo/hr_expense_action.xml',
     ],
     'license': 'OPL-1',
+    'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }

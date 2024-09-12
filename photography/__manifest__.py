@@ -52,5 +52,6 @@
         'demo/website_menu.xml',
     ],
     'license': 'OPL-1',
+    'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }
