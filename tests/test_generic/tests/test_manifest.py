@@ -12,13 +12,14 @@ from .industry_case import IndustryCase, get_industry_path
 CATEGORIES = ('Services', 'Retail', 'Manufacturing', 'eCommerce', 'Public', 'NGO')
 
 MANDATORY_KEYS = {
+    'author': 'Odoo S.A.',
     'category': '',
     'data': [],
     'demo': [],
     'description': '',
     'depends': [],
-    'images': [],
-    'license': '',
+    'images': ['images/main.png'],
+    'license': 'OPL-1',
     'name': '',
     'version': '',
 }
@@ -46,16 +47,22 @@ class ManifestTest(ManifestLinter, IndustryCase):
             self.assertIn(key, manifest_data, "Missing key %s in manifest" % key)
 
     def _test_manifest_values(self, module, manifest_data):
-        res = super()._test_manifest_values(module, manifest_data)
         for key in manifest_data:
             value = manifest_data[key]
-            expected_type = type(MANDATORY_KEYS[key])
+            expected_value = MANDATORY_KEYS[key]
+            expected_type = type(expected_value)
             self.assertEqual(
                 type(value),
                 expected_type,
                 "Wrong type for manifest value %s in module %s, expected %s"
                 % (key, module, expected_type),
             )
+            if expected_value:
+                self.assertEqual(
+                    value,
+                    expected_value,
+                    "Wrong %s '%r' in manifest, it should be %s" % (key, value, expected_value),
+                )
             if key == 'category':
                 self.assertIn(
                     value,
@@ -68,16 +75,6 @@ class ManifestTest(ManifestLinter, IndustryCase):
                         )
                     ),
                 )
-            elif key == 'images':
-                self.assertEqual(
-                    value,
-                    ['images/main.png'],
-                    "Wrong images %r in manifest, it should be ['images/main.png']" % value,
-                )
-            elif key == 'license':
-                self.assertEqual(
-                    value, 'OPL-1', "Wrong license %r in manifest, it should be 'OPL-1'" % value
-                )
             elif key == 'data':
                 self.assertTrue(
                     all(len(val.split('/')) == 2 and val.split('/')[0] == 'data' for val in value),
@@ -88,7 +85,6 @@ class ManifestTest(ManifestLinter, IndustryCase):
                     all(len(val.split('/')) == 2 and val.split('/')[0] == 'demo' for val in value),
                     "all demo files should be in 'demo/' subfolder",
                 )
-        return res
 
     def _test_files_in_manifest(self, module, manifest_data, folder_name):
         data_folder = Path(get_industry_path() + module) / folder_name
