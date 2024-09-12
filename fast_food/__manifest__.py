@@ -1,7 +1,7 @@
 {
-    'name': 'Restaurant (Foods & Cafes)',
+    'name': 'Fast Food',
     'version': '1.0',
-    'category': 'Services',
+    'category': 'Hospitality',
     'description': """
     """,
     'depends': [
