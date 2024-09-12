@@ -47,5 +47,6 @@ This module installs a configuration that presets the modules and configure Odoo
         'demo/website_theme_apply.xml',
     ],
     'license': 'OPL-1',
+    'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }

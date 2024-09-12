@@ -53,6 +53,7 @@ This module setup your database to easily use odoo in a Audit & Certification co
         'demo/x_control_charging_station.xml',
     ],
     'license': 'OPL-1',
+    'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 
 }

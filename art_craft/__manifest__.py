@@ -75,5 +75,6 @@
         'demo/website_theme_apply.xml',
     ],
     'license': 'OPL-1',
+    'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }
