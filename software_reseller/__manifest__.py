@@ -48,5 +48,6 @@ The typical sale is a 1 year Oracle Database license that is purchased to Oracle
         'demo/planning_slot.xml',
     ],
     'license': 'OPL-1',
+    'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }
