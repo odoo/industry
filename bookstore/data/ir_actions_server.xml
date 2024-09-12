@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="ir_act_server_set_condominiums_on_partner" model="ir.actions.server">
+        <field name="name">Execute Code</field>
+        <field name="state">code</field>
+        <field name="base_automation_id" ref="base_automation_1"/>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="code"><![CDATA[
+for picking in records:
+    if not picking.partner_id:
+        raise UserError("Please enter a vendor to your transfer.")
+    po = False
+    if not picking.purchase_id:
+        po = env['purchase.order'].create({
+            'partner_id': picking.partner_id.id,
+            'x_purchase_type': 'new',
+        })
+    for move in picking.move_ids_without_package:
+        if move.product_id.seller_ids[:1].partner_id == picking.partner_id:
+            continue
+        move.product_id.seller_ids.filtered(lambda s: not s.date_end).write({'date_end': datetime.datetime.today().date()})
+        env['product.supplierinfo'].create({
+            'product_id': move.product_id.id,
+            'partner_id': picking.partner_id.id,
+            'date_start': datetime.datetime.today().date(),
+            'sequence': (move.product_id.seller_ids[:1].sequence or 10) - 1,
+            'price': move.product_id.standard_price,
+            'delay': 0,
+            'min_qty': 1,
+        })
+        if not move.product_id.orderpoint_ids:
+            env['stock.warehouse.orderpoint'].create({
+                'trigger': 'manual',
+                'product_id': move.product_id.id,
+            })
+        if po:
+            env['purchase.order.line'].create({
+                'product_id': move.product_id.id,
+                'order_id': po.id,
+            })
+    if po:
+        po['state'] = 'purchase'
+        picking['purchase_id'] = po.id
+]]>
+        </field>
+    </record>
+</odoo>
