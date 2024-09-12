@@ -29,5 +29,6 @@ This module is designed for wellness practitioners, offering a complete solution
         'demo/crm_lead.xml',
     ],
     'images': ['images/main.png'],
+    'author': 'Odoo S.A.',
     'license': 'OPL-1',
 }

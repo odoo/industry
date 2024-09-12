@@ -80,5 +80,6 @@ This module is a setup specific to support the business activities of a microbre
         'demo/payment_provider_demo_post.xml',
     ],
     'license': 'OPL-1',
+    'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }

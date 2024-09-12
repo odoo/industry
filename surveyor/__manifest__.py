@@ -52,5 +52,6 @@ It may include surveying of building properties and the measurement of completed
         'demo/website_ir_attachment.xml',
     ],
     'license': 'OPL-1',
+    'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }
