@@ -61,5 +61,6 @@ This module sets up a furniture store for selling furniture like chairs, sofas, 
         'demo/payment_provider_demo_post.xml',
     ],
     'license': 'OPL-1',
+    'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }
