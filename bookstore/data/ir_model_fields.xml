@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="x_last_sale_date_field" model="ir.model.fields">
+        <field name="name">x_last_sale_date</field>
+        <field name="field_description">Last Sale</field>
+        <field name="ttype">date</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="selectable" eval="False"/>
+        <field name="depends">product_variant_ids.stock_move_ids</field>
+        <field name="compute"><![CDATA[
+outgoing_moves = self.env['stock.move']._read_group([('picking_type_id.code', '=', 'outgoing'), ('state', '!=', 'cancel')], groupby=['product_id'], aggregates=['date:max'])
+date_map = {p.id: date for p, date in outgoing_moves}
+for template in self:
+    template['x_last_sale_date'] = date_map.get(template.product_variant_id.id, False)
+]]></field>
+    </record>
+    <record id="x_last_sale_stock_field" model="ir.model.fields">
+        <field name="name">x_last_sale_stock</field>
+        <field name="field_description">Last Sale</field>
+        <field name="ttype">date</field>
+        <field name="related">product_tmpl_id.x_last_sale_date</field>
+        <field name="model_id" ref="stock.model_stock_warehouse_orderpoint"/>
+    </record>
+    <record id="x_last_vendor_template_field" model="ir.model.fields">
+        <field name="name">x_last_vendor</field>
+        <field name="field_description">Last Vendor</field>
+        <field name="ttype">many2one</field>
+        <field name="related">seller_ids.partner_id</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="relation">res.partner</field>
+    </record>
+    <record id="x_isbn_barcode_field" model="ir.model.fields">
+        <field name="name">x_isbn</field>
+        <field name="field_description">ISBN</field>
+        <field name="ttype">char</field>
+        <field name="related">product_id.barcode</field>
+        <field name="model_id" ref="purchase.model_purchase_order_line"/>
+    </record>
+    <record id="x_purchase_type_field" model="ir.model.fields">
+        <field name="name">x_purchase_type</field>
+        <field name="field_description">Purchase type</field>
+        <field name="ttype">selection</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="index" eval="True"/>
+        <field name="readonly" eval="True"/>
+        <field name="selection">[('replenishment', 'Replenishment'), ('new', 'New releases')]</field>
+    </record>
+    <record id="x_author_template_field" model="ir.model.fields">
+        <field name="name">x_author</field>
+        <field name="field_description">Author</field>
+        <field name="ttype">char</field>
+        <field name="model_id" ref="product.model_product_template"/>
+    </record>
+</odoo>

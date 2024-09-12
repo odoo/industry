@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="product_category_list_customization_view" model="ir.ui.view">
+        <field name="name">product.category.list customization</field>
+        <field name="inherit_id" ref="product.product_category_list_view"/>
+        <field name="mode">extension</field>
+        <field name="model">product.category</field>
+        <field name="active" eval="True"/>
+        <field name="priority">99</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='display_name']" position="before">
+                <field name="property_cost_method" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="product_template_product_form_customization_view" model="ir.ui.view">
+        <field name="name">product.template.product.form customization</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="model">product.template</field>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='active']" position="after">
+                <xpath expr="//field[@name='barcode']" position="move"/>
+                <field name="x_author"/>
+                <xpath expr="//field[@name='categ_id']" position="move"/>
+            </xpath>
+            <xpath expr="//field[@name='default_code']" position="after">
+                <xpath expr="//field[@name='invoice_policy']" position="move"/>
+                <xpath expr="//field[@name='product_tooltip']" position="move"/>
+            </xpath>
+            <xpath expr="//field[@name='optional_product_ids']" position="before">
+                <field name="x_last_sale_date"/>
+            </xpath>
+            <xpath expr="//field[@name='uom_po_id']" position="after">
+                <field name="x_last_vendor" force_save="1" readonly="True"/>
+            </xpath>
+            <xpath expr="//field[@name='barcode']" position="attributes">
+                <attribute name="string">ISBN</attribute>
+            </xpath>
+        </field>
+    </record>
+    <record id="purchase_order_form_customization_view" model="ir.ui.view">
+        <field name="name">purchase.order.form customization</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="model">purchase.order</field>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_ref']" position="after">
+                <field name="x_purchase_type"/>
+            </xpath>
+            <xpath expr="//page[@name='products']/field[@name='order_line']//field[@name='name']" position="after">
+                <field name="x_isbn" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="purchase_order_inherit_purchase_order_tree_customization_view" model="ir.ui.view">
+        <field name="name">purchase.order.inherit.purchase.order.tree customization</field>
+        <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
+        <field name="model">purchase.order</field>
+        <field name="active" eval="True"/>
+        <field name="mode">extension</field>
+        <field name="priority">99</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="x_purchase_type" optional="show"/>
+                <field name="create_date" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="stock_warehouse_orderpoint_tree_editable_customization_view" model="ir.ui.view">
+        <field name="name">stock.warehouse.orderpoint.tree.editable customization</field>
+        <field name="inherit_id" ref="stock.view_warehouse_orderpoint_tree_editable"/>
+        <field name="model">stock.warehouse.orderpoint</field>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="priority">160</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field optional="show" name="x_last_sale_stock"/>
+            </xpath>
+            <xpath expr="//button[@name='action_product_forecast_report']" position="after">
+                <field name="vendor_id" optional="show"/>
+                <field name="product_supplier_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="stock_warehouse_orderpoint_reorder_search_customization_view" model="ir.ui.view">
+        <field name="name">stock.warehouse.orderpoint.reorder.search customization</field>
+        <field name="inherit_id" ref="stock.stock_reorder_report_search"/>
+        <field name="model">stock.warehouse.orderpoint</field>
+        <field name="active" eval="True"/>
+        <field name="mode">extension</field>
+        <field name="priority">160</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='filter_not_snoozed']" position="after">
+                <separator/>
+                <filter name="filter_last_7_days" string="Last 7 Days"
+                    domain="[('x_last_sale_stock', '&gt;', (context_today()-relativedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="product_product_view_form_normalized" model="ir.ui.view">
+        <field name="name">product.product.view.form.normalized.account.inherit</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="account.product_product_view_form_normalized_account"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <field name="taxes_id" position="after">
+                <field name="standard_price"/>
+                <field name="categ_id"/>
+            </field>
+        </field>
+     </record>
+     <record id="product_supplierinfo_tree_view_bookstore" model="ir.ui.view">
+        <field name="name">product.supplierinfo.tree.view.bookstore</field>
+        <field name="model">product.supplierinfo</field>
+        <field name="inherit_id" ref="purchase.product_supplierinfo_tree_view2"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <field name="date_end" position="attributes">
+                 <attribute name="optional">show</attribute>
+            </field>
+            <field name="date_start" position="attributes">
+                 <attribute name="optional">show</attribute>
+            </field>
+        </field>
+     </record>
+     <record id="product_product_supplierinfo_tree_view_bookstore" model="ir.ui.view">
+         <field name="name">product.product.supplierinfo.tree.view.bookstore</field>
+         <field name="model">product.supplierinfo</field>
+         <field name="inherit_id" ref="purchase.product_product_supplierinfo_tree_view2"/>
+         <field name="active" eval="True"/>
+         <field name="arch" type="xml">
+             <field name="date_end" position="attributes">
+                  <attribute name="optional">show</attribute>
+             </field>
+             <field name="date_start" position="attributes">
+                  <attribute name="optional">show</attribute>
+             </field>
+         </field>
+      </record>
+</odoo>
