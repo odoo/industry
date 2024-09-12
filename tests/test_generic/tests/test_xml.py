@@ -340,7 +340,7 @@ class TestEnv(IndustryCase):
             if re.search('model="' + model, s):
                 _logger.warning(warning)
 
-    def _check_useless_fields_on_models(self, s, filename):
+    def _check_useless_fields_on_models(self, xml_content, filename):
         useless_model_fields = {
             'account.analytic.plan': ['color'],
             'account.analytic.account': ['root_plan_id'],
@@ -458,10 +458,12 @@ class TestEnv(IndustryCase):
             'stock.lot': ['product_uom_id'],
             'worksheet.template': ['color'],
         }
+        xml_content = xml_content.encode('utf-8')
+        tree = etree.fromstring(xml_content)
         for model, fields in useless_model_fields.items():
-            if re.search('model="' + model, s):
+            for record in tree.xpath(f"//record[@model='{model}']"):
                 for field in fields:
-                    if re.search('field name="' + field + '"', s):
+                    if record.xpath(f"field[@name='{field}']"):
                         _logger.warning(
                             "You shouldn't define the %s on %s (%s). Please refer to other modules for examples.",
                             field,
