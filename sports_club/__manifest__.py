@@ -17,7 +17,7 @@
         'social_push_notifications',
         'website_appointment',
         'website_crm',
-        'website_sale_picking',
+        'website_sale_collect',
         'website_sale_stock',
     ],
     'data': [
