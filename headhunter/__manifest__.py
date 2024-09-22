@@ -60,6 +60,7 @@ Those agencies work on two levels and with two different audiences, ...
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
+        'demo/hr_candidate.xml',
         'demo/hr_applicant.xml',
     ],
     'license': 'OPL-1',
