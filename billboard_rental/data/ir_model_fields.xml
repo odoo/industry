@@ -6,13 +6,20 @@
         <field name="ttype">html</field>
         <field name="model_id" ref="model_worksheet_template_2"/>
     </record>
+    <record id="x_billboard_field" model="ir.model.fields">
+        <field name="name">x_billboard</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Billboard</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="relation">account.analytic.account</field>
+    </record>
     <record id="x_orders_field" model="ir.model.fields">
         <field name="name">x_orders</field>
         <field name="field_description">Orders</field>
         <field name="ttype">one2many</field>
         <field name="model_id" ref="analytic.model_account_analytic_account"/>
         <field name="relation">sale.order</field>
-        <field name="relation_field">analytic_account_id</field>
+        <field name="relation_field">x_billboard</field>
     </record>
     <record id="x_state_field" model="ir.model.fields">
         <field name="name">x_is_available</field>
@@ -22,8 +29,10 @@
         <field name="model_id" ref="analytic.model_account_analytic_account"/>
         <field name="readonly" eval="True"/>
         <field name="compute"><![CDATA[
-for record in self:
-    record['x_is_available'] = not bool(self.env['sale.order'].search_count([('analytic_account_id', '=', record.id), ('subscription_state', '=', '3_progress')], limit=1))
+subscription_data = self.env['sale.order']._read_group(domain=[('x_billboard', 'in', self.ids), ('subscription_state', '=', '3_progress')], groupby=['x_billboard'], aggregates=['__count'])
+mapped_data = {analytic_account.id: count for analytic_account, count in subscription_data}
+for account in self:
+    account['x_is_available'] = not bool(mapped_data.get(account.id, 0))
         ]]></field>
     </record>
     <record id="x_no_trees_hiding_the_billboard_field" model="ir.model.fields">
@@ -81,13 +90,6 @@ for record in self:
         <field name="model_id" ref="analytic.model_account_analytic_account"/>
         <field name="relation">res.partner</field>
     </record>
-    <record id="x_billboard_field" model="ir.model.fields">
-        <field name="name">x_billboard</field>
-        <field name="ttype">many2one</field>
-        <field name="field_description">Billboard</field>
-        <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="relation">account.analytic.account</field>
-    </record>
     <record id="x_city_field" model="ir.model.fields">
         <field name="name">x_city</field>
         <field name="field_description">City</field>
@@ -102,33 +104,12 @@ for record in self:
         <field name="model_id" ref="analytic.model_account_analytic_account"/>
         <field name="selection">[('Iron', 'Iron'), ('Wood', 'Wood'), ('Aluminium', 'Aluminium'), ('Plastic', 'Plastic')]</field>
     </record>
-    <record id="x_project_task_id_field" model="ir.model.fields">
-        <field name="name">x_project_task_id</field>
-        <field name="field_description">Task</field>
+    <record id="x_billboard_task_field" model="ir.model.fields">
+        <field name="name">x_billboard_id</field>
+        <field name="field_description">Billboard</field>
+        <field name="related">sale_order_id.x_billboard</field>
         <field name="ttype">many2one</field>
-        <field name="model_id" ref="model_worksheet_template_1"/>
-        <field name="on_delete">cascade</field>
-        <field name="relation">project.task</field>
-        <field name="required" eval="True"/>
-    </record>
-    <record id="x_comments_field" model="ir.model.fields">
-        <field name="name">x_comments</field>
-        <field name="field_description">Comments</field>
-        <field name="ttype">html</field>
-        <field name="model_id" ref="model_worksheet_template_1"/>
-    </record>
-    <record id="x_name_field" model="ir.model.fields">
-        <field name="name">x_name</field>
-        <field name="field_description">Name</field>
-        <field name="related">x_project_task_id.name</field>
-        <field name="ttype">char</field>
-        <field name="model_id" ref="model_worksheet_template_1"/>
-    </record>
-    <record id="x_plan2_id_1_field" model="ir.model.fields">
-        <field name="name">x_plan2_id_1</field>
-        <field name="field_description">Billboards </field>
-        <field name="ttype">many2one</field>
-        <field name="model_id" ref="analytic.model_account_analytic_line"/>
+        <field name="model_id" ref="project.model_project_task"/>
         <field name="relation">account.analytic.account</field>
     </record>
     <record id="x_project_task_id_2_field" model="ir.model.fields">

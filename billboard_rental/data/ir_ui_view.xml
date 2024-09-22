@@ -65,8 +65,6 @@
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='display_name']" position="after">
-                <field name="x_is_available" invisible="1"/>
-                <field name="x_address" invisible="1"/>
                 <div invisible="not x_city">
                     <i class="fa fa-map-marker me-2" title="Location"/>
                     <field class="d-inline" name="x_city" display="full"/>
@@ -142,13 +140,10 @@
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='milestone_id']" position="before">
-                <xpath expr="//field[@name='analytic_account_id']" position="move"/>
+                <field name="x_billboard_id"/>
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="attributes">
                 <attribute name="string">Address</attribute>
-            </xpath>
-            <xpath expr="//field[@name='analytic_account_id']" position="attributes">
-                <attribute name="string">Billboard</attribute>
             </xpath>
         </field>
     </record>
@@ -176,15 +171,10 @@
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
-                <xpath expr="//field[@name='analytic_account_id']" position="move"/>
+                <field name="x_billboard" string="Billboard" domain='[("x_address", "!=", False), ("x_is_available", "=", True)]'/>
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="attributes">
                 <attribute name="domain">[('x_is_a_billboard', '=', False)]</attribute>
-            </xpath>
-            <xpath expr="//field[@name='analytic_account_id']" position="attributes">
-                <attribute name="domain">[("x_address", "!=", False), ("x_is_available", "=", True)]</attribute>
-                <attribute name="groups"/>
-                <attribute name="string">Billboard</attribute>
             </xpath>
         </field>
     </record>
@@ -209,49 +199,6 @@
                     </group>
                 </sheet>
             </form>
-        </field>
-    </record>
-    <record id="x_project_task_worksheet_template_1_ir_ui_view_1" model="ir.ui.view">
-        <field name="name">template_view_Default_Worksheet</field>
-        <field name="model">x_project_task_worksheet_template_1</field>
-        <field name="type">form</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <form create="false" duplicate="false">
-                <sheet>
-                    <h1 invisible="context.get('default_x_project_task_id')">
-                        <field name="x_project_task_id"/>
-                    </h1>
-                    <group>
-                        <field name="x_comments" placeholder="Add details about your intervention..."/>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-    <record id="x_project_task_worksheet_template_1_ir_ui_view_2" model="ir.ui.view">
-        <field name="name">tree_view_Default_Worksheet</field>
-        <field name="model">x_project_task_worksheet_template_1</field>
-        <field name="type">list</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <list>
-                <field name="create_date"/>
-                <field name="x_name"/>
-            </list>
-        </field>
-    </record>
-    <record id="x_project_task_worksheet_template_1_ir_ui_view_3" model="ir.ui.view">
-        <field name="name">search_view_Default_Worksheet</field>
-        <field name="model">x_project_task_worksheet_template_1</field>
-        <field name="type">search</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <search>
-                <field name="x_name"/>
-                <filter string="Created on" date="create_date" name="create_date"/>
-                <filter name="group_by_month" string="Created on" context="{'group_by': 'create_date:month'}"/>
-            </search>
         </field>
     </record>
     <record id="x_project_task_worksheet_template_2_ir_ui_view_2" model="ir.ui.view">
