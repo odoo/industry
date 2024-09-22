@@ -55,5 +55,6 @@
         'demo/purchase_order_confirm.xml',
     ],
     'license': 'OPL-1',
+    'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }

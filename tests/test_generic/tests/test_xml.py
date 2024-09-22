@@ -224,6 +224,8 @@ class TestEnv(IndustryCase):
             "loyalty.generate.wizard",
         ]
         models_not_to_update = [
+            "account.analytic.account",
+            "account.analytic.plan",
             "account.cash.rounding",
             "appointment.type",
             "calendar.event",
