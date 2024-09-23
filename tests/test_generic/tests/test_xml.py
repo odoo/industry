@@ -62,7 +62,7 @@ class TestEnv(IndustryCase):
                 self._check_static_files_usage_in_xml(content, in_use_files)
                 if root.split('/')[-1] == 'data':
                     self._check_view_active(content, file_name)
-                    self._check_is_published_false(module, file_name)
+                    self._check_is_published_false(content, file_name)
                     if not is_studio_required:
                         is_studio_required = self._check_studio(content, file_name)
         self._check_manifest(manifest_content, is_studio_required)
@@ -499,10 +499,18 @@ class TestEnv(IndustryCase):
             )
 
     def _check_is_published_false(self, xml_content, file_name):
-        if '<record ' in xml_content and '<field name="is_published" eval="True"/>' in xml_content:
-            _logger.warning(
-                f"Model in {file_name} should not have 'is_published' set to True in data."
-            )
+        root = etree.fromstring(xml_content.encode('utf-8'))
+        for record in root.xpath("//record"):
+            model = record.get('model')
+            if model == 'website.page':
+                continue
+            is_published_field = record.xpath(".//field[@name='is_published']/@eval")
+            if is_published_field and is_published_field[0] == "True":
+                _logger.warning(
+                    "Model in %s should not have 'is_published' set to True in data.",
+                    file_name,
+                )
+
 
     def _check_website_published_false(self, xml_content, file_name):
         if (
