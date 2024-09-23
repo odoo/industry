@@ -265,6 +265,7 @@ class TestEnv(IndustryCase):
             "pos_preparation_display.display",
             "pos_preparation_display.order",
             "pos_preparation_display.orderline",
+            "product.attribute",
             "product.attribute.value",
             "product.category",
             "product.packaging",
@@ -396,6 +397,10 @@ class TestEnv(IndustryCase):
                 'name',
                 'price',
             ],
+            'product.template': [
+                'can_image_1024_be_zoomed',
+                'has_configurable_attributes',
+            ],
             'product.template.attribute.line': ['value_count'],
             'product.template.attribute.value': [
                 'attribute_id',
@@ -403,19 +408,33 @@ class TestEnv(IndustryCase):
                 'product_tmpl_id',
             ],
             'project.tags': ['color'],
+            'project.task': [
+                'working_days_close',
+                'working_hours_close',
+            ],
+            'purchase.order': [
+                'receipt_status',
+                'state',
+            ],
             'purchase.order.line': [
                 'date_order',
                 'name',
+                'state',
             ],
-            'res.partner': ['tz'],
+            'res.partner': [
+                'commercial_company_name',
+                'tz',
+            ],
             'sale.order': [
                 'access_token',
                 'amount_tax',
                 'amount_to_invoice',
                 'amount_total',
                 'amount_untaxed',
+                'currency_id',
                 'currency_rate',
                 'date_order',
+                'delivery_status',
                 'health',
                 'invoice_status',
                 'is_subscription',
@@ -427,8 +446,10 @@ class TestEnv(IndustryCase):
                 'recurring_total',
                 'state',
                 'validity_date',
+                'warehouse_id',
             ],
             'sale.order.line': [
+                'currency_id',
                 'invoice_status',
                 'is_service',
                 # 'name',  # need to handle down payments and options & templates properly
