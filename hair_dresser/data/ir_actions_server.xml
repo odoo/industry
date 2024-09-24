@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="break_subpart_calendar_event_server_action" model="ir.actions.server">
+        <field name="code"><![CDATA[x_break_start = record.x_break_start
+x_break_end = record.x_break_end
+appointment_duration = record.duration
+
+start_time = record.start
+end_time = record.stop
+if record.create_date >= datetime.datetime.now() - datetime.timedelta(minutes=5) and not record.x_appointment_part_1 and not record.x_appointment_part_2:
+        event2_vals = {
+                'name': "[PART 1]" + record.name ,
+                'start': start_time,
+                'stop': start_time + datetime.timedelta(hours=x_break_start),
+                'user_id': record.user_id.id,
+                'x_parent_id': record.id,
+                'alarm_ids' : [],
+                'partner_ids': [record.partner_ids[0].id],
+                'appointment_type_id':record.appointment_type_id.id,   
+        }
+        part_1 = env['calendar.event'].create(event2_vals)
+
+        # Third event - From Break End to Original End
+        event3_vals = {
+                'name': "[PART 2]" + record.name,
+                'start': start_time + datetime.timedelta(hours=x_break_end),
+                'stop': end_time,
+                'user_id': record.user_id.id,
+                'partner_ids': [record.partner_ids[0].id],
+                'x_parent_id': record.id,
+                'alarm_ids' : [],
+                'appointment_type_id':record.appointment_type_id.id,        
+        }
+        part_2 = env['calendar.event'].create(event3_vals)
+
+        record.write({'x_visibility':True,'show_as': "free",'x_appointment_part_1': part_1.id, 'x_appointment_part_2': part_2.id})
+]]></field>
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="state">code</field>
+        <field name="name">Execute Code</field>
+   </record>
+</odoo>
