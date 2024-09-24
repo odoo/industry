@@ -17,6 +17,9 @@ class TestEnv(IndustryCase):
         index_database = sys_args.index('-d')
         if not sys_args[index_database + 1].endswith('imported_with_demo'):
             return
+        if 'bike_leasing' in self.installed_modules:
+            # we don't pay the cart in this industry, we get a quote
+            return
         if self.env['ir.module.module']._get('website_sale').state == 'installed':
             self.assertTrue(
                 self.env['ir.module.module']._get('payment_demo').state == 'installed',
