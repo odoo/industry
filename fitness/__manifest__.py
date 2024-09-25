@@ -66,7 +66,6 @@
         'demo/website_theme_apply.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
-        'demo/pos_config.xml',
         'demo/payment_provider_demo_post.xml',
     ],
     'license': 'OPL-1',
