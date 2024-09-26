@@ -1,5 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import re
 import sys
 
 from odoo.tests.common import tagged
@@ -78,3 +79,20 @@ class TestEnv(IndustryCase):
                         ["%s (ID: %s)" % (record.display_name, record.id) for record in records],
                     ),
                 )
+
+    def test_knowledge_article_links_use_latest(self):
+        pattern = r'https?://www\.odoo\.com/documentation/(?!latest/)(\d+\.\d+|master)/'
+        for module in self.installed_modules:
+            knowledge = self.env['ir.model.data'].search(
+                [('model', '=', 'knowledge.article'), ('module', '=', module)], limit=1
+            )
+            if not knowledge:
+                continue
+            knowledge_article = self.env.ref(knowledge.complete_name)
+            content = knowledge_article.body or ''
+            matches = re.findall(pattern, content)
+            self.assertFalse(
+                matches,
+                "Found links to Odoo documentation using version-specific URLs in module '%s' knowledge article: %s. Please use '/latest/' instead."
+                % (module, matches),
+            )
