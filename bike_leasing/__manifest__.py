@@ -9,6 +9,7 @@ This module is a complete solution for the bike leasing industry, simplifying le
         'base_automation',
         'calendar',
         'knowledge',
+        'payment_custom',
         'purchase_stock',
         'sale_management',
         'sale_planning',
@@ -19,7 +20,6 @@ This module is a complete solution for the bike leasing industry, simplifying le
         'website_helpdesk',
         'website_payment',
         'website_sale',
-        'payment_custom',
         'theme_vehicle',
     ],
     'data': [

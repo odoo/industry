@@ -8,9 +8,9 @@ We offer IT sales, installation, and repair services for a wide range of product
     'depends': [
         'account_followup',
         'helpdesk_stock',
+        'industry_fsm_sale',
         'knowledge',
         'purchase_stock',
-        'industry_fsm_sale',
         'repair',
         'sale_crm',
         'sale_purchase',
