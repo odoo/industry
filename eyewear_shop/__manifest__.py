@@ -9,8 +9,8 @@ The sales process involves creating sale orders, managing deliveries and invoici
     'depends': [
         'appointment_crm',
         'knowledge',
-        'purchase_stock',
         'point_of_sale',
+        'purchase_stock',
         'sale_management',
         'web_studio',
         'website_appointment',

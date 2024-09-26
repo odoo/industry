@@ -14,9 +14,9 @@
         'purchase',
         'sale_project',
         'sale_subscription',
+        'web_studio',
         'website_appointment',
         'website_sale',
-        'web_studio',
     ],
     'data': [
         'data/res_config_settings.xml',

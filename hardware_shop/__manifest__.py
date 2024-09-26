@@ -7,8 +7,8 @@ For Hardware Stores that carry a large selection of products: plumbing, machiner
 Using Point of Sale, Inventory, Sales, Purchase, Accounting, Contact, Employee, Dashboard, Barcode, and Documents to grow their business.
     """,
     'depends': [
-        'base_geolocalize',
         'barcodes',
+        'base_geolocalize',
         'contacts',
         'knowledge',
         'pos_sale',

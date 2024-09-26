@@ -8,9 +8,9 @@ The Automobile spare parts business have the more number of items for the variou
 Maintenance and accessorises etc.
     """,
     'depends': [
-        'base_automation',
         'account_check_printing',
         'account_followup',
+        'base_automation',
         'calendar',
         'knowledge',
         'pos_sale',

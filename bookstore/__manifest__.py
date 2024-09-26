@@ -15,8 +15,8 @@
         'purchase_stock',
         'sale_management',
         'sale_purchase',
-        'stock_barcode_barcodelookup',
         'stock_account',
+        'stock_barcode_barcodelookup',
         'web_studio',
     ],
     'data': [

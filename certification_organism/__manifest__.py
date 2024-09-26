@@ -6,16 +6,16 @@
 This module setup your database to easily use odoo in a Audit & Certification company.
 """,
     'depends': [
-        'web_studio',
-        'knowledge',
-        'industry_fsm_sale_report',
-        'project',
-        'hr_timesheet',
-        'hr_holidays',
         'crm',
-        'sale_timesheet',
+        'hr_holidays',
+        'hr_timesheet',
+        'industry_fsm_sale_report',
+        'knowledge',
         'product_margin',
-        'website_appointment'
+        'project',
+        'sale_timesheet',
+        'web_studio',
+        'website_appointment',
     ],
     'data': [
         'data/res_config_setting.xml',
