@@ -7,12 +7,12 @@ This setup if for IT companies reselling software licenses, and consulting servi
 The typical sale is a 1 year Oracle Database license that is purchased to Oracle, and resold to client at a margin, with extra services to setup the database.
 """,
     'depends': [
-        'project',
         'knowledge',
-        'sale_purchase',
-        'sale_timesheet',
+        'project',
         'sale_planning',
+        'sale_purchase',
         'sale_subscription',
+        'sale_timesheet',
         'web_studio',
     ],
     'data': [
