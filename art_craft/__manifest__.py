@@ -9,8 +9,8 @@
     'depends': [
         'hr_hourly_cost',
         'knowledge',
-        'pos_sale',
         'pos_discount',
+        'pos_sale',
         'product_email_template',
         'purchase_stock',
         'sale_service',

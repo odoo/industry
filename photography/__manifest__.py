@@ -13,11 +13,11 @@
     """,
     'depends': [
         'crm',
-        'sale_management',
         'knowledge',
         'project_enterprise',
-        'website_appointment',
+        'sale_management',
         'sale_project',
+        'website_appointment',
         'theme_nano',
     ],
     'data': [
