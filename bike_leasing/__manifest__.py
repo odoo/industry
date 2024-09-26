@@ -50,6 +50,7 @@ This module is a complete solution for the bike leasing industry, simplifying le
         'demo/res_partner.xml',
         'demo/hr_employee.xml',
         'demo/product_supplierinfo.xml',
+        'demo/product_template.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
