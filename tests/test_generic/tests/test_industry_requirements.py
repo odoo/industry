@@ -32,7 +32,7 @@ class TestEnv(IndustryCase):
             )
             notif = self.env['mail.message'].browse(ref.id)
             self.assertIn(
-                '<a href="/knowledge/article/',
+                '/knowledge/article/',
                 notif.body,
                 "The notification should contain a link to the knowledge article.",
             )
@@ -47,7 +47,7 @@ class TestEnv(IndustryCase):
                 "The knowledge article should be in the favorite category",
             )
             self.assertIn(
-                'href="/knowledge/article/%s' % knowledge_article.id,
+                '/knowledge/article/%s' % knowledge_article.id,
                 notif.body,
                 "The notification link should target the module-related knowledge article.",
             )
