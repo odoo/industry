@@ -7,6 +7,7 @@ This industry is ideal for construction businesses proficient in managing projec
 focusing on accurate quoting, efficient planning, seamless execution, and excellent customer service, ...
 """,
     'depends': [
+        'base_automation',
         'crm_enterprise',
         'documents',
         'helpdesk',
@@ -20,8 +21,13 @@ focusing on accurate quoting, efficient planning, seamless execution, and excell
         'sale_margin',
         'sale_project_forecast',
         'sign',
+        'web_studio',
     ],
     'data': [
+        'data/base_automation.xml',
+        'data/ir_action_server.xml',
+        'data/ir_model_fields.xml',
+        'data/ir_ui_view.xml',
         'data/account_analytic_account.xml',
         'data/documents_folder.xml',
         'data/res_config_settings.xml',
