@@ -37,7 +37,6 @@
         'data/res_config_settings.xml',
     ],
     'demo': [
-        'demo/account_analytic_line.xml',
         'demo/res_partner.xml',
         'demo/appointment_type.xml',
         'demo/crm_lead.xml',
@@ -47,6 +46,7 @@
         'demo/sale_order_confirm.xml',
         'demo/mail_activity.xml',
         'demo/timesheet.xml',
+        'demo/project_project.xml',
     ],
     'license': 'OPL-1',
     'author': 'Odoo S.A.',
