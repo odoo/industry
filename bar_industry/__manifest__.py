@@ -1,5 +1,5 @@
 {
-    'name': 'Bar Industry',
+    'name': 'Bar & Pub',
     'version': '1.0',
     'category': 'Hospitality',
     'description': """
