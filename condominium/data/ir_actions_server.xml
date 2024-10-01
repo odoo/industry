@@ -5,13 +5,16 @@
         <field name="state">code</field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="code"><![CDATA[
-for property in record.partner_id.x_condominium_units_ids:
+total_ratio = sum(record.partner_id.x_condominium_properties.mapped('x_ratio'))
+if total_ratio == 0:
+    raise UserError('There is no ratio set on the properties. Define a ratio for each property before splitting.')
+for property in record.partner_id.x_condominium_properties:
     new_so = record.copy()
     new_so['x_source_sales_order'] = record.id
-    new_so['partner_id'] = property.x_partner_id.id
+    new_so['partner_id'] = property.x_owner.id
     new_so['x_property_id'] = property
     for sol in new_so.order_line:
-        sol['price_unit'] = sol.price_unit * property.x_area_percent
+        sol['price_unit'] = sol.price_unit * property.x_ratio / total_ratio
 record['state'] = 'cancel'
 ]]></field>
     </record>
@@ -22,17 +25,6 @@ record['state'] = 'cancel'
         <field name="binding_model_id" ref="sale.model_sale_order"/>
         <field name="code"><![CDATA[
 records.action_confirm()
-]]></field>
-    </record>
-    <record id="ir_act_server_set_condominiums_on_partner" model="ir.actions.server">
-        <field name="name">Execute Code</field>
-        <field name="state">code</field>
-        <field name="base_automation_id" ref="base_automation_1"/>
-        <field name="model_id" ref="units_property_model"/>
-        <field name="code"><![CDATA[
-for unit in records:
-    condominiums_ids = unit.x_partner_id.x_units_owner_ids.x_condominium_id
-    unit.x_partner_id['x_condominiums_ids'] = [(6, 0, condominiums_ids.ids)]
 ]]></field>
     </record>
 </odoo>
