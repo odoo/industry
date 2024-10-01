@@ -8,6 +8,7 @@
     """,
     'depends': [
         'account_edi_ubl_cii',
+        "base_automation",
         'base_geolocalize',
         'hr_hourly_cost',
         'knowledge',
@@ -17,9 +18,14 @@
         'sales_team',
         'website_appointment',
         'theme_orchid',
+        "web_studio",
     ],
     'data': [
         'data/res_config_settings.xml',
+        'data/ir_model_fields.xml',
+        'data/ir_ui_view.xml',
+        'data/ir_actions_server.xml',
+        'data/base_automation.xml',
         'data/project_task_type.xml',
         'data/product_template.xml',
         'data/product_attribute.xml',
