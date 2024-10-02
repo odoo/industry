@@ -190,8 +190,8 @@ class TestEnv(IndustryCase):
                 module,
                 file_name,
             )
-        if s.count("x_studio"):
-            _logger.warning("Please remove 'studio' from 'x_studio' in %s.", file_name)
+        # if s.count("x_studio"):
+        #     _logger.warning("Please remove 'studio' from 'x_studio' in %s.", file_name)
         useless_attributes = [
             "context.get('studio')",
             "data-last-history-steps",
@@ -357,7 +357,6 @@ class TestEnv(IndustryCase):
             'hr.applicant': ['last_stage_id'],
             'ir.attachment': ['access_token'],
             'ir.model.fields': [
-                'copied',
                 'model',
             ],
             'knowledge.article': [
