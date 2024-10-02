@@ -53,7 +53,6 @@ Moreover, the business is legally regulated in lots of countries under different
     'demo': [
         'demo/account_analytic_account.xml',
         'demo/documents_folder.xml',
-        'demo/document_document.xml',
         'demo/project_project.xml',
         'demo/res_partner.xml',
         'demo/res_company.xml',
