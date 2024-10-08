@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="base_automation_when_car_booked" model="base.automation">
+        <field name="name">Update Car Status When Booked</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="filter_domain">[("state", "=", "sale")]</field>
+        <field name="filter_pre_domain">["|", ("state", "=", "draft"), ("state", "=", "sent")]</field>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale.field_sale_order_line__state')])]"/>
+    </record>
+    <record id="base_automation_when_returned" model="base.automation">
+        <field name="name">Update Car Status When Returned</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="filter_domain">[("x_rental_status", "=", "returned")]</field>
+        <field name="filter_pre_domain">[("x_rental_status", "=", "return")]</field>
+        <field name="trigger">on_create_or_write</field>
+    </record>
+    <record id="base_automation_update_hours" model="base.automation">
+        <field name="name">Update the Hours</field>
+        <field name="model_id" ref="account.model_account_analytic_line"/>
+        <field name="trigger">on_create</field>
+    </record>
+</odoo>
