@@ -426,6 +426,14 @@ class TestEnv(IndustryCase):
             'res.partner': [
                 'commercial_company_name',
                 'tz',
+                'commercial_company_name',
+                'category_id',
+                'customer_rank',
+                'email_normalized',
+                'phone_sanitized',
+                'peppol_eas',
+                'peppol_endpoint',
+                'contact_address_complete',
             ],
             'sale.order': [
                 'access_token',
