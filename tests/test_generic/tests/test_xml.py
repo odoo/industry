@@ -424,7 +424,14 @@ class TestEnv(IndustryCase):
                 'state',
             ],
             'res.partner': [
+                'category_id',
                 'commercial_company_name',
+                'contact_address_complete',
+                'customer_rank',
+                'email_normalized',
+                'peppol_eas',
+                'peppol_endpoint',
+                'phone_sanitized',
                 'tz',
             ],
             'sale.order': [
