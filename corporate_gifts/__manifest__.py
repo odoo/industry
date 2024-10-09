@@ -54,7 +54,6 @@ This module is for marketing companies selling and producing customized corporat
         'data/ir_attachment_post.xml',
         'data/website_view.xml',
         'data/website_menu.xml',
-        'data/ir_model_data.xml',
         'data/knowledge_tour.xml',
     ],
     'demo': [
@@ -90,6 +89,7 @@ This module is for marketing companies selling and producing customized corporat
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        "data/website_view.xml",
         "static/src/js/my_tour.js",
     ],
     'images': ['images/main.png'],

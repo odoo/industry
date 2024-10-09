@@ -50,7 +50,6 @@
         'data/pos_config.xml',
         'data/mail_message.xml',
         'data/website_view.xml',
-        'data/ir_model_data.xml',
         'data/knowledge_tour.xml',
     ],
     'demo': [
@@ -83,7 +82,9 @@
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
+        "data/ir_ui_view.xml",
         "data/knowledge_article.xml",
+        "data/website_view.xml",
         "static/src/js/my_tour.js",
     ],
     'images': ['images/main.png'],
