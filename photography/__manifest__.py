@@ -30,7 +30,6 @@
         'data/crm_tags_data.xml',
         "data/ir_attachment.xml",
         "data/website_contactus.xml",
-        "data/ir_model_data.xml",
         "data/knowledge_cover.xml",
         "data/knowledge_article.xml",
         "data/knowledge_article_favorite.xml",
@@ -61,6 +60,7 @@
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        "data/website_view.xml",
         "static/src/js/my_tour.js",
     ],
     'images': ['images/main.png'],
