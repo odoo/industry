@@ -41,9 +41,6 @@ Manage your properties, create and manage rental contracts, and streamline your 
         'data/ir_ui_views.xml',
         'data/ir_actions_act_window.xml',
         'data/menu_item.xml',
-        'data/website_menu.xml',
-        'data/website_view.xml',
-        'data/website_theme_apply.xml',
         'data/ir_filters.xml',
         'data/x_meters.xml',
         'data/knowledge_tour.xml',
@@ -78,8 +75,8 @@ Manage your properties, create and manage rental contracts, and streamline your 
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "data/website_controller_page.xml",
-        "data/website_view.xml",
         "static/src/js/my_tour.js",
+        "demo/website_views.xml",
     ],
     'images': ['images/main.png'],
 }

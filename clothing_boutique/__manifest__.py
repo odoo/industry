@@ -66,6 +66,7 @@ This setup if for Clothing Store companies selling female clothing.""",
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
+        "demo/website_page_views.xml",
     ],
     'images': ['images/main.png'],
 }
