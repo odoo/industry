@@ -57,6 +57,7 @@ This module installs a configuration that presets the modules and configure Odoo
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
+        "demo/website_page_views.xml",
     ],
     'images': ['images/main.png'],
 }
