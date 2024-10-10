@@ -77,7 +77,7 @@
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
-        "data/ir_ui_view.xml",
+        "data/appointment_view.xml",
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
     ],
