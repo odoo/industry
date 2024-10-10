@@ -60,7 +60,7 @@
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
-        "data/website_view.xml",
+        "data/website_contactus.xml",
         "static/src/js/my_tour.js",
     ],
     'images': ['images/main.png'],
