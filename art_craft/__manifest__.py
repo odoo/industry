@@ -67,7 +67,7 @@
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
         'demo/payment_provider_demo_post.xml',
-        'demo/website_views.xml',
+        'demo/website_view.xml',
         'demo/website_ir_attachment.xml',
         'demo/website.xml',
         'demo/website_page.xml',
@@ -85,7 +85,7 @@
         "data/knowledge_article.xml",
         "data/custom_view.xml",
         "static/src/js/my_tour.js",
-        "demo/website_views.xml",
+        "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
 }

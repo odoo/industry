@@ -76,7 +76,7 @@ class TestEnv(IndustryCase):
         for module in self.installed_modules:
             for cloc_entry in c.modules.get(module, {}):
                 message = "The view '%s' is counted in the maintenance lines. " % cloc_entry
-                message += "Please add a '__cloc_exclude__' entry in 'manifest."
+                message += "Please add the file in 'cloc_exclude' list of the manifest."
                 self.assertEqual(len(cloc_entry.split(':')), 2, message)
 
     def test_sale_ok_and_is_published_in_db(self):

@@ -42,7 +42,7 @@ This module installs a configuration that presets the modules and configure Odoo
         'demo/res_users.xml',
         'demo/appointment_type.xml',
         'demo/website.xml',
-        'demo/website_page_views.xml',
+        'demo/website_view.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
@@ -57,7 +57,7 @@ This module installs a configuration that presets the modules and configure Odoo
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
-        "demo/website_page_views.xml",
+        "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
 }
