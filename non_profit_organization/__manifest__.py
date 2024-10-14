@@ -38,7 +38,7 @@
         'demo/event_event.xml',
         'demo/event_event_ticket.xml',
         'demo/website.xml',
-        'demo/website_page_views.xml',
+        'demo/website_view.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
@@ -54,7 +54,7 @@
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
-        "demo/website_page_views.xml",
+        "demo/website_view.xml",
         "static/src/js/my_tour.js",
     ],
     'images': ['images/main.png'],

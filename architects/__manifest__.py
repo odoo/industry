@@ -51,7 +51,7 @@ schematic design, design development, worksite follow-up, energy efficiency asse
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
-        'demo/website_views.xml',
+        'demo/website_view.xml',
         'demo/website_theme_apply.xml',
         'demo/hr_expense.xml',
         'demo/hr_expense_action.xml',
@@ -66,7 +66,7 @@ schematic design, design development, worksite follow-up, energy efficiency asse
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
-        "demo/website_views.xml",
+        "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
 }

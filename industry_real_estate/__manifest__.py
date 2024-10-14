@@ -60,7 +60,7 @@ Manage your properties, create and manage rental contracts, and streamline your 
         'demo/account_move.xml',
         'demo/account_move_line.xml',
         'demo/website_attachment.xml',
-        'demo/website_views.xml',
+        'demo/website_view.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
@@ -76,7 +76,7 @@ Manage your properties, create and manage rental contracts, and streamline your 
         "data/knowledge_article.xml",
         "data/website_controller_page.xml",
         "static/src/js/my_tour.js",
-        "demo/website_views.xml",
+        "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
 }

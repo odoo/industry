@@ -56,7 +56,7 @@
         'demo/loyalty_card.xml',
         'demo/sale_order_post.xml',
         'demo/website.xml',
-        'demo/website_views.xml',
+        'demo/website_view.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
@@ -73,7 +73,7 @@
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
-        "demo/website_views.xml",
+        "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
 }

@@ -63,7 +63,7 @@ This module is for marketing companies selling and producing customized corporat
         'demo/product_template.xml',
         'demo/product_supplierinfo.xml',
         'demo/website_ir_attachment.xml',
-        'demo/website_views.xml',
+        'demo/website_view.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
@@ -88,7 +88,7 @@ This module is for marketing companies selling and producing customized corporat
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
-        "demo/website_views.xml",
+        "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
 }
