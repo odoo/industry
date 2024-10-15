@@ -52,6 +52,7 @@
         'data/mail_message.xml',
         'data/website_view.xml',
         'data/knowledge_tour.xml',
+        'data/consignment_purchase_tour.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -79,6 +80,7 @@
     'assets': {
         'web.assets_backend': [
             'art_craft/static/src/js/my_tour.js',
+            'art_craft/static/src/js/tours/consignment_purchase_tour.js',
         ]
     },
     'author': 'Odoo S.A.',
@@ -86,6 +88,7 @@
         "data/knowledge_article.xml",
         "data/qweb_view.xml",
         "static/src/js/my_tour.js",
+        "static/src/js/tours/consignment_purchase_tour.js",
         "data/website_view.xml",
         "demo/website_view.xml",
     ],

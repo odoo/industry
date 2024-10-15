@@ -63,6 +63,7 @@
         'data/website_view.xml',
         'data/sale_order_spreadsheet.xml',
         'data/knowledge_tour.xml',
+        'data/manufacturing_tour.xml',
     ],
     'demo': [
         'demo/website.xml',
@@ -94,6 +95,7 @@
     'assets': {
         'web.assets_backend': [
             'micro_brewery/static/src/js/my_tour.js',
+            'micro_brewery/static/src/js/tours/manufacturing_tour.js',
         ]
     },
     'author': 'Odoo S.A.',
@@ -102,6 +104,7 @@
         "data/qweb_view.xml",
         "data/website_view.xml",
         "static/src/js/my_tour.js",
+        "static/src/js/tours/manufacturing_tour.js",
         "demo/website_view.xml",
     ],
     'images': ['images/main.png'],

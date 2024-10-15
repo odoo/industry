@@ -53,6 +53,7 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/knowledge_tour.xml',
+        'data/purchase_lot_tour.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -89,6 +90,7 @@
     'assets': {
         'web.assets_backend': [
             'electronic_store/static/src/js/my_tour.js',
+            'electronic_store/static/src/js/tours/purchase_lot_tour.js',
         ]
     },
     'author': 'Odoo S.A.',
@@ -96,6 +98,7 @@
         "data/qweb_view.xml",
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
+        "static/src/js/tours/purchase_lot_tour.js",
         "demo/website_view.xml",
     ],
     'images': ['images/main.png'],

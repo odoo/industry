@@ -37,6 +37,7 @@
         'data/website_view.xml',
         'data/website_theme_apply.xml',
         'data/knowledge_tour.xml',
+        'data/purchase_tour.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -69,12 +70,14 @@
     'assets': {
         'web.assets_backend': [
             'agriculture_shop/static/src/js/my_tour.js',
+            'agriculture_shop/static/src/js/tours/purchase_flow.js',
         ]
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
+        "static/src/js/tours/purchase_flow.js",
         "data/website_view.xml",
         "demo/website_view.xml",
     ],
