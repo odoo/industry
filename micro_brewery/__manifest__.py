@@ -53,6 +53,7 @@ This module is a setup specific to support the business activities of a microbre
         'data/website_view.xml',
         'data/ir_model_data.xml',
         'data/knowledge_tour.xml',
+        'data/manufacturing_tour.xml',
     ],
     'demo': [
         'demo/website.xml',
@@ -84,12 +85,14 @@ This module is a setup specific to support the business activities of a microbre
     'assets': {
         'web.assets_backend': [
             'micro_brewery/static/src/js/my_tour.js',
+            'micro_brewery/static/src/js/tours/manufacturing_tour.js',
         ]
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
+        "static/src/js/tours/manufacturing_tour.js",
     ],
     'images': ['images/main.png'],
 }
