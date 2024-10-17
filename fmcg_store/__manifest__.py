@@ -66,7 +66,7 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
     'license': 'OPL-1',
     'assets': {
         'web.assets_backend': [
-            'fcmg_store/static/src/js/my_tour.js',
+            'fmcg_store/static/src/js/my_tour.js',
         ]
     },
     'author': 'Odoo S.A.',
