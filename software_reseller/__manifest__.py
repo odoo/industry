@@ -41,6 +41,7 @@ The typical sale is a 1 year Oracle Database license that is purchased to Oracle
     ],
     'demo': [
         'demo/res_partner.xml',
+        'demo/hr_employee.xml',
         'demo/product_supplierinfo.xml',
         'demo/product_product.xml',
         'demo/sale_order.xml',
@@ -49,6 +50,7 @@ The typical sale is a 1 year Oracle Database license that is purchased to Oracle
         'demo/project_task.xml',
         'demo/purchase_order_confirm.xml',
         'demo/planning_slot.xml',
+        'demo/timesheet.xml',
     ],
     'license': 'OPL-1',
     'assets': {

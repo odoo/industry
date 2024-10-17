@@ -37,6 +37,7 @@
         'demo/loyalty_program.xml',
         'demo/kitchen_display.xml',
         'demo/product_packaging.xml',
+        'demo/stock_quant.xml',
         'demo/stock_warehouse_orderpoint.xml',
         'demo/planning_role.xml',
         'demo/product_supplierinfo.xml',
