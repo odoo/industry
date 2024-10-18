@@ -47,6 +47,8 @@
         'data/quality_point.xml',
         'data/ir_model_data.xml',
         'data/knowledge_tour.xml',
+        'data/purchase_flow_tour.xml',
+        'data/sale_flow_tour.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -63,12 +65,16 @@
     'assets': {
         'web.assets_backend': [
             'coal_petroleum/static/src/js/my_tour.js',
+            'coal_petroleum/static/src/js/tours/purchase_flow_tour.js',
+            'coal_petroleum/static/src/js/tours/sale_flow_tour.js',
         ]
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
+        "static/src/js/tours/purchase_flow_tour.js",
+        "static/src/js/tours/sale_flow_tour.js",
     ],
     'images': ['images/main.png'],
 }
