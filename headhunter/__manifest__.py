@@ -43,8 +43,6 @@ Those agencies work on two levels and with two different audiences, ...
         'data/sign_request.xml',
         'data/crm_stage.xml',
         'data/crm_tag.xml',
-        'data/website_view.xml',
-        'data/ir_model_data.xml',
         'data/knowledge_tour.xml',
     ],
     'demo': [
@@ -74,6 +72,7 @@ Those agencies work on two levels and with two different audiences, ...
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
+        "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
 }
