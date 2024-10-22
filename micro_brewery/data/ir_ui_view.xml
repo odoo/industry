@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="mrp_bom_form_custom" model="ir.ui.view">
+        <field name="name">mrp.bom.form customization</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/div[1]" position="after">
+                <field name="x_auto_production"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="product_template_kanban_custom" model="ir.ui.view">
+        <field name="name">Product.template.product.kanban customization</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_kanban_view"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="priority">160</field>
+        <field name="type">kanban</field>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban[1]/templates[1]/t[1]/main[1]/div[2]" position="after">
+                <field name="x_deposit_product_1" display="full"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="product_template_form_custom" model="ir.ui.view">
+        <field name="name">product.template.product.form customization</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_tooltip']" position="after">
+                <field name="x_deposit_product_1" invisible="x_is_a_deposit"/>
+                <label for="x_quantity_by_deposit_product" invisible="x_is_a_deposit"/>
+                <div class="d-flex" name="deposit" invisible="x_is_a_deposit">
+                    <field class="oe_inline" name="x_quantity_by_deposit_product"/>
+                    <field name="x_unit_sale_product" placeholder="ex. Delta I.P.A. - 33cl"
+                        help="Leave empty if this product is the smallest unit"/>
+                </div>
+                <field name="x_deposit_product" invisible="not x_unit_sale_product"
+                    help="Deposit product must be set in Deposit category"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="ir_ui_view_3370" model="ir.ui.view">
+        <field name="inherit_id" ref="website_sale.products_add_to_cart"/>
+        <field name="key">gen_key.2c5a96</field>
+        <field name="mode">extension</field>
+        <field name="name">product.template.product.form customization</field>
+        <field name="type">qweb</field>
+        <field name="arch" type="xml">
+            <xpath expr="//t[@t-set='product_variant_id']" position="replace">
+                <t t-set="product_variant_id" t-value="product.product_variant_id.id if product.product_variant_id else False"/>
+            </xpath>
+        </field>
+        <field name="active" eval="True"/>
+      </record>
+</odoo>
