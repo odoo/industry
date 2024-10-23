@@ -1,0 +1,314 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="analytic.view_account_analytic_account_kanban" model="ir.ui.view" context="{'studio': True}" forcecreate="1">
+    <field name="arch" type="xml">
+      <kanban class="o_kanban_mobile">
+        <field name="currency_id"/>
+        <templates>
+          <t t-name="card">
+            <div t-attf-class="#{!selection_mode ? 'text-center' : ''}">
+              <field class="fw-bold fs-5" name="display_name"/>
+            </div>
+            <div t-attf-class="#{!selection_mode ? 'text-center' : ''}">
+                                Balance: <field name="balance" widget="monetary"/>
+                            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+    <field name="model">account.analytic.account</field>
+    <field name="name">account.analytic.account.kanban</field>
+    <field name="type">kanban</field>
+  </record>
+  <record id="odoo_studio_product__9be94e0b-2f45-4c1b-a2ce-0aebff9f82a5" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//button[@name='action_open_pricelist_report']" position="before">
+          <button string="Compute Ratios" name="726" type="action" class="btn-primary"/>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]" position="before">
+          <page string="Ratios" name="studio_page_ratios">
+            <field name="x_studio_ratios">
+              <list editable="bottom">
+                <field name="x_studio_sequence" widget="handle"/>
+                <field name="x_studio_property"/>
+                <field optional="show" name="x_studio_building" options="{'create_name_field': 'x_name'}"/>
+                <field optional="show" name="x_type" options="{'create_name_field': 'x_name'}"/>
+                <field name="x_studio_owner" optional="show"/>
+                <field optional="show" name="x_studio_floor"/>
+                <field name="x_studio_area" sum="Sum of Area" optional="show"/>
+                <field name="x_studio_ratio" sum="Sum of Ratio"/>
+                <field name="x_studio_company_id" optional="hide"/>
+              </list>
+            </field>
+          </page>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="product.product_pricelist_view"/>
+    <field name="mode">extension</field>
+    <field name="model">product.pricelist</field>
+    <field name="name">Odoo Studio: product.pricelist.form customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_list_view_fo_4b0695d8-e44f-4dea-ba24-97e3a87680f1" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+        <field name="x_studio_company_id" groups="base.group_multi_company"/>
+      </list>
+    </field>
+    <field name="model">x_ratios</field>
+    <field name="name">Default list view for x_ratios</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_8c2be510-bad6-4e59-9ebc-227f6fd5dfcf" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Ratios">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_ae54a3">
+            <group name="studio_group_ae54a3_left">
+              <field name="x_studio_company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+            </group>
+            <group name="studio_group_ae54a3_right"/>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+    <field name="model">x_ratios</field>
+    <field name="name">Default form view for x_ratios</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__d10333b4-05e4-4233-8be4-0a73769e2580" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_ratios" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="model">x_ratios</field>
+    <field name="name">Default search view for x_ratios</field>
+    <field name="type">search</field>
+  </record>
+  <record id="odoo_studio_default__b5d6716b-302a-410e-a95a-59ce797b4b01" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='x_name']" position="replace"/>
+        <xpath expr="//group[@name='studio_group_ae54a3_left']" position="inside">
+          <field name="x_studio_property" options="{&quot;create_name_field&quot;:&quot;x_name&quot;,&quot;no_create&quot;:true}"/>
+          <field name="x_studio_pricelist" options="{&quot;no_create&quot;:true}"/>
+        </xpath>
+        <xpath expr="//group[@name='studio_group_ae54a3_right']" position="inside">
+          <field name="x_studio_ratio"/>
+          <xpath expr="//field[@name='x_studio_company_id']" position="move"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_form_view_fo_8c2be510-bad6-4e59-9ebc-227f6fd5dfcf"/>
+    <field name="mode">extension</field>
+    <field name="model">x_ratios</field>
+    <field name="name">Odoo Studio: Default form view for x_ratios customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_product__d272fb6c-d2b6-4245-afb0-c74d3d99b734" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//list[1]/field[@name='name']" position="attributes">
+          <attribute name="string">Distribution Key</attribute>
+        </xpath>
+        <xpath expr="//field[@name='country_group_ids']" position="attributes">
+          <attribute name="column_invisible">True</attribute>
+        </xpath>
+        <xpath expr="//field[@name='company_id']" position="attributes">
+          <attribute name="column_invisible">True</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="product.product_pricelist_view_tree"/>
+    <field name="mode">extension</field>
+    <field name="model">product.pricelist</field>
+    <field name="name">Odoo Studio: product.pricelist.list customization</field>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+  </record>
+  <record id="odoo_studio_sale_ord_9a2056f1-3914-4c14-9c51-d970942088c7" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='x_property_id']" position="replace"/>
+        <xpath expr="//field[@name='x_condominiums_ids']" position="replace"/>
+        <xpath expr="//button[@name='693']" position="attributes">
+          <attribute name="invisible">x_condominiums_ids or state != "draft"</attribute>
+          <attribute name="string">Split per Owner</attribute>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/group[@name='sale_header']/group[@name='order_details']/label[not(@name)][1]" position="attributes">
+          <attribute name="string">Distribution Key</attribute>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/group[@name='sale_header']/group[@name='order_details']/div[not(@name)][3]/field[@name='pricelist_id']" position="attributes">
+          <attribute name="options">{"no_open":false,"no_create":true}</attribute>
+          <attribute name="placeholder">Area as distribution key</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="mode">extension</field>
+    <field name="model">sale.order</field>
+    <field name="name">Odoo Studio: sale.order.form customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_analytic_a82ab4e6-2230-4b1e-8fd3-cf21c9fe0bd6" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='code']" position="replace">
+          <field name="x_studio_tenant"/>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/div[not(@name)][1]/label[1]" position="replace"/>
+        <xpath expr="//button[@name='action_view_projects']" position="replace"/>
+        <xpath expr="//button[@name='subscriptions_action']" position="after">
+          <button class="oe_stat_button" icon="fa-home" type="action" name="studio_customization.properties_397b7f9d-8c61-4282-8cd4-165e23f2f9bc">
+            <field widget="statinfo" name="x_x_studio_parent_account_analytic_account_count" string="Properties"/>
+          </button>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/div[not(@name)][1]/h1[1]/field[@name='name']" position="attributes">
+          <attribute name="string">Apartment...</attribute>
+        </xpath>
+        <xpath expr="//field[@name='active']" position="after">
+          <xpath expr="//form[1]/sheet[1]/group[@name='main']/group[2]/field[@name='company_id']" position="move"/>
+          <field name="x_studio_condominium"/>
+          <field name="x_studio_building" options="{&quot;create_name_field&quot;:&quot;x_name&quot;,&quot;no_create&quot;:true}" required="plan_id == 2"/>
+          <field name="x_type" options="{'create_name_field': 'x_name'}" required="plan_id == 2"/>
+        </xpath>
+        <xpath expr="//field[@name='partner_id']" position="attributes">
+          <attribute name="required">plan_id == 2</attribute>
+          <attribute name="string">Owner</attribute>
+        </xpath>
+        <xpath expr="//field[@name='plan_id']" position="before">
+          <field widget="many2many_tags" name="x_studio_tags" options="{&quot;color_field&quot;: &quot;x_color&quot;}"/>
+          <field name="x_studio_parent" options="{&quot;no_create&quot;:true}" domain="[(&quot;plan_id&quot;, &quot;=&quot;, 2)]"/>
+          <field name="x_studio_floor"/>
+          <field name="x_studio_area"/>
+        </xpath>
+        <xpath expr="//field[@name='plan_id']" position="attributes">
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/group[@name='main']/group[1]/field[@name='company_id']" position="attributes">
+          <attribute name="force_save">1</attribute>
+          <attribute name="groups">base.group_no_one</attribute>
+          <attribute name="readonly">True</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="analytic.view_account_analytic_account_form"/>
+    <field name="mode">extension</field>
+    <field name="model">account.analytic.account</field>
+    <field name="name">Odoo Studio: analytic.analytic.account.form customization</field>
+    <field name="priority">400</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_account__c00d33ee-f139-456f-aa13-9bd3dd1fa39c" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//kanban[1]/templates[1]/t[@t-name='card']/div[2]" position="replace">
+          <field name="name" display="full"/>
+          <field name="x_studio_tags" display="full"/>
+          <field name="x_type" display="full"/>
+          <field name="partner_id" display="full" widget="many2one_avatar"/>
+        </xpath>
+        <xpath expr="//kanban[1]/templates[1]/t[@t-name='card']/div[1]" position="replace"/>
+        <xpath expr="//kanban[1]" position="attributes">
+          <attribute name="default_group_by">x_studio_building</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="analytic.view_account_analytic_account_kanban"/>
+    <field name="mode">extension</field>
+    <field name="model">account.analytic.account</field>
+    <field name="name">Odoo Studio: account.analytic.account.kanban customization</field>
+    <field name="priority">99</field>
+    <field name="type">kanban</field>
+  </record>
+  <record id="odoo_studio_default__0fc2a50e-662a-412c-b8ce-b23d5dd1388b" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//button[@name='707']" position="replace">
+          <button class="oe_stat_button" icon="fa-home" type="action" name="studio_customization.properties_7a834342-99a7-472f-9f32-b6c98fee04bb">
+            <field widget="statinfo" name="x_x_studio_building_account_analytic_account_count" string="Properties"/>
+          </button>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="condominium.default_form_view_building"/>
+    <field name="mode">extension</field>
+    <field name="model">x_buildings</field>
+    <field name="name">Odoo Studio: Default form view for x_buildings customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_res_part_debe4d8b-461e-44ea-96ed-03421979fe30" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='sales_purchases']/group[@name='container_row_2']/group[@name='sale']/field[@name='x_condominiums']" position="replace"/>
+        <xpath expr="//button[@name='708']" position="replace"/>
+        <xpath expr="//button[@name='709']" position="after">
+          <button class="oe_stat_button" icon="fa-home" type="action" name="studio_customization.properties_90329923-2672-4403-a8fb-f8e41037462d">
+            <field widget="statinfo" name="x_x_studio_condominium_account_analytic_account_count" string="Properties"/>
+          </button>
+        </xpath>
+        <xpath expr="//field[@name='property_product_pricelist']" position="after">
+          <field name="x_condominium_properties" widget="many2many_tags" force_save="1" readonly="True"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="mode">extension</field>
+    <field name="model">res.partner</field>
+    <field name="name">Odoo Studio: res.partner.form customization</field>
+    <field name="priority">1600</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_sale_ord_853ddf76-f42c-4f3c-9abc-9651602c0812" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='x_property_id']" position="replace"/>
+      </data>
+    </field>
+    <field name="inherit_id" ref="sale.view_order_tree"/>
+    <field name="mode">extension</field>
+    <field name="model">sale.order</field>
+    <field name="name">Odoo Studio: sale.order.list (orders) customization</field>
+    <field name="priority">1600</field>
+    <field name="type">list</field>
+  </record>
+  <record id="odoo_studio_account__8b441c9c-e840-4e10-a72c-ff2c159fc35d" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//button[@name='action_reload_ai_data']" position="after">
+          <button string="Distribute Costs" name="733" type="action"/>
+        </xpath>
+        <xpath expr="//field[@name='invoice_vendor_bill_id']" position="after">
+          <field name="x_studio_distribution_key" options="{&quot;no_create&quot;:true}" placeholder="Area as distribution key"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="account.view_move_form"/>
+    <field name="mode">extension</field>
+    <field name="model">account.move</field>
+    <field name="name">Odoo Studio: account.move.form customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+</odoo>

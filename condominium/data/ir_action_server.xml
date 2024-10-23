@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="ir_actions_server_726" model="ir.actions.server">
+    <field name="binding_model_id" ref="product.model_product_pricelist"/>
+    <field name="code"><![CDATA[properties = env['account.analytic.account'].search([('plan_id', '=', 2), ('id', 'not in', record.x_studio_ratios.x_studio_property.ids)])
+vals = []
+
+for property in properties:
+        vals.append((0, 0, {
+            'x_studio_pricelist': record.id,
+            'x_studio_property': property.id,
+            'x_studio_ratio': property.x_studio_area,
+        }))
+
+record.write({'x_studio_ratios': vals})]]></field>
+    <field name="model_id" ref="product.model_product_pricelist"/>
+    <field name="state">code</field>
+    <field name="name">Compute Ratios</field>
+  </record>
+  <record id="ir_actions_server_733" model="ir.actions.server">
+    <field name="binding_model_id" ref="account.model_account_move"/>
+    <field name="code"><![CDATA[ratios = record.sudo().x_studio_distribution_key.x_studio_ratios
+total_ratio = sum(ratios.mapped('x_studio_ratio'))
+analytic_distribution = {}
+
+if total_ratio != 0:
+    for ratio in ratios.filtered(lambda l: l.x_studio_ratio != 0):
+        analytic_distribution[ratio.x_studio_property.id] = ratio.x_studio_ratio / total_ratio * 100
+else: # If there is no pricelist/distribution key set, we use the area
+    properties = record.sudo().company_id.partner_id.x_condominium_properties
+    total_area = sum(properties.mapped('x_studio_area'))
+    if total_area != 0:
+        for property in properties.filtered(lambda l: l.x_studio_area != 0):
+            analytic_distribution[property.id] = property.x_studio_area / total_area * 100
+
+for aml in record.invoice_line_ids:
+            aml['analytic_distribution'] = analytic_distribution
+        
+]]></field>
+    <field name="model_id" ref="account.model_account_move"/>
+    <field name="state">code</field>
+    <field name="name">Distribute Costs</field>
+  </record>
+</odoo>
