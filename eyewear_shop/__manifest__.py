@@ -70,8 +70,6 @@ The sales process involves creating sale orders, managing deliveries and invoici
         'demo/sale_order_confirm.xml',
         'demo/stock_warehouse_orderpoint.xml',
         'demo/stock_location.xml',
-        'demo/stock_warehouse.xml',
-        'demo/stock_route.xml',
         'demo/website_ir_attachment.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
