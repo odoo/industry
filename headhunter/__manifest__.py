@@ -40,7 +40,6 @@ Those agencies work on two levels and with two different audiences, ...
         'data/ir_attachment_post.xml',
         'data/sign_template.xml',
         'data/sign_item.xml',
-        'data/sign_request.xml',
         'data/crm_stage.xml',
         'data/crm_tag.xml',
         'data/website_view.xml',
