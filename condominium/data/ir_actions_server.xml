@@ -1,23 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="ir_act_server_split_per_property" model="ir.actions.server">
-        <field name="name">Split per Property</field>
-        <field name="state">code</field>
-        <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="code"><![CDATA[
-total_ratio = sum(record.sudo().partner_id.x_condominium_properties.mapped('x_ratio'))
-if total_ratio == 0:
-    raise UserError('There is no ratio set on the properties. Define a ratio for each property before splitting.')
-for property in record.sudo().partner_id.x_condominium_properties:
-    new_so = record.copy()
-    new_so['x_source_sales_order'] = record.id
-    new_so['partner_id'] = property.x_owner.id
-    new_so['x_property_id'] = property
-    for sol in new_so.order_line:
-        sol['price_unit'] = sol.price_unit * property.x_ratio / total_ratio
-record['state'] = 'cancel'
-]]></field>
-    </record>
     <record id="ir_act_server_confirm_action" model="ir.actions.server">
         <field name="name">Confirm</field>
         <field name="state">code</field>
@@ -27,4 +9,89 @@ record['state'] = 'cancel'
 records.action_confirm()
 ]]></field>
     </record>
+    <record id="ir_actions_server_726" model="ir.actions.server">
+        <field name="binding_model_id" ref="product.model_product_pricelist"/>
+        <field name="code"><![CDATA[properties = env['account.analytic.account'].search([('plan_id', '=', 2), ('id', 'not in', record.ratios.property.ids)])
+vals = []
+
+for property in properties:
+        vals.append((0, 0, {
+            'pricelist': record.id,
+            'property': property.id,
+            'ratio': property.area,
+        }))
+
+record.write({'ratios': vals})]]></field>
+        <field name="model_id" ref="product.model_product_pricelist"/>
+        <field name="state">code</field>
+        <field name="name">Compute Ratios</field>
+      </record>
+      <record id="ir_actions_server_733" model="ir.actions.server">
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="code"><![CDATA[ratios = record.sudo().x_distribution_key.x_ratios
+total_ratio = sum(ratios.mapped('x_ratio'))
+analytic_distribution = {}
+
+if total_ratio != 0:
+    for ratio in ratios.filtered(lambda l: l.x_ratio != 0):
+        analytic_distribution[ratio.x_studio_property.id] = ratio.x_ratio / total_ratio * 100
+else: # If there is no pricelist/distribution key set, we use the area
+    properties = record.sudo().company_id.partner_id.x_condominium_properties
+    total_area = sum(properties.mapped('x_area'))
+    if total_area != 0:
+        for property in properties.filtered(lambda l: l.x_area != 0):
+            analytic_distribution[property.id] = property.x_area / total_area * 100
+
+for aml in record.invoice_line_ids:
+            aml['analytic_distribution'] = analytic_distribution
+        
+]]></field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="name">Distribute Costs</field>
+      </record>
+      <record id="ir_act_server_split_per_property" model="ir.actions.server" forcecreate="1">
+        <field name="code"><![CDATA[distributions = record.sudo().pricelist_id.ratios # By default, we assume that there is a pricelist/distribution key set on the SO
+owner_field = 'owner'
+key_field = 'ratio'
+analytic_account_field = 'property'
+total_distribution = sum(distributions.mapped(key_field))
+
+if total_distribution == 0: # If there is no pricelist/distribution key set on the SO, we use the area as distribution
+    distributions = record.sudo().partner_id.x_condominium_properties
+    owner_field = 'partner_id'
+    key_field = 'area'
+    analytic_account_field = '' # There is no field since the property is an analytic account
+    total_distribution = sum(distributions.mapped(key_field))
+
+if total_distribution != 0:
+    owners = env['res.partner'].search([('x_companies', 'in', env.context['allowed_company_ids'][0])])
+    for owner in owners: # One SO per owner
+        new_so_lines = []
+        new_so = record.copy()
+        new_so['x_source_sales_order'] = record.id
+        new_so['partner_id'] = owner.id
+        new_so.order_line.unlink() # Remove the lines that were copied from the source SO
+        for sol in record.order_line: # The lines are re-created using the distribution key and the analytic account corresponding to the property is set
+            for distribution in distributions:
+                if distribution[owner_field].id == owner.id:
+                    analytic_account = distribution if not analytic_account_field else distribution[analytic_account_field]
+                    new_so_lines.append(
+                        (0, 0, {
+                        'order_id': record.id,
+                        'product_id': sol.product_id.id,
+                        'name': sol.name,
+                        'product_uom_qty': sol.product_uom_qty,
+                        'product_uom': sol.product_uom.id,
+                        'price_unit': sol.price_unit * distribution[key_field] / total_distribution,
+                        'tax_id': sol.tax_id,
+                        'discount': sol.discount,
+                        'analytic_distribution': {analytic_account.id: 100},
+                        }))
+        new_so.write({'order_line': new_so_lines})
+    record['state'] = 'cancel']]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Split per Owner</field>
+      </record>
 </odoo>
