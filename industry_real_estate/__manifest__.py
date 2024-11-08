@@ -50,7 +50,7 @@ Manage your properties, create and manage rental contracts, and streamline your 
         'data/knowledge_tour.xml',
     ],
     'demo': [
-        'demo/account_tags.xml',
+        'demo/x_buildings.xml',
         'demo/account_analytic_account.xml',
         'demo/ir_attachment.xml',
         'demo/website.xml',
