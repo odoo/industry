@@ -98,7 +98,7 @@ class TestEnv(IndustryCase):
                 )
 
     def test_knowledge_article_links_use_latest(self):
-        pattern = r'https?://www\.odoo\.com/documentation/(?!latest/)(\d+\.\d+|master)/'
+        pattern = r'https?://www\.odoo\.com/documentation/(?!latest/)(.*)/'
         for module in self.installed_modules:
             knowledge = self.env['ir.model.data'].search(
                 [('model', '=', 'knowledge.article'), ('module', '=', module)], limit=1
