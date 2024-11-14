@@ -429,6 +429,7 @@ class TestEnv(IndustryCase):
                 'contact_address_complete',
                 'customer_rank',
                 'email_normalized',
+                'partner_share',
                 'peppol_eas',
                 'peppol_endpoint',
                 'phone_sanitized',
