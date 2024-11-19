@@ -43,6 +43,7 @@ Those agencies work on two levels and with two different audiences, ...
         'data/crm_stage.xml',
         'data/crm_tag.xml',
         'data/knowledge_tour.xml',
+        'data/website_view.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -70,6 +71,7 @@ Those agencies work on two levels and with two different audiences, ...
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        "data/website_view.xml",
         "static/src/js/my_tour.js",
         "demo/website_view.xml",
     ],

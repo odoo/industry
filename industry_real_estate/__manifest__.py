@@ -44,6 +44,9 @@ Manage your properties, create and manage rental contracts, and streamline your 
         'data/ir_filters.xml',
         'data/x_meters.xml',
         'data/knowledge_tour.xml',
+        'data/website_menu.xml',
+        'data/website_view.xml',
+        'data/website_theme_apply.xml',
     ],
     'demo': [
         'demo/x_buildings.xml',
@@ -74,6 +77,7 @@ Manage your properties, create and manage rental contracts, and streamline your 
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        "data/website_view.xml",
         "data/website_controller_page.xml",
         "static/src/js/my_tour.js",
         "demo/website_view.xml",
