@@ -40,6 +40,8 @@ This industry caters to billboard rental businesses, specializing in managing ou
         'data/mail_message.xml',
         'data/appointment_type.xml',
         'data/knowledge_tour.xml',
+        'data/website_view.xml',
+        'data/website_theme_apply.xml',
     ],
     'demo': [
         'demo/website.xml',
@@ -63,6 +65,7 @@ This industry caters to billboard rental businesses, specializing in managing ou
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "data/custom_view.xml",
+        "data/website_view.xml",
         "static/src/js/my_tour.js",
         "demo/website_view.xml",
     ],

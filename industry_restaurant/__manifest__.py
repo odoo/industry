@@ -33,6 +33,7 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/knowledge_tour.xml',
+        'data/website_view.xml',
     ],
     'demo': [
         'demo/pos_payment_method.xml',
@@ -67,6 +68,7 @@
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        "data/website_view.xml",
         "demo/website_view.xml",
         "static/src/js/my_tour.js",
     ],

@@ -47,6 +47,7 @@ This module is a complete solution for the bike leasing industry, simplifying le
         'data/ir_attachment_post.xml',
         'data/payment_provider.xml',
         'data/knowledge_tour.xml',
+        'data/website_view.xml',
     ],
     'demo': [
         'demo/website.xml',
@@ -76,6 +77,7 @@ This module is a complete solution for the bike leasing industry, simplifying le
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
+        "data/website_view.xml",
         "demo/website_view.xml",
     ],
     'images': ['images/main.png'],

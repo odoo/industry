@@ -33,6 +33,7 @@
         'data/mail_message.xml',
         'data/res_config_settings.xml',
         'data/knowledge_tour.xml',
+        'data/website_view.xml',
     ],
     'demo': [
         'demo/event_event.xml',
@@ -54,6 +55,7 @@
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        "data/website_view.xml",
         "demo/website_view.xml",
         "static/src/js/my_tour.js",
     ],

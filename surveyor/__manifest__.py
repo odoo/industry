@@ -36,6 +36,7 @@ It may include surveying of building properties and the measurement of completed
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/knowledge_tour.xml',
+        'data/website_view.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -60,6 +61,7 @@ It may include surveying of building properties and the measurement of completed
     'images': ['images/main.png'],
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        "data/website_view.xml",
         "static/src/js/my_tour.js",
         "demo/website_view.xml",
     ],

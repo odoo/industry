@@ -35,6 +35,8 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/knowledge_tour.xml',
+        'data/website_view.xml',
+        'data/website_theme_apply.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -73,6 +75,7 @@
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
+        "data/website_view.xml",
         "demo/website_view.xml",
     ],
     'images': ['images/main.png'],

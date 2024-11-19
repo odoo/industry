@@ -51,6 +51,7 @@
         'data/pos_config.xml',
         'data/mail_message.xml',
         'data/knowledge_tour.xml',
+        'data/website_view.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -85,6 +86,8 @@
         "data/knowledge_article.xml",
         "data/custom_view.xml",
         "static/src/js/my_tour.js",
+        "data/custom_view.xml",
+        "data/website_view.xml",
         "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
