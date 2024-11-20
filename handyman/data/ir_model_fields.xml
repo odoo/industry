@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="field_various_material_budget" model="ir.model.fields">
+        <field name="name">x_various_materials_budget</field>
+        <field name="ttype">monetary</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Various Materials Budget</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="currency_field">currency_id</field>
+    </record>
+    <record id="new_material_budget_related_field" model="ir.model.fields">
+        <field name="name">x_related_material_budget_field</field>
+        <field name="ttype">monetary</field>
+        <field name="related">sale_order_id.x_various_materials_budget</field>
+        <field name="field_description">Materials Budget</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="currency_field">currency_id</field>
+    </record>
+    <record id="x_task_field" model="ir.model.fields">
+        <field name="name">x_task_id</field>
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Task</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="relation">project.task</field>
+    </record>
+    <record id="x_x_task_account_move_count_field" model="ir.model.fields">
+        <field name="name">x_x_task_account_move_count</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_x_task_account_move_count'] = self.env['account.move'].search_count([('x_task_id', '=', record.id)])]]></field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Task count</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="x_vendor_bills_field" model="ir.model.fields">
+        <field name="name">x_vendor_bills</field>
+        <field name="compute"><![CDATA[
+bills = self.env['account.move']._read_group(domain=[('x_task_id', 'in', self.ids)], groupby=['x_task_id'], aggregates=['amount_untaxed:sum'])
+mapped_data = {task.id: total for task, total in bills}
+for task in self:
+    task['x_vendor_bills'] = mapped_data.get(task.id, 0)]]></field>
+        <field name="ttype">monetary</field>
+        <field name="field_description">Vendor Bills</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="readonly" eval="True"/>
+        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+        <field name="currency_field">currency_id</field>
+    </record>
+    <record id="x_percent_bills_1_field" model="ir.model.fields">
+        <field name="name">x_percent_bills_1</field>
+        <field name="compute"><![CDATA[
+for task in self:
+    task['x_percent_bills_1'] = task.x_vendor_bills / task.x_related_material_budget_field if task.x_related_material_budget_field else 0]]></field>
+        <field name="ttype">float</field>
+        <field name="depends">name</field>
+        <field name="field_description">Percent bills</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="readonly" eval="True"/>
+        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+    </record>
+</odoo>
