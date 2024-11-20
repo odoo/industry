@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="sale_order_form_custom" model="ir.ui.view">
+        <field name="name">sale.order.form customization</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="mode">extension</field>
+        <field name="model">sale.order</field>
+        <field name="active" eval="True"/>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sale_order_template_id']" position="after">
+                <field name="x_various_materials_budget"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="project_task_form_custom" model="ir.ui.view">
+        <field name="name">project.task.form customization</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="mode">extension</field>
+        <field name="model">project.task</field>
+        <field name="active" eval="True"/>
+        <field name="priority">9990</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='personal_stage_type_id']" position="after">
+                <button name="%(action_create_bill_from_task)d" string="Add Vendor Bill" type="action"/>
+            </xpath>
+            <xpath expr="//button[@name='action_fsm_worksheet']" position="after">
+                <button name="%(action_vendor_bill_button)d" class="oe_stat_button" icon="fa-file-text-o" type="action">
+                    <field name="x_x_task_account_move_count" widget="statinfo" string="Vendor Bills"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='tag_ids']" position="after">
+                <field name="x_related_material_budget_field" string="Materials Budget"/>
+                <label for="x_vendor_bills"/>
+                <div class="d-flex" name="bills">
+                    <field class="oe_inline" name="x_vendor_bills"/>
+                    <span class="ml4">(</span>
+                    <field class="oe_inline" name="x_percent_bills_1" widget="percentage"/>
+                    <span>)</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    <record id="account_move_form_custom" model="ir.ui.view">
+        <field name="name">account.move.form customization</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="mode">extension</field>
+        <field name="model">account.move</field>
+        <field name="active" eval="True"/>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="x_task_id" options="{'no_create':true}"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="project_task_list_fsm_my_task_customization" model="ir.ui.view">
+        <field name="name">project.task.list.fsm.my.task customization</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="industry_fsm.project_task_view_list_fsm_my_task"/>
+        <field name="active" eval="True"/>
+        <field name="mode">extension</field>
+        <field name="priority">99</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tag_ids']" position="replace"/>
+            <xpath expr="//field[@name='activity_ids']" position="replace"/>
+            <xpath expr="//field[@name='worksheet_template_id']" position="replace"/>
+            <xpath expr="//field[@name='progress'][2]" position="after">
+                <field name="x_percent_bills_1" optional="show" widget="percentage"/>
+                <field name="rating_avg" optional="show" widget="percentpie"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
