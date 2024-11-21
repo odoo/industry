@@ -23,7 +23,7 @@
     'data': [
         'data/res_config_settings.xml',
         'data/ir_model.xml',
-        'data/website_base_unit.xml',
+        'data/product_base_unit.xml',
         'data/ir_model_fields.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
