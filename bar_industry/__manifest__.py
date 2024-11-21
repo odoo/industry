@@ -23,6 +23,7 @@
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/project_task_type.xml',
+        'data/product_category.xml',
         'data/project_project.xml',
         'data/planning_role.xml',
         'data/product_pricelist.xml',
