@@ -22,6 +22,7 @@ This module setup your database to easily use odoo in a Audit & Certification co
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
+        'data/qweb_view.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_model_access.xml',
         'data/ir_rule.xml',
@@ -38,7 +39,6 @@ This module setup your database to easily use odoo in a Audit & Certification co
         'data/website_view.xml',
         'data/website_page.xml',
         'data/website_menu.xml',
-        'data/ir_model_data.xml',
         'data/knowledge_tour.xml',
     ],
     'demo': [
@@ -61,7 +61,9 @@ This module setup your database to easily use odoo in a Audit & Certification co
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
+        "data/qweb_view.xml",
         "data/knowledge_article.xml",
+        "data/website_view.xml",
         "static/src/js/my_tour.js",
     ],
     'images': ['images/main.png'],
