@@ -29,12 +29,12 @@
         'data/sale_order_template_data.xml',
         'data/crm_tags_data.xml',
         "data/ir_attachment.xml",
+        "data/website_view.xml",
         "data/knowledge_cover.xml",
         "data/knowledge_article.xml",
         "data/knowledge_article_favorite.xml",
         "data/mail_message.xml",
         'data/knowledge_tour.xml',
-        'data/website_view.xml',
     ],
     'demo': [
         'demo/res_partner.xml',

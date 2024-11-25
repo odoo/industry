@@ -45,9 +45,9 @@ This module is a complete solution for the bike leasing industry, simplifying le
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/ir_attachment_post.xml',
+        'data/website_view.xml',
         'data/payment_provider.xml',
         'data/knowledge_tour.xml',
-        'data/website_view.xml',
     ],
     'demo': [
         'demo/website.xml',

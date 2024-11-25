@@ -50,8 +50,8 @@ This module is a setup specific to support the business activities of a microbre
         'data/knowledge_article_favorite.xml',
         'data/quality_point.xml',
         'data/appointment_type.xml',
-        'data/knowledge_tour.xml',
         'data/website_view.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/website.xml',

@@ -32,8 +32,8 @@
         'data/knowledge_article_attachments.xml',
         'data/mail_message.xml',
         'data/res_config_settings.xml',
-        'data/knowledge_tour.xml',
         'data/website_view.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/event_event.xml',
