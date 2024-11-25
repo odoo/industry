@@ -52,9 +52,9 @@ This module is for marketing companies selling and producing customized corporat
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/ir_attachment_post.xml',
-        'data/knowledge_tour.xml',
         'data/website_view.xml',
         'data/website_menu.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/website.xml',

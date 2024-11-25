@@ -33,7 +33,7 @@
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
-        'data/custom_view.xml',
+        'data/qweb_view.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_model_access.xml',
         'data/ir_rule.xml',
@@ -93,7 +93,7 @@
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
-        "data/custom_view.xml",
+        "data/qweb_view.xml",
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
         "demo/website_view.xml",

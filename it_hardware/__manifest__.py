@@ -44,9 +44,9 @@ We offer IT sales, installation, and repair services for a wide range of product
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
-        'data/knowledge_tour.xml',
         'data/website_view.xml',
         'data/website_theme_apply.xml',
+        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/website.xml',
