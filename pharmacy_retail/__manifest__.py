@@ -27,6 +27,7 @@ They maintain the stock lot wise and also manage the expiry of the lots.
         'data/ir_ui_view.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_ui_menu.xml',
+        'data/qweb_view.xml',
         'data/product_category.xml',
         'data/res_partner.xml',
         'data/product_tag.xml',
@@ -44,7 +45,6 @@ They maintain the stock lot wise and also manage the expiry of the lots.
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/res_config_settings.xml',
-        'data/ir_model_data.xml',
         'data/mail_message.xml',
         'data/knowledge_tour.xml',
     ],
@@ -78,6 +78,7 @@ They maintain the stock lot wise and also manage the expiry of the lots.
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
+        "data/qweb_view.xml",
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
     ],
