@@ -24,6 +24,7 @@ The sales process involves creating sale orders, managing deliveries and invoici
         'data/ir_attachment_pre.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
+        'data/qweb_view.xml',
         'data/ir_actions_report.xml',
         'data/product_category.xml',
         'data/product_public_category.xml',
@@ -43,7 +44,6 @@ The sales process involves creating sale orders, managing deliveries and invoici
         'data/appointment_type.xml',
         'data/website_view.xml',
         'data/website_theme_apply.xml',
-        'data/ir_model_data.xml',
         'data/knowledge_tour.xml',
     ],
     'demo': [
@@ -84,8 +84,11 @@ The sales process involves creating sale orders, managing deliveries and invoici
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
+        "data/qweb_view.xml",
+        "data/website_view.xml",
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
+        "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
 }
