@@ -2,9 +2,7 @@
     'name': 'Microbrewery',
     'version': '1.0',
     'category': 'Supply Chain',
-    'description': """
-This module is a setup specific to support the business activities of a microbrewery such as Crafting Beer, Outside Sales, a local Bar, a local Shop and an ecommerce website.
-""",
+    'description': "",
     'depends': [
         'account',
         'appointment_crm',
@@ -15,6 +13,7 @@ This module is a setup specific to support the business activities of a microbre
         'pos_restaurant',
         'pos_sale',
         'sale_purchase',
+        'sale_renting',
         'web_studio',
         'website_appointment',
         'website_sale_stock',
@@ -26,6 +25,7 @@ This module is a setup specific to support the business activities of a microbre
         'data/ir_attachment_pre.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
+        'data/qweb_view.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
         'data/product_public_category.xml',
@@ -43,6 +43,7 @@ This module is a setup specific to support the business activities of a microbre
         'data/product_attribute_value.xml',
         'data/product_template_attribute_line.xml',
         'data/product_template_attribute_value.xml',
+        'data/product_pricing.xml',
         'data/product_product.xml',
         'data/product_template_package.xml',
         'data/ptal.xml',
@@ -60,7 +61,6 @@ This module is a setup specific to support the business activities of a microbre
         'data/quality_point.xml',
         'data/appointment_type.xml',
         'data/website_view.xml',
-        'data/ir_model_data.xml',
         'data/sale_order_spreadsheet.xml',
         'data/knowledge_tour.xml',
     ],
@@ -99,7 +99,10 @@ This module is a setup specific to support the business activities of a microbre
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        "data/qweb_view.xml",
+        "data/website_view.xml",
         "static/src/js/my_tour.js",
+        "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
 }
