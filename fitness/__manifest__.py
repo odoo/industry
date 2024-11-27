@@ -42,6 +42,7 @@
         'data/planning_role.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
+        'data/ir_model_data.xml',
         'data/knowledge_tour.xml',
     ],
     'demo': [
@@ -77,10 +78,8 @@
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
-        "data/appointment_view.xml",
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
-        "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
 }

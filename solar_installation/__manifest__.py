@@ -34,7 +34,6 @@ ensuring the efficient installation of solar panels and associated equipment.
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
-        'data/qweb_view.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_model_access.xml',
         'data/ir_rule.xml',
@@ -59,6 +58,7 @@ ensuring the efficient installation of solar panels and associated equipment.
         'data/website_view.xml',
         'data/website_page.xml',
         'data/website_menu.xml',
+        'data/ir_model_data.xml',
         'data/knowledge_tour.xml',
     ],
     'demo': [
@@ -99,11 +99,8 @@ ensuring the efficient installation of solar panels and associated equipment.
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
-        "data/qweb_view.xml",
         "data/knowledge_article.xml",
-        "data/website_view.xml",
         "static/src/js/my_tour.js",
-        "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
 }

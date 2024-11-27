@@ -36,6 +36,7 @@
         'data/mail_message.xml',
         'data/website_view.xml',
         'data/website_theme_apply.xml',
+        'data/ir_model_data.xml',
         'data/knowledge_tour.xml',
     ],
     'demo': [
@@ -58,7 +59,7 @@
         'demo/loyalty_card.xml',
         'demo/sale_order_post.xml',
         'demo/website.xml',
-        'demo/website_view.xml',
+        'demo/website_views.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
@@ -75,8 +76,6 @@
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
-        "data/website_view.xml",
-        "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
 }
