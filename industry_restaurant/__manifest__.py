@@ -33,6 +33,7 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/website_view.xml',
+        'data/ir_model_data.xml',
         'data/knowledge_tour.xml',
     ],
     'demo': [
@@ -68,8 +69,6 @@
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
-        "data/website_view.xml",
-        "demo/website_view.xml",
         "static/src/js/my_tour.js",
     ],
     'images': ['images/main.png'],

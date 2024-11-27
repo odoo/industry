@@ -71,7 +71,6 @@ This module sets up a furniture store for selling furniture like chairs, sofas, 
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
-        "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
 }

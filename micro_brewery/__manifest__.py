@@ -51,6 +51,7 @@ This module is a setup specific to support the business activities of a microbre
         'data/quality_point.xml',
         'data/appointment_type.xml',
         'data/website_view.xml',
+        'data/ir_model_data.xml',
         'data/knowledge_tour.xml',
     ],
     'demo': [
@@ -88,9 +89,7 @@ This module is a setup specific to support the business activities of a microbre
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
-        "data/website_view.xml",
         "static/src/js/my_tour.js",
-        "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
 }
