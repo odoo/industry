@@ -270,6 +270,7 @@ class TestEnv(IndustryCase):
             "pos_preparation_display.orderline",
             "product.attribute",
             "product.attribute.value",
+            "product.base.unit",
             "product.category",
             "product.packaging",
             "product.pricelist",
@@ -307,7 +308,6 @@ class TestEnv(IndustryCase):
             "uom.category",
             "uom.uom",
             "website",
-            "website.base.unit",
             "website.menu",
             "website.page",
         ]

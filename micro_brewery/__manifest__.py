@@ -30,7 +30,7 @@ This module is a setup specific to support the business activities of a microbre
         'data/product_pricelist_item.xml',
         'data/pos_category.xml',
         'data/pos_config.xml',
-        'data/website_base_unit.xml',
+        'data/product_base_unit.xml',
         'data/product_template.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
