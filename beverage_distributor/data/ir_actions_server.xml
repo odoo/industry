@@ -5,8 +5,8 @@
 if record.x_quantity_by_deposit_product == 1 and record.x_unit_sale_product.id:
     raise UserError("Unit sale product should be undefined if this product can not be sold in a smaller unit.")
 if record.x_unit_sale_product:
-    existing_bom = env['mrp.bom'].search([('product_tmpl_id', '=',record.x_unit_sale_product.product_tmpl_id.id)], limit=1)
-    reordering_rule = env['stock.warehouse.orderpoint'].search_count([('product_id', '=', record.x_unit_sale_product.id)], limit=1)
+    existing_bom = env['mrp.bom'].search([('product_tmpl_id', '=',record.x_unit_sale_product.id)], limit=1)
+    reordering_rule = env['stock.warehouse.orderpoint'].search_count([('product_id', '=', record.x_unit_sale_product.product_variant_id.id)], limit=1)
     bom_vals = {
         'product_qty': record.x_quantity_by_deposit_product,
         'type': 'normal',
@@ -25,11 +25,11 @@ if record.x_unit_sale_product:
     if existing_bom:
         existing_bom.write(bom_vals)
     else:
-        bom_vals['product_tmpl_id'] = record.x_unit_sale_product.product_tmpl_id.id
+        bom_vals['product_tmpl_id'] = record.x_unit_sale_product.id
         env['mrp.bom'].create(bom_vals)
     if not reordering_rule:
         env['stock.warehouse.orderpoint'].create({
-            'product_id': record.x_unit_sale_product.id,
+            'product_id': record.x_unit_sale_product.product_variant_id.id,
             'x_parent_product': record.id,
             'product_min_qty': 0,
             'product_max_qty': 0,
