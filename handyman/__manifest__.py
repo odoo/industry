@@ -19,6 +19,7 @@
         'sale_pdf_quote_builder',
         'sale_purchase_stock',
         'spreadsheet_sale_management',
+        'web_studio',
     ],
     'data': [
         'data/res_config_setting.xml',
