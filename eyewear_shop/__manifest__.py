@@ -45,12 +45,14 @@ The sales process involves creating sale orders, managing deliveries and invoici
         'data/website_theme_apply.xml',
         'data/ir_model_data.xml',
         'data/knowledge_tour.xml',
+        'data/sale_order_to_cash_tour.xml',
     ],
     'demo': [
         'demo/res_config_settings.xml',
         'demo/website.xml',
         'demo/stock_lot.xml',
         'demo/res_partner.xml',
+        'demo/res_company.xml',
         'demo/loyalty_program.xml',
         'demo/loyalty_rule.xml',
         'demo/loyalty_reward.xml',
@@ -67,6 +69,11 @@ The sales process involves creating sale orders, managing deliveries and invoici
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
         'demo/stock_warehouse_orderpoint.xml',
+        'demo/stock_location.xml',
+        'demo/stock_warehouse.xml',
+        'demo/stock_picking_type.xml',
+        'demo/stock_route.xml',
+        'demo/stock_rule.xml',
         'demo/website_ir_attachment.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
@@ -80,12 +87,14 @@ The sales process involves creating sale orders, managing deliveries and invoici
     'assets': {
         'web.assets_backend': [
             'eyewear_shop/static/src/js/my_tour.js',
+            'eyewear_shop/static/src/js/tours/sale_order_to_cash_tour.js',
         ]
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
+        "static/src/js/tours/sale_order_to_cash_tour.js",
     ],
     'images': ['images/main.png'],
 }

@@ -38,6 +38,7 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/knowledge_tour.xml',
+        'data/customer_order_tour.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -57,11 +58,13 @@
     'assets': {
         'web.assets_backend': [
             'bookstore/static/src/js/my_tour.js',
+            'bookstore/static/src/js/tours/customer_order_tour.js',
         ]
     },
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
+        "static/src/js/tours/customer_order_tour.js",
     ],
     'license': 'OPL-1',
     'author': 'Odoo S.A.',
