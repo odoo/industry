@@ -38,18 +38,6 @@ for product in self:
     product['x_is_a_deposit'] = product.categ_id == self.env.ref('micro_brewery.product_category_7')
         ]]></field>
     </record>
-    <record id="x_is_a_drink" model="ir.model.fields">
-        <field name="name">x_is_a_drink</field>
-        <field name="field_description">Is a drink</field>
-        <field name="ttype">boolean</field>
-        <field name="model_id" ref="product.model_product_template"/>
-        <field name="depends">categ_id</field>
-        <field name="readonly" eval="True"/>
-        <field name="compute"><![CDATA[
-for product in self:
-    product['x_is_a_drink'] = product.categ_id.parent_id == self.env.ref('micro_brewery.product_category_11')
-        ]]></field>
-    </record>
     <record id="field_empty_deposit" model="ir.model.fields">
         <field name="name">x_deposit_product</field>
         <field name="field_description">Empty deposit product</field>
@@ -63,7 +51,8 @@ for product in self:
         <field name="field_description">Unit sale product</field>
         <field name="ttype">many2one</field>
         <field name="model_id" ref="product.model_product_template"/>
-        <field name="relation">product.product</field>
+        <field name="relation">product.template</field>
+        <field name="copied" eval="False"/>
     </record>
     <record id="field_deposit_product_1" model="ir.model.fields">
         <field name="name">x_deposit_product_1</field>
@@ -73,37 +62,15 @@ for product in self:
         <field name="relation">product.template</field>
         <field name="domain">[('x_is_a_deposit', '=', True)]</field>
     </record>
-    <record id="x_sold_unit" model="ir.model.fields">
-        <field name="ttype">float</field>
-        <field name="related">sales_count</field>
-        <field name="field_description">Sold Unit</field>
-        <field name="model_id" ref="product.model_product_template"/>
-        <field name="name">x_sold_unit</field>
-        <field name="on_delete" eval="False"/>
-        <field name="readonly" eval="True"/>
-        <field name="selectable" eval="False"/>
-        <field name="store" eval="False"/>
-      </record>
-      <record id="x_studio_base_unit" model="ir.model.fields" >
-        <field name="ttype">float</field>
-        <field name="related">base_unit_count</field>
-        <field name="field_description">Base unit</field>
-        <field name="model_id" ref="product.model_product_template"/>
-        <field name="name">x_studio_base_unit</field>
-        <field name="on_delete" eval="False"/>
-        <field name="readonly" eval="True"/>
-        <field name="store" eval="False"/>
-      </record>
-      <record id="x_volume_sold" model="ir.model.fields">
+    <record id="x_volume_sold" model="ir.model.fields">
         <field name="compute"><![CDATA[    
 for record in self:        
-    record["x_volume_sold"] = record.x_sold_unit * record.x_studio_base_unit]]></field>
+    record["x_volume_sold"] = record.sales_count * record.base_unit_count]]></field>
         <field name="ttype">float</field>
-        <field name="depends">x_sold_unit, x_studio_base_unit</field>
+        <field name="depends">sales_count, base_unit_count</field>
         <field name="field_description">New Decimal</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="name">x_volume_sold</field>
-        <field name="on_delete" eval="False"/>
         <field name="readonly" eval="True"/>
-      </record>
+    </record>
 </odoo>
