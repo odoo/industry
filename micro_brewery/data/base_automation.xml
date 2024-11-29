@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="auto_production" model="base.automation">
+        <field name="name">Auto Production</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('update_state')])]"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('mrp.field_mrp_production__state')])]"/>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="trigger">on_state_set</field>
+        <field name="filter_domain">[('state', '=', 'confirmed')]</field>
+        <field name="filter_pre_domain">[("bom_id.x_auto_production", "=", True)]</field>
+    </record>
+    <record id="bom_automation" model="base.automation">
+        <field name="name">Automated BoM</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('bom_server_action')])]"/>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('field_empty_deposit'), ref('field_quantity_by_deposit_product'), ref('field_unit_sale_product')])]"/>
+        <field name="trigger">on_create_or_write</field>
+    </record>
+    <record id="update_sales_taxes" model="base.automation">
+        <field name="name">Update Taxes</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('update_sales_taxes_server_action')])]"/>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('field_deposit_product_1')])]"/>
+        <field name="filter_domain">[('x_is_a_deposit', '=', False)]</field>
+        <field name="trigger">on_create_or_write</field>
+    </record>
+    <record id="make_deposit_storable_delivery_invoice" model="base.automation">
+        <field name="name">Default fields for deposits</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_make_deposit_storable_delivery_invoice')])]"/>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('product.field_product_template__categ_id')])]"/>
+        <field name="on_change_field_ids" eval="[(6, 0, [ref('product.field_product_template__categ_id')])]"/>
+        <field name="filter_domain">[('x_is_a_deposit', '=', False)]</field>
+        <field name="trigger">on_change</field>
+    </record>
+</odoo>
