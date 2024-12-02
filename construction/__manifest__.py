@@ -43,7 +43,6 @@ focusing on accurate quoting, efficient planning, seamless execution, and excell
         'demo/res_partner.xml',
         'demo/account_analytic_account.xml',
         'demo/project_project.xml',
-        'demo/product_product.xml',
         'demo/documents_document.xml',
         'demo/helpdesk_ticket.xml',
         'demo/hr_employee.xml',
