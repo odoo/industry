@@ -34,7 +34,7 @@ class TestEnv(IndustryCase):
             for file_name in files:
                 file_path = os.path.join(root, file_name)
                 ext = os.path.splitext(file_path)[1].lower()
-                if 'static/' in file_path and 'src/js' not in file_path:
+                if 'static/' in file_path and 'src/js/' not in file_path:
                     static_files.add(os.path.relpath(file_path, start=get_industry_path()))
                 if ext not in ['.py', '.xml']:
                     continue
