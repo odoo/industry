@@ -23,6 +23,7 @@
     ],
     'data': [
         'data/res_config_setting.xml',
+        'data/ir_attachment_pre.xml',
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
         'data/ir_actions_server.xml',
@@ -30,6 +31,7 @@
         'data/ir_ui_view.xml',
         'data/ir_model_access.xml',
         'data/ir_rule.xml',
+        'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
@@ -48,6 +50,8 @@
     'demo': [
         'demo/res_partner.xml',
         'demo/account_analytic_account.xml',
+        'demo/account_move.xml',
+        'demo/account_move_line.xml',
         'demo/crm_lead.xml',
         'demo/mail_activity.xml',
         'demo/hr_employee.xml',
@@ -59,6 +63,7 @@
         'demo/planning_slot.xml',
         'demo/product_supplierinfo.xml',
         'demo/project_task.xml',
+        'demo/account_analytic_line.xml',
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
         'demo/purchase_order_confirm.xml',
@@ -73,6 +78,7 @@
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
     ],
     'images': ['images/main.png'],
 }
