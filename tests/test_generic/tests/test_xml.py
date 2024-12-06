@@ -210,14 +210,14 @@ class TestEnv(IndustryCase):
             )
 
         elements = [
-            value for element in root.iter() for attr in ['id', 'ref', 'src', 'data-original-src']
+            value for element in root.iter() for attr in ['id', 'ref', 'src', 'data-original-src', 'name']
             if (value := element.get(attr)) and value.startswith(module + '.')
         ]
         if elements:
             _logger.warning(
-                "Defining or referring to an xmlid with the current module name is useless, module name will be added automatically."
-                "Found occurence(s) of ' id=\"%s.ID' in %s: %s."
-                "This remark does not apply to 'env.ref(\"%s.ID\")' where it is required).",
+                "Defining or referring to an xmlid with the current module name is useless, module name will be added automatically. "
+                "Found occurence(s) of ' id=\"%s.ID' in %s: %s. "
+                "This remark does not apply to 'env.ref(\"%s.ID\")' where it is required.",
                 module, file_name, ', '.join(elements), module
             )
         elements = [value for element in root.iter() if (value := element.get('id')) and value.startswith('x_studio')]
