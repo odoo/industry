@@ -1,6 +1,6 @@
 {
     'name': 'Property Owner Association',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Services',
     'description': """
 This industry is tailor-made for Property Owner Association businesses that aim at managing co-ownership properties. Such a business is complex because it implies managing all the aspects of the properties while fairly splitting the charges.
@@ -9,7 +9,6 @@ Moreover, the business is legally regulated in lots of countries under different
     'depends': [
         'account_check_printing',
         'account_followup',
-        'account_payment',
         'accountant',
         'calendar',
         'contacts',
@@ -31,6 +30,7 @@ Moreover, the business is legally regulated in lots of countries under different
         'data/ir_model_fields.xml',
         'data/ir_filters.xml',
         'data/ir_default.xml',
+        'data/meter_view.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_ui_view.xml',
         'data/ir_ui_menu.xml',
@@ -50,6 +50,7 @@ Moreover, the business is legally regulated in lots of countries under different
         'data/x_buildings_tag.xml',
         'data/x_properties_types.xml',
         'data/x_properties_tag.xml',
+        'data/x_meters.xml',
         'data/knowledge_tour.xml',
     ],
     'demo': [
