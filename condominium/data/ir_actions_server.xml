@@ -89,4 +89,23 @@ for aml in record.invoice_line_ids:
 records.action_confirm()
 ]]></field>
     </record>
+    <record id="action_server_set_usage_meter_reading" model="ir.actions.server" >
+        <field name="name">Meter Reading</field>
+        <field name="model_id" ref="model_meter_reading"/>
+        <field name="state">code</field>
+        <field name="base_automation_id" ref="automation_set_usage_meter_reading"/>
+        <field name="code"><![CDATA[
+mrs = env['x_meter_reading'].search([
+    ('id', 'in', record.x_account_analytic_account_id.x_property_meter_reading_ids.ids),
+    ('x_meter_id', '=', record.x_meter_id.id)], order='x_date')
+previous_mr = False
+for mr in mrs:
+    if previous_mr:
+        mr['x_usage'] = mr['x_quantity'] - previous_mr['x_quantity']
+    else :
+        mr['x_usage'] = 0
+    previous_mr = mr
+]]>
+        </field>
+    </record>
 </odoo>
