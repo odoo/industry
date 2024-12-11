@@ -9,8 +9,8 @@
         <field name="priority">160</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='sale_order_template_id']" position="after">
-                <field name="x_various_materials_budget"/>
+            <xpath expr="//page[@name='order_lines']//field[@name='order_line']//list//field[@name='price_unit']" position="after">
+                <field name="x_various_materials_budget" optional="show"/>
             </xpath>
         </field>
     </record>
@@ -23,23 +23,72 @@
         <field name="priority">9990</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='personal_stage_type_id']" position="after">
-                <button name="%(action_create_bill_from_task)d" string="Add Vendor Bill" type="action"/>
-            </xpath>
             <xpath expr="//button[@name='action_fsm_worksheet']" position="after">
-                <button name="%(action_vendor_bill_button)d" class="oe_stat_button" icon="fa-file-text-o" type="action">
-                    <field name="x_x_task_account_move_count" widget="statinfo" string="Vendor Bills"/>
+                <button name="%(action_vendor_bill_button)d" class="oe_stat_button" icon="fa-file-text-o" type="action" invisible="not sale_order_id">
+                    <field string="Vendor Bills" name="x_vendor_bill_count" widget="statinfo"/>
                 </button>
             </xpath>
-            <xpath expr="//field[@name='tag_ids']" position="after">
-                <field name="x_related_material_budget_field" string="Materials Budget"/>
-                <label for="x_vendor_bills"/>
-                <div class="d-flex" name="bills">
-                    <field class="oe_inline" name="x_vendor_bills"/>
-                    <span class="ml4">(</span>
-                    <field class="oe_inline" name="x_percent_bills_1" widget="percentage"/>
-                    <span>)</span>
-                </div>
+            <xpath expr="//label[@for='allocated_hours']" position="replace"/>
+            <xpath expr="//div[hasclass('text-nowrap')]" position="replace"/>
+            <xpath expr="//notebook" position="before">
+                <group invisible="not sale_order_id">
+                    <group string="Time">
+                        <field name="allocated_hours" readonly="True"/>
+                        <label for="effective_hours"/>
+                        <div class="d-flex" name="bills">
+                            <field class="oe_inline" name="effective_hours"/>
+                            <span class="ml4">(</span>
+                            <field class="oe_inline" name="progress" widget="percentage"/>
+                            <span>)</span>
+                        </div>
+                    </group>
+                    <group string="Materials">
+                        <field name="x_related_material_budget_field" string="Materials Budget"/>
+                        <label for="x_vendor_bills"/>
+                        <div class="d-flex" name="bills">
+                            <field class="oe_inline" name="x_vendor_bills"/>
+                            <span class="ml4">(</span>
+                            <field class="oe_inline" name="x_percent_bills_1" widget="percentage"/>
+                            <span>)</span>
+                        </div>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+    <record id="project_project_form_custom" model="ir.ui.view">
+        <field name="name">project.project.form customization</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="mode">extension</field>
+        <field name="model">project.project</field>
+        <field name="active" eval="True"/>
+        <field name="priority">9990</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='allocated_hours']" position="replace"/>
+            <xpath expr="//notebook" position="before">
+                <group>
+                    <group string="Time">
+                        <field name="x_allocated_hours"/>
+                        <label for="x_effective_hours"/>
+                        <div class="d-flex" name="bills">
+                            <field class="oe_inline" name="x_effective_hours"/>
+                            <span class="ml4">(</span>
+                            <field class="oe_inline" name="x_percent_spent" widget="percentage"/>
+                            <span>)</span>
+                        </div>
+                    </group>
+                    <group string="Materials">
+                        <field name="x_various_materials_budget_project"/>
+                        <label for="x_debit"/>
+                        <div class="d-flex" name="bills">
+                            <field class="oe_inline" name="x_debit"/>
+                            <span class="ml4">(</span>
+                            <field class="oe_inline" name="x_percent_budget" widget="percentage"/>
+                            <span>)</span>
+                        </div>
+                    </group>
+                </group>
             </xpath>
         </field>
     </record>
@@ -52,8 +101,10 @@
         <field name="priority">160</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='ref']" position="after">
-                <field name="x_task_id" options="{'no_create':true}"/>
+            <xpath expr="//page[@id='other_tab']//group[@name='accounting_info_group']" position="after">
+                <group string="Misc">
+                    <field name="x_task_id" options="{'no_create': true}"/>
+                </group>
             </xpath>
         </field>
     </record>
