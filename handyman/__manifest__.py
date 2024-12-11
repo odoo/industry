@@ -19,9 +19,11 @@
     ],
     'data': [
         'data/res_config_setting.xml',
+        'data/account_analytic_plan.xml',
         'data/ir_attachment_pre.xml',
-        'data/ir_model_fields.xml',
         'data/ir_actions_server.xml',
+        'data/base_automation.xml',
+        'data/ir_model_fields.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_ui_view.xml',
         'data/knowledge_cover.xml',
