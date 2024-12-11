@@ -4,14 +4,14 @@
         <field name="name">x_various_materials_budget</field>
         <field name="ttype">monetary</field>
         <field name="copied" eval="True"/>
-        <field name="field_description">Various Materials Budget</field>
-        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="field_description">Materials Budget</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
         <field name="currency_field">currency_id</field>
     </record>
     <record id="new_material_budget_related_field" model="ir.model.fields">
         <field name="name">x_related_material_budget_field</field>
         <field name="ttype">monetary</field>
-        <field name="related">sale_order_id.x_various_materials_budget</field>
+        <field name="related">sale_line_id.x_various_materials_budget</field>
         <field name="field_description">Materials Budget</field>
         <field name="model_id" ref="project.model_project_task"/>
         <field name="readonly" eval="True"/>
@@ -26,30 +26,27 @@
         <field name="model_id" ref="account.model_account_move"/>
         <field name="relation">project.task</field>
     </record>
-    <record id="x_x_task_account_move_count_field" model="ir.model.fields">
-        <field name="name">x_x_task_account_move_count</field>
-        <field name="compute"><![CDATA[
-for record in self:
-    record['x_x_task_account_move_count'] = self.env['account.move'].search_count([('x_task_id', '=', record.id)])]]></field>
-        <field name="ttype">integer</field>
-        <field name="field_description">Task count</field>
-        <field name="model_id" ref="project.model_project_task"/>
-        <field name="selectable" eval="False"/>
-        <field name="store" eval="False"/>
+    <record id="related_x_task_field" model="ir.model.fields">
+        <field name="name">x_task_id</field>
+        <field name="ttype">many2one</field>
+        <field name="related">move_id.x_task_id</field>
+        <field name="field_description">Task</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="relation">project.task</field>
         <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
     </record>
     <record id="x_vendor_bills_field" model="ir.model.fields">
         <field name="name">x_vendor_bills</field>
         <field name="compute"><![CDATA[
-bills = self.env['account.move']._read_group(domain=[('x_task_id', 'in', self.ids)], groupby=['x_task_id'], aggregates=['amount_untaxed:sum'])
-mapped_data = {task.id: total for task, total in bills}
+invoice_lines = self.env['account.move.line']._read_group(domain=[('x_task_id', 'in', self.ids), ('analytic_distribution', 'in', self.project_id.account_id.ids)], groupby=['x_task_id'], aggregates=['price_subtotal:sum'])
+mapped_data = {task.id: total for task, total in invoice_lines}
 for task in self:
     task['x_vendor_bills'] = mapped_data.get(task.id, 0)]]></field>
         <field name="ttype">monetary</field>
-        <field name="field_description">Vendor Bills</field>
+        <field name="field_description">Costs</field>
         <field name="model_id" ref="project.model_project_task"/>
         <field name="readonly" eval="True"/>
-        <field name="selectable" eval="False"/>
         <field name="store" eval="False"/>
         <field name="currency_field">currency_id</field>
     </record>
@@ -59,11 +56,88 @@ for task in self:
 for task in self:
     task['x_percent_bills_1'] = task.x_vendor_bills / task.x_related_material_budget_field if task.x_related_material_budget_field else 0]]></field>
         <field name="ttype">float</field>
-        <field name="depends">name</field>
         <field name="field_description">Percent bills</field>
         <field name="model_id" ref="project.model_project_task"/>
         <field name="readonly" eval="True"/>
-        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="field_related_analytic_account_vendor_bill_count" model="ir.model.fields">
+        <field name="name">x_vendor_bill_count</field>
+        <field name="ttype">integer</field>
+        <field name="related">project_id.account_id.vendor_bill_count</field>
+        <field name="field_description">Vendor Bills</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="x_various_materials_budget_project" model="ir.model.fields">
+        <field name="name">x_various_materials_budget_project</field>
+        <field name="ttype">monetary</field>
+        <field name="field_description">Materials Budget</field>
+        <field name="compute"><![CDATA[
+for project in self:
+    project['x_various_materials_budget_project'] = sum(project.task_ids.mapped('x_related_material_budget_field'))]]></field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="currency_field">currency_id</field>
+    </record>
+    <record id="field_related_analytic_account_debit" model="ir.model.fields">
+        <field name="name">x_debit</field>
+        <field name="ttype">monetary</field>
+        <field name="compute"><![CDATA[
+for project in self:
+    project['x_debit'] = project.account_id.debit]]></field>
+        <field name="field_description">Costs</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="currency_field">currency_id</field>
+    </record>
+    <record id="field_allocated_hours" model="ir.model.fields">
+        <field name="name">x_allocated_hours</field>
+        <field name="ttype">monetary</field>
+        <field name="compute"><![CDATA[
+for project in self:
+    project['x_allocated_hours'] = sum(project.task_ids.mapped('allocated_hours'))]]></field>
+        <field name="field_description">Allocated</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="currency_field">currency_id</field>
+    </record>
+    <record id="field_effective_hours" model="ir.model.fields">
+        <field name="name">x_effective_hours</field>
+        <field name="ttype">monetary</field>
+        <field name="compute"><![CDATA[
+for project in self:
+    project['x_effective_hours'] = sum(project.task_ids.mapped('effective_hours'))]]></field>
+        <field name="field_description">Spent</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="currency_field">currency_id</field>
+    </record>
+    <record id="x_percent_time_spent_field" model="ir.model.fields">
+        <field name="name">x_percent_spent</field>
+        <field name="compute"><![CDATA[
+for project in self:
+    project['x_percent_spent'] = project.x_effective_hours / project.x_allocated_hours if project.x_allocated_hours else 0]]></field>
+        <field name="ttype">float</field>
+        <field name="field_description">Percent time</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="x_percent_material_spent_field" model="ir.model.fields">
+        <field name="name">x_percent_budget</field>
+        <field name="compute"><![CDATA[
+for project in self:
+    project['x_percent_budget'] = project.x_debit / project.x_various_materials_budget_project if project.x_various_materials_budget_project else 0]]></field>
+        <field name="ttype">float</field>
+        <field name="field_description">Percent budget</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
     </record>
 </odoo>
