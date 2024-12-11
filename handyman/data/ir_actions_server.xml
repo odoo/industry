@@ -8,7 +8,54 @@
 invoice = env['account.move'].create({'move_type': 'in_invoice', 'x_task_id': record.id})
 action = env['ir.actions.act_window']._for_xml_id('account.action_move_in_invoice_type')
 action['views'] = [(env.ref('account.view_move_form').id, 'form')]
-action['res_id'] = invoice.id
-        ]]></field>
+action['res_id'] = invoice.id]]></field>
+    </record>
+    <record id="action_create_analytic_account" model="ir.actions.server">
+        <field name="name">Execute Code</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+analytic_account_id = env['account.analytic.account'].create({
+    'name': record.name,
+    'partner_id': record.partner_id.id,
+    'code': record.partner_id.ref,
+    'plan_id': env.ref('handyman.analytic_plan_field_service').id,
+})
+record['x_analytic_account_id'] = analytic_account_id.id]]></field>
+    </record>
+    <record id="action_update_analytic_account" model="ir.actions.server">
+        <field name="name">Execute Code</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+analytic_account_id = record.x_analytic_account_id
+analytic_account_id['name'] = record.name
+analytic_account_id['partner_id'] = record.partner_id
+analytic_account_id['code'] = record.partner_id.ref
+analytic_account_id['active'] = record.active]]></field>
+    </record>
+    <record id="action_unlink_analytic_account" model="ir.actions.server">
+        <field name="name">Execute Code</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record.x_analytic_account_id['active'] = False]]></field>
+    </record>
+    <record id="action_open_bills_from_task" model="ir.actions.server">
+        <field name="name">Open Bills linked to Task</field>
+        <field name="model_id" ref = "project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+account_move_lines = env['account.move.line'].search_fetch([('move_id.move_type', '=', 'in_invoice'), ('analytic_distribution', 'in', record.x_analytic_account_id.ids)], ['move_id'])
+action = env['ir.actions.act_window']._for_xml_id('account.action_move_in_invoice_type')
+action['domain'] = [('id', 'in', account_move_lines.move_id.ids)]
+action['context'] = {'default_move_type': 'in_invoice'}]]></field>
+    </record>
+    <record id="action_add_default_analytic_account" model="ir.actions.server">
+        <field name="name">Add default analytic account</field>
+        <field name="model_id" ref = "account.model_account_move_line"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record['analytic_distribution'] = {record.move_id.x_task_id.x_analytic_account_id.id: 100}]]></field>
     </record>
 </odoo>
