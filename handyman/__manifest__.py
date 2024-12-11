@@ -20,8 +20,9 @@
     'data': [
         'data/res_config_setting.xml',
         'data/ir_attachment_pre.xml',
-        'data/ir_model_fields.xml',
         'data/ir_actions_server.xml',
+        'data/base_automation.xml',
+        'data/ir_model_fields.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_ui_view.xml',
         'data/knowledge_cover.xml',
@@ -29,7 +30,6 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/planning_role.xml',
-        'data/project_task_type.xml',
         'data/project_project.xml',
         'data/product_product.xml',
         'data/sale_order_spreadsheet.xml',
