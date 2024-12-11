@@ -6,7 +6,6 @@
         <field name="copied" eval="True"/>
         <field name="field_description">Various Materials Budget</field>
         <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="currency_field">currency_id</field>
     </record>
     <record id="new_material_budget_related_field" model="ir.model.fields">
         <field name="name">x_related_material_budget_field</field>
@@ -16,7 +15,6 @@
         <field name="model_id" ref="project.model_project_task"/>
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
-        <field name="currency_field">currency_id</field>
     </record>
     <record id="x_task_field" model="ir.model.fields">
         <field name="name">x_task_id</field>
@@ -26,44 +24,44 @@
         <field name="model_id" ref="account.model_account_move"/>
         <field name="relation">project.task</field>
     </record>
-    <record id="x_x_task_account_move_count_field" model="ir.model.fields">
-        <field name="name">x_x_task_account_move_count</field>
-        <field name="compute"><![CDATA[
-for record in self:
-    record['x_x_task_account_move_count'] = self.env['account.move'].search_count([('x_task_id', '=', record.id)])]]></field>
-        <field name="ttype">integer</field>
-        <field name="field_description">Task count</field>
+    <record id="field_analytic_account_id" model="ir.model.fields">
+        <field name="name">x_analytic_account_id</field>
+        <field name="field_description">Analytic Account</field>
+        <field name="ttype">many2one</field>
         <field name="model_id" ref="project.model_project_task"/>
-        <field name="selectable" eval="False"/>
-        <field name="store" eval="False"/>
-        <field name="readonly" eval="True"/>
+        <field name="relation">account.analytic.account</field>
     </record>
-    <record id="x_vendor_bills_field" model="ir.model.fields">
-        <field name="name">x_vendor_bills</field>
-        <field name="compute"><![CDATA[
-bills = self.env['account.move']._read_group(domain=[('x_task_id', 'in', self.ids)], groupby=['x_task_id'], aggregates=['amount_untaxed:sum'])
-mapped_data = {task.id: total for task, total in bills}
-for task in self:
-    task['x_vendor_bills'] = mapped_data.get(task.id, 0)]]></field>
+    <record id="field_related_analytic_account_credit" model="ir.model.fields">
+        <field name="name">x_credit</field>
         <field name="ttype">monetary</field>
-        <field name="field_description">Vendor Bills</field>
+        <field name="compute"><![CDATA[
+for task in self:
+    task['x_credit'] = task.x_analytic_account_id.credit]]></field>
+        <field name="field_description">Costs</field>
         <field name="model_id" ref="project.model_project_task"/>
         <field name="readonly" eval="True"/>
-        <field name="selectable" eval="False"/>
         <field name="store" eval="False"/>
-        <field name="currency_field">currency_id</field>
+        <field name="depends">x_analytic_account_id.credit</field>
     </record>
     <record id="x_percent_bills_1_field" model="ir.model.fields">
         <field name="name">x_percent_bills_1</field>
         <field name="compute"><![CDATA[
 for task in self:
-    task['x_percent_bills_1'] = task.x_vendor_bills / task.x_related_material_budget_field if task.x_related_material_budget_field else 0]]></field>
+    task['x_percent_bills_1'] = task.x_credit / task.x_related_material_budget_field if task.x_related_material_budget_field else 0]]></field>
         <field name="ttype">float</field>
         <field name="depends">name</field>
         <field name="field_description">Percent bills</field>
         <field name="model_id" ref="project.model_project_task"/>
         <field name="readonly" eval="True"/>
-        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="field_related_analytic_account_vendor_bill_count" model="ir.model.fields">
+        <field name="name">x_vendor_bill_count</field>
+        <field name="ttype">integer</field>
+        <field name="related">x_analytic_account_id.vendor_bill_count</field>
+        <field name="field_description">Vendor Bills</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
     </record>
 </odoo>
