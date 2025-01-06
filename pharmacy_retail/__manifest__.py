@@ -49,7 +49,6 @@ They maintain the stock lot wise and also manage the expiry of the lots.
         'data/knowledge_tour.xml',
     ],
     'demo': [
-        'demo/res_partner_title.xml',
         'demo/res_partner.xml',
         'demo/stock_lot.xml',
         'demo/product_supplierinfo.xml',
