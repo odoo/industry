@@ -2,13 +2,13 @@
 <odoo>
     <record id="bom_server_action" model="ir.actions.server">
         <field name="code"><![CDATA[
-if record.x_quantity_by_deposit_product == 1 and record.x_unit_sale_product.id:
+if (quant := record.x_quantity_by_deposit_product) == 1 and record.x_unit_sale_product.id:
     raise UserError("Unit sale product should be undefined if this product can not be sold in a smaller unit.")
 if record.x_unit_sale_product:
     existing_bom = env['mrp.bom'].search([('product_tmpl_id', '=',record.x_unit_sale_product.id)], limit=1)
     reordering_rule = env['stock.warehouse.orderpoint'].search_count([('product_id', '=', record.x_unit_sale_product.product_variant_id.id)], limit=1)
     bom_vals = {
-        'product_qty': record.x_quantity_by_deposit_product,
+        'product_qty': quant,
         'type': 'normal',
         'x_parent_product': record.id,
         'x_auto_production': True,
@@ -28,12 +28,13 @@ if record.x_unit_sale_product:
         bom_vals['product_tmpl_id'] = record.x_unit_sale_product.id
         env['mrp.bom'].create(bom_vals)
     if not reordering_rule:
+        uom_id = env['uom.uom'].search([('relative_factor', '=', quant), ('relative_uom_id', '=', env.ref('uom.product_uom_unit').id)], limit=1)
+        if not uom_id:
+            uom_id = env['uom.uom'].create({'relative_factor': quant, 'relative_uom_id': env.ref('uom.product_uom_unit').id, 'name': f"Pack of {quant}"})
         env['stock.warehouse.orderpoint'].create({
             'product_id': record.x_unit_sale_product.product_variant_id.id,
             'x_parent_product': record.id,
-            'product_min_qty': 0,
-            'product_max_qty': 0,
-            'qty_multiple': record.x_quantity_by_deposit_product or 1,
+            'replenishment_uom_id': uom_id.id,
             'route_id': env.ref('mrp.route_warehouse0_manufacture').id,
             'location_id': env.ref('stock.stock_location_stock').id,
         })
