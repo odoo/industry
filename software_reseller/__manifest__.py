@@ -26,7 +26,6 @@ The typical sale is a 1 year Oracle Database license that is purchased to Oracle
         'data/account_analytic_plan.xml',
         'data/account_analytic_account.xml',
         'data/project_project.xml',
-        'data/uom_category.xml',
         'data/uom_uom.xml',
         'data/planning_role.xml',
         'data/product_product.xml',
