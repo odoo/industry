@@ -34,7 +34,6 @@
         'data/qweb_view.xml',
         'data/product_public_category.xml',
         'data/product_category.xml',
-        'data/uom_uom.xml',
         'data/pos_category.xml',
         'data/product_template.xml',
         'data/product_attribute.xml',

@@ -30,6 +30,7 @@
         'data/project_project.xml',
         'data/project_task.xml',
         'data/planning_role.xml',
+        'data/uom_uom.xml',
         'data/product_template.xml',
         'data/product_attribute_value.xml',
         'data/product_template_attribute_line.xml',

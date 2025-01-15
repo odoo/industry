@@ -22,6 +22,7 @@ This module installs a configuration that presets the modules and configure Odoo
         'data/ir_attachment_pre.xml',
         'data/documents_folder.xml',
         'data/project_project.xml',
+        'data/uom_uom.xml',
         'data/product_template.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
