@@ -13,7 +13,6 @@ This setup is for bakery store companies selling to consumers. Bakery are busine
         'sale_purchase',
         'website_sale_product_configurator',
         'website_sale_stock',
-        'theme_bistro',
     ],
     'data': [
         'data/ir_attachment_pre.xml',

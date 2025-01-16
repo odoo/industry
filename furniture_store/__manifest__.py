@@ -13,7 +13,6 @@ This module sets up a furniture store for selling furniture like chairs, sofas, 
         'sale_purchase',
         'website_crm',
         'website_sale_stock',
-        'theme_anelusia',
     ],
     'data': [
         'data/res_config_settings.xml',

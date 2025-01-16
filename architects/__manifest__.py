@@ -22,7 +22,6 @@ schematic design, design development, worksite follow-up, energy efficiency asse
         'web_studio',
         'website_crm',
         'website_partner',
-        'theme_real_estate',
     ],
     'data': [
         'data/res_config_settings.xml',
