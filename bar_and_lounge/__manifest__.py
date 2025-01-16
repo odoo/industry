@@ -23,7 +23,6 @@ This Services can be avail directly from the airport and individuals can also pu
         'website_partner',
         'website_sale_product_configurator',
         'website_sale_stock',
-        'theme_treehouse',
     ],
     'data': [
         'data/ir_attachment_pre.xml',
