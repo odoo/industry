@@ -327,7 +327,7 @@ class TestEnv(IndustryCase):
                 re.search('model="' + model + '"', s)
                 and not re.search('<field .+model="' + model, s)
                 and not re.search('<function.+model="' + model, s)
-                and not s.count('<odoo noupdate="1">')
+                and not s.count('<odoo noupdate="1"')
             ):
                 _logger.warning(
                     "Model %s should not be updated, please add 'noupdate=\"1\"' in the header of %s.",
