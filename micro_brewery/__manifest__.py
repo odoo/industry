@@ -17,7 +17,6 @@
         'web_studio',
         'website_appointment',
         'website_sale_stock',
-        'theme_bistro',
     ],
     'data': [
         'data/res_config_settings.xml',

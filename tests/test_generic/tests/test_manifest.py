@@ -137,12 +137,10 @@ class ManifestTest(ManifestLinter, IndustryCase):
             unknown_dependencies,
             "Unknown dependencies for %s: %s" % (module, ", ".join(unknown_dependencies))
         )
-        theme_is_not_last = any(dependency.startswith("theme_") for dependency in dependencies) and not dependencies[-1].startswith("theme_")
         self.assertFalse(
-            theme_is_not_last,
-            "The theme should be the last dependency in manifest for module %s." % (module),
+            any(dependency.startswith("theme_") for dependency in dependencies),
+            "Themes should not be in the dependencies."
         )
-        dependencies = [dep for dep in dependencies if not dep.startswith("theme_")]
         self.assertTrue(
             dependencies == sorted(dependencies),
             "Dependencies in manifest for module %s are not in alphabetical order." % (module)
