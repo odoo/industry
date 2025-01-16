@@ -22,7 +22,6 @@
         'stock_barcode',
         'web_studio',
         'website_sale',
-        'theme_buzzy',
     ],
     'data': [
         'data/helpdesk_config.xml',

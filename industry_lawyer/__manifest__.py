@@ -15,7 +15,6 @@ This module installs a configuration that presets the modules and configure Odoo
         'sale_planning',
         'sale_timesheet_enterprise',
         'website_appointment',
-        'theme_clean',
     ],
     'data': [
         'data/res_config_settings.xml',
