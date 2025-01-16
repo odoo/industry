@@ -17,7 +17,6 @@ This module is a setup specific to support the business activities of a microbre
         'web_studio',
         'website_appointment',
         'website_sale_stock',
-        'theme_bistro',
     ],
     'data': [
         'data/res_config_settings.xml',
