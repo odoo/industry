@@ -16,7 +16,6 @@
         'project_sms',
         'sales_team',
         'website_appointment',
-        'theme_orchid',
     ],
     'data': [
         'data/res_config_settings.xml',

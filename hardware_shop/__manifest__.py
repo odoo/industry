@@ -21,7 +21,6 @@ Using Point of Sale, Inventory, Sales, Purchase, Accounting, Contact, Employee, 
         'website_sale_loyalty',
         'website_sale_product_configurator',
         'website_sale_stock',
-        'theme_kiddo',
     ],
     'data': [
         'data/res_config_setting.xml',
