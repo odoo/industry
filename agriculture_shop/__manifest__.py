@@ -16,7 +16,6 @@
         'sale_purchase',
         'web_studio',
         'website_sale_loyalty',
-        'theme_enark',
     ],
     'data': [
         'data/res_config_settings.xml',

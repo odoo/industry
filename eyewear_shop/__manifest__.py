@@ -17,7 +17,6 @@ The sales process involves creating sale orders, managing deliveries and invoici
         'website_sale_comparison',
         'website_sale_loyalty',
         'website_sale_wishlist',
-        'theme_paptic',
     ],
     'data': [
         'data/res_config_settings.xml',

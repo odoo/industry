@@ -19,7 +19,6 @@ We offer IT sales, installation, and repair services for a wide range of product
         'website_helpdesk',
         'website_sale_comparison',
         'website_sale_stock',
-        'theme_graphene',
     ],
     'data': [
         'data/res_config_settings.xml',

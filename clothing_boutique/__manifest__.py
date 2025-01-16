@@ -14,7 +14,6 @@ This setup if for Clothing Store companies selling female clothing.""",
         'website_sale_loyalty',
         'website_sale_stock',
         'website_sale_wishlist',
-        'theme_orchid',
     ],
     'data': [
         'data/res_config_settings.xml',

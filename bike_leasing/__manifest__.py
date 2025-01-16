@@ -20,7 +20,6 @@ This module is a complete solution for the bike leasing industry, simplifying le
         'website_payment',
         'website_sale',
         'payment_custom',
-        'theme_vehicle',
     ],
     'data': [
         'data/res_config_settings.xml',

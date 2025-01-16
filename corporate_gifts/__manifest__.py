@@ -25,7 +25,6 @@ This module is for marketing companies selling and producing customized corporat
         'web_studio',
         'website_crm',
         'website_sale_stock',
-        'theme_enark',
     ],
     'data': [
         'data/res_config_settings.xml',
