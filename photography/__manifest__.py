@@ -18,7 +18,6 @@
         'sale_management',
         'sale_project',
         'website_appointment',
-        'theme_nano',
     ],
     'data': [
         'data/res_groups_data.xml',
