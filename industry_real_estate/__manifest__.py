@@ -16,7 +16,6 @@ Manage your properties, create and manage rental contracts, and streamline your 
         'sale_crm',
         'website_crm',
         'website_studio',
-        'theme_treehouse',
     ],
     'data': [
         'data/account_analytic_plan.xml',

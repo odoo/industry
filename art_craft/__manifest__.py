@@ -22,7 +22,6 @@
         'website_sale_comparison',
         'website_sale_loyalty',
         'website_sale_wishlist',
-        'theme_artists',
     ],
     'data': [
         'data/res_config_settings.xml',
