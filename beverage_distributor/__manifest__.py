@@ -18,7 +18,6 @@
         'website_crm',
         'website_sale',
         'website_sale_stock',
-        'theme_bistro',
     ],
     'data': [
         'data/product_category.xml',

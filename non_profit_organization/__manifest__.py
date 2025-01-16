@@ -14,7 +14,6 @@
         'web_studio',
         'website_crm',
         'website_event_sale',
-        'theme_treehouse',
     ],
     'data': [
         'data/filters.xml',

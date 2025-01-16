@@ -11,7 +11,6 @@
         'stock',
         'website_sale_comparison_wishlist',
         'website_sale_loyalty',
-        'theme_kiddo',
     ],
     'data': [
         'data/res_config_settings.xml',

@@ -15,7 +15,7 @@ It may include surveying of building properties and the measurement of completed
         'planning',
         'sale_project',
         'web_studio',
-        'theme_treehouse',
+        'website',
     ],
     'data': [
         'data/res_config_settings.xml',
