@@ -106,6 +106,8 @@ class TestEnv(IndustryCase):
                 "'payment_demo' should not be in the dependencies. Instead, call "
                 "'button_immediate_install' on 'base.module_payment_demo' in demo."
             )
+        if any(dep.startswith('theme_') for dep in dependency_list):
+            _logger.warning("Themes should not be in the dependencies.")
         base_automation = (
             'base_automation' in dependency_list and 'sale_subscription' not in dependency_list
         )
