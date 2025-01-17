@@ -23,7 +23,6 @@
         'data/res_config_settings.xml',
         'data/appointment_type.xml',
         'data/ir_attachment_pre.xml',
-        'data/pos_payment_method.xml',
         'data/product_category.xml',
         'data/uom_uom.xml',
         'data/product_product.xml',
