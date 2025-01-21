@@ -20,7 +20,6 @@
     ],
     'data': [
         'data/res_config_settings.xml',
-        'data/product_category.xml',
         'data/ir_attachment_pre.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
@@ -28,6 +27,7 @@
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
         'data/product_public_category.xml',
+        'data/product_category.xml',
         'data/uom_uom.xml',
         'data/restaurant_floor.xml',
         'data/restaurant_table.xml',
