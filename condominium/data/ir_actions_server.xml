@@ -100,10 +100,7 @@ mrs = env['x_meter_reading'].search([
     ('x_meter_id', '=', record.x_meter_id.id)], order='x_date')
 previous_mr = False
 for mr in mrs:
-    if previous_mr:
-        mr['x_usage'] = mr['x_quantity'] - previous_mr['x_quantity']
-    else :
-        mr['x_usage'] = 0
+    mr['x_usage'] = mr['x_quantity'] - previous_mr['x_quantity'] if previous_mr else 0
     previous_mr = mr
 ]]>
         </field>
@@ -117,4 +114,26 @@ action = env['ir.actions.act_window']._for_xml_id('condominium.condo_act_window'
 action['res_id'] = env.company.partner_id.id]]>
         </field>
     </record>
+    <record id="ir_action_create_condominium" model="ir.actions.server">
+        <field name="code"><![CDATA[env['res.company'].create({
+    'partner_id': record.id,
+    'name': record.name,
+    'street': record.street,
+    'street2': record.street2,
+    'zip': record.zip,
+    'city': record.city,
+    'state_id': record.state_id.id,
+    'country_id': record.country_id.id,
+    'vat': record.vat,
+    'phone': record.phone,
+    'mobile': record.mobile,
+    'email': record.email,
+    'website': record.website,
+    'logo': record.image_1920,
+})
+action = {'type': 'ir.actions.client', 'tag': 'reload'}]]></field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="name">Create Condominium</field>
+  </record>
 </odoo>
