@@ -1,6 +1,6 @@
 {
     'name': 'Handyman Services',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Services',
     'description': "",
     'depends': [
@@ -13,6 +13,7 @@
         'project_purchase',
         'project_timesheet_forecast_sale',
         'sale_crm',
+        'sale_margin',
         'sale_purchase_stock',
         'spreadsheet_sale_management',
         'web_studio',
