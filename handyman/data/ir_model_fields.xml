@@ -1,18 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="field_various_material_budget" model="ir.model.fields">
-        <field name="name">x_various_materials_budget</field>
-        <field name="ttype">monetary</field>
-        <field name="copied" eval="True"/>
-        <field name="field_description">Materials Budget</field>
-        <field name="model_id" ref="sale.model_sale_order_line"/>
-        <field name="currency_field">currency_id</field>
-    </record>
     <record id="new_material_budget_related_field" model="ir.model.fields">
         <field name="name">x_related_material_budget_field</field>
         <field name="ttype">monetary</field>
-        <field name="related">sale_line_id.x_various_materials_budget</field>
-        <field name="field_description">Materials Budget</field>
+        <field name="compute"><![CDATA[
+all_lines = self.env['sale.order.line']._read_group(domain=[('order_id', 'in', self.mapped('sale_line_id.order_id.id')), ('product_type', '=', 'consu')], groupby=['x_section_id'], aggregates=['product_uom_qty:array_agg','purchase_price:array_agg'])
+data = {section.id: [qty, price] for section, qty, price in all_lines}
+for task in self:
+    qty, price = data.get(task.sale_line_id.x_section_id.id, ([], []))
+    task['x_related_material_budget_field'] = sum(p * q for p, q in zip(qty, price))]]></field>
+        <field name="field_description">Allocated Budget</field>
         <field name="model_id" ref="project.model_project_task"/>
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
@@ -73,7 +70,7 @@ for task in self:
     <record id="x_various_materials_budget_project" model="ir.model.fields">
         <field name="name">x_various_materials_budget_project</field>
         <field name="ttype">monetary</field>
-        <field name="field_description">Materials Budget</field>
+        <field name="field_description">Allocated Budget</field>
         <field name="compute"><![CDATA[
 for project in self:
     project['x_various_materials_budget_project'] = sum(project.task_ids.mapped('x_related_material_budget_field'))]]></field>
@@ -139,5 +136,22 @@ for project in self:
         <field name="model_id" ref="project.model_project_project"/>
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
+    </record>
+    <record id="x_section_id_field" model="ir.model.fields">
+        <field name="name">x_section_id</field>
+        <field name="field_description">Section ID</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="ttype">many2one</field>
+        <field name="compute"><![CDATA[
+all_sections = self._read_group(domain=[('order_id', 'in', self.mapped('order_id.id')), ('display_type', '=', 'line_section')], groupby=['order_id'], aggregates=['sequence:array_agg','id:array_agg'])
+data = {order.id: [seqs, ids] for order, seqs, ids in all_sections}
+for line in self:
+    line['x_section_id'] = False
+    seqs, ids = data.get(line.order_id.id, ([], []))
+    for s, i in zip(seqs, ids):
+        line['x_section_id'] = i if (line.x_section_id and line.x_section_id.id < s < line.sequence) or s < line.sequence else line.x_section_id]]></field>
+        <field name="depends">order_id.order_line</field>
+        <field name="readonly" eval="True"/>
+        <field name="relation">sale.order.line</field>
     </record>
 </odoo>
