@@ -1,18 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="field_various_material_budget" model="ir.model.fields">
-        <field name="name">x_various_materials_budget</field>
-        <field name="ttype">monetary</field>
-        <field name="copied" eval="True"/>
-        <field name="field_description">Materials Budget</field>
-        <field name="model_id" ref="sale.model_sale_order_line"/>
-        <field name="currency_field">currency_id</field>
-    </record>
     <record id="new_material_budget_related_field" model="ir.model.fields">
         <field name="name">x_related_material_budget_field</field>
         <field name="ttype">monetary</field>
-        <field name="related">sale_line_id.x_various_materials_budget</field>
-        <field name="field_description">Materials Budget</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    lines = self.env['sale.order.line'].search([('order_id', '=', record.sale_line_id.order_id.id), ('x_section_id', '=', record.sale_line_id.x_section_id.id), ('product_type', '=', 'consu')])
+    record['x_related_material_budget_field'] = sum(line.purchase_price * line.product_uom_qty for line in lines)]]></field>
+        <field name="field_description">Allocated Budget</field>
         <field name="model_id" ref="project.model_project_task"/>
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
@@ -73,7 +68,7 @@ for task in self:
     <record id="x_various_materials_budget_project" model="ir.model.fields">
         <field name="name">x_various_materials_budget_project</field>
         <field name="ttype">monetary</field>
-        <field name="field_description">Materials Budget</field>
+        <field name="field_description">Allocated Budget</field>
         <field name="compute"><![CDATA[
 for project in self:
     project['x_various_materials_budget_project'] = sum(project.task_ids.mapped('x_related_material_budget_field'))]]></field>
@@ -139,5 +134,18 @@ for project in self:
         <field name="model_id" ref="project.model_project_project"/>
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
+    </record>
+    <record id="x_section_id_field" model="ir.model.fields">
+        <field name="name">x_section_id</field>
+        <field name="field_description">Section ID</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="ttype">many2one</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    sections = self.env['sale.order.line'].search([('order_id', '=', record.order_id.id), ('sequence', '<=', record.sequence), ('display_type', '=', 'line_section')], order='sequence desc') if not record.display_type else False
+    record['x_section_id'] = sections[0] if sections else False]]></field>
+        <field name="depends">order_id.order_line</field>
+        <field name="readonly" eval="True"/>
+        <field name="relation">sale.order.line</field>
     </record>
 </odoo>
