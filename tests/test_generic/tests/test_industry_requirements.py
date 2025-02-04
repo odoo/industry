@@ -1,8 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import sys
-
-from odoo.tests.common import tagged
+from odoo.tests import tagged, get_db_name
 from odoo.tools import cloc
 
 from .industry_case import IndustryCase
@@ -12,9 +10,8 @@ from .industry_case import IndustryCase
 class TestEnv(IndustryCase):
 
     def test_payment_demo(self):
-        sys_args = sys.argv
-        index_database = sys_args.index('-d')
-        if not sys_args[index_database + 1].endswith('imported_with_demo'):
+        db_name = get_db_name()
+        if not db_name.endswith('imported_with_demo'):
             return
         if self.env['ir.module.module']._get('website_sale').state == 'installed':
             self.assertTrue(
@@ -52,7 +49,8 @@ class TestEnv(IndustryCase):
             )
 
     def test_cloc_exclude_view(self):
-        if not sys.argv[sys.argv.index('-d') + 1].endswith('imported_no_demo'):
+        db_name = get_db_name()
+        if not db_name.endswith('imported_no_demo'):
             return
         c = cloc.Cloc()
         c.count_database(self.env.cr.dbname)
