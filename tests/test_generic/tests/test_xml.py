@@ -22,7 +22,7 @@ EXCLUDED_READONLY_FIELDS = {
 USELESS_FIELDS = {
     'account.analytic.plan': ['color'],
     'crm.lead': [
-        'city', 'street', 'zip', 'state_id', 'country_id', 'email', 'email_from', 'mobile', 'contact_name',
+        'city', 'street', 'zip', 'state_id', 'country_id', 'email', 'email_from', 'contact_name',
         'partner_name', 'title', 'function', 'website', 'street2', 'phone'
     ],
     'crm.tag': ['color'],
