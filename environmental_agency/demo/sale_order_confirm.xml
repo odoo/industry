@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <function model="sale.order" name="action_confirm" eval="[[ref('sale_order_4'),ref('sale_order_3'),ref('sale_order_2'),ref('sale_order_1')]]"/>
+    <function name="_create_invoices" model="sale.order" eval="[[ref('sale_order_4'),ref('sale_order_3'),ref('sale_order_2'),ref('sale_order_1')]]"/>
+
+    <function model="project.task" name="write">
+        <value model="project.task" eval="(
+            obj().env.ref('environmental_agency.sale_order_line_3') +
+            obj().env.ref('environmental_agency.sale_order_line_5')
+        ).task_id.ids"/>
+        <value eval="{'stage_id': ref('project_task_type_10')}"/>
+    </function>
+    <function model="project.project" name="write">
+        <value model="project.project" eval="obj().search([]).ids"/>
+        <value eval="{'user_id': ref('base.user_admin')}"/>
+    </function>
+    <function model="project.project" name="write">
+        <value model="sale.order.line" eval="obj().env.ref('environmental_agency.sale_order_line_8').project_id.id"/>
+        <value eval="{'stage_id': ref('project.project_project_stage_2')}"/>
+    </function>
+    <record  id="project_update_1" model="project.update">
+        <field name="name">End of project</field>
+        <field name="project_id" model="sale.order.line" eval="obj().env.ref('environmental_agency.sale_order_line_8').project_id.id"/>
+        <field name="status">done</field>
+    </record>
+    <function model="project.project" name="write">
+        <value model="sale.order.line" eval="obj().env.ref('environmental_agency.sale_order_line_7').project_id.id"/>
+        <value eval="{'stage_id': ref('project.project_project_stage_1')}"/>
+    </function>
+    <function model="project.project" name="write">
+        <value model="sale.order.line" eval="obj().env.ref('environmental_agency.sale_order_line_1').project_id.id"/>
+        <value eval="{'stage_id': ref('project.project_project_stage_1'), 'last_update_status': 'on_track'}"/>
+    </function>
+    <record id="mail_activity_6" model="mail.activity">
+        <field name="res_model_id" ref="project.model_project_task"/>
+        <field name="date_deadline" eval="(DateTime.today() + relativedelta(days=1)).strftime('%Y-%m-%d %H:%M')"/>
+        <field name="res_id" model="project.task" search="[('sale_order_id', '=', ref('sale_order_1'))]"/>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="activity_type_id" ref="mail.mail_activity_data_todo"/>
+    </record>
+    <record id="mail_activity_7" model="mail.activity">
+        <field name="res_model_id" ref="project.model_project_task"/>
+        <field name="date_deadline" eval="(DateTime.today() + relativedelta(days=4)).strftime('%Y-%m-%d %H:%M')"/>
+        <field name="res_id" model="project.task" search="[('sale_order_id', '=', ref('sale_order_1'))]"/>
+        <field name="activity_type_id" ref="mail.mail_activity_data_meeting"/>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="summary">meet</field>
+    </record>
+</odoo>
