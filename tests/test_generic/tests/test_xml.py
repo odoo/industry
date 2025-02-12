@@ -15,6 +15,62 @@ _logger = logging.getLogger(__name__)
 
 MAX_FILE_SIZE = 100 * 1024 * 1024  # in megabytes
 
+EXCLUDED_READONLY_FIELDS = {
+    'factor_inv',
+    'is_cash_count',
+    'lot_id',
+    'type',
+    'user_id',
+}
+
+USELESS_FIELDS = {
+    'account.analytic.plan': ['color'],
+    'crm.lead': [
+        'city', 'street', 'zip', 'state_id', 'country_id', 'email', 'email_from', 'mobile', 'contact_name',
+        'partner_name', 'title', 'function', 'website', 'street2', 'phone'
+    ],
+    'crm.tag': ['color'],
+    'hr.applicant': ['last_stage_id'],
+    'ir.attachment': ['access_token'],
+    'ir.model.fields': ['model'],
+    'knowledge.article': ['article_member_ids'],
+    'loyalty.reward': ['description'],
+    'loyalty.rule': ['promo_barcode'],
+    'maintenance.request': ['maintenance_team_id', 'owner_user_id'],
+    'planning.role': ['color'],
+    'planning.slot': ['access_token', 'allocated_hours'],
+    'pos.order': ['date_order', 'pos_reference', 'company_id', 'state', 'currency_id', 'last_order_preparation_change'],
+    'pos.order.line': ['price_unit', 'total_cost', 'company_id', 'full_product_name'],
+    'product.attribute.value': ['color'],
+    'product.product': ['lst_price'],
+    'product.template.attribute.value': ['color'],
+    'project.tags': ['color'],
+    'purchase.order': ['currency_id', 'state'],
+    'purchase.order.line': ['date_planned', 'move_dest_ids', 'name'],
+    'res.partner': ['tz'],
+    'sale.order': [
+        'access_token', 'date_order', 'health', 'origin', 'partner_invoice_id', 'partner_shipping_id',
+        'state', 'validity_date', 'warehouse_id',
+    ],
+    'sale.order.line': ['qty_delivered'],
+    'sign.template': ['name'],
+    'worksheet.template': ['color'],
+}
+
+MODELS_TO_UPDATE = [
+    "base.automation",
+    "ir.actions.act_window",
+    "ir.actions.report",
+    "ir.actions.server",
+    "ir.model",
+    "ir.model.access",
+    "ir.model.fields",
+    "ir.ui.menu",
+    "ir.ui.view",
+    "knowledge.article",
+    "website.controller.page",
+]
+
 
 @tagged('post_install', '-at_install')
 class TestEnv(IndustryCase):
@@ -40,7 +96,8 @@ class TestEnv(IndustryCase):
                     continue
                 if os.path.getsize(file_path) > MAX_FILE_SIZE:
                     raise "Max file size exceeded"
-                content = pathlib.Path(file_path).read_bytes().decode('utf8')
+                encoded_content = pathlib.Path(file_path).read_bytes()
+                decoded_content = encoded_content.decode('utf8')
                 if ext == '.py':
                     if file_name != '__manifest__.py':
                         _logger.warning(
@@ -49,22 +106,27 @@ class TestEnv(IndustryCase):
                             file_name,
                         )
                     else:
-                        manifest_content = content
+                        manifest_content = decoded_content
                     continue
 
-                self._check_xml_style(content, module, file_name)
-                self._check_update_status(content, file_name)
-                self._check_useless_models(content, file_name)
-                self._check_useless_fields_on_models(content, file_name)
-                self._check_knowledge_article_is_published(content, file_name)
-                self._check_duplicate_records(content, file_name)
-                self._check_website_published_false(module, file_name)
-                self._check_static_files_usage_in_xml(content, in_use_files)
+                try:
+                    tree = etree.fromstring(encoded_content)
+                except etree.XMLSyntaxError as e:
+                    _logger.error("XML syntax error in file %s: %s", file_name, e)
+                    return
+
+                self._check_xml_style(decoded_content, tree, module, file_name)
+                self._check_update_status(tree, file_name)
+                self._check_knowledge_article_is_published(tree, file_name)
+                self._check_duplicate_records(tree, file_name)
+                self._check_website_published_false(tree, file_name)
+                self._check_static_files_usage_in_xml(tree, in_use_files)
+                self._check_fields(tree, file_name)
                 if root.split('/')[-1] == 'data':
-                    self._check_view_active(content, file_name)
-                    self._check_is_published_false(content, file_name)
+                    self._check_view_active(tree, file_name)
+                    self._check_is_published_false(tree, file_name)
                     if not is_studio_required:
-                        is_studio_required = self._check_studio(content, file_name)
+                        is_studio_required = self._check_studio(tree, file_name)
         self._check_manifest(manifest_content, is_studio_required)
         in_use_files = {file.lstrip('/') for file in in_use_files}
         for file in static_files - in_use_files:
@@ -73,9 +135,8 @@ class TestEnv(IndustryCase):
         for file in in_use_files - static_files:
             _logger.warning("No reference found for this file: %s.", file)
 
-    def _check_static_files_usage_in_xml(self, content, in_use_files):
-        tree = etree.fromstring(content.encode('utf8'))
-        for element in tree.iter():
+    def _check_static_files_usage_in_xml(self, root, in_use_files):
+        for element in root.iter():
             file_names = {element.attrib.get(key) for key in ['file', 'src', 'data-original-src']}
             if element.text:
                 if element.get("name") == "cover_properties":
@@ -118,7 +179,7 @@ class TestEnv(IndustryCase):
         elif not studio_required and studio_dependency:
             _logger.warning("'web_studio' should not be in the dependencies.")
 
-    def _check_studio(self, s, file_name):
+    def _check_studio(self, root, file_name):
         models_for_studio = [
             "ir.actions.act_window",
             "ir.actions.server",
@@ -127,22 +188,17 @@ class TestEnv(IndustryCase):
             "ir.ui.menu",
         ]
         for model in models_for_studio:
-            if (
-                re.search('model="' + model + '"', s)
-                and not re.search('<field .+model="' + model, s)
-                and not re.search('<function model="' + model, s)
-            ):
+            if root.xpath(f"//record[@model='{model}']"):
                 _logger.info("%s found in %s, needs studio", model, file_name)
                 return True
-            
-        root = etree.fromstring(s.encode('utf-8'))
+
         for record in root.xpath("//record[@model='ir.ui.view']"):
             website_id_field = record.xpath(".//field[@name='website_id']")
             if not website_id_field:
                 return True
         return False
 
-    def _check_xml_style(self, s, module, file_name):
+    def _check_xml_style(self, s, root, module, file_name):
         starts_with = [
             "<?xml version='1.0' encoding='UTF-8'?>",
             "<?xml version='1.0' encoding=\"UTF-8\"?>",
@@ -159,47 +215,28 @@ class TestEnv(IndustryCase):
                 first_line,
             )
 
-        if count := (s.count(' id="' + module + '.') + s.count(" id='" + module + '.')):
+        elements = [
+            value for element in root.iter() for attr in ['id', 'ref', 'src', 'data-original-src', 'name']
+            if (value := element.get(attr)) and value.startswith(module + '.')
+        ]
+        if elements:
             _logger.warning(
-                "Defining an xmlid with the current module name is useless, module name will be "
-                "added automatically. Found %d occurence(s) of ' id=\"%s.ID' in %s.",
-                count,
-                module,
-                file_name,
+                "Defining or referring to an xmlid with the current module name is useless, module name will be added automatically. "
+                "Found occurence(s) of ' id=\"%s.ID' in %s: %s. "
+                "This remark does not apply to 'env.ref(\"%s.ID\")' where it is required.",
+                module, file_name, ', '.join(elements), module
             )
+        elements = [value for element in root.iter() if (value := element.get('id')) and value.startswith('x_studio')]
+        if elements:
+            _logger.warning("Please remove 'studio' from 'x_studio' in %s.", ', '.join(elements))
 
-        count = (s.count('ref("' + module + '.') + s.count("ref('" + module + '.')) - (
-            s.count('env.ref("' + module + '.') + s.count("env.ref('" + module + '.')
-        )
-        if count:
-            _logger.warning(
-                "Referring to an xmlid created within the current module name is useless. If none is"
-                " provided, it will check in current module. Found %d occurence(s) of ref(\"%s.ID\")"
-                " in %s (this remark does not apply to 'env.ref(\"%s.ID\")' where it is required).",
-                count,
-                module,
-                file_name,
-                module,
-            )
-        count = s.count('ref="' + module + '.') + s.count("ref='" + module + '.')
-        if count:
-            _logger.warning(
-                "Referring to an xmlid created within the current module name is useless. If none is"
-                " provided, it will check in current module. Found %d occurence(s) of ref=\"%s.ID\""
-                " in %s.",
-                count,
-                module,
-                file_name,
-            )
-        # if s.count("x_studio"):
-        #     _logger.warning("Please remove 'studio' from 'x_studio' in %s.", file_name)
         useless_attributes = [
             "context.get('studio')",
             "data-last-history-steps",
             "context=\"{'studio'",
         ]
         for attr in useless_attributes:
-            if s.count(attr):
+            if attr in s:
                 _logger.warning("Please remove '%s' in %s.", attr, file_name)
 
         end_of_file = repr(s).split('\\')
@@ -212,308 +249,32 @@ class TestEnv(IndustryCase):
                 "One empty line at the end of %s is enough, please remove others.", file_name
             )
 
-    def _check_update_status(self, s, filename):
-        models_to_update = [
-            "base.automation",
-            "ir.actions.act_window",
-            "ir.actions.server",
-            "ir.model",
-            "ir.model.access",
-            "ir.model.fields",
-            "ir.ui.view",
-            "knowledge.article",
-            "loyalty.generate.wizard",
-        ]
-        models_not_to_update = [
-            "account.analytic.account",
-            "account.analytic.plan",
-            "account.cash.rounding",
-            "appointment.resource",
-            "appointment.type",
-            "calendar.event",
-            "crm.lead",
-            "crm.stage",
-            "crm.tag",
-            "document.document",
-            "document.folder",
-            "event.event.ticket",
-            "helpdesk.ticket",
-            "hr.applicant",
-            "hr.department",
-            "hr.employee",
-            "hr.job",
-            "hr.recruitment.stage",
-            "ir.attachment",
-            "ir.default",
-            "ir.rule",
-            "knowledge.article.favorite",
-            "knowledge.attachment",
-            "knowledge.cover",
-            "loyalty.program",
-            "loyalty.reward",
-            "loyalty.rule",
-            "mail.template",
-            "maintenance.equipment",
-            "mrp.bom",
-            "mrp.bom.line",
-            "mrp.production",
-            "mrp.routing.workcenter",
-            "mrp.workcenter",
-            "pos.category",
-            "pos.config",
-            "pos.order",
-            "pos.order.line",
-            "pos.payment.method",
-            "pos.session",
-            "pos_preparation_display.display",
-            "pos_preparation_display.order",
-            "pos_preparation_display.orderline",
-            "product.attribute",
-            "product.attribute.value",
-            "product.category",
-            "product.packaging",
-            "product.pricelist",
-            "product.pricelist.item",
-            "product.product",
-            "product.public.category",
-            "product.supplierinfo",
-            "product.template",
-            "product.template.attribute.line",
-            "product.template.attribute.value",
-            "project.project",
-            "project.task",
-            "project.task.type",
-            "purchase.order",
-            # "purchase.order.line",  # need to handle in functions
-            "planning.recurrency",
-            "planning.role",
-            "planning.slot",
-            "quality.point",
-            "repair.order",
-            "res.config.settings",
-            "res.partner",
-            "restaurant.floor",
-            "restaurant.table",
-            "sale.order",
-            "sale.order.line",
-            "sale.order.template",
-            "sale.order.template.line",
-            "sign.item",
-            "sign.request",
-            "sign.template",
-            # "stock.lot",  # need to handle in functions
-            "stock.quant",
-            "stock.warehouse.orderpoint",
-            "uom.category",
-            "uom.uom",
-            "website",
-            "website.base.unit",
-            "website.menu",
-            "website.page",
-        ]
-        for model in models_to_update:
-            if (
-                re.search('model="' + model + '"', s)
-                and not re.search('<field .+model="' + model, s)
-                and not s.count('<odoo>')
-            ):
-                _logger.warning(
-                    "Model %s should be updated, please remove 'noupdate=\"1\"' in the header of %s.",
-                    model,
-                    filename,
-                )
-        for model in models_not_to_update:
-            if (
-                re.search('model="' + model + '"', s)
-                and not re.search('<field .+model="' + model, s)
-                and not re.search('<function.+model="' + model, s)
-                and not s.count('<odoo noupdate="1">')
-            ):
+    def _check_update_status(self, root, filename):
+        noupdate = root.get('noupdate', '0') in ('1', 'True', 'true')
+        for record in root.xpath("//record"):
+            model = record.get('model')
+            if model not in MODELS_TO_UPDATE and not noupdate:
                 _logger.warning(
                     "Model %s should not be updated, please add 'noupdate=\"1\"' in the header of %s.",
                     model,
                     filename,
                 )
+            elif model in MODELS_TO_UPDATE and noupdate:
+                _logger.warning(
+                    "Model %s should be updated, please remove 'noupdate=\"1\"' in the header of %s.",
+                    model,
+                    filename,
+                )
 
-    def _check_useless_models(self, s, filename):
-        useless_models = {
-            "knowledge.article.member": "Model knowledge.article.member should be replaced by write"
-            " access to all users",
-        }
-        for model, warning in useless_models.items():
-            if re.search('model="' + model, s):
-                _logger.warning(warning)
+    def _check_knowledge_article_is_published(self, root, file_name):
+        for record in root.xpath("//record[@model='knowledge.article']"):
+            is_published_fields = record.xpath(".//field[@name='is_published' and @eval='True']")
+            if is_published_fields:
+                _logger.warning(
+                    f"Knowledge article in {file_name} should not have 'is_published' set to True."
+                )
 
-    def _check_useless_fields_on_models(self, xml_content, filename):
-        useless_model_fields = {
-            'account.analytic.plan': ['color'],
-            'account.analytic.account': ['root_plan_id'],
-            'appointment.type': [
-                'has_message',
-                'resource_total_capacity',
-            ],
-            'base.automation': ['last_run'],
-            'crm.lead': ['copied'],
-            'crm.tag': ['color'],
-            'hr.applicant': ['last_stage_id'],
-            'ir.attachment': ['access_token'],
-            'ir.model.fields': [
-                'model',
-            ],
-            'knowledge.article': [
-                'article_member_ids',
-                'inherited_permission',
-            ],
-            'loyalty.reward': [
-                'description',
-                'is_global_discount',
-                'program_type',
-                'reward_product_ids',
-                'reward_product_uom_id',
-            ],
-            'loyalty.rule': [
-                'company_id',
-                'currency_id',
-                'mode',
-                'program_type',
-                'promo_barcode',
-                'valid_product_ids',
-            ],
-            'mrp.bom.byproduct': [
-                'company_id',
-                'product_uom_category_id',
-            ],
-            'planning.role': ['color'],
-            'planning.slot': [
-                'access_token',
-                'allocated_hours',
-                'department_id',
-                'sale_order_id',
-                'work_address_id',
-                'working_days_count',
-            ],
-            'product.attribute': ['product_tmpl_ids'],
-            'product.attribute.value': ['color'],
-            'product.packaging': ['product_uom_id'],
-            'product.pricelist.item': [
-                'name',
-                'price',
-            ],
-            'product.template': [
-                'can_image_1024_be_zoomed',
-                'has_configurable_attributes',
-            ],
-            'product.template.attribute.line': ['value_count'],
-            'product.template.attribute.value': [
-                'attribute_id',
-                'color',
-                'product_tmpl_id',
-            ],
-            'project.tags': ['color'],
-            'project.task': [
-                'working_days_close',
-                'working_hours_close',
-            ],
-            'purchase.order': [
-                'receipt_status',
-                'state',
-            ],
-            'purchase.order.line': [
-                'date_order',
-                'name',
-                'state',
-            ],
-            'res.partner': [
-                'category_id',
-                'commercial_company_name',
-                'contact_address_complete',
-                'customer_rank',
-                'email_normalized',
-                'partner_share',
-                'peppol_eas',
-                'peppol_endpoint',
-                'phone_sanitized',
-                'tz',
-            ],
-            'sale.order': [
-                'access_token',
-                'amount_tax',
-                'amount_to_invoice',
-                'amount_total',
-                'amount_untaxed',
-                'currency_id',
-                'currency_rate',
-                'date_order',
-                'delivery_status',
-                'health',
-                'invoice_status',
-                'is_subscription',
-                'origin',
-                'partner_invoice_id',
-                'partner_shipping_id',
-                'percentage_satisfaction',
-                'recurring_monthly',
-                'recurring_total',
-                'state',
-                'validity_date',
-                'warehouse_id',
-            ],
-            'sale.order.line': [
-                'currency_id',
-                'invoice_status',
-                'is_service',
-                # 'name',  # need to handle down payments and options & templates properly
-                'order_partner_id',
-                'planning_hours_planned',
-                'planning_hours_to_plan',
-                'price_reduce_taxinc',
-                'price_reduce_taxexcl',
-                'price_subtotal',
-                'price_tax',
-                'price_total',
-                'qty_delivered',
-                'qty_delivered_method',
-                'qty_invoiced',
-                'qty_to_invoice',
-                'state',
-                'untaxed_amount_invoiced',
-                'untaxed_amount_to_invoice',
-            ],
-            # 'sale.order.template.line': ['name'],  # check as could be meaningful and different
-            'sign.template': [
-                'has_sign_requests',
-                'is_sharing',
-                'name',
-                'signed_count',
-            ],
-            'stock.lot': ['product_uom_id'],
-            'worksheet.template': ['color'],
-        }
-        xml_content = xml_content.encode('utf-8')
-        tree = etree.fromstring(xml_content)
-        for model, fields in useless_model_fields.items():
-            for record in tree.xpath(f"//record[@model='{model}']"):
-                for field in fields:
-                    if record.xpath(f"field[@name='{field}']"):
-                        _logger.warning(
-                            "You shouldn't define the %s on %s (%s). Please refer to other modules for examples.",
-                            field,
-                            model,
-                            filename,
-                        )
-
-    def _check_knowledge_article_is_published(self, xml_content, file_name):
-        if (
-            '<record ' in xml_content
-            and 'model="knowledge.article"' in xml_content
-            and '<field name="is_published" eval="True"/>' in xml_content
-        ):
-            _logger.warning(
-                f"Knowledge article in {file_name} should not have 'is_published' set to True."
-            )
-
-    def _check_is_published_false(self, xml_content, file_name):
-        root = etree.fromstring(xml_content.encode('utf-8'))
+    def _check_is_published_false(self, root, file_name):
         for record in root.xpath("//record"):
             model = record.get('model')
             if model == 'website.page':
@@ -525,55 +286,99 @@ class TestEnv(IndustryCase):
                     file_name,
                 )
 
+    def _check_website_published_false(self, root, file_name):
+        for record in root.xpath("//record"):
+            model = record.get('model')
+            if model == 'website.controller.page':
+                continue
+            website_published_fields = record.xpath(".//field[@name='website_published' and @eval='True']")
+            if website_published_fields:
+                _logger.warning(
+                    f"Model in {file_name} should not have 'website_published' set to True, 'is_published' is preferred in demo only."
+                )
 
-    def _check_website_published_false(self, xml_content, file_name):
-        if (
-            '<record ' in xml_content
-            and '<field name="website_published" eval="True"/>' in xml_content
-            and 'model="website.controller.page"' not in xml_content
-        ):
-            _logger.warning(
-                f"Model in {file_name} should not have 'website_published' set to True, 'is_published' is preferred in demo only."
-            )
-
-    def _check_duplicate_records(self, xml_content, file_name):
+    def _check_duplicate_records(self, root, file_name):
         records = defaultdict(set)
-        xml_content = xml_content.encode('utf-8')
-
-        try:
-            root = etree.fromstring(xml_content)
-            for record in root.xpath("//record"):
-                record_id = record.get("id")
-                model = record.get("model")
-                fields_list = [
+        for record in root.xpath("//record"):
+            record_id = record.get("id")
+            model = record.get("model")
+            fields_list = [
+                (
+                    field.get("name"),
+                    field.getparent().get('id', field.getparent().tag),
+                    field.get("position", None),
                     (
-                        field.get("name"),
-                        field.getparent().get('id', field.getparent().tag),
-                        field.get("position", None),
-                        (
-                            field.xpath("ancestor::page[1]")[0].get("name")
-                            if field.xpath("ancestor::page[1]")
-                            else None
-                        ),
-                    )
-                    for field in record.xpath(".//field")
-                ]
-                fields = frozenset(fields_list)
-                if len(fields_list) != len(fields):
-                    _logger.warning(
-                        f"Duplicate field updates in record {record_id} of model {model} in {file_name}: {', '.join(field[0] for field in fields if fields_list.count(field) > 1)}"
-                    )
-                record_key = (record_id, model)
-                if fields & records[record_key]:
-                    _logger.warning(
-                        f"Duplicate record updates in {file_name}: {record_id} in model {model}"
-                    )
-                records[record_key] |= fields
-        except etree.XMLSyntaxError as e:
-            _logger.error("XML syntax error in file %s: %s", file_name, e)
+                        field.xpath("ancestor::page[1]")[0].get("name")
+                        if field.xpath("ancestor::page[1]")
+                        else None
+                    ),
+                )
+                for field in record.xpath(".//field")
+            ]
+            fields = frozenset(fields_list)
+            if len(fields_list) != len(fields):
+                _logger.warning(
+                    f"Duplicate field updates in record {record_id} of model {model} in {file_name}: {', '.join(field[0] for field in fields if fields_list.count(field) > 1)}"
+                )
+            record_key = (record_id, model)
+            if fields & records[record_key]:
+                _logger.warning(
+                    f"Duplicate record updates in {file_name}: {record_id} in model {model}"
+                )
+            records[record_key] |= fields
 
-    def _check_view_active(self, xml_content, file_name):
-        root = etree.fromstring(xml_content.encode('utf-8'))
+    def _check_fields(self, root, file_name):
+        for record in root.xpath("//record"):
+            model_name = record.get('model')
+            if not model_name:
+                continue
+            model = self.env.get(model_name)
+            fields_set_in_record = {
+                field.get('name') for field in record.xpath('.//field')
+                if field.getparent().get('id', False) == record.get('id')  # nested record definitions
+            }
+            for field_name in fields_set_in_record:
+                field = model._fields.get(field_name)
+                useless = USELESS_FIELDS.get(model_name, [])
+                if field_name in useless:
+                    if 'crm.lead' in self.env and model == self.env['crm.lead']:
+                        if 'partner_id' in fields_set_in_record:
+                            _logger.warning(
+                                "Field '%s' in model 'crm.lead' is useless if a partner_id is set (file: %s). ",
+                                field_name,
+                                file_name,
+                            )
+                        continue
+                    else:
+                        _logger.warning(
+                            "Field '%s' in model '%s' is useless and should not be set in XML data (file: %s). ",
+                            field_name,
+                            model_name,
+                            file_name,
+                        )
+                        continue
+                if field and field.compute and field.readonly and field_name not in EXCLUDED_READONLY_FIELDS:
+                    _logger.warning(
+                        "Field '%s' in model '%s' is a readonly computed field without inverse and should not be set "
+                        "directly in XML data (file: %s). If you think this field should be maintained, please edit "
+                        "the EXCLUDED_READONLY_FIELDS list in tests/test_generic/tests/test_xml.py",
+                        field_name,
+                        model_name,
+                        file_name,
+                    )
+                    continue
+                if field and field.related and field.readonly:
+                    _logger.warning(
+                        "Field '%s' in model '%s' is a readonly related field and should not be set directly in XML data (file: %s).",
+                        field_name,
+                        model_name,
+                        file_name,
+                    )
+                    continue
+                if not field and model_name != 'ir.ui.view':
+                    _logger.warning("Field %s not defined for model %s", field_name, model_name)
+
+    def _check_view_active(self, root, file_name):
         for record in root.xpath("//record[@model='ir.ui.view']"):
             active_field = record.xpath(".//field[@name='active']/@eval")
             if not active_field or active_field[0] != "True":
