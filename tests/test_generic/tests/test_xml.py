@@ -17,6 +17,7 @@ MAX_FILE_SIZE = 100 * 1024 * 1024  # in megabytes
 
 EXCLUDED_READONLY_FIELDS = {
     'lot_id',
+    'user_id',
 }
 
 USELESS_FIELDS = {
@@ -56,13 +57,15 @@ USELESS_FIELDS = {
 MODELS_TO_UPDATE = [
     "base.automation",
     "ir.actions.act_window",
+    "ir.actions.report",
     "ir.actions.server",
     "ir.model",
     "ir.model.access",
     "ir.model.fields",
+    "ir.ui.menu",
     "ir.ui.view",
     "knowledge.article",
-    "loyalty.generate.wizard",
+    "website.controller.page",
 ]
 
 
@@ -333,13 +336,24 @@ class TestEnv(IndustryCase):
             }
             for field_name in fields_set_in_record:
                 field = model._fields.get(field_name)
-                if field_name in USELESS_FIELDS.get(model_name, []):
-                    _logger.warning(
-                        "Field '%s' in model '%s' is useless and should not be set in XML data (file: %s). ",
-                        field_name,
-                        model_name,
-                        file_name,
-                    )
+                useless = USELESS_FIELDS.get(model_name, [])
+                if field_name in useless:
+                    if 'crm.lead' in self.env and model == self.env['crm.lead']:
+                        if 'partner_id' in fields_set_in_record:
+                            _logger.warning(
+                                "Field '%s' in model 'crm.lead' is useless if a partner_id is set (file: %s). ",
+                                field_name,
+                                file_name,
+                            )
+                        continue
+                    else:
+                        _logger.warning(
+                            "Field '%s' in model '%s' is useless and should not be set in XML data (file: %s). ",
+                            field_name,
+                            model_name,
+                            file_name,
+                        )
+                        continue
                 if field and field.compute and field.readonly and field_name not in EXCLUDED_READONLY_FIELDS:
                     _logger.warning(
                         "Field '%s' in model '%s' is a readonly computed field without inverse and should not be set "
@@ -349,6 +363,7 @@ class TestEnv(IndustryCase):
                         model_name,
                         file_name,
                     )
+                    continue
                 if field and field.related and field.readonly:
                     _logger.warning(
                         "Field '%s' in model '%s' is a readonly related field and should not be set directly in XML data (file: %s).",
@@ -356,6 +371,7 @@ class TestEnv(IndustryCase):
                         model_name,
                         file_name,
                     )
+                    continue
                 if not field and model_name != 'ir.ui.view':
                     _logger.warning("Field %s not defined for model %s", field_name, model_name)
 
