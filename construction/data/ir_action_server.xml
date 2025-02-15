@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="automate_sipplier_info" model="ir.actions.server">
+        <field name="name">Automate the supplier info cost</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="base_automation_id" ref="base_automation_1"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for line in record.order_line:
+    product = line.product_id
+    if product.categ_id.x_automate_cost_update:
+        supplier_info = env['product.supplierinfo'].search([
+            ('product_tmpl_id', '=', product.product_tmpl_id.id),
+            ('partner_id', '=', record.partner_id.id) 
+        ], limit=1)
+
+        if supplier_info and float_compare(supplier_info.price, line.price_unit, precision_digits=2) != 0:
+            supplier_info.write({
+                'min_qty': line.product_qty,
+                'price': line.price_unit,
+            })
+        product.write({'standard_price': line.price_unit})
+]]></field>
+    </record>
+
+    <record id="automate_sipplier_info_invoices" model="ir.actions.server">
+        <field name="name">Automate the supplier info cost Invoices</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="base_automation_id" ref="base_automation_2"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for line in record.invoice_line_ids:
+    product = line.product_id
+    if product.categ_id.x_automate_cost_update:
+        supplier_info = env['product.supplierinfo'].search([
+            ('product_tmpl_id', '=', product.product_tmpl_id.id),
+            ('partner_id', '=', record.partner_id.id) 
+        ], limit=1)
+
+        if supplier_info and float_compare(supplier_info.price, line.price_unit, precision_digits=2) != 0:
+            supplier_info.write({
+                'min_qty': line.quantity,
+                'price': line.price_unit,
+            })
+        product.write({'standard_price': line.price_unit})
+]]></field>
+      </record>
+</odoo>
