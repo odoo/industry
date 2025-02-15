@@ -47,6 +47,7 @@ They maintain the stock lot wise and also manage the expiry of the lots.
         'data/res_config_settings.xml',
         'data/mail_message.xml',
         'data/knowledge_tour.xml',
+        'data/purchase_custom_tour.xml',
     ],
     'demo': [
         'demo/res_partner_title.xml',
@@ -74,6 +75,7 @@ They maintain the stock lot wise and also manage the expiry of the lots.
     'assets': {
         'web.assets_backend': [
             'pharmacy_retail/static/src/js/my_tour.js',
+            'pharmacy_retail/static/src/js/tours/purchase_custom_tour.js',
         ]
     },
     'author': 'Odoo S.A.',
@@ -81,6 +83,7 @@ They maintain the stock lot wise and also manage the expiry of the lots.
         "data/qweb_view.xml",
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
+        "static/src/js/tours/purchase_custom_tour.js",
     ],
     'images': ['images/main.png'],
 }

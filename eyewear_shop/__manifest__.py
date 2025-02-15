@@ -44,6 +44,7 @@ The sales process involves creating sale orders, managing deliveries and invoici
         'data/website_view.xml',
         'data/website_theme_apply.xml',
         'data/knowledge_tour.xml',
+        'data/sale_order_to_cash_tour.xml',
     ],
     'demo': [
         'demo/res_config_settings.xml',
@@ -79,6 +80,7 @@ The sales process involves creating sale orders, managing deliveries and invoici
     'assets': {
         'web.assets_backend': [
             'eyewear_shop/static/src/js/my_tour.js',
+            'eyewear_shop/static/src/js/tours/sale_order_to_cash_tour.js',
         ]
     },
     'author': 'Odoo S.A.',
@@ -87,6 +89,7 @@ The sales process involves creating sale orders, managing deliveries and invoici
         "data/website_view.xml",
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
+        "static/src/js/tours/sale_order_to_cash_tour.js",
         "demo/website_view.xml",
     ],
     'images': ['images/main.png'],

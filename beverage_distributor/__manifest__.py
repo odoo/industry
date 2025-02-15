@@ -48,6 +48,7 @@
         'data/pos_config.xml',
         'data/res_config_settings.xml',
         'data/knowledge_tour.xml',
+        'data/deposit_management_tour.xml',
     ],
     'demo': [
         'demo/website.xml',
@@ -76,11 +77,13 @@
     'assets': {
         'web.assets_backend': [
             'beverage_distributor/static/src/js/my_tour.js',
+            'beverage_distributor/static/src/js/tours/deposit_management_tour.js',
         ]
     },
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
+        "static/src/js/tours/deposit_management_tour.js",
         "demo/website_view.xml",
     ],
     'license': 'OPL-1',
