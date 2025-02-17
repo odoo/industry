@@ -15,10 +15,7 @@ _logger = logging.getLogger(__name__)
 
 MAX_FILE_SIZE = 100 * 1024 * 1024  # in megabytes
 
-EXCLUDED_READONLY_FIELDS = {
-    'lot_id',
-    'user_id',
-}
+EXCLUDED_READONLY_FIELDS = {'lot_id', 'url', 'user_id',}
 
 USELESS_FIELDS = {
     'account.analytic.plan': ['color'],
