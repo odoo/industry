@@ -68,6 +68,15 @@ MODELS_TO_UPDATE = [
     "website.controller.page",
 ]
 
+models_with_user_id = [
+    'crm.lead',
+    'event.event',
+    'knowledge.article.favorite',
+    'project.project',
+    'purchase.order',
+    'sale.order',
+]
+
 
 @tagged('post_install', '-at_install')
 class TestEnv(IndustryCase):
@@ -81,6 +90,7 @@ class TestEnv(IndustryCase):
         is_studio_required = False
         static_files = set()
         in_use_files = set()
+        checked_records_with_user = {}
         for root, dirs, files in os.walk(path):
             # sort the directory by alphabetical order so static directory is read first.
             dirs.sort(reverse=True)
@@ -115,6 +125,7 @@ class TestEnv(IndustryCase):
                 self._check_xml_style(decoded_content, tree, module, file_name)
                 self._check_update_status(tree, file_name)
                 self._check_knowledge_article_is_published(tree, file_name)
+                checked_records_with_user = self._check_user_is_set(tree, checked_records_with_user)
                 self._check_duplicate_records(tree, file_name)
                 self._check_website_published_false(tree, file_name)
                 self._check_static_files_usage_in_xml(tree, in_use_files)
@@ -125,6 +136,7 @@ class TestEnv(IndustryCase):
                     if not is_studio_required:
                         is_studio_required = self._check_studio(tree, file_name)
         self._check_manifest(manifest_content, is_studio_required)
+        self._check_records_without_user_id(checked_records_with_user)
         in_use_files = {file.lstrip('/') for file in in_use_files}
         for file in static_files - in_use_files:
             if 'description' not in file:
@@ -384,3 +396,17 @@ class TestEnv(IndustryCase):
                     record.get('id'),
                     file_name,
                 )
+
+    def _check_user_is_set(self, root, previous_records):
+        records = previous_records
+        for model in models_with_user_id:
+            for record in root.xpath(f"//record[@model='{model}']"):
+                record_id = record.get('id')
+                user_field = record.xpath(".//field[@name='user_id']")
+                records[record_id] = records.get(record_id) or bool(user_field)
+        return records
+
+    def _check_records_without_user_id(self, records):
+        for record, has_user in records.items():
+            if not has_user:
+                _logger.warning("You forgot to assign user_id(s) to the record with id=%s.", record)
