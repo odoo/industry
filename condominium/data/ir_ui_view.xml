@@ -144,6 +144,9 @@
         <field name="priority">400</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="placeholder">e.g. Apartment A0</attribute>
+            </xpath>
             <xpath expr="//field[@name='code']" position="replace">
                 <field name="x_tenant" />
             </xpath>
@@ -198,26 +201,39 @@
             </notebook>
         </field>
     </record>
+    <record id="quick_create_account_form" model="ir.ui.view">
+        <field name="name">account.analytic.account.quick_create</field>
+        <field name="model">account.analytic.account</field>
+        <field name="priority">1000</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name" string="Building" placeholder="e.g. Apartment A0"/>
+                    <field name="x_type" placeholder="e.g. Apartment"/>
+                    <field name="partner_id" string="Owner" placeholder="e.g. John Smith"/>
+                </group>
+            </form>
+        </field>
+    </record>
     <record id="analytic_account_custom_kanban_view" model="ir.ui.view">
         <field name="name">account.analytic.account.kanban customization</field>
-        <field name="inherit_id" ref="analytic.view_account_analytic_account_kanban" />
-        <field name="mode">extension</field>
+        <field name="mode">primary</field>
         <field name="active" eval="True"/>
         <field name="model">account.analytic.account</field>
         <field name="priority">99</field>
         <field name="type">kanban</field>
         <field name="arch" type="xml">
-            <xpath expr="//kanban[1]/templates[1]/t[@t-name='card']" position="replace">
-                <t t-name="card">
-                    <field name="name" display="full" />
-                    <field name="x_tags" display="full" />
-                    <field name="x_type" display="full" />
-                    <field name="partner_id" display="full" widget="many2one_avatar" />
-                </t>
-            </xpath>
-            <xpath expr="//kanban[1]" position="attributes">
-                <attribute name="default_group_by">x_building</attribute>
-            </xpath>
+            <kanban default_group_by="x_building" quick_create_view="condominium.quick_create_account_form">
+                <templates>
+                    <t t-name="card">
+                        <field name="name" display="full" placeholder="e.g. Apartment A0"/>
+                        <field name="x_tags" display="full"/>
+                        <field name="x_type" display="full"/>
+                        <field name="partner_id" display="full" widget="many2one_avatar"/>
+                    </t>
+                </templates>
+            </kanban>
         </field>
     </record>
     <record id="account_analytic_plan_form_view_inherit" model="ir.ui.view">
