@@ -1,6 +1,6 @@
 {
     'name': 'Handyman Services',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Services',
     'description': "",
     'depends': [
