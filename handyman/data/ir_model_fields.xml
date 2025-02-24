@@ -58,10 +58,14 @@ for task in self:
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
     </record>
-    <record id="field_related_analytic_account_vendor_bill_count" model="ir.model.fields">
-        <field name="name">x_vendor_bill_count</field>
+    <record id="field_task_vendor_bill_count" model="ir.model.fields">
+        <field name="name">x_x_task_id_account_move_count</field>
         <field name="ttype">integer</field>
-        <field name="related">project_id.account_id.vendor_bill_count</field>
+        <field name="compute"><![CDATA[
+bills = self.env['account.move']._read_group(domain=[('x_task_id', 'in', self.ids), ('move_type', 'in', self.env['account.move'].get_purchase_types(include_receipts=True))], groupby=['x_task_id'], aggregates=['__count'])
+mapped_data = {task.id: total for task, total in bills}
+for task in self:
+    task['x_x_task_id_account_move_count'] = mapped_data.get(task.id, 0)]]></field>
         <field name="field_description">Vendor Bills</field>
         <field name="model_id" ref="project.model_project_task"/>
         <field name="readonly" eval="True"/>
