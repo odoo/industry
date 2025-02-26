@@ -41,6 +41,10 @@ class TestEnv(IndustryCase):
 
     def test_knowledge_article_notification(self):
         for module in self.installed_modules:
+            ref = self.env.ref(module + '.knowledge_tour', raise_if_not_found=False)
+            self.assertTrue(
+                ref, "You forgot to define a `knowledge.tour` with `id=knowledge_tour`."
+            )
             ref = self.env.ref(module + '.notification_knowledge', raise_if_not_found=False)
             self.assertTrue(
                 ref, "You forgot to define a `mail.message` with `id=notification_knowledge`."
