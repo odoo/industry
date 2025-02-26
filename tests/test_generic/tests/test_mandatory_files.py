@@ -51,4 +51,4 @@ class FileTest(IndustryCase):
             old = Path(get_industry_path() + module + '/i18n/' + module + '.pot').read_text(encoding="utf-8")
             diff = list(unified_diff(old, new))
             diff_str = ''.join(d.replace('+','').replace('-','') for d in diff)
-            assert len(diff_str.split('\n')) < 6, "You forgot to export the pot file.\n" + diff_str
+            self.assertTrue(len(diff_str.split('\n')) < 6, "You forgot to export the pot file.\n" + diff_str)
