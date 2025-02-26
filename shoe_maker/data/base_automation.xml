@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="on_last_task_done_turning_order_as_collectible" model="base.automation">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain" eval="[('x_is_order_collectible', '=', True), ('stage_id', 'in', [ref('project.selection__project_task__state__1_done'), ref('project.selection__project_task__state__1_canceled')])]"/>
+        <field name="filter_pre_domain">[("x_is_order_collectible", "=", False)]</field>
+        <field name="name">On last task done turning order as collectible</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('project.field_project_task__stage_id'), ref('field_project_task_collectible')])]"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('send_email_sales_order_ready')])]"/>
+    </record>
+    <record id="null_so_quantity_cancel_related_tasks" model="base.automation">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain" eval="[('sale_line_id.product_uom_qty', '=', 0), ('stage_id', '=', ref('industry_fsm.planning_project_stage_0'))]"/>
+        <field name="name">Null SO quantity cancels the related task</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale_project.field_project_task__sale_line_id'), ref('project.field_project_task__stage_id')])]"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('update_stage_cancel')])]"/>
+    </record>
+    <record id="base_automation_1" model="base.automation">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="trigger">on_stage_set</field>
+        <field name="trg_field_ref" ref="industry_fsm.planning_project_stage_3"/>
+        <field name="filter_domain" eval="[('stage_id', '=', ref('industry_fsm.planning_project_stage_3'))]"/>
+        <field name="name">Stage is set to "Done"</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('project.field_project_task__stage_id')])]"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('update_state_done')])]"/>
+    </record>
+    <record id="base_automation_2" model="base.automation">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="trigger">on_stage_set</field>
+        <field name="trg_field_ref" ref="industry_fsm.planning_project_stage_4"/>
+        <field name="filter_domain" eval="[('stage_id', '=', ref('industry_fsm.planning_project_stage_4'))]"/>
+        <field name="name">Stage is set to "Cancelled"</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('project.field_project_task__stage_id')])]"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('update_state_cancel')])]"/>
+    </record>
+</odoo>
