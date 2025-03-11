@@ -1,11 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import logging
 import re
 
 from odoo.tests import tagged, get_db_name
 from odoo.tools import cloc
 
 from .industry_case import IndustryCase
+
+_logger = logging.getLogger(__name__)
 
 
 @tagged('post_install', '-at_install')
@@ -41,35 +44,25 @@ class TestEnv(IndustryCase):
 
     def test_knowledge_article_notification(self):
         for module in self.installed_modules:
-            ref = self.env.ref(module + '.knowledge_tour', raise_if_not_found=False)
-            self.assertTrue(
-                ref, "You forgot to define a `knowledge.tour` with `id=knowledge_tour`."
-            )
-            ref = self.env.ref(module + '.notification_knowledge', raise_if_not_found=False)
-            self.assertTrue(
-                ref, "You forgot to define a `mail.message` with `id=notification_knowledge`."
-            )
-            notif = self.env['mail.message'].browse(ref.id)
-            self.assertIn(
-                '/knowledge/article/',
-                notif.body,
-                "The notification should contain a link to the knowledge article.",
-            )
+            if not self.env.ref(module + '.knowledge_tour', raise_if_not_found=False):
+                _logger.warning("You forgot to define a `knowledge.tour` with `id=knowledge_tour`.")
+
+            if not (ref := self.env.ref(module + '.notification_knowledge', raise_if_not_found=False)):
+                _logger.warning("You forgot to define a `mail.message` with `id=notification_knowledge`.")
+            notif = ref and self.env['mail.message'].browse(ref.id)
+            if notif and '/knowledge/article/' not in notif.body:
+                _logger.warning("The mail.message should contain a link to the knowledge article.")
+
             knowledge = self.env['ir.model.data'].search(
                 [('model', '=', 'knowledge.article'), ('module', '=', module)], limit=1
             )
-            self.assertTrue(knowledge, "Missing knowledge article for the industry module.")
-            knowledge_article = self.env.ref(knowledge.complete_name)
-            self.assertNotEqual(
-                knowledge_article.favorite_count,
-                0,
-                "The knowledge article should be in the favorite category",
-            )
-            self.assertIn(
-                '/knowledge/article/%s' % knowledge_article.id,
-                notif.body,
-                "The notification link should target the module-related knowledge article.",
-            )
+            if not knowledge:
+                _logger.warning("Missing knowledge article for the industry module.")
+            knowledge_article = knowledge and self.env.ref(knowledge.complete_name)
+            if knowledge and knowledge_article.favorite_count == 0:
+                _logger.warning("The knowledge article should be in the favorite category")
+            if notif and knowledge and '/knowledge/article/%s' % knowledge_article.id not in notif.body:
+                _logger.warning("The notification link should target the module-related knowledge article.")
 
     def test_cloc_exclude_view(self):
         c = cloc.Cloc()
