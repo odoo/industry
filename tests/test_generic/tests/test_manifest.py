@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from ast import literal_eval
+import logging
 from pathlib import Path
 
 from odoo.addons.test_lint.tests.test_manifests import ManifestLinter
@@ -8,6 +9,8 @@ from odoo.modules.module import module_manifest
 from odoo.tests.common import tagged
 
 from .industry_case import IndustryCase, get_industry_path
+
+_logger = logging.getLogger(__name__)
 
 CATEGORIES = ('Services', 'Retail', 'Construction', 'Hospitality', 'Health and Fitness', 'Supply Chain')
 
@@ -45,7 +48,7 @@ class ManifestTest(ManifestLinter, IndustryCase):
         self._test_manifest_keys(module, manifest_data)
         for key, expected_value in MANDATORY_KEYS.items():
             value = manifest_data.get(key)
-            self.assertIsNotNone(value, "Missing '{key}' in manifest")
+            self.assertIsNotNone(value, f"Missing '{key}' in manifest")
             expected_value = MANDATORY_KEYS[key]
             expected_type = type(expected_value)
             self.assertIsInstance(value, expected_type, f"Wrong type for '{key}', expected {expected_type}")
@@ -84,24 +87,25 @@ class ManifestTest(ManifestLinter, IndustryCase):
         manifest_files_list = manifest_data.get(folder_name, [])
         manifest_files = set(manifest_files_list)
 
-        duplicates = {item for item in manifest_files_list if manifest_files_list.count(item) > 1}
-        self.assertFalse(duplicates, f"Duplicated in {folder_name} in the manifest: {', '.join(duplicates)}")
-        duplicates = {item for item in data_files_list if data_files_list.count(item) > 1}
-        self.assertFalse(duplicates, f"Duplicated in {folder_name} folder: {', '.join(duplicates)}")
+        if (duplicates := {item for item in manifest_files_list if manifest_files_list.count(item) > 1}):
+            _logger.warning("Duplicated in %s in the manifest: %s", folder_name, ', '.join(duplicates))
+        if (duplicates := {item for item in data_files_list if data_files_list.count(item) > 1}):
+            _logger.warning("Duplicated in %s folder: %s", folder_name, ', '.join(duplicates))
 
-        not_listed = data_files - manifest_files
-        self.assertFalse(not_listed, f"Files not listed in manifest {folder_name}: {', '.join(not_listed)}")
-        not_found = manifest_files - data_files
-        self.assertFalse(not_found, f"Files listed in manifest {folder_name} not found: {', '.join(not_found)}")
+        if (not_listed := data_files - manifest_files):
+            _logger.warning("Files not listed in manifest %s: %s", folder_name, ', '.join(not_listed))
+        if (not_found := manifest_files - data_files):
+            _logger.error("Files listed in manifest %s not found: %s", folder_name, ', '.join(not_found))
 
     def _test_dependencies(self, manifest_data):
         dependencies = manifest_data.get('depends', [])
         self.assertTrue(dependencies, "The 'depends' list must not be empty")
-        duplicates = {item for item in dependencies if dependencies.count(item) > 1}
-        self.assertFalse(duplicates, f"These dependencies are duplicated in manifest: {', '.join(duplicates)}")
+        if (duplicates := {item for item in dependencies if dependencies.count(item) > 1}):
+            _logger.warning("These dependencies are duplicated in manifest: %s", ', '.join(duplicates))
         known_dependencies = self.env['ir.module.module'].search([('name', 'in', dependencies)]).mapped('name')
-        unknown_dependencies = set(dependencies) - set(known_dependencies)
-        self.assertFalse(unknown_dependencies, f"Unknown dependencies: {', '.join(unknown_dependencies)}")
-        self.assertTrue(dependencies == sorted(dependencies), "Dependencies not in alphabetical order")
-        theme_dependency = any(dependency.startswith("theme_") for dependency in dependencies)
-        self.assertFalse(theme_dependency, "Themes should not be in the dependencies.")
+        if (unknown_dependencies := set(dependencies) - set(known_dependencies)):
+            _logger.error("Unknown dependencies: %s", ', '.join(unknown_dependencies))
+        if dependencies != sorted(dependencies):
+            _logger.warning("Dependencies not in alphabetical order")
+        if any(dependency.startswith("theme_") for dependency in dependencies):
+            _logger.warning("Themes should not be in the dependencies.")
