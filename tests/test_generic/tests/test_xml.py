@@ -47,7 +47,7 @@ USELESS_FIELDS = {
     'res.partner': ['tz'],
     'sale.order': [
         'access_token', 'date_order', 'health', 'origin', 'partner_invoice_id', 'partner_shipping_id',
-        'state', 'validity_date', 'warehouse_id',
+        'validity_date', 'warehouse_id',
     ],
     'sale.order.line': ['qty_delivered'],
     'sign.template': ['name'],
