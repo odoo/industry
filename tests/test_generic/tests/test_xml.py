@@ -207,6 +207,7 @@ class TestEnv(IndustryCase):
         for record in root.xpath("//record[@model='ir.ui.view']"):
             website_id_field = record.xpath(".//field[@name='website_id']")
             if not website_id_field:
+                _logger.info("ir.ui.view found in %s, needs studio", file_name)
                 return True
         return False
 
