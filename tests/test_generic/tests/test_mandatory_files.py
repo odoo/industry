@@ -55,4 +55,4 @@ class FileTest(IndustryCase):
             diff = list(unified_diff(old, new))
             diff_str = ''.join(d.replace('+','').replace('-','') for d in diff)
             if len(diff_str.split('\n')) > 6:
-                _logger.warning("You forgot to export the pot file. Part of what changed:\n%s", diff_str[:100])
+                _logger.warning("You forgot to export the pot file. Part of what changed:\n%s", diff_str[:1000])
