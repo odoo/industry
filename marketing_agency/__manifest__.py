@@ -46,6 +46,7 @@
         'data/knowledge_tour.xml',
         'data/crm_tag.xml',
         'data/hr_department.xml',
+        'data/install_apps.xml',
     ],
     'demo': [
         'demo/crm_team.xml',
