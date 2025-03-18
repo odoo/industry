@@ -29,7 +29,9 @@
         'data/worksheet_template.xml',
         'data/project_task_type.xml',
         'data/project_project.xml',
-        'data/product_template.xml',
+        'data/project_task_recurrence.xml',
+        'data/sale_subscription_plan.xml',
+        'data/sale_subscription_pricing.xml',
         'data/product_product.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
@@ -49,10 +51,10 @@
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/project_task.xml',
+        'demo/account_analytic_line.xml',
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
         'demo/project_project.xml',
-        # 'demo/sale_order_confirm.xml',
     ],
     'assets': {
         'web.assets_backend': [
