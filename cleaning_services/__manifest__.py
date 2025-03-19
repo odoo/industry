@@ -39,6 +39,7 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/account_analytic_account.xml',
         'demo/res_partner.xml',
         'demo/crm_tag.xml',
@@ -64,5 +65,6 @@
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
     ],
+    'images': ['images/main.png'],
     'license': 'OPL-1',
 }
