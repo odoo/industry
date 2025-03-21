@@ -52,7 +52,6 @@ class FileTest(IndustryCase):
                 trans_export(False, [module], buf, 'po', self.env.cr)
                 new = buf.getvalue().decode("utf-8")
             old = Path(get_industry_path() + module + '/i18n/' + module + '.pot').read_text(encoding="utf-8")
-            diff = list(unified_diff(old, new))
-            diff_str = ''.join(d.replace('+','').replace('-','') for d in diff)
-            if len(diff_str.split('\n')) > 6:
-                _logger.warning("You forgot to export the pot file. Part of what changed:\n%s", diff_str[:1000])
+            diff = list(unified_diff(old.split('\n'), new.split('\n')))
+            if diff_str := '\n'.join(diff[16:]):
+                _logger.warning("You forgot to export the pot file. Here is what changed:\n%s", diff_str)
