@@ -67,10 +67,10 @@
         'demo/ir_attachment_post.xml',
         'demo/sale_order_confirm.xml',
         'demo/website.xml',
-        # 'demo/ir_ui_view.xml',
-        # 'demo/website_page.xml',
-        # 'demo/website_menu.xml',
-        # 'demo/website_theme_apply.xml',
+        'demo/website_view.xml',
+        'demo/website_page.xml',
+        'demo/website_menu.xml',
+        'demo/website_theme_apply.xml',
     ],
     'assets': {
         'web.assets_backend': [
