@@ -72,6 +72,7 @@
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
+        'demo/payment_provider_demo_post.xml',
     ],
     'assets': {
         'web.assets_backend': [
@@ -80,6 +81,7 @@
     },
     "cloc_exclude": [
         "data/qweb_view.xml",
+        "data/ir_ui_view.xml",
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
         "demo/website_view.xml",
