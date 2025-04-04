@@ -5,7 +5,6 @@
     'description': '',
     'author': 'Odoo S.A.',
     'depends': [
-        'account_online_synchronization',
         'crm_enterprise',
         'hr_calendar',
         'hr_skills',
@@ -34,10 +33,10 @@
         'data/knowledge_article_favorite.xml',
         'data/knowledge_tour.xml',
         'data/mail_message.xml',
+        'data/crm_tag.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
-        'demo/crm_tag.xml',
         'demo/crm_lead.xml',
         'demo/calendar_event.xml',
         'demo/account_analytic_account.xml',
