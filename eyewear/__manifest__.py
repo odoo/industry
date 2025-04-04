@@ -20,6 +20,7 @@
         'website_sale',
     ],
     'data': [
+        'data/res_config_settings.xml',
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
         'data/qweb_view.xml',
@@ -47,11 +48,11 @@
         'data/mail_message.xml',
         'data/knowledge_tour.xml',
         'data/x_res_partner_line_0ace2.xml',
+        'data/crm_tag.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
         'demo/appointment_type.xml',
-        'demo/crm_tag.xml',
         'demo/crm_lead.xml',
         'demo/hr_department.xml',
         'demo/hr_employee.xml',
@@ -78,8 +79,10 @@
         ]
     },
     "cloc_exclude": [
+        "data/qweb_view.xml",
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
+        "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
     'license': 'OPL-1',
