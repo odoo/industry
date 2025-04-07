@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="carpenter.replace_so_email" model="ir.actions.server">
+    <field name="binding_model_id" ref="sale.model_sale_order"/>
+    <field name="model_id" ref="sale.model_sale_order"/>
+    <field name="state">code</field>
+    <field name="name">Execute Code</field>
+    <field name="code">
+      <![CDATA[
+action = record.action_quotation_send()
+action['context']['default_template_id'] = env.ref("carpenter.mail_template_24").id
+    ]]>
+    </field>
+  </record>
+  <!-- <record id="carpenter.replace_invoice_email" model="ir.actions.server" forcecreate="1">
+    <field name="binding_model_id" ref="account.model_account_move"/>
+    <field name="code"><![CDATA[action = record.action_invoice_sent()
+action['context']['default_pdf_report_id'] = env.ref('carpenter.simplified_invoice_report').id]]></field>
+    <field name="model_id" ref="account.model_account_move"/>
+    <field name="state">code</field>
+    <field name="name">Replace</field>
+  </record> -->
+  <record id="replace_portal" model="ir.actions.server">
+    <field name="code">
+      <![CDATA[
+view = env.ref('carpenter.portal_sale_view')
+view.write({'active': record.x_simplify_so})
+view = env.ref('carpenter.portal_sale_view_2')
+view.write({'active': record.x_simplify_so})
+view = env.ref('sale_stock.sale_order_portal_content_inherit_sale_stock')
+view.write({'active': not record.x_simplify_so})
+    ]]>
+    </field>
+    <field name="model_id" ref="base.model_res_config_settings"/>
+    <field name="state">code</field>
+    <field name="name">Execute Code</field>
+    <field name="usage">base_automation</field>
+  </record>
+</odoo>
