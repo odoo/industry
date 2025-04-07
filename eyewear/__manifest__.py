@@ -43,6 +43,7 @@
         'data/product_template_attribute_value.xml',
         'data/product_product.xml',
         'data/appointment_type.xml',
+        'data/appointment_slot.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
