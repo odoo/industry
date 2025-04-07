@@ -4,8 +4,6 @@
     'category': 'Services',
     'description': '',
     'depends': [
-        'account_online_synchronization',
-        'account_peppol',
         'appointment',
         'crm_enterprise',
         'industry_fsm_sale',
@@ -18,19 +16,17 @@
         'sign',
         'stock',
         'survey',
-        'web_studio',
-        'worksheet'
+        'web_studio'
     ],
     'data': [
         'data/ir_attachment_pre.xml',
         'data/ir_model_fields.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_ui_view.xml',
+        'data/crm_tag.xml',
         'data/planning_role.xml',
         'data/product_template.xml',
         'data/product_product.xml',
-        'data/project_task_type.xml',
-        'data/project_project.xml',
         'data/sale_order_spreadsheet.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
@@ -43,9 +39,6 @@
     ],
     'demo': [
         'demo/res_partner.xml',
-        'demo/res_users.xml',
-        'demo/account_analytic_account.xml',
-        'demo/crm_tag.xml',
         'demo/crm_lead.xml',
         'demo/hr_department.xml',
         'demo/hr_employee.xml',
@@ -53,6 +46,7 @@
         'demo/planning_slot_template.xml',
         'demo/planning_slot.xml',
         'demo/product_supplierinfo.xml',
+        'demo/project_project.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
@@ -60,13 +54,12 @@
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
         'demo/stock_quant.xml',
-        'demo/project_project.xml',
     ],
     'assets': {
         'web.assets_backend': [
             'electrician/static/src/js/my_tour.js',
         ]
-        },
+    },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",

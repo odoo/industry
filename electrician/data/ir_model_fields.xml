@@ -8,7 +8,7 @@
     <field name="name">x_task_id</field>
     <field name="relation">project.task</field>
   </record>
-  <record id="related_x_task_field" model="ir.model.fields">
+  <!-- <record id="related_x_task_field" model="ir.model.fields">
     <field name="ttype">many2one</field>
     <field name="related">move_id.x_task_id</field>
     <field name="field_description">Task</field>
@@ -17,79 +17,7 @@
     <field name="readonly" eval="True"/>
     <field name="relation">project.task</field>
     <field name="store" eval="False"/>
-  </record>
-  <record id="field_allocated_hours" model="ir.model.fields">
-    <field name="compute"><![CDATA[
-for project in self:
-    project['x_allocated_hours'] = sum(project.task_ids.mapped('allocated_hours'))]]></field>
-    <field name="ttype">monetary</field>
-    <field name="field_description">Allocated</field>
-    <field name="model_id" ref="project.model_project_project"/>
-    <field name="name">x_allocated_hours</field>
-    <field name="on_delete" eval="False"/>
-    <field name="readonly" eval="True"/>
-    <field name="selectable" eval="False"/>
-    <field name="store" eval="False"/>
-    <field name="currency_field">currency_id</field>
-  </record>
-  <record id="field_related_analytic_account_debit" model="ir.model.fields">
-    <field name="compute"><![CDATA[
-for project in self:
-    project['x_debit'] = project.account_id.debit]]></field>
-    <field name="ttype">monetary</field>
-    <field name="field_description">Costs</field>
-    <field name="model_id" ref="project.model_project_project"/>
-    <field name="name">x_debit</field>
-    <field name="on_delete" eval="False"/>
-    <field name="readonly" eval="True"/>
-    <field name="selectable" eval="False"/>
-    <field name="store" eval="False"/>
-    <field name="currency_field">currency_id</field>
-  </record>
-  <record id="field_effective_hours" model="ir.model.fields">
-    <field name="compute"><![CDATA[
-for project in self:
-    project['x_effective_hours'] = sum(project.task_ids.mapped('effective_hours'))]]></field>
-    <field name="ttype">monetary</field>
-    <field name="field_description">Spent</field>
-    <field name="model_id" ref="project.model_project_project"/>
-    <field name="name">x_effective_hours</field>
-    <field name="on_delete" eval="False"/>
-    <field name="readonly" eval="True"/>
-    <field name="selectable" eval="False"/>
-    <field name="store" eval="False"/>
-    <field name="currency_field">currency_id</field>
-  </record>
-  <record id="x_percent_time_spent_field" model="ir.model.fields">
-    <field name="compute"><![CDATA[
-for project in self:
-    project['x_percent_spent'] = project.x_effective_hours / project.x_allocated_hours if project.x_allocated_hours else 0]]></field>
-    <field name="ttype">float</field>
-    <field name="field_description">Percent time</field>
-    <field name="model_id" ref="project.model_project_project"/>
-    <field name="name">x_percent_spent</field>
-    <field name="on_delete" eval="False"/>
-    <field name="readonly" eval="True"/>
-    <field name="selectable" eval="False"/>
-    <field name="store" eval="False"/>
-  </record>
-  <record id="x_section_id_field" model="ir.model.fields">
-    <field name="compute"><![CDATA[
-all_sections = self._read_group(domain=[('order_id', 'in', self.mapped('order_id.id')), ('display_type', '=', 'line_section')], groupby=['order_id'], aggregates=['sequence:array_agg','id:array_agg'])
-data = {order.id: [seqs, ids] for order, seqs, ids in all_sections}
-for line in self:
-    line['x_section_id'] = False
-    seqs, ids = data.get(line.order_id.id, ([], []))
-    for s, i in zip(seqs, ids):
-        line['x_section_id'] = i if (line.x_section_id and line.x_section_id.id < s < line.sequence) or s < line.sequence else line.x_section_id]]></field>
-    <field name="ttype">many2one</field>
-    <field name="depends">order_id.order_line</field>
-    <field name="field_description">Section ID</field>
-    <field name="model_id" ref="sale.model_sale_order_line"/>
-    <field name="name">x_section_id</field>
-    <field name="readonly" eval="True"/>
-    <field name="relation">sale.order.line</field>
-  </record>
+  </record> -->
   <record id="field_related_analytic_account_vendor_bill_count" model="ir.model.fields">
     <field name="ttype">integer</field>
     <field name="related">project_id.account_id.vendor_bill_count</field>
