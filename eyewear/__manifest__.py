@@ -36,6 +36,7 @@
         'data/pos_payment_method.xml',
         'data/product_category.xml',
         'data/product_public_category.xml',
+        'data/product_tag.xml',
         'data/product_template.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
