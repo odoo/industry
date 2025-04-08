@@ -25,7 +25,6 @@
         'data/ir_ui_view.xml',
         'data/crm_tag.xml',
         'data/planning_role.xml',
-        'data/product_template.xml',
         'data/product_product.xml',
         'data/sale_order_spreadsheet.xml',
         'data/sale_order_template.xml',
