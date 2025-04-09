@@ -2,9 +2,6 @@
     'name': 'Billboard Rental',
     'version': '1.0',
     'category': 'Services',
-    'description': """
-This industry caters to billboard rental businesses, specializing in managing outdoor advertising spaces. It involves coordinating prime location leases, complying with regulations, and maximizing client visibility.
-""",
     'depends': [
         'hr',
         'industry_fsm',

@@ -21,7 +21,6 @@ MANDATORY_KEYS = {
     'cloc_exclude': [],
     'data': [],
     'demo': [],
-    'description': '',
     'depends': [],
     'images': ['images/main.png'],
     'license': 'OPL-1',
@@ -46,6 +45,7 @@ class ManifestTest(ManifestLinter, IndustryCase):
 
     def _validate_manifest(self, module, manifest_data):
         self._test_manifest_keys(module, manifest_data)
+        self.assertNotIn('description', manifest_data, "Module description should be defined in /static/description/index.html, not in the manifest.")
         for key, expected_value in MANDATORY_KEYS.items():
             value = manifest_data.get(key)
             self.assertIsNotNone(value, f"Missing '{key}' in manifest")
