@@ -2,8 +2,6 @@
     'name': 'Custom Furniture Production',
     'version': '1.0',
     'category': 'Supply Chain',
-    'description': """
-""",
     'depends': [
         'account_followup',
         'calendar',
