@@ -2,10 +2,6 @@
     'name': 'Electronic Store',
     'version': '1.0',
     'category': 'Retail',
-    'description': """
-        This module provides essential features to manage an electronic store.
-        It includes product categories, products, sales orders, and more for electronic products.
-    """,
     'depends': [
         'crm',
         'documents_fsm',

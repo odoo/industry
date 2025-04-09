@@ -2,9 +2,6 @@
     'name': 'Law Firm',
     'version': '1.1',
     'category': 'Services',
-    'description': """
-This module installs a configuration that presets the modules and configure Odoo for a law firm.
-""",
     'depends': [
         'contacts',
         'crm',

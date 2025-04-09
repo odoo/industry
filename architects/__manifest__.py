@@ -2,10 +2,6 @@
     'name': 'Architecture Firm',
     'version': '1.0',
     'category': 'Services',
-    'description': """
-This industry is made for Architecture Firm that sell all kind of architectural services such as feasibility studies,
-schematic design, design development, worksite follow-up, energy efficiency assessment.
-""",
     'depends': [
         'account_followup',
         'base_automation',

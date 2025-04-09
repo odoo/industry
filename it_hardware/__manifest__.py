@@ -2,9 +2,6 @@
     'name': 'IT Hardware & Support',
     'version': '1.0',
     'category': 'Services',
-    'description': """
-We offer IT sales, installation, and repair services for a wide range of products, including laptops, RAM, accessories, and CCTV cameras.
-""",
     'depends': [
         'account_followup',
         'helpdesk_stock',

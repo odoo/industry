@@ -2,7 +2,6 @@
     'name': 'Environmental Agency',
     'version': '1.0',
     'category': 'Services',
-    'description': '',
     'author': 'Odoo S.A.',
     'depends': [
         'appointment_account_payment',

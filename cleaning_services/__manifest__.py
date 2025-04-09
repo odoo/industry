@@ -2,7 +2,6 @@
     'name': 'Cleaning Services',
     'version': '1.0',
     'category': 'Services',
-    'description': '',
     'author': 'Odoo S.A.',
     'depends': [
         'crm_sale_subscription',

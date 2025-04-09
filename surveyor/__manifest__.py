@@ -2,10 +2,6 @@
     'name': 'Surveying & Mapping',
     'version': '1.0',
     'category': 'Services',
-    'description': """
-This setup is for industrial companies who are into sureveying and measurement activities.
-It may include surveying of building properties and the measurement of completed construction activities.
-""",
     'depends': [
         'base_automation',
         'crm',
