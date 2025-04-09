@@ -2,10 +2,6 @@
     'name': 'Pharmacy',
     'version': '1.0',
     'category': 'Health and Fitness',
-    'description': """
-This setup is for pharmacy retail companies that purchase and sell products.
-They maintain the stock lot wise and also manage the expiry of the lots.
-""",
     'depends': [
         'calendar',
         'contacts',

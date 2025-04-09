@@ -2,7 +2,6 @@
     'name': 'Handyman Services',
     'version': '1.2',
     'category': 'Services',
-    'description': "",
     'depends': [
         'account_accountant',
         'appointment_account_payment',
