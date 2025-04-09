@@ -2,8 +2,6 @@
     'name': 'Bookstore',
     'version': '1.0',
     'category': 'Retail',
-    'description': """
-""",
     'depends': [
         'account_followup',
         'contacts',

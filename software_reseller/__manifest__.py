@@ -2,10 +2,6 @@
     'name': 'Software Reseller',
     'version': '1.0',
     'category': 'Services',
-    'description': """
-This setup if for IT companies reselling software licenses, and consulting services.🚀
-The typical sale is a 1 year Oracle Database license that is purchased to Oracle, and resold to client at a margin, with extra services to setup the database.
-""",
     'depends': [
         'knowledge',
         'project',

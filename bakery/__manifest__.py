@@ -2,7 +2,6 @@
     'name': 'Bakery Shop',
     'version': '1.0',
     'category': 'Retail',
-    'description': '',
     'author': 'Odoo S.A.',
     'depends': [
         'contacts',
