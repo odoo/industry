@@ -2,12 +2,6 @@
     'name': 'Fossil Fuel Trading',
     'version': '1.0',
     'category': 'Supply Chain',
-    'description': """
-        The module specializes in trading coal and petroleum products, acquiring them from international
-        suppliers or local vendors and reselling them to customers. They have a unique quality-checking
-        method during the procurement process, defining specific parameters in the GRN and Delivery stages
-        to ensure product quality.
-    """,
     'depends': [
         'account_asset',
         'base_automation',

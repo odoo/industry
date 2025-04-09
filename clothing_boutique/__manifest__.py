@@ -2,8 +2,6 @@
     'name': 'Clothing Store',
     'version': '1.0',
     'category': 'Retail',
-    'description': """
-This setup if for Clothing Store companies selling female clothing.""",
     'depends': [
         'knowledge',
         'pos_sale',
