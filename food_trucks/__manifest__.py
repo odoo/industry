@@ -2,7 +2,6 @@
   'name': 'Food Trucks',
   'version': '1.0',
   'category': 'Hospitality',
-  'description': '',
   'author': 'Odoo S.A.',
   'depends': [
       'gamification',
@@ -19,7 +18,6 @@
       'data/pos_config.xml',
       'data/uom_uom.xml',
       'data/project_task_type.xml',
-      'data/product_template.xml',
       'data/product_product.xml',
       'data/restaurant_floor.xml',
       'data/restaurant_table.xml',
