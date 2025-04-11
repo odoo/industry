@@ -26,7 +26,6 @@
         'data/mail_template.xml',
         'data/mail_activity_type.xml',
         'data/crm_stage.xml',
-        'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favourite.xml',
         'data/product_template.xml',
