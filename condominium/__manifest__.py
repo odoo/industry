@@ -2,10 +2,6 @@
     'name': 'Property Owner Association',
     'version': '1.3',
     'category': 'Services',
-    'description': """
-This industry is tailor-made for Property Owner Association businesses that aim at managing co-ownership properties. Such a business is complex because it implies managing all the aspects of the properties while fairly splitting the charges.
-Moreover, the business is legally regulated in lots of countries under different names: condo in the US, co-ownership in Canada, joint domination in the UK, property syndicate in France, syndic in Belgium, etc
-""",
     'depends': [
         'account_check_printing',
         'account_followup',

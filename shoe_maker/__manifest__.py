@@ -2,7 +2,6 @@
     'name': 'Shoe Maker',
     'version': '1.0',
     'category': 'Services',
-    'description': '',
     'author': 'Odoo S.A.',
     'depends': [
         'industry_fsm_stock',

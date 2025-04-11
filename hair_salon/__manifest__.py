@@ -2,7 +2,6 @@
     'name': 'Hair Salon',
     'version': '1.1',
     'category': 'Services',
-    'description': "",
     'depends': [
         'base_automation',
         'base_geolocalize',

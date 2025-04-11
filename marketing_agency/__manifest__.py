@@ -2,7 +2,6 @@
     'name': 'Marketing Agency',
     'version': '1.0',
     'category': 'Services',
-    'description': '',
     'author': 'Odoo S.A.',
     'depends': [
         'contacts',

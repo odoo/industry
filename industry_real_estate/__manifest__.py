@@ -2,10 +2,6 @@
     'name': 'Real Estate',
     'version': '1.0',
     'category': 'Services',
-    'description': """
-Manage your long term or mid long term rental properties
-Manage your properties, create and manage rental contracts, and streamline your entire rental process. Efficient property management.
-""",
     'depends': [
         'base_automation',
         'crm_enterprise',

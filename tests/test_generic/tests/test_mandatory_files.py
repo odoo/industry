@@ -26,6 +26,7 @@ class FileTest(IndustryCase):
                 'image': '/images/main.png',
                 'pot file': f'/i18n/{module}.pot',
                 'tour': '/static/src/js/my_tour.js',
+                'index html file': '/static/description/index.html',
             }
             for f, path in required_files.items():
                 if not os.path.isfile(get_industry_path() + module + path):

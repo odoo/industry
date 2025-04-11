@@ -2,7 +2,6 @@
     'name': 'Fitness Center',
     'version': '1.0',
     'category': 'Health and Fitness',
-    'description': "",
     'depends': [
         'calendar',
         'contacts',

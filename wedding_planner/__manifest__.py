@@ -2,7 +2,6 @@
     'name': 'Wedding Planner',
     'version': '1.0',
     'category': 'Services',
-    'description': '',
     'author': 'Odoo S.A.',
     'depends': [
         'crm_enterprise',

@@ -2,11 +2,6 @@
     'name': 'Solar Energy Systems',
     'version': '1.0',
     'category': 'Construction',
-    'description': """
-This configuration is designed for companies specializing in solar equipment and installation services.
-They cater to both residential and commercial customers,
-ensuring the efficient installation of solar panels and associated equipment.
-""",
     'depends': [
         'account_followup',
         'helpdesk_account',

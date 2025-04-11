@@ -2,7 +2,6 @@
     'name': 'Odoo Partner',
     'version': '1.0',
     'category': 'Services',
-    'description': "",
     'depends': [
         'appointment_account_payment',
         'documents_project',
