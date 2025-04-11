@@ -1,0 +1,71 @@
+{
+    'name': 'Tattoo Shop',
+    'version': '1.0',
+    'category': 'Services',
+    'description': '',
+    'author': 'Odoo S.A.',
+    'depends': [
+        'appointment_account_payment',
+        'base_automation',
+        'crm_enterprise',
+        'sale_planning',
+        'sale_purchase',
+        'sale_service',
+        'sales_team',
+        'sign',
+        'social',
+        'web_studio',
+        'website_knowledge'
+    ],
+    'data': [
+        'data/crm_tag.xml',
+        'data/ir_attachment_pre.xml',
+        'data/ir_attachment_post.xml',
+        'data/appointment_data.xml',
+        'data/appointment_resource.xml',
+        'data/mail_template.xml',
+        'data/mail_activity_type.xml',
+        'data/crm_stage.xml',
+        'data/knowledge_cover.xml',
+        'data/knowledge_article.xml',
+        'data/knowledge_article_favourite.xml',
+        'data/product_template.xml',
+        'data/product_product.xml',
+        'data/sign_template_tag.xml',
+        'data/sign_template.xml',
+        'data/sign_item.xml',
+        'data/mail_message.xml',
+        'data/knowledge_tour.xml',
+        'data/base_automation.xml'
+    ],
+    'demo': [
+        'demo/appointement_type.xml',
+        'demo/website_theme.xml',
+        'demo/res_partner.xml',
+        'demo/crm_lead.xml',
+        'demo/calendar_event.xml',
+        'demo/website.xml',
+        'demo/website_views.xml',
+        'demo/hr_department.xml',
+        'demo/hr_employee.xml',
+        'demo/sale_order.xml',
+        'demo/sale_order_line.xml',
+        'demo/website_page.xml',
+        'demo/website_menu.xml',
+        'demo/website_theme_apply.xml',
+        'demo/ir_attachment_post.xml'
+        ],
+    'assets': {
+        'web.assets_backend': [
+            'tattoo_shop/static/src/js/my_tour.js',
+        ]
+    },
+    'cloc_exclude': [
+        "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
+        'demo/website.xml',
+        'demo/website_views.xml'
+    ],
+    'images': ['images/main.png'],
+    'license': 'OPL-1',
+}
