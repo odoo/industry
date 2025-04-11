@@ -12,10 +12,7 @@
         'project_forecast',
         'purchase',
         'sale_margin',
-        'sale_timesheet',
-        'sign',
         'stock',
-        'survey',
         'web_studio'
     ],
     'data': [
