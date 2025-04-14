@@ -8,14 +8,12 @@ from odoo.addons.test_lint.tests.test_manifests import ManifestLinter
 from odoo.modules.module import module_manifest
 from odoo.tests.common import tagged
 
-from .industry_case import IndustryCase, get_industry_path
+from .industry_case import CATEGORIES, IndustryCase, get_industry_path
 
 _logger = logging.getLogger(__name__)
 
-CATEGORIES = ('Services', 'Retail', 'Construction', 'Hospitality', 'Health and Fitness', 'Supply Chain')
 
 MANDATORY_KEYS = {
-    'assets': {},
     'author': 'Odoo S.A.',
     'category': '',
     'cloc_exclude': [],
