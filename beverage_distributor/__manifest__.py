@@ -2,7 +2,6 @@
     'name': 'Beverage Distributor',
     'version': '1.0',
     'category': 'Supply Chain',
-    'description': "",
     'depends': [
         'base_automation',
         'calendar',

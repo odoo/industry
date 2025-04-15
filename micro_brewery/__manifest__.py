@@ -2,7 +2,6 @@
     'name': 'Microbrewery',
     'version': '1.0',
     'category': 'Supply Chain',
-    'description': "",
     'depends': [
         'account',
         'appointment_crm',
