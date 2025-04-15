@@ -2,7 +2,6 @@
     'name': 'Electricians',
     'version': '1.0',
     'category': 'Services',
-    'description': '',
     'depends': [
         'appointment',
         'crm_enterprise',

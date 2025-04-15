@@ -2,11 +2,6 @@
     'name': 'Nonprofit Organization',
     'version': '1.0',
     'category': 'Services',
-    'description': """
-    Non Profit Organization
-
-    This industry module pre-configure odoo for non profit organizations.
-""",
     'depends': [
         'knowledge',
         'mass_mailing',

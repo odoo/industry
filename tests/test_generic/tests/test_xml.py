@@ -8,7 +8,7 @@ import re
 from lxml import etree
 from collections import defaultdict
 
-from odoo.tests.common import tagged
+from odoo.tests import tagged, get_db_name
 from .industry_case import IndustryCase, get_industry_path
 
 _logger = logging.getLogger(__name__)
@@ -18,13 +18,15 @@ MAX_FILE_SIZE = 100 * 1024 * 1024  # in megabytes
 EXCLUDED_READONLY_FIELDS = {'lot_id', 'url', 'user_id',}
 
 USELESS_FIELDS = {
+    'account.analytic.account': ['company_id'],
     'account.analytic.plan': ['color'],
     'crm.lead': [
-        'city', 'street', 'zip', 'state_id', 'country_id', 'email', 'email_from', 'contact_name',
-        'partner_name', 'title', 'function', 'website', 'street2', 'phone'
+        'city', 'street', 'zip', 'state_id', 'country_id', 'email', 'email_from', 'mobile', 'contact_name',
+        'partner_name', 'title', 'function', 'website', 'street2', 'phone', 'company_id'
     ],
     'crm.tag': ['color'],
     'hr.applicant': ['last_stage_id'],
+    'hr.employee': ['company_id'],
     'ir.attachment': ['access_token'],
     'ir.model.fields': ['model'],
     'knowledge.article': ['article_member_ids'],
@@ -39,14 +41,15 @@ USELESS_FIELDS = {
     'product.product': ['lst_price'],
     'product.template.attribute.value': ['color'],
     'project.tags': ['color'],
+    'project.task': ['company_id'],
     'purchase.order': ['currency_id', 'state'],
-    'purchase.order.line': ['date_planned', 'move_dest_ids', 'name'],
+    'purchase.order.line': ['date_planned', 'move_dest_ids', 'name', 'company_id'],
     'res.partner': ['tz'],
     'sale.order': [
         'access_token', 'date_order', 'health', 'origin', 'partner_invoice_id', 'partner_shipping_id',
-        'validity_date', 'warehouse_id',
+        'validity_date', 'warehouse_id', 'company_id'
     ],
-    'sale.order.line': ['qty_delivered'],
+    'sale.order.line': ['qty_delivered', 'company_id'],
     'sign.template': ['name'],
     'worksheet.template': ['color'],
 }
@@ -113,6 +116,8 @@ class TestEnv(IndustryCase):
                         manifest_content = decoded_content
                     continue
 
+                if root.split('/')[-1] == 'demo' and get_db_name().endswith('imported_no_demo'):
+                    continue
                 try:
                     tree = etree.fromstring(encoded_content)
                 except etree.XMLSyntaxError as e:
@@ -134,12 +139,13 @@ class TestEnv(IndustryCase):
                         is_studio_required = self._check_studio(tree, file_name)
         self._check_manifest(manifest_content, is_studio_required)
         self._check_records_without_user_id(checked_records_with_user)
-        in_use_files = {file.lstrip('/') for file in in_use_files}
-        for file in static_files - in_use_files:
-            if 'description' not in file:
-                _logger.warning("Unused static file: %s.", file)
-        for file in in_use_files - static_files:
-            _logger.warning("No reference found for this file: %s.", file)
+        if not get_db_name().endswith('imported_no_demo'):
+            in_use_files = {file.lstrip('/') for file in in_use_files}
+            for file in static_files - in_use_files:
+                if 'description' not in file:
+                    _logger.warning("Unused static file: %s.", file)
+            for file in in_use_files - static_files:
+                _logger.warning("No reference found for this file: %s.", file)
 
     def _check_static_files_usage_in_xml(self, root, in_use_files):
         for element in root.iter():
@@ -348,6 +354,8 @@ class TestEnv(IndustryCase):
                 field = model._fields.get(field_name)
                 useless = USELESS_FIELDS.get(model_name, [])
                 if field_name in useless:
+                    if field_name == 'company_id' and self.env['res.company'].search_count([]) > 1:
+                        continue  # company_id only matters in a multi-company setup
                     if 'crm.lead' in self.env and model == self.env['crm.lead']:
                         if 'partner_id' in fields_set_in_record:
                             _logger.warning(
