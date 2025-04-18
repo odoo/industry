@@ -6,7 +6,7 @@
         <field name="state">code</field>
         <field name="base_automation_id" ref="base_automation_4"/>
         <field name="code"><![CDATA[
-move_lines = env["stock.move.line"].search([("state", "=", "done"), ("picking_code", "=", "outgoing"), ("lot_id.x_warranty_date", "!=", False)])
+move_lines = records.filtered(lambda sml: not sml.lot_id.x_warranty_date and sml.product_id.expiration_time)
 for line in move_lines:
     line.lot_id.write({'x_warranty_date': datetime.datetime.today() + datetime.timedelta(line.product_id.expiration_time)})
         ]]></field>
