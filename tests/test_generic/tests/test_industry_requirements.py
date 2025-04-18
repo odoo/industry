@@ -44,9 +44,6 @@ class TestEnv(IndustryCase):
 
     def test_knowledge_article_notification(self):
         for module in self.installed_modules:
-            if not self.env.ref(module + '.knowledge_tour', raise_if_not_found=False):
-                _logger.warning("You forgot to define a `knowledge.tour` with `id=knowledge_tour`.")
-
             if not (ref := self.env.ref(module + '.notification_knowledge', raise_if_not_found=False)):
                 _logger.warning("You forgot to define a `mail.message` with `id=notification_knowledge`.")
             notif = ref and self.env['mail.message'].browse(ref.id)
@@ -77,7 +74,7 @@ class TestEnv(IndustryCase):
     def test_sale_ok_and_is_published_in_db(self):
         models = ["product.template", "product.product"]
         for model in models:
-            if "is_published" in self.env[model]._fields:
+            if model in self.env and "is_published" in self.env[model]._fields:
                 records = self.env[model].search(
                     [("is_published", "=", True), ("sale_ok", "=", False)]
                 )
