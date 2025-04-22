@@ -3,34 +3,19 @@
        'version': '1.0',
        'category': 'Services',
        'depends': [
-              # 'account_followup',
-              # 'account_invoice_extract',
-              # 'account_online_synchronization',
               'account_peppol',
-              # 'auth_totp_mail',
-              # 'base_install_request',
-              # 'base_module',
               'calendar',
               'hr_skills',
               'l10n_be_reports_post_wizard',
-              # 'partner_autocomplete',
-              # 'product_barcodelookup',
-              # 'project_sms',
-              # 'sale_async_emails',
-              # 'sale_pdf_quote_builder',
               'sale_planning',
               'sale_purchase_project',
-              # 'snailmail_account',
               'social_push_notifications',
-              # 'stock_barcode',
               'stock_dropshipping',
               'survey',
-              #  'theme_buzzy',
-              # 'web_grid',
-              'web_studio',
+              'theme_buzzy',
               'website_knowledge',
               'website_partner',
-              # 'website_project',
+              'marketing_automation',
               'website_sale_mass_mailing',
        ],
        'data': [
@@ -42,9 +27,10 @@
               'data/product_template_attribute_value.xml',
               'data/product_product.xml',
               'data/knowledge_article.xml',
+              'data/knowledge_article_favorite.xml',
               'data/mail_message.xml',
               'data/knowledge_tour.xml',
-              # 'data/project_project_stage.xml'
+              'data/project_project_stage.xml'
        ],
        'demo': [
               'demo/website.xml',
@@ -62,18 +48,19 @@
               'demo/website_page.xml',
               'demo/website_menu.xml',
               'demo/ir_attachment_post.xml',
-              'demo/sale_order_confirm.xml'
+              'demo/sale_order_confirm.xml',
+              # 'demo/payment_provider_demo_post.xml',
               ],
-              'assets': {
-                     'web.assets_backend': [
-                            'dropshipping/static/src/js/my_tour.js',
-                     ]
-              },
-              'author': 'Odoo S.A.',
-              "cloc_exclude": [
-                     "data/knowledge_article.xml",
-                     "static/src/js/my_tour.js",
-              ],
-              'images': ['images/main.png'],
-              'license': 'OPL-1'
+       'assets': {
+              'web.assets_backend': [
+                     'dropshipping/static/src/js/my_tour.js',
+              ]
+       },
+       'author': 'Odoo S.A.',
+       "cloc_exclude": [
+              "data/knowledge_article.xml",
+              "static/src/js/my_tour.js",
+       ],
+       'images': ['images/main.png'],
+       'license': 'OPL-1'
 }
