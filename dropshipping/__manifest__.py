@@ -3,19 +3,17 @@
        'version': '1.0',
        'category': 'Services',
        'depends': [
-              'account_peppol',
               'calendar',
               'hr_skills',
               'l10n_be_reports_post_wizard',
+              'marketing_automation',
               'sale_planning',
               'sale_purchase_project',
               'social_push_notifications',
               'stock_dropshipping',
               'survey',
-              'theme_buzzy',
               'website_knowledge',
               'website_partner',
-              'marketing_automation',
               'website_sale_mass_mailing',
        ],
        'data': [
@@ -49,7 +47,7 @@
               'demo/website_menu.xml',
               'demo/ir_attachment_post.xml',
               'demo/sale_order_confirm.xml',
-              # 'demo/payment_provider_demo_post.xml',
+              'demo/payment_provider_demo_post.xml',
               ],
        'assets': {
               'web.assets_backend': [
@@ -60,6 +58,7 @@
        "cloc_exclude": [
               "data/knowledge_article.xml",
               "static/src/js/my_tour.js",
+              "demo/website_view.xml",
        ],
        'images': ['images/main.png'],
        'license': 'OPL-1'
