@@ -1,0 +1,161 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="ir_actions_update_tasks" model="ir.actions.server">
+        <field name="code">
+            <![CDATA[
+ProjectTask = env['project.task']
+ProjectTag = env['project.tags']
+
+# Get references
+stage_1 = env.ref('accounting_firm.project_task_type_1')
+stage_2 = env.ref('accounting_firm.project_task_type_2')
+stage_3 = env.ref('accounting_firm.project_task_type_3')
+admin_user = env.ref('base.user_admin')
+
+today = datetime.datetime.today()
+now = datetime.datetime.now()
+
+# Month and quarter mapping
+MONTH_TAGS = {
+    'january': 1, 'february': 2, 'march': 3, 'april': 4,
+    'may': 5, 'june': 6, 'july': 7, 'august': 8,
+    'september': 9, 'october': 10, 'november': 11, 'december': 12
+}
+QUARTER_STARTS = {
+    'q1': 1, 'q2': 4, 'q3': 7, 'q4': 10
+}
+
+# Get all relevant tasks
+project_tasks = ProjectTask.search([
+    ('sale_line_id', '!=', False),
+    ('stage_id', '=', stage_1.id)
+])
+
+# Move tasks to stage 2 if they have current month or quarter tag
+month_name = today.strftime('%B').lower()
+quarter = f"q{((today.month - 1) // 3 + 1)}".lower()
+
+month_tag = ProjectTag.search([('name', 'ilike', month_name)], limit=1)
+quarter_tag = ProjectTag.search([('name', 'ilike', quarter)], limit=1)
+
+if month_tag:
+    project_tasks.filtered(lambda t: month_tag in t.tag_ids).write({'stage_id': stage_2.id})
+
+if quarter_tag:
+    project_tasks.filtered(lambda t: quarter_tag in t.tag_ids).write({'stage_id': stage_2.id})
+
+# Assign admin user
+project_tasks.write({'user_ids': [admin_user.id]})
+
+# Move customer onboarding tasks to stage 3
+onboarding_tasks = project_tasks.filtered(lambda t: t.name.lower() in 'customer onboarding'.lower())
+onboarding_tasks.write({'stage_id': stage_3.id})
+for task in onboarding_tasks:
+    desc = str(task.description or '')
+    desc = desc.replace('<li>', '<li class="o_checked">')
+    task.write({'description': desc})
+# Template-based classification
+template_monthly = [
+    env.ref('accounting_firm.sale_order_template_1'),
+    env.ref('accounting_firm.sale_order_template_4')
+]
+template_quarterly = [
+    env.ref('accounting_firm.sale_order_template_2'),
+    env.ref('accounting_firm.sale_order_template_5')
+]
+template_yearly = [
+    env.ref('accounting_firm.sale_order_template_3'),
+    env.ref('accounting_firm.sale_order_template_6')
+]
+template_ubo = [
+    env.ref('accounting_firm.sale_order_template_7')
+]
+
+# Handle deadlines
+for task in project_tasks:
+    tag_names = [tag.name.lower() for tag in task.tag_ids]
+    deadline = None
+
+    # Monthly tag logic
+    matched_months = [month_num for name, month_num in MONTH_TAGS.items() if name in tag_names]
+    if matched_months:
+        month_num = matched_months[0]
+        next_month = month_num + 1
+        year = today.year
+        if next_month > 12:
+            next_month = 1
+            year += 1
+        deadline = datetime.datetime(year, next_month, 20, 0, 0)
+    # Quarterly tag logic
+    if not deadline:
+        matched_quarters = [start_month for quarter_name, start_month in QUARTER_STARTS.items() if quarter_name in tag_names]
+        if matched_quarters:
+            start_month = matched_quarters[0]
+            next_quarter_month = start_month + 3
+            year = today.year
+            if next_quarter_month > 12:
+                next_quarter_month -= 12
+                year += 1
+            deadline = datetime.datetime(year, next_quarter_month, 25, 0, 0)
+
+    # Yearly task logic
+    if not deadline and task.sale_line_id.order_id.sale_order_template_id in template_yearly:
+        year = now.year
+        deadline = datetime.datetime(year, 10, 20, 23, 55)
+        if now >= deadline:
+            deadline = datetime.datetime(year + 1, 10, 20, 23, 55)
+
+    # UBO task logic
+    if not deadline and task.sale_line_id.order_id.sale_order_template_id in template_ubo:
+        create_date_str = env['ir.config_parameter'].sudo().get_param('database.create_date')
+        try:
+            db_create_date = datetime.datetime.strptime(create_date_str, "%Y-%m-%d %H:%M:%S")
+        except Exception:
+            db_create_date = now
+        deadline = db_create_date + datetime.timedelta(days=30)
+        deadline = deadline.replace(hour=23, minute=55)
+
+    # Template fallback logic
+    if not deadline:
+        template = task.sale_line_id.order_id.sale_order_template_id
+        if template in template_monthly:
+            next_month = now.month + 1
+            year = now.year
+            if next_month > 12:
+                next_month = 1
+                year += 1
+            deadline = datetime.datetime(year, next_month, 20, 23, 55)
+        elif template in template_quarterly:
+            next_month = now.month + 1
+            year = now.year
+            if next_month > 12:
+                next_month = 1
+                year += 1
+            deadline = datetime.datetime(year, next_month, 25, 23, 55)
+
+    if deadline:
+        task.write({'date_deadline': deadline})
+    ]]>
+        </field>
+        <field name="model_id" ref="project.model_project_task" />
+        <field name="state">code</field>
+        <field name="name">Execute Code</field>
+        <field name="base_automation_id" ref="base_automation_1" />
+        <field name="usage">base_automation</field>
+    </record>
+    <record id="ir_actions_update_projects" model="ir.actions.server">
+        <field name="code">
+            <![CDATA[
+to_process = env['project.project'].search([('stage_id', '=', env.ref('project.project_project_stage_0').id), ('sale_line_id', '!=', False)])
+to_process.write({'stage_id': env.ref('project.project_project_stage_1').id})
+for record in to_process:
+    record.write({'name': record.partner_id.name if record.partner_id else env.company.name})
+    ]]>
+        </field>
+        <field name="model_id" ref="project.model_project_project" />
+        <field name="state">code</field>
+        <field name="name">Execute Code</field>
+        <field name="usage">base_automation</field>
+        <field name="base_automation_id" ref="base_automation_2" />
+    </record>
+</odoo>
