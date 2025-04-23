@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <function model="project.project" name="write">
+        <value model="project.project" eval="obj().search([('reinvoiced_sale_order_id', 'in', [ref('accounting_firm.sale_order_1'), ref('accounting_firm.sale_order_2')])]).ids" />
+        <value eval="{
+            'stage_id': ref('project.project_project_stage_1')}
+        "/>
+    </function>
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('sale_line_id.product_id', '=', ref('accounting_firm.product_product_6'))]).ids" />
+        <value eval="{'tag_ids': [Command.link(ref('accounting_firm.project_tags_3'))]}" />
+    </function>
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('sale_line_id.product_id', '=', ref('accounting_firm.product_product_8'))]).ids" />
+        <value eval="{'tag_ids': [Command.link(ref('accounting_firm.project_tags_4'))]}" />
+    </function>
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('sale_line_id.product_id', '=', ref('accounting_firm.product_product_9'))]).ids" />
+        <value eval="{'tag_ids': [Command.link(ref('accounting_firm.project_tags_5'))]}" />
+    </function>
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('sale_line_id.product_id', '=', ref('accounting_firm.product_product_4'))]).ids" />
+        <value eval="{'tag_ids': [Command.link(ref('accounting_firm.project_tags_23'))]}" />
+    </function>
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('sale_line_id.product_id', '=', ref('accounting_firm.product_product_3'))]).ids" />
+        <value eval="{'tag_ids': [Command.link(ref('accounting_firm.project_tags_2'))]}" />
+    </function>
+    <record id="document_request_third_company" model="documents.document">
+        <field name="name">Receipt</field>
+        <field name="folder_id" model="documents.document" eval="obj().search([('type', '=', 'folder'), ('project_ids.reinvoiced_sale_order_id', 'in', [ref('accounting_firm.sale_order_2')])], limit=1)"/>
+        <field name="requestee_partner_id" ref="base.partner_admin"/>
+        <field name="activity_type_id" ref="documents.mail_documents_activity_data_md"/>
+    </record>
+    <function model="ir.actions.server" name="unlink">
+        <value model="ir.actions.server" eval="obj().search([('id', 'in', [ref('accounting_firm.ir_actions_update_tasks'), ref('accounting_firm.ir_actions_update_projects')])]).ids"/>
+    </function>
+    <function model="base.automation" name="unlink">
+        <value model="base.automation" eval="obj().search([('id', 'in', [ref('accounting_firm.base_automation_1'), ref('accounting_firm.base_automation_2')])]).ids"/>
+    </function>
+    <function name="button_immediate_uninstall" model="ir.module.module" eval="[ref('base.module_web_studio', raise_if_not_found=False)]"/>
+</odoo>
