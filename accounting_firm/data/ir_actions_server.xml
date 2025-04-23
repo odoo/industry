@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="ir_actions_to_stage_change" model="ir.actions.server">
+    <field name="code"><![CDATA[
+current_month_name = datetime.datetime.today().strftime('%B')
+month_tag = env['project.tags'].search([('name', 'ilike', current_month_name)], limit=1)
+records_to_process = records.filtered(lambda r: r.tag_ids.ids in [month_tag.id])
+records_to_process.write({'stage_id': env.ref('accounting_firm.project_task_type_3').id})
+]]></field>
+    <field name="model_id" ref="project.model_project_task"/>
+    <field name="state">code</field>
+    <field name="name">Execute Code</field>
+    <field name="usage">base_automation</field>
+    <field name="base_automation_id" ref="base_automation_1"/>
+  </record>
+  <record id="ir_actions_server_738" model="ir.actions.server">
+    <field name="model_id" ref="project.model_project_task"/>
+    <field name="update_path">stage_id</field>
+    <field name="crud_model_id" ref="project.model_project_task"/>
+    <field name="update_field_id" ref="project.field_project_task__stage_id"/>
+    <field name="name">Update Stage</field>
+    <field name="resource_ref" ref="accounting_firm.project_task_type_3"/>
+    <field name="usage">base_automation</field>
+    <field name="base_automation_id" ref="base_automation_2"/>
+  </record>
+</odoo>

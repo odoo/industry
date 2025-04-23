@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <!-- To change the stage of projects -->
+    <function model="project.project" name="write">
+        <value model="sale.order" eval="obj().env.ref('accounting_firm.sale_order_1').project_id.id" />
+        <value model="sale.order" eval="{'stage_id': ref('project.project_project_stage_1'), 'name': obj().env.ref('accounting_firm.sale_order_1').company_id.name}" />
+    </function>
+    <function model="project.project" name="write">
+        <value model="sale.order" eval="obj().env.ref('accounting_firm.sale_order_2').project_id.id" />
+        <value model="sale.order" eval="{'stage_id': ref('project.project_project_stage_1'), 'name': obj().env.ref('accounting_firm.sale_order_2').company_id.name }" />
+    </function>
+    <!-- To assign the uesrs on created tasks -->
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('project_id', '=', obj().env.ref('accounting_firm.sale_order_1').project_id.id)]).ids" />
+        <value eval="{'user_ids': [Command.link(ref('base.user_admin'))]}" />
+    </function>
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('project_id', '=', obj().env.ref('accounting_firm.sale_order_2').project_id.id)]).ids" />
+        <value eval="{'user_ids': [Command.link(ref('base.user_admin'))]}" />
+    </function>
+    <!-- To set tags on task, created from products of SO -->
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('sale_line_id.product_id', '=', ref('accounting_firm.product_product_6'))]).ids" />
+        <value eval="{'tag_ids': [Command.link(ref('accounting_firm.project_tags_3'))]}" />
+    </function>
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('sale_line_id.product_id', '=', ref('accounting_firm.product_product_8'))]).ids" />
+        <value eval="{'tag_ids': [Command.link(ref('accounting_firm.project_tags_4'))]}" />
+    </function>
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('sale_line_id.product_id', '=', ref('accounting_firm.product_product_9'))]).ids" />
+        <value eval="{'tag_ids': [Command.link(ref('accounting_firm.project_tags_5'))]}" />
+    </function>
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('sale_line_id.product_id', '=', ref('accounting_firm.product_product_4'))]).ids" />
+        <value eval="{'tag_ids': [Command.link(ref('accounting_firm.project_tags_23'))]}" />
+    </function>
+    <!-- To change the stages of task -->
+
+<!--     <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('tag_ids', '=', ref('sale_order_line_5')), ('sale_line_id.product_id', '=', ref('accounting_firm.product_product_6'))]).id" />
+        <value eval="{'stage_id': ref('accounting_firm.project_task_type_3')}" />
+    </function>
+
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('sale_line_id', '=', ref('sale_order_line_5')), ('sale_line_id.product_id', '=', ref('accounting_firm.product_product_6'))]).id" />
+        <value eval="{'stage_id': ref('accounting_firm.project_task_type_3')}" />
+    </function>
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('sale_line_id', '=', ref('sale_order_line_1')), ('name', '=', 'Accounting Services - February')]).id" />
+        <value eval="{'stage_id': ref('accounting_firm.project_task_type_3')}" />
+    </function>
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('sale_line_id', '=', ref('sale_order_line_1')),('name', '=', 'Customer onboarding')]).id" />
+        <value eval="{'stage_id': ref('accounting_firm.project_task_type_3')}" />
+    </function>
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('name', '=', 'Intra-community declaration - February'), ('project_id', '=', obj().env.ref('accounting_firm.sale_order_1').project_id.id)], limit=1).id" />
+        <value eval="{'stage_id': ref('accounting_firm.project_task_type_3')}" />
+    </function>
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('name', '=', 'Accounting Services - March'), ('project_id', '=', obj().env.ref('accounting_firm.sale_order_1').project_id.id)], limit=1).id" />
+        <value eval="{'stage_id': ref('accounting_firm.project_task_type_2')}" />
+    </function>
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('name', '=', 'Intra-community declaration - March'), ('project_id', '=', obj().env.ref('accounting_firm.sale_order_1').project_id.id)], limit=1).id" />
+        <value eval="{'stage_id': ref('accounting_firm.project_task_type_2')}" />
+    </function>
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('name', '=', 'Customer onboarding'), ('project_id', '=', obj().env.ref('accounting_firm.sale_order_2').project_id.id)], limit=1).id" />
+        <value eval="{'stage_id': ref('accounting_firm.project_task_type_3')}" />
+    </function>
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('name', '=', 'Accounting Services - Q1'), ('project_id', '=', obj().env.ref('accounting_firm.sale_order_2').project_id.id)], limit=1).id" />
+        <value eval="{'stage_id': ref('accounting_firm.project_task_type_2')}" />
+    </function>
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().search([('name', '=', 'Intra-community declaration - Q1'), ('project_id', '=', obj().env.ref('accounting_firm.sale_order_2').project_id.id)], limit=1).id" />
+        <value eval="{'stage_id': ref('accounting_firm.project_task_type_2')}" />
+    </function> -->
+</odoo>
