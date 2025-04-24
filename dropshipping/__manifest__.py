@@ -24,11 +24,12 @@
               'data/product_template_attribute_line.xml',
               'data/product_template_attribute_value.xml',
               'data/product_product.xml',
+              'data/delivery_carrier.xml',
               'data/knowledge_article.xml',
               'data/knowledge_article_favorite.xml',
               'data/mail_message.xml',
               'data/knowledge_tour.xml',
-              'data/project_project_stage.xml'
+              'data/res_config_settings.xml'
        ],
        'demo': [
               'demo/website.xml',
@@ -47,7 +48,8 @@
               'demo/website_menu.xml',
               'demo/ir_attachment_post.xml',
               'demo/sale_order_confirm.xml',
-              'demo/payment_provider_demo_post.xml',
+              'demo/product_template.xml',
+              'demo/payment_provider_demo_post.xml'
               ],
        'assets': {
               'web.assets_backend': [
