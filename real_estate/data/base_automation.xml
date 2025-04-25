@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="create_technical_partner_map_view" model="base.automation">
+        <field name="name">Create Technical Partner for Map View</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('create_technical_partner_server_action')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[("x_technical_partner_id", "=", False)]</field>
+        <field name="filter_pre_domain">[("x_technical_partner_id", "=", False)]</field>
+    </record>
+    <record id="prevent_publishing_draft_products" model="base.automation">
+        <field name="name">Prevent Publishing Draft Products</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('update_is_published_server_action')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[("website_ribbon_id.x_is_draft_ribbon", "=", True), ("is_published", "=", True)]</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('website_sale.field_product_template__is_published'), ref('website_sale.field_product_template__website_ribbon_id')])]"/>
+    </record>
+    <record id="archive_appointment_types" model="base.automation">
+        <field name="name">Archive Appointment Types</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('update_appointments_active_server_action')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[("x_is_closed", "=", True)]</field>
+        <field name="filter_pre_domain">[("x_appointment_ids", "!=", False)]</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('website_sale.field_product_template__website_ribbon_id')])]"/>
+    </record>
+    <record id="record_last_notification_update_on_ribbon_change" model="base.automation">
+        <field name="name">Record last notification update on ribbon change</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('on_ribbon_update_server_action')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('website_sale.field_product_template__website_ribbon_id')])]"/>
+        <field name="filter_domain">[("website_ribbon_id.x_is_draft_ribbon", "=", False), ("x_is_closed", "=", False), ("x_ribbon_stage_is_accounted", "=", False)]</field>
+    </record>
+    <record id="record_last_notification_update_on_price_change" model="base.automation">
+        <field name="name">Record last notification update on price change</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('on_price_change_server_action')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('product.field_product_template__list_price')])]"/>
+        <field name="filter_domain">[("website_ribbon_id.x_is_draft_ribbon", "=", False), ("x_is_closed", "=", False)]</field>
+    </record>
+    <record id="on_new_lead" model="base.automation">
+        <field name="name">On new lead</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('search_for_property_reference_server_action')])]"/>
+        <field name="trigger">on_message_received</field>
+        <field name="filter_domain">[("x_interested_in_id", "=", False), ("has_message", "=", True)]</field>
+        <field name="filter_pre_domain">[("x_interested_in_id", "=", False), ("has_message", "=", False)]</field>
+    </record>
+    <record id="base_automation_15" model="base.automation">
+        <field name="name">Commission Plan</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('account.field_account_move__move_type'), ref('account.field_account_move__state')])]"/>
+        <field name="filter_domain">[("state", "=", "posted"), ("move_type", "=", "out_invoice")]</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('commission_plan_server_action')])]"/>
+    </record>
+</odoo>
