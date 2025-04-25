@@ -1,0 +1,401 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="product_template_product_form_customization_view" model="ir.ui.view">
+    <field name="name">product.template.product.form customization</field>
+    <field name="inherit_id" ref="product.product_template_only_form_view"/>
+    <field name="model">product.template</field>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+        <xpath expr="//sheet[@name='product_form']" position="before">
+          <header>
+            <button string="Create Visit Link" name="%(create_appointment_link_server_action)d" type="action" invisible="x_appointment_ids or x_is_closed"/>
+          </header>
+        </xpath>
+        <xpath expr="//button[@name='action_view_sales']" position="after">
+          <button class="oe_stat_button" icon="fa-star" type="action" name="%(buyers_act_window)d" invisible="not x_is_properties">
+            <field widget="statinfo" name="x_x_interested_in_crm_lead_count" string="Buyers"/>
+          </button>
+          <button class="oe_stat_button" icon="fa-key" type="action" name="%(visits_event_act_window)d" invisible="not x_is_properties">
+            <field widget="statinfo" name="x_x_property_calendar_event_count" string="Visits"/>
+          </button>
+          <button class="oe_stat_button" icon="fa-heart" type="action" name="%(matches_contact_act_window)d" invisible="not x_is_properties" context="{'property_id': id}">
+            <field widget="statinfo" name="x_x_property_matches_contacts_res_partner_count" string="Matches"/>
+          </button>
+        </xpath>
+        <xpath expr="//field[@name='default_code']" position="after">
+          <field name="x_reference_ids" widget="many2many_tags" options="{'edit_tags':true}" invisible="not x_is_properties" help="Incoming emails with these references will create opportunities linked to this product."/>
+        </xpath>
+        <xpath expr="//field[@name='product_tag_ids']" position="before">
+          <xpath expr="//field[@name='public_categ_ids']" position="move"/>
+          <xpath expr="//field[@name='website_ribbon_id']" position="move"/>
+          <xpath expr="//page[@name='sales']/group[@name='sale']//field[@name='is_published']" position="move"/>
+        </xpath>
+        <xpath expr="//page[@name='sales']" position="after">
+          <page string="Property" invisible="not x_is_properties">
+            <group>
+              <group string="Address">
+                <field name="x_street"/>
+                <field name="x_zip_code"/>
+                <field name="x_city"/>
+                <field name="x_country"/>
+              </group>
+              <group string="Owners">
+                <field name="x_owner_id" widget="many2one_avatar"/>
+                <field name="x_co_owners_ids" widget="many2many_tags_avatar"/>
+              </group>
+            </group>
+            <group>
+              <group string="Visits">
+                <field name="x_agent_id" widget="many2one_avatar"/>
+                <field name="x_appointment_ids" widget="many2many_uom_tags" force_save="0" readonly="1" options="{'no_create':true,'label_field':'activity_exception_icon','edit_tags':true}"/>
+                <field name="x_booking_link" widget="CopyClipboardURL" invisible="not x_booking_link"/>
+              </group>
+              <group string="Third-parties">
+                <field name="x_notary_id" widget="many2one_avatar"/>
+                <field name="x_developer_id" widget="many2one_avatar"/>
+                <field name="x_contractors_ids" widget="many2many_tags_avatar"/>
+              </group>
+            </group>
+            <group>
+              <group string="Details">
+                <field name="x_construction_year"/>
+                <field name="x_last_renovation"/>
+                <field name="x_living_surface"/>
+                <field name="x_field_surface"/>
+                <field name="x_orientation"/>
+              </group>
+            </group>
+          </page>
+        </xpath>
+        <xpath expr="//field[@name='website_ribbon_id']" position="attributes">
+          <attribute name="help">You cannot publish a product with a Draft Ribbon</attribute>
+          <attribute name="widget">selection_badge</attribute>
+          <attribute name="groups"/>
+        </xpath>
+    </field>
+  </record>
+  <record id="product_category_form_customization_view" model="ir.ui.view">
+    <field name="name">product.category.form customization</field>
+    <field name="inherit_id" ref="product.product_category_form_view"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">product.category</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='parent_id']" position="after">
+          <field name="x_is_properties_category"/>
+        </xpath>
+    </field>
+  </record>
+  <record id="sign_template_form_customization_view" model="ir.ui.view">
+    <field name="name">sign.template.form customization</field>
+    <field name="inherit_id" ref="sign.sign_template_view_form"/>
+    <field name="mode">extension</field>
+    <field name="model">sign.template</field>
+    <field name="active" eval="True"/>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='tag_ids']" position="after">
+          <field name="x_is_offer"/>
+        </xpath>
+    </field>
+  </record>
+  <record id="product_ribbon_form_customization_view" model="ir.ui.view">
+    <field name="name">product.ribbon.form.view customization</field>
+    <field name="inherit_id" ref="website_sale.product_ribbon_form_view"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">product.ribbon</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='position']" position="after">
+          <field name="x_is_draft_ribbon"/>
+          <field name="x_is_closed_ribbon"/>
+        </xpath>
+    </field>
+  </record>
+  <record id="crm_lead_form_customization_view" model="ir.ui.view">
+    <field name="name">crm.lead.form customization</field>
+    <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">crm.lead</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='stage_id']" position="after">
+          <button string="Visit" name="%(book_your_visit_server_action)d" type="action" invisible="not x_appointment_ids"/>
+          <button string="Offer" name="%(ir_actions_server_778)d" type="action"/>
+        </xpath>
+        <xpath expr="//group[@name='opportunity_partner']" position="inside">
+          <field name="x_property_id" string="Selling/Renting"/>
+          <field name="x_interested_in_id" domain="[('x_is_properties', '=', True), ('active', '=', True)]" widget="many2one"/>
+        </xpath>
+    </field>
+  </record>
+  <record id="account_move_form_customizations" model="ir.ui.view">
+    <field name="name">account.move.form customization</field>
+    <field name="inherit_id" ref="account.view_move_form"/>
+    <field name="active" eval="True"/>
+    <field name="mode">extension</field>
+    <field name="model">account.move</field>
+    <field name="priority">300</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='invoice_user_id']" position="after">
+          <field name="x_seller" widget="many2one_avatar_user"/>
+        </xpath>
+    </field>
+  </record>
+  <record id="sale_commission_plan_view_form_customizations" model="ir.ui.view">
+    <field name="name">sale.commission.plan.form customization</field>
+    <field name="inherit_id" ref="sale_commission.sale_commission_plan_view_form"/>
+    <field name="active" eval="True"/>
+    <field name="mode">extension</field>
+    <field name="model">sale.commission.plan</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='product_categ_id']" position="after">
+          <field name="x_receiver"/>
+        </xpath>
+    </field>
+  </record>
+  <record id="sign_send_request_form_customizations" model="ir.ui.view">
+    <field name="name">sign.send.request.form customization</field>
+    <field name="inherit_id" ref="sign.sign_send_request_view_form"/>
+    <field name="active" eval="True"/>
+    <field name="mode">extension</field>
+    <field name="model">sign.send.request</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='template_id']" position="attributes">
+          <attribute name="invisible">0</attribute>
+        </xpath>
+    </field>
+  </record>
+  <record id="default_map_view_for_product_template" model="ir.ui.view">
+    <field name="name">Default map view for product.template</field>
+    <field name="model">product.template</field>
+    <field name="active" eval="True"/>
+    <field name="type">map</field>
+    <field name="arch" type="xml">
+      <map res_partner="x_technical_partner_id" string="Default map view for product.template"/>
+    </field>
+  </record>
+  <record id="res_partner_form_customization_view" model="ir.ui.view">
+    <field name="name">res.partner.form customization</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">res.partner</field>
+    <field name="priority">200</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+        <xpath expr="//div[@name='warning_tax']" position="before">
+          <header>
+            <button string="Send New Matches" name="%(send_matches_from_contact_server_action)d" type="action" invisible="not x_to_notify_property_ids"/>
+          </header>
+        </xpath>
+        <xpath expr="//field[@name='is_published']" position="after">
+          <button class="oe_stat_button" icon="fa-home" type="action" name="%(properties_owner_act_window)d">
+            <field widget="statinfo" name="x_x_owner_product_template_count" string="Properties"/>
+          </button>
+          <button class="oe_stat_button" icon="fa-heart" type="action" name="%(matches_property_act_window)d">
+            <field widget="statinfo" name="x_x_contact_matches_properties_product_template_count" string="Matches"/>
+          </button>
+        </xpath>
+        <xpath expr="//page[@name='internal_notes']" position="after">
+          <page string="Matchmaking">
+            <group>
+              <group string="Criterias">
+                <field name="x_categories_ids" widget="many2many_tags"/>
+                <field name="x_region_ids" widget="many2many_tags" string="Regions"/>
+                <field name="x_type" widget="many2many_tags"/>
+                <field name="x_condition_ids" widget="many2many_tags"/>
+                <field name="x_min_price"/>
+                <field name="x_max_price"/>
+              </group>
+              <group string="Notifications">
+                <field name="x_subscribe" help="Partner will receive notification for each new property matching his criterias."/>
+              </group>
+            </group>
+          </page>
+        </xpath>
+    </field>
+  </record>
+  <record id="crm_opportunity_view_graph" model="ir.ui.view">
+    <field name="name">crm.lead.graph.view</field>
+    <field name="model">crm.lead</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+        <graph string="Opportunities" sample="1" stacked="1">
+            <field name="x_interested_in_id" type="col"/>
+            <field name="date_deadline" interval="month"/>
+        </graph>
+    </field>
+  </record>
+  <record id="crm_lead_view_pivot" model="ir.ui.view">
+    <field name="name">crm.lead.pivot.view</field>
+    <field name="model">crm.lead</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+        <pivot string="Leads" display_quantity="1" sample="1">
+            <field name="x_interested_in_id" type="row"/>
+            <field name="stage_id" type="row"/>
+        </pivot>
+    </field>
+  </record>
+  <record id="crm_team_form_customization_view" model="ir.ui.view">
+    <field name="name">crm.team.form customization</field>
+    <field name="inherit_id" ref="sales_team.crm_team_view_form"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">crm.team</field>
+    <field name="priority">120</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <xpath expr="//group[@name='left']" position="inside">
+        <field name="x_is_sellers_team"/>
+        <field name="x_is_a_buyer_team"/>
+      </xpath>
+    </field>
+  </record>
+  <record id="crm_lead_search_opportunity_customization_view" model="ir.ui.view">
+    <field name="name">crm.lead.search.opportunity customization</field>
+    <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">crm.lead</field>
+    <field name="priority">320</field>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+        <xpath expr="//filter[@name='assigned_to_me']" position="before">
+          <filter domain="[('team_id.x_is_sellers_team', '=', True)]" name="sellers" string="Sellers"/>
+        </xpath>
+        <xpath expr="//filter[@name='salesperson']" position="before">
+          <filter name="property" string="Property" context="{'group_by': 'x_interested_in_id'}"/>
+        </xpath>
+    </field>
+  </record>
+  <record id="appointment_type_form_customization_view" model="ir.ui.view">
+    <field name="name">appointment.type.form customization</field>
+    <field name="inherit_id" ref="appointment.appointment_type_view_form"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">appointment.type</field>
+    <field name="priority">200</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+        <xpath expr="//group[@name='left_details']/div[1]" position="after">
+          <field name="appointment_invite_ids" widget="many2many_tags" options="{'edit_tags':true}"/>
+        </xpath>
+        <xpath expr="//group[@name='left_details']/div[5]" position="after">
+          <field name="x_property_id" domain="[('x_is_properties', '=', True)]"/>
+        </xpath>
+        <xpath expr="//field[@name='location_id']" position="attributes">
+          <attribute name="domain">[]</attribute>
+        </xpath>
+    </field>
+  </record>
+  <record id="default_form_view_x_product_template_line" model="ir.ui.view">
+    <field name="name">Default form view for x_product_template_line</field>
+    <field name="model">x_product_template_line</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+        <form>
+            <header/>
+            <sheet string="product_template_line">
+                <div class="oe_title">
+                    <h1>
+                    <field name="x_name" required="1" placeholder="Identifier..."/>
+                    </h1>
+                </div>
+            </sheet>
+        </form>
+    </field>
+  </record>
+  <record id="res_partner_kanban_customization_view" model="ir.ui.view">
+    <field name="name">res.partner.kanban customization</field>
+    <field name="inherit_id" ref="base.res_partner_kanban_view"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">res.partner</field>
+    <field name="priority">200</field>
+    <field name="type">kanban</field>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='activity_ids']" position="after">
+          <button name="%(create_lead_from_match_server_action)d" type="action" string="Opportunity" icon="fa-star-o" class="oe_highlight" invisible="not context.get('property_id') or context.get('property_id') in x_interested_in_ids"/>
+        </xpath>
+    </field>
+  </record>
+  <record id="crm_lead_kanban_lead_customization_view" model="ir.ui.view">
+    <field name="name">crm.lead.kanban.lead customization</field>
+    <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">crm.lead</field>
+    <field name="priority">320</field>
+    <field name="type">kanban</field>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='name']" position="after">
+          <field name="x_interested_in_id" display="full"/>
+        </xpath>
+        <xpath expr="//field[@name='partner_id']" position="attributes">
+          <attribute name="options">{"no_open":true}</attribute>
+          <attribute name="widget">many2one</attribute>
+        </xpath>
+    </field>
+  </record>
+  <record id="product_template_product_kanban_customization_view" model="ir.ui.view">
+    <field name="name">Product.template.product.kanban customization</field>
+    <field name="inherit_id" ref="product.product_template_kanban_view"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">product.template</field>
+    <field name="priority">160</field>
+    <field name="type">kanban</field>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='image_128']" position="attributes">
+        <attribute name="options">{"img_class":"w-100 object-fit-contain","preview_image":"image_256","size":[0,270]}</attribute>
+      </xpath>
+    </field>
+  </record>
+  <record id="sale_order_form_customization_view" model="ir.ui.view">
+    <field name="name">sale.order.form customization</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">sale.order</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='partner_id']" position="attributes">
+          <attribute name="domain">[("x_is_technical_partner", "=", False)]</attribute>
+        </xpath>
+        <xpath expr="//group[@name='partner_details']/field[@name='partner_invoice_id']" position="attributes">
+          <attribute name="domain">[("x_is_technical_partner", "=", False)]</attribute>
+        </xpath>
+        <xpath expr="//field[@name='partner_shipping_id']" position="attributes">
+          <attribute name="domain">[("x_is_technical_partner", "=", False)]</attribute>
+        </xpath>
+    </field>
+  </record>
+  <record id="reporting_act_window" model="ir.actions.act_window">
+    <field name="name">Reporting</field>
+    <field name="res_model">crm.lead</field>
+    <field name="view_mode">pivot,graph</field>
+    <field name="domain">[("x_interested_in_id", "!=", False)]</field>
+    <field name="view_ids" eval="[
+        (5, 0, 0),
+        (0, 0, {'view_mode': 'pivot', 'view_id': ref('crm_lead_view_pivot')}),
+        (0, 0, {'view_mode': 'graph', 'view_id': ref('crm_opportunity_view_graph')}),
+    ]"/>
+  </record>
+</odoo>
