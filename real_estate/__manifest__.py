@@ -13,12 +13,14 @@
         'sale_crm',
         'sale_project',
         'website_crm',
+        'website_sale',
         'knowledge',
         'website_product_barcodelookup',
     ],
     'data': [
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
+        'data/appointment_type.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
         'data/ir_actions_act_window.xml',
@@ -54,8 +56,8 @@
         'demo/calendar_event.xml',
         'demo/crm_tag.xml',
         'demo/crm_lead.xml',
-        'demo/hr_employee.xml',
         'demo/hr_department.xml',
+        'demo/hr_employee.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/project_task.xml',
@@ -67,6 +69,7 @@
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
+        'demo/payment_provider_demo_post.xml',
     ],
     'assets': {
         'web.assets_backend': [
