@@ -20,7 +20,6 @@
     'data': [
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
-        'data/appointment_type.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
         'data/ir_actions_act_window.xml',
@@ -62,7 +61,7 @@
         'demo/project_task.xml',
         'demo/product_template.xml',
         'demo/ir_attachment_post.xml',
-        'demo/sale_order_confirm.xml',
+        # 'demo/sale_order_confirm.xml',
         'demo/website.xml',
         'demo/website_view.xml',
         'demo/website_page.xml',
