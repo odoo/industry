@@ -5,7 +5,7 @@ import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add("eyewear_shop_knowledge_tour", {
     url: "/odoo",
-    
+
     steps: () => [
         {
             trigger: '.o_app[data-menu-xmlid="knowledge.knowledge_menu_root"]',
