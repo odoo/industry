@@ -87,16 +87,6 @@ new_lead = { 'name': 'Matchmaking', 'partner_id': partner.id, 'x_studio_interest
 env['crm.lead'].create(new_lead)]]></field>
   </record>
 
-  <record id="create_appointment_i_93a63bba-4a1e-400a-8352-780e3121ddcc" model="ir.actions.server">
-    <field name="name">Industry: Create Appointment Invite with name general-visits</field>
-    <field name="model_id" ref="appointment.model_appointment_type"/>
-    <field name="crud_model_id" ref="appointment.model_appointment_invite"/>
-    <field name="link_field_id" ref="appointment.field_appointment_type__appointment_invite_ids"/>
-    <field name="value"><![CDATA[general-visits]]></field>
-    <field name="usage">base_automation</field>
-    <field name="state">object_create</field>
-  </record>
-
   <record id="industry_code_to_cre_b5bee376-3f5b-4e16-a2fa-3de36b9e8c2c" model="ir.actions.server">
     <field name="code"><![CDATA[if record.x_studio_technical_partner :
     record['x_studio_technical_partner']['street'] = record.x_studio_street
@@ -126,14 +116,14 @@ else:
     <field name="binding_model_id" ref="product.model_product_template"/>
     <field name="state">code</field>
     <field name="code"><![CDATA[if not record.x_studio_appointments:
-    # First create the link
-    link = env['appointment.invite'].create({ 'short_code': datetime.datetime.now().strftime("%M%m%S%d%Y%H"), 'display_name': record.name, })
-    # Then the appointment (which creates the general-visit...)
-    appointment = env['appointment.type'].create({ 'name': record.name, 'display_name': record.name, 'x_studio_property': record.id, 'appointment_invite_ids': [link.id], 'location_id': record.x_studio_technical_partner.id, 'image_1920': record.image_1920 })
-    # And then delete the general-visit
-    link_to_delete = env['appointment.invite'].search([('short_code','=','general-visits')])
-    link_to_delete.unlink()
-]]></field>
+      # First create the link
+      link = env['appointment.invite'].create({ 'short_code': datetime.datetime.now().strftime("%M%m%S%d%Y%H"), 'display_name': record.name, })
+      # Then the appointment (which creates the general-visit...)
+      appointment = env['appointment.type'].create({ 'name': record.name, 'display_name': record.name, 'x_studio_property': record.id, 'appointment_invite_ids': [link.id], 'location_id': record.x_studio_technical_partner.id, 'image_1920': record.image_1920, 'appointment_tz': env.ref('base.user_admin').tz or 'Europe/Brussels' })
+      # And then delete the general-visit
+      link_to_delete = env['appointment.invite'].search([('short_code','=','general-visits')])
+      link_to_delete.unlink()
+  ]]></field>     
   </record>
 
   <record id="ir_actions_server_743" model="ir.actions.server">
