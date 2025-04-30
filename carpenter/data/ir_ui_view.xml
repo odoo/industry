@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="sale_res_config_settings_inherit_view" model="ir.ui.view">
+        <field name="name">res.config.settings.inherit.sale.view</field>
+        <field name="model">res.config.settings</field>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='quotation_order_setting_container']" position="inside">
+                <div class="col-12 col-lg-6 o_setting_box" id="x_simplify_so ">
+                    <div class="o_setting_left_pane">
+                        <field name="x_simplify_so"/>
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="x_simplify_so" string="Simplified Sales Order"/>
+                        <div class="text-muted mb16">
+                            Simplified Sales Order
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    <record id="contact_report_default" model="ir.ui.view">
+        <field name="arch" type="xml">
+          <data>
+            <xpath expr="//field[@name='category_id']" position="after">
+              <field name="x_report" domain="[(&quot;binding_model_id&quot;, &quot;in&quot;, [471])]"/>
+            </xpath>
+          </data>
+        </field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="mode">extension</field>
+        <field name="model">res.partner</field>
+        <field name="active" eval="True"/>
+        <field name="name">Odoo Studio: res.partner.form customization</field>
+        <field name="priority">360</field>
+        <field name="type">form</field>
+      </record>
+    <record id="sale_order_custom_view" model="ir.ui.view" >
+        <field name="arch" type="xml">
+          <data>
+            <xpath expr="//form[1]/header[1]/field[@name='state']" position="after">
+                <button string="Send Simplified Email" name="carpenter.replace_so_email" type="action"/>
+              </xpath>
+            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='order_lines']/field[@name='order_line']/list[1]/field[@name='product_uom']" position="after">
+              <field optional="show" name="x_studio_unit_cost"/>
+              <attribute name="column_invisible">True</attribute>
+            </xpath>
+            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='order_lines']/field[@name='order_line']/list[1]/field[@name='discount']" position="attributes">
+              <attribute name="column_invisible">True</attribute>
+            </xpath>
+          </data>
+        </field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="mode">extension</field>
+        <field name="model">sale.order</field>
+        <field name="name">Odoo Studio: sale.order.form customization</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+      </record>
+      <record id="portal_sale_view_2" model="ir.ui.view">
+        <field name="name">portal_sale_view.customization2</field>
+        <field name="inherit_id" ref="sale.sale_order_portal_template"/>
+        <field name="mode">extension</field>
+        <field name="model"></field>
+        <field name="active" eval="False"/>
+        <field name="priority">160</field>
+        <field name="type">qweb</field>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('o_download_pdf', 'd-flex', 'gap-2', 'flex-lg-column', 'flex-xl-row', 'flex-wrap')]" position="replace"/>
+        </field>
+    </record>
+    <record id="portal_sale_view" model="ir.ui.view">
+        <field name="name">portal_sale_view.customization</field>
+        <field name="inherit_id" ref="sale.sale_order_portal_content"/>
+        <field name="mode">extension</field>
+        <field name="model"></field>
+        <field name="active" eval="False"/>
+        <field name="priority">160</field>
+        <field name="type">qweb</field>
+        <field name="arch" type="xml">
+            <data inherit_id="sale.sale_order_portal_content" name="Default">
+                <xpath expr="//table[@id='sales_order_table']" position="replace">
+                    <table t-att-data-order-id="sale_order.id" t-att-data-token="sale_order.access_token" class="table table-sm" id="sales_order_table">
+                        <thead>
+                            <tr>
+                                <th class="text-start">Product</th>
+                                <th class="text-end text-nowrap">Total Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody class="sale_tbody">
+                            <t t-set="current_subtotal" t-value="0"/>
+                            <t t-set="lines_to_report" t-value="sale_order._get_order_lines_to_report()"/>
+                            <t t-set="has_section" t-value="any(line.display_type == 'line_section' or line.product_type == 'combo' for line in lines_to_report)"/>
+                
+                            <t t-if="has_section">
+                                <t t-foreach="lines_to_report" t-as="line">
+                                    <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal"/>
+                                    <t t-if="line.display_type == 'line_section' or line.product_type == 'combo'">
+                                        <tr>
+                                            <td colspan="99">
+                                                <span t-field="line.name"/>
+                                            </td>
+                                            <t t-set="current_section" t-value="line"/>
+                                            <t t-set="current_subtotal" t-value="0"/>
+                                        </tr>
+                                    </t>
+                                    <t t-if="current_section and (line_last or lines_to_report[line_index+1].display_type == 'line_section')">
+                                        <tr class="is-subtotal text-end">
+                                            <td colspan="99">
+                                                <strong class="mr16">Subtotal</strong>
+                                                <span t-out="current_subtotal" t-options="{'widget': 'monetary', 'display_currency': sale_order.currency_id}"/>
+                                            </td>
+                                        </tr>
+                                        <t t-set="current_section" t-value="None"/>
+                                    </t>
+                                </t>
+                            </t>
+                
+                            <t t-else="">
+                                <tr>
+                                    <td colspan="99">
+                                        <strong>Project: </strong>
+                                            <span t-field="sale_order.name"/> 
+                                    </td>
+                                </tr>
+                                <tr class="is-subtotal text-end">
+                                    <td colspan="99">
+                                        <strong class="mr16">Total</strong>
+                                        <span t-out="sale_order.amount_total" t-options="{'widget': 'monetary', 'display_currency': sale_order.currency_id}"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </xpath>
+                
+</data>
+</field>
+</record>
+</odoo>
