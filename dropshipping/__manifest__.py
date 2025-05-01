@@ -33,10 +33,11 @@
               'data/knowledge_article_favorite.xml',
               'data/mail_message.xml',
               'data/knowledge_tour.xml',
+              'data/mailing_mailing.xml',
               'data/res_config_settings.xml',
-              'data/mailing_mailing.xml'
        ],
        'demo': [
+              'demo/delivery_carrier.xml',
               'demo/website.xml',
               'demo/website_view.xml',
               'demo/website_theme_apply.xml',
