@@ -35,6 +35,7 @@
         'data/product_category.xml',
         'data/project_task_type.xml',
         'data/project_project.xml',
+        'data/product_ribbon.xml',
         'data/product_template.xml',
         'data/mail_template.xml',
         'data/ir_attachment_post.xml',
