@@ -1,0 +1,305 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="name_excise_category" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Name</field>
+        <field name="model_id" ref="excise_category"/>
+        <field name="name">x_name</field>
+        <field name="required" eval="True"/>
+        <field name="tracking">1</field>
+        <field name="translate" eval="True"/>
+    </record>
+    <record id="active_excise_category" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Active</field>
+        <field name="model_id" ref="excise_category"/>
+        <field name="name">x_active</field>
+        <field name="tracking">1</field>
+    </record>
+    <record id="sequence_excise_category" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Sequence</field>
+        <field name="model_id" ref="excise_category"/>
+        <field name="name">x_sequence</field>
+    </record>
+    <record id="description_excise_category" model="ir.model.fields">
+        <field name="ttype">text</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Description</field>
+        <field name="model_id" ref="excise_category"/>
+        <field name="name">x_description</field>
+    </record>
+    <record id="sequence_excise_category_line" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Sequence</field>
+        <field name="model_id" ref="excise_category_line"/>
+        <field name="name">x_sequence</field>
+    </record>
+    <record id="name_excise_category_line" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Name</field>
+        <field name="model_id" ref="excise_category_line"/>
+        <field name="name">x_name</field>
+        <field name="required" eval="True"/>
+        <field name="translate" eval="True"/>
+    </record>
+    <record id="excise_category_line_excise_category" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Excise Category</field>
+        <field name="model_id" ref="excise_category_line"/>
+        <field name="name">x_excise_category_id</field>
+        <field name="relation">x_excise_category</field>
+        <field name="required" eval="True"/>
+        <field name="on_delete">cascade</field>
+    </record>
+    <record id="excise_category_excise_category_line" model="ir.model.fields">
+        <field name="ttype">one2many</field>
+        <field name="field_description">Excises</field>
+        <field name="model_id" ref="excise_category"/>
+        <field name="name">x_excises</field>
+        <field name="relation">x_excise_category_line</field>
+        <field name="relation_field">x_excise_category_id</field>
+    </record>
+    <record id="excise_category_line_currency" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Currency</field>
+        <field name="model_id" ref="excise_category_line"/>
+        <field name="name">x_currency_id</field>
+        <field name="relation">res.currency</field>
+        <field name="required" eval="True"/>
+        <field name="on_delete">restrict</field>
+    </record>
+    <record id="excise_category_line_amount" model="ir.model.fields">
+        <field name="ttype">monetary</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Amount</field>
+        <field name="model_id" ref="excise_category_line"/>
+        <field name="name">x_amount</field>
+        <field name="currency_field">x_currency_id</field>
+        <field name="required" eval="True"/>
+    </record>
+    <record id="excise_category_line_unit" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Unit</field>
+        <field name="model_id" ref="excise_category_line"/>
+        <field name="name">x_unit</field>
+        <field name="relation">uom.uom</field>
+        <field name="required" eval="True"/>
+        <field name="on_delete">restrict</field>
+    </record>
+    <record id="excise_category_line_unit_correction" model="ir.model.fields">
+        <field name="ttype">selection</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Unit correction</field>
+        <field name="model_id" ref="excise_category_line"/>
+        <field name="name">x_unit_correction</field>
+        <field name="selection">[('none', 'None'), ('plato', 'Plato degree'), ('alcohol', 'Neat alcohol')]</field>
+        <field name="required" eval="True"/>
+    </record>
+    <record id="product_template_excise_category" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Excise category</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="name">x_excise_category</field>
+        <field name="relation">x_excise_category</field>
+    </record>
+    <record id="product_template_alcohol_degree" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Alcohol degree</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="name">x_alcohol_degree</field>
+    </record>
+    <record id="product_template_alcohol_plato_degree" model="ir.model.fields">
+        <field name="compute"><![CDATA[for record in self:
+    record['x_alcohol_plato_degree'] = int((258.6*(record.x_alcohol_degree))/(0.12+0.88*(1+record.x_alcohol_degree))) + ((258.6*(record.x_alcohol_degree)) % (0.12+0.88*(1+record.x_alcohol_degree)) > 0) ]]></field>
+        <field name="ttype">float</field>
+        <field name="depends">x_alcohol_degree</field>
+        <field name="field_description">Alcohol Plato degree</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="name">x_alcohol_plato_degree</field>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="product_template_excise_amount" model="ir.model.fields">
+        <field name="compute"><![CDATA[for record in self:
+    if record.x_excise_category :
+        computed_excises = 0
+        product_volume = self.env.ref('excise_management.convert_to_base_unit_server_action').with_context(active_model='uom.uom', active_id=record.uom_id.id).run()
+        for excise in record.x_excise_category.x_excises:
+            excise_volume = self.env.ref('excise_management.convert_to_base_unit_server_action').with_context(active_model='uom.uom', active_id=excise.x_unit.id).run()
+            volume_correction = 1
+            match excise.x_unit_correction:
+                case "none":
+                    volume_correction = 1
+                case "plato":
+                    volume_correction = record.x_alcohol_plato_degree
+                case "alcohol":
+                    volume_correction = record.x_alcohol_degree
+            computed_excises += excise.x_amount * product_volume * volume_correction / excise_volume
+        record["x_excise_amount"] = computed_excises
+    else:
+        record["x_excise_amount"] = 0]]></field>
+        <field name="ttype">monetary</field>
+        <field name="depends">x_excise_category, uom_id, x_alcohol_plato_degree, x_alcohol_degree</field>
+        <field name="field_description">Excise amount</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="name">x_excise_amount</field>
+        <field name="readonly" eval="True"/>
+        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+        <field name="currency_field">currency_id</field>
+    </record>
+    <record id="product_template_excise_volume" model="ir.model.fields">
+        <field name="compute"><![CDATA[excise_uom = self.env["uom.uom"].search([('x_excise_reporting_unit', '=', True)], limit=1)
+convert = self.env.ref('excise_management.convert_to_base_unit_server_action').with_context(active_model='uom.uom')
+for record in self:
+    record["x_excise_volume"] = convert.with_context(active_id=record.uom_id.id).run() / convert.with_context(active_id=excise_uom.id).run() if record.x_excise_category else 0
+]]></field>
+        <field name="ttype">float</field>
+        <field name="depends">x_excise_category, uom_id</field>
+        <field name="field_description">Excise volume</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="name">x_excise_volume</field>
+        <field name="readonly" eval="True"/>
+        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="product_template_excise_description" model="ir.model.fields">
+        <field name="ttype">text</field>
+        <field name="related">x_excise_category.x_description</field>
+        <field name="field_description">Excise description</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="name">x_excise_description</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="excise_category_product_template_ids" model="ir.model.fields">
+        <field name="ttype">one2many</field>
+        <field name="field_description">Products</field>
+        <field name="model_id" ref="excise_category"/>
+        <field name="name">x_product_template_ids</field>
+        <field name="relation">product.template</field>
+        <field name="relation_field">x_excise_category</field>
+    </record>
+    <!-- <record id="sale_order_line_excise_category" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="related">product_id.x_excise_category</field>
+        <field name="field_description">Excise category</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_excise_category</field>
+        <field name="readonly" eval="True"/>
+        <field name="relation">x_excise_category</field>
+    </record> -->
+    <!-- <record id="sale_order_line_excise_volume" model="ir.model.fields">
+        <field name="compute"><![CDATA[for record in self:
+    record['x_excise_volume'] = record.product_uom_qty * record.product_template_id.x_excise_volume]]></field>
+        <field name="ttype">float</field>
+        <field name="depends">product_uom_qty, product_template_id</field>
+        <field name="field_description">Excise volume</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_excise_volume</field>
+        <field name="readonly" eval="True"/>
+    </record> -->
+    <record id="uom_uom_excise_reporting_unit" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Excise reporting unit</field>
+        <field name="model_id" ref="uom.model_uom_uom"/>
+        <field name="name">x_excise_reporting_unit</field>
+    </record>
+    <record id="stock_warehouse_is_fiscal_deposit" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Is Fiscal Deposit</field>
+        <field name="model_id" ref="stock.model_stock_warehouse"/>
+        <field name="name">x_is_fiscal_deposit</field>
+    </record>
+    <record id="account_tax_is_excise" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Is Excise</field>
+        <field name="model_id" ref="account.model_account_tax"/>
+        <field name="name">x_is_excise</field>
+    </record>
+    <record id="stock_move_fiscal_deposit_move" model="ir.model.fields">
+      <field name="compute"><![CDATA[for record in self:
+    if record.location_id.warehouse_id.x_is_fiscal_deposit:
+        if record.location_dest_id.warehouse_id.x_is_fiscal_deposit:
+            record['x_fiscal_deposit_move'] = "transfer"
+        else:
+            # Check if destination is fiscal deposit or not
+            if len(list(filter(lambda t: t.tax_src_id.x_is_excise, record.partner_id.property_account_position_id.tax_ids))) > 0:
+                record['x_fiscal_deposit_move'] = "exit fd"
+            else:
+                record['x_fiscal_deposit_move'] = "exit"
+    else:
+        if record.location_dest_id.warehouse_id.x_is_fiscal_deposit:
+            # Check if destination is fiscal deposit or not
+            if len(list(filter(lambda t: t.tax_src_id.x_is_excise, record.picking_id.partner_id.property_account_position_id.tax_ids))) > 0:
+                record['x_fiscal_deposit_move'] = "entry fd"
+            else:
+                record['x_fiscal_deposit_move'] = "entry"
+        else:
+            record['x_fiscal_deposit_move'] = "none"]]></field>
+      <field name="ttype">selection</field>
+      <field name="selection">[('none', "None"), ('entry', "Entry"), ('entry fd', "Entry FD"), ('exit', "Entry"), ('exit fd', "Entry FD"), ('transfer', "Transfer")]</field>
+      <field name="depends">location_id,location_dest_id</field>
+      <field name="field_description">Fiscal deposit move</field>
+      <field name="model_id" ref="stock.model_stock_move"/>
+      <field name="name">x_fiscal_deposit_move</field>
+      <field name="readonly" eval="True"/>
+    </record>
+    <record id="stock_move_excise_amount" model="ir.model.fields">
+      <field name="compute"><![CDATA[for record in self:
+    record['x_excise_amount'] = record.quantity * record.product_id.product_templ_id.x_excise_amount]]></field>
+      <field name="ttype">monetary</field>
+      <field name="depends">quantity, product_id</field>
+      <field name="field_description">Excise amount</field>
+      <field name="model_id" ref="stock.model_stock_move"/>
+      <field name="name">x_excise_amount</field>
+      <field name="readonly" eval="True"/>
+    </record>
+    <!-- <record id="ir_model_fields_16304" model="ir.model.fields">
+      <field name="compute"><![CDATA[for record in self:
+    record['x_excise_amount'] = record.product_uom_qty * record.product_template_id.x_excise_amount]]></field>
+      <field name="ttype">monetary</field>
+      <field name="depends">product_uom_qty, product_template_id</field>
+      <field name="field_description">Excise amount</field>
+      <field name="model_id" ref="sale.model_sale_order_line"/>
+      <field name="name">x_excise_amount</field>
+      <field name="readonly" eval="True"/>
+    </record> -->
+    <record id="stock_move_excise_category" model="ir.model.fields">
+      <field name="ttype">many2one</field>
+      <field name="related">product_id.product_tmpl_id.x_excise_category</field>
+      <field name="field_description">Excise category</field>
+      <field name="model_id" ref="stock.model_stock_move"/>
+      <field name="name">x_excise_category</field>
+      <field name="readonly" eval="True"/>
+      <field name="relation">x_excise_category</field>
+    </record>
+    <record id="stock_move_excise_volume" model="ir.model.fields">
+      <field name="compute"><![CDATA[for record in self:
+    if "exit" in record.x_fiscal_deposit_move:
+        record['x_excise_volume'] = -1 * record.quantity * record.product_id.x_excise_volume
+    else:
+        if "entry" in record.x_fiscal_deposit_move:
+            record['x_excise_volume'] = +1 * record.quantity * record.product_id.x_excise_volume
+        else:
+            record['x_excise_volume'] = 0
+]]></field>
+      <field name="ttype">float</field>
+      <field name="depends">quantity, product_id, x_fiscal_deposit_move</field>
+      <field name="field_description">Excise volume</field>
+      <field name="model_id" ref="stock.model_stock_move"/>
+      <field name="name">x_excise_volume</field>
+      <field name="readonly" eval="True"/>
+    </record>
+</odoo>
