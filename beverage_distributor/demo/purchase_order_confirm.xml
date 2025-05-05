@@ -1,4 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo noupdate="1">
     <function name="button_confirm" model="purchase.order" eval="[[ref('purchase_order_4'),ref('purchase_order_5'),ref('purchase_order_6'),ref('purchase_order_7')]]"/>
+    <function name="write" model="stock.picking">
+        <value model="stock.picking" eval="obj().env.ref('beverage_distributor.purchase_order_7').picking_ids.ids"/>
+        <value model="stock.location" eval="{'location_id': obj().search([('warehouse_id', '=', ref('excise_management.stock_warehouse_fiscal_deposit')), ('child_ids', '=', False)], limit=1).id}"/>
+    </function>
+    <function name="write" model="stock.move">
+        <value model="stock.move" eval="obj().env.ref('beverage_distributor.purchase_order_7').picking_ids.move_ids.ids"/>
+        <value eval="{'quantity': 30}"/>
+    </function>
+    <function name="button_validate" model="stock.picking" context="{'skip_sms': True}">
+        <value model="stock.picking" eval="obj().env.ref('beverage_distributor.purchase_order_7').picking_ids.ids"/>
+    </function>
 </odoo>

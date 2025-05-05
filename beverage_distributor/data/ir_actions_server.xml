@@ -52,13 +52,13 @@ else:
     </record>
     <record id="update_sales_taxes_server_action" model="ir.actions.server">
         <field name="code"><![CDATA[
-product_taxe = record.taxes_id.filtered(lambda t: t.tax_group_id.name != 'Deposit')
-supplier_taxe = record.supplier_taxes_id.filtered(lambda t: t.tax_group_id.name != 'Deposit')
-if record.x_deposit_product_1:
-    product_taxe += record.x_deposit_product_1.taxes_id
-    supplier_taxe += record.x_deposit_product_1.supplier_taxes_id
-record['taxes_id'] = [(6, 0, (product_taxe).ids)]
-record['supplier_taxes_id'] = [(6, 0, (supplier_taxe).ids)]
+for product in records:
+    if product.x_deposit_product_1:
+        if (taxes := product.x_deposit_product_1.taxes_id): product['taxes_id'] = [Command.link(id) for id in taxes.ids]
+        if (taxes := product.x_deposit_product_1.supplier_taxes_id): product['supplier_taxes_id'] = [Command.link(id) for id in taxes.ids]
+    else:
+        if (taxes := product.taxes_id.filtered(lambda t: t.tax_group_id.x_is_deposit)): product['taxes_id'] = [Command.unlink(id) for id in taxes.ids]
+        if (taxes := product.supplier_taxes_id.filtered(lambda t: t.tax_group_id.x_is_deposit)): product['supplier_taxes_id'] = [Command.unlink(id) for id in taxes.ids]
 ]]></field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="state">code</field>
