@@ -1,0 +1,133 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="x_excise_category_view_list" model="ir.ui.view">
+        <field name="name">x_excise_category.view.list</field>
+        <field name="model">x_excise_category</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="x_sequence" widget="handle"/>
+                <field name="x_name"/>
+                <field name="x_description" optional="show"/>
+            </list>
+        </field>
+    </record>
+    <record id="product_template_view_form" model="ir.ui.view">
+        <field name="name">product.template.form.view.inherit.excise</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="model">product.template</field>
+        <field name="priority">1600</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='general_information']/group[@name='internal_notes']" position="before">
+                <group>
+                    <group name="excise" string="Excises">
+                        <label for="x_excise_category"/>
+                        <div class="d-flex" name="deposit">
+                            <field class="oe_inline" name="x_excise_category" options="{'no_open': True, 'no_create': True}"/>
+                            <field name="x_excise_description" force_save="1" readonly="True"/>
+                        </div>
+                        <label for="x_excise_amount" invisible="not x_excise_category"/>
+                        <div class="d-flex" name="excise_amount" invisible="not x_excise_category">
+                            <field name="x_currency_symbol" class="oe_inline" force_save="1"/>
+                            <field name="x_excise_amount" class="oe_inline" force_save="1" options="{'digits':[8,4]}"/>
+                        </div> 
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+    <record id="uom_uom_view_form" model="ir.ui.view">
+        <field name="name">uom.uom.view.form.inherit.excise</field>
+        <field name="inherit_id" ref="uom.product_uom_form_view"/>
+        <field name="model">uom.uom</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='uom_details']" position="inside">
+                <field name="x_excise_reporting_unit"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="stock_move_view_pivot" model="ir.ui.view">
+        <field name="name">stock.move.view.pivot.excise</field>
+        <field name="model">stock.move</field>
+        <field name="priority">99</field>
+        <field name="type">pivot</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <pivot string="Excises Analysis">
+                <field name="x_excise_volume" type="measure" options="{'digits':[8,4]}"/>
+                <field name="x_excise_amount" type="measure"/>
+                <field name="x_excise_category" type="col"/>
+                <field name="date" interval="week" type="row"/>
+                <field name="x_fiscal_deposit_move" type="row"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="stock_move_view_search" model="ir.ui.view">
+        <field name="name">stock.move.view.search.inherit.excise</field>
+        <field name="inherit_id" ref="stock.view_move_search"/>
+        <field name="model">stock.move</field>
+        <field name="priority">99</field>
+        <field name="type">search</field>
+        <field name="mode">primary</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='ready']" position="replace"/>
+            <xpath expr="//filter[@name='future']" position="replace"/>
+            <xpath expr="//filter[@name='done']" position="replace"/>
+        </field>
+    </record>
+    <record id="stock_warehouse_view_form" model="ir.ui.view">
+        <field name="name">stock.warehouse.view.form.inherit.excise</field>
+        <field name="inherit_id" ref="stock.view_warehouse"/>
+        <field name="model">stock.warehouse</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='resupply_wh_ids']" position="after">
+                <field name="x_is_fiscal_deposit"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="account_fiscal_position_view_form" model="ir.ui.view">
+        <field name="name">account.fiscal.position.form.inherit.excise</field>
+        <field name="inherit_id" ref="account.view_account_position_form"/>
+        <field name="model">account.fiscal.position</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="x_is_fiscal_deposit"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="stock_move_view_list" model="ir.ui.view">
+        <field name="name">stock.move.view.list.excise</field>
+        <field name="model">stock.move</field>
+        <field name="priority">99</field>
+        <field name="active" eval="True"/>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <list default_order="date, picking_id, sequence" string="Moves" create="0">
+                <field name="date_deadline" optional="hide"/>
+                <field name="date" optional="show"/>
+                <field name="x_fiscal_deposit_move" optional="show"/>
+                <field name="product_id" optional="show"/>
+                <field name="product_uom" optional="show" groups="uom.group_uom" widget="many2one_uom"/>
+                <field name="product_uom_qty" optional="show"/>
+                <field name="x_excise_category" optional="show"/>
+                <field name="x_excise_amount" optional="show"/>
+                <field name="x_currency_id" column_invisible="True"/>
+                <field name="x_excise_volume" optional="show" options="{'digits':[8,4]}"/>
+                <field name="x_excise_unit" optional="show"/>
+            </list>
+        </field>
+    </record>
+</odoo>
