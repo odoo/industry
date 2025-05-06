@@ -130,6 +130,7 @@ class TestEnv(IndustryCase):
                 self._check_xml_style(decoded_content, tree, module, file_name)
                 self._check_update_status(tree, file_name)
                 self._check_knowledge_article_is_published(tree, file_name)
+                self._check_knowledge_article_is_locked(tree, file_name)
                 checked_records_with_user = self._check_user_is_set(tree, checked_records_with_user)
                 self._check_duplicate_records(tree, file_name)
                 self._check_website_published_false(tree, file_name)
@@ -288,6 +289,14 @@ class TestEnv(IndustryCase):
             if is_published_fields:
                 _logger.warning(
                     f"Knowledge article in {file_name} should not have 'is_published' set to True."
+                )
+
+    def _check_knowledge_article_is_locked(self, root, file_name):
+        for record in root.xpath("//record[@model='knowledge.article']"):
+            is_locked_fields = record.xpath(".//field[@name='is_locked']/@eval")
+            if not is_locked_fields:
+                _logger.warning(
+                    f"Knowledge article in {file_name} should have 'is_locked' set to True."
                 )
 
     def _check_is_published_false(self, root, file_name):
