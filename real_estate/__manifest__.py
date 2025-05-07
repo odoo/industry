@@ -89,6 +89,7 @@
         "data/ir_actions_server.xml",
         "static/src/js/my_tour.js",
         "data/website_view.xml",
+        "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
     'license': 'OPL-1',
