@@ -65,6 +65,7 @@ MODELS_TO_UPDATE = [
     "ir.actions.act_window",
     "ir.actions.report",
     "ir.actions.server",
+    "ir.cron",
     "ir.model",
     "ir.model.access",
     "ir.model.fields",
