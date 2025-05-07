@@ -34,14 +34,19 @@
     <field name="state">code</field>
     <field name="usage">ir_cron</field>
     <field name="code"><![CDATA[contacts = model.search([('x_subscribe', '=', True)])
-mail_template = env['mail.template'].search([('id','=',42)])
+mail_template = env['mail.template'].search([('id','=',env.ref('real_estate.mail_template_42'))])
 for contact in contacts:
     if contact.x_to_notify_properties:
         res = mail_template.send_mail(res_id=contact.id)
-        if res: contact.write({'x_last_notification': datetime.datetime.now()}) # Update contact last notification date
-
-
+        if res:
+            contact.write({'x_last_notification': datetime.datetime.now()})
 ]]></field>
+  </record>
+
+  <record id="notify_contacts_for_matches_cron" model="ir.cron">
+    <field name="interval_type">days</field>
+    <field name="state">code</field>
+    <field name="ir_actions_server_id" ref="notify_contacts_for_matches_server_action"/>
   </record>
 
   <record id="on_ribbon_update_server_action" model="ir.actions.server">
@@ -56,15 +61,15 @@ for contact in contacts:
         ]]></field>
   </record>
 
-  <record id="on_price_change_server_action" model="ir.actions.server">
-    <field name="name">Industry: On price change</field>
-    <field name="model_id" ref="product.model_product_template"/>
-    <field name="usage">base_automation</field>
-    <field name="state">code</field>
-    <field name="code"><![CDATA[if not record.website_ribbon_id.x_is_draft_ribbon and not record.website_ribbon_id.x_is_closed_ribbon:
+    <record id="on_price_change_server_action" model="ir.actions.server">
+        <field name="name">Industry: On price change</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[if not record.website_ribbon_id.x_is_draft_ribbon and not record.website_ribbon_id.x_is_closed_ribbon:
     record['x_last_notification_update'] = datetime.datetime.now()#.strftime('%Y-%m-%d %H:%M:%S')
-        ]]></field>
-  </record>
+            ]]></field>
+    </record>
 
   <record id="search_for_property_reference_server_action" model="ir.actions.server">
     <field name="name">Search for property reference</field>
