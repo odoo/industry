@@ -13,7 +13,7 @@
   <record id="update_appointments_active_server_action" model="ir.actions.server">
     <field name="name">Update Appointments &gt; Active</field>
     <field name="model_id" ref="product.model_product_template"/>
-    <field name="update_path">x_studio_appointments.active</field>
+    <field name="update_path">x_appointments.active</field>
     <field name="crud_model_id" ref="appointment.model_appointment_type"/>
     <field name="update_field_id" ref="appointment.field_appointment_type__active"/>
     <field name="update_boolean_value">false</field>
@@ -33,12 +33,12 @@
     <field name="model_id" ref="base.model_res_partner"/>
     <field name="state">code</field>
     <field name="usage">ir_cron</field>
-    <field name="code"><![CDATA[contacts = model.search([('x_studio_subscribe', '=', True)])
+    <field name="code"><![CDATA[contacts = model.search([('x_subscribe', '=', True)])
 mail_template = env['mail.template'].search([('id','=',42)])
 for contact in contacts:
-    if contact.x_studio_to_notify_properties:
+    if contact.x_to_notify_properties:
         res = mail_template.send_mail(res_id=contact.id)
-        if res: contact.write({'x_studio_last_notification': datetime.datetime.now()}) # Update contact last notification date
+        if res: contact.write({'x_last_notification': datetime.datetime.now()}) # Update contact last notification date
 
 
 ]]></field>
@@ -49,10 +49,10 @@ for contact in contacts:
     <field name="model_id" ref="product.model_product_template"/>
     <field name="state">code</field>
     <field name="usage">base_automation</field>
-    <field name="code"><![CDATA[if not record.website_ribbon_id.x_studio_is_draft_ribbon and not record.website_ribbon_id.x_studio_is_closed_ribbon:
-    if not record.x_studio_ribbon_stage_is_accounted:
-        record['x_studio_ribbon_stage_is_accounted'] = True
-        record['x_studio_last_notification_update'] = datetime.datetime.now()#.strftime('%Y-%m-%d %H:%M:%S')
+    <field name="code"><![CDATA[if not record.website_ribbon_id.x_is_draft_ribbon and not record.website_ribbon_id.x_is_closed_ribbon:
+    if not record.x_ribbon_stage_is_accounted:
+        record['x_ribbon_stage_is_accounted'] = True
+        record['x_last_notification_update'] = datetime.datetime.now()#.strftime('%Y-%m-%d %H:%M:%S')
         ]]></field>
   </record>
 
@@ -61,8 +61,8 @@ for contact in contacts:
     <field name="model_id" ref="product.model_product_template"/>
     <field name="usage">base_automation</field>
     <field name="state">code</field>
-    <field name="code"><![CDATA[if not record.website_ribbon_id.x_studio_is_draft_ribbon and not record.website_ribbon_id.x_studio_is_closed_ribbon:
-    record['x_studio_last_notification_update'] = datetime.datetime.now()#.strftime('%Y-%m-%d %H:%M:%S')
+    <field name="code"><![CDATA[if not record.website_ribbon_id.x_is_draft_ribbon and not record.website_ribbon_id.x_is_closed_ribbon:
+    record['x_last_notification_update'] = datetime.datetime.now()#.strftime('%Y-%m-%d %H:%M:%S')
         ]]></field>
   </record>
 
@@ -71,12 +71,12 @@ for contact in contacts:
     <field name="model_id" ref="crm.model_crm_lead"/>
     <field name="state">code</field>
     <field name="usage">base_automation</field>
-    <field name="code"><![CDATA[if len(record.message_ids) == 1 and not record.x_studio_interested_in :
+    <field name="code"><![CDATA[if len(record.message_ids) == 1 and not record.x_interested_in :
     properties = env["product.template"].search([])
     for property in properties:
-        for reference in property.x_studio_other_ads:
+        for reference in property.x_other_ads:
             if reference.x_name in record.message_ids[0].body or reference.x_name in record.message_ids[0].subject or reference.x_name in record.message_ids[0].email_from:
-                record["x_studio_interested_in"] = property.id]]></field>
+                record["x_interested_in"] = property.id]]></field>
   </record>
 
   <record id="create_lead_from_match_server_action" model="ir.actions.server">
@@ -84,26 +84,26 @@ for contact in contacts:
     <field name="model_id" ref="base.model_res_partner"/>
     <field name="state">code</field>
     <field name="code"><![CDATA[partner = env['res.partner'].search([('id', '=', env.context.get('active_id'))])
-new_lead = { 'name': 'Matchmaking', 'partner_id': partner.id, 'x_studio_interested_in': env.context.get('property_id') }
+new_lead = { 'name': 'Matchmaking', 'partner_id': partner.id, 'x_interested_in': env.context.get('property_id') }
 env['crm.lead'].create(new_lead)]]></field>
   </record>
 
   <record id="create_technical_partner_server_action" model="ir.actions.server">
-    <field name="code"><![CDATA[if record.x_studio_technical_partner :
-    record['x_studio_technical_partner']['street'] = record.x_studio_street
-    record['x_studio_technical_partner']['zip'] = record.x_studio_zip_code
-    record['x_studio_technical_partner']['city'] = record.x_studio_city
-    record['x_studio_technical_partner']['country_id'] = record.x_studio_country.id
+    <field name="code"><![CDATA[if record.x_technical_partner :
+    record['x_technical_partner']['street'] = record.x_street
+    record['x_technical_partner']['zip'] = record.x_zip_code
+    record['x_technical_partner']['city'] = record.x_city
+    record['x_technical_partner']['country_id'] = record.x_country.id
 else: 
     technical_partner = env['res.partner'].create({
         'name': record.name,
-        'street': record.x_studio_street, 
-        'zip': record.x_studio_zip_code, 
-        'city': record.x_studio_city, 
-        'country_id': record.x_studio_country.id, 
-        'x_studio_technical_partner': True,
+        'street': record.x_street, 
+        'zip': record.x_zip_code, 
+        'city': record.x_city, 
+        'country_id': record.x_country.id, 
+        'x_technical_partner': True,
     })
-    record['x_studio_technical_partner'] = technical_partner.id]]></field>
+    record['x_technical_partner'] = technical_partner.id]]></field>
     <field name="model_id" ref="product.model_product_template"/>
     <field name="state">code</field>
     <field name="name">Industry: Create Technical Partner</field>
@@ -116,11 +116,11 @@ else:
     <field name="model_id" ref="product.model_product_template"/>
     <field name="binding_model_id" ref="product.model_product_template"/>
     <field name="state">code</field>
-    <field name="code"><![CDATA[if not record.x_studio_appointments:
+    <field name="code"><![CDATA[if not record.x_appointments:
       # First create the link
       link = env['appointment.invite'].create({ 'short_code': datetime.datetime.now().strftime("%M%m%S%d%Y%H"), 'display_name': record.name, })
       # Then the appointment (which creates the general-visit...)
-      appointment = env['appointment.type'].create({ 'name': record.name, 'display_name': record.name, 'x_studio_property': record.id, 'appointment_invite_ids': [link.id], 'location_id': record.x_studio_technical_partner.id, 'image_1920': record.image_1920, 'appointment_tz': env.ref('base.user_admin').tz or 'Europe/Brussels' })
+      appointment = env['appointment.type'].create({ 'name': record.name, 'display_name': record.name, 'x_property': record.id, 'appointment_invite_ids': [link.id], 'location_id': record.x_technical_partner.id, 'image_1920': record.image_1920, 'appointment_tz': env.ref('base.user_admin').tz or 'Europe/Brussels' })
       # And then delete the general-visit
       link_to_delete = env['appointment.invite'].search([('short_code','=','general-visits')])
       link_to_delete.unlink()
@@ -134,7 +134,7 @@ else:
     <field name="state">code</field>
     <field name="code"><![CDATA[mail_template = env['mail.template'].search([('id','=',33)])
 res = mail_template.send_mail(res_id=record.id)
-if res: record.write({'x_studio_last_notification': datetime.datetime.now()}) # Update contact last notification date
+if res: record.write({'x_last_notification': datetime.datetime.now()}) # Update contact last notification date
 
 ]]></field>
   </record>
