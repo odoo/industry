@@ -15,7 +15,6 @@
         'sign',
         'web_studio',
         'website_crm',
-        'website_product_barcodelookup',
         'website_sale',
     ],
     'data': [
@@ -52,9 +51,6 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/knowledge_tour.xml',
-        'data/website_view.xml',
-        'data/website_page.xml',
-        'data/website_menu.xml',
     ],
     'demo': [
         'demo/crm_team.xml',
@@ -76,6 +72,7 @@
         'demo/website.xml',
         'demo/website_view.xml',
         'demo/website_page.xml',
+        'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
         'demo/payment_provider_demo_post.xml',
     ],
@@ -88,7 +85,6 @@
         "data/knowledge_article.xml",
         "data/ir_actions_server.xml",
         "static/src/js/my_tour.js",
-        "data/website_view.xml",
         "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
