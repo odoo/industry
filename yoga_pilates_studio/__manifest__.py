@@ -5,8 +5,10 @@
     'author': 'Odoo S.A.',
     'depends': [
         'appointment_crm',
+        'base_industry_data',
         'hr_skills_survey',
         'knowledge',
+        'partnership',
         'product_barcodelookup',
         'sale_planning',
         'website_appointment_sale',
