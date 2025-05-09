@@ -4,6 +4,7 @@
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
+        'base_industry_data',
         'industry_fsm_stock',
         'knowledge',
         'pos_sale',
@@ -36,7 +37,6 @@
         'data/sale_order_template_line.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
-        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -51,14 +51,8 @@
         'demo/sale_order_confirm.xml',
     ],
     'license': 'OPL-1',
-    'assets': {
-        'web.assets_backend': [
-            'shoe_maker/static/src/js/my_tour.js',
-        ],
-    },
     'cloc_exclude': [
         'data/knowledge_article.xml',
-        'static/src/js/my_tour.js',
     ],
     'images': ['images/main.png'],
 }

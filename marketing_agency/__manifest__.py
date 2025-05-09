@@ -37,7 +37,6 @@
         'data/ir_attachment.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
-        'data/res_partner_category.xml',
         'data/sale_order_spreadsheet.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
@@ -48,7 +47,6 @@
         'data/install_apps.xml',
     ],
     'demo': [
-        'demo/res_config_settings.xml',
         'demo/crm_team.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
