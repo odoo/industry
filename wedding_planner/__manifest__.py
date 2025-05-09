@@ -4,6 +4,7 @@
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
+        'base_industry_data',
         'crm_enterprise',
         'hr_calendar',
         'knowledge',
@@ -30,7 +31,6 @@
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
-        'data/knowledge_tour.xml',
         'data/mail_message.xml',
         'data/crm_tag.xml',
     ],
@@ -49,14 +49,8 @@
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
     ],
-    'assets': {
-        'web.assets_backend': [
-            'wedding_planner/static/src/js/my_tour.js',
-        ]
-    },
     "cloc_exclude": [
         "data/knowledge_article.xml",
-        "static/src/js/my_tour.js",
     ],
     'images': ['images/main.png'],
     'license': 'OPL-1',
