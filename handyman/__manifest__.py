@@ -5,6 +5,7 @@
     'depends': [
         'account_accountant',
         'appointment_account_payment',
+        'base_industry_data',
         'hr',
         'industry_fsm_sale_report',
         'industry_fsm_stock',
@@ -35,7 +36,6 @@
         'data/sale_order_spreadsheet.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
-        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -55,15 +55,9 @@
         'demo/purchase_order_confirm.xml',
     ],
     'license': 'OPL-1',
-    'assets': {
-        'web.assets_backend': [
-            'handyman/static/src/js/my_tour.js',
-        ],
-    },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
-        "static/src/js/my_tour.js",
     ],
     'images': ['images/main.png'],
 }

@@ -4,6 +4,7 @@
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
+        'base_industry_data',
         'crm_sale_subscription',
         'hr',
         'industry_fsm_sale',
@@ -26,7 +27,6 @@
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
-        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/res_company.xml',
@@ -42,14 +42,8 @@
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
     ],
-    'assets': {
-        'web.assets_backend': [
-            'cleaning_services/static/src/js/my_tour.js',
-        ]
-    },
     "cloc_exclude": [
         "data/knowledge_article.xml",
-        "static/src/js/my_tour.js",
     ],
     'images': ['images/main.png'],
     'license': 'OPL-1',

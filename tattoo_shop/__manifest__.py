@@ -6,6 +6,7 @@
     'depends': [
         'appointment_account_payment',
         'base_automation',
+        'base_industry_data',
         'crm_enterprise',
         'knowledge',
         'sale_planning',
@@ -30,7 +31,6 @@
         'data/sign_template.xml',
         'data/sign_item.xml',
         'data/mail_message.xml',
-        'data/knowledge_tour.xml',
         'data/base_automation.xml',
         'data/ir_actions_server.xml',
     ],
@@ -51,14 +51,8 @@
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
     ],
-    'assets': {
-        'web.assets_backend': [
-            'tattoo_shop/static/src/js/my_tour.js',
-        ]
-    },
     'cloc_exclude': [
         "data/knowledge_article.xml",
-        "static/src/js/my_tour.js",
         'demo/website_views.xml',
     ],
     'images': ['images/main.png'],

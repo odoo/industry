@@ -4,12 +4,19 @@
     'version': '1.0',
     'category': 'Hidden/Tools',
     'description': """Base module for data/demo in industries.""",
-    'depends': ['base'],
+    'depends': [
+        'base',
+        'digest',
+    ],
     'data': [
         'data/knowledge_tour.xml',
+        'data/res_partner_category.xml',
     ],
     'demo': [
+        'demo/res_config_settings.xml',
+        'demo/res_users.xml',
         'demo/res_partner.xml',
+        'demo/res_partner_category.xml',
     ],
     'license': 'LGPL-3',
     'assets': {

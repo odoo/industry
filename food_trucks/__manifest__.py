@@ -4,6 +4,7 @@
   'category': 'Hospitality',
   'author': 'Odoo S.A.',
   'depends': [
+      'base_industry_data',
       'industry_fsm_sale',
       'knowledge',
       'planning',
@@ -20,7 +21,6 @@
       'data/knowledge_article.xml',
       'data/knowledge_article_favorite.xml',
       'data/mail_message.xml',
-      'data/knowledge_tour.xml',
       'data/res_config_settings.xml',
   ],
   'demo': [
@@ -36,14 +36,8 @@
       'demo/sale_order_confirm.xml',
       'demo/project_task.xml',
   ],
-  'assets': {
-      'web.assets_backend': [
-          'food_trucks/static/src/js/my_tour.js',
-      ]
-  },
   "cloc_exclude": [
       "data/knowledge_article.xml",
-      "static/src/js/my_tour.js",
   ],
   'images': ['images/main.png'],
   'license': 'OPL-1'
