@@ -5,6 +5,7 @@
     'author': 'Odoo S.A.',
     'depends': [
         'appointment_account_payment',
+        'base_industry_data',
         'crm_enterprise',
         'documents_project',
         'knowledge',
@@ -30,7 +31,6 @@
         'data/sale_order_template_line.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
-        'data/knowledge_tour.xml',
         'data/document_document.xml',
     ],
     'demo': [
@@ -53,15 +53,9 @@
         'demo/account_analytic_line.xml',
     ],
     'license': 'OPL-1',
-    'assets': {
-        'web.assets_backend': [
-            'environmental_agency/static/src/js/my_tour.js',
-        ],
-    },
     'cloc_exclude': [
         'data/knowledge_article.xml',
         'demo/website_view.xml',
-        'static/src/js/my_tour.js',
     ],
     'images': ['images/main.png'],
 }
