@@ -9,7 +9,6 @@
         'website_appointment',
     ],
     'data': [
-        # 'data/ir_attachment_pre.xml',
         'data/appointment_resource.xml',
         'data/pos_category.xml',
         'data/product_category.xml',
@@ -17,7 +16,6 @@
         'data/restaurant_floor.xml',
         'data/pos_payment_method.xml',
         'data/restaurant_table.xml',
-        # 'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
