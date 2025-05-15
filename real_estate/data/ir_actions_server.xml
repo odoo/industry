@@ -1,0 +1,147 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="update_is_published_server_action" model="ir.actions.server">
+    <field name="name">Update Is Published</field>
+    <field name="model_id" ref="product.model_product_template"/>
+    <field name="update_path">is_published</field>
+    <field name="crud_model_id" ref="product.model_product_template"/>
+    <field name="update_field_id" ref="website_sale.field_product_template__is_published"/>
+    <field name="update_boolean_value">false</field>
+    <field name="usage">base_automation</field>
+  </record>
+
+  <record id="update_appointments_active_server_action" model="ir.actions.server">
+    <field name="name">Update Appointments &gt; Active</field>
+    <field name="model_id" ref="product.model_product_template"/>
+    <field name="update_path">x_appointments.active</field>
+    <field name="crud_model_id" ref="appointment.model_appointment_type"/>
+    <field name="update_field_id" ref="appointment.field_appointment_type__active"/>
+    <field name="update_boolean_value">false</field>
+    <field name="usage">base_automation</field>
+  </record>
+
+  <record id="book_your_visit_server_action" model="ir.actions.server">
+    <field name="name">Send email: Book your visit</field>
+    <field name="binding_model_id" ref="crm.model_crm_lead"/>
+    <field name="model_id" ref="crm.model_crm_lead"/>
+    <field name="state">mail_post</field>
+    <field name="template_id" ref="book_your_visit_795461fb-80d6-4bd9-8814-0dd0450f52b8"/>
+  </record>
+
+  <record id="notify_contacts_for_matches_server_action" model="ir.actions.server">
+    <field name="name">Industry: Notify contacts for their matches</field>
+    <field name="model_id" ref="base.model_res_partner"/>
+    <field name="state">code</field>
+    <field name="usage">ir_cron</field>
+    <field name="code"><![CDATA[contacts = model.search([('x_subscribe', '=', True)])
+mail_template = env['mail.template'].search([('id','=',env.ref('real_estate.mail_template_42'))])
+for contact in contacts:
+    if contact.x_to_notify_properties:
+        res = mail_template.send_mail(res_id=contact.id)
+        if res:
+            contact.write({'x_last_notification': datetime.datetime.now()})
+]]></field>
+  </record>
+
+  <record id="notify_contacts_for_matches_cron" model="ir.cron">
+    <field name="interval_type">days</field>
+    <field name="state">code</field>
+    <field name="ir_actions_server_id" ref="notify_contacts_for_matches_server_action"/>
+  </record>
+
+  <record id="on_ribbon_update_server_action" model="ir.actions.server">
+    <field name="name">Industry: On ribbon update</field>
+    <field name="model_id" ref="product.model_product_template"/>
+    <field name="state">code</field>
+    <field name="usage">base_automation</field>
+    <field name="code"><![CDATA[if not record.website_ribbon_id.x_is_draft_ribbon and not record.website_ribbon_id.x_is_closed_ribbon:
+    if not record.x_ribbon_stage_is_accounted:
+        record['x_ribbon_stage_is_accounted'] = True
+        record['x_last_notification_update'] = datetime.datetime.now()#.strftime('%Y-%m-%d %H:%M:%S')
+        ]]></field>
+  </record>
+
+    <record id="on_price_change_server_action" model="ir.actions.server">
+        <field name="name">Industry: On price change</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[if not record.website_ribbon_id.x_is_draft_ribbon and not record.website_ribbon_id.x_is_closed_ribbon:
+    record['x_last_notification_update'] = datetime.datetime.now()#.strftime('%Y-%m-%d %H:%M:%S')
+            ]]></field>
+    </record>
+
+  <record id="search_for_property_reference_server_action" model="ir.actions.server">
+    <field name="name">Search for property reference</field>
+    <field name="model_id" ref="crm.model_crm_lead"/>
+    <field name="state">code</field>
+    <field name="usage">base_automation</field>
+    <field name="code"><![CDATA[if len(record.message_ids) == 1 and not record.x_interested_in :
+    properties = env["product.template"].search([])
+    for property in properties:
+        for reference in property.x_other_ads:
+            if reference.x_name in record.message_ids[0].body or reference.x_name in record.message_ids[0].subject or reference.x_name in record.message_ids[0].email_from:
+                record["x_interested_in"] = property.id]]></field>
+  </record>
+
+  <record id="create_lead_from_match_server_action" model="ir.actions.server">
+    <field name="name">Industry: Create lead from match</field>
+    <field name="model_id" ref="base.model_res_partner"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[partner = env['res.partner'].search([('id', '=', env.context.get('active_id'))])
+team = env.ref('real_estate.crm_team_4')
+new_lead = { 'name': 'Matchmaking', 'partner_id': partner.id, 'x_interested_in': env.context.get('property_id'), 'team_id': team.id }
+env['crm.lead'].create(new_lead)]]></field>
+  </record>
+
+  <record id="create_technical_partner_server_action" model="ir.actions.server">
+    <field name="code"><![CDATA[if record.x_technical_partner :
+    record['x_technical_partner']['street'] = record.x_street
+    record['x_technical_partner']['zip'] = record.x_zip_code
+    record['x_technical_partner']['city'] = record.x_city
+    record['x_technical_partner']['country_id'] = record.x_country.id
+else: 
+    technical_partner = env['res.partner'].create({
+        'name': record.name,
+        'street': record.x_street, 
+        'zip': record.x_zip_code, 
+        'city': record.x_city, 
+        'country_id': record.x_country.id, 
+        'x_technical_partner': True,
+    })
+    record['x_technical_partner'] = technical_partner.id]]></field>
+    <field name="model_id" ref="product.model_product_template"/>
+    <field name="state">code</field>
+    <field name="name">Industry: Create Technical Partner</field>
+    <field name="sequence">6</field>
+    <field name="usage">base_automation</field>
+  </record>
+
+  <record id="create_appointment_link_server_action" model="ir.actions.server">
+    <field name="name">Industry: Create Appointment &amp; Link</field>
+    <field name="model_id" ref="product.model_product_template"/>
+    <field name="binding_model_id" ref="product.model_product_template"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[if not record.x_appointments:
+      # First create the link
+      link = env['appointment.invite'].create({ 'short_code': datetime.datetime.now().strftime("%M%m%S%d%Y%H"), 'display_name': record.name, })
+      # Then the appointment (which creates the general-visit...)
+      appointment = env['appointment.type'].create({ 'name': record.name, 'display_name': record.name, 'x_property': record.id, 'appointment_invite_ids': [link.id], 'location_id': record.x_technical_partner.id, 'image_1920': record.image_1920, 'appointment_tz': env.ref('base.user_admin').tz or 'Europe/Brussels' })
+      # And then delete the general-visit
+      link_to_delete = env['appointment.invite'].search([('short_code','=','general-visits')])
+      link_to_delete.unlink()
+  ]]></field>     
+  </record>
+
+  <record id="ir_actions_server_743" model="ir.actions.server">
+    <field name="name">Industry: Send matches from contact</field>
+    <field name="model_id" ref="base.model_res_partner"/>
+    <field name="binding_model_id" ref="base.model_res_partner"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[mail_template = env['mail.template'].search([('id','=',33)])
+res = mail_template.send_mail(res_id=record.id)
+if res: record.write({'x_last_notification': datetime.datetime.now()}) # Update contact last notification date
+
+]]></field>
+  </record>
+</odoo>
