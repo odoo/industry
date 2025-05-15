@@ -1,97 +1,136 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="odoo_crm_lead_form_customization" model="ir.ui.view">
-        <field name="name">crm.lead.form.customization.eyewear</field>
-        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
-        <field name="mode">extension</field>
-        <field name="model">crm.lead</field>
-        <field name="active" eval="True"/>
-        <field name="priority">160</field>
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-            <xpath expr="//notebook[1]" position="inside">
-                <page string="Glasses Rx">
-                    <group>
-                        <group>
-                            <field name="x_od_spherical"/>
-                            <field name="x_od_cylindrical"/>
-                            <field name="x_od_axis"/>
-                            <field name="x_od_add"/>
-                            <field name="x_od_pd"/>
-                        </group>
-                        <group>
-                            <field name="x_os_spherical"/>
-                            <field name="x_os_cylindrical"/>
-                            <field name="x_os_axis"/>
-                            <field name="x_os_add"/>
-                            <field name="x_os_pd"/>
-                        </group>
-                    </group>
-                </page>
-                <page string="Lens Rx">
-                    <group>
-                        <group>
-                            <field name="x_right_od_power"/>
-                            <field name="x_right_od_add"/>
-                            <field name="x_right_od_bc"/>
-                            <field name="x_right_od_dia"/>
-                        </group>
-                        <group>
-                            <field name="x_left_os_power"/>
-                            <field name="x_left_os_add"/>
-                            <field name="x_left_os_bc"/>
-                            <field name="x_left_os_dia"/>
-                        </group>
-                    </group>
-                </page>
-            </xpath>
-        </field>
-    </record>
-    <record id="odoo_res_partner_form_customization_eyewear" model="ir.ui.view">
-        <field name="name">res.partner.form.customization.eyewear</field>
-        <field name="inherit_id" ref="base.view_partner_form"/>
-        <field name="mode">extension</field>
-        <field name="model">res.partner</field>
-        <field name="active" eval="True"/>
-        <field name="priority">360</field>
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-            <xpath expr="//notebook[1]" position="inside">
-                <page string="Glasses Rx">
-                    <group>
-                        <group>
-                            <field name="x_od_spherical"/>
-                            <field name="x_od_cylindrical"/>
-                            <field name="x_od_axis"/>
-                            <field name="x_od_add_1"/>
-                            <field name="x_od_pd"/>
-                        </group>
-                        <group>
-                            <field name="x_os_spherical"/>
-                            <field name="x_os_cylindrical_1"/>
-                            <field name="x_os_axis"/>
-                            <field name="x_os_add"/>
-                            <field name="x_os_pd"/>
-                        </group>
-                    </group>
-                </page>
-                <page string="Lenses Rx">
-                    <group>
-                        <group>
-                            <field name="x_right_od_power"/>
-                            <field name="x_od_add_2"/>
-                            <field name="x_od_bc"/>
-                            <field name="x_od_dia"/>
-                        </group>
-                        <group>
-                            <field name="x_os_power"/>
-                            <field name="x_os_add_1"/>
-                            <field name="x_os_bc"/>
-                            <field name="x_os_dia"/>
-                        </group>
-                    </group>
-                </page>
-            </xpath>
-        </field>
-    </record>
+  <record id="res_partner_form_customization" model="ir.ui.view">
+    <field name="name">res.partner.form customization</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="mode">extension</field>
+    <field name="model">res.partner</field>
+    <field name="active" eval="True"/>
+    <field name="priority">360</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+        <xpath expr="//form[1]/sheet[1]/group[1]" position="after">
+          <group string="Consultations">
+            <field name="x_visits_1">
+              <list delete="false">
+                <field name="x_sequence" widget="handle"/>
+                <field name="id" optional="hide"/>
+                <field name="create_date" optional="show" string="Consultation date"/>
+                <field name="create_uid" optional="show"/>
+                <field name="x_remarks" optional="show"/>
+              </list>
+            </field>
+          </group>
+        </xpath>
+    </field>
+  </record>
+  <record id="x_res_partner_line_default_list_view" model="ir.ui.view">
+    <field name="name">Default list view for x_res_partner_line</field>
+    <field name="model">x_res_partner_line</field>
+    <field name="type">list</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+  </record>
+  <record id="x_res_partner_line_default_form_view" model="ir.ui.view">
+    <field name="name">Default form view for x_res_partner_line</field>
+    <field name="model">x_res_partner_line</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button string="Print results" name="%(partner_line_eye_test_result_report)d" type="action"/>
+        </header>
+        <sheet string="res_partner_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="New" force_save="1" readonly="1"/>
+            </h1>
+          </div>
+          <group>
+            <group>
+              <field name="create_uid"/>
+              <field name="x_res_partner_id" string="Client"/>
+            </group>
+            <group>
+              <field name="create_date" string="Consultation Date" readonly="False"/>
+              <field name="x_remarks"/>
+            </group>
+          </group>
+  
+          <notebook>
+            <page string="Eyesight">
+              <group>
+                <group string="Right Eye">
+                  <field name="x_visual_acuity_distance_right"/>
+                  <field name="x_visual_acuity_near_right"/>
+                  <field name="x_sphere_diopters_right"/>
+                  <field name="x_cylinder_diopters_right"/>
+                  <field name="x_axis_degrees_right"/>
+                  <field name="x_addition_add_right"/>
+                  <field name="x_keratometry_k1_k2_right"/>
+                  <field name="x_corneal_diameter_white_to_white_right"/>
+                </group>
+                <group string="Left Eye">
+                  <field name="x_visual_acuity_distance_left"/>
+                  <field name="x_visual_acuity_near_left"/>
+                  <field name="x_sphere_diopters_left"/>
+                  <field name="x_cylinder_diopters_left"/>
+                  <field name="x_axis_degrees_left"/>
+                  <field name="x_addition_add_left"/>
+                  <field name="x_keratometry_k1_k2_left"/>
+                  <field name="x_corneal_diameter_white_to_white_left"/>
+                </group>
+              </group>
+            </page>
+            <page string="Binocular Measurements">
+              <group>
+                <group>
+                  <field name="x_pupillary_distance_pd"/>
+                  <field name="x_near_pd_for_reading"/>
+                  <field name="x_segment_height_for_multifocals"/>
+                  <field name="x_vertex_distance"/>
+                </group>
+                <group>
+                  <field name="x_ocular_dominance_right"/>
+                  <field name="x_ocular_dominance_left"/>
+                </group>
+              </group>
+            </page>
+            <page string="Contact Lenses">
+              <group>
+                <group string="Right Eye">
+                  <field name="x_base_curve_mm_right"/>
+                  <field name="x_diameter_mm_right"/>
+                </group>
+                <group string="Left Eye">
+                  <field name="x_base_curve_mm_left"/>
+                  <field name="x_diameter_mm_left"/>
+                </group>
+              </group>
+            </page>
+          </notebook>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+  <record id="view_calendar_event_form_inherit" model="ir.ui.view">
+    <field name="name">calendar.event.form.inherit.opportunity.partner</field>
+    <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
+    <field name="model">calendar.event</field>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='alarm_ids']" position="after">
+            <field name="x_calendar_opportunity"/>
+        </xpath>
+    </field>
+</record>
 </odoo>
