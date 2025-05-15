@@ -35,7 +35,6 @@
         'data/product_pricelist_item.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
-        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/appointment_type.xml',
@@ -63,14 +62,8 @@
         'demo/website_theme_apply.xml',
         'demo/payment_provider_demo_post.xml',
     ],
-    'assets': {
-        'web.assets_backend': [
-            'yoga_pilates_studio/static/src/js/my_tour.js',
-        ]
-    },
     "cloc_exclude": [
         "data/knowledge_article.xml",
-        "static/src/js/my_tour.js",
         "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
