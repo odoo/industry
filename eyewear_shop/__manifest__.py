@@ -5,6 +5,7 @@
     'author': 'Odoo S.A.',
     'depends': [
         'appointment_crm',
+        'base_industry_data',
         'crm_enterprise',
         'hr',
         'knowledge',
@@ -46,7 +47,6 @@
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
-        'data/knowledge_tour.xml',
         'data/crm_tag.xml',
     ],
     'demo': [
@@ -69,15 +69,9 @@
         'demo/website_theme_apply.xml',
         'demo/payment_provider_demo_post.xml',
     ],
-    'assets': {
-        'web.assets_backend': [
-            'eyewear_shop/static/src/js/my_tour.js',
-        ]
-    },
     "cloc_exclude": [
         "data/qweb_view.xml",
         "data/knowledge_article.xml",
-        "static/src/js/my_tour.js",
         "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
