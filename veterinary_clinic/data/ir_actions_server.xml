@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="ir_actions_server_795" model="ir.actions.server">
+    <field name="binding_model_id" ref="pets_line_a64c8075-abc9-44cd-a27a-a8610a264b0d"/>
+    <field name="code"><![CDATA[
+sale_order = env['sale.order'].search([('x_studio_pet', '=', record.id)], limit=1)
+
+if not sale_order:
+    # Create a demo sale order if none exists
+    sale_order = env['sale.order'].create({
+        'partner_id': record.x_pets_id.x_studio_owner.id,
+        'x_studio_pet': record.id,
+    })
+
+ctx = dict(env.context, order_id=sale_order.id)
+action = record.env['sale.order.line'].with_context(ctx).action_add_from_catalog()
+]]></field>
+    <field name="model_id" ref="pets_line_a64c8075-abc9-44cd-a27a-a8610a264b0d"/>
+    <field name="state">code</field>
+    <field name="name">catalog</field>
+  </record>
+  <record id="ir_actions_server_790" model="ir.actions.server">
+    <field name="binding_model_id" ref="pets_eb77f7e5-e355-459f-a7f2-4f2ef2d77f4e"/>
+    <field name="code"><![CDATA[
+action = {
+    'view_mode': 'form',
+    'res_model': 'x_pets',
+    'res_id': record.id,
+    'type': 'ir.actions.act_window',
+}
+]]></field>
+    <field name="model_id" ref="pets_eb77f7e5-e355-459f-a7f2-4f2ef2d77f4e"/>
+    <field name="state">code</field>
+    <field name="name">View Action</field>
+  </record>
+  <record id="create_activity_plan_b2fcf0e3-3f16-442a-8a00-677bd229884b" model="ir.actions.server">
+    <field name="name">Create activity: Plan Next Appointment</field>
+    <field name="model_id" ref="pets_line_a64c8075-abc9-44cd-a27a-a8610a264b0d"/>
+    <field name="state">next_activity</field>
+    <field name="usage">base_automation</field>
+  </record>
+  <record id="action_server_appointment_sequence" model="ir.actions.server" >
+    <field name="name">Appointment Sequence server action</field>
+    <field name="model_id" ref="pets_line_a64c8075-abc9-44cd-a27a-a8610a264b0d"/>
+    <field name="state">code</field>
+    <field name="base_automation_id" ref="appointment_sequence_automation_rule"/>
+    <field name="code"><![CDATA[
+record.write({'x_name': "APP/" + record.env['ir.sequence'].next_by_code('appointment.sequence')})
+]]></field>
+</record>
+<record id="action_server_pet_owner_automation" model="ir.actions.server" >
+  <field name="name">Pet Owner Automation</field>
+  <field name="model_id" ref="calendar.model_calendar_event"/>
+  <field name="state">code</field>
+  <field name="base_automation_id" ref="base_automation_3"/>
+  <field name="code"><![CDATA[
+record.write({'appointment_booker_id': env.user.partner_id.id})
+]]></field>
+</record>
+</odoo>
