@@ -9,11 +9,12 @@ class ActionServerTestCase(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.partner_a = cls.env['res.partner'].create({
+                'name': 'partner_a',
+        })
         cls.demo_account_move = cls.env['account.move'].create({
             'move_type': 'out_refund',
-            'partner_id': cls.env['res.partner'].create({
-                'name': 'partner_a',
-            }).id,
+            'partner_id': cls.partner_a.id,
             'invoice_date': fields.Date.today().strftime("%Y-%m-02"),
             'delivery_date': fields.Date.today().strftime("%Y-%m-02"),
             'invoice_line_ids': [
@@ -28,9 +29,7 @@ class ActionServerTestCase(TransactionCase):
         })
         cls.sale_order_1 = cls.env['sale.order'].create({
             'name': 'order_item_1',
-            'partner_id': cls.env['res.partner'].create({
-                'name': 'partner_a',
-            }).id,
+            'partner_id': cls.partner_a.id,
             'order_line': [Command.create({'name': 'section_1', 'display_type': 'line_section'})]
         })
         cls.sale_order_1.order_line = [Command.link(cls.env['sale.order.line'].create({
@@ -39,12 +38,8 @@ class ActionServerTestCase(TransactionCase):
             'order_id': cls.sale_order_1.id,
             'x_section_id': False,
         }).id)]
-        #print(cls.sale_order_1.order_line.mapped('name'))
-        #print("\n", cls.sale_order_1.order_line[1].x_section_id)
         cls.sale_order_1.order_line[1].x_section_id = cls.sale_order_1.order_line[0]
-        #print(cls.env.ref("handyman.x_section_id_field").compute)
         cls.sale_order_1.action_confirm()
-        #print(cls.sale_order_1.order_line[1].x_section_id, "\n")
 
     def test_base_automation_create_move_line_add_automatic_account(self):
         self.move_line = self.demo_account_move.invoice_line_ids[0]
