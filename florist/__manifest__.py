@@ -19,6 +19,7 @@
         'website_crm',
     ],
     'data': [
+        'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/crm_stage.xml',
         'data/pos_category.xml',
