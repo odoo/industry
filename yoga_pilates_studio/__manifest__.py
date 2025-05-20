@@ -38,6 +38,8 @@
     ],
     'demo': [
         'demo/appointment_type.xml',
+        'demo/event_event.xml',
+        'demo/product_product.xml',
         'demo/hr_department.xml',
         'demo/res_partner.xml',
         'demo/hr_job.xml',
