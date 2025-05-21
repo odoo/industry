@@ -18,6 +18,7 @@
         'website_appointment',
     ],
     'data': [
+        'data/resource_calendar_data.xml',
         'data/res_config_settings.xml',
         'data/appointment_type.xml',
         'data/ir_attachment_pre.xml',
