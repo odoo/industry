@@ -25,7 +25,6 @@
     ],
     'data': [
         'data/res_config_settings.xml',
-        'data/ir_attachment_pre.xml',
         'data/res_groups.xml',
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
