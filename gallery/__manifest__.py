@@ -15,7 +15,7 @@
         'website_event_sale',
         'website_sale_stock',
         'website_sale_subscription'
-    ],
+  ],
   'data': [
         'data/crm_stage.xml',
         'data/pos_category.xml',
@@ -30,22 +30,26 @@
         'data/product_product.xml',
         'data/product_pricelist.xml',
         'data/product_pricelist_item.xml',
+        'data/res_config_settings.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/knowledge_tour.xml',
         'data/ir_attachment.xml',
         'data/sign_template.xml',
-        'data/sign_item.xml'
-          ],
+        'data/sign_item.xml',
+        'data/res_partner_grade.xml',
+        'data/crm_tag.xml'
+  ],
   'demo': [
         'demo/payment_provider_demo_post.xml',
-        'demo/crm_tag.xml',
         'demo/pos_config.xml',
         'demo/website.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
+        'demo/commission_plan.xml',
         'demo/res_partner.xml',
+        'demo/res_partner_category.xml',
         'demo/crm_lead.xml',
         'demo/pos_session.xml',
         'demo/pos_order.xml',
@@ -59,18 +63,19 @@
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/ir_attachment_post.xml',
-        'demo/sale_order_confirm.xml'],
+        'demo/sale_order_confirm.xml'
+  ],
   'assets': {
         'web.assets_backend': [
                 'gallery/static/src/js/my_tour.js',
         ]
-    },
-    'author': 'Odoo S.A.',
-    "cloc_exclude": [
-        "data/knowledge_article.xml",
-        "static/src/js/my_tour.js",
-        "demo/website_view.xml",
-    ],
-    'images': ['images/main.png'],
-    'license': 'OPL-1'
+  },
+  'author': 'Odoo S.A.',
+  "cloc_exclude": [
+      "data/knowledge_article.xml",
+      "static/src/js/my_tour.js",
+      "demo/website_view.xml",
+  ],
+  'images': ['images/main.png'],
+  'license': 'OPL-1'
 }
