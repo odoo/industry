@@ -184,22 +184,6 @@ for property in self:
         <field name="ttype">many2many</field>
     </record>
 
-    <record id="field_property_rental_contract_id" model="ir.model.fields">
-        <field name="name">x_rental_contract_id</field>
-        <field name="field_description">Rental Contract</field>
-        <field name="model_id" ref="analytic.model_account_analytic_account"/>
-        <field name="relation">sale.order</field>
-        <field name="ttype">many2one</field>
-        <field name="readonly" eval="True"/>
-        <field name="store" eval="False"/>
-        <field name="compute">
-<![CDATA[
-for record in self:
-    sos = self.env['sale.order'].search([('x_account_analytic_account_id', '=', record.id), ('state', '=', 'sale'), ('x_rental_start_date', '<=', datetime.date.today())], order='x_rental_start_date desc')
-    record['x_rental_contract_id'] = sos[0] if sos else None
-]]></field>
-    </record>
-
     <record id="field_property_invoice_status" model="ir.model.fields">
         <field name="name">x_invoice_status</field>
         <field name="field_description">Invoice Status</field>
@@ -237,6 +221,24 @@ for record in self:
         <field name="field_description">Rental Start Date</field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="ttype">date</field>
+    </record>
+
+    <!-- After field_rental_start_date because field_property_rental_contract_id needs it-->
+    <record id="field_property_rental_contract_id" model="ir.model.fields">
+        <field name="name">x_rental_contract_id</field>
+        <field name="field_description">Rental Contract</field>
+        <field name="model_id" ref="analytic.model_account_analytic_account"/>
+        <field name="relation">sale.order</field>
+        <field name="ttype">many2one</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="compute">
+<![CDATA[
+sos = self.env['sale.order']._read_group([('x_account_analytic_account_id', 'in', self.ids), ('state', '=', 'sale'), ('x_rental_start_date', '<=', datetime.date.today()), ('subscription_state', 'not in', ['5_renewed', '6_churn'])], groupby=['x_account_analytic_account_id','id'], order='x_rental_start_date:max')
+mapped_data = {account_id.id: so_id for account_id, so_id in sos}
+for record in self:
+    record['x_rental_contract_id'] = mapped_data.get(record.id, False)
+]]></field>
     </record>
 
     <record id="field_account_analytic_account_id" model="ir.model.fields">
