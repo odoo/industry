@@ -30,6 +30,7 @@
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
+        'data/mail_template.xml',
         'data/planning_role.xml',
         'data/product_pricelist.xml',
         'data/product_pricelist_item.xml',
