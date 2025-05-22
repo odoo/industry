@@ -43,6 +43,7 @@
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/mail_message.xml',
+        'data/mail_template.xml',
         'data/knowledge_article_favorite.xml',
         'data/knowledge_tour.xml',
     ],
