@@ -15,7 +15,6 @@
         'data/product_product.xml',
         'data/appointment_type.xml',
         'data/restaurant_floor.xml',
-        'data/pos_payment_method.xml',
         'data/restaurant_table.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
