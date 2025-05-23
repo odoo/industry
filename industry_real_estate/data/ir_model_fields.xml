@@ -234,9 +234,9 @@ for record in self:
         <field name="store" eval="False"/>
         <field name="compute">
 <![CDATA[
-sos = self.env['sale.order']._read_group([('x_account_analytic_account_id', 'in', self.ids), ('state', '=', 'sale'), ('x_rental_start_date', '<=', datetime.date.today())], groupby=['x_account_analytic_account_id'], aggregates=['x_rental_start_date:max','id:min'])
-mapped_data = {account_id.id: so_id for account_id,_start_date,so_id in sos}
-for record in self:
+sos = self.env['sale.order']._read_group([('x_account_analytic_account_id', 'in', self.ids), ('state', '=', 'sale'), ('x_rental_start_date', '<=', datetime.date.today())], groupby=['x_account_analytic_account_id','id'], order='x_rental_start_date:max')  
+mapped_data = {account_id.id: so_id for account_id,so_id in sos}
+for record in self:  
     record['x_rental_contract_id'] = mapped_data.get(record.id, False)
 ]]></field>
     </record>
