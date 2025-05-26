@@ -56,7 +56,7 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
-        # 'demo/payment_provider_demo.xml',
+        'demo/payment_provider_demo.xml',
         'demo/appointment_type.xml',
         'demo/survey_survey.xml',
         'demo/hr_job.xml',
