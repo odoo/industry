@@ -35,7 +35,6 @@
         'data/product_template_attribute_line.xml',
         'data/product_template_attribute_value.xml',
         'data/product_product.xml',
-        'data/ir_attachment_pre.xml',
         'data/event_event.xml',
         'data/event_event_ticket.xml',
         'data/knowledge_article.xml',
