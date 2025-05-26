@@ -28,7 +28,7 @@
         'data/res_groups.xml',
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
-        'data/ir_ui_view.xml',
+        'data/qweb_views.xml',
         'data/ir_actions_act_window.xml',
         'data/mail_template.xml',
         'data/ir_model_access.xml',
