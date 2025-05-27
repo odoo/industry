@@ -39,7 +39,7 @@
         'data/pos_payment_method.xml',
         'data/project_task_type.xml',
         'data/project_project.xml',
-        # 'data/worksheet_template.xml',
+        'data/worksheet_template.xml',
         'data/product_public_category.xml',
         'data/product_category.xml',
         'data/product_attribute.xml',
