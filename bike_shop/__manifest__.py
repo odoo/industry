@@ -87,7 +87,7 @@
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/hr_employee.xml',
-        # 'demo/sale_order_confirm.xml',
+        'demo/sale_order_confirm.xml',
         'demo/product_supplierinfo.xml',
     ],
     'license': 'OPL-1',
@@ -100,6 +100,7 @@
         'data/knowledge_article.xml',
         'static/src/js/my_tour.js',
         'data/qweb_views.xml',
+        'demo/website_view.xml',
     ],
     'images': [
         'images/main.png',
