@@ -77,12 +77,12 @@
         <field name="on_delete">restrict</field>
     </record>
     <record id="excise_category_line_amount" model="ir.model.fields">
-        <field name="ttype">monetary</field>
+        <field name="ttype">float</field>
         <field name="copied" eval="True"/>
         <field name="field_description">Amount</field>
         <field name="model_id" ref="excise_category_line"/>
         <field name="name">x_amount</field>
-        <field name="currency_field">x_currency_id</field>
+        <!-- <field name="currency_field">x_currency_id</field> -->
         <field name="required" eval="True"/>
     </record>
     <record id="excise_category_line_unit" model="ir.model.fields">
@@ -131,7 +131,7 @@
     </record>
     <record id="product_template_excise_amount" model="ir.model.fields">
         <field name="compute"><![CDATA[for record in self:
-    if record.x_excise_category :
+    if record.x_excise_category:
         computed_excises = 0
         product_volume = self.env.ref('excise_management.convert_to_base_unit_server_action').with_context(active_model='uom.uom', active_id=record.uom_id.id).run()
         for excise in record.x_excise_category.x_excises:
@@ -144,25 +144,24 @@
                     volume_correction = record.x_alcohol_plato_degree
                 case "alcohol":
                     volume_correction = record.x_alcohol_degree
-            computed_excises += excise.x_amount * product_volume * volume_correction / excise_volume
+            computed_excises += excise.x_currency_id._convert(excise.x_amount, record.currency_id) * product_volume * volume_correction / excise_volume
         record["x_excise_amount"] = computed_excises
     else:
         record["x_excise_amount"] = 0]]></field>
         <field name="ttype">monetary</field>
-        <field name="depends">x_excise_category, uom_id, x_alcohol_plato_degree, x_alcohol_degree</field>
+        <field name="depends">x_excise_category, x_excise_category.x_excises, uom_id, x_alcohol_plato_degree, x_alcohol_degree</field>
         <field name="field_description">Excise amount</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="name">x_excise_amount</field>
         <field name="readonly" eval="True"/>
         <field name="selectable" eval="False"/>
-        <field name="store" eval="False"/>
         <field name="currency_field">currency_id</field>
     </record>
     <record id="product_template_excise_volume" model="ir.model.fields">
         <field name="compute"><![CDATA[excise_uom = self.env["uom.uom"].search([('x_excise_reporting_unit', '=', True)], limit=1)
 convert = self.env.ref('excise_management.convert_to_base_unit_server_action').with_context(active_model='uom.uom')
 for record in self:
-    record["x_excise_volume"] = convert.with_context(active_id=record.uom_id.id).run() / convert.with_context(active_id=excise_uom.id).run() if record.x_excise_category else 0
+    record["x_excise_volume"] = convert.with_context(active_id=record.uom_id.id).run() / convert.with_context(active_id=excise_uom.id).run() if (record.x_excise_category and excise_uom) else 0
 ]]></field>
         <field name="ttype">float</field>
         <field name="depends">x_excise_category, uom_id</field>
@@ -235,35 +234,45 @@ for record in self:
             record['x_fiscal_deposit_move'] = "transfer"
         else:
             # Check if destination is fiscal deposit or not
-            if len(list(filter(lambda t: t.tax_src_id.x_is_excise, record.partner_id.property_account_position_id.tax_ids))) > 0:
-                record['x_fiscal_deposit_move'] = "exit fd"
-            else:
+            if any(tax.x_is_excise for tax in record.partner_id.property_account_position_id.tax_ids):
                 record['x_fiscal_deposit_move'] = "exit"
+            else:
+                record['x_fiscal_deposit_move'] = "exit fd"
     else:
         if record.location_dest_id.warehouse_id.x_is_fiscal_deposit:
             # Check if destination is fiscal deposit or not
-            if len(list(filter(lambda t: t.tax_src_id.x_is_excise, record.picking_id.partner_id.property_account_position_id.tax_ids))) > 0:
-                record['x_fiscal_deposit_move'] = "entry fd"
-            else:
+            if any(tax.x_is_excise for tax in record.partner_id.picking_id.property_account_position_id.tax_ids):
                 record['x_fiscal_deposit_move'] = "entry"
+            else:
+                record['x_fiscal_deposit_move'] = "entry fd"
         else:
             record['x_fiscal_deposit_move'] = "none"]]></field>
       <field name="ttype">selection</field>
-      <field name="selection">[('none', "None"), ('entry', "Entry"), ('entry fd', "Entry FD"), ('exit', "Entry"), ('exit fd', "Entry FD"), ('transfer', "Transfer")]</field>
+      <field name="selection">[('none', "None"), ('entry', "Entry"), ('entry fd', "Entry from FD"), ('exit', "Exit"), ('exit fd', "Exit to FD"), ('transfer', "Transfer")]</field>
       <field name="depends">location_id,location_dest_id</field>
       <field name="field_description">Fiscal deposit move</field>
       <field name="model_id" ref="stock.model_stock_move"/>
       <field name="name">x_fiscal_deposit_move</field>
       <field name="readonly" eval="True"/>
     </record>
+    <record id="stock_move_currency" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">Currency</field>
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="name">x_currency_id</field>
+        <field name="related">product_id.currency_id</field>
+        <field name="relation">res.currency</field>
+        <field name="readonly" eval="True"/>
+    </record>
     <record id="stock_move_excise_amount" model="ir.model.fields">
       <field name="compute"><![CDATA[for record in self:
-    record['x_excise_amount'] = record.quantity * record.product_id.product_templ_id.x_excise_amount]]></field>
+    record['x_excise_amount'] = record.quantity * record.product_id.product_tmpl_id.x_excise_amount]]></field>
       <field name="ttype">monetary</field>
       <field name="depends">quantity, product_id</field>
       <field name="field_description">Excise amount</field>
       <field name="model_id" ref="stock.model_stock_move"/>
       <field name="name">x_excise_amount</field>
+      <field name="currency_field">x_currency_id</field>
       <field name="readonly" eval="True"/>
     </record>
     <!-- <record id="ir_model_fields_16304" model="ir.model.fields">
@@ -289,11 +298,10 @@ for record in self:
       <field name="compute"><![CDATA[for record in self:
     if "exit" in record.x_fiscal_deposit_move:
         record['x_excise_volume'] = -1 * record.quantity * record.product_id.x_excise_volume
+    elif "entry" in record.x_fiscal_deposit_move:
+        record['x_excise_volume'] = +1 * record.quantity * record.product_id.x_excise_volume
     else:
-        if "entry" in record.x_fiscal_deposit_move:
-            record['x_excise_volume'] = +1 * record.quantity * record.product_id.x_excise_volume
-        else:
-            record['x_excise_volume'] = 0
+        record['x_excise_volume'] = 0
 ]]></field>
       <field name="ttype">float</field>
       <field name="depends">quantity, product_id, x_fiscal_deposit_move</field>
@@ -301,5 +309,17 @@ for record in self:
       <field name="model_id" ref="stock.model_stock_move"/>
       <field name="name">x_excise_volume</field>
       <field name="readonly" eval="True"/>
+    </record>
+    <record id="stock_move_excise_amount_unit" model="ir.model.fields">
+        <field name="compute"><![CDATA[excise_uom = self.env["uom.uom"].search([('x_excise_reporting_unit', '=', True)], limit=1)
+for record in self: record['x_excise_unit'] = excise_uom.id
+]]></field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Excise Unit</field>
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="depends">x_excise_volume</field>
+        <field name="name">x_excise_unit</field>
+        <field name="relation">uom.uom</field>
+        <field name="readonly" eval="True"/>
     </record>
 </odoo>

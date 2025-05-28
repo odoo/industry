@@ -37,7 +37,7 @@
                         <list editable="bottom">
                             <field name="x_sequence" widget="handle"/>
                             <field name="x_name" string="Name"/>
-                            <field name="x_amount" optional="show"/>
+                            <field name="x_amount" optional="show" options="{'digits':[8,4]}"/>
                             <field name="x_currency_id" optional="show"/>
                             <field name="x_unit" optional="show"/>
                             <field name="x_unit_correction" optional="show"/>
@@ -56,7 +56,8 @@
                             <field name="x_alcohol_degree" optional="show" widget="percentage"/>
                             <field name="x_alcohol_plato_degree" optional="show" options="{'human_readable':true}"/>
                             <field name="x_excise_volume" optional="show" options="{'digits':[8,4]}"/>
-                            <field name="x_excise_amount" optional="show" options="{'no_symbol':false}"/>
+                            <field name="x_excise_amount" optional="show" options="{'digits':[8,4]}"/>
+                            <field name="currency_id" column_invisible="True"/>
                         </list>
                     </field>
                 </sheet>
@@ -104,10 +105,10 @@
             </div>
             <group>
                 <group>
-                    <field name="x_amount"/>
+                    <field name="x_amount" options="{'digits':[8,4]}"/>
                     <field name="x_currency_id"/>
                 </group>
-                <group name="studio_group_9b192d_right">
+                <group>
                     <field name="x_unit"/>
                     <field name="x_unit_correction"/>
                 </group>
@@ -143,8 +144,8 @@
                             <field name="x_excise_description" force_save="1" readonly="True"/>
                         </div>
                         <field name="x_alcohol_degree" widget="percentage" invisible="not x_excise_category"/>
-                        <field name="x_alcohol_plato_degree" force_save="1" readonly="True" options="{'human_readable':true}" invisible="not x_excise_category"/>
-                        <field name="x_excise_amount" force_save="1" readonly="True" invisible="not x_excise_category"/>
+                        <field name="x_alcohol_plato_degree" force_save="1" options="{'human_readable':true}" invisible="not x_excise_category"/>
+                        <field name="x_excise_amount" force_save="1" options="{'digits':[8,4]}" invisible="not x_excise_category"/>
                     </group>
                 </group>
             </xpath>
@@ -164,21 +165,42 @@
         </field>
     </record>
     <record id="stock_move_view_pivot" model="ir.ui.view">
-        <field name="name">stock.move.view.pivot.inherit.excise</field>
-        <field name="inherit_id" ref="stock.view_move_pivot"/>
+        <field name="name">stock.move.view.pivot.excise</field>
+        <!-- <field name="inherit_id" ref="stock.view_move_pivot"/> -->
         <field name="model">stock.move</field>
         <field name="priority">99</field>
         <field name="type">pivot</field>
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
-            <xpath expr="//pivot[1]/field[@name='date']" position="replace">
+            <!-- <xpath expr="//pivot[1]/field[@name='date']" position="replace">
             <field name="x_excise_category" type="col"/>
             </xpath>
             <xpath expr="//field[@name='picking_type_id']" position="after">
                 <field name="x_excise_volume" type="measure"/>
                 <field name="date" interval="week" type="row"/>
                 <field name="x_fiscal_deposit_move" type="row"/>
-            </xpath>
+            </xpath> -->
+            <pivot string="Excises Analysis">
+                <field name="x_excise_volume" type="measure" options="{'digits':[8,4]}"/>
+                <field name="x_excise_amount" type="measure"/>
+                <field name="x_excise_category" type="col"/>
+                <field name="date" interval="week" type="row"/>
+                <field name="x_fiscal_deposit_move" type="row"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="stock_move_view_search" model="ir.ui.view">
+        <field name="name">stock.move.view.search.inherit.excise</field>
+        <field name="inherit_id" ref="stock.view_move_search"/>
+        <field name="model">stock.move</field>
+        <field name="priority">99</field>
+        <field name="type">search</field>
+        <field name="mode">primary</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='ready']" position="replace"/>
+            <xpath expr="//filter[@name='future']" position="replace"/>
+            <xpath expr="//filter[@name='done']" position="replace"/>
         </field>
     </record>
     <record id="stock_warehouse_view_form" model="ir.ui.view">
@@ -194,25 +216,28 @@
             </xpath>
         </field>
     </record>
-    <!-- <record id="stock_move_view_list" model="ir.ui.view">
-        <field name="name">stock.move.view.list.inherit.excise</field>
-        <field name="inherit_id" ref="stock.view_move_tree_receipt_picking"/>
+    <record id="stock_move_view_list" model="ir.ui.view">
+        <field name="name">stock.move.view.list.excise</field>
+        <!-- <field name="inherit_id" ref="stock.view_move_tree_receipt_picking"/> -->
         <field name="model">stock.move</field>
         <field name="priority">99</field>
         <field name="type">list</field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='state']" position="replace"/>
-            <xpath expr="//field[@name='product_uom_qty']" position="replace">
-                <field name="product_qty" optional="show"/>
-            </xpath>
-            <xpath expr="//field[@name='origin']" position="replace">
+            <list default_order="date, picking_id, sequence" string="Moves" create="0">
+                <field name="date_deadline" optional="hide"/>
                 <field name="date" optional="show"/>
-                <field name="x_excise_category" optional="show"/>
                 <field name="x_fiscal_deposit_move" optional="show"/>
+                <field name="product_id" optional="show"/>
+                <field name="product_uom" optional="show" groups="uom.group_uom" widget="many2one_uom"/>
+                <field name="product_uom_qty" optional="show"/>
+                <field name="x_excise_category" optional="show"/>
+                <field name="x_excise_amount" optional="show"/>
+                <field name="x_currency_id" column_invisible="True"/>
                 <field name="x_excise_volume" optional="show" options="{'digits':[8,4]}"/>
-            </xpath>
+                <field name="x_excise_unit" optional="show"/>
+            </list>
         </field>
-    </record> -->
+    </record>
     <record id="account_tax_view_form" model="ir.ui.view">
         <field name="name">account.tax.view.form.inherit.excise</field>
         <field name="inherit_id" ref="account.view_tax_form"/>
