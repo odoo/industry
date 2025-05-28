@@ -1,7 +1,7 @@
 {
     'name': 'Bike Shop',
     'version': '1.0',
-    'category': 'Industry Retail',
+    'category': 'Retail',
     'author': 'Odoo S.A.',
     'depends': [
         'appointment_google_calendar',
@@ -22,6 +22,7 @@
         'website_appointment_sale_project',
         'website_helpdesk_knowledge',
         'website_sale_collect',
+        'web_studio',
     ],
     'data': [
         'data/res_config_settings.xml',
@@ -57,6 +58,7 @@
     ],
     'demo': [
         'demo/payment_provider_demo.xml',
+        'demo/product_template.xml',
         'demo/appointment_type.xml',
         'demo/survey_survey.xml',
         'demo/hr_job.xml',
@@ -97,6 +99,7 @@
     'cloc_exclude': [
         'data/knowledge_article.xml',
         'static/src/js/my_tour.js',
+        'views/worksheet_template.xml',
     ],
     'images': [
         'images/main.png',
