@@ -99,7 +99,7 @@
     'cloc_exclude': [
         'data/knowledge_article.xml',
         'static/src/js/my_tour.js',
-        'views/worksheet_template.xml',
+        'data/worksheet_template.xml',
     ],
     'images': [
         'images/main.png',
