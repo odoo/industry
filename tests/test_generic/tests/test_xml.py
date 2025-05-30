@@ -36,7 +36,7 @@ USELESS_FIELDS = {
     'planning.role': ['color'],
     'planning.slot': ['access_token', 'allocated_hours'],
     'pos.order': ['date_order', 'pos_reference', 'company_id', 'state', 'currency_id', 'last_order_preparation_change'],
-    'pos.order.line': ['price_unit', 'total_cost', 'company_id', 'full_product_name'],
+    'pos.order.line': ['total_cost', 'company_id', 'full_product_name'],
     'product.attribute.value': ['color'],
     'product.product': ['lst_price'],
     'product.template.attribute.value': ['color'],
