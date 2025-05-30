@@ -19,7 +19,6 @@
         'data/sale_order_template_data.xml',
         'data/crm_tags_data.xml',
         "data/ir_attachment.xml",
-        "data/website_view.xml",
         "data/knowledge_cover.xml",
         "data/knowledge_article.xml",
         "data/knowledge_article_favorite.xml",
@@ -50,7 +49,6 @@
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
-        "data/website_view.xml",
         "static/src/js/my_tour.js",
         "demo/website_view.xml",
     ],
