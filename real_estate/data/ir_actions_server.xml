@@ -33,7 +33,7 @@
         <field name="usage">ir_cron</field>
         <field name="code"><![CDATA[
 for contact in model.search([('x_subscribe', '=', True), ('x_to_notify_property_ids', '!=', False)]):
-    if env['mail.template'].browse(env.ref('real_estate.mail_template_42')).send_mail(res_id=contact.id):
+    if env['mail.template'].browse(env.ref('real_estate.mail_template_42').id).send_mail(res_id=contact.id):
         contact['x_last_notification'] = datetime.datetime.now()
     ]]></field>
     </record>
@@ -101,11 +101,10 @@ record['x_technical_partner_id'] = env['res.partner'].create({'name': record.nam
     <record id="create_appointment_link_server_action" model="ir.actions.server">
         <field name="name">Create Appointment &amp; Link</field>
         <field name="model_id" ref="product.model_product_template"/>
-        <field name="binding_model_id" ref="product.model_product_template"/>
         <field name="state">code</field>
-        <field name="code"><![CDATA[
-link = env['appointment.invite'].create({'short_code': datetime.datetime.now().strftime("%M%m%S%d%Y%H"), 'display_name': record.name})
-appointment = env['appointment.type'].create({'name': record.name, 'display_name': record.name, 'x_property_id': record.id, 'appointment_invite_ids': [link.id], 'location_id': record.x_technical_partner.id, 'image_1920': record.image_1920, 'appointment_tz': env.ref('base.user_admin').tz or 'Europe/Brussels'})
+        <field name="code"><![CDATA[for record in records:
+    link = env['appointment.invite'].create({'short_code': datetime.datetime.now().strftime("%M%m%S%d%Y%H") + str(record.id), 'display_name': record.name})
+    appointment = env['appointment.type'].create({'name': record.name, 'display_name': record.name, 'x_property_id': record.id, 'appointment_invite_ids': [link.id], 'location_id': record.x_technical_partner_id.id, 'image_1920': record.image_1920, 'appointment_tz': env.ref('base.user_admin').tz or 'Europe/Brussels'})
         ]]></field>     
     </record>
 
@@ -115,7 +114,7 @@ appointment = env['appointment.type'].create({'name': record.name, 'display_name
         <field name="binding_model_id" ref="base.model_res_partner"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-if env['mail.template'].browse(env.ref('real_estate.mail_template_42')).send_mail(res_id=record.id):
+if env['mail.template'].browse(env.ref('real_estate.mail_template_42').id).send_mail(res_id=record.id):
     record['x_last_notification'] = datetime.datetime.now()
         ]]></field>
     </record>

@@ -70,7 +70,7 @@
                         <group string="Visits">
                             <field name="x_agent_id" widget="many2one_avatar"/>
                             <field name="x_appointment_ids" widget="many2many_uom_tags" force_save="0" readonly="False" options="{'no_create':true,'label_field':'activity_exception_icon','edit_tags':true}"/>
-                            <field name="x_booking_link" widget="CopyClipboardURL"/>
+                            <field name="x_booking_link" widget="CopyClipboardURL" invisible="not x_booking_link"/>
                             <!-- <field name="x_ribbon_stage_is_accounted" force_save="1" readonly="True" invisible="True"/>
                             <field name="x_last_notification_update" force_save="1" readonly="True" invisible="True"/> -->
                         </group>
@@ -303,6 +303,16 @@
             </xpath>
         </field>
     </record> -->
+    <record id="crm_opportunity_view_graph" model="ir.ui.view">
+        <field name="name">crm.lead.graph.view</field>
+        <field name="model">crm.lead</field>
+        <field name="arch" type="xml">
+            <graph string="Opportunities" sample="1" stacked="1">
+                <field name="x_interested_in_id" type="col"/>
+                <field name="date_deadline" interval="month"/>
+            </graph>
+        </field>
+    </record>
     <!-- <record id="crm_lead_pivot_view_customization" model="ir.ui.view">
         <field name="name">crm.lead.pivot.view customization</field>
         <field name="inherit_id" ref="crm_enterprise.crm_lead_view_pivot"/>
@@ -323,6 +333,17 @@
             </xpath>
         </field>
     </record> -->
+
+    <record id="crm_lead_view_pivot" model="ir.ui.view">
+        <field name="name">crm.lead.pivot.view</field>
+        <field name="model">crm.lead</field>
+        <field name="arch" type="xml">
+            <pivot string="Leads" display_quantity="1" sample="1">
+                <field name="x_interested_in_id" type="row"/>
+                <field name="stage_id" type="row"/>
+            </pivot>
+        </field>
+    </record>
     <record id="appointment_type_form_customization_view" model="ir.ui.view">
         <field name="name">appointment.type.form customization</field>
         <field name="inherit_id" ref="appointment.appointment_type_view_form"/>
@@ -423,6 +444,9 @@
         <field name="priority">320</field>
         <field name="type">kanban</field>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="x_interested_in_id" display="full"/>
+            </xpath>
             <xpath expr="//field[@name='partner_id']" position="attributes">
                 <attribute name="options">{"no_open":true}</attribute>
                 <attribute name="widget">many2one</attribute>
@@ -462,5 +486,17 @@
                 <attribute name="domain">[("x_technical_partner", "=", False)]</attribute>
             </xpath>
         </field>
+    </record>
+
+    <record id="reporting_act_window" model="ir.actions.act_window">
+        <field name="name">Reporting</field>
+        <field name="res_model">crm.lead</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="domain">[("x_interested_in_id", "!=", False)]</field>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'pivot', 'view_id': ref('crm_lead_view_pivot')}),
+            (0, 0, {'view_mode': 'graph', 'view_id': ref('crm_opportunity_view_graph')}),
+        ]"/>
     </record>
 </odoo>
