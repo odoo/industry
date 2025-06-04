@@ -2,25 +2,6 @@
     'name': 'Fine Dining Restaurant',
     'version': '3.0',
     'category': 'Hospitality',
-    'description': """
-Odoo for Restaurant
-======================================================
-
-This industry package is designed to streamline and enhance the management of your restaurant operations. It provides a seamless integration of all necessary modules (POS, Inventory, Accounting, Reporting, ...) to optimize restaurant workflows and improve customer satisfaction.
-
-Basics
-  * Use the Point of Sale at the desk for your sales. You can also download the Odoo Mobile App on any phone to take orders.
-  * The Kitchen Display will ensure a great follow-up of every order in your bar and kitchen.
-  * Let your customer book a table anytime with the Appointment App.
-  * Use the Project App to never miss a reordering or a cleaning task.
-  * Use the Planning App to schedule and share your shifts with your employees.
-  * Use the Purchase App to reorder your products.
-  * Use the Inventory App to manage your stock and receive products.
-  * Get visibility and share your menu with a great Website.
-  * Use the Attendances App to record employee's time spent working.
-Customisations
-  * User defined settings save time at product attribute definition.
-""",
     'depends': [
         'account_followup',
         'contacts',
