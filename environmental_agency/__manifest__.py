@@ -34,6 +34,7 @@
         'data/document_document.xml',
     ],
     'demo': [
+        'demo/res_config_settings.xml',
         'demo/ir_attachment_post.xml',
         'demo/res_company.xml',
         'demo/website.xml',

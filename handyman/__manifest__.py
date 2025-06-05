@@ -38,6 +38,7 @@
         'data/sale_order_template_line.xml',
     ],
     'demo': [
+        'demo/res_config_settings.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/mail_activity.xml',

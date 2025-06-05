@@ -33,6 +33,7 @@
         'data/hr_employee_category.xml',
     ],
     'demo': [
+        'demo/res_config_settings.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/mail_activity.xml',

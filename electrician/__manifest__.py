@@ -33,6 +33,7 @@
         'data/mail_message.xml',
     ],
     'demo': [
+        'demo/res_config_settings.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/hr_department.xml',
