@@ -234,14 +234,14 @@ for record in self:
             record['x_fiscal_deposit_move'] = "transfer"
         else:
             # Check if destination is fiscal deposit or not
-            if any(tax.x_is_excise for tax in record.partner_id.property_account_position_id.tax_ids):
+            if any(tax.x_is_excise for tax in record.picking_id.partner_id.property_account_position_id.tax_ids):
                 record['x_fiscal_deposit_move'] = "exit"
             else:
                 record['x_fiscal_deposit_move'] = "exit fd"
     else:
         if record.location_dest_id.warehouse_id.x_is_fiscal_deposit:
             # Check if destination is fiscal deposit or not
-            if any(tax.x_is_excise for tax in record.partner_id.picking_id.property_account_position_id.tax_ids):
+            if any(tax.x_is_excise for tax in record.picking_id.partner_id.property_account_position_id.tax_ids):
                 record['x_fiscal_deposit_move'] = "entry"
             else:
                 record['x_fiscal_deposit_move'] = "entry fd"
@@ -266,7 +266,13 @@ for record in self:
     </record>
     <record id="stock_move_excise_amount" model="ir.model.fields">
       <field name="compute"><![CDATA[for record in self:
-    record['x_excise_amount'] = record.quantity * record.product_id.product_tmpl_id.x_excise_amount]]></field>
+    if record.x_fiscal_deposit_move == "exit":
+        record['x_excise_amount'] = -1 * record.quantity * record.product_id.x_excise_amount
+    elif record.x_fiscal_deposit_move == "entry":
+        record['x_excise_amount'] = +1 * record.quantity * record.product_id.x_excise_amount
+    else:
+        record['x_excise_amount'] = 0
+    ]]></field>
       <field name="ttype">monetary</field>
       <field name="depends">quantity, product_id</field>
       <field name="field_description">Excise amount</field>
@@ -296,9 +302,9 @@ for record in self:
     </record>
     <record id="stock_move_excise_volume" model="ir.model.fields">
       <field name="compute"><![CDATA[for record in self:
-    if "exit" in record.x_fiscal_deposit_move:
+    if record.x_fiscal_deposit_move == "exit":
         record['x_excise_volume'] = -1 * record.quantity * record.product_id.x_excise_volume
-    elif "entry" in record.x_fiscal_deposit_move:
+    elif record.x_fiscal_deposit_move == "entry":
         record['x_excise_volume'] = +1 * record.quantity * record.product_id.x_excise_volume
     else:
         record['x_excise_volume'] = 0
