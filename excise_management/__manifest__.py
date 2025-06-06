@@ -21,7 +21,7 @@
         'data/ir_model_access.xml',
         'data/ir_default.xml',
         'data/account_tax_group.xml',
-        'data/account_tax.xml',
+        # 'data/account_tax.xml',
         'data/stock_warehouse.xml',
         'data/uom_uom.xml',
         'data/x_excise_category.xml',

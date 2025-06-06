@@ -1,22 +1,34 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
     <record id="add_excise_server_action" model="ir.actions.server">
-        <field name="code"><![CDATA[excise_taxes = env["account.tax"].search([('x_is_excise', '=', True)])
-records.write({'taxes_id': [Command.link(id) for id in excise_taxes.filtered(lambda t: t.type_tax_use == 'sale').ids],
-               'supplier_taxes_id': [Command.link(id) for id in excise_taxes.filtered(lambda t: t.type_tax_use == 'purchase').ids]})
+        <field name="code"><![CDATA[if (taxes := record.taxes_id.filtered('x_is_excise')):
+    record['taxes_id'] = [Command.unlink(id) for id in taxes.ids]
+if (taxes := record.supplier_taxes_id.filtered('x_is_excise')):
+    record['supplier_taxes_id'] = [Command.unlink(id) for id in taxes.ids]
+if (categ := record.x_excise_category_id):
+    record.write({'taxes_id': [Command.link(categ.x_sales_tax_id.id)], 'supplier_taxes_id': [Command.link(categ.x_purchase_tax_id.id)]})
 ]]></field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="state">code</field>
-        <field name="name">Add excise tax</field>
+        <field name="name">Add/Remove excise tax</field>
     </record>
-    <record id="remove_excise_server_action" model="ir.actions.server">
-        <field name="code"><![CDATA[excise_taxes = env["account.tax"].search([('x_is_excise', '=', True)])
-records.write({'taxes_id': [Command.unlink(id) for id in excise_taxes.filtered(lambda t: t.type_tax_use == 'sale').ids],
-               'supplier_taxes_id': [Command.unlink(id) for id in excise_taxes.filtered(lambda t: t.type_tax_use == 'purchase').ids]})
-]]></field>
-        <field name="model_id" ref="product.model_product_template"/>
+    <record id="create_excise_tax_server_action" model="ir.actions.server">
+        <field name="code"><![CDATA[
+common_values = {'name': 'Ex. ' + record.name,
+    'description': record.description,
+    'amount_type': 'code',
+    'price_include_override': 'tax_included',
+    'include_base_amount': True,
+    'x_is_excise': True,
+    'formula': quantity * product.x_excise_amount,
+    'tax_group_id': env.ref('excisement_management.excises_tax_group', raise_if_not_found=False).id}
+record['x_sales_tax_id'] = record.create(common_values | {'type_tax_use': 'sale'})
+record['x_purchase_tax_id'] = record.create(common_values | {'type_tax_use': 'purchase'})
+})
+    ]]></field>
+        <field name="model_id" ref="excise_category"/>
         <field name="state">code</field>
-        <field name="name">Remove excise tax</field>
+        <field name="name">Create excise tax</field>
     </record>
     <record id="convert_to_base_unit_server_action" model="ir.actions.server">
         <field name="binding_model_id" ref="uom.model_uom_uom"/>
