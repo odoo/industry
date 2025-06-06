@@ -16,6 +16,7 @@
         'web_studio',
         'website_appointment',
         'website_sale',
+        'partnership',
     ],
     'data': [
         'data/res_config_settings.xml',
@@ -27,6 +28,7 @@
         'data/project_task_type.xml',
         'data/project_project.xml',
         'data/project_task.xml',
+        'data/res_partner_grade.xml',
         'data/product_product.xml',
         'data/pos_payment_method.xml',
         'data/pos_config.xml',
@@ -39,8 +41,6 @@
         'data/maintenance_equipment.xml',
         'data/appointment_view.xml',
         'data/planning_role.xml',
-        'data/ir_actions_server.xml',
-        'data/base_automation.xml',
         'data/knowledge_tour.xml',
     ],
     'demo': [
