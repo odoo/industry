@@ -28,6 +28,7 @@
         'data/sale_subscription_plan.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
+        'data/res_config_settings.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
@@ -35,6 +36,7 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
+        'demo/hr_department.xml',
         'demo/res_partner.xml',
         'demo/hr_employee.xml',
         'demo/product_supplierinfo.xml',
@@ -43,9 +45,9 @@
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
         'demo/project_task.xml',
-        'demo/purchase_order_confirm.xml',
+        # 'demo/purchase_order_confirm.xml',
         'demo/planning_slot.xml',
-        'demo/timesheet.xml',
+        # 'demo/timesheet.xml',
     ],
     'license': 'OPL-1',
     'assets': {
