@@ -6,7 +6,6 @@
     'depends': [
         'crm_enterprise',
         'documents_sign',
-        'hr_skills',
         'industry_fsm_sale_report',
         'knowledge',
         'pos_online_payment',
@@ -58,6 +57,8 @@
         'data/appointment_question.xml',
         'data/appointment_answer.xml',
         'data/crm_tag.xml',
+        'data/website_view.xml',
+        'data/website_theme_apply.xml',
     ],
     'demo': [
         'demo/appointment_type.xml',
@@ -65,7 +66,6 @@
         'demo/crm_team.xml',
         'demo/website.xml',
         'demo/website_view.xml',
-        'demo/hr_department.xml',
         'demo/pos_session.xml',
         'demo/res_partner.xml',
         'demo/calendar_event.xml',
@@ -73,10 +73,7 @@
         'demo/ir_attachment_post.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
-        'demo/website_page.xml',
-        'demo/website_menu.xml',
         'demo/x_pets.xml',
-        'demo/hr_employee.xml',
         'demo/website_theme_apply.xml',
         'demo/stock_warehouse_orderpoint.xml',
     ],
@@ -88,6 +85,7 @@
     },
     'cloc_exclude': [
         'data/knowledge_article.xml',
+        'data/website_view.xml',
         'static/src/js/my_tour.js',
         'demo/website_view.xml',
     ],
