@@ -67,6 +67,7 @@ MODELS_TO_UPDATE = [
     "ir.ui.view",
     "knowledge.article",
     "website.controller.page",
+    "web_editor.assets",
 ]
 
 models_with_user_id = [
@@ -265,18 +266,25 @@ class TestEnv(IndustryCase):
             )
 
     def _check_update_status(self, root, filename):
-        noupdate = root.get('noupdate', '0') in ('1', 'True', 'true')
-        for record in root.xpath("//record"):
+        for record in root.xpath("//record") + root.xpath("//function"):
             model = record.get('model')
+            noupdate = False
+            parent = record.getparent()
+            while parent is not None:  # Find nearest parent with 'noupdate' attribute (data tag or odoo header tag)
+                if 'noupdate' in parent.attrib:
+                    noupdate = parent.attrib['noupdate'] in ('1', 'True', 'true')
+                    break
+                parent = parent.getparent()
+
             if model not in MODELS_TO_UPDATE and not noupdate:
                 _logger.warning(
-                    "Model %s should not be updated, please add 'noupdate=\"1\"' in the header of %s.",
+                    "Model %s should not be updated, please add 'noupdate=\"1\"' in the header of %s, or in a data tag around it.",
                     model,
                     filename,
                 )
             elif model in MODELS_TO_UPDATE and noupdate:
                 _logger.warning(
-                    "Model %s should be updated, please remove 'noupdate=\"1\"' in the header of %s.",
+                    "Model %s should be updated, please remove 'noupdate=\"1\"' attribute tied to it in %s",
                     model,
                     filename,
                 )
