@@ -1,12 +1,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import Command, fields
+from odoo import fields
 from odoo.tests.common import TransactionCase
 from dateutil.relativedelta import relativedelta
-from odoo.tests import Form
+from odoo.tests import Form, tagged
 
+
+@tagged('post_install', '-at_install')
 class ServerActionsTestCase(TransactionCase):
-    
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
