@@ -63,10 +63,13 @@ MODELS_TO_UPDATE = [
     "ir.model",
     "ir.model.access",
     "ir.model.fields",
+    "ir.module.module",
     "ir.ui.menu",
     "ir.ui.view",
+    "theme.utils",
     "knowledge.article",
     "website.controller.page",
+    "web_editor.assets",
 ]
 
 models_with_user_id = [
@@ -265,18 +268,32 @@ class TestEnv(IndustryCase):
             )
 
     def _check_update_status(self, root, filename):
-        noupdate = root.get('noupdate', '0') in ('1', 'True', 'true')
-        for record in root.xpath("//record"):
+        for record in root.xpath("//record") + root.xpath("//function"):
             model = record.get('model')
+            noupdate = False
+            parent = record.getparent()
+            data_tag = False
+            while parent is not None:  # Find nearest parent with 'noupdate' attribute (data tag or odoo header tag)
+                if 'noupdate' in parent.attrib:
+                    if data_tag:
+                        _logger.warning(
+                            "Avoid setting 'noupdate' around an already existing 'data' tag in %s",
+                            filename,
+                        )
+                    noupdate = noupdate or parent.attrib['noupdate'] in ('1', 'True', 'true')
+                if parent.tag == 'data':
+                    data_tag = True
+                parent = parent.getparent()
+
             if model not in MODELS_TO_UPDATE and not noupdate:
                 _logger.warning(
-                    "Model %s should not be updated, please add 'noupdate=\"1\"' in the header of %s.",
+                    "Model %s should not be updated, please add 'noupdate=\"1\"' in the header of %s, or in a data tag around it.",
                     model,
                     filename,
                 )
             elif model in MODELS_TO_UPDATE and noupdate:
                 _logger.warning(
-                    "Model %s should be updated, please remove 'noupdate=\"1\"' in the header of %s.",
+                    "Model %s should be updated, please remove 'noupdate=\"1\"' attribute tied to it in %s",
                     model,
                     filename,
                 )
