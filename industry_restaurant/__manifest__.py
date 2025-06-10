@@ -1,11 +1,10 @@
 {
     'name': 'Fine Dining Restaurant',
-    'version': '3.0',
+    'version': '1.1',
     'category': 'Hospitality',
     'depends': [
         'account_followup',
         'contacts',
-        'hr',
         'hr_attendance',
         'knowledge',
         'planning',
@@ -18,13 +17,12 @@
         'website_appointment',
     ],
     'data': [
-        'data/resource_calendar_data.xml',
+        'data/product_category.xml',
+        'data/product_pricelist.xml',
         'data/res_config_settings.xml',
         'data/appointment_type.xml',
         'data/ir_attachment_pre.xml',
         'data/ir_default_data.xml',
-        'data/product_category.xml',
-        'data/product_pricelist.xml',
         'data/uom_uom.xml',
         'data/product_product.xml',
         'data/project_task_type.xml',
@@ -36,6 +34,7 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
+        'demo/resource_calendar_data.xml',
         'demo/pos_payment_method.xml',
         'demo/payment_provider_demo_post.xml',
         'demo/res_partner.xml',
