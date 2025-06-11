@@ -7,14 +7,11 @@
         'l10n_be_pos_sale',
         'partner_commission',
         'pos_sale_subscription',
-        'project_sale_subscription',
         'sale_purchase_project',
+        'sale_stock',
+        'sale_subscription',
         'sign',
-        'website',
-        'website_crm_iap_reveal',
-        'website_event_sale',
-        'website_sale_stock',
-        'website_sale_subscription'
+        'website_event_sale'
   ],
   'data': [
         'data/crm_stage.xml',
@@ -67,7 +64,7 @@
   ],
   'assets': {
         'web.assets_backend': [
-                'gallery/static/src/js/my_tour.js',
+            'gallery/static/src/js/my_tour.js',
         ]
   },
   'author': 'Odoo S.A.',
