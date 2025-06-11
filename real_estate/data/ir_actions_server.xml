@@ -144,4 +144,64 @@ if res: record.write({'x_last_notification': datetime.datetime.now()}) # Update 
 
 ]]></field>
   </record>
+
+  <record id="commission_plan_server_action" model="ir.actions.server">
+    <field name="name">Industry: Commission Plan server action</field>
+    <field name="model_id" ref="account.model_account_move"/>
+    <field name="state">code</field>
+    <field name="usage">base_automation</field>
+    <field name="code"><![CDATA[
+for record in records:
+    commission_plan = env['sale.commission.plan'].search([('name', '=', 'Commission Plan 2025')], limit=1)
+    if record.move_type == 'out_invoice' or record.state != 'posted' and commission_plan:
+        if record.x_seller and record.x_seller.id != record.invoice_user_id.id:
+            plan_user_id_finder = env['sale.commission.plan.user'].search([
+                ('plan_id', '=', commission_plan.id),
+                ('user_id', '=', record.invoice_user_id.id),
+            ])
+            plan_user_id_seller = env['sale.commission.plan.user'].search([
+                ('plan_id', '=', commission_plan.id),
+                ('user_id', '=', record.x_seller.id),
+            ])
+            if plan_user_id_finder and plan_user_id_seller:
+                adjustment = env['sale.commission.achievement'].create({
+                    'achieved': record.amount_untaxed * 0.10,
+                    'currency_id': record.currency_id.id,
+                    'display_name': record.name,
+                    'add_user_id': plan_user_id_seller.id,
+                    'reduce_user_id': plan_user_id_finder.id,
+                    'company_id': record.company_id.id,
+      })]]></field>
+  </record>
+  <record id="ir_actions_server_778" model="ir.actions.server">
+    <field name="name">Send for Signature</field>
+    <field name="model_id" ref="crm.model_crm_lead"/>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+for rec in records:
+    if not rec.partner_id or not rec.x_interested_in.x_owner:
+        raise UserError("Missing signer: Customer or Owner is not set.")
+    act = rec.env['ir.actions.act_window']._for_xml_id('sign.action_sign_send_request')
+    act['context'] = {
+        'default_template_id': env.ref('real_estate.sign_template_3').id,
+        "active_id": rec.id,
+        "default_res_model": "crm.lead",
+        "default_res_id": rec.id,
+        'default_set_sign_order': True,
+        'default_property': rec.x_interested_in,
+        'default_signer_ids': [
+            (0, 0, {
+                'partner_id': rec.partner_id.id,
+                'role_id': env.ref('real_estate.sign_item_role_9').id,
+            }),
+            (0, 0, {
+                'partner_id': rec.x_interested_in.x_owner.id,
+                'role_id': env.ref('real_estate.sign_item_role_10').id,
+            }),
+        ],
+        "default_reference_doc": f"crm.lead,{rec.id}"
+    }
+    action = act
+]]></field>
+  </record>
 </odoo>
