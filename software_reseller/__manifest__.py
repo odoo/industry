@@ -3,6 +3,7 @@
     'version': '1.0',
     'category': 'Services',
     'depends': [
+        'contacts',
         'knowledge',
         'project',
         'sale_planning',
