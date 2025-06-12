@@ -11,6 +11,7 @@
         'knowledge',
         'project_enterprise',
         'sale_commission',
+        'sale_commission_linked_achievement',
         'sale_crm',
         'sale_project',
         'sign',
