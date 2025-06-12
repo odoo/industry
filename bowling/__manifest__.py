@@ -5,7 +5,8 @@
     'depends': [
         'knowledge',
         'planning',
-        'pos_self_order_preparation_display',
+        'pos_enterprise',
+        'pos_restaurant',
         'website_appointment',
     ],
     'data': [
@@ -37,7 +38,6 @@
         'demo/pos_order.xml',
         'demo/pos_order_line.xml',
         'demo/website_page.xml',
-        'demo/website_menu.xml',
         'demo/appointment_resource.xml',
     ],
     'license': 'OPL-1',
