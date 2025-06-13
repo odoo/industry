@@ -152,26 +152,31 @@ if res: record.write({'x_last_notification': datetime.datetime.now()}) # Update 
     <field name="usage">base_automation</field>
     <field name="code"><![CDATA[
 for record in records:
-    commission_plan = env['sale.commission.plan'].search([('name', '=', 'Commission Plan 2025')], limit=1)
-    if record.move_type == 'out_invoice' or record.state != 'posted' and commission_plan:
-        if record.x_seller and record.x_seller.id != record.invoice_user_id.id:
-            plan_user_id_finder = env['sale.commission.plan.user'].search([
-                ('plan_id', '=', commission_plan.id),
-                ('user_id', '=', record.invoice_user_id.id),
-            ])
-            plan_user_id_seller = env['sale.commission.plan.user'].search([
-                ('plan_id', '=', commission_plan.id),
-                ('user_id', '=', record.x_seller.id),
-            ])
-            if plan_user_id_finder and plan_user_id_seller:
-                adjustment = env['sale.commission.achievement'].create({
-                    'achieved': record.amount_untaxed * 0.10,
-                    'currency_id': record.currency_id.id,
-                    'display_name': record.name,
-                    'add_user_id': plan_user_id_seller.id,
-                    'reduce_user_id': plan_user_id_finder.id,
-                    'company_id': record.company_id.id,
-      })]]></field>
+    for commission_plan in env['sale.commission.plan']:
+        if record.move_type == 'out_invoice' or record.state != 'posted' and commission_plan:
+            if record.x_studio_seller and record.x_studio_seller.id != record.invoice_user_id.id:
+                plan_user_id_finder = env['sale.commission.plan.user'].search([
+                    ('plan_id', '=', commission_plan.id),
+                    ('user_id', '=', record.invoice_user_id.id),
+                ])
+                plan_user_id_seller = env['sale.commission.plan.user'].search([
+                    ('plan_id', '=', commission_plan.id),
+                    ('user_id', '=', record.x_studio_seller.id),
+                ])
+                seller_plan = env['sale.commission.plan.achievement'].search([
+                    ('plan_id', '=', commission_plan.id),
+                    ('x_studio_reciever', '=', 'Seller')
+                ], limit=1)
+                if plan_user_id_finder and plan_user_id_seller and seller_plan.rate:
+                    adjustment = env['sale.commission.achievement'].create({
+                        'achieved': record.amount_untaxed * seller_plan.rate,
+                        'currency_id': record.currency_id.id,
+                        'display_name': record.name,
+                        'add_user_id': plan_user_id_seller.id,
+                        'reduce_user_id': plan_user_id_finder.id,
+                        'company_id': record.company_id.id,
+                  })
+    ]]></field>
   </record>
   <record id="ir_actions_server_778" model="ir.actions.server">
     <field name="name">Send for Signature</field>
