@@ -20,6 +20,7 @@ Manage your properties, create and manage rental contracts, and streamline your 
     ],
     'data': [
         'data/account_analytic_plan.xml',
+        'data/ir_default.xml',
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
         'data/ir_model_2.xml',
