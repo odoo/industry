@@ -163,15 +163,20 @@ for record in records:
                 ('plan_id', '=', commission_plan.id),
                 ('user_id', '=', record.x_seller.id),
             ])
-            if plan_user_id_finder and plan_user_id_seller:
+            seller_plan = env['sale.commission.plan.achievement'].search([
+                ('plan_id', '=', commission_plan.id),
+                ('x_receiver', '=', 'Seller')
+            ], limit=1)
+            if plan_user_id_finder and plan_user_id_seller and seller_plan.rate:
                 adjustment = env['sale.commission.achievement'].create({
-                    'achieved': record.amount_untaxed * 0.10,
+                    'achieved': record.amount_untaxed * seller_plan.rate,
                     'currency_id': record.currency_id.id,
                     'display_name': record.name,
                     'add_user_id': plan_user_id_seller.id,
                     'reduce_user_id': plan_user_id_finder.id,
                     'company_id': record.company_id.id,
-      })]]></field>
+              })
+    ]]></field>
   </record>
   <record id="ir_actions_server_778" model="ir.actions.server">
     <field name="name">Send for Signature</field>
