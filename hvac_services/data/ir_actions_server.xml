@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="update_so_line_quantity" model="ir.actions.server">
+        <field name="name">Update SO line Quantity</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for so_line in records:
+    so_line['product_uom_qty'] = len(so_line.x_maintained_serials_ids)
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+    </record>
+    <record id="update_fs_task_serials_on_create" model="ir.actions.server">
+        <field name="name">Update FS Task Serials on create</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for task in records:
+    for lot_id in task.sale_order_id.order_line.mapped('x_maintained_serials_ids').filtered(lambda l: l and l not in task.x_serials):
+        task['x_serials'] = [Command.link(lot_id.id)]
+]]></field>
+        <field name="model_id" ref="project.model_project_task"/>
+    </record>
+    <record id="update_fs_task_serials_on_delivery" model="ir.actions.server">
+        <field name="name">Update FS Task Serials on Delivery</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for stock_pick in records:
+    for task in stock_pick.sale_id.tasks_ids.filtered('is_fsm'):
+        for move in stock_pick.move_ids_without_package:
+            if move.product_id.is_storable and move.product_id.tracking == "serial":
+                for lot_id in move.lot_ids.filtered(lambda l: l not in task.x_serials):
+                    task['x_serials'] = [Command.link(lot_id.id)]
+]]></field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+    </record>
+    <record id="add_sale_order_line_serials_to_sale_order" model="ir.actions.server">
+        <field name="name">Set serials of the sale order equal to the serials of its order lines</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for so in records:
+    so['x_maintained_serials_ids'] = [Command.set(so.order_line.x_maintained_serials_ids.ids)]
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+    </record>
+</odoo>
