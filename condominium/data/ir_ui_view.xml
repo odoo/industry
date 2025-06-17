@@ -1,523 +1,1430 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="sale_order_form_custom" model="ir.ui.view">
-        <field name="name">Custom form view for sale order</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale_subscription.sale_subscription_order_view_form"/>
-        <field name="mode">extension</field>
-        <field name="active" eval="True"/>
-        <field name="priority">160</field>
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-            <xpath expr="//header" position="inside">
-                <button name="%(ir_act_server_split_per_property)d" string="Split per Owner" type="action" invisible="not x_company_partner_id or state != 'draft'"/>
-            </xpath>
-            <xpath expr="//button[@name='action_sale_order_log']" position="after">
-                <button name="%(sale_order_button_action)d" class="oe_stat_button" icon="fa-dollar" type="action" invisible="x_x_source_sales_order_sale_order_count == 0">
-                    <field widget="statinfo" name="x_x_source_sales_order_sale_order_count" string="Sales Orders"/>
-                </button>
-            </xpath>
-            <xpath expr="//field[@name='tag_ids']" position="after">
-                <field name="x_source_sales_order"/>
-            </xpath>
-            <xpath expr="//label[@for='pricelist_id']" position="attributes">
-                <attribute name="string">Distribution Key</attribute>
-            </xpath>
-            <xpath expr="//field[@name='pricelist_id']" position="attributes">
-                <attribute name="options">{"no_open": false, "no_create": true}</attribute>
-                <attribute name="placeholder">Area as distribution key</attribute>
-            </xpath>
-        </field>
-    </record>
-    <record id="default_list_view_building" model="ir.ui.view">
-        <field name="name">Default list view for x_buildings</field>
-        <field name="model">x_buildings</field>
-        <field name="type">list</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <list>
-                <field name="x_sequence" widget="handle"/>
-                <field name="x_name"/>
-                <field name="x_tag_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+  <record id="analytic_account_custom_form_view" model="ir.ui.view">
+    <field name="inherit_id" ref="analytic.view_account_analytic_account_form"/>
+    <field name="mode">primary</field>
+    <field name="model">account.analytic.account</field>
+    <field name="name">analytic.analytic.account.form.condominium</field>
+    <field name="priority">99</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='code']" position="replace"/>
+        <xpath expr="//form//label[@for='name']" position="replace"/>
+        <xpath expr="//field[@name='name']" position="attributes">
+          <attribute name="placeholder">e.g. Apartment A0</attribute>
+        </xpath>
+        <xpath expr="//button[@name='subscriptions_action']" position="after">
+          <button class="oe_stat_button" type="object" name="action_view_vendor_bill" icon="fa-file-text-o">
+            <field string="Vendor Bills" name="vendor_bill_count" widget="statinfo"/>
+          </button>
+        </xpath>
+        <xpath expr="//button[@name='action_view_projects']" position="replace"/>
+        <xpath expr="//field[@name='active']" position="after">
+          <xpath expr="//group[@name='main']/group[2]/field[@name='company_id']" position="move"/>
+          <field name="x_condominium"/>
+        </xpath>
+        <xpath expr="//field[@name='currency_id']" position="replace">
+          <field name="x_property" options="{'create_name_field': 'x_name', 'no_create' :true}"/>
+          <xpath expr="//field[@name='partner_id']" position="move"/>
+          <field name="x_start_date" force_save="1" readonly="True"/>
+          <field name="x_end_date" force_save="1" readonly="True"/>
+        </xpath>
+        <xpath expr="//field[@name='partner_id']" position="attributes">
+          <attribute name="required">x_is_a_property</attribute>
+          <attribute name="string">Owner</attribute>
+        </xpath>
+        <xpath expr="//field[@name='plan_id']" position="attributes">
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//group[@name='main']/group/field[@name='company_id']" position="attributes">
+          <attribute name="force_save">1</attribute>
+          <attribute name="groups">base.group_no_one</attribute>
+          <attribute name="readonly">True</attribute>
+        </xpath>
+      </data>
+    </field>
+  </record>
+  <record id="sale_order_form_custom" model="ir.ui.view">
+    <field name="name">sale.order.form.condominium</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale_subscription.sale_subscription_order_view_form"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <xpath expr="//header" position="inside">
+        <button name="%(ir_act_server_split_so_per_owner)d" string="Split per Owner" type="action" invisible="not x_company_partner_id or state != 'draft'"/>
+      </xpath>
+      <xpath expr="//button[@name='action_sale_order_log']" position="after">
+        <button name="%(sale_order_button_action)d" class="oe_stat_button" icon="fa-dollar" type="action" invisible="x_source_sales_order_sale_order_count == 0">
+          <field widget="statinfo" name="x_source_sales_order_sale_order_count" string="Sales Orders"/>
+        </button>
+      </xpath>
+      <xpath expr="//field[@name='tag_ids']" position="after">
+        <field name="x_source_sales_order"/>
+      </xpath>
+      <xpath expr="//label[@for='pricelist_id']" position="attributes">
+        <attribute name="string">Distribution Key</attribute>
+      </xpath>
+      <xpath expr="//field[@name='pricelist_id']" position="attributes">
+        <attribute name="options">{"no_open": false, "no_create": true}</attribute>
+        <attribute name="placeholder">Area as distribution key</attribute>
+      </xpath>
+    </field>
+  </record>
+  <record id="default_list_view_building" model="ir.ui.view">
+    <field name="name">x_buildings.list.condominium</field>
+    <field name="model">x_buildings</field>
+    <field name="type">list</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+        <field name="x_tag_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+      </list>
+    </field>
+  </record>
+  <record id="default_form_view_building" model="ir.ui.view">
+    <field name="model">x_buildings</field>
+    <field name="name">x_buildings.form.condominium</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Buildings">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_image" class="oe_avatar" widget="image"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name or reference..."/>
+            </h1>
+          </div>
+          <group>
+            <group>
+              <field name="x_condominium"/>
+              <field name="x_company_id" groups="base.group_no_one" options="{'no_create': True}"/>
+              <span class="fw-bold">Address</span>
+              <div class="o_address_format">
+                <field name="x_street" placeholder="Street..." class="o_address_street"/>
+                <field name="x_street2" placeholder="Street 2..." class="o_address_street"/>
+                <field name="x_city" placeholder="City" class="o_address_city"/>
+                <field name="x_state" class="o_address_state" placeholder="State" options="{'no_open': True, 'no_quick_create': True}"/>
+                <field name="x_zip" placeholder="ZIP" class="o_address_zip"/>
+                <field name="x_country" placeholder="Country" class="o_address_country" options="{'no_open': True, 'no_create': True}"/>
+              </div>
+            </group>
+            <group>
+              <field name="x_tag_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+            </group>
+          </group>
+          <group>
+            <field name="x_notes" placeholder="Type down your notes here..." nolabel="1" colspan="2"/>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+  <record id="default_search_view_building" model="ir.ui.view">
+    <field name="model">x_buildings</field>
+    <field name="name">x_buildings.form.condominium</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <field name="x_tag_ids"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_buildings" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+  </record>
+  <record id="default_list_view_building_tags" model="ir.ui.view">
+    <field name="model">x_buildings_tag</field>
+    <field name="name">x_buildings_tag.list.condominium</field>
+    <field name="type">list</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <list editable="bottom">
+        <field name="x_name"/>
+        <field name="x_color" widget="color_picker"/>
+      </list>
+    </field>
+  </record>
+  <record id="default_form_view_building_tags" model="ir.ui.view">
+    <field name="model">x_buildings_tag</field>
+    <field name="name">x_buildings_tag.form.condominium</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Buildings Tags">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+        </sheet>
+      </form>
+    </field>
+  </record>
+  <record id="analytic_account_kanban_view" model="ir.ui.view">
+    <field name="name">account.analytic.account.kanban.condominium</field>
+    <field name="mode">primary</field>
+    <field name="active" eval="True"/>
+    <field name="model">account.analytic.account</field>
+    <field name="priority">99</field>
+    <field name="type">kanban</field>
+    <field name="arch" type="xml">
+      <kanban default_group_by="x_building" quick_create_view="condominium.quick_create_account_form">
+        <templates>
+          <t t-name="card">
+            <field name="name" display="full" placeholder="e.g. Apartment A0"/>
+            <field name="x_tags" display="full"/>
+            <field name="x_type" display="full"/>
+            <field name="partner_id" display="full" widget="many2one_avatar"/>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+  <record id="account_analytic_plan_form_view_inherit" model="ir.ui.view">
+    <field name="name">account.analytic.plan.inherit.form.condominium</field>
+    <field name="model">account.analytic.plan</field>
+    <field name="active" eval="True"/>
+    <field name="inherit_id" ref="analytic.account_analytic_plan_form_view"/>
+    <field name="arch" type="xml">
+      <field name="color" position="after">
+        <field name="x_is_a_property_plan"/>
+      </field>
+    </field>
+  </record>
+  <record id="default_kanban_view_building" model="ir.ui.view">
+    <field name="name">x_buildings.kanban.condominium</field>
+    <field name="model">x_buildings</field>
+    <field name="active" eval="True"/>
+    <field name="priority">99</field>
+    <field name="type">kanban</field>
+    <field name="arch" type="xml">
+      <kanban>
+        <templates>
+          <t t-name="card">
+            <field name="x_name" />
+            <field name="x_tag_ids" display="full"/>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+  <record id="default_list_view_properties_type" model="ir.ui.view">
+    <field name="name">x_properties_types.list.condominium</field>
+    <field name="model">x_properties_types</field>
+    <field name="type">list</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <list editable="bottom">
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+  </record>
+  <record id="default_form_view_property_type" model="ir.ui.view">
+    <field name="name">x_properties_types.form.condominium</field>
+    <field name="model">x_properties_types</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Properties Types">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+  <record id="default_search_view_property_type" model="ir.ui.view">
+    <field name="name">x_properties_types.search.condominium</field>
+    <field name="model">x_properties_types</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_properties_types" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+  </record>
+  <record id="default_list_view_for_x_ratios" model="ir.ui.view">
+    <field name="name">x_ratios.list.condominium</field>
+    <field name="model">x_ratios</field>
+    <field name="active" eval="True"/>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_sequence" widget="handle" />
+        <field name="x_name" />
+        <field name="x_company_id" groups="base.group_multi_company" />
+      </list>
+    </field>
+  </record>
+  <record id="default_form_view_for_x_ratios" model="ir.ui.view">
+    <field name="name">x_ratios.form.condominium</field>
+    <field name="model">x_ratios</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Ratios">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active" />
+          <group>
+            <group>
+              <field name="x_property" options='{"create_name_field": "x_name", "no_create": true}'/>
+              <field name="x_pricelist" options='{"no_create": true}'/>
+              <field name="x_company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+              <field name="x_building"/>
+              <field name="x_property_ratios"/>
+            </group>
+            <group>
+              <field name="x_type"/>
+              <field name="x_area"/>
+              <field name="x_ratio"/>
+            </group>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+  <record id="default_search_view_for_x_ratios" model="ir.ui.view">
+    <field name="name">x_ratios.search.condominium</field>
+    <field name="model">x_ratios</field>
+    <field name="active" eval="True"/>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_ratios" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+  </record>
+  <record id="product_pricelist_list_view_inherit" model="ir.ui.view">
+    <field name="name">product.pricelist.list.condominium</field>
+    <field name="inherit_id" ref="product.product_pricelist_view_tree" />
+    <field name="mode">extension</field>
+    <field name="model">product.pricelist</field>
+    <field name="active" eval="True"/>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='name']" position="attributes">
+        <attribute name="string">Distribution Key</attribute>
+      </xpath>
+      <xpath expr="//field[@name='country_group_ids']" position="attributes">
+        <attribute name="column_invisible">True</attribute>
+      </xpath>
+      <xpath expr="//field[@name='company_id']" position="attributes">
+        <attribute name="column_invisible">True</attribute>
+      </xpath>
+    </field>
+  </record>
+  <record id="res_partner_form_view_inherit" model="ir.ui.view">
+    <field name="name">res.partner.form.condominium</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="mode">extension</field>
+    <field name="model">res.partner</field>
+    <field name="active" eval="True"/>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <xpath expr="//sheet" position="before">
+        <header>
+          <button string="Create Condominium" name="%(ir_action_create_condominium)d" type="action" invisible="company_type == 'person' or ref_company_ids or not x_is_main_company"/>
+        </header>
+      </xpath>
+      <xpath expr="//button[@name='action_open_employees']" position="after">
+        <button class="oe_stat_button" icon="fa-home" type="action" name="%(condominium_property_count_contact_smart_button)d" invisible="not x_x_condominium_x_property_count">
+          <field widget="statinfo" name="x_x_condominium_x_property_count" string="Properties" />
+        </button>
+      </xpath>
+      <xpath expr="//field[@name='property_product_pricelist']" position="after">
+        <field name="x_condominium_properties" widget="many2many_tags" force_save="1" readonly="True" />
+      </xpath>
+      <xpath expr="//sheet/notebook" position="inside">
+        <page string="Vendors" invisible="not ref_company_ids">
+          <field name="x_vendors">
+            <list string="Contacts" sample="1" multi_edit="1" editable="bottom">
+              <field name="complete_name" string="Name"/>
+              <field name="x_is_main_company" invisible="1"/>
+              <field name="phone" class="o_force_ltr" optional="show"/>
+              <field name="email" optional="show"/>
+              <field name="user_id" optional="show" widget="many2one_avatar_user" domain="[('share', '=', False)]"/>
+              <field name="activity_ids" optional="show" widget="list_activity"/>
+              <field name="street" optional="hide"/>
+              <field name="city" optional="show"/>
+              <field name="state_id" optional="hide" readonly="1"/>
+              <field name="country_id" optional="show" readonly="1"/>
+              <field name="vat" optional="hide" readonly="1" string="VAT"/>
+              <field name="category_id" optional="hide" widget="many2many_tags" options="{'color_field': 'color'}"/>
+              <field name="company_id" groups="base.group_multi_company" readonly="1"/>
             </list>
-        </field>
-    </record>
-    <record id="default_form_view_building" model="ir.ui.view">
-        <field name="model">x_buildings</field>
-        <field name="name">Default form view for x_buildings</field>
-        <field name="priority">99</field>
-        <field name="type">form</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <form>
-                <header/>
-                <sheet string="Buildings">
-                    <div name="button_box" class="oe_button_box">
-                        <button class="oe_stat_button" icon="fa-home" type="action" name="%(props_build_act_window)d">
-                            <field widget="statinfo" name="x_x_building_account_analytic_account_count" string="Properties"/>
-                        </button>
-                    </div>
-                    <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
-                    <field name="x_image" class="oe_avatar" widget="image"/>
-                    <div class="oe_title">
-                        <h1>
-                            <field name="x_name" required="1" placeholder="Name or reference..."/>
-                        </h1>
-                    </div>
-                    <group>
-                        <group>
-                            <field name="x_condominium"/>
-                            <field name="x_company_id" groups="base.group_no_one" options="{'no_create': True}"/>
-                            <span class="fw-bold">Address</span>
-                            <div class="o_address_format">
-                                <field name="x_street" placeholder="Street..." class="o_address_street"/>
-                                <field name="x_street2" placeholder="Street 2..." class="o_address_street"/>
-                                <field name="x_city" placeholder="City" class="o_address_city"/>
-                                <field name="x_state" class="o_address_state" placeholder="State" options="{'no_open': True, 'no_quick_create': True}"/>
-                                <field name="x_zip" placeholder="ZIP" class="o_address_zip"/>
-                                <field name="x_country" placeholder="Country" class="o_address_country" options="{'no_open': True, 'no_create': True}"/>
-                            </div>
-                        </group>
-                        <group>
-                            <field name="x_tag_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
-                        </group>
+          </field>
+        </page>
+      </xpath>
+      <xpath expr="//field[@name='x_condominium_properties']" position="replace"/>
+      <xpath expr="//button[@name='action_see_documents']" position="after">
+        <button class="oe_stat_button" icon="fa-home" type="action" name="%(owner_properties_contact_smart_button)d" invisible="not x_x_current_owner_x_property_count">
+          <field widget="statinfo" name="x_x_current_owner_x_property_count" string="Properties"/>
+        </button>
+      </xpath>
+      <xpath expr="//field[@name='child_ids']" position="after">
+        <field name="x_ownership_properties"/>
+        <field name="x_co_ownership_properties"/>
+      </xpath>
+    </field>
+  </record>
+  <record id="res_partner_select_search_inherit" model="ir.ui.view">
+    <field name="name">res.partner.select.search.condominium</field>
+    <field name="inherit_id" ref="base.view_res_partner_filter"/>
+    <field name="mode">extension</field>
+    <field name="model">res.partner</field>
+    <field name="active" eval="True"/>
+    <field name="priority">160</field>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+      <field name="name" position="after">
+        <field name="x_companies" string="Condominiums"/>
+      </field>
+    </field>
+  </record>
+  <record id="sale_order_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='sale_order_template_id']" position="after">
+          <field name="x_distribution_key" options="{'create_name_field': 'x_name'}"/>
+        </xpath>
+        <xpath expr="//label[@for='pricelist_id']" position="attributes">
+          <attribute name="string">Pricelist</attribute>
+        </xpath>
+        <xpath expr="//field[@name='pricelist_id']" position="attributes">
+          <attribute name="placeholder"/>
+        </xpath>
+        <xpath expr="//group[@name='sale_header']" position="after">
+          <group name="sale_header_group"/>
+        </xpath>
+        <xpath expr="//page[@name='order_lines']/field[@name='order_line']/list" position="attributes">
+          <attribute name="open_form_view">true</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="mode">extension</field>
+    <field name="model">sale.order</field>
+    <field name="name">sale.order.form.condominium</field>
+    <field name="priority">160</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+  </record>
+  <record id="x_property_list_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+        <field name="x_type" optional="show"/>
+        <field name="x_building" optional="show"/>
+        <field name="x_current_owner" optional="show"/>
+      </list>
+    </field>
+    <field name="model">x_property</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_property.list.condominium</field>
+    <field name="type">list</field>
+  </record>
+  <record id="x_property_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Property">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="property_group_detail">
+            <group name="property_group_detailleft">
+              <field name="x_type" options="{'create_name_field': 'x_name'}"/>
+              <field name="x_building" options="{'create_name_field': 'x_name'}"/>
+              <field name="x_floor"/>
+              <field name="x_area"/>
+            </group>
+            <group name="property_group_detailright">
+              <field name="x_tags" widget="many2many_tags"/>
+              <field name="x_parent" options="{'create_name_field': 'x_name'}" domain="[('x_company_id', 'in', allowed_company_ids)]"/>
+              <field name="x_current_owner" force_save="1" readonly="True"/>
+              <field name="x_company_id" string="Company"/>
+              <field name="x_condominium" force_save="1" readonly="True"/>
+            </group>
+          </group>
+          <notebook name="meter_readings_notebook">
+            <page string="Meter Readings" name="meter_readings_page">
+              <field name="x_meter_reading_ids">
+                <list string="Meter Reading" editable="bottom" default_order="x_date desc">
+                  <field name="x_meter_id" optional="show"/>
+                  <field name="x_date" optional="show"/>
+                  <field name="x_quantity" optional="show"/>
+                  <field name="x_usage" optional="show"/>
+                  <field name="x_description" optional="show"/>
+                  <field name="x_image" optional="show"/>
+                </list>
+                <form>
+                  <sheet string="Meter Reading" name="meter_readings_sheet">
+                    <group name="meter_readings_group_detail">
+                      <group name="meter_readings_group_detail_left">
+                        <field name="x_meter_id"/>
+                        <field name="x_quantity"/>
+                        <field name="x_description"/>
+                        <field name="x_account_analytic_account_id"/>
+                      </group>
+                      <group name="meter_readings_group_detail_right">
+                        <field name="x_date"/>
+                        <field name="x_usage"/>
+                        <field name="x_image"/>
+                        <field name="x_property"/>
+                      </group>
                     </group>
-                    <group>
-                        <field name="x_notes" placeholder="Type down your notes here..." nolabel="1" colspan="2"/>
+                    <group name="meter_readings_group_detail_separator">
+                      <separator/>
                     </group>
-                </sheet>
-                <chatter/>
-            </form>
-        </field>
-    </record>
-    <record id="default_search_view_building" model="ir.ui.view">
-        <field name="model">x_buildings</field>
-        <field name="name">Default search view for x_buildings</field>
-        <field name="type">search</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <search>
-                <field name="x_name"/>
-                <field name="x_tag_ids"/>
-                <separator/>
-                <filter string="Archived" name="archived_x_buildings" domain="[['x_active', '=', False]]"/>
-                <separator/>
-            </search>
-        </field>
-    </record>
-    <record id="default_list_view_building_tags" model="ir.ui.view">
-        <field name="model">x_buildings_tag</field>
-        <field name="name">Default list view for buildings tags</field>
-        <field name="type">list</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <list editable="bottom">
-                <field name="x_name"/>
-                <field name="x_color" widget="color_picker"/>
-            </list>
-        </field>
-    </record>
-    <record id="default_form_view_building_tags" model="ir.ui.view">
-        <field name="model">x_buildings_tag</field>
-        <field name="name">Default form view for buildings tag</field>
-        <field name="type">form</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <form>
-                <header/>
-                <sheet string="Buildings Tags">
-                    <div class="oe_title">
-                        <h1>
-                            <field name="x_name" required="1" placeholder="Name..."/>
-                        </h1>
-                    </div>
-                </sheet>
-            </form>
-        </field>
-    </record>
-    <record id="analytic_account_custom_form_view" model="ir.ui.view">
-        <field name="name">analytic.analytic.account.form customization</field>
-        <field name="inherit_id" ref="analytic.view_account_analytic_account_form" />
-        <field name="mode">primary</field>
-        <field name="active" eval="True"/>
-        <field name="model">account.analytic.account</field>
-        <field name="priority">400</field>
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='name']" position="attributes">
-                <attribute name="placeholder">e.g. Apartment A0</attribute>
-            </xpath>
-            <xpath expr="//field[@name='code']" position="replace">
-                <field name="x_tenant" />
-            </xpath>
-            <xpath expr="//form[1]/sheet[1]/div[not(@name)][1]/label[1]" position="replace" />
-            <xpath expr="//button[@name='action_view_projects']" position="replace" />
-            <xpath expr="//button[@name='subscriptions_action']" position="after">
-                <button class="oe_stat_button" icon="fa-home" type="action" name="%(properties_parent_act_window)d">
-                    <field widget="statinfo" name="x_parent_account_analytic_account_count" string="Properties" />
-                </button>
-            </xpath>
-            <xpath expr="//form[1]/sheet[1]/div[not(@name)][1]/h1[1]/field[@name='name']" position="attributes">
-                <attribute name="string">Apartment...</attribute>
-            </xpath>
-            <xpath expr="//field[@name='active']" position="after">
-                <xpath expr="//form[1]/sheet[1]/group[@name='main']/group[2]/field[@name='company_id']" position="move" />
-                <field name="x_condominium" />
-                <field name="x_building" options='{"create_name_field":"x_name","no_create":true}' required="x_is_a_property"/>
-                <field name="x_type" options="{'create_name_field': 'x_name'}" required="x_is_a_property" />
-            </xpath>
-            <xpath expr="//field[@name='partner_id']" position="attributes">
-                <attribute name="required">x_is_a_property</attribute>
-                <attribute name="string">Owner</attribute>
-            </xpath>
-            <xpath expr="//field[@name='plan_id']" position="before">
-                <field widget="many2many_tags" name="x_tags" options='{"color_field": "x_color"}' />
-                <field name="x_parent" options='{"no_create":true}' domain='[("x_is_a_property", "=", True)]' />
-                <field name="x_floor"/>
-                <field name="x_area"/>
-            </xpath>
-            <xpath expr="//field[@name='plan_id']" position="attributes">
-                <attribute name="invisible">True</attribute>
-            </xpath>
-            <xpath expr="//form[1]/sheet[1]/group[@name='main']/group[1]/field[@name='company_id']" position="attributes">
-                <attribute name="force_save">1</attribute>
-                <attribute name="groups">base.group_no_one</attribute>
-                <attribute name="readonly">True</attribute>
-            </xpath>
+                  </sheet>
+                </form>
+              </field>
+            </page>
+            <page string="Owners" name="owners_page">
+              <field name="x_owner_ids">
+                <list editable="top">
+                  <field name="x_sequence" widget="handle"/>
+                  <field name="x_start_date" required="True"/>
+                  <field optional="show" name="x_end_date"/>
+                  <field name="x_owner" required="True" widget="many2one_avatar_user"/>
+                  <field optional="show" name="x_co_owners" widget="many2many_tags_avatar"/>
+                  <field optional="show" name="x_account" options="{'no_create': true}" readonly="True" widget="many2one_tax_tags" column_invisible="True"/>
+                </list>
+              </field>
+            </page>
+            <page string="Tenants" name="tenants_page">
+              <field name="x_tenant_ids">
+                <list editable="top">
+                  <field name="x_sequence" widget="handle"/>
+                  <field name="x_start_date" required="True"/>
+                  <field optional="show" name="x_end_date"/>
+                  <field name="x_tenant" column_required="True" widget="many2one_avatar_user"/>
+                </list>
+              </field>
+            </page>
+            <page string="Accounts" name="accounts_page" invisible="True">
+              <field name="x_account_ids"/>
+            </page>
+          </notebook>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+    <field name="model">x_property</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_property.form.condominium</field>
+    <field name="type">form</field>
+  </record>
+  <record id="x_property_search_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_property" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="model">x_property</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_property.search.condominium</field>
+    <field name="type">search</field>
+  </record>
+  <record id="x_property_line_meter_reading_list_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_property_line_meter_reading</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_property_line_meter_reading.list.condominium</field>
+    <field name="type">list</field>
+  </record>
+  <record id="x_property_line_meter_reading_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="property_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="property_line_meter_reading_group">
+            <group name="property_line_meter_reading_group_left"/>
+            <group name="property_line_meter_reading_group_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_property_line_meter_reading</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_property_line_meter_reading.form.condominium</field>
+    <field name="type">form</field>
+  </record>
+  <record id="x_property_line_meter_reading_search_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_property_line_meter_reading</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_property_line_meter_reading.search.condominium</field>
+    <field name="type">search</field>
+  </record>
+  <record id="x_property_line_owner_list_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_property_line_owner</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_property_line_owner.list.condominium</field>
+    <field name="type">list</field>
+  </record>
+  <record id="x_property_line_owner_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="property_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="property_line_owner_group">
+            <group name="property_line_owner_group_left"/>
+            <group name="property_line_owner_group_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_property_line_owner</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_property_line_owner.form.condominium</field>
+    <field name="type">form</field>
+  </record>
+  <record id="x_property_line_owner_search_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_property_line_owner</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_property_line_owner.search.condominium</field>
+    <field name="type">search</field>
+  </record>
+  <record id="x_property_line_tenant_list_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_property_line_tenant</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_property_line_tenant.list.condominium</field>
+    <field name="type">list</field>
+  </record>
+  <record id="x_property_line_tenant_form" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="property_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="property_line_tenant_group">
+            <group name="property_line_tenant_group_left"/>
+            <group name="property_line_tenant_group_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_property_line_tenant</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_property_line_tenant.form.condominium</field>
+    <field name="type">form</field>
+  </record>
+  <record id="x_property_line_tenant_search_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_property_line_tenant</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_property_line_tenant.search.condominium</field>
+    <field name="type">search</field>
+  </record>
+  <record id="x_property_kanban_view" model="ir.ui.view">
+    <field name="name">x_property.kanban.condominium</field>
+    <field name="mode">primary</field>
+    <field name="active" eval="True"/>
+    <field name="model">x_property</field>
+    <field name="priority">99</field>
+    <field name="type">kanban</field>
+    <field name="arch" type="xml">
+      <kanban default_group_by="x_building">
+        <templates>
+          <t t-name="card">
+            <field name="x_name" class="fw-bold"/>
+            <field name="x_type" display="full"/>
+            <field name="x_current_owner" display="full" widget="many2one_avatar"/>
+            <field name="x_tags" display="full"/>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+  <record id="analytic_account_custom_list_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='company_id' and @groups='base.group_multi_company']" position="replace"/>
+        <xpath expr="//field[@name='plan_id']" position="replace"/>
+        <xpath expr="//field[@name='code']" position="replace">
+          <field name="x_start_date" optional="show"/>
+          <field name="x_end_date" optional="show"/>
+          <field name="x_property" optional="show"/>
+        </xpath>
+        <xpath expr="//field[@name='partner_id']" position="attributes">
+          <attribute name="string">Owner</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="analytic.view_account_analytic_account_list"/>
+    <field name="mode">primary</field>
+    <field name="active" eval="True"/>
+    <field name="model">account.analytic.account</field>
+    <field name="name">account.analytic.account.list.condominium</field>
+    <field name="priority">400</field>
+    <field name="type">list</field>
+  </record>
+  <record id="account_analytic_account_search_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//filter[@name='inactive']" position="after">
+        <separator/>
+        <filter string="Ongoing" name="ongoing" domain="[('x_end_date', '=', False)]"/>
+        <filter string="Closed" name="closed" domain="[('x_end_date', '!=', False)]"/>
+        <separator/>
+      </xpath>
+      <xpath expr="//filter[@name='associatedpartner']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="analytic.view_account_analytic_account_search"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">account.analytic.account</field>
+    <field name="name">account.analytic.account.search.condominium</field>
+    <field name="type">search</field>
+  </record>
 
-            <notebook>
-                <page string="Meter Readings">
-                    <field name="x_property_meter_reading_ids" context="{'default_x_account_analytic_account_id': id}">
-                        <list editable="bottom">
-                            <field name="x_meter_id" required="True"/>
-                            <field name="x_date"/>
-                            <field name="x_quantity"/>
-                            <field name="x_usage" optional="show"/>
-                            <field name="x_description" optional="show"/>
-                            <field name="x_image" optional="show"/>
-                        </list>
-                    </field>
-                </page>
-            </notebook>
-        </field>
-    </record>
-    <record id="quick_create_account_form" model="ir.ui.view">
-        <field name="name">account.analytic.account.quick_create</field>
-        <field name="model">account.analytic.account</field>
-        <field name="priority">1000</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <form>
-                <group>
-                    <field name="name" string="Building" placeholder="e.g. Apartment A0"/>
-                    <field name="x_type" placeholder="e.g. Apartment"/>
-                    <field name="partner_id" string="Owner" placeholder="e.g. John Smith"/>
+  <record id="view_account_analytic_line_form_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='company_id']" position="before">
+          <header>
+            <button string="Split" name="%(split_analytic_item_action)d" type="action" class="btn-primary"/>
+          </header>
+        </xpath>
+        <xpath expr="//group/group/field[@name='company_id']" position="after">
+          <field name="x_notes"/>
+        </xpath>
+        <xpath expr="//field[@name='product_id']" position="after">
+          <field name="x_product_category" options="{'create_name_field': 'complete_name'}" force_save="1" readonly="True"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="analytic.view_account_analytic_line_form"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">account.analytic.line</field>
+    <field name="name">account.analytic.line.form.condominium</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+  <record id="ir_default_tree_view_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='json_value']" position="after">
+          <field name="company_id" optional="show"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="base.ir_default_tree_view"/>
+    <field name="mode">extension</field>
+    <field name="model">ir.default</field>
+    <field name="active" eval="True"/>
+    <field name="name">ir.default.list.condominium</field>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+  </record>
+  <record id="ir_default_form_view_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='user_id']" position="after">
+          <field name="company_id"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="base.ir_default_form_view"/>
+    <field name="mode">extension</field>
+    <field name="model">ir.default</field>
+    <field name="active" eval="True"/>
+    <field name="name">ir.default.form.condominium</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="x_calendar_event_line_motion_list_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_calendar_event_line_motion</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_calendar_event_line_motion.list.condominium</field>
+    <field name="type">list</field>
+  </record>
+  <record id="x_calendar_event_line_motion_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button string="Reset Votes" name="%(action_populate_voters)d" type="action"/>
+          <button string="Plan Task" name="%(action_create_task_from_motion)d" type="action"/>
+        </header>
+        <sheet string="calendar_event_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Motion..."/>
+            </h1>
+          </div>
+          <group name="calendar_event_line_motion_group">
+            <group name="calendar_event_line_motion_group_left">
+              <field name="x_notes"/>
+              <widget name="web_ribbon" title="Approved" invisible="x_outcome != 'Approved'"/>
+              <widget name="web_ribbon" title="Rejected" invisible="x_outcome != 'Rejected'" bg_color="text-bg-danger"/>
+            </group>
+            <group name="calendar_event_line_motion_group_right">
+              <field name="x_vote_criteria" options="{'create_name_field': 'x_name'}" string="Motion Criteria" required="x_abstention &lt; 1"/>
+              <field name="x_in_favor" force_save="1" readonly="True" widget="percentage"/>
+              <field name="x_against" widget="percentage" force_save="1" readonly="True"/>
+              <field name="x_abstention" widget="percentage"/>
+              <button name="%(action_set_votes_as_all_against)d" string="All Against" type="action"/>
+              <button name="%(action_set_votes_as_all_favor)d" string="All In Favor" type="action"/>
+              <field name="x_attendee_vote_ids" nolabel="1" colspan="2">
+                <list editable="bottom" open_form_view="false" delete="false" duplicate="false" create="false">
+                  <field name="x_sequence" widget="handle"/>
+                  <field optional="show" name="x_attendee" readonly="True"/>
+                  <field optional="show" name="x_vote" widget="radio" options="{'horizontal': true}"/>
+                </list>
+              </field>
+            </group>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_calendar_event_line_motion</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_calendar_event_line_motion.form.condominium</field>
+    <field name="type">form</field>
+  </record>
+  <record id="x_calendar_event_line_motion_search_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_calendar_event_line_motion</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_calendar_event_line_motion.search.condominium</field>
+    <field name="type">search</field>
+  </record>
+  <record id="x_calendar_event_line_motion_line_vote_list_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_calendar_event_line_motion_line_vote</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_calendar_event_line_motion_line_vote.list.condominium</field>
+    <field name="type">list</field>
+  </record>
+  <record id="x_calendar_event_line_motion_line_vote_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="calendar_event_line_a1bce_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="calendar_event_line_motion_line_vote_group">
+            <group name="calendar_event_line_motion_line_vote_group_left"/>
+            <group name="calendar_event_line_motion_line_vote_group_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_calendar_event_line_motion_line_vote</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_calendar_event_line_motion_line_vote.form.condominium</field>
+    <field name="type">form</field>
+  </record>
+  <record id="x_calendar_event_line_motion_line_vote_search_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_calendar_event_line_motion_line_vote</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_calendar_event_line_motion_line_vote.search.condominium</field>
+    <field name="type">search</field>
+  </record>
+  <record id="x_vote_criteria_list_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list editable="bottom">
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+        <field name="x_acceptation_threshold" optional="show" widget="percentage"/>
+      </list>
+    </field>
+    <field name="model">x_vote_criteria</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_vote_criteria.list.condominium</field>
+    <field name="type">list</field>
+  </record>
+  <record id="x_vote_criteria_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Vote Criteria">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="x_vote_criteria_group">
+            <group name="x_vote_criteria_group_left">
+              <field name="x_acceptation_threshold" widget="percentage" force_save="0" readonly="False" required="True"/>
+            </group>
+            <group name="x_vote_criteria_group_right"/>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+    <field name="model">x_vote_criteria</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_vote_criteria.form.condominium</field>
+    <field name="type">form</field>
+  </record>
+  <record id="x_vote_criteria_search_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_vote_criteria" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="model">x_vote_criteria</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_vote_criteria.search.condominium</field>
+    <field name="type">search</field>
+  </record>
+  <record id="view_calendar_event_form_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//header" position="inside">
+          <button string="Send Agenda" name="%(action_send_general_meeting_agenda)d" type="action" invisible="not x_condominium" class="btn-primary"/>
+          <button string="View Report" name="%(calendar_event_general_meeting_report)d" type="action" invisible="not x_condominium"/>
+          <button string="Send Report" name="%(action_send_general_meeting_report)d" type="action" invisible="not x_condominium"/>
+        </xpath>
+        <xpath expr="//field[@name='should_show_status']" position="after">
+          <field name="x_condominium"/>
+        </xpath>
+        <xpath expr="//field[@name='attendee_ids']" position="attributes">
+          <attribute name="force_save">0</attribute>
+          <attribute name="readonly">False</attribute>
+        </xpath>
+        <xpath expr="//page[@name='page_invitations']" position="attributes">
+          <attribute name="groups"/>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/list[1]/field[@name='partner_id']" position="attributes">
+          <attribute name="readonly">True</attribute>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/list[1]/field[@name='email']" position="attributes">
+          <attribute name="readonly">True</attribute>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/list[1]/field[@name='phone']" position="attributes">
+          <attribute name="readonly">True</attribute>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/list[1]/field[@name='state']" position="attributes">
+          <attribute name="readonly">True</attribute>
+        </xpath>
+        <xpath expr="//field[@name='attendee_ids']/list/button[@name='do_decline']" position="after">
+          <field name="x_attending" invisible="not x_condominium"/>
+          <field optional="show" name="x_delegating" invisible="not x_condominium"/>
+          <field name="x_ratio" optional="show"/>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/kanban[1]" position="after">
+          <form>
+            <sheet string="Calendar Attendee Information" name="calendar_attendee_information_sheet">
+              <group name="calendar_attendee_information_group">
+                <group name="calendar_attendee_information_group_left">
+                  <field name="event_id"/>
+                  <field name="partner_id"/>
+                  <field name="phone"/>
+                  <field name="access_token"/>
+                  <field name="state"/>
+                  <field name="x_delegating"/>
+                  <field name="x_condominium"/>
                 </group>
-            </form>
-        </field>
-    </record>
-    <record id="analytic_account_custom_kanban_view" model="ir.ui.view">
-        <field name="name">account.analytic.account.kanban customization</field>
-        <field name="mode">primary</field>
-        <field name="active" eval="True"/>
-        <field name="model">account.analytic.account</field>
-        <field name="priority">99</field>
-        <field name="type">kanban</field>
-        <field name="arch" type="xml">
-            <kanban default_group_by="x_building" quick_create_view="condominium.quick_create_account_form">
-                <templates>
-                    <t t-name="card">
-                        <field name="name" display="full" placeholder="e.g. Apartment A0"/>
-                        <field name="x_tags" display="full"/>
-                        <field name="x_type" display="full"/>
-                        <field name="partner_id" display="full" widget="many2one_avatar" context="{'default_company_id': company_id}"/>
-                    </t>
-                </templates>
-            </kanban>
-        </field>
-    </record>
-    <record id="account_analytic_plan_form_view_inherit" model="ir.ui.view">
-        <field name="name">account.analytic.plan.inherit.form</field>
-        <field name="model">account.analytic.plan</field>
-        <field name="active" eval="True"/>
-        <field name="inherit_id" ref="analytic.account_analytic_plan_form_view"/>
-        <field name="arch" type="xml">
-            <field name="color" position="after">
-                <field name="x_is_a_property_plan"/>
-            </field>
-        </field>
-    </record>
-    <record id="default_kanban_view_building" model="ir.ui.view">
-        <field name="name">kanban view for buildings</field>
-        <field name="model">x_buildings</field>
-        <field name="active" eval="True"/>
-        <field name="priority">99</field>
-        <field name="type">kanban</field>
-        <field name="arch" type="xml">
-            <kanban>
-                <templates>
-                    <t t-name="card">
-                        <field name="x_name" />
-                        <field name="x_tag_ids" display="full"/>
-                    </t>
-                </templates>
-            </kanban>
-        </field>
-    </record>
-    <record id="default_list_view_properties_type" model="ir.ui.view">
-        <field name="name">Default list view for properties types</field>
-        <field name="model">x_properties_types</field>
-        <field name="type">list</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <list editable="bottom">
-                <field name="x_sequence" widget="handle"/>
-                <field name="x_name"/>
-            </list>
-        </field>
-    </record>
-    <record id="default_form_view_property_type" model="ir.ui.view">
-        <field name="name">Default form view for x_properties_types</field>
-        <field name="model">x_properties_types</field>
-        <field name="type">form</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <form>
+                <group name="calendar_attendee_information_group_right">
+                  <field name="recurrence_id"/>
+                  <field name="email"/>
+                  <field name="common_name"/>
+                  <field name="mail_tz"/>
+                  <field name="availability"/>
+                  <field name="x_attending"/>
+                  <field name="x_ratio"/>
+                </group>
+              </group>
+            </sheet>
+          </form>
+        </xpath>
+        <xpath expr="//form/sheet/notebook" position="inside">
+          <page string="Motions" name="motions_page" invisible="not x_condominium">
+            <group name="motions_group_main">
+              <group name="motions_group_left">
+                <field name="x_voting_key" options="{'create_name_field': 'x_name'}"/>
+                <field name="x_attending_ratio" widget="percentage" force_save="1" readonly="True" string="Attending and Delegating Ratio"/>
+                <field name="x_attending_owners" string="Attending and Delegating Owners"/>
+              </group>
+              <group name="motions_group_right"/>
+            </group>
+            <field name="x_vote_ids">
+              <form>
                 <header/>
-                <sheet string="Properties Types">
-                    <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
-                    <field name="x_active" invisible="1"/>
-                    <div class="oe_title">
-                        <h1>
-                            <field name="x_name" required="1" placeholder="Name..."/>
-                        </h1>
-                    </div>
-                </sheet>
-                <chatter/>
-            </form>
-        </field>
-    </record>
-    <record id="default_search_view_property_type" model="ir.ui.view">
-        <field name="name">Default search view for properties types</field>
-        <field name="model">x_properties_types</field>
-        <field name="type">search</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <search>
-                <field name="x_name"/>
-                <separator/>
-                <filter string="Archived" name="archived_x_properties_types" domain="[['x_active', '=', False]]"/>
-                <separator/>
-            </search>
-        </field>
-    </record>
-    <record id="product_pricelist_custom_view" model="ir.ui.view">
-        <field name="name">product.pricelist.form customization</field>
-        <field name="inherit_id" ref="product.product_pricelist_view" />
-        <field name="mode">extension</field>
-        <field name="model">product.pricelist</field>
-        <field name="active" eval="True"/>
-        <field name="priority">160</field>
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-            <xpath expr="//button[@name='action_open_pricelist_report']" position="before">
-                <button name="%(ir_actions_server_compute_ratio)d" string="Compute Ratios" type="action" class="btn-primary" />
-            </xpath>
-            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]" position="before">
-                <page string="Ratios" name="studio_page_ratios">
-                    <field name="x_ratios">
-                        <list editable="bottom">
-                            <field name="x_sequence" widget="handle" />
-                            <field name="x_property" domain='[("x_is_a_property", "=", True)]'/>
-                            <field name="x_building" optional="show" options="{'create_name_field': 'x_name'}"/>
-                            <field name="x_type" optional="show" options="{'create_name_field': 'x_name'}" />
-                            <field name="x_owner" optional="show"/>
-                            <field name="x_floor" optional="show"/>
-                            <field name="x_area" sum="Sum of Area" optional="show"/>
-                            <field name="x_ratio" sum="Sum of Ratio"/>
-                            <field name="x_company_id" optional="hide" groups="base.group_multi_company"/>
-                        </list>
-                    </field>
-                </page>
-            </xpath>
-        </field>
-    </record>
-    <record id="default_list_view_for_x_ratios" model="ir.ui.view">
-        <field name="name">Default list view for x_ratios</field>
-        <field name="model">x_ratios</field>
-        <field name="active" eval="True"/>
-        <field name="type">list</field>
-        <field name="arch" type="xml">
-            <list>
-                <field name="x_sequence" widget="handle" />
-                <field name="x_name" />
-                <field name="x_company_id" groups="base.group_multi_company" />
-            </list>
-        </field>
-    </record>
-    <record id="default_form_view_for_x_ratios" model="ir.ui.view">
-        <field name="name">Default form view for x_ratios</field>
-        <field name="model">x_ratios</field>
-        <field name="active" eval="True"/>
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-            <form>
-                <header/>
-                <sheet string="Ratios">
-                    <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active" />
-                    <group>
-                        <group>
-                            <field name="x_property" options='{"create_name_field": "x_name", "no_create": true}'/>
-                            <field name="x_pricelist" options='{"no_create": true}'/>
-                        </group>
-                        <group>
-                            <field name="x_ratio"/>
-                            <field name="x_company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
-                        </group>
+                <sheet string="calendar_event_line" name="calendar_event_line_sheet">
+                  <div class="oe_title" name="calendar_event_line_div">
+                    <h1>
+                      <field name="x_name" required="1" placeholder="Name..."/>
+                    </h1>
+                  </div>
+                  <group name="calendar_event_group">
+                    <group name="calendar_event_group_left">
+                      <field name="x_notes"/>
                     </group>
-                </sheet>
-                <chatter/>
-            </form>
-        </field>
-    </record>
-    <record id="default_search_view_for_x_ratios" model="ir.ui.view">
-        <field name="name">Default search view for x_ratios</field>
-        <field name="model">x_ratios</field>
-        <field name="active" eval="True"/>
-        <field name="type">search</field>
-        <field name="arch" type="xml">
-            <search>
-                <field name="x_name"/>
-                <separator/>
-                <filter string="Archived" name="archived_x_ratios" domain="[['x_active', '=', False]]"/>
-                <separator/>
-            </search>
-        </field>
-    </record>
-    <record id="product_pricelist_list_custom_view" model="ir.ui.view">
-        <field name="name">product.pricelist.list customization</field>
-        <field name="inherit_id" ref="product.product_pricelist_view_tree" />
-        <field name="mode">extension</field>
-        <field name="model">product.pricelist</field>
-        <field name="active" eval="True"/>
-        <field name="priority">99</field>
-        <field name="type">list</field>
-        <field name="arch" type="xml">
-            <xpath expr="//list[1]/field[@name='name']" position="attributes">
-                <attribute name="string">Distribution Key</attribute>
-            </xpath>
-            <xpath expr="//field[@name='country_group_ids']" position="attributes">
-                <attribute name="column_invisible">True</attribute>
-            </xpath>
-            <xpath expr="//field[@name='company_id']" position="attributes">
-                <attribute name="column_invisible">True</attribute>
-            </xpath>
-        </field>
-    </record>
-    <record id="res_partner_form_view" model="ir.ui.view">
-        <field name="name">Condominium form view</field>
-        <field name="inherit_id" ref="base.view_partner_form"/>
-        <field name="mode">extension</field>
-        <field name="model">res.partner</field>
-        <field name="active" eval="True"/>
-        <field name="priority">160</field>
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-            <xpath expr="//sheet" position="before">
-                <div role="alert" class="alert alert-info" groups="base.group_system" invisible="not ref_company_ids">
-                    New condominiums should be created as companies from the settings <button name="%(base.action_res_company_form)d" icon="oi-arrow-right" type="action" string="Manage Companies" class="btn-link"/>
-                </div>
-                <header>
-                    <button string="Create Condominium" name="%(ir_action_create_condominium)d" type="action" invisible="company_type == 'person' or ref_company_ids"/>
-                </header>
-            </xpath>
-            <xpath expr="//button[@name='action_open_employees']" position="after">
-                <button class="oe_stat_button" icon="fa-home" type="action" name="%(properties_act_window_view)d">
-                    <field widget="statinfo" name="x_condominium_account_analytic_account_count" string="Properties" />
-                </button>
-            </xpath>
-            <xpath expr="//field[@name='property_product_pricelist']" position="after">
-                <field name="x_condominium_properties" widget="many2many_tags" force_save="1" readonly="True" />
-            </xpath>
-            <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
-                <page string="Vendors" invisible="not ref_company_ids">
-                    <field name="x_vendors">
-                        <list string="Contacts" sample="1" multi_edit="1" editable="bottom">
-                            <field name="complete_name" string="Name"/>
-                            <field name="phone" class="o_force_ltr" optional="show"/>
-                            <field name="email" optional="show"/>
-                            <field name="user_id" optional="show" widget="many2one_avatar_user" domain="[('share', '=', False)]"/>
-                            <field name="activity_ids" optional="show" widget="list_activity"/>
-                            <field name="street" optional="hide"/>
-                            <field name="city" optional="show"/>
-                            <field name="state_id" optional="hide" readonly="1"/>
-                            <field name="country_id" optional="show" readonly="1"/>
-                            <field name="vat" optional="hide" readonly="1" string="VAT"/>
-                            <field name="category_id" optional="hide" widget="many2many_tags" options="{'color_field': 'color'}"/>
-                            <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                    <group name="calendar_event_group_right">
+                      <field name="x_vote_criteria" options="{'create_name_field': 'x_name'}"/>
+                      <field name="x_in_favor" force_save="1" readonly="True" widget="percentage"/>
+                      <field name="x_against" widget="percentage" force_save="1" readonly="True"/>
+                      <field name="x_abstention" widget="percentage"/>
+                      <button name="%(action_set_votes_as_all_against)d" string="All Against" type="action"/>
+                      <button name="%(action_set_votes_as_all_favor)d" string="All In Favor" type="action"/>
+                      <field name="x_attendee_vote_ids" nolabel="1" colspan="2">
+                        <list editable="bottom" open_form_view="false" delete="false" duplicate="false" create="false">
+                          <field name="x_sequence" widget="handle"/>
+                          <field optional="show" name="x_attendee" readonly="True"/>
+                          <field optional="show" name="x_vote" widget="radio" options="{'horizontal': true}"/>
                         </list>
-                    </field>
-                </page>
-            </xpath>
-        </field>
-    </record>
-    <record id="account_move_custom_form_view" model="ir.ui.view">
-        <field name="name">account.move.form customization</field>
-        <field name="inherit_id" ref="account.view_move_form" />
-        <field name="mode">extension</field>
-        <field name="model">account.move</field>
-        <field name="active" eval="True"/>
-        <field name="priority">160</field>
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-            <xpath expr="//button[@name='action_reload_ai_data']" position="after">
-                <button string="Distribute Costs" name="%(ir_actions_server_distribute_costs)d" type="action"/>
-            </xpath>
-            <xpath expr="//field[@name='invoice_vendor_bill_id']" position="after">
-                <field name="x_distribution_key" options="{'no_create': true}" placeholder="Area as distribution key"/>
-            </xpath>
-        </field>
-    </record>
-    <record id="res_partner_select_custom" model="ir.ui.view">
-        <field name="name">res.partner.select customization</field>
-        <field name="inherit_id" ref="base.view_res_partner_filter"/>
-        <field name="mode">extension</field>
-        <field name="model">res.partner</field>
-        <field name="active" eval="True"/>
-        <field name="priority">160</field>
-        <field name="type">search</field>
-        <field name="arch" type="xml">
-            <field name="name" position="after">
-                <field name="x_companies" string="Condominiums"/>
+                      </field>
+                    </group>
+                  </group>
+                </sheet>
+              </form>
+              <list editable="bottom" open_form_view="true">
+                <field name="x_name" string="Motion"/>
+                <field name="x_outcome" widget="badge" decoration-danger="x_outcome == 'Rejected'" decoration-success="x_outcome == 'Approved'" invisible="x_outcome == False" optional="show"/>
+              </list>
             </field>
-        </field>
-    </record>
-    <record id="properties_act_window_view" model="ir.actions.act_window">
-        <field name="view_ids" eval="[
-            (5, 0, 0),
-            (0, 0, {'view_mode': 'kanban', 'view_id': ref('analytic_account_custom_kanban_view')}),
-            (0, 0, {'view_mode': 'form', 'view_id': ref('analytic_account_custom_form_view')}),
-        ]"/>
-    </record>
-    <record id="properties_parent_act_window" model="ir.actions.act_window">
-        <field name="view_ids" eval="[
-            (5, 0, 0),
-            (0, 0, {'view_mode': 'kanban', 'view_id': ref('analytic_account_custom_kanban_view')}),
-            (0, 0, {'view_mode': 'form', 'view_id': ref('analytic_account_custom_form_view')}),
-        ]"/>
-    </record>
-    <record id="props_build_act_window" model="ir.actions.act_window">
-        <field name="view_ids" eval="[
-            (5, 0, 0),
-            (0, 0, {'view_mode': 'kanban', 'view_id': ref('analytic_account_custom_kanban_view')}),
-            (0, 0, {'view_mode': 'form', 'view_id': ref('analytic_account_custom_form_view')}),
-        ]"/>
-    </record>
-    <record id="properties_act_window" model="ir.actions.act_window">
-        <field name="view_ids" eval="[
-            (5, 0, 0),
-            (0, 0, {'view_mode': 'kanban', 'view_id': ref('analytic_account_custom_kanban_view')}),
-            (0, 0, {'view_mode': 'form', 'view_id': ref('analytic_account_custom_form_view')}),
-        ]"/>
-    </record>
+          </page>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
+    <field name="mode">extension</field>
+    <field name="model">calendar.event</field>
+    <field name="active" eval="True"/>
+    <field name="name">calendar.event.form.condominium</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+  <record id="account_report_line_form_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='user_groupby']" position="after">
+          <field name="x_used_for_categorization" help="When checked, the line can be selected to be assigned to an expense as a category for Condominium Balance Sheet reporting"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="account_reports.account_report_line_form"/>
+    <field name="mode">extension</field>
+    <field name="model">account.report.line</field>
+    <field name="active" eval="True"/>
+    <field name="name">account.report.line.form.condominium</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="view_move_line_tree_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='move_name']" position="after">
+          <field name="account_type" optional="show"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="account.view_move_line_tree"/>
+    <field name="mode">extension</field>
+    <field name="model">account.move.line</field>
+    <field name="name">account.move.line.list.condominium</field>
+    <field name="active" eval="True"/>
+    <field name="priority">160</field>
+    <field name="type">list</field>
+  </record>
+  <record id="x_period_list_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list editable="bottom" default_order="x_start_date desc">
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_start_date" optional="show"/>
+        <field name="x_end_date" optional="show"/>
+        <field name="x_name" string="Name"/>
+      </list>
+    </field>
+    <field name="model">x_period</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_period.list.condominium</field>
+    <field name="type">list</field>
+  </record>
+  <record id="x_period_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Period">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="x_period_group">
+            <group name="x_period_group_left">
+              <field name="x_start_date" required="True"/>
+              <field name="x_end_date" required="True"/>
+            </group>
+            <group name="x_period_group_right"/>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+    <field name="model">x_period</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_period.form.condominium</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view_period" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter date="x_date" name="filter_date" string="Date"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_period" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="model">x_period</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_period.search.condominium</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_calendar_vie_aa7c70be-7624-4171-969f-1890532903fd" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <calendar date_start="x_date" create_name_field="x_name"/>
+    </field>
+    <field name="model">x_period</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_period.calendar.condominium</field>
+    <field name="type">calendar</field>
+  </record>
+  <record id="view_invoice_tree_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//list" position="attributes">
+          <attribute name="create">false</attribute>
+          <attribute name="default_order">invoice_date desc</attribute>
+          <attribute name="delete">false</attribute>
+          <attribute name="multi_edit">true</attribute>
+          <attribute name="open_form_view">true</attribute>
+        </xpath>
+        <xpath expr="//field[@name='name']" position="attributes">
+          <attribute name="readonly">True</attribute>
+        </xpath>
+        <xpath expr="//field[@name='name']" position="after">
+          <field name="invoice_partner_display_name" optional="show" readonly="True" string="Vendor"/>
+          <field name="amount_total_in_currency_signed" optional="show" readonly="True"/>
+        </xpath>
+        <xpath expr="//field[@name='invoice_partner_display_name']" position="after">
+          <xpath expr="//list/field[@name='amount_total_in_currency_signed']" position="move" string="Total"/>
+          <field name="x_distribution_key" optional="show"/>
+          <field name="x_period_start" optional="show"/>
+          <field name="x_period_end" optional="show"/>
+        </xpath>
+        <xpath expr="//field[@name='x_distribution_key']" position="before">
+          <xpath expr="//field[@name='invoice_date']" position="move"/>
+          <xpath expr="//field[@name='invoice_date_due']" optional="hide" position="move"/>
+          <xpath expr="//field[@name='ref']" position="move"/>
+          <xpath expr="//field[@name='amount_untaxed_in_currency_signed']" optional="hide" position="move"/>
+          <xpath expr="//field[@name='amount_total_in_currency_signed']" string="Total" position="move"/>
+          <field name="status_in_payment" position="move"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="mode">extension</field>
+    <field name="model">account.move</field>
+    <field name="inherit_id" ref="account.view_invoice_tree" />
+    <field name="active" eval="True"/>
+    <field name="name">account.move.list.condominium</field>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+  </record>
+  <record id="view_account_invoice_filter_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//filter[@name='groupy_by_journal']" position="replace"/>
+        <xpath expr="//filter[@name='preferred_payment_method_line']" position="replace"/>
+        <xpath expr="//filter[@name='late']" position="replace"/>
+        <xpath expr="//filter[@name='in_payment']" position="replace"/>
+        <xpath expr="//filter[@name='open']" position="replace"/>
+        <xpath expr="//filter[@name='to_check']" position="replace"/>
+        <xpath expr="//filter[@name='not_sent']" position="replace"/>
+        <xpath expr="//field[@name='line_ids']" position="replace"/>
+        <xpath expr="//field[@name='next_payment_date']" position="replace"/>
+        <xpath expr="//search/field[@name='date']" position="replace"/>
+        <xpath expr="//field[@name='invoice_user_id']" position="replace"/>
+        <xpath expr="//field[@name='journal_group_id']" position="replace"/>
+        <xpath expr="//field[@name='journal_id']" position="replace"/>
+        <xpath expr="//filter[@name='salesperson']" position="after">
+          <filter name="distribution_key_group_by" string="Distribution Key" context="{'group_by': 'x_distribution_key'}"/>
+        </xpath>
+        <xpath expr="//filter[@name='myinvoices']" position="after">
+          <filter domain="[('x_distribution_key', '=', False)]" name="undistributed" help="Without distribution"/>
+          <separator/>
+        </xpath>
+        <xpath expr="//filter[@name='draft']" position="replace"/>
+        <xpath expr="//filter[@name='partner']" position="replace"/>
+      </data>
+    </field>
+    <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+    <field name="mode">extension</field>
+    <field name="model">account.move</field>
+    <field name="active" eval="True"/>
+    <field name="name">account.move.search.condominium</field>
+    <field name="priority">160</field>
+    <field name="type">search</field>
+  </record>
+  <record id="x_distribution_key_list_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+        <field name="x_based_on" optional="show"/>
+        <field name="x_meter" optional="show"/>
+      </list>
+    </field>
+    <field name="model">x_distribution_key</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_distribution_key.list.condominium</field>
+    <field name="type">list</field>
+  </record>
+  <record id="x_distribution_key_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button string="Populate" name="%(action_populate_distribution_key)d" type="action" class="btn-primary" invisible="x_based_on != 'Shares'"/>
+          <button string="Compute Ratios" name="%(action_compute_distribution_key_ratios)d" type="action" invisible="x_based_on != 'Shares'"/>
+        </header>
+        <sheet string="Distribution Key">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="x_distribution_key_group">
+            <group name="x_distribution_key_group_left">
+              <field name="x_based_on" required="True"/>
+              <field name="x_meter" options="{'create_name_field': 'x_name'}" invisible="x_based_on != 'Meter Readings'" force_save="0" readonly="False" required="x_based_on == 'Meter Readings'"/>
+            </group>
+            <group name="x_distribution_key_group_right">
+              <field name="x_company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+            </group>
+            <field name="x_ratio_ids" invisible="x_based_on != 'Shares'">
+              <list editable="bottom">
+                <field name="x_sequence" widget="handle"/>
+                <field name="x_property_ratios" optional="show"/>
+                <field name="x_owner" strinng="Current Owner" optional="show"/>
+                <field name="x_building" optional="show"/>
+                <field name="x_type" optional="show"/>
+                <field name="x_floor" optional="show"/>
+                <field name="x_area" sum="Sum of Area" optional="show"/>
+                <field name="x_ratio" sum="Sum of Ratio" optional="show" options="{'digits':[6,2]}"/>
+              </list>
+            </field>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+    <field name="model">x_distribution_key</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_distribution_key.form.condominium</field>
+    <field name="type">form</field>
+  </record>
+  <record id="x_distribution_key_search_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_distribution_key" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="model">x_distribution_key</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_distribution_key.search.condominium</field>
+    <field name="type">search</field>
+  </record>
+  <record id="account_move_custom_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//form/sheet/notebook" position="inside">
+          <page string="Distribution" name="distribution_page">
+            <group name="distribution_group">
+              <group name="distribution_group_left" string="Distribution">
+                <field name="x_distribution_key" options="{'create_name_field': 'x_name', 'no_create': true}"/>
+                <field name="x_period_start" help="Used to distribute costs by meter; closest meter reading date used"/>
+                <field name="x_period_end" help="Used to distribute costs by meter; closest meter reading date used"/>
+              </group>
+            </group>
+          </page>
+        </xpath>
+        <xpath expr="//form/header" position="inside">
+          <button string="Distribute Costs" name="%(distribute_costs)d" type="action"/>
+        </xpath>
+        <xpath expr="//field[@name='x_period_start']" position="attributes">
+          <attribute name="required">x_based_on == "Meter Readings"</attribute>
+        </xpath>
+        <xpath expr="//field[@name='x_period_end']" position="attributes">
+          <attribute name="required">x_based_on == "Meter Readings"</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="account.view_move_form" />
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">account.move</field>
+    <field name="name">account.move.form.condominium</field>
+    <field name="priority">16000</field>
+    <field name="type">form</field>
+  </record>
+  <record id="analytic_account_wizard_form" model="ir.ui.view">
+    <field name="name">analytic.account.wizard.form.condominium</field>
+    <field name="active" eval="True"/>
+    <field name="model">x_split_analytic_items_wizard</field>
+    <field name="arch" type="xml">
+      <form string="Analytic item split">
+        <div style="max-height:250px; overflow-y:auto;">
+          <field name="x_line_ids" nolabel="1" widget="one2many_list">
+            <list editable="bottom">
+              <field name="x_analytic_account_id"/>
+              <field name="x_share" string="Share (%)"/>
+              <field name="x_currency_id" invisible='1'/>
+              <field name="x_amount"/>
+            </list>
+          </field>
+        </div>
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; text-align: right;">
+          <div></div>
+          <div>
+            <field name="x_share_total" nolabel="1" readonly="1" class="oe_inline"/>
+          </div>
+          <div>
+            <field name="x_total" nolabel="1" readonly="1" class="oe_inline"/>
+          </div>
+        </div>
+        <footer>
+          <button string="Confirm" type="action" name="%(confirm_analytic_account_item_split_action)d" class="btn-primary"/>
+          <button string="Cancel" special="cancel" class="btn-secondary"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+  <record id="properties_act_window_account" model="ir.actions.act_window">
+    <field name="view_ids" eval="[
+        (5, 0, 0),
+        (0, 0, {'view_mode': 'list', 'view_id': ref('analytic_account_custom_list_view')}),
+        (0, 0, {'view_mode': 'form', 'view_id': ref('analytic_account_custom_form_view')}),
+    ]"/>
+  </record>
 </odoo>
