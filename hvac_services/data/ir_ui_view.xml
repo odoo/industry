@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="product_template_form_view" model="ir.ui.view">
+        <field name="name">HVAC form view for Product Template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="mode">extension</field>
+        <field name="model">product.template</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='default_code']" position="after">
+                <field name="x_is_maintenance" string="Is Maintenance or Repair"/>
+                <field name="x_is_refrigerant"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="product_template_kanban_view" model="ir.ui.view">
+        <field name="name">HVAC kanban view for Product Template</field>
+        <field name="inherit_id" ref="product.product_template_kanban_view"/>
+        <field name="mode">extension</field>
+        <field name="model">product.template</field>
+        <field name="priority">160</field>
+        <field name="type">kanban</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban[1]" position="attributes">
+                <attribute name="default_group_by">categ_id</attribute>
+            </xpath>
+        </field>
+    </record>
+    <record id="sale_order_form_view" model="ir.ui.view">
+        <field name="name">HVAC form view for Sale Order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="mode">extension</field>
+        <field name="model">sale.order</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='order_lines']/field[@name='order_line']/list[1]/field[@name='name']" position="after">
+                <field name="x_maintained_serials_ids"  widget="many2many_tags" optional="show" 
+                    domain="[('partner_ids', '=', order_partner_id)]"
+                    required="x_product_is_maintenance" readonly="not x_product_is_maintenance"
+                    />
+            </xpath>
+        </field>
+    </record>
+    <record id="stock_lot_form_view" model="ir.ui.view">
+        <field name="name">HVAC form view for stock lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="mode">extension</field>
+        <field name="model">stock.lot</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_view_stock_valuation_layers']" position="after">
+                <button class="oe_stat_button" icon="fa-rotate-right" type="action" name="%(get_maintenances_action)d">
+                    <field widget="statinfo" name="x_sale_order_count" string="Maintenances"/>
+                </button>
+                <button class="oe_stat_button" icon="fa-flash" type="action" name="%(get_field_services_action)d">
+                    <field widget="statinfo" name="x_project_task_count" string="Field Services"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='partner_ids']" position="after">
+                <field name="x_delivery" force_save="1" readonly="True" widget="remaining_days"/>
+                <widget name="web_ribbon" title="Maintained" invisible="x_maintenance != 'Maintained'"/>
+                <widget name="web_ribbon" title="No Maintenance" invisible="x_maintenance != 'No Maintenance'" bg_color="text-bg-danger"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="stock_lot_list_view_with_maintenances" model="ir.ui.view">
+        <field name="name">HVAC list view for stock lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_tree"/>
+        <field name="mode">primary</field>
+        <field name="model">stock.lot</field>
+        <field name="priority">160</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='activity_ids']" position="replace"/>
+            <xpath expr="//field[@name='partner_ids']" position="replace">
+                <field name="partner_ids" widget="many2many_tags" string="Transfer to"/>
+            </xpath>
+            <xpath expr="//field[@name='create_date']" position="replace">
+                <field name="x_delivery" optional="show" widget="remaining_days" decoration-danger="x_delivery &lt; current_date"/>
+                <field name="x_maintenance" optional="show" widget="badge" decoration-success="x_maintenance == 'Maintained'" decoration-danger="x_maintenance == 'No Maintenance'"/>
+            </xpath>
+            <xpath expr="//field[@name='ref']" position="replace"/>
+        </field>
+    </record>
+    <record id="display_stock_lot_view_with_maintenances" model="ir.actions.act_window">
+        <field name="view_ids" eval="[(5, 0, 0), (0, 0, {'view_mode': 'list', 'view_id': ref('stock_lot_list_view_with_maintenances')})]"/>
+    </record>
+    <record id="view_partner_stock_form" model="ir.ui.view">
+        <field name="name">res.partner.stock</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="stock.view_partner_stock_warnings_form"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_view_stock_serial']" position="replace">
+                <button type="action"
+                    name="%(display_stock_lot_view_with_maintenances)d"
+                    class="oe_stat_button" icon="fa-bars" groups="stock.group_production_lot"
+                    context="{'partner_ids': id}">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Lots/Serial Numbers</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+    <record id="project_task_form_view" model="ir.ui.view">
+        <field name="name">HVAC form view for project task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="mode">extension</field>
+        <field name="model">project.task</field>
+        <field name="priority">9990</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook[1]" position="inside">
+                <page string="Serials" name="serials_page" invisible="not is_fsm">
+                    <field name="x_serials" context="{'search_default_partner_ids': partner_id}">
+                        <list string="Lots/Serial Numbers">
+                            <field name="name" decoration-bf="1" string="Serial Number" help="Unique Serial Number"/>
+                            <field name="product_id" readonly="1"/>
+                            <field name="partner_ids" optional="show" widget="many2many_tags"/>
+                            <field name="x_delivery" optional="show" widget="remaining_days" decoration-danger="x_delivery &lt; current_date"/>
+                            <field name="x_maintenance" optional="show" widget="badge" decoration-success="x_maintenance == 'Maintained'" decoration-danger="x_maintenance == 'No Maintenance'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="lot_properties" optional="hide"/>
+                            <field name="product_qty" optional="hide"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <record id="industry_fsm.project_task_list_view" model="ir.ui.view" forcecreate="1">
+        <field name="name">HVAC list view for project task</field>
+        <field name="inherit_id" ref="industry_fsm.project_task_view_list_fsm"/>
+        <field name="mode">extension</field>
+        <field name="model">project.task</field>
+        <field name="priority">9990</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list[1]" position="attributes">
+                <attribute name="open_form_view">false</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_ids']" position="after">
+                <xpath expr="//field[@name='date_deadline']" position="move"/>
+            </xpath>
+            <xpath expr="//field[@name='date_deadline']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+        </field>
+    </record>
+    <record id="project_task_list_view" model="ir.ui.view">
+        <field name="name">HVAC list view for project task</field>
+        <field name="inherit_id" ref="project.view_task_tree2"/>
+        <field name="mode">extension</field>
+        <field name="model">project.task</field>
+        <field name="priority">160</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list[1]" position="attributes">
+                <attribute name="default_group_by"/>
+                <attribute name="default_order">planned_date_begin desc</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_ids']" position="after">
+                <xpath expr="//field[@name='date_deadline']" position="move"/>
+            </xpath>
+            <xpath expr="//field[@name='date_deadline']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+        </field>
+    </record>
+    <record id="x_project_task_worksheet_template_form_view" model="ir.ui.view">
+        <field name="model">x_project_task_worksheet_template</field>
+        <field name="name">template_view_INST/MAIN/REPA_Worksheet</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form create="false" duplicate="false">
+                <sheet>
+                    <h1 invisible="context.get('default_x_project_task_id')">
+                        <field name="x_project_task_id"/>
+                    </h1>
+                    <group>
+                        <field name="x_operation" widget="selection_badge" required="True"/>
+                        <field name="x_date" string="Date" required="True"/>
+                    </group>
+                    <group string="Repair" invisible="x_operation != &quot;Repair&quot;">
+                        <field name="x_primary_root_cause"/>
+                        <field name="x_root_cause_comments" help="Provide details if additional root cause led to the repair operation"/>
+                    </group>
+                    <group string="Refrigerant">
+                        <field name="x_refrigerant_product" 
+                            domain="[('x_is_refrigerant', '!=', False)]" 
+                            required="x_removed_refrigerant != 0 or x_added_refrigerant != 0"/>
+                        <field name="x_removed_refrigerant" invisible="x_operation == &quot;Installation&quot;"/>
+                        <field name="x_added_refrigerant"/>
+                    </group>
+                    <group string="Conformity">
+                        <field name="x_product_is_functional" string="Product is functional after operation"/>
+                        <field name="x_comments" placeholder="Add details about your intervention..."/>
+                        <field widget="signature" name="x_worker_signature" force_save="0" readonly="False" required="True"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="x_project_task_worksheet_template_list_view" model="ir.ui.view">
+        <field name="model">x_project_task_worksheet_template</field>
+        <field name="name">list_view_INST/MAIN/REPA_Worksheet</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list default_order="create_date DESC">
+                <field name="create_date"/>
+                <field name="x_name"/>
+            </list>
+        </field>
+    </record>
+    <record id="x_project_task_worksheet_template_pivot_view" model="ir.ui.view">
+        <field name="model">x_project_task_worksheet_template</field>
+        <field name="name">Default pivot view for x_project_task_worksheet_template</field>
+        <field name="type">pivot</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <pivot string="Refrigerant Consumption">
+                <field name="x_added_refrigerant" type="measure"/>
+                <field name="x_removed_refrigerant" type="measure"/>
+                <field name="x_refrigerant_product" type="col"/>
+                <field name="x_date" interval="month" type="row"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="x_project_task_worksheet_template_search_view" model="ir.ui.view">
+        <field name="name">search_view_INST/MAIN/REPA_Worksheet</field>
+        <field name="model">x_project_task_worksheet_template</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <search>
+                <field name="x_name"/>
+                <filter string="Created on" date="create_date" name="create_date"/>
+                <filter name="group_by_month" string="Created on" context="{'group_by': 'create_date:month'}"/>
+            </search>
+        </field>
+    </record>
+    <record id="x_project_task_worksheet_template_ir_actions_get_worksheets" model="ir.actions.act_window">
+        <field name="search_view_id" ref="x_project_task_worksheet_template_search_view"/>
+    </record>
+</odoo>
