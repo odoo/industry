@@ -1,0 +1,296 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="product_template_form_view" model="ir.ui.view">
+        <field name="name">Custom form view for Product Template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="mode">extension</field>
+        <field name="model">product.template</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='default_code']" position="after">
+                    <field name="x_is_maintenance" string="Is Maintenance or Repair"/>
+                    <field name="x_is_refrigerant"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="product_template_kanban_view" model="ir.ui.view">
+        <field name="name">Custom kanban view for Product Template</field>
+        <field name="inherit_id" ref="product.product_template_kanban_view"/>
+        <field name="mode">extension</field>
+        <field name="model">product.template</field>
+        <field name="priority">160</field>
+        <field name="type">kanban</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//kanban[1]" position="attributes">
+                    <attribute name="default_group_by">categ_id</attribute>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="sale_order_form_view" model="ir.ui.view">
+        <field name="name">Custom form view for Sale Order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="mode">extension</field>
+        <field name="model">sale.order</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='order_lines']/field[@name='order_line']/list[1]/field[@name='name']" position="after">
+                    <field name="x_maintained_serials" widget="many2many_tags" optional="show"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="stock_lot_form_view" model="ir.ui.view">
+        <field name="name">Custom form view for stock lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="mode">extension</field>
+        <field name="model">stock.lot</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//button[@name='action_view_stock_valuation_layers']" position="after">
+                    <!-- <button class="oe_stat_button" icon="fa-rotate-right" type="action" name="get_maintenances_action">
+                        <field widget="statinfo" name="x_sale_order_count" string="Maintenances"/>
+                    </button>
+                    <button class="oe_stat_button" icon="fa-flash" type="action" name="get_field_services_action">
+                        <field widget="statinfo" name="x_project_task_count" string="Field Services"/>
+                    </button> -->
+                </xpath>
+                <xpath expr="//field[@name='partner_ids']" position="after">
+                    <field name="x_delivery" force_save="1" readonly="True" widget="remaining_days"/>
+                    <widget name="web_ribbon" title="Maintained" invisible="x_maintenance != 'Maintained'"/>
+                    <widget name="web_ribbon" title="No Maintenance" invisible="x_maintenance != 'No Maintenance'" bg_color="text-bg-danger"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="project_task_form_view" model="ir.ui.view">
+        <field name="name">Custom form view for project task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="mode">extension</field>
+        <field name="model">project.task</field>
+        <field name="priority">9990</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+                    <page string="Serials" name="serials_page">
+                        <field name="x_serials">
+                            <list string="Lots/Serial Numbers">
+                                <field name="name" decoration-bf="1" string="Serial Number" help="Unique Serial Number"/>
+                                <field name="product_id" readonly="1"/>
+                                <field name="partner_ids" optional="show" widget="many2many_tags"/>
+                                <field name="x_delivery" optional="show" widget="remaining_days"/>
+                                <field name="x_maintenance" optional="show" widget="badge" decoration-success="x_maintenance == 'Maintained'" decoration-danger="x_maintenance == 'No Maintenance'"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="lot_properties" optional="hide"/>
+                                <field name="product_qty" optional="hide"/>
+                            </list>
+                        </field>
+                    </page>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <!-- TO CLEAN -->
+    <record id="odoo_studio_project__dfd597c7-2933-443a-bbcd-5719df89b82c" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <data>
+            <xpath expr="//list[1]" position="attributes">
+                <attribute name="open_form_view">false</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_ids']" position="after">
+                <xpath expr="//field[@name='date_deadline']" position="move"/>
+            </xpath>
+            <xpath expr="//field[@name='date_deadline']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+        </data>
+        </field>
+        <field name="inherit_id" ref="industry_fsm.project_task_view_list_fsm"/>
+        <field name="mode">extension</field>
+        <field name="model">project.task</field>
+        <field name="name">Odoo Studio: project.task.list.fsm customization</field>
+        <field name="priority">9990</field>
+        <field name="type">list</field>
+    </record>
+    <!-- TO CLEAN -->
+    <record id="odoo_studio_project__c7e0881f-89d4-4d37-ad29-83bc4a3e999b" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <data>
+            <xpath expr="//list[1]" position="attributes">
+            <attribute name="default_group_by"/>
+            <attribute name="default_order">planned_date_begin desc</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_ids']" position="after">
+            <xpath expr="//field[@name='date_deadline']" position="move"/>
+            </xpath>
+            <xpath expr="//field[@name='date_deadline']" position="attributes">
+            <attribute name="optional">show</attribute>
+            </xpath>
+        </data>
+        </field>
+        <field name="inherit_id" ref="project.view_task_tree2"/>
+        <field name="mode">extension</field>
+        <field name="model">project.task</field>
+        <field name="name">Odoo Studio: project.task.list customization</field>
+        <field name="priority">160</field>
+        <field name="type">list</field>
+    </record>
+    <!-- TO CLEAN -->
+    <!-- <record id="industry_fsm_report.x_project_task_worksheet_template_1_ir_ui_view_3" model="ir.ui.view" forcecreate="1">
+      <field name="model">x_project_task_worksheet_template_1</field>
+      <field name="name">search_view_Default_Worksheet</field>
+      <field name="type">search</field>
+      <field name="arch" type="xml">
+        <search>
+          <field name="x_name"/>
+          <filter string="Created on" date="create_date" name="create_date"/>
+          <filter name="group_by_month" string="Created on" context="{'group_by': 'create_date:month'}"/>
+        </search>
+      </field>
+    </record> -->
+    <!-- TO CLEAN -->
+    <record id="industry_fsm_report.x_project_task_worksheet_template_2_ir_ui_view_3" model="ir.ui.view" forcecreate="1">
+      <field name="name">x_project_task_worksheet_template_2</field>
+      <field name="key">gen_key.61d324</field>
+      <field name="type">qweb</field>
+      <field name="arch" type="xml">
+        <t t-name="x_project_task_worksheet_template_2">
+          <div>
+            <div>
+              <div>
+                <div class="row mb-2 bg-light bg-opacity-25 border-top border-bottom pt-2 pb-2" style="page-break-inside: avoid">
+                  <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-3 col-12') + ' fw-bold'">Operation</div>
+                  <div widget="selection_badge" required="True" t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-9 col-12'" t-field="worksheet.x_operation"/>
+                </div>
+                <div class="row mb-2" style="page-break-inside: avoid">
+                  <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-3 col-12') + ' fw-bold'">Date</div>
+                  <div required="True" t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-9 col-12'" t-field="worksheet.x_date"/>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div>
+                <div class="row mb-2 bg-light bg-opacity-25 border-top border-bottom pt-2 pb-2" style="page-break-inside: avoid">
+                  <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-3 col-12') + ' fw-bold'">Primary Root Cause</div>
+                  <div t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-9 col-12'" t-field="worksheet.x_primary_root_cause"/>
+                </div>
+                <div class="row mb-2" style="page-break-inside: avoid">
+                  <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-3 col-12') + ' fw-bold'">Root Cause Comments</div>
+                  <div help="Provide details if additional root cause led to the repair operation" t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-9 col-12'" t-field="worksheet.x_root_cause_comments"/>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div>
+                <div class="row mb-2 bg-light bg-opacity-25 border-top border-bottom pt-2 pb-2" style="page-break-inside: avoid">
+                  <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-3 col-12') + ' fw-bold'">Refrigerant Product</div>
+                  <div domain="[(&quot;x_is_refrigerant&quot;, &quot;!=&quot;, False)]" required="x_removed_refrigerant != 0 or x_added_refrigerant != 0" can_create="True" can_write="True" t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-9 col-12'" t-field="worksheet.x_refrigerant_product"/>
+                </div>
+                <div class="row mb-2" style="page-break-inside: avoid">
+                  <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-3 col-12') + ' fw-bold'">Removed Refrigerant</div>
+                  <div invisible="x_operation == &quot;Installation&quot;" t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-9 col-12'" t-field="worksheet.x_removed_refrigerant"/>
+                </div>
+                <div class="row mb-2 bg-light bg-opacity-25 border-top border-bottom pt-2 pb-2" style="page-break-inside: avoid">
+                  <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-3 col-12') + ' fw-bold'">Added Refrigerant</div>
+                  <div t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-9 col-12'" t-field="worksheet.x_added_refrigerant"/>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div>
+                <div class="row mb-2 bg-light bg-opacity-25 border-top border-bottom pt-2 pb-2" style="page-break-inside: avoid">
+                  <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-3 col-12') + ' fw-bold'">Product is functional after operation</div>
+                  <i t-att-class="'col-lg-7 col-12 fa ' + ('fa-check-square' if worksheet.x_product_is_functional else 'fa-square-o')"/>
+                </div>
+                <div class="row mb-2" style="page-break-inside: avoid">
+                  <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-3 col-12') + ' fw-bold'">Comments</div>
+                  <div placeholder="Add details about your intervention..." t-att-class="'col-7' if report_type == 'pdf' else 'col-lg-9 col-12'" t-field="worksheet.x_comments"/>
+                </div>
+                <div class="row mb-2 bg-light bg-opacity-25 border-top border-bottom pt-2 pb-2" style="page-break-inside: avoid">
+                  <div t-att-class="('col-5' if report_type == 'pdf' else 'col-lg-3 col-12') + ' fw-bold'">Worker Signature</div>
+                  <img force_save="0" readonly="False" required="True" style="width: 250px;" t-att-src="image_data_uri(worksheet.x_worker_signature)" t-if="worksheet.x_worker_signature"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </t>
+      </field>
+    </record>
+    <record id="industry_fsm_report.x_project_task_worksheet_template_2_ir_ui_view_1" model="ir.ui.view" forcecreate="1">
+    <field name="arch" type="xml">
+      <form create="false" duplicate="false">
+        <sheet>
+          <h1 invisible="context.get('studio') or context.get('default_x_project_task_id')">
+            <field name="x_project_task_id"/>
+          </h1>
+          <group>
+            <field name="x_operation" widget="selection_badge" required="True"/>
+            <field name="x_date" string="Date" required="True"/>
+          </group>
+          <group string="Repair" invisible="x_operation != &quot;Repair&quot;">
+            <field name="x_primary_root_cause"/>
+            <field name="x_root_cause_comments" help="Provide details if additional root cause led to the repair operation"/>
+          </group>
+          <group string="Refrigerant">
+            <field name="x_refrigerant_product" domain="[(&quot;categ_id&quot;, &quot;=&quot;, 5)]" required="x_removed_refrigerant != 0 or x_added_refrigerant != 0"/>
+            <field name="x_removed_refrigerant" invisible="x_operation == &quot;Installation&quot;"/>
+            <field name="x_added_refrigerant"/>
+          </group>
+          <group string="Conformity">
+            <field name="x_product_is_functional" string="Product is functional after operation"/>
+            <field name="x_comments" placeholder="Add details about your intervention..."/>
+            <field widget="signature" name="x_worker_signature" force_save="0" readonly="False" required="True"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_project_task_worksheet_template_2</field>
+    <field name="name">template_view_INST/MAIN/REPA_Worksheet</field>
+    <field name="type">form</field>
+  </record>
+    <record id="industry_fsm_report.x_project_task_worksheet_template_2_ir_ui_view_2" model="ir.ui.view" forcecreate="1">
+    <field name="arch" type="xml">
+      <list default_order="create_date DESC">
+        <field name="create_date"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_project_task_worksheet_template_2</field>
+    <field name="name">list_view_INST/MAIN/REPA_Worksheet</field>
+    <field name="type">list</field>
+  </record>
+  <record id="ir_ui_view_2642" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <pivot string="Refrigerant Consumption">
+        <field name="x_added_refrigerant" type="measure"/>
+        <field name="x_removed_refrigerant" type="measure"/>
+        <field name="x_refrigerant_product" type="col"/>
+        <field name="x_date" interval="month" type="row"/>
+      </pivot>
+    </field>
+    <field name="model">x_project_task_worksheet_template_2</field>
+    <field name="name">Default pivot view for ir.model(874,)</field>
+    <field name="type">pivot</field>
+  </record>
+  <record id="industry_fsm_report.x_project_task_worksheet_template_2_ir_ui_view_3" model="ir.ui.view" forcecreate="1">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <filter string="Created on" date="create_date" name="create_date"/>
+        <filter name="group_by_month" string="Created on" context="{'group_by': 'create_date:month'}"/>
+      </search>
+    </field>
+    <field name="model">x_project_task_worksheet_template_2</field>
+    <field name="name">search_view_INST/MAIN/REPA_Worksheet</field>
+    <field name="type">search</field>
+  </record>
+</odoo>
