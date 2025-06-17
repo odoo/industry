@@ -1,85 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="ir_act_server_split_per_property" model="ir.actions.server">
-        <field name="name">Split per Owner</field>
-        <field name="state">code</field>
-        <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="code"><![CDATA[
-distributions = record.sudo().pricelist_id.x_ratios # By default, we assume that there is a pricelist/distribution key set on the SO
-owner_field = 'x_owner'
-key_field = 'x_ratio'
-analytic_account_field = 'x_property'
-total_distribution = sum(distributions.mapped(key_field))
-if total_distribution == 0: # If there is no pricelist/distribution key set on the SO, we use the area as distribution
-    distributions = record.sudo().partner_id.x_condominium_properties
-    owner_field = 'partner_id'
-    key_field = 'x_area'
-    analytic_account_field = '' # There is no field since the property is an analytic account
-    total_distribution = sum(distributions.mapped(key_field))
-if total_distribution == 0:
-    raise UserError("Cannot split the Sales Orders because there is not distribution key in the pricelist nor areas")
-owners = env['res.partner'].search([('x_companies', 'in', record.company_id.id)])
-for owner in owners:  # One SO per owner
-    new_so = record.copy()
-    new_so['x_source_sales_order'] = record.id
-    new_so['partner_id'] = owner.id
-    new_so.order_line.unlink() # Remove the lines that were copied from the source SO
-    new_so_lines = []
-    for sol in record.order_line: # The lines are re-created using the distribution key and the analytic account corresponding to the property is set
-        for distribution in distributions:
-            if distribution[owner_field].id == owner.id:
-                analytic_account = distribution if not analytic_account_field else distribution[analytic_account_field]
-                new_so_lines.append((0, 0, {
-                    'order_id': record.id,
-                    'product_id': sol.product_id.id,
-                    'name': sol.name,
-                    'product_uom_qty': sol.product_uom_qty,
-                    'product_uom_id': sol.product_uom_id.id,
-                    'price_unit': sol.price_unit * distribution[key_field] / total_distribution,
-                    'tax_ids': sol.tax_ids,
-                    'discount': sol.discount,
-                    'analytic_distribution': {analytic_account.id: 100},
-                }))
-    new_so.write({'order_line': new_so_lines})
-record['state'] = 'cancel'
-]]></field>
-    </record>
-    <record id="ir_actions_server_compute_ratio" model="ir.actions.server">
-        <field name="name">Compute Ratios</field>
-        <field name="state">code</field>
-        <field name="model_id" ref="product.model_product_pricelist"/>
-        <field name="binding_model_id" ref="product.model_product_pricelist"/>
-        <field name="code"><![CDATA[
-for pricelist in records:
-    if (properties := env['account.analytic.account'].search([('x_is_a_property', '=', True), ('id', 'not in', pricelist.x_ratios.x_property.ids)])):
-        pricelist.write({'x_ratios': [(0, 0, {
-            'x_pricelist': pricelist.id,
-            'x_property': property.id,
-            'x_ratio': property.x_area,
-        }) for property in properties]})
-]]></field>
-    </record>
-    <record id="ir_actions_server_distribute_costs" model="ir.actions.server">
-        <field name="name">Distribute Costs</field>
-        <field name="model_id" ref="account.model_account_move"/>
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-x_ratios = record.sudo().x_distribution_key.x_ratios
-total_ratio = sum(x_ratios.mapped('x_ratio'))
-analytic_distribution = {}
-if total_ratio != 0:
-    for ratio in x_ratios.filtered(lambda l: l.x_ratio != 0):
-        analytic_distribution[ratio.x_property.id] = ratio.x_ratio / total_ratio * 100
-else: # If there is no pricelist/distribution key set, we use the area
-    properties = record.sudo().company_id.partner_id.x_condominium_properties
-    total_area = sum(properties.mapped('x_area'))
-    if total_area != 0:
-        for property in properties.filtered(lambda l: l.x_area != 0):
-            analytic_distribution[property.id] = property.x_area / total_area * 100
-for aml in record.invoice_line_ids:
-    aml['analytic_distribution'] = analytic_distribution
-]]></field>
-    </record>
     <record id="ir_act_server_confirm_action" model="ir.actions.server">
         <field name="name">Confirm</field>
         <field name="state">code</field>
@@ -87,24 +7,128 @@ for aml in record.invoice_line_ids:
         <field name="binding_model_id" ref="sale.model_sale_order"/>
         <field name="code"><![CDATA[
 records.action_confirm()
-]]></field>
+]]>        </field>
     </record>
-    <record id="action_server_set_usage_meter_reading" model="ir.actions.server" >
-        <field name="name">Meter Reading</field>
-        <field name="model_id" ref="model_meter_reading"/>
+
+    <record id="confirm_analytic_account_item_split_action" model="ir.actions.server">
+        <field name="name">Confirm</field>
         <field name="state">code</field>
-        <field name="base_automation_id" ref="automation_set_usage_meter_reading"/>
-        <field name="code"><![CDATA[
-mrs = env['x_meter_reading'].search([
-    ('id', 'in', record.x_account_analytic_account_id.x_property_meter_reading_ids.ids),
-    ('x_meter_id', '=', record.x_meter_id.id)], order='x_date')
-previous_mr = False
-for mr in mrs:
-    mr['x_usage'] = mr['x_quantity'] - previous_mr['x_quantity'] if previous_mr else 0
-    previous_mr = mr
+        <field name="model_id" ref="model_analytic_account_wizard"/>
+        <field name="binding_model_id" ref="model_analytic_account_wizard"/>
+        <field name="code"><![CDATA[total_share = 0
+note_lines = []
+new_analytic_item = env['account.analytic.line']
+note_details = {}
+occupied_cells = {}
+
+for line in records.x_line_ids:
+    total_share += line.x_share
+
+if round(total_share) != 100:
+    raise UserError(total_share)
+
+for line in records.x_line_ids:
+    analytic_id = line.x_analytic_account_name_id
+    analytic_name = analytic_id.name
+
+
+    new_analytic_item_id = new_analytic_item.create({
+        "x_plan11_id": analytic_id.id,
+        "name": analytic_id.name,
+        "amount": line.x_amount
+    })
+    # new_analytic_item += new_analytic_item_id
+    # occupied_cells.append((line.x_analytic_line_id.id, new_analytic_item_id))
+
+    if line.x_analytic_line_id.id in occupied_cells:
+        occupied_cells[line.x_analytic_line_id.id].update(new_analytic_item_id)
+    else:
+        occupied_cells.update({line.x_analytic_line_id.id: set(new_analytic_item_id)})
+
+    if line.x_analytic_line_id.id in note_details:
+        analytic_url = f"/odoo/analytic-items/{new_analytic_item_id.id}"
+        note_line = f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{analytic_name}</a>"
+        note_details[line.x_analytic_line_id.id].add(note_line)
+    else:
+        analytic_url = f"/odoo/analytic-items/{new_analytic_item_id.id}"
+        note_line = {f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{analytic_name}</a>"}
+        note_details.update({line.x_analytic_line_id.id: set(note_line)})
+
+for cell, new_analytic_lines in occupied_cells.items():
+    for new_analytic_line in list(new_analytic_lines):
+        for Aid, values in note_details.items():
+            if cell == Aid:
+                note_html = f"""
+                    <i>{datetime.date.today().strftime("%d %B %Y")}</i><br/>
+                    <p><b>Analytic item coming from a split</b><br/>
+                    {'<br/>'.join(list(values))}<br/>
+                    See <a href='/odoo/analytic-items/{cell}' target='_blank'> original analytic item:</a>
+                    </p>
+                    """
+                new_analytic_line.write({"x_notes": note_html.strip()})
+
+for Aid, values in note_details.items():
+    raise UserError(values)
+    note_html = f"""
+        <i>{datetime.date.today().strftime("%d %B %Y")}</i><br/>
+        <p><b>Analytic item splited</b><br/>
+        {'<br/>'.join(list(values))}<br/>
+        </p>
+        """
+    new_analytic_item.browse(Aid).write({"x_notes": note_html.strip()})
+
+
+# for Aid, values in occupied_cells.items():
+#     raise UserError(values)
+#     for value in values:
+#         raise UserError(value)
+
+# note_html = f"""
+# <i>{datetime.date}</i><br/>
+# <p><b>Analytic item coming from a split</b><br/>
+# {'<br/>'.join(note_lines)}<br/>
+# See <a href='/odoo/analytic-items/{original_id.id}' target='_blank'> original analytic item:</a>
+# </p>
+# """
+
+# new_analytic_item.write({"x_notes": note_html.strip()})]]>
+        </field>
+    </record>
+
+    <record id="split_analytic_item_action" model="ir.actions.server">
+        <field name="name">Split</field>
+        <field name="model_id" ref="analytic.model_account_analytic_line"/>
+        <field name="binding_model_id" ref="analytic.model_account_analytic_line"/>
+        <field name="binding_view_types">list,kanban</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[product_commands = []
+amount_total = 0
+for record in records:
+    amount_total += record.amount
+    product_commands.append((0, 0, {
+        "x_analytic_account_name_id": record.x_plan11_id.id,
+        "x_analytic_line_id": record.id,
+        "x_amount": record.amount / 2
+
+    }))
+    product_commands.append((0, 0, {
+        "x_analytic_account_name_id": record.x_plan11_id.id,
+        "x_analytic_line_id": record.id,
+        "x_amount": record.amount / 2
+
+    }))
+wizard = env['x_analytic_account_wizard'].create({
+    "x_line_ids": product_commands,
+    "x_total": amount_total
+})
+
+action = env['ir.actions.act_window']._for_xml_id('condominium.split_act_window')
+action['res_id'] = wizard.id
+
 ]]>
         </field>
     </record>
+
     <record id="action_view_company_partner" model="ir.actions.server">
         <field name="name">Open company partner form view</field>
         <field name="model_id" ref="base.model_res_partner"/>
@@ -134,5 +158,219 @@ action = {'type': 'ir.actions.client', 'tag': 'reload'}]]></field>
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="state">code</field>
         <field name="name">Create Condominium</field>
-  </record>
+    </record>
+    <record id="ir_act_server_split_per_property" model="ir.actions.server">
+        <field name="code"><![CDATA[
+    distributions = record.x_studio_distribution_key.x_studio_ratio_ids
+total_distribution = sum(distributions.mapped('x_ratio'))
+if total_distribution == 0: raise UserError("Cannot split the Sales Orders because there is not distribution key total is null.")
+for owner in env['res.partner'].search([('x_companies', 'in', record.company_id.id)]):  # One SO per owner
+    new_so = record.copy(); new_so_lines = [];
+    new_so['x_source_sales_order'] = record.id
+    new_so['partner_id'] = owner.id
+    new_so.order_line.unlink() # Remove the lines that were copied from the source SO
+    for sol in record.order_line: # The lines are re-created using the distribution key and the analytic account corresponding to the property is set
+        for distribution in distributions:
+            if distribution['x_owner'].id == owner.id:
+                new_so_lines.append((0, 0, { 'order_id': record.id, 'product_id': sol.product_id.id, 'name': sol.name #+ '\n' + distribution.x_studio_property.x_name
+                , 'product_uom_qty': sol.product_uom_qty, 'product_uom_id': sol.product_uom_id.id,
+                    'price_unit': sol.price_unit * distribution['x_ratio'] / total_distribution, 'tax_ids': sol.tax_ids, 'discount': sol.discount, 'analytic_distribution': {distribution.x_studio_account.id: 100} }))
+    new_so.write({'order_line': new_so_lines})
+record['state'] = 'cancel'
+]]>        </field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Split SO per Owner</field>
+    </record>
+    <record id="action_server_set_usage_meter_reading" model="ir.actions.server">
+        <field name="code"><![CDATA[mrs = env['x_meter_reading'].search([('id', 'in', record.x_studio_property.x_studio_meter_reading_ids.ids), ('x_meter_id', '=', record.x_meter_id.id)], order='x_date')
+previous_mr = False
+for mr in mrs:
+    mr['x_usage'] = mr['x_quantity'] - previous_mr['x_quantity'] if previous_mr else 0
+    previous_mr = mr
+
+        ]]>        </field>
+        <field name="model_id" ref="model_meter_reading"/>
+        <field name="state">code</field>
+        <field name="name">Compute Meter Reading Consumption</field>
+    </record>
+    <record id="industry_update_curr_9c379c6b-889a-4235-af2e-df6e3dcfaa6d" model="ir.actions.server">
+        <field name="code"><![CDATA[for line in record.x_property_id.x_studio_owner_ids:
+    if line.x_studio_end_date == False: record['x_property_id']['x_studio_current_owner'] = line.x_studio_owner
+    account = env['account.analytic.account'].search([('x_studio_property','=',record.x_property_id.id),('partner_id','=',line.x_studio_owner.id)])
+    if not account: line['x_studio_account'] = env['account.analytic.account'].create({ 'name': record.x_property_id.x_name + " - " + line.x_studio_owner.name, 'x_studio_property': record.x_property_id.id, 'partner_id': line.x_studio_owner.id, 'x_studio_owner_line': line.id}).id
+]]>        </field>
+        <field name="model_id" ref="property_line_58f38056-6793-42e3-8f7a-f3db6e3da145"/>
+        <field name="state">code</field>
+        <field name="name">Update Property Current Owner</field>
+        <field name="usage">base_automation</field>
+    </record>
+    <record id="industry_archive_rel_1116b329-ad32-4a7f-b31c-59702e264ec1" model="ir.actions.server">
+        <field name="code"><![CDATA[for owner in record.x_studio_owner_ids:
+    if owner.x_studio_account: owner['x_studio_account']['active'] = False
+
+]]>        </field>
+        <field name="model_id" ref="property_9abd67e7-492e-4fac-9aef-812e565e196e"/>
+        <field name="state">code</field>
+        <field name="name">Archive related accounts</field>
+        <field name="usage">base_automation</field>
+    </record>
+    <record id="industry_populate_vo_154b8787-f5ce-4bea-931b-a6edbc80a723" model="ir.actions.server">
+        <field name="binding_model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
+        <field name="code"><![CDATA[record['x_studio_attendee_vote_ids'].unlink()
+voters = []
+for attendee in record.x_calendar_event_id.attendee_ids:
+    if (attendee.x_studio_attending or attendee.x_studio_delegating) and attendee.partner_id.id not in list(map(lambda voter: voter.x_studio_attendee.id, record.x_studio_attendee_vote_ids)): voters.append({ 'x_studio_attendee': attendee.partner_id.id, })
+record['x_studio_attendee_vote_ids'] = env['x_calendar_event_line_a1bce_line_a3f04'].create(voters).ids
+
+
+]]>        </field>
+        <field name="model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
+        <field name="state">code</field>
+        <field name="name">Populate Voters</field>
+        <field name="usage">base_automation</field>
+    </record>
+    <record id="industry_set_votes_a_73342a03-85fc-4775-afd2-800be099d3aa" model="ir.actions.server">
+        <field name="binding_model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
+        <field name="code"><![CDATA[for attendee_vote in record.x_studio_attendee_vote_ids: attendee_vote['x_studio_vote'] = "Against"
+
+
+]]>        </field>
+        <field name="model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
+        <field name="state">code</field>
+        <field name="name">Set Votes as All Against</field>
+    </record>
+    <record id="industry_set_votes_a_d3b6fd79-aef3-4619-9279-4ec49d90559d" model="ir.actions.server">
+        <field name="binding_model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
+        <field name="code"><![CDATA[for attendee_vote in record.x_studio_attendee_vote_ids: attendee_vote['x_studio_vote'] = "In Favor"
+
+
+]]>        </field>
+        <field name="model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
+        <field name="state">code</field>
+        <field name="name">Set Votes as All In Favor</field>
+    </record>
+    <record id="industry_send_genera_2c1dc29b-783e-4233-89c4-0ad81f20c6eb" model="ir.actions.server">
+        <field name="binding_model_id" ref="calendar.model_calendar_event"/>
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="state">mail_post</field>
+        <field name="name">Send General Meeting Report</field>
+    </record>
+    <record id="industry_send_genera_636204d5-33e7-437e-99cb-fbc897d72c0e" model="ir.actions.server">
+        <field name="binding_model_id" ref="calendar.model_calendar_event"/>
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="state">mail_post</field>
+        <field name="name">Send General Meeting Agenda</field>
+    </record>
+    <record id="distribute_costs" model="ir.actions.server">
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="code"><![CDATA[def findClosestMeterReading (date, meter_readings):
+    closest_mr = meter_readings[0] # Assume first is a good start
+    if date:
+        # Take the closest meter reading from date
+        for mr in meter_readings:
+            if abs((date - mr.x_date).days) < abs((date - closest_mr.x_date).days): closest_mr = mr
+    else: # Case when owner is still current owner, end date is False, then take the latest readings available
+        for mr in meter_readings:
+            if closest_mr.x_date < mr.x_date: closest_mr = mr
+    return closest_mr
+#
+if not record.x_studio_distribution_key:
+    #raise UserError("A distribution key is required to distribute costs to accounts.")
+    for aml in record.invoice_line_ids: aml['analytic_distribution'] = {}
+else:
+    analytic_distribution = {};
+    # Key distribution
+    if record.x_studio_distribution_key.x_studio_based_on == "Shares" and ((record.x_studio_period_start and record.x_studio_period_end) or (not record.x_studio_period_start and not record.x_studio_period_end)):
+        x_ratios = record.sudo().x_studio_distribution_key.x_studio_ratio_ids
+        for ratio in x_ratios.filtered(lambda l: l.x_ratio != 0):
+            for owner in ratio.x_studio_property.x_studio_owner_ids:
+                if record.x_studio_period_start and record.x_studio_period_end:
+                    # Handle owner changes
+                    if owner.x_studio_start_date <= record.x_studio_period_end and (not owner.x_studio_end_date or record.x_studio_period_start <= owner.x_studio_end_date):
+                        if not owner.x_studio_end_date : analytic_distribution[owner.x_studio_account.id] = (record.x_studio_period_end - max(owner.x_studio_start_date, record.x_studio_period_start)).days * ratio.x_ratio
+                        else: analytic_distribution[owner.x_studio_account.id] = (owner.x_studio_end_date - max(owner.x_studio_start_date, record.x_studio_period_start)).days * ratio.x_ratio
+                else:
+                    # Only current owner
+                    if owner.x_studio_owner.id == ratio.x_studio_property.x_studio_current_owner.id : analytic_distribution[owner.x_studio_account.id] = ratio.x_ratio
+    # Meter distribution
+    if record.x_studio_distribution_key.x_studio_based_on == "Meter Readings" and record.x_studio_period_start and record.x_studio_period_end:
+        for property in env['x_property'].search([]):
+            meter_reading_ids = [item for item in property.x_studio_meter_reading_ids if item.x_meter_id.id == record.x_studio_distribution_key.x_studio_meter.id]
+            if len(meter_reading_ids) >= 2:
+                mrstart = findClosestMeterReading(record.x_studio_period_start, property.x_studio_meter_reading_ids)
+                mrend = findClosestMeterReading(record.x_studio_period_end, property.x_studio_meter_reading_ids)
+                for owner in property.x_studio_owner_ids:
+                    mrostart = findClosestMeterReading(owner.x_studio_start_date, property.x_studio_meter_reading_ids)
+                    mroend = findClosestMeterReading(owner.x_studio_end_date, property.x_studio_meter_reading_ids)
+                    if mrostart and mrostart.x_date <  mrstart.x_date: mrostart = mrstart
+                    if mroend and mrend.x_date < mroend.x_date: mroend = mrend
+                    if mrostart and mroend and not (mrend.x_date < mrostart.x_date or mroend.x_date < mroend.x_date):
+                        analytic_distribution[owner.x_studio_account.id] = abs(mroend.x_quantity - mrostart.x_quantity)
+
+        #else:
+            #raise UserError("Period Start and Period End are required to distribute costs by meter.")
+            #for aml in record.invoice_line_ids: aml['analytic_distribution'] = {}
+    # Outcome
+    total_ratio = sum(analytic_distribution.values())
+    if total_ratio:
+        for key in analytic_distribution: analytic_distribution[key] *=  100 / total_ratio
+        for aml in record.invoice_line_ids: aml['analytic_distribution'] = analytic_distribution
+    else:
+        for aml in record.invoice_line_ids: aml['analytic_distribution'] = {}
+
+]]>        </field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="name">Distribute Costs</field>
+    </record>
+    <record id="industry_populate_di_1bcb08fe-f6dc-4ea0-9ffc-d4607055470e" model="ir.actions.server">
+        <field name="binding_model_id" ref="distribution_key_ebf70cee-4475-4921-a5f1-85e747bc5842"/>
+        <field name="code"><![CDATA[for distribution_key in records:
+    properties = env['x_property'].search([])
+    if properties:
+        total_distribution = sum(properties.mapped('x_studio_area'))
+        for property in properties:
+            if property.id not in distribution_key.x_studio_ratio_ids.mapped('x_studio_property').ids: distribution_key.write({'x_studio_ratio_ids': [(0, 0, {'x_distribution_key': distribution_key.id, 'x_studio_property': property.id, 'x_ratio': property.x_studio_area / total_distribution * 100, })]})
+]]>        </field>
+        <field name="model_id" ref="distribution_key_ebf70cee-4475-4921-a5f1-85e747bc5842"/>
+        <field name="state">code</field>
+        <field name="name">Populate Distribution Key</field>
+    </record>
+    <record id="industry_compute_dis_a81d25a4-1a4e-4e6d-94d2-cd9ed915b36f" model="ir.actions.server">
+        <field name="binding_model_id" ref="distribution_key_ebf70cee-4475-4921-a5f1-85e747bc5842"/>
+        <field name="code"><![CDATA[for distribution_key in records:
+    total_distribution = sum(distribution_key.x_studio_ratio_ids.mapped('x_area'))
+    for ratio in distribution_key.x_studio_ratio_ids: ratio['x_ratio'] = ratio.x_area / total_distribution * 100]]></field>
+        <field name="model_id" ref="distribution_key_ebf70cee-4475-4921-a5f1-85e747bc5842"/>
+        <field name="state">code</field>
+        <field name="name">Compute Distribution Key Ratios</field>
+    </record>
+    <record id="execute_code_2a88e896-cf76-4255-8ab9-1c04b6739bd9" model="ir.actions.server">
+        <field name="code"><![CDATA[server_action = env['ir.actions.server'].search([('name','=','Industry: Distribute Costs')])
+if server_action: server_action.run()]]></field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="name">Call Distribute Costs on UI update</field>
+        <field name="usage">base_automation</field>
+    </record>
+    <record id="industry_call_distri_1dff37c7-1c90-46cd-be7e-0d935c31d7a6" model="ir.actions.server">
+        <field name="code"><![CDATA[server_action = env['ir.actions.server'].search([('name','=','Industry: Distribute Costs')])
+if server_action: server_action.run()]]></field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="name">Call Distribute Costs on save</field>
+        <field name="usage">base_automation</field>
+    </record>
+    <record id="industry_create_task_47e0cf69-8b12-4e53-b7d5-794639319f20" model="ir.actions.server">
+        <field name="binding_model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
+        <field name="code"><![CDATA[customer_id = record.x_calendar_event_id.x_studio_partner_id.id
+action = { 'type': 'ir.actions.act_window', 'name': 'Create Task', 'res_model': 'project.task', 'view_mode': 'form', 'view_type': 'form', 'target': 'new', 'context': { 'default_project_id': env['project.project'].search([('partner_id', '=', customer_id)]).id, 'default_name': record.x_name, 'default_user_ids': [env.user.id], 'default_partner_id': customer_id } }
+
+
+]]>        </field>
+        <field name="model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
+        <field name="state">code</field>
+        <field name="name">Create Task from Motion</field>
+    </record>
 </odoo>
