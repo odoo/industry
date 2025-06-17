@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="base_automation_SO_line" model="base.automation">
+        <field name="name">On SO line Serial Edit</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('update_so_line_quantity')])]"/>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[("product_id.x_is_maintenance", "!=", False), ("order_id.state", "in", ["draft", "sent"])]</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale.field_sale_order_line__product_id'), ref('x_maintained_serials_on_sale_order_line_field')])]"/>
+    </record>
+    <record id="base_automation_fs_task_serials_on_delivery" model="base.automation">
+        <field name="name">On Delivery Confirmed</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('update_fs_task_serials_on_delivery')])]"/>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="trigger">on_state_set</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('stock.field_stock_picking__state')])]"/>
+        <field name="filter_domain">[("state", "=", "done")]</field>
+    </record>
+    <record id="base_automation_SO_serials" model="base.automation">
+        <field name="name">On SO line Edit</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('add_sale_order_line_serials_to_sale_order')])]"/>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale.field_sale_order__order_line')])]"/>
+    </record>
+    <record id="base_automation_on_task_create" model="base.automation">
+        <field name="name">On Project Task Create</field>
+        <field name="action_server_ids" eval="[(6, 0, [ ref('update_fs_task_serials_on_create')])]"/>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="filter_domain">[('sale_order_id', '!=', False), ('is_fsm', '=', True)]</field>
+        <field name="trigger">on_create</field>
+    </record>
+</odoo>
