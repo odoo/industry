@@ -1,6 +1,96 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="sale_order_form_custom" model="ir.ui.view">
+  <record id="web.basic_layout" model="ir.ui.view" forcecreate="1">
+    <field name="arch" type="xml">
+      <t t-name="web.basic_layout">
+        <t t-call="web.html_container">
+          <t t-if="not o" t-set="o" t-value="doc"/>
+          <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <h3/>
+            <table class="table table-bordered mb64">
+              <tr>
+                <td colspan="20">
+                  <u>
+                    <strong>Security</strong>
+                  </u>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </t>
+      </t>
+    </field>
+    <field name="key">web.basic_layout</field>
+    <field name="name">basic_layout</field>
+    <field name="active" eval="True"/>
+    <field name="type">qweb</field>
+  </record>
+  <record id="analytic_account_custom_form_view" model="ir.ui.view">
+        <field name="name">analytic.analytic.account.form customization</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_account_form" />
+        <field name="mode">primary</field>
+        <field name="active" eval="True"/>
+        <field name="model">account.analytic.account</field>
+        <field name="priority">400</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="placeholder">e.g. Apartment A0</attribute>
+            </xpath>
+            <xpath expr="//field[@name='code']" position="replace">
+                <field name="x_tenant" />
+            </xpath>
+            <xpath expr="//form[1]/sheet[1]/div[not(@name)][1]/label[1]" position="replace" />
+            <xpath expr="//button[@name='action_view_projects']" position="replace" />
+            <xpath expr="//button[@name='subscriptions_action']" position="after">
+                <button class="oe_stat_button" icon="fa-home" type="action" name="%(properties_parent_act_window)d">
+                    <field widget="statinfo" name="x_parent_account_analytic_account_count" string="Properties" />
+                </button>
+            </xpath>
+            <xpath expr="//form[1]/sheet[1]/div[not(@name)][1]/h1[1]/field[@name='name']" position="attributes">
+                <attribute name="string">Apartment...</attribute>
+            </xpath>
+            <xpath expr="//field[@name='active']" position="after">
+                <xpath expr="//form[1]/sheet[1]/group[@name='main']/group[2]/field[@name='company_id']" position="move" />
+                <field name="x_condominium" />
+                <field name="x_building" options='{"create_name_field":"x_name","no_create":true}' required="x_is_a_property"/>
+                <field name="x_type" options="{'create_name_field': 'x_name'}" required="x_is_a_property" />
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="required">x_is_a_property</attribute>
+                <attribute name="string">Owner</attribute>
+            </xpath>
+            <xpath expr="//field[@name='plan_id']" position="before">
+                <field widget="many2many_tags" name="x_tags" options='{"color_field": "x_color"}' />
+                <field name="x_parent" options='{"no_create":true}' domain='[("x_is_a_property", "=", True)]' />
+                <field name="x_floor"/>
+                <field name="x_area"/>
+            </xpath>
+            <xpath expr="//field[@name='plan_id']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//form[1]/sheet[1]/group[@name='main']/group[1]/field[@name='company_id']" position="attributes">
+                <attribute name="force_save">1</attribute>
+                <attribute name="groups">base.group_no_one</attribute>
+                <attribute name="readonly">True</attribute>
+            </xpath>
+            <notebook>
+                <page string="Meter Readings">
+                    <field name="x_property_meter_reading_ids" context="{'default_x_account_analytic_account_id': id}">
+                        <list editable="bottom">
+                            <field name="x_meter_id" required="True"/>
+                            <field name="x_date"/>
+                            <field name="x_quantity"/>
+                            <field name="x_usage" optional="show"/>
+                            <field name="x_description" optional="show"/>
+                            <field name="x_image" optional="show"/>
+                        </list>
+                    </field>
+                </page>
+            </notebook>
+        </field>
+  </record>
+  <record id="sale_order_form_custom" model="ir.ui.view">
         <field name="name">Custom form view for sale order</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale_subscription.sale_subscription_order_view_form"/>
@@ -135,72 +225,6 @@
             </form>
         </field>
     </record>
-    <record id="analytic_account_custom_form_view" model="ir.ui.view">
-        <field name="name">analytic.analytic.account.form customization</field>
-        <field name="inherit_id" ref="analytic.view_account_analytic_account_form" />
-        <field name="mode">primary</field>
-        <field name="active" eval="True"/>
-        <field name="model">account.analytic.account</field>
-        <field name="priority">400</field>
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='name']" position="attributes">
-                <attribute name="placeholder">e.g. Apartment A0</attribute>
-            </xpath>
-            <xpath expr="//field[@name='code']" position="replace">
-                <field name="x_tenant" />
-            </xpath>
-            <xpath expr="//form[1]/sheet[1]/div[not(@name)][1]/label[1]" position="replace" />
-            <xpath expr="//button[@name='action_view_projects']" position="replace" />
-            <xpath expr="//button[@name='subscriptions_action']" position="after">
-                <button class="oe_stat_button" icon="fa-home" type="action" name="%(properties_parent_act_window)d">
-                    <field widget="statinfo" name="x_parent_account_analytic_account_count" string="Properties" />
-                </button>
-            </xpath>
-            <xpath expr="//form[1]/sheet[1]/div[not(@name)][1]/h1[1]/field[@name='name']" position="attributes">
-                <attribute name="string">Apartment...</attribute>
-            </xpath>
-            <xpath expr="//field[@name='active']" position="after">
-                <xpath expr="//form[1]/sheet[1]/group[@name='main']/group[2]/field[@name='company_id']" position="move" />
-                <field name="x_condominium" />
-                <field name="x_building" options='{"create_name_field":"x_name","no_create":true}' required="x_is_a_property"/>
-                <field name="x_type" options="{'create_name_field': 'x_name'}" required="x_is_a_property" />
-            </xpath>
-            <xpath expr="//field[@name='partner_id']" position="attributes">
-                <attribute name="required">x_is_a_property</attribute>
-                <attribute name="string">Owner</attribute>
-            </xpath>
-            <xpath expr="//field[@name='plan_id']" position="before">
-                <field widget="many2many_tags" name="x_tags" options='{"color_field": "x_color"}' />
-                <field name="x_parent" options='{"no_create":true}' domain='[("x_is_a_property", "=", True)]' />
-                <field name="x_floor"/>
-                <field name="x_area"/>
-            </xpath>
-            <xpath expr="//field[@name='plan_id']" position="attributes">
-                <attribute name="invisible">True</attribute>
-            </xpath>
-            <xpath expr="//form[1]/sheet[1]/group[@name='main']/group[1]/field[@name='company_id']" position="attributes">
-                <attribute name="force_save">1</attribute>
-                <attribute name="groups">base.group_no_one</attribute>
-                <attribute name="readonly">True</attribute>
-            </xpath>
-
-            <notebook>
-                <page string="Meter Readings">
-                    <field name="x_property_meter_reading_ids" context="{'default_x_account_analytic_account_id': id}">
-                        <list editable="bottom">
-                            <field name="x_meter_id" required="True"/>
-                            <field name="x_date"/>
-                            <field name="x_quantity"/>
-                            <field name="x_usage" optional="show"/>
-                            <field name="x_description" optional="show"/>
-                            <field name="x_image" optional="show"/>
-                        </list>
-                    </field>
-                </page>
-            </notebook>
-        </field>
-    </record>
     <record id="quick_create_account_form" model="ir.ui.view">
         <field name="name">account.analytic.account.quick_create</field>
         <field name="model">account.analytic.account</field>
@@ -313,7 +337,7 @@
     </record>
     <record id="product_pricelist_custom_view" model="ir.ui.view">
         <field name="name">product.pricelist.form customization</field>
-        <field name="inherit_id" ref="product.product_pricelist_view" />
+        <field name="inherit_id" ref="product.product_pricelist_view"/>
         <field name="mode">extension</field>
         <field name="model">product.pricelist</field>
         <field name="active" eval="True"/>
@@ -321,7 +345,7 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_open_pricelist_report']" position="before">
-                <button name="%(ir_actions_server_compute_ratio)d" string="Compute Ratios" type="action" class="btn-primary" />
+                <button name="%(action_server_set_usage_meter_reading)d" string="Compute Ratios" type="action" class="btn-primary" />
             </xpath>
             <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]" position="before">
                 <page string="Ratios" name="studio_page_ratios">
@@ -471,7 +495,7 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_reload_ai_data']" position="after">
-                <button string="Distribute Costs" name="%(ir_actions_server_distribute_costs)d" type="action"/>
+                <button string="Distribute Costs" name="%(distribute_costs)d" type="action"/>
             </xpath>
             <xpath expr="//field[@name='invoice_vendor_bill_id']" position="after">
                 <field name="x_distribution_key" options="{'no_create': true}" placeholder="Area as distribution key"/>
@@ -520,4 +544,3041 @@
             (0, 0, {'view_mode': 'form', 'view_id': ref('analytic_account_custom_form_view')}),
         ]"/>
     </record>
+  <record id="odoo_studio_analytic_e24d1766-3331-491b-9f50-16cd3518f693" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]" position="replace">
+          <group name="studio_group_6pd_1ipk0qiuk"/>
+        </xpath>
+        <xpath expr="//field[@name='currency_id']" position="replace">
+          <field name="x_studio_property" options="{&quot;create_name_field&quot;:&quot;x_name&quot;,&quot;no_create&quot;:true}"/>
+          <xpath expr="//field[@name='partner_id']" position="move"/>
+          <field name="x_studio_start_date" force_save="1" readonly="True"/>
+          <field name="x_studio_end_date" force_save="1" readonly="True"/>
+        </xpath>
+        <xpath expr="//field[@name='x_area']" position="replace"/>
+        <xpath expr="//field[@name='x_floor']" position="replace"/>
+        <xpath expr="//field[@name='x_parent']" position="replace"/>
+        <xpath expr="//field[@name='x_tags']" position="replace"/>
+        <xpath expr="//field[@name='x_tenant']" position="replace"/>
+        <xpath expr="//field[@name='x_type']" position="replace"/>
+        <xpath expr="//field[@name='x_building']" position="replace"/>
+        <!-- meet1130 -->
+        <!-- <xpath expr="//button[@name='properties_parent_act_window']" position="replace" /> -->
+        <xpath expr="//field[@name='partner_id']" position="attributes">
+          <attribute name="force_save">0</attribute>
+          <attribute name="readonly">False</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="analytic_account_custom_form_view"/>
+    <field name="mode">extension</field>
+    <field name="model">account.analytic.account</field>
+    <field name="name">analytic.analytic.account.form customization customization</field>
+    <field name="priority">99</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_sale_ord_51c6b4e1-3957-4613-b5ea-db8fba2b8957" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <!-- <xpath expr="//button[@name='786']" position="attributes">
+          <attribute name="invisible">not x_company_partner_id or state != "draft" or not x_studio_distribution_key</attribute>
+          <attribute name="string">Split by Property</attribute>
+        </xpath> -->
+        <xpath expr="//field[@name='sale_order_template_id']" position="after">
+          <field name="x_studio_distribution_key" options="{'create_name_field': 'x_name'}"/>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/group[@name='sale_header']/group[@name='order_details']/label[not(@name)][1]" position="attributes">
+          <attribute name="string">Pricelist</attribute>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/group[@name='sale_header']/group[@name='order_details']/div[not(@name)][3]/field[@name='pricelist_id']" position="attributes">
+          <attribute name="placeholder"/>
+        </xpath>
+        <xpath expr="//group[@name='sale_header']" position="after">
+          <group name="studio_group_7pu_1iphj3jik"/>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='order_lines']/field[@name='order_line']/list[1]" position="attributes">
+          <attribute name="open_form_view">true</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="mode">extension</field>
+    <field name="model">sale.order</field>
+    <field name="name">sale.order.form customization</field>
+    <field name="priority">160</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_product__eb3e25fc-fad8-4f9a-a6fa-74893a893bdb" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='x_sequence']" position="after">
+          <field optional="show" name="x_studio_property" options="{'create_name_field': 'x_name'}"/>
+          <xpath expr="//field[@name='x_owner']" position="move"/>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='studio_page_ratios']/field[@name='x_ratios']/list[1]/field[@name='x_ratio']" position="attributes">
+          <attribute name="options">{"digits":[6,3]}</attribute>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='studio_page_ratios']/field[@name='x_ratios']/list[1]" position="after">
+          <form>
+            <header/>
+            <sheet string="Ratios" name="studio_sheet_67b972">
+              <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+              <group name="studio_group_df42aa">
+                <group name="studio_group_ca35c2"/>
+              </group>
+            </sheet>
+          </form>
+        </xpath>
+        <xpath expr="//group[@name='studio_group_ca35c2']" position="inside">
+          <field name="x_pricelist" options="{&quot;no_create&quot;: true}"/>
+        </xpath>
+        <xpath expr="//group[@name='studio_group_df42aa']" position="inside">
+          <group name="studio_group_fb7a97">
+            <field name="x_ratio"/>
+            <field name="x_company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+          </group>
+        </xpath>
+        <xpath expr="//field[@name='x_owner']" position="attributes">
+          <attribute name="string">Current Owner</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="product.product_pricelist_view"/>
+    <field name="mode">extension</field>
+    <field name="model">product.pricelist</field>
+    <field name="name">product.pricelist.form customization</field>
+    <field name="active" eval="True"/>
+    <field name="priority">1600</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_list_view_fo_7f11ccd1-f094-4639-885b-bd1d7ec8bc19" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_property</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_property</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_9f1487e5-eabf-4bad-bb05-6c029c02e27f" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Property">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_d40dcf">
+            <group name="studio_group_d40dcf_left"/>
+            <group name="studio_group_d40dcf_right"/>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+    <field name="model">x_property</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_property</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__f88cdb09-027d-4b61-9869-fb26920a1886" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_property" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="model">x_property</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default search view for x_property</field>
+    <field name="type">search</field>
+  </record>
+  <record id="odoo_studio_default__89845a3c-3645-4ee0-885f-271d95c2370c" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//group[@name='studio_group_d40dcf_left']" position="inside">
+          <field name="x_studio_type" options="{'create_name_field': 'x_name'}"/>
+          <field name="x_studio_building" options="{'create_name_field': 'x_name'}"/>
+          <field name="x_studio_floor"/>
+          <field name="x_studio_area"/>
+        </xpath>
+        <xpath expr="//group[@name='studio_group_d40dcf_right']" position="inside">
+          <field name="x_studio_tags" widget="many2many_tags"/>
+          <field name="x_studio_parent" options="{'create_name_field': 'x_name'}"/>
+          <field name="x_studio_current_owner" force_save="1" readonly="True"/>
+          <field name="x_studio_company_id" string="Company"/>
+          <field name="x_studio_condominium" force_save="1" readonly="True"/>
+        </xpath>
+        <xpath expr="//group[@name='studio_group_d40dcf']" position="after">
+          <notebook name="studio_notebook_tl_1ipjs3dc0">
+            <page string="Meter Readings" name="studio_page_tl">
+              <field name="x_studio_meter_reading_ids">
+                <list string="Meter Reading" editable="bottom" default_order="x_date desc">
+                  <field name="x_meter_id" optional="show"/>
+                  <field name="x_date" optional="show"/>
+                  <field name="x_quantity" optional="show"/>
+                  <field name="x_usage" optional="show"/>
+                  <field name="x_description" optional="show"/>
+                  <field name="x_image" optional="show"/>
+                </list>
+                <form>
+                  <sheet string="Meter Reading" name="studio_sheet_bf045e">
+                    <group name="studio_group_8ffe76">
+                      <group name="studio_group_dfe9dd">
+                        <field name="x_meter_id"/>
+                        <field name="x_quantity"/>
+                        <field name="x_description"/>
+                        <field name="x_account_analytic_account_id"/>
+                      </group>
+                      <group name="studio_group_fa1b35">
+                        <field name="x_date"/>
+                        <field name="x_usage"/>
+                        <field name="x_image"/>
+                        <field name="x_studio_property"/>
+                      </group>
+                    </group>
+                    <group name="studio_group_3a155c">
+                      <separator/>
+                    </group>
+                  </sheet>
+                </form>
+              </field>
+            </page>
+            <page string="Owners" name="studio_page_7sn_1ipjs3r3u">
+              <field name="x_studio_owner_ids">
+                <list editable="top" open_form_view="true">
+                  <field name="x_studio_sequence" widget="handle"/>
+                  <field optional="show" name="x_studio_start_date" required="True"/>
+                  <field optional="show" name="x_studio_end_date"/>
+                  <field optional="show" name="x_studio_owner" required="True" widget="many2one_avatar_user"/>
+                  <field optional="show" name="x_studio_co_owners" widget="many2many_tags_avatar"/>
+                  <field optional="show" name="x_studio_account" options="{&quot;no_create&quot;:true}" readonly="True" widget="many2one_tax_tags" column_invisible="True"/>
+                </list>
+              </field>
+            </page>
+            <page string="Tenants" name="studio_page_s9_1ipjs4bi6">
+              <field name="x_studio_tenant_ids">
+                <list editable="top">
+                  <field name="x_studio_sequence" widget="handle"/>
+                  <field optional="show" name="x_studio_start_date" required="True"/>
+                  <field optional="show" name="x_studio_end_date"/>
+                  <field optional="show" name="x_studio_tenant" column_invisible="False" invisible="False" required="True" widget="many2one_avatar_user"/>
+                </list>
+              </field>
+            </page>
+            <page string="Accounts" name="studio_page_1j7_1ipmch0he" invisible="True">
+              <field name="x_studio_account_ids"/>
+            </page>
+          </notebook>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_form_view_fo_9f1487e5-eabf-4bad-bb05-6c029c02e27f"/>
+    <field name="mode">extension</field>
+    <field name="model">x_property</field>
+    <field name="name">Default form view for x_property customization</field>
+    <field name="priority">99</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+  </record>
+  <record id="default_list_view_fo_c3d34cb8-7465-4ebe-8ccc-c68a749b70bc" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_property_line_bfb14</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_property_line_bfb14</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_03e007bf-17ad-467e-a8bc-0592b17b66e9" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="property_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_39e165">
+            <group name="studio_group_39e165_left"/>
+            <group name="studio_group_39e165_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_property_line_bfb14</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_property_line_bfb14</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__94e22e19-e077-4fc5-92ba-4efebdc632a5" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_property_line_bfb14</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default search view for x_property_line_bfb14</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_list_view_fo_740c1f1f-3907-4d9f-8893-914c9999112d" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_property_line_019a4</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_property_line_019a4</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_2b5eeda3-5376-4a55-b09e-374c51a9beee" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="property_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_288408">
+            <group name="studio_group_288408_left"/>
+            <group name="studio_group_288408_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_property_line_019a4</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_property_line_019a4</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__91023503-6711-4055-b066-caa4747ed3cb" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_property_line_019a4</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default search view for x_property_line_019a4</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_list_view_fo_1bb21a71-b146-4433-be29-97eda95ccf38" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_property_line_07bf7</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_property_line_07bf7</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_0b08689e-c8d2-4504-a86e-ca64ceb1bace" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="property_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_ffd699">
+            <group name="studio_group_ffd699_left"/>
+            <group name="studio_group_ffd699_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_property_line_07bf7</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_property_line_07bf7</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__1dc4fe31-7cfb-4181-a5a0-dad054233076" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_property_line_07bf7</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default search view for x_property_line_07bf7</field>
+    <field name="type">search</field>
+  </record>
+  <!-- <record id="odoo_studio_default__0b41b371-7e01-4ca4-bb33-6cf1258f2a9c" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='x_name']" position="attributes">
+          <attribute name="class">fw-bold</attribute>
+        </xpath>
+        <xpath expr="//field[@name='x_name']" position="after">
+          <field name="x_studio_type" display="full"/>
+          <field name="x_studio_current_owner" display="full" widget="many2one_avatar"/>
+          <field name="x_studio_tags" display="full"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="mode">extension</field>
+    <field name="model">x_property</field>
+    <field name="name">Default kanban view for ir.model(847,) customization</field>
+    <field name="priority">99</field>
+    <field name="type">kanban</field>
+  </record> -->
+  <record id="odoo_studio_account__e8ebb539-08fa-4e83-9a43-b02c63fb70f7" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//list[1]/field[@name='company_id'][2]" position="replace"/>
+        <xpath expr="//field[@name='plan_id']" position="replace"/>
+        <xpath expr="//field[@name='code']" position="replace">
+          <field name="x_studio_start_date" optional="show"/>
+          <field name="x_studio_end_date" optional="show"/>
+          <field name="x_studio_property" optional="show"/>
+        </xpath>
+        <xpath expr="//field[@name='partner_id']" position="attributes">
+          <attribute name="string">Owner</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="analytic.view_account_analytic_account_list"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">account.analytic.account</field>
+    <field name="name">account.analytic.account.list customization</field>
+    <field name="priority">400</field>
+    <field name="type">list</field>
+  </record>
+  <record id="odoo_studio_account__94def992-2f7b-4ea1-baf0-56202860d0f3" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//form[1]/field[@name='company_id']" position="before">
+          <header>
+            <button string="Split" name="%(split_analytic_item_action)d" type="action" class="btn-primary"/>
+          </header>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/group[1]/group[@name='analytic_item']/field[@name='company_id']" position="after">
+          <field name="x_studio_analytic_category"/>
+          <field name="x_notes"/>
+        </xpath>
+        <xpath expr="//field[@name='product_id']" position="after">
+          <field name="x_studio_product_category" options="{'create_name_field': 'complete_name'}" force_save="1" readonly="True"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="analytic.view_account_analytic_line_form"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">account.analytic.line</field>
+    <field name="name">account.analytic.line.form customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_res_part_5d3d3a75-a585-4fce-adbc-2d119045d836" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='x_condominium_properties']" position="replace"/>
+        <!-- <xpath expr="//button[@name='802']" position="replace">
+          <button class="oe_stat_button" icon="fa-home" type="action" name="properties_bcdebf3d-1009-4ec1-b263-329f31ab8376" invisible="not x_x_studio_condominium_x_property_count">
+            <field widget="statinfo" name="x_x_studio_condominium_x_property_count" string="Properties"/>
+          </button>
+        </xpath> -->
+        <xpath expr="//field[@name='child_ids']" position="after">
+          <field name="x_studio_ownership_properties"/>
+          <field name="x_studio_co_ownership_properties"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="mode">extension</field>
+    <field name="model">res.partner</field>
+    <field name="active" eval="True"/>
+    <field name="name">res.partner.form customization</field>
+    <field name="priority">1600</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_default__45aaa2bc-76b2-473c-9045-3dcade7e8c43" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='x_name']" position="after">
+          <field name="x_studio_type" optional="show"/>
+          <field name="x_studio_building" optional="show"/>
+          <field name="x_studio_current_owner" optional="show"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_list_view_fo_7f11ccd1-f094-4639-885b-bd1d7ec8bc19"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">x_property</field>
+    <field name="name">Default list view for x_property customization</field>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+  </record>
+  <record id="odoo_studio_ir_defau_af5d1d9e-409e-439a-a72e-6ffba7305c85" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='json_value']" position="after">
+          <field name="company_id" optional="show"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="base.ir_default_tree_view"/>
+    <field name="mode">extension</field>
+    <field name="model">ir.default</field>
+    <field name="active" eval="True"/>
+    <field name="name">ir.default list view customization</field>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+  </record>
+  <record id="odoo_studio_ir_defau_564de00e-d52b-4798-8f80-db4ee78c8696" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='user_id']" position="after">
+          <field name="company_id"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="base.ir_default_form_view"/>
+    <field name="mode">extension</field>
+    <field name="model">ir.default</field>
+    <field name="active" eval="True"/>
+    <field name="name">ir.default form view customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_default__a1b9cefe-461c-43ab-b1fc-adf02b9efd7a" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='x_pricelist']" position="before"/>
+        <xpath expr="//field[@name='x_pricelist']" position="after">
+          <xpath expr="//field[@name='x_company_id']" position="move"/>
+          <field name="x_building"/>
+          <field name="x_studio_property"/>
+        </xpath>
+        <xpath expr="//field[@name='x_ratio']" position="before">
+          <field name="x_type"/>
+          <field name="x_area"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_form_view_for_x_ratios"/>
+    <field name="mode">extension</field>
+    <field name="model">x_ratios</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_ratios customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_list_view_fo_b0d7ca6f-f54d-44d8-a970-4242da2ec66a" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_calendar_event_line_a7dc0</field>
+    <field name="name">Default list view for x_calendar_event_line_a7dc0</field>
+    <field name="active" eval="True"/>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_e5f54a81-938a-498c-bf3f-51a54b4433eb" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="calendar_event_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_c84158">
+            <group name="studio_group_c84158_left"/>
+            <group name="studio_group_c84158_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_calendar_event_line_a7dc0</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_calendar_event_line_a7dc0</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__d8b3a0f1-5b2b-4a94-803d-232311e97956" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_calendar_event_line_a7dc0</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default search view for x_calendar_event_line_a7dc0</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_list_view_fo_849446f0-1ecd-498c-b1c6-085e920df214" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_calendar_event_line_a1bce</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_7c12ffe2-d680-4f0a-9c3f-7b49fcbbc1d8" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="calendar_event_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_a3daf6">
+            <group name="studio_group_a3daf6_left"/>
+            <group name="studio_group_a3daf6_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_calendar_event_line_a1bce</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__812edcb2-7225-4e8d-8ef1-135ca3a428dc" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default search view for x_calendar_event_line_a1bce</field>
+    <field name="type">search</field>
+  </record>
+  <record id="odoo_studio_default__b7acc772-442e-4a84-9c08-9014040515ff" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//form[1]/header[1]" position="inside">
+          <button string="Reset Votes" name="%(industry_populate_vo_154b8787-f5ce-4bea-931b-a6edbc80a723)d" type="action"/>
+          <button string="Plan Task" name="%(industry_create_task_47e0cf69-8b12-4e53-b7d5-794639319f20)d" type="action"/>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/div[1]/h1[1]/field[@name='x_name']" position="attributes">
+          <attribute name="placeholder">Motion...</attribute>
+        </xpath>
+        <xpath expr="//group[@name='studio_group_a3daf6_left']" position="inside">
+          <field name="x_studio_notes"/>
+          <widget name="web_ribbon" title="Approved" invisible="x_studio_outcome != 'Approved'"/>
+          <widget name="web_ribbon" title="Rejected" invisible="x_studio_outcome != 'Rejected'" bg_color="text-bg-danger"/>
+        </xpath>
+        <xpath expr="//group[@name='studio_group_a3daf6_right']" position="inside">
+          <field name="x_studio_vote_criteria" options="{'create_name_field': 'x_name'}" string="Motion Criteria" required="x_studio_abstention &lt; 1"/>
+          <field name="x_studio_in_favor" force_save="1" readonly="True" widget="percentage"/>
+          <field name="x_studio_against" widget="percentage" force_save="1" readonly="True"/>
+          <field name="x_studio_abstention" widget="percentage"/>
+          <button name="%(industry_set_votes_a_73342a03-85fc-4775-afd2-800be099d3aa)d" string="All Against" type="action"/> 
+          <button name="%(industry_set_votes_a_d3b6fd79-aef3-4619-9279-4ec49d90559d)d" string="All In Favor" type="action"/>
+          <field name="x_studio_attendee_vote_ids" nolabel="1" colspan="2">
+            <list editable="bottom" open_form_view="false" delete="false" duplicate="false" create="false">
+              <field name="x_studio_sequence" widget="handle"/>
+              <field optional="show" name="x_studio_attendee" readonly="True"/>
+              <field optional="show" name="x_studio_vote" widget="radio" options="{&quot;horizontal&quot;:true}"/>
+            </list>
+            <form>
+              <header/>
+              <sheet string="calendar_event_line_a1bce_line" name="studio_sheet_119cb2">
+                <div class="oe_title" name="studio_div_11ac83">
+                  <h1>
+                    <field name="x_name" required="1" placeholder="Name..."/>
+                  </h1>
+                </div>
+                <group name="studio_group_37cb0f">
+                  <group name="studio_group_37cb0f_left"/>
+                  <group name="studio_group_37cb0f_right"/>
+                </group>
+              </sheet>
+            </form>
+          </field>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_form_view_fo_7c12ffe2-d680-4f0a-9c3f-7b49fcbbc1d8"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">x_calendar_event_line_a1bce</field>
+    <field name="name">Default form view for x_calendar_event_line_a1bce customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_list_view_fo_9812d1c5-3bc4-4326-8b69-7cab7d792402" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce_line_a3f04</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_calendar_event_line_a1bce_line_a3f04</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_e3d11bbd-2479-422f-b24a-abb0272d8fe0" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="calendar_event_line_a1bce_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_37cb0f">
+            <group name="studio_group_37cb0f_left"/>
+            <group name="studio_group_37cb0f_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce_line_a3f04</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_calendar_event_line_a1bce_line_a3f04</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__56f54935-ee97-4288-a279-c6cd4066580c" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce_line_a3f04</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default search view for x_calendar_event_line_a1bce_line_a3f04</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_list_view_fo_19cae0fc-7e40-4cf0-9e81-d77c4242f567" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_calendar_event_line_920fe</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_calendar_event_line_920fe</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_8193d201-031a-49ba-8f15-48f3813b6c37" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="calendar_event_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_e43e82">
+            <group name="studio_group_e43e82_left"/>
+            <group name="studio_group_e43e82_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_calendar_event_line_920fe</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_calendar_event_line_920fe</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__72251a69-bdeb-4f88-966f-863bac3391b3" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_calendar_event_line_920fe</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default search view for x_calendar_event_line_920fe</field>
+    <field name="type">search</field>
+  </record>
+  <record id="studio_report_docume_d82d6b24-6a82-450a-a87f-abbc9b325593" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t t-name="studio_report_document">
+        <t t-call="web.external_layout">
+          <div class="page">
+            <div class="oe_structure"/>
+          </div>
+        </t>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_d82d6b24-6a82-450a-a87f-abbc9b325593_document</field>
+    <field name="active" eval="True"/>
+    <field name="name">condominium.studio_report_docume_d82d6b24-6a82-450a-a87f-abbc9b325593_document</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="studio_main_report_e4dd1c39-f03e-4c96-bae2-39f623e50270" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t t-name="studio_main_report">
+        <t t-call="web.html_container">
+          <t t-foreach="docs" t-as="doc">
+            <t t-call="condominium.studio_report_docume_d82d6b24-6a82-450a-a87f-abbc9b325593_document"/>
+          </t>
+        </t>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_d82d6b24-6a82-450a-a87f-abbc9b325593</field>
+    <field name="active" eval="True"/>
+    <field name="name">condominium.studio_report_docume_d82d6b24-6a82-450a-a87f-abbc9b325593</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="web_studio_backup__s_612be4cb-c3a9-4ce6-bd81-6b5150a015e2" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <t t-name="studio_report_document">
+        <t t-call="web.external_layout">
+          <div class="page">
+            <div class="oe_structure"/>
+          </div>
+        </t>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_d82d6b24-6a82-450a-a87f-abbc9b325593_document_</field>
+    <field name="active" eval="True"/>
+    <field name="name">web_studio_backup__condominium.studio_report_docume_d82d6b24-6a82-450a-a87f-abbc9b325593_document</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="web_studio_report_ed_f669ff87-4d66-4945-a7f2-724a31874566" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='studio_report_document']//t[@t-call='web.external_layout']/div/div" meta-class="oe_structure"/>
+          <xpath position="inside" expr="/t[@t-name='studio_report_document']//t[@t-call='web.external_layout']/div" meta-class="page">
+            <div class="oe_structure">lijdlijDZMZQ</div>
+            <div class="oe_structure">
+              <br/>
+            </div>
+            <div class="oe_structure">/</div>
+            <table class="table table-sm">
+              <tbody>
+                <tr class="border-bottom border-top-0 border-start-0 border-end-0 border-2 border-dark fw-bold" style="height: 29px;">
+                  <td>nO VOTES.</td>
+                </tr>
+                <tr t-foreach="doc.x_studio_vote_ids" t-as="x2many_record" style="height: 29.5px;">
+                  <td>
+                    <span t-field="x2many_record.x_name"/>
+                  </td>
+                </tr>
+                <tr style="height: 43px;">
+                  <td>
+                    <p>
+                      <br/>
+                    </p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="oe_structure">
+              <br/>
+            </div>
+          </xpath>
+        </data>
+      </data>
+    </field>
+    <field name="inherit_id" ref="studio_report_docume_d82d6b24-6a82-450a-a87f-abbc9b325593"/>
+    <field name="key">condominium.studio_report_docume_d82d6b24-6a82-450a-a87f-abbc9b325593_document</field>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="name">web_studio.report_editor_customization_diff.view._condominium.studio_report_docume_d82d6b24-6a82-450a-a87f-abbc9b325593_document</field>
+    <field name="priority">9999999</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="odoo_studio_account__1666fca2-e4aa-46e3-b320-454b2b3cfef4" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+          <page string="Distribution and Allocation" name="studio_page_8lb_1iqq9bhcp" invisible="False">
+            <group name="studio_group_8lb">
+              <group name="studio_group_8lb_left" string="Distribution">
+                <field name="x_studio_distribution_key" options="{&quot;create_name_field&quot;:&quot;x_name&quot;,&quot;no_create&quot;:true}"/>
+                <field name="x_studio_period_start" invisible="False" help="Used to distribute costs by meter; closest meter reading date used"/>
+                <field name="x_studio_period_end" invisible="False" help="Used to distribute costs by meter; closest meter reading date used"/>
+              </group>
+              <group name="studio_group_8lb_right" string="Allocation">
+                <field name="x_studio_analytic_category" domain="[(&quot;x_studio_used_for_categorization&quot;, &quot;=&quot;, True)]" string="Allocation"/>
+              </group>
+            </group>
+          </page>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="account.view_move_form"/>
+    <field name="mode">extension</field>
+    <field name="model">account.move</field>
+    <field name="active" eval="True"/>
+    <field name="name">Condominium: account.move.form customization</field>
+    <field name="priority">1600</field>
+    <field name="type">form</field>
+  </record>
+  <record id="web_studio_backup__e_a4a36d77-637b-4a31-8a1d-67d2773d5005" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <t t-name="web.external_layout_standard">
+        <div t-attf-class="header o_company_#{company.id}_layout">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <img t-if="company.logo" class="o_company_logo_small" t-att-src="image_data_uri(company.logo)" alt="Logo"/>
+            <div t-if="company.report_header" t-field="company.report_header" class="o_company_tagline mw-50 fw-bold">Company tagline</div>
+          </div>
+          <div class="row">
+            <div class="col-6" name="company_address">
+              <ul class="list-unstyled" name="company_address_list">
+                <li t-if="company.is_company_details_empty">
+                  <span t-field="company.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: true}">
+                    <div class="bg-light border-1 rounded h-100 d-flex flex-column align-items-center justify-content-center p-4 w-100 opacity-75 text-muted text-center">
+                      <strong>Company address block</strong>
+                      <div>Contains the company address.</div>
+                    </div>
+                  </span>
+                </li>
+                <li t-else="">
+                  <span t-field="company.company_details" class="text-nowrap">
+                    <div class="bg-light border-1 rounded h-100 d-flex flex-column align-items-center justify-content-center p-4 w-100 opacity-75 text-muted text-center">
+                      <strong>Company details block</strong>
+                      <div>Contains the company details.</div>
+                    </div>
+                  </span>
+                </li>
+                <li t-if="not forced_vat"/>
+                <li t-else=""><t t-esc="company.country_id.vat_label or 'Tax ID'">Tax ID</t>:
+                            <span t-esc="forced_vat">US12345671</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <t t-set="layout_background_url" t-value="'data:image/png;base64,%s' % company.layout_background_image.decode('utf-8') if company.layout_background_image and company.layout_background == 'Custom' else                 '/base/static/img/demo_logo_report.png' if company.layout_background == 'Demo logo' else ''"/>
+        <div t-attf-class="article o_report_layout_standard o_table_standard o_company_#{company.id}_layout o_snail_mail {{'o_report_layout_background' if company.layout_background != 'Blank' else ''}}" t-attf-style="{{ 'background-image: url(%s);' % layout_background_url if layout_background_url else '' }}" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+          <t t-call="web.address_layout"/>
+          <h2 t-out="layout_document_title"/>
+          <t t-out="0"/>
+        </div>
+        <div t-attf-class="footer o_company_#{company.id}_layout {{report_type != 'pdf' and 'mt-auto'}}">
+          <div class="o_footer_content d-flex border-top pt-2">
+            <div class="flex-grow-1 text-start me-2" t-field="company.report_footer"/>
+            <div class="text-end text-muted">
+              <div t-if="report_type == 'pdf' and display_name_in_footer" t-out="o.name">(document name)</div>
+              <div t-if="report_type == 'pdf'">Page <span class="page"/> / <span class="topage"/></div>
+            </div>
+          </div>
+        </div>
+      </t>
+    </field>
+    <field name="key">web.external_layout_standard_</field>
+    <field name="active" eval="True"/>
+    <field name="name">web_studio_backup__external_layout_standard</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="web_studio_report_ed_1324f6bf-3192-428b-801b-1a6c39e29bcb" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='web.external_layout_standard']//ul[@name='company_address_list']/li[3]" meta-t-if="not forced_vat"/>
+          <xpath position="after" expr="/t[@t-name='web.external_layout_standard']//ul[@name='company_address_list']/li[2]" meta-t-else="">
+            <li t-if="not forced_vat">
+                        </li>
+          </xpath>
+        </data>
+      </data>
+    </field>
+    <field name="inherit_id" ref="web.external_layout_standard"/>
+    <field name="key">web.external_layout_standard</field>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="name">web_studio.external_layout_standard</field>
+    <field name="priority">9999999</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="studio_report_docume_04eabd52-dd1a-4e7e-862a-bc6e89e0a363" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t t-name="studio_report_document">
+        <div class="page">
+          <div class="oe_structure"/>
+        </div>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_04eabd52-dd1a-4e7e-862a-bc6e89e0a363_document</field>
+    <field name="active" eval="True"/>
+    <field name="name">condominium.studio_report_docume_04eabd52-dd1a-4e7e-862a-bc6e89e0a363_document</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="studio_main_report_60a22668-dc49-4b36-9716-572a3dd973f1" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t t-name="studio_main_report">
+        <t t-foreach="docs" t-as="doc">
+          <t t-call="web.basic_layout">
+            <t t-call="condominium.studio_report_docume_04eabd52-dd1a-4e7e-862a-bc6e89e0a363_document"/>
+            <p style="page-break-after: always;"/>
+          </t>
+        </t>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_04eabd52-dd1a-4e7e-862a-bc6e89e0a363</field>
+    <field name="active" eval="True"/>
+    <field name="name">condominium.studio_report_docume_04eabd52-dd1a-4e7e-862a-bc6e89e0a363</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="studio_report_docume_eb117474-667c-4e5a-89a4-3977ab4af1fc" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t t-name="studio_report_document">
+        <div class="page">
+          <div class="oe_structure"/>
+        </div>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_eb117474-667c-4e5a-89a4-3977ab4af1fc_document</field>
+    <field name="active" eval="True"/>
+    <field name="name">condominium.studio_report_docume_eb117474-667c-4e5a-89a4-3977ab4af1fc_document</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="studio_main_report_b153788a-f099-4f8a-8b9a-a7696bc850e8" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t t-name="studio_main_report">
+        <t t-foreach="docs" t-as="doc">
+          <t t-call="web.basic_layout">
+            <t t-call="condominium.studio_report_docume_eb117474-667c-4e5a-89a4-3977ab4af1fc_document"/>
+            <p style="page-break-after: always;"/>
+          </t>
+        </t>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_eb117474-667c-4e5a-89a4-3977ab4af1fc</field>
+    <field name="active" eval="True"/>
+    <field name="name">condominium.studio_report_docume_eb117474-667c-4e5a-89a4-3977ab4af1fc</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="web_studio_backup__b_a0adc7a4-74d9-42e5-8c28-07d91468e157" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <t t-name="web.basic_layout">
+        <t t-call="web.html_container">
+          <t t-if="not o" t-set="o" t-value="doc"/>
+          <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <t t-out="0"/>
+          </div>
+        </t>
+      </t>
+    </field>
+    <field name="key">web.basic_layout_</field>
+    <field name="active" eval="True"/>
+    <field name="name">web_studio_backup__basic_layout</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="default_list_view_fo_6964e352-ba17-43ba-beee-a927fa62197b" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_vote_criteria</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_vote_criteria</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_c690517f-b466-458c-811b-9b7274b4be8e" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Vote Criteria">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_42f7a7">
+            <group name="studio_group_42f7a7_left"/>
+            <group name="studio_group_42f7a7_right"/>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+    <field name="model">x_vote_criteria</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_vote_criteria</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__cd591762-dc10-459f-847f-2ac67ee981e1" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_vote_criteria" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="model">x_vote_criteria</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default search view for x_vote_criteria</field>
+    <field name="type">search</field>
+  </record>
+  <record id="odoo_studio_default__0fa0af68-25d6-4bc8-9ab9-62543d5d14c2" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//group[@name='studio_group_42f7a7_left']" position="inside">
+          <field name="x_studio_acceptation_threshold" widget="percentage" force_save="0" readonly="False" invisible="False" required="True"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_form_view_fo_c690517f-b466-458c-811b-9b7274b4be8e"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">x_vote_criteria</field>
+    <field name="name">Default form view for x_vote_criteria customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_default__1ca52e38-15d9-412f-8e1a-70c0ec4bdf08" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//list[1]" position="attributes">
+          <attribute name="editable">bottom</attribute>
+        </xpath>
+        <xpath expr="//field[@name='x_name']" position="after">
+          <field name="x_studio_acceptation_threshold" optional="show" widget="percentage"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_list_view_fo_6964e352-ba17-43ba-beee-a927fa62197b"/>
+    <field name="mode">extension</field>
+    <field name="model">x_vote_criteria</field>
+    <field name="name">Default list view for x_vote_criteria customization</field>
+    <field name="priority">99</field>
+    <field name="active" eval="True"/>
+    <field name="type">list</field>
+  </record>
+  <record id="odoo_studio_calendar_7789adc7-207d-47e7-858a-b821e51de589" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//form[1]/div[1]" position="before">
+          <header>
+            <button string="Send Agenda" name="%(industry_send_genera_636204d5-33e7-437e-99cb-fbc897d72c0e)d" type="action" invisible="not x_studio_condominium" class="btn-primary"/>
+            <button string="View Report" name="%(calendar_event_repor_1d994bd6-fd47-4f13-bd7f-6277d05dc56e)d" type="action" invisible="not x_studio_condominium"/>
+            <button string="Send Report" name="%(industry_send_genera_2c1dc29b-783e-4233-89c4-0ad81f20c6eb)d" type="action" invisible="not x_studio_condominium"/>
+          </header>
+        </xpath>
+        <xpath expr="//field[@name='should_show_status']" position="after">
+          <field name="x_studio_condominium"/>
+        </xpath>
+        <xpath expr="//field[@name='attendee_ids']" position="attributes">
+          <attribute name="force_save">0</attribute>
+          <attribute name="readonly">False</attribute>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/list[1]/field[@name='partner_id']" position="attributes">
+          <attribute name="readonly">True</attribute>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/list[1]/field[@name='email']" position="attributes">
+          <attribute name="readonly">True</attribute>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/list[1]/field[@name='phone']" position="attributes">
+          <attribute name="readonly">True</attribute>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/list[1]/field[@name='state']" position="attributes">
+          <attribute name="readonly">True</attribute>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/list[1]/button[@name='do_decline']" position="after">
+          <field name="x_studio_attending" invisible="not x_studio_condominium"/>
+          <field optional="show" name="x_studio_delegating" invisible="not x_studio_condominium"/>
+          <field name="x_studio_ratio" optional="show"/>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/kanban[1]" position="after">
+          <form>
+            <sheet string="Calendar Attendee Information" name="studio_sheet_3ed2cb">
+              <group name="studio_group_e51ec3">
+                <group name="studio_group_eb21e2">
+                  <field name="event_id"/>
+                  <field name="partner_id"/>
+                  <field name="phone"/>
+                  <field name="access_token"/>
+                  <field name="state"/>
+                  <field name="x_studio_delegating"/>
+                  <field name="x_studio_condominium"/>
+                </group>
+                <group name="studio_group_ab6001">
+                  <field name="recurrence_id"/>
+                  <field name="email"/>
+                  <field name="common_name"/>
+                  <field name="mail_tz"/>
+                  <field name="availability"/>
+                  <field name="x_studio_attending"/>
+                  <field name="x_studio_ratio"/>
+                </group>
+              </group>
+              <group name="studio_group_2a2167">
+                <field name="x_studio_properties"/>
+              </group>
+              <group name="studio_group_d29970"/>
+              <group name="studio_group_09933f">
+                <separator/>
+              </group>
+            </sheet>
+          </form>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+          <page string="Motions" name="studio_page_no_1iq3i8uel" invisible="not x_studio_condominium">
+            <group name="studio_group_no">
+              <group name="studio_group_no_left">
+                <field name="x_studio_voting_key" options="{'create_name_field': 'x_name'}"/>
+                <field name="x_studio_attending_ratio" widget="percentage" force_save="1" readonly="True" string="Attending and Delegating Ratio"/>
+                <field name="x_studio_attending_owners" string="Attending and Delegating Owners"/>
+              </group>
+              <group name="studio_group_no_right"/>
+            </group>
+            <field name="x_studio_vote_ids">
+              <form>
+                <header/>
+                <sheet string="calendar_event_line" name="studio_sheet_fc0efc">
+                  <div class="oe_title" name="studio_div_922c51">
+                    <h1>
+                      <field name="x_name" required="1" placeholder="Name..."/>
+                    </h1>
+                  </div>
+                  <group name="studio_group_a3daf6">
+                    <group name="studio_group_a3daf6_left">
+                      <field name="x_studio_notes"/>
+                    </group>
+                    <group name="studio_group_a3daf6_right">
+                      <field name="x_studio_vote_criteria" options="{'create_name_field': 'x_name'}"/>
+                      <field name="x_studio_in_favor" force_save="1" readonly="True" widget="percentage"/>
+                      <field name="x_studio_against" widget="percentage" force_save="1" readonly="True"/>
+                      <field name="x_studio_abstention" widget="percentage"/>
+                      <button name="%(industry_set_votes_a_73342a03-85fc-4775-afd2-800be099d3aa)d" string="All Against" type="action"/>
+                      <button name="%(industry_set_votes_a_d3b6fd79-aef3-4619-9279-4ec49d90559d)d" string="All In Favor" type="action"/>
+                      <field name="x_studio_attendee_vote_ids" nolabel="1" colspan="2">
+                        <list editable="bottom" open_form_view="false" delete="false" duplicate="false" create="false">
+                          <field name="x_studio_sequence" widget="handle"/>
+                          <field optional="show" name="x_studio_attendee" readonly="True"/>
+                          <field optional="show" name="x_studio_vote" widget="radio" options="{&quot;horizontal&quot;:true}"/>
+                        </list>
+                      </field>
+                    </group>
+                  </group>
+                </sheet>
+              </form>
+              <list editable="bottom" open_form_view="true">
+                <field name="x_studio_sequence" widget="handle"/>
+                <field name="x_name" string="Motion"/>
+                <field name="x_studio_outcome" widget="badge" decoration-danger="x_studio_outcome == 'Rejected'" decoration-success="x_studio_outcome == 'Approved'" invisible="x_studio_outcome == False" optional="show"/>
+              </list>
+            </field>
+          </page>
+        </xpath>
+        <!-- <xpath expr="/form[1]/sheet[1]/notebook[1]/page[4]/field[1]/form[1]/sheet[1]/group[1]/group[2]/field[5]" position="inside">
+          <form>
+            <header/>
+            <sheet string="calendar_event_line_a1bce_line">
+              <div class="oe_title">
+                <h1>
+                  <field name="x_name" required="1" placeholder="Name..."/>
+                </h1>
+              </div>
+              <group name="studio_group_37cb0f">
+                <group name="studio_group_37cb0f_left"/>
+                <group name="studio_group_37cb0f_right"/>
+              </group>
+            </sheet>
+          </form>
+        </xpath> -->
+      </data>
+    </field>
+    <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
+    <field name="mode">extension</field>
+    <field name="model">calendar.event</field>
+    <field name="active" eval="True"/>
+    <field name="name">calendar.event.form customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+  <record id="studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t t-name="studio_report_document">
+        <t t-call="web.external_layout">
+          <div class="page">
+            <div class="oe_structure"/>
+          </div>
+        </t>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document</field>
+    <field name="active" eval="True"/>
+    <field name="name">condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="studio_main_report_a0ab3aee-0a96-4b7f-816d-58a00820fa62" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t t-name="studio_main_report">
+        <t t-call="web.html_container">
+          <t t-foreach="docs" t-as="doc">
+            <t t-call="condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document"/>
+          </t>
+        </t>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517</field>
+    <field name="active" eval="True"/>
+    <field name="name">condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="web_studio_backup__s_2b39fee2-a2a3-417f-b2c1-3714e15d7710" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <t t-name="studio_report_document">
+        <t t-call="web.external_layout">
+          <div class="page">
+            <div class="oe_structure"/>
+          </div>
+        </t>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_</field>
+    <field name="active" eval="True"/>
+    <field name="name">web_studio_backup__condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="web_studio_report_ed_b22dc65e-fb45-4b98-91a9-e4821dc1c727" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='studio_report_document']//t[@t-call='web.external_layout']/div/div" meta-class="oe_structure"/>
+          <xpath position="inside" expr="/t[@t-name='studio_report_document']//t[@t-call='web.external_layout']/div" meta-class="page">
+            <div class="oe_structure" style="text-align: center;">
+              <h2>
+                <strong>GENERAL MEETING REPORT</strong>
+              </h2>
+              <h5 t-field="doc.start"/>
+              <h5 t-field="doc.location"/>
+            </div>
+            <div class="oe_structure"><br/><strong><span t-field="doc.x_studio_attending_owners"/> owners
+                </strong> were present and represented 
+                <strong><span t-esc="round(doc.x_studio_attending_ratio * 100,1)"/>%
+                </strong> of the owner ratios.
+                <br/>
+                <br/>
+            </div>
+            <h5 class="oe_structure">Attending</h5>
+            <t t-set="total_ratios" t-value="sum([x_studio_ratio.x_ratio for x_studio_ratio in doc.x_studio_voting_key.x_studio_ratio_ids]) "/>
+            <t t-foreach="doc.attendee_ids" t-as="attendee">
+              <t t-if="attendee.x_studio_attending and attendee.x_studio_ratio &gt; 0">
+                <li><strong><t t-out="attendee.partner_id.name"/></strong>, representing 
+                        <span t-esc="round(attendee.x_studio_ratio / total_ratios * 100,1)"/>% of the owner ratios
+                        <t t-if="attendee.x_studio_delegating"> and delegating</t>;
+                    </li>
+              </t>
+            </t>
+            <br/>
+            <h5 class="oe_structure">Excused</h5>
+            <t t-foreach="doc.attendee_ids" t-as="attendee">
+              <t t-if="not attendee.x_studio_attending and attendee.x_studio_ratio &gt; 0">
+                <li><strong><t t-out="attendee.partner_id.name"/></strong>, representing 
+                        <span t-esc="round(attendee.x_studio_ratio / total_ratios * 100,1)"/>% of the owner ratios
+                        <t t-if="attendee.x_studio_delegating"><strong> and delegating</strong></t>;
+                    </li>
+              </t>
+            </t>
+            <br/>
+            <div class="oe_structure">
+              <br/>
+            </div>
+            <div class="oe_structure" style="text-align: center;">
+              <h3>
+                <strong>Motions</strong>
+              </h3>
+              <br/>
+            </div>
+            <t t-set="motion_number" t-value="0"/>
+            <t t-foreach="doc.x_studio_vote_ids" t-as="motion">
+              <t t-set="motion_number" t-value="motion_number + 1"/>
+              <h4><t t-out="motion_number"/>. <t t-out="motion.x_name"/></h4>
+              <p t-field="motion.x_studio_notes"/>
+              <p>Votes (need <t t-out="motion.x_studio_vote_criteria.x_name"/>):</p>
+              <t t-if="motion.x_studio_abstention != 0">
+                <li>
+                  <span>
+                    <strong style="color:grey;">Abstention: <t t-out="round(motion.x_studio_abstention * 100,1)"/>%</strong>
+                  </span>
+                  <t t-if="motion.x_studio_abstention != 0 and motion.x_studio_abstention != 1">
+                    <span style="color:grey;">
+                      <t t-foreach="motion.x_studio_attendee_vote_ids" t-as="voter">
+                        <t t-if="voter.x_studio_vote == 'Abstention'"><t t-out="voter.x_studio_attendee.name"/>, 
+                                    </t>
+                      </t>
+                    </span>
+                    <br/>
+                  </t>
+                </li>
+              </t>
+              <t t-if="motion.x_studio_against != 0">
+                <li>
+                  <span>
+                    <strong style="color:red;">Against: <t t-out="round(motion.x_studio_against * 100,1)"/>%</strong>
+                  </span>
+                  <t t-if="motion.x_studio_against != 0 and motion.x_studio_against != 1">
+                    <span style="color:grey;">
+                      <t t-foreach="motion.x_studio_attendee_vote_ids" t-as="voter">
+                        <t t-if="voter.x_studio_vote == 'Against'"><t t-out="voter.x_studio_attendee.name"/>, 
+                                    </t>
+                      </t>
+                    </span>
+                    <br/>
+                  </t>
+                </li>
+              </t>
+              <t t-if="motion.x_studio_in_favor != 0">
+                <li>
+                  <span>
+                    <strong style="color:green;">In favor: <t t-out="round(motion.x_studio_in_favor * 100,1)"/>%</strong>
+                  </span>
+                  <t t-if="motion.x_studio_in_favor != 0 and motion.x_studio_in_favor &lt; 0.999">
+                    <span style="color:grey;">
+                      <t t-foreach="motion.x_studio_attendee_vote_ids" t-as="voter">
+                        <t t-if="voter.x_studio_vote == 'In Favor'"><t t-out="voter.x_studio_attendee.name"/>, 
+                                    </t>
+                      </t>
+                    </span>
+                    <br/>
+                  </t>
+                </li>
+              </t>
+              <div class="oe_structure">
+                <p>
+                  <br/>
+                  <t t-if="motion.x_studio_outcome">
+                    <strong>The motion is <t t-out="motion.x_studio_outcome"/>.</strong>
+                  </t>
+                  <t t-else="">
+                    <p>The motion is not submitted to vote.</p>
+                  </t>
+                  <br/>
+                  <br/>
+                </p>
+              </div>
+            </t>
+            <div class="oe_structure">
+              <br/>
+            </div>
+          </xpath>
+        </data>
+      </data>
+    </field>
+    <field name="inherit_id" ref="studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517"/>
+    <field name="key">condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document</field>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="name">web_studio.report_editor_customization_diff.view._condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document</field>
+    <field name="priority">9999999</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="web_studio_backup__w_74e7f627-414d-45e9-910e-cae8c0503b6e" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='studio_report_document']//t[@t-call='web.external_layout']/div/div" meta-class="oe_structure"/>
+          <xpath position="inside" expr="/t[@t-name='studio_report_document']//t[@t-call='web.external_layout']/div" meta-class="page">
+            <h2 class="oe_structure">GENERAL MEETING REPORT</h2>
+            <div class="oe_structure">
+              <span t-field="doc.start_date"/>
+            </div>
+            <div class="oe_structure">
+              <br/>
+            </div>
+            <div class="oe_structure">
+              <br/>
+            </div>
+          </xpath>
+        </data>
+      </data>
+    </field>
+    <field name="key">condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_</field>
+    <field name="name">web_studio_backup__web_studio.report_editor_customization_diff.view._condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document</field>
+    <field name="priority">9999999</field>
+    <field name="active" eval="True"/>
+    <field name="active" eval="True"/>
+    <field name="type">qweb</field>
+  </record>
+  <record id="studio_customization_f3f00314-1071-4fea-b571-4b5a2c70132b" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t t-name="condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_copy_1">
+        <t t-call="web.html_container">
+          <t t-foreach="docs" t-as="doc">
+            <t t-call="condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1"/>
+          </t>
+        </t>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_copy_1</field>
+    <field name="active" eval="True"/>
+    <field name="name">condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517 copy(1)</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="studio_customization_12a112cb-6cd1-48cb-8e34-aeb584af8498" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t t-name="condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1">
+        <t t-call="web.external_layout">
+          <div class="page">
+            <div class="oe_structure" style="text-align: center;">
+              <h2>
+                <strong>GENERAL MEETING REPORT</strong>
+              </h2>
+              <h5 t-field="doc.start"/>
+              <h5 t-field="doc.location"/>
+            </div>
+            <div class="oe_structure"><br/><strong><span t-field="doc.x_studio_attending_owners"/> owners
+                </strong> were present and represented 
+                <strong><span t-esc="round(doc.x_studio_attending_ratio * 100,1)"/>%
+                </strong> of the owner ratios.
+                <br/>
+                <br/>
+            </div>
+            <h5 class="oe_structure">Attending</h5>
+            <t t-foreach="doc.attendee_ids" t-as="attendee">
+              <t t-if="attendee.x_studio_attending and attendee.x_studio_ratio &gt; 0">
+                <li><strong><t t-out="attendee.partner_id.name"/></strong>, representing 
+                        <span t-esc="round(attendee.x_studio_ratio * 100,1)"/>% of the owner ratios;
+                    </li>
+              </t>
+            </t>
+            <br/>
+            <h5 class="oe_structure">Excused</h5>
+            <t t-foreach="doc.attendee_ids" t-as="attendee">
+              <t t-if="not attendee.x_studio_attending and attendee.x_studio_ratio &gt; 0">
+                <li><strong><t t-out="attendee.partner_id.name"/></strong>, representing 
+                        <span t-esc="round(attendee.x_studio_ratio * 100,1)"/>% of the owner ratios;
+                    </li>
+              </t>
+            </t>
+            <br/>
+            <div class="oe_structure">
+              <br/>
+            </div>
+            <div class="oe_structure" style="text-align: center;">
+              <h3>
+                <strong>Motions</strong>
+              </h3>
+              <br/>
+            </div>
+            <t t-set="motion_number" t-value="0"/>
+            <t t-foreach="doc.x_studio_vote_ids" t-as="motion">
+              <t t-set="motion_number" t-value="motion_number + 1"/>
+              <h4><t t-out="motion_number"/>. <t t-out="motion.x_name"/></h4>
+              <p t-field="motion.x_studio_notes"/>
+              <p>Votes (need <t t-out="motion.x_studio_vote_criteria.x_name"/>):</p>
+              <t t-if="motion.x_studio_abstention != 0">
+                <li>
+                  <span>
+                    <strong style="color:grey;">Abstention: <t t-out="round(motion.x_studio_abstention * 100,1)"/>%</strong>
+                  </span>
+                  <t t-if="motion.x_studio_abstention != 0 and motion.x_studio_abstention != 1">
+                    <span style="color:grey;">
+                      <t t-foreach="motion.x_studio_attendee_vote_ids" t-as="voter">
+                        <t t-if="voter.x_studio_vote == 'Abstention'"><t t-out="voter.x_studio_attendee.name"/>, 
+                                    </t>
+                      </t>
+                    </span>
+                    <br/>
+                  </t>
+                </li>
+              </t>
+              <t t-if="motion.x_studio_against != 0">
+                <li>
+                  <span>
+                    <strong style="color:red;">Against: <t t-out="round(motion.x_studio_against * 100,1)"/>%</strong>
+                  </span>
+                  <t t-if="motion.x_studio_against != 0 and motion.x_studio_against != 1">
+                    <span style="color:grey;">
+                      <t t-foreach="motion.x_studio_attendee_vote_ids" t-as="voter">
+                        <t t-if="voter.x_studio_vote == 'Against'"><t t-out="voter.x_studio_attendee.name"/>, 
+                                    </t>
+                      </t>
+                    </span>
+                    <br/>
+                  </t>
+                </li>
+              </t>
+              <t t-if="motion.x_studio_in_favor != 0">
+                <li>
+                  <span>
+                    <strong style="color:green;">In favor: <t t-out="round(motion.x_studio_in_favor * 100,1)"/>%</strong>
+                  </span>
+                  <t t-if="motion.x_studio_in_favor != 0 and motion.x_studio_in_favor &lt; 0.999">
+                    <span style="color:grey;">
+                      <t t-foreach="motion.x_studio_attendee_vote_ids" t-as="voter">
+                        <t t-if="voter.x_studio_vote == 'In Favor'"><t t-out="voter.x_studio_attendee.name"/>, 
+                                    </t>
+                      </t>
+                    </span>
+                    <br/>
+                  </t>
+                </li>
+              </t>
+              <div class="oe_structure">
+                <p>
+                  <br/>
+                  <t t-if="motion.x_studio_outcome">
+                    <strong>The motion is <t t-out="motion.x_studio_outcome"/>.</strong>
+                  </t>
+                  <t t-else="">
+                    <p>The motion is not submitted to vote.</p>
+                  </t>
+                  <br/>
+                  <br/>
+                </p>
+              </div>
+            </t>
+            <div class="oe_structure">
+              <br/>
+            </div>
+          </div>
+        </t>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1</field>
+    <field name="active" eval="True"/>
+    <field name="name">condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document copy(1)</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="web_studio_backup__s_2b4510ac-0d06-4114-bd7f-c953b855d913" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <t t-name="condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1">
+        <t t-call="web.external_layout">
+          <div class="page">
+            <div class="oe_structure" style="text-align: center;">
+              <h2>
+                <strong>GENERAL MEETING REPORT</strong>
+              </h2>
+              <h5 t-field="doc.start"/>
+              <h5 t-field="doc.location"/>
+            </div>
+            <div class="oe_structure"><br/><strong><span t-field="doc.x_studio_attending_owners"/> owners
+                </strong> were present and represented 
+                <strong><span t-esc="round(doc.x_studio_attending_ratio * 100,1)"/>%
+                </strong> of the owner ratios.
+                <br/>
+                <br/>
+            </div>
+            <h5 class="oe_structure">Attending</h5>
+            <t t-foreach="doc.attendee_ids" t-as="attendee">
+              <t t-if="attendee.x_studio_attending and attendee.x_studio_ratio &gt; 0">
+                <li><strong><t t-out="attendee.partner_id.name"/></strong>, representing 
+                        <span t-esc="round(attendee.x_studio_ratio * 100,1)"/>% of the owner ratios;
+                    </li>
+              </t>
+            </t>
+            <br/>
+            <h5 class="oe_structure">Excused</h5>
+            <t t-foreach="doc.attendee_ids" t-as="attendee">
+              <t t-if="not attendee.x_studio_attending and attendee.x_studio_ratio &gt; 0">
+                <li><strong><t t-out="attendee.partner_id.name"/></strong>, representing 
+                        <span t-esc="round(attendee.x_studio_ratio * 100,1)"/>% of the owner ratios;
+                    </li>
+              </t>
+            </t>
+            <br/>
+            <div class="oe_structure">
+              <br/>
+            </div>
+            <div class="oe_structure" style="text-align: center;">
+              <h3>
+                <strong>Motions</strong>
+              </h3>
+              <br/>
+            </div>
+            <t t-set="motion_number" t-value="0"/>
+            <t t-foreach="doc.x_studio_vote_ids" t-as="motion">
+              <t t-set="motion_number" t-value="motion_number + 1"/>
+              <h4><t t-out="motion_number"/>. <t t-out="motion.x_name"/></h4>
+              <p t-field="motion.x_studio_notes"/>
+              <p>Votes (need <t t-out="motion.x_studio_vote_criteria.x_name"/>):</p>
+              <t t-if="motion.x_studio_abstention != 0">
+                <li>
+                  <span>
+                    <strong style="color:grey;">Abstention: <t t-out="round(motion.x_studio_abstention * 100,1)"/>%</strong>
+                  </span>
+                  <t t-if="motion.x_studio_abstention != 0 and motion.x_studio_abstention != 1">
+                    <span style="color:grey;">
+                      <t t-foreach="motion.x_studio_attendee_vote_ids" t-as="voter">
+                        <t t-if="voter.x_studio_vote == 'Abstention'"><t t-out="voter.x_studio_attendee.name"/>, 
+                                    </t>
+                      </t>
+                    </span>
+                    <br/>
+                  </t>
+                </li>
+              </t>
+              <t t-if="motion.x_studio_against != 0">
+                <li>
+                  <span>
+                    <strong style="color:red;">Against: <t t-out="round(motion.x_studio_against * 100,1)"/>%</strong>
+                  </span>
+                  <t t-if="motion.x_studio_against != 0 and motion.x_studio_against != 1">
+                    <span style="color:grey;">
+                      <t t-foreach="motion.x_studio_attendee_vote_ids" t-as="voter">
+                        <t t-if="voter.x_studio_vote == 'Against'"><t t-out="voter.x_studio_attendee.name"/>, 
+                                    </t>
+                      </t>
+                    </span>
+                    <br/>
+                  </t>
+                </li>
+              </t>
+              <t t-if="motion.x_studio_in_favor != 0">
+                <li>
+                  <span>
+                    <strong style="color:green;">In favor: <t t-out="round(motion.x_studio_in_favor * 100,1)"/>%</strong>
+                  </span>
+                  <t t-if="motion.x_studio_in_favor != 0 and motion.x_studio_in_favor &lt; 0.999">
+                    <span style="color:grey;">
+                      <t t-foreach="motion.x_studio_attendee_vote_ids" t-as="voter">
+                        <t t-if="voter.x_studio_vote == 'In Favor'"><t t-out="voter.x_studio_attendee.name"/>, 
+                                    </t>
+                      </t>
+                    </span>
+                    <br/>
+                  </t>
+                </li>
+              </t>
+              <div class="oe_structure">
+                <p>
+                  <br/>
+                  <t t-if="motion.x_studio_outcome">
+                    <strong>The motion is <t t-out="motion.x_studio_outcome"/>.</strong>
+                  </t>
+                  <t t-else="">
+                    <p>The motion is not submitted to vote.</p>
+                  </t>
+                  <br/>
+                  <br/>
+                </p>
+              </div>
+            </t>
+            <div class="oe_structure">
+              <br/>
+            </div>
+          </div>
+        </t>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1_</field>
+    <field name="active" eval="True"/>
+    <field name="name">web_studio_backup__condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document copy(1)</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="web_studio_report_ed_e7df6450-629f-460a-9206-09aa25df59a2" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/h5[2]" meta-class="oe_structure"/>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/br"/>
+        </data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/div/h5[@t-field='doc.location']" meta-t-field="doc.location"/>
+          <xpath position="after" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/div/h5[@t-field='doc.start']" meta-t-field="doc.start">
+            <h5 t-field="doc.location"/>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/div/h2/strong">
+            <strong>GENERAL MEETING</strong>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="inside" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/div[2]" meta-class="oe_structure">
+            <div class="oe_structure"/>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/div[2]/div" position="inside">
+            <br/>
+          </xpath>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/div[2]" meta-class="oe_structure">
+            <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/div[2]/div" position="move" meta-class="oe_structure"/>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/h5" meta-class="oe_structure">
+            <h5 class="oe_structure">Expected attendees</h5>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="inside" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t/t" meta-t-if="attendee.x_studio_attending and attendee.x_studio_ratio &gt; 0">
+            <p>
+              <o-diff-hole for="20"/>
+              <o-diff-hole for="22"/>
+            </p>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t/t//o-diff-hole[@for='20']" position="replace">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t/t/li/strong"/>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t/t//o-diff-hole[@for='22']" position="replace">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t/t/li/span" meta-t-esc="round(attendee.x_studio_ratio * 100,1)"/>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[2]/t/li"/>
+          <xpath position="inside" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[2]/t" meta-t-if="not attendee.x_studio_attending and attendee.x_studio_ratio &gt; 0">
+            <p> </p>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="inside" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[2]" meta-t-if="motion.x_studio_abstention != 0">
+            <p>
+              <o-diff-hole for="49"/>
+              <o-diff-hole for="52"/>
+            </p>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[2]//o-diff-hole[@for='49']" position="replace">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[2]/li/span"/>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[2]//o-diff-hole[@for='52']" position="replace">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[2]/li/t" meta-t-if="motion.x_studio_abstention != 0 and motion.x_studio_abstention != 1"/>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="inside" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[3]" meta-t-if="motion.x_studio_against != 0">
+            <p>
+              <o-diff-hole for="60"/>
+              <o-diff-hole for="63"/>
+            </p>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[3]//o-diff-hole[@for='60']" position="replace">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[3]/li/span"/>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[3]//o-diff-hole[@for='63']" position="replace">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[3]/li/t" meta-t-if="motion.x_studio_against != 0 and motion.x_studio_against != 1"/>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="inside" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[4]" meta-t-if="motion.x_studio_in_favor != 0">
+            <p>
+              <o-diff-hole for="71"/>
+              <o-diff-hole for="74"/>
+            </p>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[4]//o-diff-hole[@for='71']" position="replace">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[4]/li/span"/>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[4]//o-diff-hole[@for='74']" position="replace">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[4]/li/t" meta-t-if="motion.x_studio_in_favor != 0 and motion.x_studio_in_favor &lt; 0.999"/>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="after" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/div/p">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/div/p/t[2]/p"/>
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/div/p/br[2]"/>
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/div/p/br[2]"/>
+            <p>
+              <br/>
+            </p>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/div/p/t[2]" meta-t-else="">
+            <t t-else="">
+                            </t>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[3]/li"/>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[2]/li"/>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[4]/li"/>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t/t/li"/>
+        </data>
+      </data>
+    </field>
+    <field name="inherit_id" ref="studio_customization_12a112cb-6cd1-48cb-8e34-aeb584af8498"/>
+    <field name="key">condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1</field>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="name">web_studio.report_editor_customization_diff.view._condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1</field>
+    <field name="priority">9999999</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="web_studio_backup__w_72be60bb-3c02-4141-92c2-f0cc495dc26c" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/h5[2]" meta-class="oe_structure"/>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/br"/>
+        </data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/div/h5[@t-field='doc.location']" meta-t-field="doc.location"/>
+          <xpath position="after" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/div/h5[@t-field='doc.start']" meta-t-field="doc.start">
+            <h5 t-field="doc.location"/>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/div/h2/strong">
+            <strong>GENERAL MEETING</strong>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="inside" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/div[2]" meta-class="oe_structure">
+            <div class="oe_structure"/>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/div[2]/div" position="inside">
+            <br/>
+          </xpath>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/div[2]" meta-class="oe_structure">
+            <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/div[2]/div" position="move" meta-class="oe_structure"/>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/h5" meta-class="oe_structure">
+            <h5 class="oe_structure">Expected attendees</h5>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="inside" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t/t" meta-t-if="attendee.x_studio_attending and attendee.x_studio_ratio &gt; 0">
+            <p>
+              <o-diff-hole for="20"/>
+              <o-diff-hole for="22"/>
+            </p>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t/t//o-diff-hole[@for='20']" position="replace">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t/t/li/strong"/>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t/t//o-diff-hole[@for='22']" position="replace">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t/t/li/span" meta-t-esc="round(attendee.x_studio_ratio * 100,1)"/>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[2]/t/li"/>
+          <xpath position="inside" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[2]/t" meta-t-if="not attendee.x_studio_attending and attendee.x_studio_ratio &gt; 0">
+            <p> </p>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="inside" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[2]" meta-t-if="motion.x_studio_abstention != 0">
+            <p>
+              <o-diff-hole for="49"/>
+              <o-diff-hole for="52"/>
+            </p>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[2]//o-diff-hole[@for='49']" position="replace">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[2]/li/span"/>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[2]//o-diff-hole[@for='52']" position="replace">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[2]/li/t" meta-t-if="motion.x_studio_abstention != 0 and motion.x_studio_abstention != 1"/>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="inside" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[3]" meta-t-if="motion.x_studio_against != 0">
+            <p>
+              <o-diff-hole for="60"/>
+              <o-diff-hole for="63"/>
+            </p>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[3]//o-diff-hole[@for='60']" position="replace">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[3]/li/span"/>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[3]//o-diff-hole[@for='63']" position="replace">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[3]/li/t" meta-t-if="motion.x_studio_against != 0 and motion.x_studio_against != 1"/>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="inside" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[4]" meta-t-if="motion.x_studio_in_favor != 0">
+            <p>
+              <o-diff-hole for="71"/>
+              <o-diff-hole for="74"/>
+            </p>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[4]//o-diff-hole[@for='71']" position="replace">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[4]/li/span"/>
+          </xpath>
+          <xpath expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[4]//o-diff-hole[@for='74']" position="replace">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[4]/li/t" meta-t-if="motion.x_studio_in_favor != 0 and motion.x_studio_in_favor &lt; 0.999"/>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="after" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/div/p">
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/div/p/t[2]/p"/>
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/div/p/br[2]"/>
+            <xpath position="move" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/div/p/br[2]"/>
+            <p>
+              <br/>
+            </p>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/div/p/t[2]" meta-t-else="">
+            <t t-else="">
+                            </t>
+          </xpath>
+        </data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[3]/li"/>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[2]/li"/>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t[4]/t[4]/li"/>
+          <xpath position="replace" expr="/t[@t-name='condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1']//t[@t-call='web.external_layout']/div/t/t/li"/>
+        </data>
+      </data>
+    </field>
+    <field name="key">condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1_</field>
+    <field name="name">web_studio_backup__web_studio.report_editor_customization_diff.view._condominium.studio_report_docume_d1eb9c9c-5c91-47ca-9895-ba519a3d0517_document_copy_1</field>
+    <field name="priority">9999999</field>
+    <field name="active" eval="True"/>
+    <field name="type">qweb</field>
+  </record>
+  <record id="studio_report_docume_a3b324bd-6488-4bed-af67-073173dc2ef8" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='studio_report_document']//t[@t-call='web.external_layout']/div/div" meta-class="oe_structure"/>
+          <xpath position="inside" expr="/t[@t-name='studio_report_document']//t[@t-call='web.external_layout']/div" meta-class="page">
+            <div class="oe_structure" style="text-align: center;">
+              <h2>
+                <strong>GENERAL MEETING REPORT</strong>
+              </h2>
+              <h5 t-field="doc.start"/>
+              <h5 t-field="doc.location"/>
+            </div>
+            <div class="oe_structure"><br/><strong><span t-field="doc.x_studio_attending_owners"/> owners
+                </strong> were present and represented 
+                <strong><span t-esc="round(doc.x_studio_attending_ratio * 100,1)"/>%
+                </strong> of the owner ratios.
+                <br/>
+                <br/>
+            </div>
+            <h5 class="oe_structure">Attending</h5>
+            <t t-foreach="doc.attendee_ids" t-as="attendee">
+              <t t-if="attendee.x_studio_attending and attendee.x_studio_ratio &gt; 0">
+                <li><strong><t t-out="attendee.partner_id.name"/></strong>, representing 
+                        <span t-esc="round(attendee.x_studio_ratio * 100,1)"/>% of the owner ratios;
+                    </li>
+              </t>
+            </t>
+            <br/>
+            <h5 class="oe_structure">Excused</h5>
+            <t t-foreach="doc.attendee_ids" t-as="attendee">
+              <t t-if="not attendee.x_studio_attending and attendee.x_studio_ratio &gt; 0">
+                <li><strong><t t-out="attendee.partner_id.name"/></strong>, representing 
+                        <span t-esc="round(attendee.x_studio_ratio * 100,1)"/>% of the owner ratios;
+                    </li>
+              </t>
+            </t>
+            <br/>
+            <div class="oe_structure">
+              <br/>
+            </div>
+            <div class="oe_structure" style="text-align: center;">
+              <h3>
+                <strong>Motions</strong>
+              </h3>
+              <br/>
+            </div>
+            <t t-set="motion_number" t-value="0"/>
+            <t t-foreach="doc.x_studio_vote_ids" t-as="motion">
+              <t t-set="motion_number" t-value="motion_number + 1"/>
+              <h4><t t-out="motion_number"/>. <t t-out="motion.x_name"/></h4>
+              <p t-field="motion.x_studio_notes"/>
+              <p>Votes (need <t t-out="motion.x_studio_vote_criteria.x_name"/>):</p>
+              <t t-if="motion.x_studio_abstention != 0">
+                <li>
+                  <span>
+                    <strong style="color:grey;">Abstention: <t t-out="round(motion.x_studio_abstention * 100,1)"/>%</strong>
+                  </span>
+                  <t t-if="motion.x_studio_abstention != 0 and motion.x_studio_abstention != 1">
+                    <span style="color:grey;">
+                      <t t-foreach="motion.x_studio_attendee_vote_ids" t-as="voter">
+                        <t t-if="voter.x_studio_vote == 'Abstention'"><t t-out="voter.x_studio_attendee.name"/>, 
+                                    </t>
+                      </t>
+                    </span>
+                    <br/>
+                  </t>
+                </li>
+              </t>
+              <t t-if="motion.x_studio_against != 0">
+                <li>
+                  <span>
+                    <strong style="color:red;">Against: <t t-out="round(motion.x_studio_against * 100,1)"/>%</strong>
+                  </span>
+                  <t t-if="motion.x_studio_against != 0 and motion.x_studio_against != 1">
+                    <span style="color:grey;">
+                      <t t-foreach="motion.x_studio_attendee_vote_ids" t-as="voter">
+                        <t t-if="voter.x_studio_vote == 'Against'"><t t-out="voter.x_studio_attendee.name"/>, 
+                                    </t>
+                      </t>
+                    </span>
+                    <br/>
+                  </t>
+                </li>
+              </t>
+              <t t-if="motion.x_studio_in_favor != 0">
+                <li>
+                  <span>
+                    <strong style="color:green;">In favor: <t t-out="round(motion.x_studio_in_favor * 100,1)"/>%</strong>
+                  </span>
+                  <t t-if="motion.x_studio_in_favor != 0 and motion.x_studio_in_favor &lt; 0.999">
+                    <span style="color:grey;">
+                      <t t-foreach="motion.x_studio_attendee_vote_ids" t-as="voter">
+                        <t t-if="voter.x_studio_vote == 'In Favor'"><t t-out="voter.x_studio_attendee.name"/>, 
+                                    </t>
+                      </t>
+                    </span>
+                    <br/>
+                  </t>
+                </li>
+              </t>
+              <div class="oe_structure">
+                <p>
+                  <br/>
+                  <t t-if="motion.x_studio_outcome">
+                    <strong>The motion is <t t-out="motion.x_studio_outcome"/>.</strong>
+                  </t>
+                  <t t-else="">
+                    <p>The motion is not submitted to vote.</p>
+                  </t>
+                  <br/>
+                  <br/>
+                </p>
+              </div>
+            </t>
+            <div class="oe_structure">
+              <br/>
+            </div>
+          </xpath>
+        </data>
+      </data>
+    </field>
+    <field name="key">condominium.studio_report_docume_a3b324bd-6488-4bed-af67-073173dc2ef8_document</field>
+    <field name="active" eval="True"/>
+    <field name="name">condominium.studio_report_docume_a3b324bd-6488-4bed-af67-073173dc2ef8_document</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="studio_main_report_28266422-5276-48a9-8927-f443a2ac6f2a" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t t-name="studio_main_report">
+        <t t-call="web.html_container">
+          <t t-foreach="docs" t-as="doc">
+            <t t-call="condominium.studio_report_docume_a3b324bd-6488-4bed-af67-073173dc2ef8_document"/>
+          </t>
+        </t>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_a3b324bd-6488-4bed-af67-073173dc2ef8</field>
+    <field name="active" eval="True"/>
+    <field name="name">condominium.studio_report_docume_a3b324bd-6488-4bed-af67-073173dc2ef8</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="web_studio_backup__s_c29f711e-e123-4376-838f-9c10378b95f5" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <t t-name="studio_report_document">
+        <t t-call="web.external_layout">
+          <div class="page">
+            <div class="oe_structure"/>
+          </div>
+        </t>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_a3b324bd-6488-4bed-af67-073173dc2ef8_document_</field>
+    <field name="active" eval="True"/>
+    <field name="name">web_studio_backup__condominium.studio_report_docume_a3b324bd-6488-4bed-af67-073173dc2ef8_document</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="studio_report_docume_f2caf209-068e-49ab-9a02-4cfe3e9625b2" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t t-name="studio_report_document">
+        <t t-call="web.external_layout">
+          <div class="page">
+            <div class="oe_structure"/>
+          </div>
+        </t>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_f2caf209-068e-49ab-9a02-4cfe3e9625b2_document</field>
+    <field name="active" eval="True"/>
+    <field name="name">condominium.studio_report_docume_f2caf209-068e-49ab-9a02-4cfe3e9625b2_document</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="studio_main_report_05e9f499-762e-4bc2-bbd8-ea7239389b85" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t t-name="studio_main_report">
+        <t t-call="web.html_container">
+          <t t-foreach="docs" t-as="doc">
+            <t t-call="condominium.studio_report_docume_f2caf209-068e-49ab-9a02-4cfe3e9625b2_document"/>
+          </t>
+        </t>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_f2caf209-068e-49ab-9a02-4cfe3e9625b2</field>
+    <field name="active" eval="True"/>
+    <field name="name">condominium.studio_report_docume_f2caf209-068e-49ab-9a02-4cfe3e9625b2</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="web_studio_backup__s_4532aa50-f495-4593-ad02-1286b7322c19" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <t t-name="studio_report_document">
+        <t t-call="web.external_layout">
+          <div class="page">
+            <div class="oe_structure"/>
+          </div>
+        </t>
+      </t>
+    </field>
+    <field name="key">condominium.studio_report_docume_f2caf209-068e-49ab-9a02-4cfe3e9625b2_document_</field>
+    <field name="active" eval="True"/>
+    <field name="name">web_studio_backup__condominium.studio_report_docume_f2caf209-068e-49ab-9a02-4cfe3e9625b2_document</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="web_studio_report_ed_a28f8c92-d072-488a-afda-b4730397d5ca" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='studio_report_document']//t[@t-call='web.external_layout']/div/div" meta-class="oe_structure"/>
+          <xpath position="inside" expr="/t[@t-name='studio_report_document']//t[@t-call='web.external_layout']/div" meta-class="page">
+            <div class="oe_structure" style="text-align: center;">
+              <h2>
+                <strong>GENERAL MEETING AGENDA</strong>
+              </h2>
+              <h5 t-field="doc.start"/>
+              <h5 t-field="doc.location"/>
+              <br/>
+            </div>
+            <h5 class="oe_structure">Expected attendees</h5>
+            <t t-set="total_ratios" t-value="sum([x_studio_ratio.x_ratio for x_studio_ratio in doc.x_studio_voting_key.x_studio_ratio_ids]) "/>
+            <t t-foreach="doc.attendee_ids" t-as="attendee">
+              <t t-if="attendee.x_studio_ratio &gt; 0">
+                <li><strong><t t-out="attendee.partner_id.name"/></strong>, representing 
+                        <span t-esc="round(attendee.x_studio_ratio / total_ratios * 100,1)"/>% of the owner ratios;
+                    </li>
+              </t>
+            </t>
+            <t t-set="motion_number" t-value="0"/>
+            <t t-foreach="doc.x_studio_vote_ids" t-as="motion">
+              <t t-set="motion_number" t-value="motion_number + 1"/>
+              <br/>
+              <h4><t t-out="motion_number"/>. <t t-out="motion.x_name"/></h4>
+            </t>
+            <div class="oe_structure">
+              <br/>
+            </div>
+          </xpath>
+        </data>
+      </data>
+    </field>
+    <field name="inherit_id" ref="studio_report_docume_f2caf209-068e-49ab-9a02-4cfe3e9625b2"/>
+    <field name="key">condominium.studio_report_docume_f2caf209-068e-49ab-9a02-4cfe3e9625b2_document</field>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="name">web_studio.report_editor_customization_diff.view._condominium.studio_report_docume_f2caf209-068e-49ab-9a02-4cfe3e9625b2_document</field>
+    <field name="priority">9999999</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="web_studio_backup__w_21caa531-8d56-40bb-bb29-c5265e87a100" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <data>
+        <data>
+          <xpath position="replace" expr="/t[@t-name='studio_report_document']//t[@t-call='web.external_layout']/div/div" meta-class="oe_structure">
+            <div class="oe_structure">dfgdfg</div>
+          </xpath>
+        </data>
+      </data>
+    </field>
+    <field name="key">condominium.studio_report_docume_f2caf209-068e-49ab-9a02-4cfe3e9625b2_document_</field>
+    <field name="name">web_studio_backup__web_studio.report_editor_customization_diff.view._condominium.studio_report_docume_f2caf209-068e-49ab-9a02-4cfe3e9625b2_document</field>
+    <field name="priority">9999999</field>
+    <field name="active" eval="True"/>
+    <field name="type">qweb</field>
+  </record>
+  <!-- <record id="odoo_studio_default__613d0d5a-5f19-4f01-a924-c9b364612655" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='id']" position="replace">
+          <field name="x_date" optional="show"/>
+          <field name="x_studio_property" optional="show"/>
+          <field name="x_description" optional="show"/>
+          <field name="x_meter_id" optional="show"/>
+          <field name="x_quantity" optional="show"/>
+          <field name="x_image" optional="show"/>
+        </xpath>
+        <xpath expr="//list[1]" position="attributes">
+          <attribute name="default_order">x_date desc</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="mode">extension</field>
+    <field name="model">x_meter_reading</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for ir.model(816,) customization</field>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+  </record> -->
+  <record id="odoo_studio_account__a25da466-f9b9-425a-9919-a46cfe5e49e1" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='user_groupby']" position="after">
+          <field name="x_studio_used_for_categorization" help="When checked, the line can be selected to be assigned to an expense as a category for Condominium Balance Sheet reporting"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="account_reports.account_report_line_form"/>
+    <field name="mode">extension</field>
+    <field name="model">account.report.line</field>
+    <field name="active" eval="True"/>
+    <field name="name">account.report.line.form customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_account__39a436dc-4f7c-45a2-89e1-1fb49e992db8" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='ref']" position="after">
+          <field name="x_studio_analytic_category" optional="show"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="account.view_move_tree"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">account.move</field>
+    <field name="name">account.move.list customization</field>
+    <field name="priority">160</field>
+    <field name="type">list</field>
+  </record>
+  <record id="odoo_studio_account__485a4437-0359-4b73-bb01-ede38aa91f99" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='move_name']" position="after">
+          <field optional="show" name="x_studio_analytic_category"/>
+          <field name="account_type" optional="show"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="account.view_move_line_tree"/>
+    <field name="mode">extension</field>
+    <field name="model">account.move.line</field>
+    <field name="name">account.move.line.list customization</field>
+    <field name="active" eval="True"/>
+    <field name="priority">160</field>
+    <field name="type">list</field>
+  </record>
+  <record id="odoo_studio_account__f41a914d-a260-473c-8e27-102eec57eb14" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='date']" position="after">
+          <field name="x_studio_analytic_category" optional="show"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="analytic.view_account_analytic_line_tree"/>
+    <field name="mode">extension</field>
+    <field name="model">account.analytic.line</field>
+    <field name="active" eval="True"/>
+    <field name="name">account.analytic.line.list customization</field>
+    <field name="priority">160</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_list_view_fo_62ecbeef-9397-4032-9b25-469b8c8e9c4d" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_period</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_period</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_2a9e3eda-a4d3-4c9d-8be4-804e42cfa6ed" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Period">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_992ec6">
+            <group name="studio_group_992ec6_left">
+              <field name="x_studio_date"/>
+            </group>
+            <group name="studio_group_992ec6_right"/>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+    <field name="model">x_period</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_period</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__357f8b9e-0127-48a6-97ac-45ad1fce0030" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter date="x_studio_date" name="studio_filter_date" string="Date"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_period" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="model">x_period</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default search view for x_period</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_calendar_vie_aa7c70be-7624-4171-969f-1890532903fd" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <calendar date_start="x_studio_date" create_name_field="x_name"/>
+    </field>
+    <field name="model">x_period</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default calendar view for x_period</field>
+    <field name="type">calendar</field>
+  </record>
+  <record id="odoo_studio_default__a5df63b6-5d2e-4323-95a6-65e6965d8b49" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='x_studio_date']" position="replace">
+          <field name="x_studio_start_date" required="True"/>
+          <field name="x_studio_end_date" required="True"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_form_view_fo_2a9e3eda-a4d3-4c9d-8be4-804e42cfa6ed"/>
+    <field name="mode">extension</field>
+    <field name="model">x_period</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_period customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_default__e4f59ec5-2713-4033-b7b0-e3b0e85a33b6" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//list[1]" position="attributes">
+          <attribute name="default_order">x_studio_start_date desc</attribute>
+          <attribute name="editable">bottom</attribute>
+        </xpath>
+        <xpath expr="//field[@name='x_studio_sequence']" position="after">
+          <field name="x_studio_start_date" optional="show"/>
+          <field name="x_studio_end_date" optional="show"/>
+        </xpath>
+        <xpath expr="//field[@name='x_name']" position="attributes">
+          <attribute name="string">Name</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_list_view_fo_62ecbeef-9397-4032-9b25-469b8c8e9c4d"/>
+    <field name="mode">extension</field>
+    <field name="model">x_period</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_period customization</field>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+  </record>
+
+
+  <!-- #meet1130 -->
+  <record id="odoo_studio_condomin_b037142b-7612-4095-85cf-016fbc14b18e" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//list[1]" position="attributes">
+          <attribute name="create">false</attribute>
+          <attribute name="default_order">invoice_date desc</attribute>
+          <attribute name="delete">false</attribute>
+          <attribute name="editable">top</attribute>
+          <attribute name="multi_edit">true</attribute>
+          <attribute name="open_form_view">true</attribute>
+        </xpath>
+        <xpath expr="//list[1]/field[@name='name']" position="attributes">
+          <attribute name="readonly">True</attribute>
+        </xpath>
+        <xpath expr="//field[@name='name']" position="after">
+          <field name="invoice_partner_display_name" optional="show" readonly="True"/>
+          <field name="amount_total_in_currency_signed" optional="show" readonly="True"/>
+        </xpath>
+        <xpath expr="//field[@name='invoice_partner_display_name']" position="attributes">
+          <attribute name="string">Vendor</attribute>
+        </xpath>
+        <xpath expr="//field[@name='amount_total_in_currency_signed']" position="attributes">
+          <attribute name="string">Total</attribute>
+        </xpath>
+        <xpath expr="//field[@name='invoice_partner_display_name']" position="after">
+          <xpath expr="//list[1]/field[@name='amount_total_in_currency_signed']" position="move"/>
+          <!-- <field name="invoice_line_ids" optional="show" widget="many2many_tags" readonly="True"/> -->
+          <field name="x_studio_distribution_key" optional="show"/>
+          <field name="x_studio_meter" optional="show"/>
+          <field name="x_studio_period_start" optional="show"/>
+          <field name="x_studio_period_end" optional="show"/>
+        </xpath>
+        <xpath expr="//field[@name='invoice_date_due']" position="attributes">
+          <attribute name="optional">hide</attribute>
+        </xpath>
+        <xpath expr="//field[@name='amount_untaxed_in_currency_signed']" position="attributes">
+          <attribute name="optional">hide</attribute>
+        </xpath>
+        <xpath expr="//field[@name='x_studio_distribution_key']" position="before">
+          <field name="status_in_payment" position="move"/>
+          <field name="x_studio_analytic_category" optional="show" readonly="True"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="mode">extension</field>
+    <field name="model">account.move</field>
+    <field name="inherit_id" ref="account.view_invoice_tree" />
+    <field name="active" eval="True"/>
+    <field name="name">Condominium account.invoice.list customization</field>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+  </record>
+
+  <record id="odoo_studio_account__c993ac06-9d5e-4f4d-a45f-b500c234dbfa" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//filter[@name='groupy_by_journal']" position="replace"/>
+        <xpath expr="//filter[@name='preferred_payment_method_line']" position="replace"/>
+        <xpath expr="//filter[@name='late']" position="replace"/>
+        <xpath expr="//filter[@name='in_payment']" position="replace"/>
+        <xpath expr="//filter[@name='open']" position="replace"/>
+        <xpath expr="//filter[@name='to_check']" position="replace"/>
+        <xpath expr="//filter[@name='out_refund']" position="replace"/>
+        <xpath expr="//filter[@name='out_invoice']" position="replace"/>
+        <xpath expr="//filter[@name='not_sent']" position="replace"/>
+        <xpath expr="//field[@name='line_ids']" position="replace"/>
+        <xpath expr="//field[@name='next_payment_date']" position="replace"/>
+        <xpath expr="//search[1]/field[@name='date']" position="replace"/>
+        <xpath expr="//field[@name='invoice_user_id']" position="replace"/>
+        <xpath expr="//field[@name='journal_group_id']" position="replace"/>
+        <xpath expr="//field[@name='journal_id']" position="replace"/>
+        <xpath expr="//filter[@name='salesperson']" position="replace">
+          <filter name="studio_group_by_g8_1iqqi7ti8" string="Allocation" context="{'group_by': 'x_studio_analytic_category'}"/>
+          <filter name="studio_group_by_5c1_1iqqi93k0" string="Distribution Key" context="{'group_by': 'x_distribution_key'}"/>
+          <filter name="studio_group_by_7oi_1iqqibl90" string="Meter" context="{'group_by': 'x_studio_meter'}"/>
+        </xpath>
+        <xpath expr="//filter[@name='myinvoices']" position="replace">
+          <filter domain="[('x_studio_analytic_category', '=', False)]" name="unallocated" help="Unallocated"/>
+          <filter domain="[('x_distribution_key', '=', False), ('x_studio_meter', '=', False)]" name="undistributed" help="Without distribution"/>
+          <!-- <filter domain="[('x_studio_to_distribute', '=', True)]" name="undistributed" help="To distribute"/> -->
+          <separator/>
+        </xpath>
+        <xpath expr="//search[1]/field[@name='name']" position="before">
+          <field name="x_studio_analytic_category"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+    <field name="mode">extension</field>
+    <field name="model">account.move</field>
+    <field name="active" eval="True"/>
+    <field name="name">account.invoice.select customization</field>
+    <field name="priority">160</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_list_view_fo_5444e2b0-9805-4874-ac80-eaa16973e6d0" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+        <field name="x_studio_company_id" groups="base.group_multi_company"/>
+      </list>
+    </field>
+    <field name="model">x_distribution_key</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_distribution_key</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_05ed18e5-7ade-46ff-bb7f-7020e9812caf" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Distribution Key">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_ad492f">
+            <group name="studio_group_ad492f_left">
+              <field name="x_studio_company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+            </group>
+            <group name="studio_group_ad492f_right"/>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+    <field name="model">x_distribution_key</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_distribution_key</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__f6a9d429-3a17-4536-9b58-dd0f1e622bf4" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_distribution_key" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="model">x_distribution_key</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default search view for x_distribution_key</field>
+    <field name="type">search</field>
+  </record>
+  <record id="odoo_studio_default__214161ff-2fbf-4a5e-8e17-44ccb8a2dbb7" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//form[1]/header[1]" position="inside">
+          <button string="Populate" name="%(industry_populate_di_1bcb08fe-f6dc-4ea0-9ffc-d4607055470e)d" type="action" class="btn-primary" invisible="x_studio_based_on != &quot;Shares&quot;"/>
+          <button string="Compute Ratios" name="%(industry_compute_dis_a81d25a4-1a4e-4e6d-94d2-cd9ed915b36f)d" type="action" invisible="x_studio_based_on != &quot;Shares&quot;"/>
+        </xpath>
+        <xpath expr="//group[@name='studio_group_ad492f_left']" position="inside">
+          <field name="x_studio_based_on" required="True"/>
+          <field name="x_studio_meter" options="{'create_name_field': 'x_name'}" invisible="x_studio_based_on != &quot;Meter Readings&quot;" force_save="0" readonly="False" required="x_studio_based_on == &quot;Meter Readings&quot;"/>
+        </xpath>
+        <xpath expr="//group[@name='studio_group_ad492f_right']" position="inside">
+          <xpath expr="//field[@name='x_studio_company_id']" position="move"/>
+        </xpath>
+        <xpath expr="//group[@name='studio_group_ad492f']" position="after">
+          <field name="x_studio_ratio_ids" invisible="x_studio_based_on != &quot;Shares&quot;">
+            <list editable="bottom">
+              <field name="x_sequence" widget="handle"/>
+              <field name="x_studio_property" optional="show"/>
+              <field name="x_owner" optional="show"/>
+              <field name="x_building" optional="show"/>
+              <field name="x_type" optional="show"/>
+              <field name="x_floor" optional="show"/>
+              <field name="x_area" sum="Sum of Area" optional="show"/>
+              <field name="x_ratio" sum="Sum of Ratio" optional="show"/>
+            </list>
+          </field>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_form_view_fo_05ed18e5-7ade-46ff-bb7f-7020e9812caf"/>
+    <field name="mode">extension</field>
+    <field name="model">x_distribution_key</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_distribution_key customization</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_default__d0c79897-97c1-474f-9a96-6087c436ab49" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='x_studio_company_id']" position="replace">
+          <field name="x_studio_based_on" optional="show"/>
+          <field name="x_studio_meter" optional="show"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="default_list_view_fo_5444e2b0-9805-4874-ac80-eaa16973e6d0"/>
+    <field name="mode">extension</field>
+    <field name="model">x_distribution_key</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_distribution_key customization</field>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_list_view_fo_40ba5f92-72b6-40df-8826-0a2c1798c399" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_distribution_key_line_4d544</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_distribution_key_line_4d544</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_fb9b93f9-40c4-4089-a79e-405424d9a2be" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="distribution_key_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_0d5e88">
+            <group name="studio_group_0d5e88_left"/>
+            <group name="studio_group_0d5e88_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_distribution_key_line_4d544</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_distribution_key_line_4d544</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__b52e044b-4074-41b4-9168-9d01c1197dbd" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_distribution_key_line_4d544</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default search view for x_distribution_key_line_4d544</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_list_view_fo_a9f0c2ac-6325-4b54-8703-77305aecf395" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_distribution_key_line_92aae</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_distribution_key_line_92aae</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_b4555d72-ed1c-42ea-a7aa-226608911791" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="distribution_key_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_da40a4">
+            <group name="studio_group_da40a4_left"/>
+            <group name="studio_group_da40a4_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_distribution_key_line_92aae</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_distribution_key_line_92aae</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__dbd98f50-9351-4ebf-90f9-d4b85ce69a3e" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_distribution_key_line_92aae</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default search view for x_distribution_key_line_92aae</field>
+    <field name="type">search</field>
+  </record>
+
+  <!-- nidhi0820 -->
+  <record id="odoo_studio_condomin_55acfba8-de78-4b89-9c68-0c8b2af8686e" model="ir.ui.view">
+    <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">account.move</field>
+    <field name="name">Condominium distrib alloc account.invoice.select customization</field>
+    <field name="priority">1600</field>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/search[1]/filter[3]" position="replace"/>
+        <xpath expr="/search[1]/group[1]/filter[2]" position="replace"/>
+        <xpath expr="/search[1]/group[1]/filter[2]" position="after">
+          <filter name="studio_group_by_8mh_1ir6u7kbt" string="Distribution Key" context="{'group_by': 'x_studio_distribution_key'}"/>
+        </xpath>
+        <xpath expr="/search[1]/group[1]/filter[2]" position="replace"/>
+        <xpath expr="/search[1]/field[1]" position="after">
+          <field name="x_studio_distribution_key"/>
+        </xpath>
+        <xpath expr="/search[1]/filter[2]" position="attributes">
+          <attribute name="domain">[("x_studio_distribution_key", "=", False)]</attribute>
+        </xpath>
+        <xpath expr="/search[1]/filter[2]" position="after">
+          <filter domain="[]" name="studio_filter_6lq_1ir6v75kg" string="With distribution"/>
+        </xpath>
+        <xpath expr="/search[1]/filter[2]" position="attributes">
+          <attribute name="domain">[("x_studio_distribution_key", "=", False)]</attribute>
+        </xpath>
+        <xpath expr="/search[1]/filter[3]" position="attributes">
+          <attribute name="domain">[("x_studio_is_distributed", "=", True)]</attribute>
+        </xpath>
+        <xpath expr="/search[1]/filter[2]" position="attributes">
+          <attribute name="domain">[("x_studio_is_distributed", "=", False)]</attribute>
+        </xpath>
+        <xpath expr="/search[1]/filter[3]" position="replace"/>
+        <xpath expr="/search[1]/filter[1]" position="attributes">
+          <attribute name="string">Without allocation</attribute>
+        </xpath>
+      </data>
+    </field>
+  </record>
+  <record id="odoo_studio_account__2e8becc3-7a71-4fe4-83c2-6ee588410e4e" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//group[@name='studio_group_8lb_right']" position="replace"/>
+        <!-- this xpath come from 'account_peppol' -->
+        <xpath expr="//button[@name='action_cancel_peppol_documents']" position="after">
+          <button string="Distribute Costs" name="%(distribute_costs)d" type="action"/>
+        </xpath>
+        <xpath expr="//page[@name='studio_page_8lb_1iqq9bhcp']" position="attributes">
+          <attribute name="string">Distribution</attribute>
+        </xpath>
+        <xpath expr="//group[@name='studio_group_8lb_left']" position="attributes">
+          <attribute name="string"/>
+        </xpath>
+        <xpath expr="//field[@name='x_studio_period_start']" position="attributes">
+          <attribute name="required">x_studio_based_on == "Meter Readings"</attribute>
+        </xpath>
+        <xpath expr="//field[@name='x_studio_period_end']" position="attributes">
+          <attribute name="required">x_studio_based_on == "Meter Readings"</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="account.view_move_form"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">account.move</field>
+    <field name="name">account.move.form customization</field>
+    <field name="priority">16000</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_list_view_fo_e16d1ddd-cdbf-49c5-8d89-7f05a10655d1" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce_line_cce2e</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_calendar_event_line_a1bce_line_cce2e</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_ec0961c8-0c6f-4dfc-9990-e0da07c8d2b1" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="calendar_event_line_a1bce_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_06110c">
+            <group name="studio_group_06110c_left"/>
+            <group name="studio_group_06110c_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce_line_cce2e</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_calendar_event_line_a1bce_line_cce2e</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__c3de3ea9-ac05-4c09-8ecd-d5fde1f4ae8d" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce_line_cce2e</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default search view for x_calendar_event_line_a1bce_line_cce2e</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_list_view_fo_50bae836-54d8-4289-80e2-30937a6e7fb3" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce_line_ea528</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_calendar_event_line_a1bce_line_ea528</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_8b7cb702-3ec0-443d-b8b5-600e1075afb1" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="calendar_event_line_a1bce_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_efc6b1">
+            <group name="studio_group_efc6b1_left"/>
+            <group name="studio_group_efc6b1_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce_line_ea528</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_calendar_event_line_a1bce_line_ea528</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__2a284cf6-111e-43ac-b394-4b2221079610" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce_line_ea528</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default search view for x_calendar_event_line_a1bce_line_ea528</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_list_view_fo_1672de8b-f784-43f6-9294-def1fa093b35" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce_line_e3675</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_calendar_event_line_a1bce_line_e3675</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_0c42c9f9-7810-488b-89b8-1d053d16ffb2" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="calendar_event_line_a1bce_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_f613a5">
+            <group name="studio_group_f613a5_left"/>
+            <group name="studio_group_f613a5_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce_line_e3675</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_calendar_event_line_a1bce_line_e3675</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__e2578b5d-b369-4b77-8498-322d24c9447f" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce_line_e3675</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default search view for x_calendar_event_line_a1bce_line_e3675</field>
+    <field name="type">search</field>
+  </record>
+  <record id="default_list_view_fo_6ce727c5-101e-454f-a44f-a94bc0bcefdd" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce_line_89b1c</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default list view for x_calendar_event_line_a1bce_line_89b1c</field>
+    <field name="type">list</field>
+  </record>
+  <record id="default_form_view_fo_8a51bbc5-cd87-4a3e-8f56-aaf7f9ea5b3d" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="calendar_event_line_a1bce_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="studio_group_77cb9d">
+            <group name="studio_group_77cb9d_left"/>
+            <group name="studio_group_77cb9d_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce_line_89b1c</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default form view for x_calendar_event_line_a1bce_line_89b1c</field>
+    <field name="type">form</field>
+  </record>
+  <record id="default_search_view__524d4068-a410-41e3-8243-dafffb82e0b0" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+    <field name="model">x_calendar_event_line_a1bce_line_89b1c</field>
+    <field name="active" eval="True"/>
+    <field name="name">Default search view for x_calendar_event_line_a1bce_line_89b1c</field>
+    <field name="type">search</field>
+  </record>
+  <record id="analytic_account_wizard_form" model="ir.ui.view">
+    <field name="name">analytic.account.wizard.form</field>
+    <field name="model">x_analytic_account_wizard</field>
+    <field name="arch" type="xml">
+      <form string="Split">
+        <field name="x_line_ids" nolabel="1" widget="one2many_list">
+          <list editable="bottom" delete="false" >
+            <field name="x_analytic_account_name_id"/>
+            <field name="x_share" sum="Total Share"/>
+            <field name="x_currency_id" attrs="{'invisible': True}"/>
+            <field name="x_amount" sum="Total Amount"/>
+          </list>
+        </field>
+        <footer>
+          <button string="Confirm" type="action" name="%(confirm_analytic_account_item_split_action)d" class="btn-primary"/>
+          <button string="Cancel" special="cancel" class="btn-secondary"/>
+        </footer>
+      </form>
+    </field>
+  </record>
 </odoo>
