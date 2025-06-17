@@ -1,0 +1,204 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="x_maintained_serials_on_sale_order_line_field" model="ir.model.fields">
+        <field name="name">x_maintained_serials_ids</field>
+        <field name="ttype">many2many</field>
+        <field name="field_description">Serials</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="relation">stock.lot</field>
+        <field name="copied" eval="True"/>
+    </record>
+    <record id="x_maintained_serials_on_sale_order_field" model="ir.model.fields">
+        <field name="name">x_maintained_serials_ids</field>
+        <field name="ttype">many2many</field>
+        <field name="field_description">Serials</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="relation">stock.lot</field>
+        <field name="copied" eval="True"/>
+    </record>
+    <record id="x_serials_field" model="ir.model.fields">
+        <field name="name">x_serials</field>
+        <field name="ttype">many2many</field>
+        <field name="field_description">Serials</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="relation">stock.lot</field>
+    </record>
+    <record id="x_is_refrigerant_field" model="ir.model.fields">
+        <field name="name">x_is_refrigerant</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">Is Refrigerant</field>
+        <field name="copied" eval="True"/>
+        <field name="model_id" ref="product.model_product_template"/>
+    </record>
+    <record id="x_is_maintenance_field" model="ir.model.fields">
+        <field name="name">x_is_maintenance</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">Is Maintenance or Repair</field>
+        <field name="copied" eval="True"/>
+        <field name="model_id" ref="product.model_product_template"/>
+    </record>
+    <record id="x_product_is_maintenance_field" model="ir.model.fields">
+        <field name="name">x_product_is_maintenance</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">Is Maintenance or Repair</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="related">product_id.x_is_maintenance</field>
+    </record>
+    <record id="x_sale_order_count_field" model="ir.model.fields">
+        <field name="name">x_sale_order_count</field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Sale Order count</field>
+        <field name="model_id" ref="stock.model_stock_lot"/>
+        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+for record in self: record['x_sale_order_count'] = self.env['sale.order'].search_count([('x_maintained_serials_ids', '=', record.id)])
+]]></field>
+    </record>
+    <record id="x_project_task_count_field" model="ir.model.fields">
+        <field name="name">x_project_task_count</field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Project Task count</field>
+        <field name="model_id" ref="stock.model_stock_lot"/>
+        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+for record in self: record['x_project_task_count'] = self.env['project.task'].search_count([('x_serials', '=', record.id)])
+]]></field>
+    </record>
+    <record id="x_delivery_field" model="ir.model.fields">
+        <field name="name">x_delivery</field>
+        <field name="ttype">datetime</field>
+        <field name="field_description">Delivery</field>
+        <field name="model_id" ref="stock.model_stock_lot"/>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+for record in self: 
+    record['x_delivery'] = max(record.delivery_ids.filtered(lambda d: d.picking_type_code == "outgoing").mapped('date_done'), default=False)
+]]></field>
+    </record>
+    <record id="x_maintenances_field" model="ir.model.fields">
+        <field name="name">x_maintenances_ids</field>
+        <field name="ttype">many2many</field>
+        <field name="field_description">Maintenances</field>
+        <field name="model_id" ref="stock.model_stock_lot"/>
+        <field name="relation">sale.order</field>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_maintenances_ids'] = [(6, 0, (self.env['sale.order.line'].search([
+        ('product_template_id', '=', self.env.ref('hvac_services.product_template_maintenance')), 
+        ('x_maintained_serials_ids', 'in', record.id),
+    ]).mapped('order_id')).ids)]
+]]></field>
+    </record>
+    <record id="x_maintenance_field" model="ir.model.fields">
+        <field name="name">x_maintenance</field>
+        <field name="ttype">selection</field>
+        <field name="field_description">Maintenance</field>
+        <field name="model_id" ref="stock.model_stock_lot"/>
+        <field name="selection">[('Maintained', 'Maintained'), ('No Maintenance', 'No Maintenance'), ('N/A', 'N/A')]</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+for record in self:
+    x_maintenance = 'N/A'
+    if len(record.delivery_ids) > 0 :
+        x_maintenance = 'No Maintenance'
+    if record.x_maintenances_ids and any(maintenance.subscription_state == '3_progress' for maintenance in record.x_maintenances_ids):
+        x_maintenance = 'Maintained'
+    record['x_maintenance'] = x_maintenance
+]]></field>
+    </record>
+    <record id="x_project_task_id_field" model="ir.model.fields">
+        <field name="name">x_project_task_id</field>
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Task</field>
+        <field name="model_id" ref="x_project_task_worksheet_template"/>
+        <field name="on_delete">cascade</field>
+        <field name="relation">project.task</field>
+        <field name="required" eval="True"/>
+    </record>
+    <record id="x_name_field" model="ir.model.fields">
+        <field name="name">x_name</field>
+        <field name="ttype">char</field>
+        <field name="related">x_project_task_id.name</field>
+        <field name="field_description">Name</field>
+        <field name="model_id" ref="x_project_task_worksheet_template"/>
+    </record>
+    <record id="x_refrigerant_product_field" model="ir.model.fields">
+        <field name="name">x_refrigerant_product</field>
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Refrigerant Product</field>
+        <field name="model_id" ref="x_project_task_worksheet_template"/>
+        <field name="relation">product.template</field>
+    </record>
+    <record id="x_comments_field" model="ir.model.fields">
+        <field name="name">x_comments</field>
+        <field name="ttype">html</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Comments</field>
+        <field name="model_id" ref="x_project_task_worksheet_template"/>
+    </record>
+    <record id="x_added_refrigerant_field" model="ir.model.fields">
+        <field name="name">x_added_refrigerant</field>
+        <field name="ttype">float</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Added Refrigerant</field>
+        <field name="model_id" ref="x_project_task_worksheet_template"/>
+    </record>
+    <record id="x_date_field" model="ir.model.fields">
+        <field name="name">x_date</field>
+        <field name="ttype">date</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Date</field>
+        <field name="model_id" ref="x_project_task_worksheet_template"/>
+    </record>
+    <record id="x_operation_field" model="ir.model.fields">
+        <field name="name">x_operation</field>
+        <field name="ttype">selection</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Operation</field>
+        <field name="model_id" ref="x_project_task_worksheet_template"/>
+        <field name="selection">[('Installation', 'Installation'), ('Maintenance', 'Maintenance'), ('Repair', 'Repair')]</field>
+    </record>
+    <record id="x_primary_root_cause_field" model="ir.model.fields">
+        <field name="name">x_primary_root_cause</field>
+        <field name="ttype">selection</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Primary Root Cause</field>
+        <field name="model_id" ref="x_project_task_worksheet_template"/>
+        <field name="selection">[('Misuse', 'Misuse'), ('Defect', 'Defect'), ('Natural Failure', 'Natural Failure'), ('Unknown', 'Unknown')]</field>
+    </record>
+    <record id="x_product_is_functional_field" model="ir.model.fields">
+        <field name="name">x_product_is_functional</field>
+        <field name="ttype">boolean</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Product is functional after operation</field>
+        <field name="model_id" ref="x_project_task_worksheet_template"/>
+    </record>
+    <record id="x_removed_refrigerant_field" model="ir.model.fields">
+        <field name="name">x_removed_refrigerant</field>
+        <field name="ttype">float</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Removed Refrigerant</field>
+        <field name="model_id" ref="x_project_task_worksheet_template"/>
+    </record>
+    <record id="x_root_cause_comments_field" model="ir.model.fields">
+        <field name="name">x_root_cause_comments</field>
+        <field name="ttype">html</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Root Cause Comments</field>
+        <field name="model_id" ref="x_project_task_worksheet_template"/>
+    </record>
+    <record id="x_worker_signature_field" model="ir.model.fields">
+        <field name="name">x_worker_signature</field>
+        <field name="ttype">binary</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Worker Signature</field>
+        <field name="model_id" ref="x_project_task_worksheet_template"/>
+    </record>
+</odoo>
