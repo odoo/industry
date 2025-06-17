@@ -24,6 +24,7 @@
     ],
     'data': [
         'data/knowledge_article.xml',
+        'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/product_category.xml',
         'data/ir_models.xml',

@@ -32,16 +32,14 @@
         <field name="ttype">boolean</field>
         <field name="field_description">Is Refrigerant</field>
         <field name="copied" eval="True"/>
-        <field name="model">product.template</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="on_delete" eval="False"/>
     </record>
-    <record id="x_is_maintenance_field" model="ir.model.fields" context="{'studio': True}">
+    <record id="x_is_maintenance_field" model="ir.model.fields">
         <field name="name">x_is_maintenance</field>
         <field name="ttype">boolean</field>
         <field name="field_description">Is Maintenance or Repair</field>
         <field name="copied" eval="True"/>
-        <field name="model">product.template</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="on_delete" eval="False"/>
     </record>
@@ -49,7 +47,6 @@
         <field name="name">x_sale_order_count</field>
         <field name="ttype">integer</field>
         <field name="field_description">Maintained Serials count</field>
-        <field name="model">stock.lot</field>
         <field name="model_id" ref="stock.model_stock_lot"/>
         <field name="selectable" eval="False"/>
         <field name="store" eval="False"/>
@@ -61,7 +58,6 @@ for record in self: record['x_sale_order_count'] = self.env['sale.order'].search
         <field name="name">x_project_task_count</field>
         <field name="ttype">integer</field>
         <field name="field_description">Serials count</field>
-        <field name="model">stock.lot</field>
         <field name="model_id" ref="stock.model_stock_lot"/>
         <field name="selectable" eval="False"/>
         <field name="store" eval="False"/>
@@ -73,25 +69,14 @@ for record in self: record['x_project_task_count'] = self.env['project.task'].se
         <field name="name">x_delivery</field>
         <field name="ttype">datetime</field>
         <field name="field_description">Delivery</field>
-        <field name="model">stock.lot</field>
         <field name="model_id" ref="stock.model_stock_lot"/>
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
-    </record>
-    <record id="x_refrigerant_product_field" model="ir.model.fields">
-        <field name="name">x_refrigerant_product</field>
-        <field name="ttype">many2one</field>
-        <field name="copied" eval="True"/>
-        <field name="field_description">Refrigerant Product</field>
-        <field name="model">x_project_task_worksheet_template_2</field>
-        <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
-        <field name="relation">product.template</field>
     </record>
     <record id="x_maintenance_field" model="ir.model.fields">
         <field name="ttype">selection</field>
         <field name="copied" eval="True"/>
         <field name="field_description">Maintenance</field>
-        <field name="model">stock.lot</field>
         <field name="model_id" ref="stock.model_stock_lot"/>
         <field name="name">x_maintenance</field>
         <field name="selection">[('Maintained', 'Maintained'), ('No Maintenance', 'No Maintenance'), ('N/A', 'N/A')]</field>
@@ -100,105 +85,99 @@ for record in self: record['x_project_task_count'] = self.env['project.task'].se
         <field name="ttype">many2many</field>
         <field name="copied" eval="True"/>
         <field name="field_description">Maintenances</field>
-        <field name="model">stock.lot</field>
         <field name="model_id" ref="stock.model_stock_lot"/>
         <field name="name">x_maintenances</field>
         <field name="relation">sale.order</field>
     </record>
 
-    <!-- fields for worksheet template -->
-    <record id="industry_fsm_report.x_project_task_worksheet_template_2_ir_model_fields_7" model="ir.model.fields" forcecreate="1">
-    <field name="ttype">html</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Comments</field>
-    <field name="model">x_project_task_worksheet_template_2</field>
-    <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
-    <field name="name">x_comments</field>
+    <record id="x_project_task_id_field" model="ir.model.fields">
+        <field name="name">x_project_task_id</field>
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Task</field>
+        <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
+        <field name="on_delete">cascade</field>
+        <field name="relation">project.task</field>
+        <field name="required" eval="True"/>
     </record>
-  <record id="industry_fsm_report.x_project_task_worksheet_template_2_ir_model_fields_9" model="ir.model.fields" forcecreate="1">
-    <field name="ttype">many2one</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Task</field>
-    <field name="model">x_project_task_worksheet_template_2</field>
-    <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
-    <field name="name">x_project_task_id</field>
-    <field name="on_delete">cascade</field>
-    <field name="relation">project.task</field>
-    <field name="required" eval="True"/>
-  </record>
-  <record id="industry_fsm_report.x_project_task_worksheet_template_2_ir_model_fields_8" model="ir.model.fields" forcecreate="1">
-    <field name="ttype">char</field>
-    <field name="related">x_project_task_id.name</field>
-    <field name="field_description">Name</field>
-    <field name="model">x_project_task_worksheet_template_2</field>
-    <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
-    <field name="name">x_name</field>
+    <record id="x_name_field" model="ir.model.fields">
+        <field name="name">x_name</field>
+        <field name="ttype">char</field>
+        <field name="related">x_project_task_id.name</field>
+        <field name="field_description">Name</field>
+        <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
     </record>
-  <record id="ir_model_fields_13814" model="ir.model.fields">
-    <field name="ttype">float</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Added Refrigerant</field>
-    <field name="model">x_project_task_worksheet_template_2</field>
-    <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
-    <field name="name">x_added_refrigerant</field>
+    <record id="x_refrigerant_product_field" model="ir.model.fields">
+        <field name="name">x_refrigerant_product</field>
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Refrigerant Product</field>
+        <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
+        <field name="relation">product.template</field>
     </record>
-  <record id="ir_model_fields_13812" model="ir.model.fields">
-    <field name="ttype">date</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Date</field>
-    <field name="model">x_project_task_worksheet_template_2</field>
-    <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
-    <field name="name">x_date</field>
+    <record id="x_comments_field" model="ir.model.fields">
+        <field name="name">x_comments</field>
+        <field name="ttype">html</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Comments</field>
+        <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
     </record>
-  <record id="ir_model_fields_13810" model="ir.model.fields">
-    <field name="ttype">selection</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Operation</field>
-    <field name="model">x_project_task_worksheet_template_2</field>
-    <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
-    <field name="name">x_operation</field>
-    <field name="selection">[('Installation', 'Installation'), ('Maintenance', 'Maintenance'), ('Repair', 'Repair')]</field>
-  </record>
-  <record id="ir_model_fields_13808" model="ir.model.fields">
-    <field name="ttype">selection</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Primary Root Cause</field>
-    <field name="model">x_project_task_worksheet_template_2</field>
-    <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
-    <field name="name">x_primary_root_cause</field>
-    <field name="selection">[('Misuse', 'Misuse'), ('Defect', 'Defect'), ('Natural Failure', 'Natural Failure'), ('Unknown', 'Unknown')]</field>
-  </record>
-  <record id="ir_model_fields_13806" model="ir.model.fields">
-    <field name="ttype">boolean</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Product is functional after operation</field>
-    <field name="model">x_project_task_worksheet_template_2</field>
-    <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
-    <field name="name">x_product_is_functional</field>
+    <record id="x_added_refrigerant_field" model="ir.model.fields">
+        <field name="name">x_added_refrigerant</field>
+        <field name="ttype">float</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Added Refrigerant</field>
+        <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
     </record>
-  
-  <record id="ir_model_fields_13802" model="ir.model.fields">
-    <field name="ttype">float</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Removed Refrigerant</field>
-    <field name="model">x_project_task_worksheet_template_2</field>
-    <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
-    <field name="name">x_removed_refrigerant</field>
+    <record id="x_date_field" model="ir.model.fields">
+        <field name="name">x_date</field>
+        <field name="ttype">date</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Date</field>
+        <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
     </record>
-  <record id="ir_model_fields_13800" model="ir.model.fields">
-    <field name="ttype">html</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Root Cause Comments</field>
-    <field name="model">x_project_task_worksheet_template_2</field>
-    <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
-    <field name="name">x_root_cause_comments</field>
+    <record id="x_operation_field" model="ir.model.fields">
+        <field name="name">x_operation</field>
+        <field name="ttype">selection</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Operation</field>
+        <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
+        <field name="selection">[('Installation', 'Installation'), ('Maintenance', 'Maintenance'), ('Repair', 'Repair')]</field>
     </record>
-  <record id="ir_model_fields_13798" model="ir.model.fields">
-    <field name="ttype">binary</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Worker Signature</field>
-    <field name="model">x_project_task_worksheet_template_2</field>
-    <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
-    <field name="name">x_worker_signature</field>
+    <record id="x_primary_root_cause_field" model="ir.model.fields">
+        <field name="name">x_primary_root_cause</field>
+        <field name="ttype">selection</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Primary Root Cause</field>
+        <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
+        <field name="selection">[('Misuse', 'Misuse'), ('Defect', 'Defect'), ('Natural Failure', 'Natural Failure'), ('Unknown', 'Unknown')]</field>
+    </record>
+    <record id="x_product_is_functional_field" model="ir.model.fields">
+        <field name="name">x_product_is_functional</field>
+        <field name="ttype">boolean</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Product is functional after operation</field>
+        <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
+    </record>
+    <record id="x_removed_refrigerant_field" model="ir.model.fields">
+        <field name="name">x_removed_refrigerant</field>
+        <field name="ttype">float</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Removed Refrigerant</field>
+        <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
+    </record>
+    <record id="x_root_cause_comments_field" model="ir.model.fields">
+        <field name="name">x_root_cause_comments</field>
+        <field name="ttype">html</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Root Cause Comments</field>
+        <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
+    </record>
+    <record id="x_worker_signature_field" model="ir.model.fields">
+        <field name="name">x_worker_signature</field>
+        <field name="ttype">binary</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Worker Signature</field>
+        <field name="model_id" ref="industry_fsm_report.x_project_task_worksheet_template_2"/>
     </record>
 </odoo>
