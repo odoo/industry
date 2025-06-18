@@ -19,10 +19,10 @@
           <button class="oe_stat_button" icon="fa-star" type="action" name="%(buyers_act_window)d" invisible="not x_is_properties">
             <field widget="statinfo" name="x_x_interested_in_crm_lead_count" string="Buyers"/>
           </button>
-          <button class="oe_stat_button" icon="fa-key" type="action" name="%(visits_1e463517-d083-48d2-8dd0-0c25d8d8ba4e)d" invisible="not x_is_properties">
+          <button class="oe_stat_button" icon="fa-key" type="action" name="%(visits_event_act_window)d" invisible="not x_is_properties">
             <field widget="statinfo" name="x_x_property_calendar_event_count" string="Visits"/>
           </button>
-          <button class="oe_stat_button" icon="fa-heart" type="action" name="%(matches_2271ffa5-4f55-4268-a247-ce5a08b2b5a2)d" invisible="not x_is_properties" context="{'property_id': id}">
+          <button class="oe_stat_button" icon="fa-heart" type="action" name="%(matches_contact_act_window)d" invisible="not x_is_properties" context="{'property_id': id}">
             <field widget="statinfo" name="x_x_property_matches_contacts_res_partner_count" string="Matches" invisible="False"/>
           </button>
         </xpath>
@@ -36,7 +36,7 @@
           <field name="x_reference_ids" widget="many2many_tags" options="{&quot;edit_tags&quot;:true}" invisible="not x_is_properties" help="Incoming emails with these references will create opportunities linked to this product."/>
         </xpath>
         <xpath expr="//form[@name='Product Template']/sheet[@name='product_form']/notebook[1]/page[@name='variants']/p[1]" position="after">
-          <field name="x_attribute_values" invisible="True"/>
+          <field name="x_attribute_value_ids" invisible="True"/>
         </xpath>
         <xpath expr="//page[@name='sales']" position="attributes">
           <attribute name="invisible">not x_is_properties</attribute>
@@ -56,15 +56,15 @@
           <page string="Property" name="studio_page_2qs_1inp0h046" invisible="not x_is_properties">
             <group name="studio_group_2qs">
               <group name="studio_group_2qs_left" string="Address">
-                <field name="x_technical_partner" help="Used to generate Map View for Properties" invisible="True"/>
+                <field name="x_technical_partner_id" help="Used to generate Map View for Properties" invisible="True"/>
                 <field name="x_street"/>
                 <field name="x_zip_code"/>
                 <field name="x_city"/>
                 <field name="x_country"/>
               </group>
               <group name="studio_group_2qs_right" string="Owners">
-                <field name="x_owner_id" widget="many2one_avatar" domain="[(&quot;x_technical_partner&quot;, &quot;!=&quot;, True)]"/>
-                <field name="x_co_owners_ids" widget="many2many_tags_avatar" domain="[(&quot;x_technical_partner&quot;, &quot;!=&quot;, True)]"/>
+                <field name="x_owner_id" widget="many2one_avatar" domain="[(&quot;x_technical_partner_id&quot;, &quot;!=&quot;, True)]"/>
+                <field name="x_co_owners_ids" widget="many2many_tags_avatar" domain="[(&quot;x_technical_partner_id&quot;, &quot;!=&quot;, True)]"/>
                 <field name="x_price" invisible="True"/>
               </group>
             </group>
@@ -72,14 +72,14 @@
               <group name="studio_group_3o5_left" string="Visits">
                 <field name="x_agent_id" widget="many2one_avatar"/>
                 <field name="x_appointment_ids" widget="many2many_uom_tags" force_save="0" readonly="1" options="{&quot;no_create&quot;:true,&quot;label_field&quot;:&quot;activity_exception_icon&quot;,&quot;edit_tags&quot;:true}"/>
-                <field name="x_booking_link" widget="CopyClipboardURL"/>
+                <field name="x_booking_link" widget="CopyClipboardURL" invisible="not x_booking_link"/>
                 <field name="x_ribbon_stage_is_accounted" force_save="1" readonly="True" invisible="True"/>
                 <field name="x_last_notification_update" force_save="1" readonly="True" invisible="True"/>
               </group>
               <group name="studio_group_3o5_right" string="Third-parties">
-                <field name="x_notary_id" widget="many2one_avatar" domain="[(&quot;x_technical_partner&quot;, &quot;!=&quot;, True)]"/>
-                <field name="x_developer_id" widget="many2one_avatar" domain="[(&quot;x_technical_partner&quot;, &quot;!=&quot;, True)]"/>
-                <field name="x_contractors_ids" widget="many2many_tags_avatar" domain="[(&quot;x_technical_partner&quot;, &quot;!=&quot;, True)]"/>
+                <field name="x_notary_id" widget="many2one_avatar" domain="[(&quot;x_technical_partner_id&quot;, &quot;!=&quot;, True)]"/>
+                <field name="x_developer_id" widget="many2one_avatar" domain="[(&quot;x_technical_partner_id&quot;, &quot;!=&quot;, True)]"/>
+                <field name="x_contractors_ids" widget="many2many_tags_avatar" domain="[(&quot;x_technical_partner_id&quot;, &quot;!=&quot;, True)]"/>
               </group>
             </group>
             <group name="studio_group_28m_1intv4irf">
@@ -241,7 +241,7 @@
     <field name="active" eval="True"/>
     <field name="type">map</field>
     <field name="arch" type="xml">
-      <map res_partner="x_technical_partner" string="Default map view for product.template"/>
+      <map res_partner="x_technical_partner_id" string="Default map view for product.template"/>
     </field>
   </record>
   <record id="res_partner_form_customization_view" model="ir.ui.view">
@@ -260,15 +260,15 @@
           </header>
         </xpath>
         <xpath expr="//field[@name='is_published']" position="after">
-          <button class="oe_stat_button" icon="fa-home" type="action" name="%(properties_72e28132-f501-4476-b133-d9189230f17e)d">
+          <button class="oe_stat_button" icon="fa-home" type="action" name="%(properties_owner_act_window)d">
             <field widget="statinfo" name="x_x_owner_product_template_count" string="Properties"/>
           </button>
-          <button class="oe_stat_button" icon="fa-heart" type="action" name="%(matches_75c9244c-0935-4342-8e89-0b156c561cc9)d">
+          <button class="oe_stat_button" icon="fa-heart" type="action" name="%(matches_property_act_window)d">
             <field widget="statinfo" name="x_x_contact_matches_properties_product_template_count" string="Matches"/>
           </button>
         </xpath>
         <xpath expr="//span[@name='address_name']" position="before">
-          <field name="x_technical_partner" invisible="True"/>
+          <field name="x_technical_partner_id" invisible="True"/>
         </xpath>
         <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
           <page string="Matchmaking" name="studio_page_938_1inqrh2n8">
@@ -308,13 +308,22 @@
                 <field name="active" column_invisible="True"/>
                 <field name="activity_exception_decoration" widget="activity_exception"/>
                 <field name="x_last_notification_update" optional="show"/>
-
               </list>
             </field>
             <field name="x_to_notify_property_ids" invisible="True"/>
           </page>
         </xpath>
       </data>
+    </field>
+  </record>
+  <record id="crm_opportunity_view_graph" model="ir.ui.view">
+    <field name="name">crm.lead.graph.view</field>
+    <field name="model">crm.lead</field>
+    <field name="arch" type="xml">
+        <graph string="Opportunities" sample="1" stacked="1">
+            <field name="x_interested_in_id" type="col"/>
+            <field name="date_deadline" interval="month"/>
+        </graph>
     </field>
   </record>
   <record id="crm_team_form_customization_view" model="ir.ui.view">
@@ -375,26 +384,14 @@
       </data>
     </field>
   </record>
-  <record id="crm_lead_pivot_view_customization" model="ir.ui.view">
-    <field name="name">crm.lead.pivot.view customization</field>
-    <field name="inherit_id" ref="crm_enterprise.crm_lead_view_pivot"/>
-    <field name="mode">extension</field>
-    <field name="active" eval="True"/>
+  <record id="crm_lead_view_pivot" model="ir.ui.view">
+    <field name="name">crm.lead.pivot.view</field>
     <field name="model">crm.lead</field>
-    <field name="priority">99</field>
-    <field name="type">pivot</field>
     <field name="arch" type="xml">
-      <data>
-        <xpath expr="//field[@name='day_close']" position="replace">
-          <field name="x_interested_in_id" type="row"/>
-        </xpath>
-        <xpath expr="//field[@name='prorated_revenue']" position="replace"/>
-        <xpath expr="//field[@name='expected_revenue']" position="replace"/>
-        <xpath expr="//field[@name='user_id']" position="replace"/>
-        <xpath expr="//field[@name='recurring_revenue_prorated']" position="after">
-          <field name="stage_id" type="row"/>
-        </xpath>
-      </data>
+        <pivot string="Leads" display_quantity="1" sample="1">
+            <field name="x_interested_in_id" type="row"/>
+            <field name="stage_id" type="row"/>
+        </pivot>
     </field>
   </record>
   <record id="appointment_type_form_customization_view" model="ir.ui.view">
@@ -522,6 +519,9 @@
     <field name="type">kanban</field>
     <field name="arch" type="xml">
       <data>
+        <xpath expr="//field[@name='name']" position="after">
+          <field name="x_interested_in_id" display="full"/>
+        </xpath>
         <xpath expr="//field[@name='partner_id']" position="attributes">
           <attribute name="options">{"no_open":true}</attribute>
           <attribute name="widget">many2one</attribute>
@@ -554,15 +554,26 @@
     <field name="arch" type="xml">
       <data>
         <xpath expr="//field[@name='partner_id']" position="attributes">
-          <attribute name="domain">[("x_technical_partner", "=", False)]</attribute>
+          <attribute name="domain">[("x_technical_partner_id", "=", False)]</attribute>
         </xpath>
         <xpath expr="//form[1]/sheet[1]/group[@name='sale_header']/group[@name='partner_details']/field[@name='partner_invoice_id']" position="attributes">
-          <attribute name="domain">[("x_technical_partner", "=", False)]</attribute>
+          <attribute name="domain">[("x_technical_partner_id", "=", False)]</attribute>
         </xpath>
         <xpath expr="//field[@name='partner_shipping_id']" position="attributes">
-          <attribute name="domain">[("x_technical_partner", "=", False)]</attribute>
+          <attribute name="domain">[("x_technical_partner_id", "=", False)]</attribute>
         </xpath>
       </data>
     </field>
+  </record>
+  <record id="reporting_act_window" model="ir.actions.act_window">
+    <field name="name">Reporting</field>
+    <field name="res_model">crm.lead</field>
+    <field name="view_mode">pivot,graph</field>
+    <field name="domain">[("x_interested_in_id", "!=", False)]</field>
+    <field name="view_ids" eval="[
+        (5, 0, 0),
+        (0, 0, {'view_mode': 'pivot', 'view_id': ref('crm_lead_view_pivot')}),
+        (0, 0, {'view_mode': 'graph', 'view_id': ref('crm_opportunity_view_graph')}),
+    ]"/>
   </record>
 </odoo>
