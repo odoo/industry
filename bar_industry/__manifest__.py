@@ -23,6 +23,8 @@
         'data/hr_employee.xml',
         'data/product_category.xml',
         'data/product_pricelist.xml',
+        # 'data/restaurant_floor.xml',
+        # 'data/restaurant_table.xml',
         'data/pos_config.xml',
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
