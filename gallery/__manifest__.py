@@ -6,10 +6,7 @@
         'knowledge',
         'l10n_be_pos_sale',
         'partner_commission',
-        'pos_sale_subscription',
         'sale_purchase_project',
-        'sale_stock',
-        'sale_subscription',
         'sign',
         'website_event_sale'
   ],
