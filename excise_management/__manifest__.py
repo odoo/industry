@@ -1,8 +1,8 @@
 {
     'name': 'Excise Management',
     'version': '1.0',
-    'category': 'Inventory/Inventory',
-    'description': 'Define excises applying to specific products and leverage inventory reporting',
+    'category': 'Supply Chain/Inventory',
+    'description': '',
     'author': 'Odoo S.A.',
     'depends': [
         'account_tax_python',
@@ -21,11 +21,9 @@
         'data/ir_model_access.xml',
         'data/ir_default.xml',
         'data/account_tax_group.xml',
-        # 'data/account_tax.xml',
         'data/stock_warehouse.xml',
         'data/uom_uom.xml',
         'data/x_excise_category.xml',
-        'data/x_excise_category_line.xml',
         'data/res_config_setting.xml',
     ],
     'license': 'OPL-1',
