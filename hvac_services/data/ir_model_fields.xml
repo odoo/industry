@@ -46,7 +46,7 @@
     <record id="x_sale_order_count_field" model="ir.model.fields">
         <field name="name">x_sale_order_count</field>
         <field name="ttype">integer</field>
-        <field name="field_description">Maintained Serials count</field>
+        <field name="field_description">Sale Order count</field>
         <field name="model_id" ref="stock.model_stock_lot"/>
         <field name="selectable" eval="False"/>
         <field name="store" eval="False"/>
@@ -57,7 +57,7 @@ for record in self: record['x_sale_order_count'] = self.env['sale.order'].search
     <record id="x_project_task_count_field" model="ir.model.fields">
         <field name="name">x_project_task_count</field>
         <field name="ttype">integer</field>
-        <field name="field_description">Serials count</field>
+        <field name="field_description">Project Task count</field>
         <field name="model_id" ref="stock.model_stock_lot"/>
         <field name="selectable" eval="False"/>
         <field name="store" eval="False"/>
@@ -72,14 +72,14 @@ for record in self: record['x_project_task_count'] = self.env['project.task'].se
         <field name="model_id" ref="stock.model_stock_lot"/>
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
-    </record>
-    <record id="x_maintenance_field" model="ir.model.fields">
-        <field name="ttype">selection</field>
-        <field name="copied" eval="True"/>
-        <field name="field_description">Maintenance</field>
-        <field name="model_id" ref="stock.model_stock_lot"/>
-        <field name="name">x_maintenance</field>
-        <field name="selection">[('Maintained', 'Maintained'), ('No Maintenance', 'No Maintenance'), ('N/A', 'N/A')]</field>
+        <field name="compute"><![CDATA[
+for record in self: 
+    x_delivery = False
+    for delivery in record.delivery_ids:
+        if delivery.picking_type_code == "outgoing" and (x_delivery == False or x_delivery < delivery.date_done): 
+            x_delivery = delivery.date_done
+    record['x_delivery'] = x_delivery
+]]></field>
     </record>
     <record id="x_maintenances_field" model="ir.model.fields">
         <field name="ttype">many2many</field>
@@ -88,6 +88,24 @@ for record in self: record['x_project_task_count'] = self.env['project.task'].se
         <field name="model_id" ref="stock.model_stock_lot"/>
         <field name="name">x_maintenances</field>
         <field name="relation">sale.order</field>
+    </record>
+    <record id="x_maintenance_field" model="ir.model.fields">
+        <field name="ttype">selection</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Maintenance</field>
+        <field name="model_id" ref="stock.model_stock_lot"/>
+        <field name="name">x_maintenance</field>
+        <field name="selection">[('Maintained', 'Maintained'), ('No Maintenance', 'No Maintenance'), ('N/A', 'N/A')]</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    x_maintenance = "N/A"
+    if len(record.delivery_ids) > 0 : 
+        x_maintenance = "No Maintenance"
+    for maintenance in record.x_maintenances:
+        if maintenance.subscription_state == "3_progress": 
+            x_maintenance = "Maintained"
+    record['x_maintenance'] = x_maintenance
+]]></field>
     </record>
 
     <record id="x_project_task_id_field" model="ir.model.fields">
