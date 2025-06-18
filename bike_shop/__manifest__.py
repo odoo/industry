@@ -34,6 +34,8 @@
         'data/pos_payment_method.xml',
         'data/project_task_type.xml',
         'data/project_project.xml',
+        'data/mail_alias_domain.xml',
+        'data/mail_alias.xml',
         'data/helpdesk_team.xml',
         'data/helpdesk_stage.xml',
         'data/worksheet_template.xml',
