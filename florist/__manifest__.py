@@ -5,7 +5,6 @@
     'author': 'Odoo S.A.',
     'depends': [
         'crm_enterprise',
-        'hr_skills',
         'knowledge',
         'pos_enterprise',
         'pos_hr',
@@ -21,7 +20,6 @@
     'data': [
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
-        'data/crm_stage.xml',
         'data/pos_category.xml',
         'data/pos_payment_method.xml',
         'data/pos_config.xml',
@@ -37,7 +35,6 @@
         'data/product_product.xml',
         'data/project_project_stage.xml',
         'data/project_task_type.xml',
-        'data/project_project.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
         'data/knowledge_cover.xml',
@@ -46,8 +43,11 @@
         'data/mail_template.xml',
         'data/knowledge_article_favorite.xml',
         'data/knowledge_tour.xml',
+        'data/website_view.xml',
+        'data/website_theme_apply.xml',
     ],
     'demo': [
+        'demo/crm_stage.xml',
         'demo/crm_tag.xml',
         'demo/crm_team.xml',
         'demo/loyalty_program.xml',
@@ -55,7 +55,6 @@
         'demo/res_partner.xml',
         'demo/res_users.xml',
         'demo/loyalty_rule.xml',
-        'demo/account_analytic_plan.xml',
         'demo/hr_department.xml',
         'demo/pos_session.xml',
         'demo/hr_employee.xml',
@@ -67,6 +66,7 @@
         'demo/pos_order_line.xml',
         'demo/sale_order.xml',
         'demo/ir_attachment_post.xml',
+        'demo/project_project.xml',
         'demo/project_task.xml',
         'demo/mail_activity.xml',
         'demo/sale_order_line.xml',
@@ -74,8 +74,6 @@
         'demo/product_supplierinfo.xml',
         'demo/website.xml',
         'demo/website_view.xml',
-        'demo/website_page.xml',
-        'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
     ],
     'license': 'OPL-1',
@@ -87,6 +85,7 @@
     'cloc_exclude': [
         'data/knowledge_article.xml',
         'static/src/js/my_tour.js',
+        'data/website_view.xml',
         'demo/website_view.xml',
     ],
     'images': [
