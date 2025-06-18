@@ -41,6 +41,7 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
+        'demo/res_config_settings.xml',
         'demo/website.xml',
         'demo/res_partner.xml',
         'demo/account_analytic_plan.xml',
