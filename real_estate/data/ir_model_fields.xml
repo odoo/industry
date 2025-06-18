@@ -17,7 +17,7 @@
         <field name="store" eval="False"/>
     </record>
     <record id="field_product_template_technical_partner_id" model="ir.model.fields">
-        <field name="name">x_technical_partner</field>
+        <field name="name">x_technical_partner_id</field>
         <field name="ttype">many2one</field>
         <field name="copied" eval="True"/>
         <field name="field_description">Technical Partner</field>
@@ -27,7 +27,7 @@
     <record id="field_product_template_street" model="ir.model.fields">
         <field name="name">x_street</field>
         <field name="ttype">char</field>
-        <field name="related">x_technical_partner.street</field>
+        <field name="related">x_technical_partner_id.street</field>
         <field name="field_description">Street</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="store" eval="False"/>
@@ -35,7 +35,7 @@
     <record id="field_product_template_zip" model="ir.model.fields">
         <field name="name">x_zip_code</field>
         <field name="ttype">char</field>
-        <field name="related">x_technical_partner.zip</field>
+        <field name="related">x_technical_partner_id.zip</field>
         <field name="field_description">Zip Code</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="store" eval="False"/>
@@ -43,7 +43,7 @@
     <record id="field_product_template_city" model="ir.model.fields">
         <field name="name">x_city</field>
         <field name="ttype">char</field>
-        <field name="related">x_technical_partner.city</field>
+        <field name="related">x_technical_partner_id.city</field>
         <field name="field_description">City</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="store" eval="False"/>
@@ -51,7 +51,7 @@
     <record id="field_product_template_country" model="ir.model.fields">
         <field name="name">x_country</field>
         <field name="ttype">many2one</field>
-        <field name="related">x_technical_partner.country_id</field>
+        <field name="related">x_technical_partner_id.country_id</field>
         <field name="field_description">Country</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="relation">res.country</field>
@@ -323,7 +323,7 @@ for record in self: record['x_x_properties_from_contacts_res_partner_count'] = s
       <field name="relation">product.template</field>
     </record>
     <record id="owner_count_contact_fb17ef3e-5b01-404e-8c50-be58af804048" model="ir.model.fields">
-        <field name="compute"><![CDATA[Add commentMore actions
+        <field name="compute"><![CDATA[
 property_data = self.env['product.template']._read_group(domain=[('x_owner_id', 'in', self.ids)], groupby=['x_owner_id'], aggregates=['__count'])
 mapped_data = {partner.id: count for partner, count in property_data}
 for partner in self: partner['x_x_owner_product_template_count'] = mapped_data.get(partner.id, 0)
@@ -350,6 +350,22 @@ for partner in self: partner['x_x_owner_product_template_count'] = mapped_data.g
     <field name="field_description">Is Closed Ribbon</field>
     <field name="model_id" ref="website_sale.model_product_ribbon"/>
     <field name="name">x_is_closed_ribbon</field>
+  </record>
+  <record id="field_product_template_attribute_value_ids" model="ir.model.fields">
+    <field name="name">x_attribute_value_ids</field>
+    <field name="model_id" ref="product.model_product_template"/>
+    <field name="depends">attribute_line_ids</field>
+    <field name="field_description">Attribute values</field>
+    <field name="ttype">many2many</field>
+    <!-- <field name="compute"><![CDATA[for record in self:
+attribute_values = []
+for attribute_line in record.attribute_line_ids:
+  attribute_values += attribute_line.value_ids.ids
+record['x_attribute_value_ids'] = attribute_values]]></field> -->
+      <field name="readonly" eval="True"/>
+      <field name="relation">product.attribute.value</field>
+      <field name="selectable" eval="False"/>
+      <field name="store" eval="False"/>
   </record>
   <record id="field_product_template_matching_partners" model="ir.model.fields">
     <field name="compute"><![CDATA[
@@ -381,7 +397,7 @@ for record in self:
     <field name="relation_table">x_product_template_res_partner_rel</field>
   </record>
     <record id="field_res_partner_contact_matches_properties_count" model="ir.model.fields">
-        <field name="compute"><![CDATA[Add commentMore actions
+        <field name="compute"><![CDATA[
 property_data = self.env['product.template']._read_group(domain=[('x_contact_matches_properties', 'in', self.ids)], groupby=['x_contact_matches_properties'], aggregates=['__count'])
 mapped_data = {partner.id: count for partner, count in property_data}
 for partner in self: partner['x_x_contact_matches_properties_product_template_count'] = mapped_data.get(partner.id, 0)
@@ -398,7 +414,7 @@ for partner in self: partner['x_x_contact_matches_properties_product_template_co
         <field name="compute"><![CDATA[
 attribute_field_names = self.env['ir.model.fields'].search_fetch([("ttype", "in", ["many2many", "many2one"]), ("relation", "=", "product.attribute.value"), ("model_id", "=", self.env.ref('base.model_res_partner').id)], ['name']).mapped('name')
 for record in self:
-    filters = []Add commentMore actions
+    filters = []
     pav = self.env['product.attribute.value']
     # Attributes - Generic on any field added to contact form related to product.attributes as m2o or m2m
     for afn in attribute_field_names:
@@ -424,7 +440,7 @@ for record in self:
         <field name="relation_table">x_product_template_res_partner_rel</field>
     </record>
     <record id="field_product_template_contact_matches_properties_count" model="ir.model.fields">
-        <field name="compute"><![CDATA[Add commentMore actions
+        <field name="compute"><![CDATA[
 partner_data = self.env['res.partner']._read_group(domain=[('x_property_matches_contacts', 'in', self.ids)], groupby=['x_property_matches_contacts'], aggregates=['__count'])
 mapped_data = {property.id: count for property, count in partner_data}
 for property in self: property['x_x_property_matches_contacts_res_partner_count'] = mapped_data.get(property.id, 0)
@@ -532,7 +548,7 @@ for property in self: property['x_x_property_calendar_event_count'] = mapped_dat
         <field name="readonly" eval="True"/>
     </record>
     <record id="field_res_partner_to_notify_property_ids" model="ir.model.fields">
-        <field name="compute"><![CDATA[Add commentMore actions
+        <field name="compute"><![CDATA[
 for record in self: record['x_to_notify_property_ids'] = [(6, 0, record.x_property_matches_contacts.filtered(lambda p, ln=record.x_last_notification: p.is_published and (not p.x_last_notification_update or not ln or ln < p.x_last_notification_update)).ids)]
         ]]></field>
         <field name="ttype">many2many</field>
@@ -637,7 +653,7 @@ for record in self: record['x_to_notify_property_ids'] = [(6, 0, record.x_proper
         <field name="relation_field">x_product_template_id</field>
     </record>
     <record id="field_res_partner_interested_in_ids" model="ir.model.fields">
-        <field name="compute"><![CDATA[Add commentMore actions
+        <field name="compute"><![CDATA[
 all_leads = self.env['crm.lead']._read_group(domain=[('id', 'in', self.opportunity_ids.ids), ('x_interested_in_id', '!=', False)], groupby=['partner_id'], aggregates=['x_interested_in_id:array_agg'])
 data = {partner.id: properties for partner, properties in all_leads}
 for partner in self: partner['x_interested_in_ids'] = [(6, 0, data.get(partner.id, []))]
@@ -650,22 +666,6 @@ for partner in self: partner['x_interested_in_ids'] = [(6, 0, data.get(partner.i
         <field name="readonly" eval="True"/>
         <field name="relation">product.template</field>
         <field name="relation_table">x_product_template_res_partner_rel_interested_in</field>
-    </record>
-    <record id="new_many2many_produc_e5b83960-d250-4ec1-b2b1-a11a9e1a5e8a" model="ir.model.fields">
-        <field name="compute"><![CDATA[for record in self:
-attribute_values = []
-for attribute_line in record.attribute_line_ids:
-    attribute_values += attribute_line.value_ids.ids
-record['x_attribute_values'] = attribute_values]]></field>
-        <field name="ttype">many2many</field>
-        <field name="depends">attribute_line_ids</field>
-        <field name="field_description">Attribute values</field>
-        <field name="model_id" ref="product.model_product_template"/>
-        <field name="name">x_attribute_values</field>
-        <field name="readonly" eval="True"/>
-        <field name="relation">product.attribute.value</field>
-        <field name="selectable" eval="False"/>
-        <field name="store" eval="False"/>
     </record>
     <record id="field_product_template_book_url" model="ir.model.fields">
         <field name="ttype">char</field>
@@ -681,7 +681,7 @@ record['x_attribute_values'] = attribute_values]]></field>
         <field name="copied" eval="True"/>
         <field name="field_description">Technical Partner</field>
         <field name="model_id" ref="base.model_res_partner"/>
-        <field name="name">x_technical_partner</field>
+        <field name="name">x_technical_partner_id</field>
     </record>
     <record id="new_many2one_journal_52c20240-9936-4fbe-874d-e22ce0e02907" model="ir.model.fields">
         <field name="name">x_seller</field>
