@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <record id="mail_template_order_ready" model="mail.template">
+        <field name="body_html"><![CDATA[<div style="margin: 0px; padding: 0px;" data-oe-version="1.0"> 
+    <p style="box-sizing:border-box;margin: 0px; padding: 0px; font-size: 12px;"> 
+    Dear <span style="font-weight:bold;" t-out="object.partner_id.display_name or ''">John Doe</span>,<br/>
+    <br/> 
+    Your order <span style="font-weight:bold;" t-out="object.name or ''">S00049</span> is ready.
+    <br/>
+    You can collect it at our store at your convenience.
+    <br/>
+    Thank you for your trust and patience!<br/>
+    <br/> 
+    Do not hesitate to contact us if you have any questions. <br/>
+    <br/>
+    <t t-if="not is_html_empty(object.user_id.signature)" data-o-mail-quote-container="1">
+        <span style="font-weight:bold;" t-out="object.user_id.signature">Mitchell Admin</span>
+    </t>
+    </p></div>]]></field>
+        <field name="lang">{{ object.partner_id.lang }}</field>
+        <field name="model_id" ref="sale.model_sale_order" />
+        <field name="name">Sales Order: Order Ready</field>
+        <field name="subject">Your order {{ object.name or 'n/a' }} is ready for pickup</field>
+    </record>
+
+    <record id="mail_template_warranty_claim" model="mail.template">
+        <field name="body_html"><![CDATA[<div style="margin: 0px; padding: 0px;" data-oe-version="1.0"> 
+            <p style="box-sizing:border-box;margin: 0px; padding: 0px; font-size: 12px;"> 
+            Dear <span style="font-weight:bold;" t-out="object.partner_id.name or ''">John Doe</span>,<br/>
+            <br/> 
+            We are submitting a warranty claim for a customer.
+            <ul>
+                <t t-if="object.properties and object.properties.get('order_line_id')">
+                    <t t-set="order_line" t-value="env['sale.order.line'].browse(object.properties['order_line_id'])"/>
+                    <li>
+                        Customer Name: <t t-out="order_line.order_id.partner_id.display_name or 'N/A'"/>
+                    </li>
+                    <li>
+                        Product ID: <t t-out="order_line.product_id.id or 'N/A'"/>
+                    </li>
+                </t>
+                <t t-if="object.properties and object.properties.get('task_id')">
+                    <t t-set="task" t-value="env['project.task'].browse(object.properties['task_id'])"/>
+                    <t t-if="task.task_properties and task.task_properties.get('serial_number_id')">
+                        <t t-set="serial" t-value="env['stock.lot'].browse(task.task_properties['serial_number_id'])"/>
+                        <li>
+                            Serial Number: <t t-out="serial.name or 'N/A'"/>
+                        </li>
+                        <t t-if="serial.purchase_order_ids and len(serial.purchase_order_ids) > 0">
+                            <t t-set="po" t-value="serial.purchase_order_ids[0]"/>
+                            <li>
+                                Purchase Date: <t t-out="po.effective_date or 'N/A'"/>
+                            </li>
+                        </t>
+                    </t>
+                </t>
+            </ul>
+            Issue Description: <t t-out="object.description"></t>
+            <br>
+            Please find attached photos of the defect.<br/>
+            <br/>
+            Thank you, <br/>
+            <t t-out="object.user_id.display_name"></t> <br/>
+            <t t-out="object.company_id.name"></t> 
+            </p></div> ]]></field>
+        <field name="name">Helpdesk: Warranty Claim</field>
+        <field name="email_from">{{ (object.user_id.email or object.company_id.email or user.email or '') }}</field>
+        <field name="lang">{{ object.partner_id.lang }}</field>
+        <field name="model_id" ref="helpdesk.model_helpdesk_ticket" />
+        <field name="subject">Warranty Claim - {{(object.env['sale.order.line'].browse(object.properties['order_line_id']).order_id.partner_id.display_name + " - " + object.env['sale.order.line'].browse(object.properties['order_line_id']).name)if object.properties and object.properties.get('order_line_id') else ''  }}
+        </field>
+    </record>
+</odoo>
