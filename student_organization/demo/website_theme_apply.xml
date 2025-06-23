@@ -1,9 +1,76 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-	<function name="button_immediate_install" model="ir.module.module" eval="[ref('base.module_theme_clean', raise_if_not_found=False)]"/>
+  <function name="button_immediate_install" model="ir.module.module" eval="[ref('base.module_theme_clean', raise_if_not_found=False)]"/>
 
   <function model="ir.module.module" name="_theme_load" context="{'apply_new_theme': True}">
-    <value model="ir.module.module" eval="obj().env['ir.module.module'].search([('name', '=', 'theme_clean')]).ids"/>
-    <value model="ir.module.module" eval="obj().env.ref('website.default_website')"/>
+    <value model="ir.module.module" eval="obj().env['ir.module.module'].search([('name', '=', 'theme_clean')]).ids" />
+    <value model="ir.module.module" eval="obj().env.ref('website.default_website')" />
+  </function>
+
+  <function model="ir.ui.view" name="write">
+    <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('website.default_website').id).viewref('website.homepage').id" />
+    <value model="ir.ui.view" eval="{'arch': obj().env.ref('student_organization.homepage').arch}" />
+  </function>
+
+  <function model="ir.ui.view" name="write">
+    <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('website.default_website').id).viewref('website.template_footer_headline').id"/>
+    <value model="ir.ui.view" eval="{'arch': obj().env.ref('student_organization.ir_ui_view_4382').arch}"/>
+  </function>
+
+  <function model="website.menu" name="unlink">
+    <value model="website.menu"
+      eval="obj().search([
+            ('website_id', '=', ref('website.default_website')),
+            ('url', '=', '/appointment'),
+        ]).ids" />
+  </function>
+
+  <function model="web_editor.assets" name="make_scss_customization">
+    <value eval="'/website/static/src/scss/options/user_values.scss'" />
+    <value eval="{
+          'menu-gradient': 'null',
+          'menu-secondary-gradient': 'null',
+          'footer-gradient': 'null',
+          'copyright-gradient': 'null',
+          'o-cc1-bg-gradient': 'null',
+          'o-cc2-bg-gradient': 'null',
+          'o-cc3-bg-gradient': 'null',
+          'o-cc4-bg-gradient': 'null',
+          'o-cc5-bg-gradient': 'null',
+          'font': 'null',
+          'headings-font': 'Caveat',
+          'navbar-font': 'null',
+          'buttons-font': 'null',
+          'color-palettes-number': 'null',
+          'color-palettes-name': 'default-23',
+          'btn-ripple': 'null',
+          'header-template': 'default',
+          'footer-template': 'centered',
+          'footer-scrolltop': 'null',
+          'header-links-style': 'default',
+          '': 'null',
+          'google-fonts': ('Caveat'),
+          'google-local-fonts': 'null',
+          'uploaded-local-fonts': 'null',
+          'font-size-base': '1rem',
+          'h6-font-size': '1.125rem',
+          'h5-font-size': '1.3125rem',
+          'h4-font-size': '1.875rem',
+      }"/>
+  </function>
+  <function model="web_editor.assets" name="make_scss_customization">
+    <value eval="'/website/static/src/scss/options/colors/user_color_palette.scss'" />
+    <value eval="{
+          'o-color-1': '#DD7B31',
+      }"/>
+  </function>
+  <function model="web_editor.assets" name="make_scss_customization">
+    <value eval="'/website/static/src/scss/options/colors/user_theme_color_palette.scss'"/>
+    <value eval="{
+          'success': 'null',
+          'info': 'null',
+          'warning': 'null',
+          'danger': 'null',
+      }"/>
   </function>
 </odoo>
