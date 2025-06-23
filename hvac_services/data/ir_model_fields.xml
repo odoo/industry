@@ -19,6 +19,11 @@
         <field name="relation_table">x_sale_order_stock_lot_rel</field>
         <field name="copied" eval="True"/>
         <field name="on_delete" eval="False"/>
+        <field name="compute"><![CDATA[
+for record in self:
+    for line in record.order_line:
+        record['x_maintained_serials'] += line.x_maintained_serials
+]]></field>
     </record>
     <record id="x_serials_field" model="ir.model.fields">
         <field name="name">x_serials</field>
@@ -98,13 +103,13 @@ for record in self:
         <field name="selection">[('Maintained', 'Maintained'), ('No Maintenance', 'No Maintenance'), ('N/A', 'N/A')]</field>
         <field name="compute"><![CDATA[
 for record in self:
-    x_maintenance = "N/A"
-    if len(record.delivery_ids) > 0 : 
-        x_maintenance = "No Maintenance"
+    record['x_maintenance'] = 'N/A'
+    if len(record.delivery_ids) > 0 :
+        record['x_maintenance'] = 'No Maintenance'
     for maintenance in record.x_maintenances:
-        if maintenance.subscription_state == "3_progress": 
-            x_maintenance = "Maintained"
-    record['x_maintenance'] = x_maintenance
+        if maintenance.subscription_state == '3_progress': 
+            record['x_maintenance'] = 'Maintained'
+            break
 ]]></field>
     </record>
 
