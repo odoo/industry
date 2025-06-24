@@ -49,7 +49,7 @@ class FileTest(IndustryCase):
             if not db_name.endswith('imported_with_demo'):
                 return
             with io.BytesIO() as buf:
-                trans_export(False, [module], buf, 'po', self.env.cr)
+                trans_export(False, [module], buf, 'po', self.env)
                 new = buf.getvalue().decode("utf-8")
             old = Path(get_industry_path() + module + '/i18n/' + module + '.pot').read_text(encoding="utf-8")
             diff = list(unified_diff(old.split('\n'), new.split('\n')))
