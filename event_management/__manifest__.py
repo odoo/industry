@@ -83,6 +83,7 @@
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
         'demo/product_supplierinfo.xml',
+        'demo/payment_provider_demo_post.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [
