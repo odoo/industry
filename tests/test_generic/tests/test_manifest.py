@@ -17,14 +17,17 @@ _logger = logging.getLogger(__name__)
 MANDATORY_KEYS = {
     'author': 'Odoo S.A.',
     'category': '',
-    'cloc_exclude': [],
     'data': [],
-    'demo': [],
     'depends': [],
-    'images': ['images/main.png'],
     'license': 'OPL-1',
     'name': '',
     'version': '',
+}
+
+MANDATORY_KEYS_INDUSTRIES = {
+    'cloc_exclude': [],
+    'demo': [],
+    'images': ['images/main.png'],
 }
 
 
@@ -49,20 +52,27 @@ class ManifestTest(ManifestLinter, IndustryCase):
         self._test_manifest_keys(fake_Manifest)
         self._test_manifest_values(fake_Manifest)
         self.assertNotIn('description', manifest_data, "Module description should be defined in /static/description/index.html, not in the manifest.")
-        for key, expected_value in MANDATORY_KEYS.items():
+        mandatory_keys = MANDATORY_KEYS.copy()
+        if module in self.installed_industries:
+            mandatory_keys.update(MANDATORY_KEYS_INDUSTRIES)
+        for key, expected_value in mandatory_keys.items():
             value = manifest_data.get(key)
             self.assertIsNotNone(value, f"Missing '{key}' in manifest")
-            expected_value = MANDATORY_KEYS[key]
+            expected_value = mandatory_keys[key]
             expected_type = type(expected_value)
             self.assertIsInstance(value, expected_type, f"Wrong type for '{key}', expected {expected_type}")
             if expected_value:
                 self.assertEqual(value, expected_value, f"Wrong {key} '{value}' in manifest, it should be {expected_value}")
             if key == 'category':
-                self.assertIn(value, CATEGORIES, f"Invalid category '{value}' not in {CATEGORIES}")
+                if module in self.installed_industries:
+                    self.assertIn(value, CATEGORIES, f"Invalid category '{value}' not in {CATEGORIES}")
+                else:
+                    self.assertNotIn(value, CATEGORIES, f"Module category '{value}' should not be an industry category: {CATEGORIES}")
             elif key in ['data', 'demo']:
                 self.assertTrue(all(val.startswith(f'{key}/') for val in value), f"Files must be in '{key}/' directory")
-        for folder in ['data', 'demo']:
-            self._test_files_in_manifest(manifest_data, folder)
+        self._test_files_in_manifest(manifest_data, 'data')
+        if manifest_data.get('demo'):
+            self._test_files_in_manifest(manifest_data, 'demo')
         self._validate_assets(module, manifest_data)
         self._test_cloc_exclude_files(manifest_data)
         self._test_dependencies(manifest_data)
