@@ -162,12 +162,12 @@
     <field name="model_id" ref="x_pets_model"/>
     <field name="name">x_general_remarks</field>
   </record>
-  <record id="x_many2many_field_6r2_1ijqjdqkq_calendar_model_field" model="ir.model.fields">
+  <record id="x_new_pet_model_field" model="ir.model.fields">
     <field name="ttype">many2many</field>
     <field name="copied" eval="True"/>
     <field name="field_description">New pet</field>
     <field name="model_id" ref="calendar.model_calendar_event"/>
-    <field name="name">x_many2many_field_6r2_1ijqjdqkq</field>
+    <field name="name">x_new_pet_field</field>
     <field name="relation">x_pets</field>
     <field name="relation_table">x_calendar_event_x_pets_rel</field>
   </record>
@@ -620,29 +620,6 @@
     <field name="name">x_aggression_level</field>
     <field name="selection">[('Passive', 'Passive'), ('Tolerant', 'Tolerant'), ('Defensive', 'Defensive'), ('Reactive', 'Reactive'), ('Aggressive', 'Aggressive'), ('Severe aggression', 'Severe aggression')]</field>
   </record>
-  <record id="x_sequence_vaccines_line_model_field" model="ir.model.fields">
-    <field name="ttype">integer</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Sequence</field>
-    <field name="model_id" ref="x_vaccines_line_model"/>
-    <field name="name">x_sequence</field>
-  </record>
-  <record id="x_name_vaccines_line_model_field" model="ir.model.fields">
-    <field name="ttype">char</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Description</field>
-    <field name="model_id" ref="x_vaccines_line_model"/>
-    <field name="name">x_name</field>
-    <field name="translate" eval="True"/>
-  </record>
-  <record id="x_vaccines_id_vaccines_line_model_field" model="ir.model.fields">
-    <field name="ttype">many2one</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">X Vaccines</field>
-    <field name="model_id" ref="x_vaccines_line_model"/>
-    <field name="name">x_vaccines_id</field>
-    <field name="relation">x_vaccines</field>
-  </record>
   <record id="x_aggression_level_pets_line_field" model="ir.model.fields">
     <field name="ttype">selection</field>
     <field name="related">x_pets_id.x_aggression_level</field>
@@ -673,8 +650,18 @@
   </record>
   <record id="x_x_many2many_field_6r2_1ijqjdqkq_calendar_event_count_pets_model_field" model="ir.model.fields">
     <field name="compute"><![CDATA[
-for record in self: record['x_x_many2many_field_6r2_1ijqjdqkq_calendar_event_count'] = self.env['calendar.event'].search_count([('x_many2many_field_6r2_1ijqjdqkq', '=', record.id)])
-]]></field>
+groups = self.env['calendar.event'].read_group(
+    domain=[('x_new_pet_field', 'in', self.ids)],
+    fields=['x_new_pet_field'],
+    groupby=['x_new_pet_field'],
+)
+count_map = {}
+for g in groups:
+    if g.get('x_new_pet_field'):
+        count_map[g['x_new_pet_field'][0]] = g.get('__count', 0)
+for record in self:
+    record['x_x_many2many_field_6r2_1ijqjdqkq_calendar_event_count'] = count_map.get(record.id, 0)
+      ]]></field>
     <field name="ttype">integer</field>
     <field name="field_description">Appointments</field>
     <field name="model_id" ref="x_pets_model"/>
@@ -710,8 +697,18 @@ for record in self: record['x_x_many2many_field_6r2_1ijqjdqkq_calendar_event_cou
   </record>
   <record id="x_x_pet_id_sale_order_count_pets_model_field" model="ir.model.fields">
     <field name="compute"><![CDATA[
-for record in self: record['x_x_pet_id_sale_order_count'] = self.env['sale.order'].search_count([('x_pet_id', '=', record.id)])
-]]></field>
+groups = self.env['sale.order'].read_group(
+    domain=[('x_pet_id', 'in', self.ids)],
+    fields=['x_pet_id'],
+    groupby=['x_pet_id'],
+)
+count_map = {}
+for g in group_data:
+    if g.get('x_pet_id'):
+        count_map[g['x_pet_id'][0]] = g.get('__count', 0)
+for record in self:
+    record['x_x_pet_sale_order_count'] = count_map.get(record.id, 0)
+      ]]></field>
     <field name="ttype">integer</field>
     <field name="field_description">Pet id count</field>
     <field name="model_id" ref="x_pets_model"/>
@@ -729,8 +726,18 @@ for record in self: record['x_x_pet_id_sale_order_count'] = self.env['sale.order
   </record>
   <record id="x_x_pet_sale_order_count_pets_line_model_field" model="ir.model.fields">
     <field name="compute"><![CDATA[
-for record in self: record['x_x_pet_sale_order_count'] = self.env['sale.order'].search_count([('x_pet', '=', record.id)])
-]]></field>
+groups = self.env['sale.order'].read_group(
+    domain=[('x_pet', 'in', self.ids)],
+    fields=['x_pet'],
+    groupby=['x_pet'],
+)
+mapped_order = {}
+for res in groups:
+    if res.get('x_pet'):
+        mapped_order[res['x_pet'][0]] = res.get('__count', 0)
+for record in self:
+    record['x_x_pet_sale_order_count'] = mapped_order.get(record.id, 0)
+    ]]></field>
     <field name="ttype">integer</field>
     <field name="field_description">Pet count</field>
     <field name="model_id" ref="x_pets_line_model_record"/>
@@ -816,7 +823,7 @@ if self:
         ).mapped(lambda g: (g['x_owner'][0], g['__count']))
     )
     for record in self:
-        record.x_x_owner_x_pets_count = counts.get(record.id, 0)
+        record['x_x_owner_x_pets_count'] = counts.get(record.id, 0)
 ]]></field>
     <field name="ttype">integer</field>
     <field name="field_description">Owner count</field>
