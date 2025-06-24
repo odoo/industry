@@ -19,7 +19,6 @@
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
-        'data/res_config_settings.xml',
         'data/pos_config.xml',
         'data/knowledge_tour.xml',
         'data/hr_department.xml',
