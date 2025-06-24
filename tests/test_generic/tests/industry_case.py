@@ -25,6 +25,8 @@ class IndustryCase(TransactionCase):
 
     def setUp(cls):
         super().setUp()
-        cls.installed_modules = cls.env['ir.module.module'].search(
-            [('name', 'in', get_modules()), ('state', '=', 'installed'), ('category_id.name', 'in', CATEGORIES)]
-        ).mapped('name')
+        modules = cls.env['ir.module.module'].search(
+            [('name', 'in', get_modules()), ('state', '=', 'installed')]
+        )
+        cls.installed_modules = modules.mapped('name')
+        cls.installed_industries = modules.filtered(lambda m: m.category_id.name in CATEGORIES).mapped('name')

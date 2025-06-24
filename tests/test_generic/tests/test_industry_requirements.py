@@ -18,7 +18,7 @@ class TestEnv(IndustryCase):
         db_name = get_db_name()
         if not db_name.endswith('imported_with_demo'):
             return
-        if 'bike_leasing' in self.installed_modules:
+        if self.installed_industries == ['bike_leasing']:
             # we don't pay the cart in this industry, we get a quote
             return
         if self.env['ir.module.module']._get('website_sale').state == 'installed':
@@ -29,21 +29,21 @@ class TestEnv(IndustryCase):
             )
 
     def test_welcome_article_exists(self):
-        for module in self.installed_modules:
+        for module in self.installed_industries:
             ref = self.env.ref(f"{module}.welcome_article", raise_if_not_found=False)
             self.assertTrue(
                 ref, f"You forgot to define a record with id='welcome_article' in module '{module}'."
             )
 
     def test_welcome_article_body_exists(self):
-        for module in self.installed_modules:
+        for module in self.installed_industries:
             ref = self.env.ref(f"{module}.welcome_article_body", raise_if_not_found=False)
             self.assertTrue(
                 ref, f"You forgot to define a template with id='welcome_article_body' in module '{module}'."
             )
 
     def test_knowledge_article_notification(self):
-        for module in self.installed_modules:
+        for module in self.installed_industries:
             if not (ref := self.env.ref(module + '.notification_knowledge', raise_if_not_found=False)):
                 _logger.warning("You forgot to define a `mail.message` with `id=notification_knowledge`.")
             notif = ref and self.env['mail.message'].browse(ref.id)
@@ -87,16 +87,17 @@ class TestEnv(IndustryCase):
     def test_knowledge_article_links_use_latest(self):
         pattern = r'https?://www\.odoo\.com/documentation/(?!latest/)(.*)/'
         for module in self.installed_modules:
-            knowledge = self.env['ir.model.data'].search(
-                [('model', '=', 'knowledge.article'), ('module', '=', module)], limit=1
+            knowledges = self.env['ir.model.data'].search(
+                [('model', '=', 'knowledge.article'), ('module', '=', module)]
             )
-            if not knowledge:
+            if not knowledges:
                 continue
-            knowledge_article = self.env.ref(knowledge.complete_name)
-            content = knowledge_article.body or ''
-            matches = re.findall(pattern, content)
-            self.assertFalse(
-                matches,
-                "Found links to Odoo documentation using version-specific URLs in module '%s' knowledge article: %s. Please use '/latest/' instead."
-                % (module, matches),
-            )
+            for knowledge in knowledges:
+                knowledge_article = self.env.ref(knowledge.complete_name)
+                content = knowledge_article.body or ''
+                matches = re.findall(pattern, content)
+                self.assertFalse(
+                    matches,
+                    "Found links to Odoo documentation using version-specific URLs in module '%s' knowledge article: %s. Please use '/latest/' instead."
+                    % (module, matches),
+                )
