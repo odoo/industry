@@ -20,6 +20,7 @@
     'data': [
         'data/res_config_settings.xml',
         'data/res_groups.xml',
+        'data/mail_template.xml',
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
         'data/ir_model_access.xml',
@@ -28,7 +29,6 @@
         'data/base_automation.xml',
         'data/qweb_views.xml',
         'data/ir_actions_act_window.xml',
-        'data/mail_template.xml',
         'data/knowledge_article.xml',
         'data/pos_category.xml',
         'data/pos_config.xml',

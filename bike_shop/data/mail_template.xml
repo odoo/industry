@@ -36,7 +36,7 @@
                         Customer Name: <t t-out="order_line.order_id.partner_id.display_name or 'N/A'"/>
                     </li>
                     <li>
-                        Product ID: <t t-out="order_line.product_id.id or 'N/A'"/>
+                        Product ID: <t t-out="order_line.product_id.name or 'N/A'"/>
                     </li>
                 </t>
                 <t t-if="object.properties and object.properties.get('task_id')">
@@ -46,13 +46,13 @@
                         <li>
                             Serial Number: <t t-out="serial.name or 'N/A'"/>
                         </li>
-                        <t t-if="serial.purchase_order_ids and len(serial.purchase_order_ids) > 0">
-                            <t t-set="po" t-value="serial.purchase_order_ids[0]"/>
-                            <li>
-                                Purchase Date: <t t-out="po.effective_date or 'N/A'"/>
-                            </li>
-                        </t>
                     </t>
+                </t>
+                <t t-if="object.properties and object.properties.get('order_line_id')">
+                    <t t-set="order_line" t-value="env['sale.order.line'].browse(object.properties['order_line_id'])"/>
+                    <li>
+                        Purchase Date: <t t-out="format_date(order_line.order_id.date_order) or 'N/A'"/>
+                    </li>
                 </t>
             </ul>
             Issue Description: <t t-out="object.description"></t>
