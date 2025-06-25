@@ -125,52 +125,50 @@
             </data>
         </field>
     </record>
-    <!-- TO CLEAN -->
-    <record id="odoo_studio_project__dfd597c7-2933-443a-bbcd-5719df89b82c" model="ir.ui.view">
-        <field name="arch" type="xml">
-        <data>
-            <xpath expr="//list[1]" position="attributes">
-                <attribute name="open_form_view">false</attribute>
-            </xpath>
-            <xpath expr="//field[@name='user_ids']" position="after">
-                <xpath expr="//field[@name='date_deadline']" position="move"/>
-            </xpath>
-            <xpath expr="//field[@name='date_deadline']" position="attributes">
-                <attribute name="optional">show</attribute>
-            </xpath>
-        </data>
-        </field>
+    <record id="industry_fsm.project_task_list_view" model="ir.ui.view" forcecreate="1">
+        <field name="name">Custom list view for project task</field>
         <field name="inherit_id" ref="industry_fsm.project_task_view_list_fsm"/>
         <field name="mode">extension</field>
         <field name="model">project.task</field>
-        <field name="name">Odoo Studio: project.task.list.fsm customization</field>
         <field name="priority">9990</field>
         <field name="type">list</field>
         <field name="active" eval="True"/>
-    </record>
-    <!-- TO CLEAN -->
-    <record id="odoo_studio_project__c7e0881f-89d4-4d37-ad29-83bc4a3e999b" model="ir.ui.view">
         <field name="arch" type="xml">
-        <data>
-            <xpath expr="//list[1]" position="attributes">
-            <attribute name="default_group_by"/>
-            <attribute name="default_order">planned_date_begin desc</attribute>
-            </xpath>
-            <xpath expr="//field[@name='user_ids']" position="after">
-            <xpath expr="//field[@name='date_deadline']" position="move"/>
-            </xpath>
-            <xpath expr="//field[@name='date_deadline']" position="attributes">
-            <attribute name="optional">show</attribute>
-            </xpath>
-        </data>
+            <data>
+                <xpath expr="//list[1]" position="attributes">
+                    <attribute name="open_form_view">false</attribute>
+                </xpath>
+                <xpath expr="//field[@name='user_ids']" position="after">
+                    <xpath expr="//field[@name='date_deadline']" position="move"/>
+                </xpath>
+                <xpath expr="//field[@name='date_deadline']" position="attributes">
+                    <attribute name="optional">show</attribute>
+                </xpath>
+            </data>
         </field>
+    </record>
+    <record id="project_task_list_view" model="ir.ui.view">
+        <field name="name">Custom list view for project task</field>
         <field name="inherit_id" ref="project.view_task_tree2"/>
         <field name="mode">extension</field>
         <field name="model">project.task</field>
-        <field name="name">Odoo Studio: project.task.list customization</field>
         <field name="priority">160</field>
         <field name="type">list</field>
         <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//list[1]" position="attributes">
+                <attribute name="default_group_by"/>
+                <attribute name="default_order">planned_date_begin desc</attribute>
+                </xpath>
+                <xpath expr="//field[@name='user_ids']" position="after">
+                <xpath expr="//field[@name='date_deadline']" position="move"/>
+                </xpath>
+                <xpath expr="//field[@name='date_deadline']" position="attributes">
+                <attribute name="optional">show</attribute>
+                </xpath>
+            </data>
+        </field>
     </record>
     <record id="industry_fsm_report.x_project_task_worksheet_template_qweb_view" model="ir.ui.view" forcecreate="1">
       <field name="name">x_project_task_worksheet_template_2</field>
@@ -240,96 +238,95 @@
         </t>
       </field>
     </record>
-    <record id="industry_fsm_report.x_project_task_worksheet_template_2_ir_ui_view_1" model="ir.ui.view" forcecreate="1">
-    <field name="arch" type="xml">
-      <form create="false" duplicate="false">
-        <sheet>
-          <h1 invisible="context.get('default_x_project_task_id')">
-            <field name="x_project_task_id"/>
-          </h1>
-          <group>
-            <field name="x_operation" widget="selection_badge" required="True"/>
-            <field name="x_date" string="Date" required="True"/>
-          </group>
-          <group string="Repair" invisible="x_operation != &quot;Repair&quot;">
-            <field name="x_primary_root_cause"/>
-            <field name="x_root_cause_comments" help="Provide details if additional root cause led to the repair operation"/>
-          </group>
-          <group string="Refrigerant">
-            <field name="x_refrigerant_product" domain="[(&quot;categ_id&quot;, &quot;=&quot;, 5)]" required="x_removed_refrigerant != 0 or x_added_refrigerant != 0"/>
-            <field name="x_removed_refrigerant" invisible="x_operation == &quot;Installation&quot;"/>
-            <field name="x_added_refrigerant"/>
-          </group>
-          <group string="Conformity">
-            <field name="x_product_is_functional" string="Product is functional after operation"/>
-            <field name="x_comments" placeholder="Add details about your intervention..."/>
-            <field widget="signature" name="x_worker_signature" force_save="0" readonly="False" required="True"/>
-          </group>
-        </sheet>
-      </form>
-    </field>
-    <field name="model">x_project_task_worksheet_template_2</field>
-    <field name="name">template_view_INST/MAIN/REPA_Worksheet</field>
-    <field name="type">form</field>
-    <field name="active" eval="True"/>
-  </record>
-    <record id="industry_fsm_report.x_project_task_worksheet_template_2_ir_ui_view_2" model="ir.ui.view" forcecreate="1">
-    <field name="arch" type="xml">
-      <list default_order="create_date DESC">
-        <field name="create_date"/>
-        <field name="x_name"/>
-      </list>
-    </field>
-    <field name="model">x_project_task_worksheet_template_2</field>
-    <field name="name">list_view_INST/MAIN/REPA_Worksheet</field>
-    <field name="type">list</field>
-    <field name="active" eval="True"/>
-  </record>
-  <record id="ir_ui_view_2642" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <pivot string="Refrigerant Consumption">
-        <field name="x_added_refrigerant" type="measure"/>
-        <field name="x_removed_refrigerant" type="measure"/>
-        <field name="x_refrigerant_product" type="col"/>
-        <field name="x_date" interval="month" type="row"/>
-      </pivot>
-    </field>
-    <field name="model">x_project_task_worksheet_template_2</field>
-    <field name="name">Default pivot view for ir.model(874,)</field>
-    <field name="type">pivot</field>
-    <field name="active" eval="True"/>
-  </record>
-  <record id="industry_fsm_report.x_project_task_worksheet_template_2_search_view" model="ir.ui.view" forcecreate="1">
-    <field name="arch" type="xml">
-      <search>
-        <field name="x_name"/>
-        <filter string="Created on" date="create_date" name="create_date"/>
-        <filter name="group_by_month" string="Created on" context="{'group_by': 'create_date:month'}"/>
-      </search>
-    </field>
-    <field name="model">x_project_task_worksheet_template_2</field>
-    <field name="name">search_view_INST/MAIN/REPA_Worksheet</field>
-    <field name="type">search</field>
-    <field name="active" eval="True"/>
-  </record>
-
-  <record id="odoo_studio_template_3f18f93e-00b7-4445-92cc-7dd3b702bef3" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <data>
-        <xpath expr="//field[@name='x_refrigerant_product']" position="attributes">
-          <attribute name="domain">[("x_is_refrigerant", "!=", False)]</attribute>
-        </xpath>
-      </data>
-    </field>
-    <field name="inherit_id" ref="industry_fsm_report.x_project_task_worksheet_template_2_ir_ui_view_1"/>
-    <field name="mode">extension</field>
-    <field name="model">x_project_task_worksheet_template_2</field>
-    <field name="name">Odoo Studio: template_view_INST/MAIN/REPA_Worksheet customization</field>
-    <field name="priority">99</field>
-    <field name="type">form</field>
-    <field name="active" eval="True"/>
-  </record> 
-  <record id="view_partner_stock_form" model="ir.ui.view">
+    <record id="industry_fsm_report.x_project_task_worksheet_template_2_form_view" model="ir.ui.view" forcecreate="1">
+        <field name="model">x_project_task_worksheet_template_2</field>
+        <field name="name">template_view_INST/MAIN/REPA_Worksheet</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form create="false" duplicate="false">
+            <sheet>
+                <h1 invisible="context.get('default_x_project_task_id')">
+                <field name="x_project_task_id"/>
+                </h1>
+                <group>
+                <field name="x_operation" widget="selection_badge" required="True"/>
+                <field name="x_date" string="Date" required="True"/>
+                </group>
+                <group string="Repair" invisible="x_operation != &quot;Repair&quot;">
+                <field name="x_primary_root_cause"/>
+                <field name="x_root_cause_comments" help="Provide details if additional root cause led to the repair operation"/>
+                </group>
+                <group string="Refrigerant">
+                <field name="x_refrigerant_product" domain="[(&quot;categ_id&quot;, &quot;=&quot;, 5)]" required="x_removed_refrigerant != 0 or x_added_refrigerant != 0"/>
+                <field name="x_removed_refrigerant" invisible="x_operation == &quot;Installation&quot;"/>
+                <field name="x_added_refrigerant"/>
+                </group>
+                <group string="Conformity">
+                <field name="x_product_is_functional" string="Product is functional after operation"/>
+                <field name="x_comments" placeholder="Add details about your intervention..."/>
+                <field widget="signature" name="x_worker_signature" force_save="0" readonly="False" required="True"/>
+                </group>
+            </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="industry_fsm_report.x_project_task_worksheet_template_2_list_view" model="ir.ui.view" forcecreate="1">
+        <field name="model">x_project_task_worksheet_template_2</field>
+        <field name="name">list_view_INST/MAIN/REPA_Worksheet</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list default_order="create_date DESC">
+                <field name="create_date"/>
+                <field name="x_name"/>
+            </list>
+        </field>
+    </record>
+    <record id="x_project_task_worksheet_template_2_pivot_view" model="ir.ui.view">
+        <field name="model">x_project_task_worksheet_template_2</field>
+        <field name="name">Default pivot view for x_project_task_worksheet_template_2</field>
+        <field name="type">pivot</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <pivot string="Refrigerant Consumption">
+                <field name="x_added_refrigerant" type="measure"/>
+                <field name="x_removed_refrigerant" type="measure"/>
+                <field name="x_refrigerant_product" type="col"/>
+                <field name="x_date" interval="month" type="row"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="industry_fsm_report.x_project_task_worksheet_template_2_search_view" model="ir.ui.view" forcecreate="1">
+        <field name="name">search_view_INST/MAIN/REPA_Worksheet</field>
+        <field name="model">x_project_task_worksheet_template_2</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <search>
+                <field name="x_name"/>
+                <filter string="Created on" date="create_date" name="create_date"/>
+                <filter name="group_by_month" string="Created on" context="{'group_by': 'create_date:month'}"/>
+            </search>
+        </field>
+    </record>
+    <record id="x_project_task_worksheet_template_2_form_view_extended" model="ir.ui.view">
+        <field name="name">Odoo Studio: template_view_INST/MAIN/REPA_Worksheet customization</field>
+        <field name="inherit_id" ref="industry_fsm_report.x_project_task_worksheet_template_2_form_view"/>
+        <field name="mode">extension</field>
+        <field name="model">x_project_task_worksheet_template_2</field>
+        <field name="priority">99</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='x_refrigerant_product']" position="attributes">
+                    <attribute name="domain">[("x_is_refrigerant", "!=", False)]</attribute>
+                </xpath>
+            </data>
+        </field>
+    </record> 
+    <record id="view_partner_stock_form" model="ir.ui.view">
         <field name="name">res.partner.stock</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="stock.view_partner_stock_warnings_form"/>
