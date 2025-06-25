@@ -7,7 +7,7 @@
         'appointment',
         'contacts',
         'helpdesk',
-        'industry_fsm',
+        'industry_fsm_stock',
         'knowledge',
         'point_of_sale',
         'purchase_stock',

@@ -35,24 +35,27 @@
                     <li>
                         Customer Name: <t t-out="order_line.order_id.partner_id.display_name or 'N/A'"/>
                     </li>
-                    <li>
-                        Product ID: <t t-out="order_line.product_id.name or 'N/A'"/>
-                    </li>
                 </t>
                 <t t-if="object.properties and object.properties.get('task_id')">
                     <t t-set="task" t-value="env['project.task'].browse(object.properties['task_id'])"/>
                     <t t-if="task.task_properties and task.task_properties.get('serial_number_id')">
                         <t t-set="serial" t-value="env['stock.lot'].browse(task.task_properties['serial_number_id'])"/>
+
+                        <t t-set="move_lines" t-value="env['stock.move.line'].search([('lot_id', '=', serial.id)])"/>
+                        <t t-set="sale_date" t-value="False"/>
+                        <t t-foreach="move_lines" t-as="ml">
+                            <t t-if="ml.move_id.sale_line_id">
+                                <t t-set="sale_date" t-value="ml.move_id.sale_line_id.order_id.date_order"/>
+                                <t t-break="True"/>
+                            </t>
+                        </t>
                         <li>
                             Serial Number: <t t-out="serial.name or 'N/A'"/>
                         </li>
+                        <li t-if="sale_date">
+                            Purchase Date: <t t-out="format_date(sale_date) if sale_date else 'N/A'"/>
+                        </li>
                     </t>
-                </t>
-                <t t-if="object.properties and object.properties.get('order_line_id')">
-                    <t t-set="order_line" t-value="env['sale.order.line'].browse(object.properties['order_line_id'])"/>
-                    <li>
-                        Purchase Date: <t t-out="format_date(order_line.order_id.date_order) or 'N/A'"/>
-                    </li>
                 </t>
             </ul>
             Issue Description: <t t-out="object.description"></t>
