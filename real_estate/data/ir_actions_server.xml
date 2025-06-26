@@ -164,9 +164,14 @@ for record in records:
 for rec in records:
     if not rec.partner_id or not rec.x_interested_in_id.x_owner_id:
         raise UserError("Missing signer: Customer or Owner is not set.")
+
+    offer_template = rec.env['sign.template'].search([('x_is_offer', '=', True)], limit=1)
+    if not offer_template:
+        raise UserError("No offer template found. Please configure a sign template with 'Is Offer' checked.")
+
     act = rec.env['ir.actions.act_window']._for_xml_id('sign.action_sign_send_request')
     act['context'] = {
-        'default_template_id': env.ref('real_estate.sign_template_3').id,
+        'default_template_id': offer_template.id,
         "active_id": rec.id,
         "default_res_model": "crm.lead",
         "default_res_id": rec.id,
