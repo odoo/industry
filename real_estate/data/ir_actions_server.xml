@@ -106,22 +106,11 @@ record['x_technical_partner_id'] = env['res.partner'].create({'name': record.nam
     <field name="binding_model_id" ref="product.model_product_template"/>
     <field name="state">code</field>
     <field name="code"><![CDATA[
-if not record.x_appointment_ids:
-    link = env['appointment.invite'].create({
-        'short_code': datetime.datetime.now().strftime("%M%m%S%d%Y%H"),
-        'display_name': record.name
-    })
-    appointment = env['appointment.type'].create({
-        'name': record.name,
-        'display_name': record.name,
-        'x_property_id': record.id,
-        'appointment_invite_ids': [(6, 0, [link.id])],
-        'location_id': record.x_technical_partner_id.id,
-        'image_1920': record.image_1920,
-        'appointment_tz': env.ref('base.user_admin').tz or 'Europe/Brussels'
-    })
-        ]]></field>
-  </record>
+for record in records:
+    link = env['appointment.invite'].create({'short_code': datetime.datetime.now().strftime("%M%m%S%d%Y%H") + str(record.id), 'display_name': record.name})
+    appointment = env['appointment.type'].create({'name': record.name, 'display_name': record.name, 'x_property_id': record.id, 'appointment_invite_ids': [link.id], 'location_id': record.x_technical_partner_id.id, 'image_1920': record.image_1920, 'appointment_tz': env.ref('base.user_admin').tz or 'Europe/Brussels'})
+    ]]></field>
+    </record>
 
   <record id="send_matches_from_contact_server_action" model="ir.actions.server">
     <field name="name">Send matches from contact</field>
