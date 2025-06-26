@@ -68,7 +68,6 @@
         'demo/product_template_attribute_value.xml',
         'demo/product_product.xml',
         'demo/x_product_template_line.xml',
-        'demo/create_link.xml',
         'demo/appointment_type.xml',
         'demo/calendar_event.xml',
         'demo/crm_lead.xml',
