@@ -13,7 +13,7 @@
         'data/res_partner_category.xml',
     ],
     'demo': [
-        'demo/res_config_settings.xml',
+        'demo/ir_cron.xml',
         'demo/res_users.xml',
         'demo/res_partner.xml',
         'demo/res_partner_category.xml',
