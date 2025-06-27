@@ -1,6 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.tests import tagged
+from odoo.tests import tagged, Form
 from odoo.tests.common import TransactionCase
 from odoo import fields, Command
 
@@ -32,15 +32,14 @@ class ActionServerTestCase(TransactionCase):
         cls.sale_order_1 = cls.env['sale.order'].create({
             'name': 'order_item_1',
             'partner_id': cls.partner_a.id,
-            'order_line': [Command.create({'name': 'section_1', 'display_type': 'line_section'})]
         })
-        cls.sale_order_1.order_line = [Command.link(cls.env['sale.order.line'].create({
-            'name': 'sale_line_1',
-            'product_id': cls.env.ref("handyman.product_product_5").id,
-            'order_id': cls.sale_order_1.id,
-            'x_section_id': False,
-        }).id)]
-        cls.sale_order_1.order_line[1].x_section_id = cls.sale_order_1.order_line[0]
+        sale_order_form = Form(cls.sale_order_1)
+        with sale_order_form.order_line.new() as order_line:
+            order_line.display_type = 'line_section'
+            order_line.name = 'section_1'
+        with sale_order_form.order_line.new() as order_line:
+            order_line.product_id = cls.env.ref("handyman.product_product_5")
+        sale_order_form.save()
         cls.sale_order_1.action_confirm()
 
     def test_base_automation_create_move_line_add_automatic_account(self):
