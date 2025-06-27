@@ -5,6 +5,7 @@
     'author': 'Odoo S.A.',
     'depends': [
         'appointment',
+        'base_industry_data',
         'documents_sign',
         'hr_expense',
         'knowledge',
@@ -15,7 +16,6 @@
         'sale_planning',
         'social',
         'survey',
-        'website_crm',
         'website_event_sale',
         'website_sale_mass_mailing',
         'website_sale_subscription',
@@ -45,16 +45,13 @@
         'data/knowledge_article.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
-        'data/knowledge_tour.xml',
         'data/event_event.xml',
-        'data/event_event_ticket.xml',
     ],
     'demo': [
         'demo/product_template.xml',
         'demo/res_partner.xml',
         'demo/purchase_order.xml',
         'demo/sale_order.xml',
-        # 'demo/hr_department.xml',
         'demo/purchase_order_line.xml',
         'demo/ir_attachment_post.xml',
         'demo/project_task.xml',
@@ -67,17 +64,12 @@
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
         'demo/sale_order_confirm.xml',
+        'demo/event_event_ticket.xml',
         'demo/payment_provider_demo.xml',
     ],
     'license': 'OPL-1',
-    'assets': {
-        'web.assets_backend': [
-            'student_organization/static/src/js/my_tour.js',
-        ],
-    },
     'cloc_exclude': [
         'data/knowledge_article.xml',
-        'static/src/js/my_tour.js',
         'demo/website_view.xml',
     ],
     'images': [
