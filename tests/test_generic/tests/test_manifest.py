@@ -2,10 +2,11 @@
 
 from ast import literal_eval
 import logging
+import os
 from pathlib import Path
 
 from odoo.addons.test_lint.tests.test_manifests import ManifestLinter
-from odoo.modules.module import module_manifest
+from odoo.modules.module import MANIFEST_NAMES, Manifest
 from odoo.tests.common import tagged
 
 from .industry_case import CATEGORIES, IndustryCase, get_industry_path
@@ -31,8 +32,10 @@ MANDATORY_KEYS = {
 class ManifestTest(ManifestLinter, IndustryCase):
 
     def _load_manifest(self, module):
-        manifest_file = module_manifest(get_industry_path() + module)
-        return literal_eval(Path(manifest_file).read_text())
+        for manifest_name in MANIFEST_NAMES:
+            candidate = os.path.join(get_industry_path() + module, manifest_name)
+            if os.path.isfile(candidate):
+                return literal_eval(Path(candidate).read_text())
 
     def test_manifests(self):
         for module in self.installed_modules:
@@ -42,7 +45,9 @@ class ManifestTest(ManifestLinter, IndustryCase):
                 self._validate_manifest(module, manifest_data)
 
     def _validate_manifest(self, module, manifest_data):
-        self._test_manifest_keys(module, manifest_data)
+        fake_Manifest = Manifest(path=get_industry_path() + 'test/test_generic', manifest_content=manifest_data)
+        self._test_manifest_keys(fake_Manifest)
+        self._test_manifest_values(fake_Manifest)
         self.assertNotIn('description', manifest_data, "Module description should be defined in /static/description/index.html, not in the manifest.")
         for key, expected_value in MANDATORY_KEYS.items():
             value = manifest_data.get(key)
