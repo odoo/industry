@@ -1,47 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <function name="button_immediate_install" model="ir.module.module" eval="[ref('base.module_theme_bistro', raise_if_not_found=False)]"/>
+  <function name="button_choose_theme" model="ir.module.module" eval="[ref('base.module_theme_enark', raise_if_not_found=False) or ref('base.module_theme_default')]"/>
+    
+  <function name="make_scss_customization" model="web_editor.assets" context="{'website_id': ref('website.default_website')}">
+    <value eval="'/website/static/src/scss/options/colors/user_color_palette.scss'"/>
+    <value eval="{'o-color-1': '#e6b500','o-color-2': '#080903','o-color-3': '#FBFBFB','o-color-4': '#FFFFFF','o-color-5': '#714b67', 'menu': 1}"/>
+  </function>
 
-    <function model="ir.module.module" name="_theme_load" context="{'apply_new_theme': True}">
-        <value model="ir.module.module" eval="obj().env['ir.module.module'].search([('name', '=', 'theme_bistro')]).ids"/>
-        <value model="website" eval="obj().env.ref('website.default_website')"/>
-    </function>
-
-    <function name="write" model="ir.ui.view">
-        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=ref('website.default_website')).viewref('website.homepage').id"/>
-        <value model="ir.ui.view" eval="{'arch': obj().env.ref('micro_brewery.homepage').arch}"/>
-    </function>
-
-    <data noupdate="1">
-        <function name="write" model="website.menu">
-            <value model="website.menu" eval="obj().search([('url', '=', '/shop'), ('website_id', '=', ref('website.default_website'))]).id"/>
-            <value eval="{'name': 'Our eShop', 'sequence': 3}"/>
-        </function>
-
-        <function name="write" model="website.menu">
-            <value model="website.menu" eval="obj().search([('url', '=', '/'), ('website_id', '=', ref('website.default_website'))]).id"/>
-            <value eval="{'name': 'About us', 'sequence': 1}"/>
-        </function>
-    </data>
-
-    <function name="write" model="ir.ui.view">
-        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=ref('website.default_website')).viewref('website_sale.products_add_to_cart').id"/>
-        <value model="ir.ui.view" eval="{'active': True}"/>
-    </function>
-
-    <function name="write" model="ir.ui.view">
-        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=ref('website.default_website')).viewref('website_sale.products_categories_top').id"/>
-        <value model="ir.ui.view" eval="{'active': False}"/>
-    </function>
-
-    <function name="write" model="ir.ui.view">
-        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=ref('website.default_website')).viewref('website_sale.products_categories').id"/>
-        <value model="ir.ui.view" eval="{'active': True}"/>
-    </function>
-
-    <function model="web_editor.assets" name="make_scss_customization" context="{'website_id': ref('website.default_website')}">
-        <value eval="'/website/static/src/scss/options/colors/user_color_palette.scss'"/>
-        <value eval="{'o-color-1': '#714B67','o-color-2': '#714b673b','o-color-3': '#F8F9FA','o-color-4': '#FFFFFF','o-color-5': '#343a40', 'menu': 5, 'footer': 1, 'copyright': 5}"/>
-    </function>
-
+  <function name="write" model="ir.ui.view">
+    <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=ref('website.default_website')).viewref('website.homepage').id"/>
+    <value model="ir.ui.view" eval="{'arch': obj().env.ref('micro_brewery.homepage').arch}"/>
+  </function>
 </odoo>
