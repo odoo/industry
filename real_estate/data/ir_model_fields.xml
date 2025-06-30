@@ -19,7 +19,6 @@
     <record id="field_product_template_technical_partner_id" model="ir.model.fields">
         <field name="name">x_technical_partner_id</field>
         <field name="ttype">many2one</field>
-        <field name="copied" eval="True"/>
         <field name="field_description">Technical Partner</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="relation">res.partner</field>
@@ -105,6 +104,13 @@
         <field name="copied" eval="True"/>
         <field name="field_description">Is Draft Ribbon</field>
     </record>
+    <record id="field_product_ribbon_is_closed_ribbon" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Is Closed Ribbon</field>
+        <field name="model_id" ref="website_sale.model_product_ribbon"/>
+        <field name="name">x_is_closed_ribbon</field>
+    </record>
     <record id="field_crm_lead_interested_in_id" model="ir.model.fields">
         <field name="name">x_interested_in_id</field>
         <field name="field_description">Interested in</field>
@@ -151,7 +157,6 @@ for product in self: product['x_x_interested_in_crm_lead_count'] = mapped_data.g
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="ttype">integer</field>
         <field name="copied" eval="True"/>
-        <field name="on_delete" eval="False"/>
     </record>
     <record id="field_res_partner_max_price" model="ir.model.fields">
         <field name="name">x_max_price</field>
@@ -186,127 +191,6 @@ for product in self: product['x_x_interested_in_crm_lead_count'] = mapped_data.g
         <field name="field_description">Subscribe</field>
         <field name="model_id" ref="base.model_res_partner"/>
     </record>
-  <record id="new_many2many_contac_d385b9fd-40b5-4889-ae1a-9148d3f19eb1" model="ir.model.fields">
-    <field name="compute"><![CDATA[properties = self.env['product.template'].search([])
-for record in self:
-    matching_properties = []
-    if record.x_categories_ids or record.x_region_ids or record.x_type or record.x_condition_ids or record.x_min_price != 0 or record.x_max_price != 0: # At least 1 criteria
-        for property in properties:
-            if property.categ_id.x_is_properties_category and not property.website_ribbon_id.x_is_closed_ribbon : # Properties only && Not closed ribbons only
-                matching_property = True
-                # Categories
-                if record.x_categories_ids:
-                    matched = False
-                    for interest in record.x_categories_ids:
-                        if interest in property.public_categ_ids: matched = True
-                    if not matched: matching_property = False
-                # Region
-                if record.x_region_ids:
-                    matched = False
-                    for interest in record.x_region_ids:
-                        for attribute_line in property.attribute_line_ids:
-                            if interest in attribute_line.value_ids: matched = True
-                    if not matched: matching_property = False
-                # Construction type
-                if record.x_type:
-                    matched = False
-                    for interest in record.x_type:
-                        for attribute_line in property.attribute_line_ids:
-                            if interest in attribute_line.value_ids: matched = True
-                    if not matched: matching_property = False
-                # Condition
-                if record.x_condition_ids:
-                    matched = False
-                    for interest in record.x_condition_ids:
-                        for attribute_line in property.attribute_line_ids:
-                            if interest in attribute_line.value_ids: matched = True
-                    if not matched: matching_property = False
-                # Price
-                if record.x_min_price != 0 or record.x_max_price != 0:
-                    matched = True
-                    if record.x_min_price != 0 and record.x_min_price > property.list_price: matched = False
-                    if record.x_max_price != 0 and property.list_price > record.x_max_price: matched = False
-                    if not matched: matching_property = False
-                # Outcome
-                if matching_property: matching_properties.append(property.id)
-    record['x_properties_from_contacts'] = matching_properties]]></field>
-    <field name="ttype">many2many</field>
-    <field name="depends">x_categories_ids, x_region_ids, x_type, x_condition_ids, x_min_price, x_max_price</field>
-    <field name="field_description">Properties from Contacts</field>
-    <field name="model_id" ref="base.model_res_partner"/>
-    <field name="name">x_properties_from_contacts</field>
-    <field name="readonly" eval="True"/>
-    <field name="relation">product.template</field>
-    <field name="selectable" eval="False"/>
-    <field name="store" eval="False"/>
-  </record>
-  <record id="new_many2many_produc_241cc75e-4391-4e12-a558-54602c883847" model="ir.model.fields">
-    <field name="compute"><![CDATA[contacts = self.env['res.partner'].search([])
-for record in self:
-    matching_contacts = []
-    if record.id and record.categ_id.x_is_properties_category and not record.website_ribbon_id.x_is_closed_ribbon: # Properties only &&  Not closed ribbons only
-        for contact in contacts:
-            if contact.x_categories_ids or contact.x_region_ids or contact.x_type or contact.x_condition_ids or contact.x_min_price != 0 or contact.x_max_price != 0: # At least 1 criteria
-                matching_contact = True
-                # Categories
-                if contact.x_categories_ids:
-                    matched = False
-                    for interest in contact.x_categories_ids:
-                        if interest in record.public_categ_ids: matched = True
-                    if not matched: matching_contact = False
-                # Region
-                if contact.x_region_ids:
-                    matched = False
-                    for interest in contact.x_region_ids:
-                        for attribute_line in record.attribute_line_ids:
-                            if interest in attribute_line.value_ids: matched = True
-                    if not matched: matching_contact = False
-                # Construction type
-                if contact.x_type:
-                    matched = False
-                    for interest in contact.x_type:
-                        for attribute_line in record.attribute_line_ids:
-                            if interest in attribute_line.value_ids: matched = True
-                    if not matched: matching_contact = False
-                # Condition
-                if contact.x_condition_ids:
-                    matched = False
-                    for interest in contact.x_condition_ids:
-                        for attribute_line in record.attribute_line_ids:
-                            if interest in attribute_line.value_ids: matched = True
-                    if not matched: matching_contact = False
-                # Price
-                if contact.x_min_price != 0 or contact.x_max_price != 0:
-                    matched = True
-                    if contact.x_min_price != 0 and contact.x_min_price > record.list_price: matched = False
-                    if contact.x_max_price != 0 and record.list_price > contact.x_max_price: matched = False
-                    if not matched: matching_contact = False
-                # Outcome
-                if matching_contact: matching_contacts.append(contact.id)
-    record['x_contacts_from_properties'] = matching_contacts]]></field>
-    <field name="ttype">many2many</field>
-    <field name="depends">categ_id, public_categ_ids, attribute_line_ids, list_price, website_ribbon_id</field>
-    <field name="field_description">Contacts from Properties</field>
-    <field name="model_id" ref="product.model_product_template"/>
-    <field name="name">x_contacts_from_properties</field>
-    <field name="readonly" eval="True"/>
-    <field name="relation">res.partner</field>
-    <field name="selectable" eval="False"/>
-    <field name="store" eval="False"/>
-  </record>
-  <record id="properties_from_cont_4c7895ee-8021-49b0-ab12-8d1e53e73235" model="ir.model.fields">
-    <field name="compute"><![CDATA[
-for record in self: record['x_x_properties_from_contacts_res_partner_count'] = self.env['res.partner'].search_count([('x_properties_from_contacts', 'in', [record.id])])
-]]></field>
-    <field name="ttype">integer</field>
-    <field name="depends">x_contacts_from_properties</field>
-    <field name="field_description">Matchs</field>
-    <field name="model_id" ref="product.model_product_template"/>
-    <field name="name">x_x_properties_from_contacts_res_partner_count</field>
-    <field name="readonly" eval="True"/>
-    <field name="selectable" eval="False"/>
-    <field name="store" eval="False"/>
-  </record>
     <record id="field_crm_team_is_sellers_team" model="ir.model.fields">
         <field name="ttype">boolean</field>
         <field name="copied" eval="True"/>
@@ -322,19 +206,19 @@ for record in self: record['x_x_properties_from_contacts_res_partner_count'] = s
         <field name="name">x_is_a_buyer_team</field>
     </record>
     <record id="field_crm_lead_property_id" model="ir.model.fields">
-      <field name="ttype">many2one</field>
-      <field name="copied" eval="True"/>
-      <field name="field_description">Selling/Renting</field>
-      <field name="model_id" ref="crm.model_crm_lead"/>
-      <field name="name">x_property_id</field>
-      <field name="relation">product.template</field>
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Selling/Renting</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="name">x_property_id</field>
+        <field name="relation">product.template</field>
     </record>
-    <record id="owner_count_contact_fb17ef3e-5b01-404e-8c50-be58af804048" model="ir.model.fields">
+    <record id="field_res_partner_owner_count" model="ir.model.fields">
         <field name="compute"><![CDATA[
 property_data = self.env['product.template']._read_group(domain=[('x_owner_id', 'in', self.ids)], groupby=['x_owner_id'], aggregates=['__count'])
 mapped_data = {partner.id: count for partner, count in property_data}
 for partner in self: partner['x_x_owner_product_template_count'] = mapped_data.get(partner.id, 0)
-                  ]]></field>
+        ]]></field>
         <field name="ttype">integer</field>
         <field name="field_description">Owner count</field>
         <field name="model_id" ref="base.model_res_partner"/>
@@ -342,40 +226,27 @@ for partner in self: partner['x_x_owner_product_template_count'] = mapped_data.g
         <field name="selectable" eval="False"/>
         <field name="store" eval="False"/>
     </record>
-  <record id="field_product_template_agent_id" model="ir.model.fields">
-    <field name="ttype">many2one</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Agent</field>
-    <field name="model_id" ref="product.model_product_template"/>
-    <field name="name">x_agent_id</field>
-    <field name="relation">hr.employee</field>
-    <field name="tracking">1</field>
-  </record>
-  <record id="new_checkbox_product_2daf1119-459b-426a-8aa1-9c4b88de5b84" model="ir.model.fields">
-    <field name="ttype">boolean</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Is Closed Ribbon</field>
-    <field name="model_id" ref="website_sale.model_product_ribbon"/>
-    <field name="name">x_is_closed_ribbon</field>
-  </record>
-  <record id="field_product_template_attribute_value_ids" model="ir.model.fields">
-    <field name="name">x_attribute_value_ids</field>
-    <field name="model_id" ref="product.model_product_template"/>
-    <field name="depends">attribute_line_ids</field>
-    <field name="field_description">Attribute values</field>
-    <field name="ttype">many2many</field>
-    <!-- <field name="compute"><![CDATA[for record in self:
-attribute_values = []
-for attribute_line in record.attribute_line_ids:
-  attribute_values += attribute_line.value_ids.ids
-record['x_attribute_value_ids'] = attribute_values]]></field> -->
-      <field name="readonly" eval="True"/>
-      <field name="relation">product.attribute.value</field>
-      <field name="selectable" eval="False"/>
-      <field name="store" eval="False"/>
-  </record>
-  <record id="field_product_template_matching_partners" model="ir.model.fields">
-    <field name="compute"><![CDATA[
+    <record id="field_product_template_agent_id" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Agent</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="name">x_agent_id</field>
+        <field name="relation">hr.employee</field>
+        <field name="tracking">1</field>
+    </record>
+    <record id="field_product_template_attribute_value_ids" model="ir.model.fields">
+        <field name="name">x_attribute_value_ids</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="field_description">Attribute values</field>
+        <field name="ttype">many2many</field>
+        <field name="readonly" eval="True"/>
+        <field name="related">attribute_line_ids.value_ids</field>
+        <field name="relation">product.attribute.value</field>
+        <field name="store" eval="False"/>
+     </record>
+    <record id="field_product_template_matching_partners" model="ir.model.fields">
+        <field name="compute"><![CDATA[
 attribute_field_names = self.env['ir.model.fields'].search_fetch([("ttype", "in", ["many2many", "many2one"]), ("relation", "=", "product.attribute.value"), ("model_id", "=", self.env.ref('base.model_res_partner').id)], ['name']).mapped('name')
 for record in self:
     if not record.id or not record.x_is_properties or record.x_is_closed: record['x_contact_matches_properties'] = False
@@ -394,15 +265,15 @@ for record in self:
     # Query leveraging domain
     record['x_contact_matches_properties'] = self.env['res.partner'].search(filters)
         ]]></field>
-    <field name="ttype">many2many</field>
-    <field name="depends">categ_id, public_categ_ids, attribute_line_ids, list_price, website_ribbon_id</field>
-    <field name="field_description">Contact matches (Properties)</field>
-    <field name="model_id" ref="product.model_product_template"/>
-    <field name="name">x_contact_matches_properties</field>
-    <field name="readonly" eval="True"/>
-    <field name="relation">res.partner</field>
-    <field name="relation_table">x_product_template_res_partner_rel</field>
-  </record>
+        <field name="ttype">many2many</field>
+        <field name="depends">categ_id, public_categ_ids, attribute_line_ids, list_price, website_ribbon_id</field>
+        <field name="field_description">Contact matches (Properties)</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="name">x_contact_matches_properties</field>
+        <field name="readonly" eval="True"/>
+        <field name="relation">res.partner</field>
+        <field name="relation_table">x_product_template_res_partner_rel</field>
+    </record>
     <record id="field_res_partner_contact_matches_properties_count" model="ir.model.fields">
         <field name="compute"><![CDATA[
 property_data = self.env['product.template']._read_group(domain=[('x_contact_matches_properties', 'in', self.ids)], groupby=['x_contact_matches_properties'], aggregates=['__count'])
@@ -416,7 +287,7 @@ for partner in self: partner['x_x_contact_matches_properties_product_template_co
         <field name="readonly" eval="True"/>
         <field name="selectable" eval="False"/>
         <field name="store" eval="False"/>
-      </record>
+    </record>
     <record id="field_res_partner_matching_properties" model="ir.model.fields">
         <field name="compute"><![CDATA[
 attribute_field_names = self.env['ir.model.fields'].search_fetch([("ttype", "in", ["many2many", "many2one"]), ("relation", "=", "product.attribute.value"), ("model_id", "=", self.env.ref('base.model_res_partner').id)], ['name']).mapped('name')
@@ -461,13 +332,6 @@ for property in self: property['x_x_property_matches_contacts_res_partner_count'
         <field name="selectable" eval="False"/>
         <field name="store" eval="False"/>
     </record>
-    <record id="new_checkbox_crm_sta_0b8903f4-1c62-4329-a8cf-7df986e2d974" model="ir.model.fields">
-        <field name="ttype">boolean</field>
-        <field name="copied" eval="True"/>
-        <field name="field_description">Is Offer Stage?</field>
-        <field name="model_id" ref="crm.model_crm_stage"/>
-        <field name="name">x_offer_stage</field>
-    </record>
     <record id="field_appointment_type_property_id" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="copied" eval="True"/>
@@ -494,7 +358,7 @@ for property in self: property['x_x_property_matches_contacts_res_partner_count'
         <field name="relation">product.template</field>
     </record>
     <record id="field_product_template_calendar_event_count" model="ir.model.fields">
-      <field name="compute"><![CDATA[
+        <field name="compute"><![CDATA[
 event_data = self.env['calendar.event']._read_group(domain=[('x_property_id', 'in', self.ids)], groupby=['x_property_id'], aggregates=['__count'])
 mapped_data = {property.id: count for property, count in event_data}
 for property in self: property['x_x_property_calendar_event_count'] = mapped_data.get(property.id, 0)
@@ -526,27 +390,6 @@ for property in self: property['x_x_property_calendar_event_count'] = mapped_dat
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
     </record>
-    <record id="new_related_field_le_d6152e16-e8d2-48f8-b26e-18796b7f40c5" model="ir.model.fields">
-        <field name="ttype">many2many</field>
-        <field name="related">x_appointment_ids.appointment_invite_ids</field>
-        <field name="field_description">Links</field>
-        <field name="model_id" ref="crm.model_crm_lead"/>
-        <field name="name">x_link</field>
-        <field name="readonly" eval="True"/>
-        <field name="relation">appointment.invite</field>
-        <field name="relation_table">x_appointment_invite_crm_lead_rel</field>
-        <field name="store" eval="False"/>
-    </record>
-    <record id="new_related_field_le_d3e4dadd-b8bf-49d0-8ee7-c18a7ee241aa" model="ir.model.fields">
-        <field name="ttype">char</field>
-        <field name="related">x_link.book_url</field>
-        <field name="field_description">Booking Link</field>
-        <field name="model_id" ref="crm.model_crm_lead"/>
-        <field name="name">x_booking_link</field>
-        <field name="readonly" eval="True"/>
-        <field name="selectable" eval="False"/>
-        <field name="store" eval="False"/>
-    </record>
     <record id="field_res_partner_last_nofication" model="ir.model.fields">
         <field name="ttype">datetime</field>
         <field name="field_description">Last notification</field>
@@ -572,60 +415,43 @@ for record in self: record['x_to_notify_property_ids'] = [(6, 0, record.x_proper
         <field name="field_description">Last notification update</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="name">x_last_notification_update</field>
-        <field name="on_delete" eval="False"/>
     </record>
     <record id="field_product_template_construction_year" model="ir.model.fields">
         <field name="ttype">char</field>
-        <field name="copied" eval="True"/>
         <field name="field_description">Construction Year</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="name">x_construction_year</field>
     </record>
     <record id="field_product_template_last_renovation" model="ir.model.fields">
         <field name="ttype">char</field>
-        <field name="copied" eval="True"/>
         <field name="field_description">Last Renovation</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="name">x_last_renovation</field>
     </record>
     <record id="field_product_template_living_surface" model="ir.model.fields">
         <field name="ttype">integer</field>
-        <field name="copied" eval="True"/>
         <field name="field_description">Living Surface</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="name">x_living_surface</field>
     </record>
     <record id="field_product_template_field_surface" model="ir.model.fields">
         <field name="ttype">integer</field>
-        <field name="copied" eval="True"/>
         <field name="field_description">Field Surface</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="name">x_field_surface</field>
     </record>
     <record id="field_product_template_orientation" model="ir.model.fields">
         <field name="ttype">selection</field>
-        <field name="copied" eval="True"/>
         <field name="field_description">Orientation</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="name">x_orientation</field>
-        <field name="on_delete" eval="False"/>
         <field name="selection">[('South', 'South'), ('East', 'East'), ('North', 'North'), ('West', 'West')]</field>
     </record>
     <record id="field_product_template_ribbon_stage_accounted" model="ir.model.fields">
         <field name="ttype">boolean</field>
-        <field name="copied" eval="True"/>
         <field name="field_description">Ribbon stage is accounted</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="name">x_ribbon_stage_is_accounted</field>
-    </record>
-    <record id="new_related_field_pr_aaa0fefe-70da-4d85-8d7e-aad769c1699a" model="ir.model.fields">
-        <field name="ttype">float</field>
-        <field name="related">list_price</field>
-        <field name="field_description">Price</field>
-        <field name="model_id" ref="product.model_product_template"/>
-        <field name="name">x_price</field>
-        <field name="store" eval="False"/>
-        <field name="tracking">100</field>
     </record>
     <record id="field_product_template_line_sequence" model="ir.model.fields">
         <field name="ttype">integer</field>
@@ -646,7 +472,7 @@ for record in self: record['x_to_notify_property_ids'] = [(6, 0, record.x_proper
     <record id="field_product_template_line_property_id" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="copied" eval="True"/>
-        <field name="field_description">X Product Template</field>
+        <field name="field_description">Property</field>
         <field name="model_id" ref="product_template_line_model"/>
         <field name="name">x_product_template_id</field>
         <field name="relation">product.template</field>
@@ -678,23 +504,21 @@ for partner in self: partner['x_interested_in_ids'] = [(6, 0, data.get(partner.i
         <field name="ttype">char</field>
         <field name="related">x_appointment_ids.appointment_invite_ids.book_url</field>
         <field name="model_id" ref="product.model_product_template"/>
-        <field name="name">x_booking_link_template</field>
+        <field name="name">x_booking_link</field>
         <field name="readonly" eval="True"/>
         <field name="selectable" eval="False"/>
         <field name="store" eval="False"/>
     </record>
     <record id="field_res_partner_is_technical_partner" model="ir.model.fields">
         <field name="ttype">boolean</field>
-        <field name="copied" eval="True"/>
-        <field name="field_description">Technical Partner</field>
+        <field name="field_description">Is a Technical Partner</field>
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="name">x_technical_partner_id</field>
     </record>
-    <record id="new_many2one_journal_52c20240-9936-4fbe-874d-e22ce0e02907" model="ir.model.fields">
+    <record id="field_account_move_seller" model="ir.model.fields">
         <field name="name">x_seller</field>
         <field name="field_description">Seller</field>
         <field name="ttype">many2one</field>
-        <field name="copied" eval="True"/>
         <field name="model_id" ref="account.model_account_move"/>
         <field name="relation">res.users</field>
     </record>
@@ -711,6 +535,5 @@ for partner in self: partner['x_interested_in_ids'] = [(6, 0, data.get(partner.i
         <field name="field_description">Is Offer</field>
         <field name="model_id" ref="sign.model_sign_template"/>
         <field name="ttype">boolean</field>
-        <field name="copied" eval="True"/>
     </record>
 </odoo>
