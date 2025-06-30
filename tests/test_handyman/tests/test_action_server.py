@@ -30,6 +30,7 @@ class ActionServerTestCase(TransactionCase):
                 order_line.name = 'section_1'
             with so.order_line.new() as order_line:
                 order_line.product_id = cls.env.ref("handyman.product_product_5")
+                order_line.sequence = 11
             so.save()
         cls.sale_order_1.action_confirm()
 
