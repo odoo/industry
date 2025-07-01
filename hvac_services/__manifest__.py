@@ -36,6 +36,7 @@
         'data/ir_actions_act_window.xml',
         'data/ir_ui_view.xml',
         'data/ir_actions_act_window_2.xml',
+        'data/ir_ui_view_2.xml',
         'data/ir_ui_menu.xml',
         'data/worksheet_template.xml',
         'data/product_template.xml',

@@ -21,4 +21,14 @@ for task in record.env['project.task'].search([('sale_order_id.id', '=', record.
 ]]></field>
         <field name="model_id" ref="stock.model_stock_picking"/>
     </record>
+    <record id="add_sale_order_line_serials_to_sale_order" model="ir.actions.server">
+        <field name="name">Set x_maintained_serials of the sale order equal to the serials of its order lines</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for line in record.order_line:
+    if line.x_maintained_serials not in record.x_maintained_serials:
+        record['x_maintained_serials'] += line.x_maintained_serials
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+    </record>
 </odoo>
