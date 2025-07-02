@@ -82,6 +82,7 @@
         'demo/ir_attachment_post.xml',
         'demo/website.xml',
         'demo/website_view.xml',
+        'demo/website_page.xml',
         'demo/website_theme_apply.xml',
     ],
     'assets': {
