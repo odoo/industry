@@ -48,6 +48,8 @@
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
+        'demo/knowledge_article.xml',
+        'demo/knowledge_article_favorite.xml',
         'demo/documents_document.xml',
         'demo/hr_expense.xml',
         'demo/ir_attachment_post.xml',
