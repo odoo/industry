@@ -23,6 +23,7 @@
         'web_studio',
     ],
     'data': [
+        'data/knowledge_tour.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
@@ -69,8 +70,14 @@
     ],
     'license': 'OPL-1',
     'author': 'Odoo S.A.',
+    'assets': {
+        'web.assets_backend': [
+            'hvac_services/static/src/js/my_tour.js',
+        ],
+    },
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        "static/src/js/my_tour.js",
     ],
     'images': ['images/main.png'],
 }

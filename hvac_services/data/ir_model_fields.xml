@@ -94,6 +94,13 @@ for record in self:
         <field name="field_description">Maintenances</field>
         <field name="model_id" ref="stock.model_stock_lot"/>
         <field name="relation">sale.order</field>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_maintenances'] = self.env['sale.order.line'].search([
+        ('product_template_id', '=', self.env.ref('hvac_services.product_template_maintenance')), 
+        ('x_maintained_serials', '=', record.id)]).order_id
+]]></field>
     </record>
     <record id="x_maintenance_field" model="ir.model.fields">
         <field name="name">x_maintenance</field>
