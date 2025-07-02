@@ -91,6 +91,7 @@
     },
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        "data/website_view.xml",
         "static/src/js/my_tour.js",
         "demo/website_view.xml",
     ],
