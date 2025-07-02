@@ -1,11 +1,7 @@
-/** @odoo-module **/
-
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add("real_estate_studio_knowledge_tour", {
-    url: "/odoo",
-
     steps: () => [
         {
             trigger: '.o_app[data-menu-xmlid="knowledge.knowledge_menu_root"]',

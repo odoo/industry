@@ -11,7 +11,7 @@
     </record>
 
     <record id="update_appointments_active_server_action" model="ir.actions.server">
-        <field name="name">Update Appointments &gt; Active</field>
+        <field name="name">Update Appointments as Active</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="update_path">x_appointment_ids.active</field>
         <field name="crud_model_id" ref="appointment.model_appointment_type"/>
@@ -72,7 +72,7 @@ for product in records: product['x_last_notification_update'] = datetime.datetim
         <field name="state">code</field>
         <field name="usage">base_automation</field>
         <field name="code"><![CDATA[
-for record in records: record["x_interested_in_id"] = env['product.template'].search([('x_is_property', '=', True), ('x_reference_ids', 'any', ['|', '|', ('x_name', 'in', record.message_ids[0].body), ('x_name', 'in', record.message_ids[0].subject), ('x_name', 'in', record.message_ids[0].email_from)])], limit=1).id
+for record in records: record["x_interested_in_id"] = env['product.template'].search([('x_is_property', '=', True), ('x_reference_ids', 'any', ['|', '|', ('x_name', 'in', record.message_ids[0].body), ('x_name', 'in', record.message_ids[0].subject), ('x_name', 'in', record.message_ids[0].email_from)])], limit=1)
         ]]></field>
     </record>
 
@@ -81,7 +81,7 @@ for record in records: record["x_interested_in_id"] = env['product.template'].se
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-env['crm.lead'].create({'name': 'Matchmaking', 'partner_id': env.context.get('active_id'), 'x_interested_in_id': env.context.get('property_id'), 'team_id': env['crm.team'].search([('x_is_a_buyer_team', '=', True)], limit=1).id})
+env['crm.lead'].create({'name': 'Matchmaking', 'partner_id': env.context.get('active_id'), 'x_interested_in_id': env.context.get('property_id'), 'team_id': env['crm.team'].search([('x_is_a_buyer_team', '=', True)], limit=1)})
         ]]></field>
     </record>
 
@@ -91,7 +91,7 @@ env['crm.lead'].create({'name': 'Matchmaking', 'partner_id': env.context.get('ac
         <field name="name">Create Technical Partner</field>
         <field name="usage">base_automation</field>
         <field name="code"><![CDATA[
-for record in records: record['x_technical_partner_id'] = env['res.partner'].create({'name': record.name, 'street': record.x_street,  'zip': record.x_zip_code, 'city': record.x_city, 'country_id': record.x_country.id, 'x_technical_partner_id': True}).id
+for record in records: record['x_technical_partner_id'] = env['res.partner'].create({'name': record.name, 'street': record.x_street,  'zip': record.x_zip_code, 'city': record.x_city, 'country_id': record.x_country.id, 'x_is_technical_partner': True})
           ]]></field>
     </record>
 
