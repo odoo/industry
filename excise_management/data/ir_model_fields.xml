@@ -134,10 +134,16 @@ for record in self:
     </record>
     <record id="stock_move_fiscal_deposit_move" model="ir.model.fields">
       <field name="compute"><![CDATA[for record in self:
-    if record.location_id.warehouse_id.x_is_fiscal_deposit:
-        if record.location_dest_id.warehouse_id.x_is_fiscal_deposit:
+    record['x_fiscal_deposit_move'] = "none"
+    if record.location_id.usage == 'internal' and record.location_dest_id.usage == 'internal':
+        if record.location_id.warehouse_id.x_is_fiscal_deposit and record.location_dest_id.warehouse_id.x_is_fiscal_deposit:
             record['x_fiscal_deposit_move'] = "transfer"
-        elif not (fp := record.picking_id.partner_id.property_account_position_id) or fp.x_is_fiscal_deposit:
+        elif record.location_id.warehouse_id.x_is_fiscal_deposit:
+            record['x_fiscal_deposit_move'] = "exit"
+        elif record.location_dest_id.warehouse_id.x_is_fiscal_deposit:
+            record['x_fiscal_deposit_move'] = "entry"
+    elif record.location_id.warehouse_id.x_is_fiscal_deposit:
+        if not (fp := record.picking_id.partner_id.property_account_position_id) or fp.x_is_fiscal_deposit:
             record['x_fiscal_deposit_move'] = "exit fd"
         else:
             record['x_fiscal_deposit_move'] = "exit"
@@ -146,8 +152,6 @@ for record in self:
             record['x_fiscal_deposit_move'] = "entry fd"
         else:
             record['x_fiscal_deposit_move'] = "entry"
-    else:
-        record['x_fiscal_deposit_move'] = "none"
         ]]></field>
       <field name="ttype">selection</field>
       <field name="selection">[('none', "None"), ('entry', "Entry"), ('entry fd', "Entry from FD"), ('exit', "Exit"), ('exit fd', "Exit to FD"), ('transfer', "Transfer")]</field>

@@ -1,5 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from odoo import Command
 from odoo.tests import tagged, Form
 from odoo.tests.common import TransactionCase
 
@@ -85,3 +86,146 @@ class ActionServerTestCase(TransactionCase):
         result = server_action.with_context(active_id=uom.id, active_model="uom.uom").run()
         self.assertEqual(result, factor_1 * factor_2,
             "The convert to base unit server action should return the product of the UOM factor and its relative UOM factor")
+
+    def test_fiscal_deposit_move_computation(self):
+        customers = self.env['stock.location'].create({'name': 'Customers', 'usage': 'customer'})
+        internal = self.env['stock.location'].create({'name': 'Internal', 'usage': 'internal'})
+        internal_fd, internal_fd2 = self.env['stock.warehouse'].create([
+            {
+                'code': 'FD 1',
+                'name': 'FD 2',
+                'x_is_fiscal_deposit': True,
+                'partner_id': self.env.ref('base.main_partner').id
+            }, {
+                'code': 'FD 3',
+                'name': 'FD 4',
+                'x_is_fiscal_deposit': True,
+                'partner_id': self.env.ref('base.main_partner').id
+            },
+        ])
+        fiscal_position = self.env['account.fiscal.position'].create({
+            'name': 'Fiscal Position',
+            'x_is_fiscal_deposit': True,
+        })
+        partner, partner_FD, partner_not_FD = self.env['res.partner'].create([
+            {'name': 'dummy'},
+            {'name': 'FD', 'property_account_position_id': fiscal_position.id},
+            {'name': 'Not FD', 'property_account_position_id': self.fiscal_position.id},
+        ])
+        product = self.env['product.product'].create({'name': 'product'})
+
+        move = self.env['stock.move'].create({
+            'location_id': internal.id,
+            'location_dest_id': internal_fd.lot_stock_id.id,
+            'product_id': product.id,
+            'name': 'move',
+            'partner_id': partner_FD.id,
+        })
+        self.assertEqual(move.x_fiscal_deposit_move, 'entry')
+        move = self.env['stock.move'].create({
+            'location_id': internal_fd.lot_stock_id.id,
+            'location_dest_id': internal.id,
+            'product_id': product.id,
+            'name': 'move',
+            'partner_id': partner_FD.id,
+        })
+        self.assertEqual(move.x_fiscal_deposit_move, 'exit')
+        move = self.env['stock.move'].create({
+            'location_id': internal_fd2.lot_stock_id.id,
+            'location_dest_id': internal_fd.lot_stock_id.id,
+            'product_id': product.id,
+            'name': 'move',
+            'partner_id': partner_FD.id,
+        })
+        self.assertEqual(move.x_fiscal_deposit_move, 'transfer')
+        picking = self.env['stock.picking'].create({
+            'picking_type_id': self.env.ref('stock.picking_type_out').id,
+            'partner_id': partner_not_FD.id,
+            'location_id': internal.id,
+            'location_dest_id': customers.id,
+            'move_ids': [Command.create({
+                'location_id': internal.id,
+                'location_dest_id': customers.id,
+                'product_id': product.id,
+                'name': 'move',
+            })]
+        })
+        self.assertEqual(picking.move_ids[0].x_fiscal_deposit_move, 'none')
+        picking = self.env['stock.picking'].create({
+            'picking_type_id': self.env.ref('stock.picking_type_out').id,
+            'partner_id': partner_not_FD.id,
+            'location_id': internal_fd.lot_stock_id.id,
+            'location_dest_id': customers.id,
+            'move_ids': [Command.create({
+                'location_id': internal_fd.lot_stock_id.id,
+                'location_dest_id': customers.id,
+                'product_id': product.id,
+                'name': 'move',
+            })]
+        })
+        self.assertEqual(picking.move_ids[0].x_fiscal_deposit_move, 'exit')
+        picking = self.env['stock.picking'].create({
+            'picking_type_id': self.env.ref('stock.picking_type_out').id,
+            'partner_id': partner_not_FD.id,
+            'location_dest_id': internal_fd.lot_stock_id.id,
+            'location_id': customers.id,
+            'move_ids': [Command.create({
+                'location_dest_id': internal_fd.lot_stock_id.id,
+                'location_id': customers.id,
+                'product_id': product.id,
+                'name': 'move',
+            })]
+        })
+        self.assertEqual(picking.move_ids[0].x_fiscal_deposit_move, 'entry')
+        picking = self.env['stock.picking'].create({
+            'picking_type_id': self.env.ref('stock.picking_type_out').id,
+            'partner_id': partner_FD.id,
+            'location_id': internal_fd.lot_stock_id.id,
+            'location_dest_id': customers.id,
+            'move_ids': [Command.create({
+                'location_id': internal_fd.lot_stock_id.id,
+                'location_dest_id': customers.id,
+                'product_id': product.id,
+                'name': 'move',
+            })]
+        })
+        self.assertEqual(picking.move_ids[0].x_fiscal_deposit_move, 'exit fd')
+        picking = self.env['stock.picking'].create({
+            'picking_type_id': self.env.ref('stock.picking_type_out').id,
+            'partner_id': partner_FD.id,
+            'location_dest_id': internal_fd.lot_stock_id.id,
+            'location_id': customers.id,
+            'move_ids': [Command.create({
+                'location_dest_id': internal_fd.lot_stock_id.id,
+                'location_id': customers.id,
+                'product_id': product.id,
+                'name': 'move',
+            })]
+        })
+        self.assertEqual(picking.move_ids[0].x_fiscal_deposit_move, 'entry fd')
+        picking = self.env['stock.picking'].create({
+            'picking_type_id': self.env.ref('stock.picking_type_out').id,
+            'partner_id': partner.id,
+            'location_id': internal_fd.lot_stock_id.id,
+            'location_dest_id': customers.id,
+            'move_ids': [Command.create({
+                'location_id': internal_fd.lot_stock_id.id,
+                'location_dest_id': customers.id,
+                'product_id': product.id,
+                'name': 'move',
+            })]
+        })
+        self.assertEqual(picking.move_ids[0].x_fiscal_deposit_move, 'exit fd')
+        picking = self.env['stock.picking'].create({
+            'picking_type_id': self.env.ref('stock.picking_type_out').id,
+            'partner_id': partner.id,
+            'location_dest_id': internal_fd.lot_stock_id.id,
+            'location_id': customers.id,
+            'move_ids': [Command.create({
+                'location_dest_id': internal_fd.lot_stock_id.id,
+                'location_id': customers.id,
+                'product_id': product.id,
+                'name': 'move',
+            })]
+        })
+        self.assertEqual(picking.move_ids[0].x_fiscal_deposit_move, 'entry fd')
