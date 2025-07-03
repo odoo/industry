@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="add_excise_server_action" model="ir.actions.server">
+        <field name="code"><![CDATA[if (taxes := record.taxes_id.filtered('x_is_excise')):
+    record['taxes_id'] = [Command.unlink(id) for id in taxes.ids]
+if (taxes := record.supplier_taxes_id.filtered('x_is_excise')):
+    record['supplier_taxes_id'] = [Command.unlink(id) for id in taxes.ids]
+if (categ := record.x_excise_category):
+    record.write({'taxes_id': [Command.link(categ.x_sales_tax_id.id)], 'supplier_taxes_id': [Command.link(categ.x_purchase_tax_id.id)]})
+]]></field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="state">code</field>
+        <field name="name">Add/Remove excise tax on Product</field>
+    </record>
+    <record id="create_excise_tax_server_action" model="ir.actions.server">
+        <field name="code"><![CDATA[
+common_values = {'name': 'Ex. ' + record.x_name, 'description': record.x_description, 'amount_type': 'code',
+    'price_include_override': 'tax_included', 'include_base_amount': True, 'formula': 'quantity * product.x_excise_amount',
+    'tax_group_id': env.ref('excise_management.excises_tax_group').id}
+record['x_sales_tax_id'] = env['account.tax'].create(common_values | {'type_tax_use': 'sale'})
+record['x_purchase_tax_id'] = env['account.tax'].create(common_values | {'type_tax_use': 'purchase'})
+for fp in env['account.fiscal.position'].search([('x_is_fiscal_deposit', '=', True)]):
+    env['account.fiscal.position.tax'].create([{'position_id': fp.id, 'tax_src_id': record.x_sales_tax_id.id}, {'position_id': fp.id, 'tax_src_id': record.x_purchase_tax_id.id}])
+    ]]></field>
+        <field name="model_id" ref="excise_category"/>
+        <field name="state">code</field>
+        <field name="name">Create excise tax</field>
+    </record>
+    <record id="add_excise_taxes_fiscal_position_server_action" model="ir.actions.server">
+        <field name="code"><![CDATA[excise_taxes = env['account.tax'].search([('x_is_excise', '=', True)])
+for fp in records:
+    if not fp.x_is_fiscal_deposit and (taxes := fp.tax_ids.filtered('tax_src_id.x_is_excise')):
+        fp['tax_ids'] = [Command.unlink(id) for id in taxes.ids]
+    elif fp.x_is_fiscal_deposit and excise_taxes:
+        fp['tax_ids'] = [Command.create({'position_id': fp.id, 'tax_src_id': id}) for id in excise_taxes.ids]
+]]></field>
+        <field name="model_id" ref="account.model_account_fiscal_position"/>
+        <field name="state">code</field>
+        <field name="name">Add/Remove excise tax on Fiscal Position</field>
+    </record>
+</odoo>
