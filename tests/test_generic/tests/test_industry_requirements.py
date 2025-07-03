@@ -18,8 +18,12 @@ class TestEnv(IndustryCase):
         db_name = get_db_name()
         if not db_name.endswith('imported_with_demo'):
             return
-        if 'bike_leasing' in self.installed_modules:
-            # we don't pay the cart in this industry, we get a quote
+        no_online_payment_industries = [
+            'bike_leasing',
+            'real_estate',
+        ]
+        if any(m in self.installed_modules for m in no_online_payment_industries):
+            # we don't pay the cart in this industry, we get a quote or fill a form
             return
         if self.env['ir.module.module']._get('website_sale').state == 'installed':
             self.assertTrue(
