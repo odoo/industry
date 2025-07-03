@@ -1,6 +1,6 @@
 {
     'name': 'Law Firm',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Services',
     'depends': [
         'contacts',
@@ -17,6 +17,7 @@
     ],
     'data': [
         'data/res_config_settings.xml',
+        'data/ir_default.xml',
         'data/project_task_type.xml',
         'data/project_tags.xml',
         'data/project_project_stage.xml',
