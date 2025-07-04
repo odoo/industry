@@ -1,13 +1,13 @@
 {
     'name': 'Agricultural Store',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Retail',
     'depends': [
         'knowledge',
         'pos_sale',
         'product_expiry',
         'purchase_requisition',
-        'sale_purchase',
+        'sale_purchase_stock',
         'survey_crm',
         'web_studio',
         'website_sale_loyalty',
