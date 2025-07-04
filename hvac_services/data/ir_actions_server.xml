@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="update_so_line_quantity" model="ir.actions.server">
+        <field name="name">Update SO line Quantity</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if record.order_id.state != "cancel" and record.order_id.state != "sale": 
+    record['product_uom_qty'] = len(record.x_maintained_serials)
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+    </record>
+    <record id="update_fs_task_serials_on_delivery" model="ir.actions.server">
+        <field name="name">Update FS Task Serials on Delivery</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for task in record.env['project.task'].search([('sale_order_id.id', '=', record.sale_id.id)]):
+    if task.is_fsm: 
+        for move in record.move_ids_without_package:
+            if move.product_id.is_storable and move.product_id.tracking == "serial" and move.lot_ids not in task.x_serials:
+                task['x_serials'] += move.lot_ids
+]]></field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+    </record>
+    <record id="add_sale_order_line_serials_to_sale_order" model="ir.actions.server">
+        <field name="name">Set x_maintained_serials of the sale order equal to the serials of its order lines</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for line in record.order_line:
+    if line.x_maintained_serials not in record.x_maintained_serials:
+        record['x_maintained_serials'] += line.x_maintained_serials
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+    </record>
+</odoo>
