@@ -8,7 +8,7 @@
         'pos_sale',
         'product_expiry',
         'purchase_requisition',
-        'sale_purchase',
+        'sale_purchase_stock',
         'survey',
         'web_studio',
         'website_sale_loyalty',
