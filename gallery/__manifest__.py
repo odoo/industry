@@ -4,8 +4,8 @@
   'category': 'Retail',
   'depends': [
         'knowledge',
-        'l10n_be_pos_sale',
         'partner_commission',
+        'pos_sale',
         'sale_purchase_project',
         'sign',
         'website_event_sale'
@@ -14,6 +14,7 @@
         'data/crm_stage.xml',
         'data/pos_category.xml',
         'data/pos_payment_method.xml',
+        'data/pos_config.xml',
         'data/product_public_category.xml',
         'data/product_category.xml',
         'data/product_template.xml',
@@ -33,15 +34,14 @@
         'data/sign_template.xml',
         'data/sign_item.xml',
         'data/res_partner_grade.xml',
-        'data/crm_tag.xml'
+        'data/crm_tag.xml',
+        'data/commission_plan.xml',
   ],
   'demo': [
         'demo/payment_provider_demo_post.xml',
-        'demo/pos_config.xml',
         'demo/website.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
-        'demo/commission_plan.xml',
         'demo/res_partner.xml',
         'demo/res_partner_category.xml',
         'demo/crm_lead.xml',
@@ -53,9 +53,6 @@
         'demo/purchase_order_line.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
-        'demo/stock_quant.xml',
-        'demo/website_page.xml',
-        'demo/website_menu.xml',
         'demo/ir_attachment_post.xml',
         'demo/sale_order_confirm.xml'
   ],
