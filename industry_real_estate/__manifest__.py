@@ -1,5 +1,5 @@
 {
-    'name': 'Real Estate',
+    'name': 'Estate Management',
     'version': '1.0',
     'category': 'Services',
     'depends': [
