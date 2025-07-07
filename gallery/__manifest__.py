@@ -53,6 +53,8 @@
         'demo/purchase_order_line.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
+        'demo/website_page.xml',
+        'demo/website_menu.xml',
         'demo/ir_attachment_post.xml',
         'demo/sale_order_confirm.xml'
   ],
