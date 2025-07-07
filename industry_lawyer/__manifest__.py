@@ -34,6 +34,7 @@
         'data/mail_message.xml',
         'data/knowledge_tour.xml',
         'data/hr_employee_category.xml',
+        'data/sign_item_role.xml',
         'data/ir_attachment.xml',
         'data/website_view.xml',
         'data/website_page.xml',
