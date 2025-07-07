@@ -25,7 +25,6 @@
         'data/event_event.xml',
         'data/product_category.xml',
         'data/pos_category.xml',
-        'data/product_template.xml',
         'data/product_product.xml',
         'data/event_event_ticket.xml',
         'data/knowledge_cover.xml',
@@ -40,6 +39,9 @@
         'data/sign_item.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
+        'data/website_view.xml',
+        'data/website_page.xml',
+        'data/website_theme_apply.xml',
     ],
     'demo': [
         'demo/hr_job.xml',
@@ -67,7 +69,9 @@
     ],
     'license': 'OPL-1',
     'cloc_exclude': [
+        'data/website_view.xml',
         'data/knowledge_article.xml',
+        'demo/website_view.xml',
     ],
     'images': [
         'images/main.png',
