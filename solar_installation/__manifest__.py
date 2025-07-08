@@ -74,7 +74,6 @@
         'demo/im_livechat_channel.xml',
         'demo/im_livechat_channel_rule.xml',
         'demo/website_ir_attachment.xml',
-        'demo/website.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
         'demo/helpdesk_ticket.xml',
@@ -83,6 +82,7 @@
         'demo/stock_picking_return.xml',
         'demo/ir_attachment_post.xml',
         'demo/x_project_task_worksheet.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'assets': {

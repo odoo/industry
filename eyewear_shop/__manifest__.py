@@ -64,12 +64,12 @@
         'demo/website_ir_attachment.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
-        'demo/website.xml',
         'demo/pos_session.xml',
         'demo/pos_order.xml',
         'demo/pos_order_line.xml',
         'demo/pos_confirm.xml',
         'demo/payment_provider_demo_post.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'assets': {

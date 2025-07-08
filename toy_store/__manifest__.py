@@ -47,12 +47,12 @@
         'demo/loyalty_card.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
-        'demo/website.xml',
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
         'demo/purchase_order_confirm.xml',
         'demo/stock_warehouse_orderpoint.xml',
         'demo/payment_provider_demo_post.xml',
+        'demo/website.xml',
     ],
     'assets': {
         'web.assets_backend': [

@@ -37,8 +37,8 @@
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
         'demo/website_attachment.xml',
-        'demo/website.xml',
         'demo/payment_provider_demo_post.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'assets': {

@@ -49,7 +49,6 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
-        'demo/website.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/product_template.xml',
@@ -71,6 +70,7 @@
         'demo/mail_activity.xml',
         'demo/delivery_carrier.xml',
         'demo/payment_provider_demo_post.xml',
+        'demo/website.xml',
     ],
     'assets': {
         'web.assets_backend': [

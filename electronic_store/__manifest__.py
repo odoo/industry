@@ -76,9 +76,9 @@
         'demo/pos_order_line.xml',
         'demo/pos_confirm.xml',
         'demo/website_theme_apply.xml',
-        'demo/website.xml',
         'demo/x_worksheet_template.xml',
-        'demo/payment_provider_demo_post.xml'
+        'demo/payment_provider_demo_post.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'assets': {
