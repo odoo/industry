@@ -46,7 +46,6 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
-        'demo/website.xml',
         'demo/res_partner.xml',
         'demo/hr_employee.xml',
         'demo/product_supplierinfo.xml',
@@ -58,6 +57,7 @@
         'demo/website_theme_apply.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
+        'demo/website.xml',
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
         'demo/purchase_order_confirm.xml',

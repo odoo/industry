@@ -27,9 +27,9 @@
     ],
     'demo': [
         'demo/res_partner.xml',
-        'demo/website.xml',
         'demo/appointment_type.xml',
         'demo/website_theme_apply.xml',
+        'demo/website.xml',
         'demo/website_views.xml',
         'demo/crm_lead.xml',
         'demo/mail_message.xml',

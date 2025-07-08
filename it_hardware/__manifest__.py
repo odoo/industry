@@ -46,7 +46,6 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
-        'demo/website.xml',
         'demo/res_partner.xml',
         'demo/product_supplierinfo.xml',
         'demo/product_template.xml',
@@ -61,6 +60,7 @@
         'demo/website_attachment.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
+        'demo/website.xml',
         'demo/payment_provider_demo_post.xml',
     ],
     'license': 'OPL-1',
