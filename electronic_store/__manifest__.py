@@ -56,7 +56,6 @@
         'demo/helpdesk_ticket.xml',
         'demo/repair_order.xml',
         'demo/website_ir_attachment.xml',
-        'demo/website.xml',
         'demo/crm_lead.xml',
         'demo/product_supplierinfo.xml',
         'demo/product_product.xml',
@@ -77,6 +76,7 @@
         'demo/pos_order_line.xml',
         'demo/pos_confirm.xml',
         'demo/website_theme_apply.xml',
+        'demo/website.xml',
         'demo/x_worksheet_template.xml',
         'demo/payment_provider_demo_post.xml'
     ],

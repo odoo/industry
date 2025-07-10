@@ -48,7 +48,6 @@
         'demo/x_buildings.xml',
         'demo/account_analytic_account.xml',
         'demo/ir_attachment.xml',
-        'demo/website.xml',
         'demo/res_partner.xml',
         'demo/crm_tag.xml',
         'demo/crm_lead.xml',
@@ -63,6 +62,7 @@
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'assets': {

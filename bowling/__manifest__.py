@@ -23,9 +23,9 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
-        'demo/website.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
+        'demo/website.xml',
         'demo/res_partner.xml',
         'demo/appointment_type.xml',
         'demo/calendar_event.xml',

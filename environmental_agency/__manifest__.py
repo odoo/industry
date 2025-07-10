@@ -36,9 +36,9 @@
     'demo': [
         'demo/ir_attachment_post.xml',
         'demo/res_company.xml',
-        'demo/website.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
+        'demo/website.xml',
         'demo/hr_department.xml',
         'demo/hr_employee.xml',
         'demo/res_partner.xml',

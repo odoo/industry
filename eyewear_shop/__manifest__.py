@@ -43,7 +43,6 @@
     ],
     'demo': [
         'demo/res_config_settings.xml',
-        'demo/website.xml',
         'demo/stock_lot.xml',
         'demo/res_partner.xml',
         'demo/loyalty_program.xml',
@@ -65,6 +64,7 @@
         'demo/website_ir_attachment.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
+        'demo/website.xml',
         'demo/pos_session.xml',
         'demo/pos_order.xml',
         'demo/pos_order_line.xml',
