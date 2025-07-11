@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+    <template id="cart" name="Shopping Cart"></template>
+
+    <template id="portal_my_home_products" name="Your products" customize_show="True" inherit_id="portal.portal_my_home" priority="50">
+        <div id="portal_common_category" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/marketplace/static/src/img/bag.svg'"/>
+                <t t-set="title">Your Products</t>
+                <t t-set="text">Manage you products and stock</t>
+                <t t-set="url" t-value="'/website/action/products'"/>
+                <t t-set="config_card" t-value="True"/>
+            </t>
+        </div>
+    </template>
+
+    <template id="portal_products" name="Your Products">
+        <t t-call="portal.portal_layout">
+            <t t-set="logged_partner" t-value="request.env.user.id"/>
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Products</t>
+            </t>
+            <a href="/website/action/new_product" class="btn btn-primary btn-lg">New product</a>
+            <a href="/website/action/change_request" class="btn btn-primary btn-lg">Request change</a>
+            <div t-if="not request.env['product.template'].search([('x_vendor', '=', logged_partner)])" class="alert alert-info">
+                There are currently no products for your account.
+            </div>
+            <t t-else="">
+                <t t-call="portal.portal_table">
+                    <thead>
+                        <tr>
+                            <th>Products</th>
+                            <th class="text-end" t-if="groupby != 'create_date'">Reported on</th>
+                            <th id="product_user_header" t-if="groupby != 'user_id'" class="ps-5">Assigned to</th>
+                        </tr>
+                    </thead>
+                    <t t-foreach="request.env['product.template'].search([('x_vendor', '=', logged_partner)])" t-as="product">
+                        <div>
+                            <a t-att-href="'/shop/' + str(product.id)">
+                                <p>Name: <t t-esc="product.display_name"/></p>
+                                <img t-att-src="image_data_uri(product.image_1920)"/>
+                            </a>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
