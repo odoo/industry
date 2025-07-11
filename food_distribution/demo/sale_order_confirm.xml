@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate ="1">
+    <function name="action_confirm" model="sale.order">
+        <value eval="[
+            ref('sale_order_2'),
+            ref('sale_order_3'),
+            ref('sale_order_1'),
+        ]"/>
+    </function>
+
+    <function model="stock.move" name="write">
+        <value model="stock.move" eval="obj().search([('sale_line_id', '=', obj().env.ref('food_distribution.sale_order_line_4').id)]).ids"/>
+        <value eval="{'quantity': 60}"/>
+    </function>
+    <function model="stock.move.line" name="write">
+        <value model="stock.move.line" eval="obj().search([('picking_id', '=', obj().env.ref('food_distribution.sale_order_3').picking_ids.id)]).id"/>
+        <value eval="{'lot_id': ref('stock_lot_8')}"/>
+    </function>
+
+    <function name="button_validate" model="stock.picking">
+        <value model="stock.picking" eval="(
+            obj().env.ref('food_distribution.sale_order_3')
+        ).picking_ids.ids"/>
+    </function>
+</odoo>
