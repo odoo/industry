@@ -2,6 +2,8 @@
 <odoo>
     <record id="action_create_product_template" model="ir.actions.server">
         <field name="code"><![CDATA[
+if not request.env.user.partner_id:
+    request.env.user['partner_id'] = env['res.partner'].create({'name': request.env.user.name})
 new_product = env['product.template'].create({
     "name": request.params.get('name'),
     "description_ecommerce": request.params.get('ecommerce_description'),
@@ -10,13 +12,16 @@ new_product = env['product.template'].create({
     "list_price": request.params.get('list_price'),
     "image_1920": request.params.get('image_1920'),
     "x_vendor": request.env.user.id,
+    "is_published": True,
+    "route_ids": [(6, 0, [env.ref("stock_dropshipping.route_drop_shipping").id])],
+    "seller_ids": [(0, 0, {'partner_id':request.env.user.partner_id.id})],
 })
 new_project_task = env['project.task'].create({
     "name": "Review activity "+request.params.get('name'),
     "project_id": request.env.ref('marketplace.project_product_management').id,
     "user_ids": [request.env.ref('marketplace.project_product_management').user_id.id],
 })
-response = request.make_json_response(new_project_task.id, status=200)]]></field>
+response = json.dumps({'id': new_project_task.id})]]></field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="state">code</field>
         <field name="website_published">True</field>
