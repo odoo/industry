@@ -585,6 +585,14 @@ for record in self:
     <field name="name">x_studio_current_owner</field>
     <field name="relation">res.partner</field>
   </record>
+  <record id="field_ratios_property" model="ir.model.fields">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Property</field>
+    <field name="model_id" ref="ratios_model"/>
+    <field name="name">x_studio_property</field>
+    <field name="relation">x_property</field>
+  </record>
   <record id="field_property_name" model="ir.model.fields">
     <field name="ttype">char</field>
     <field name="copied" eval="True"/>
@@ -871,6 +879,13 @@ for record in self:
     <field name="relation">account.analytic.account</field>
     <field name="selectable" eval="False"/>
     <field name="store" eval="False"/>
+  </record>
+  <record id="x_property_on_meter" model="ir.model.fields">
+    <field name="name">x_studio_property</field>
+    <field name="ttype">many2one</field>
+    <field name="model_id" ref="model_meter_reading"/>
+    <field name="field_description">Property</field>
+    <field name="relation">x_property</field>
   </record>
   <record id="field_property_meter_reading_ids" model="ir.model.fields">
     <field name="ttype">one2many</field>
@@ -1541,6 +1556,14 @@ for record in self: record['x_x_studio_condominium_x_property_count'] = self.env
     <field name="name">x_distribution_key_id</field>
     <field name="relation">x_distribution_key</field>
   </record>
+  <record id="distribution_key_account_move_field" model="ir.model.fields">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Distribution Key</field>
+    <field name="model_id" ref="account.model_account_move"/>
+    <field name="name">x_studio_distribution_key</field>
+    <field name="relation">x_distribution_key</field>
+  </record>
   <record id="distribution_key_sale_order_field" model="ir.model.fields">
     <field name="ttype">many2one</field>
     <field name="copied" eval="True"/>
@@ -1760,8 +1783,14 @@ for record in self: record['x_x_studio_condominium_x_property_count'] = self.env
     <field name="name">x_calendar_event_line_a1bce_id</field>
     <field name="relation">x_calendar_event_line_a1bce</field>
   </record>
-
-
+  <record id="new_lines_calendar_e_5f600d8e-925a-43ee-99ad-5a1e5174d333" model="ir.model.fields">
+    <field name="ttype">one2many</field>
+    <field name="field_description">New Lines</field>
+    <field name="model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
+    <field name="name">x_studio_one2many_field_1ed_1is91cj3m</field>
+    <field name="relation">x_calendar_event_line_a1bce_line_89b1c</field>
+    <field name="relation_field">x_calendar_event_line_a1bce_id</field>
+  </record>
 
   <record id="field_line_wizard_id" model="ir.model.fields">
       <field name="name">x_analytic_account_wizard_id</field>
@@ -1770,16 +1799,18 @@ for record in self: record['x_x_studio_condominium_x_property_count'] = self.env
       <field name="model_id" ref="model_x_analytic_account_wizard_line"/>
       <field name="relation">x_analytic_account_wizard</field>
   </record>
-  <!-- Add One2many field to Wizard -->
-  <record id="field_line_ids" model="ir.model.fields">
-    <field name="name">x_line_ids</field>
-    <field name="ttype">one2many</field>
-    <field name="relation">x_analytic_account_wizard_line</field>
-    <field name="relation_field">x_analytic_account_wizard_id</field>
-    <field name="field_description">Split Lines</field>
-    <field name="model_id" ref="model_analytic_account_wizard"/>
-  </record>
 
+  <!-- <record id="ir_model_fields_3089" model="ir.model.fields">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Departments</field>
+    <field name="index" eval="True"/>
+    <field name="model">account.analytic.line</field>
+    <field name="model_id" ref="analytic.model_account_analytic_line"/>
+    <field name="name">x_plan2_id</field>
+    <field name="on_delete">restrict</field>
+    <field name="relation">account.analytic.account</field>
+  </record> -->
 
   <!-- Many2one to analytic line -->
   <record id="field_x_analytic_line_id" model="ir.model.fields">
@@ -1794,10 +1825,9 @@ for record in self: record['x_x_studio_condominium_x_property_count'] = self.env
       <field name="ttype">many2one</field>
       <field name="relation">account.analytic.account</field>
       <field name="field_description">Account name</field>
-      <field name="related">x_analytic_line_id.x_plan11_id</field>
+      <field name="related">x_analytic_line_id.x_plan2_id</field>
       <field name="model_id" ref="model_x_analytic_account_wizard_line"/>
   </record>
-
   <record id="field_x_currency_id" model="ir.model.fields">
     <field name="name">x_currency_id</field>
     <field name="ttype">many2one</field>
@@ -1815,6 +1845,15 @@ for record in self: record['x_x_studio_condominium_x_property_count'] = self.env
       <field name="currency_field">x_currency_id</field>
       <field name="store">True</field>
   </record>
+  <!-- Add One2many field to Wizard -->
+  <record id="field_line_ids" model="ir.model.fields">
+    <field name="name">x_line_ids</field>
+    <field name="ttype">one2many</field>
+    <field name="relation">x_analytic_account_wizard_line</field>
+    <field name="relation_field">x_analytic_account_wizard_id</field>
+    <field name="field_description">Split Lines</field>
+    <field name="model_id" ref="model_analytic_account_wizard"/>
+  </record>
   <!-- Share -->
   <record id="field_x_share" model="ir.model.fields">
       <field name="name">x_share</field>
@@ -1830,6 +1869,12 @@ for line in self:
       <field name="store" eval="True"/>
       <field name="readonly" eval="True"/>
   </record>
+  <record id="x_total_field" model="ir.model.fields">
+    <field name="name">x_total</field>
+    <field name="ttype">float</field>
+    <field name="field_description">Total</field>
+    <field name="model_id" ref="model_analytic_account_wizard" />
+  </record>
   <record id="x_notes_splited_analytic_items" model="ir.model.fields">
     <field name="name">x_notes</field>
     <field name="ttype">html</field>
@@ -1837,10 +1882,5 @@ for line in self:
     <field name="field_description">Notes</field>
     <field name="model_id" ref="analytic.model_account_analytic_line"/>
   </record>
-  <record id="x_total_field" model="ir.model.fields">
-    <field name="name">x_total</field>
-    <field name="ttype">float</field>
-    <field name="field_description">Total</field>
-    <field name="model_id" ref="model_analytic_account_wizard" />
-  </record>
+
 </odoo>
