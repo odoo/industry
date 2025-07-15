@@ -16,7 +16,6 @@
     'data': [
         'data/res_config_settings.xml',
         'data/mail_activity_type.xml',
-        'data/mail_alias_domain.xml',
         'data/crm_stage.xml',
         'data/knowledge_article.xml',
         'data/knowledge_tour.xml',
