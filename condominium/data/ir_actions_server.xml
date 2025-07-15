@@ -30,7 +30,7 @@ if round(total_share) != 100:
 for line in records.x_line_ids:
     analytic_id = line.x_analytic_account_name_id
     analytic_name = analytic_id.name
-
+    original_id = line.x_analytic_line_id.id
 
     new_analytic_item_id = new_analytic_item.create({
         "x_plan11_id": analytic_id.id,
@@ -38,21 +38,21 @@ for line in records.x_line_ids:
         "amount": line.x_amount
     })
     # new_analytic_item += new_analytic_item_id
-    # occupied_cells.append((line.x_analytic_line_id.id, new_analytic_item_id))
+    # occupied_cells.append((original_id, new_analytic_item_id))
 
-    if line.x_analytic_line_id.id in occupied_cells:
-        occupied_cells[line.x_analytic_line_id.id].update(new_analytic_item_id)
+    if original_id in occupied_cells:
+        occupied_cells[original_id].update(new_analytic_item_id)
     else:
-        occupied_cells.update({line.x_analytic_line_id.id: set(new_analytic_item_id)})
+        occupied_cells.update({original_id: set(new_analytic_item_id)})
 
-    if line.x_analytic_line_id.id in note_details:
+    if original_id in note_details:
         analytic_url = f"/odoo/analytic-items/{new_analytic_item_id.id}"
         note_line = f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{analytic_name}</a>"
-        note_details[line.x_analytic_line_id.id].add(note_line)
+        note_details[original_id].add(note_line)
     else:
         analytic_url = f"/odoo/analytic-items/{new_analytic_item_id.id}"
         note_line = {f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{analytic_name}</a>"}
-        note_details.update({line.x_analytic_line_id.id: set(note_line)})
+        note_details.update({original_id: set(note_line)})
 
 for cell, new_analytic_lines in occupied_cells.items():
     for new_analytic_line in list(new_analytic_lines):
@@ -77,20 +77,6 @@ for Aid, values in note_details.items():
         """
     new_analytic_item.browse(Aid).write({"x_notes": note_html.strip()})
 
-
-# for Aid, values in occupied_cells.items():
-#     raise UserError(values)
-#     for value in values:
-#         raise UserError(value)
-
-# note_html = f"""
-# <i>{datetime.date}</i><br/>
-# <p><b>Analytic item coming from a split</b><br/>
-# {'<br/>'.join(note_lines)}<br/>
-# See <a href='/odoo/analytic-items/{original_id.id}' target='_blank'> original analytic item:</a>
-# </p>
-# """
-
 # new_analytic_item.write({"x_notes": note_html.strip()})]]>
         </field>
     </record>
@@ -101,31 +87,30 @@ for Aid, values in note_details.items():
         <field name="binding_model_id" ref="analytic.model_account_analytic_line"/>
         <field name="binding_view_types">list,kanban</field>
         <field name="state">code</field>
-        <field name="code"><![CDATA[product_commands = []
+        <field name="code"><![CDATA[analytic_account_lines = []
 amount_total = 0
+
 for record in records:
     amount_total += record.amount
-    product_commands.append((0, 0, {
-        "x_analytic_account_name_id": record.x_plan11_id.id,
-        "x_analytic_line_id": record.id,
-        "x_amount": record.amount / 2
+    split_amount = record.amount / 2
 
-    }))
-    product_commands.append((0, 0, {
-        "x_analytic_account_name_id": record.x_plan11_id.id,
-        "x_analytic_line_id": record.id,
-        "x_amount": record.amount / 2
+    for _ in range(2):
+        analytic_account_lines.append((0, 0, {
+            "x_analytic_account_name_id": record.x_plan11_id.id,
+            "x_analytic_line_id": record.id,
+            "x_amount": split_amount
+        }))
 
-    }))
+if amount_total == 0:
+    raise UserError("Total amount is zero. Cannot split analytic items.")
+
 wizard = env['x_analytic_account_wizard'].create({
-    "x_line_ids": product_commands,
+    "x_line_ids": analytic_account_lines,
     "x_total": amount_total
 })
 
 action = env['ir.actions.act_window']._for_xml_id('condominium.split_act_window')
-action['res_id'] = wizard.id
-
-]]>
+action['res_id'] = wizard.id]]>
         </field>
     </record>
 
