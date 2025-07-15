@@ -1,5 +1,5 @@
 {
-    'name': 'Account firm',
+    'name': 'Accounting firm',
     'version': '1.0',
     'category': 'Services',
     'author': 'Odoo S.A.',
