@@ -1820,14 +1820,14 @@ for record in self: record['x_x_studio_condominium_x_property_count'] = self.env
       <field name="model_id" ref="model_x_analytic_account_wizard_line"/>
       <field name="relation">account.analytic.line</field>
   </record>
-  <record id="field_x_analytic_account_name_id" model="ir.model.fields">
+  <!-- <record id="field_x_analytic_account_name_id" model="ir.model.fields">
       <field name="name">x_analytic_account_name_id</field>
       <field name="ttype">many2one</field>
       <field name="relation">account.analytic.account</field>
       <field name="field_description">Account name</field>
       <field name="related">x_analytic_line_id.x_plan2_id</field>
       <field name="model_id" ref="model_x_analytic_account_wizard_line"/>
-  </record>
+  </record> -->
   <record id="field_x_currency_id" model="ir.model.fields">
     <field name="name">x_currency_id</field>
     <field name="ttype">many2one</field>
@@ -1881,6 +1881,22 @@ for line in self:
     <field name="copied" eval="True"/>
     <field name="field_description">Notes</field>
     <field name="model_id" ref="analytic.model_account_analytic_line"/>
+  </record>
+  <record id="field_x_analytic_account_name_id" model="ir.model.fields">
+      <field name="name">x_analytic_account_name_id</field>
+      <field name="compute"><![CDATA[
+for rec in self:
+    project_plan, other_plans = rec.x_analytic_line_id.env['account.analytic.plan']._get_all_plans()
+    for plan in other_plans:
+        if plan.name == 'Properties':
+            fname = plan._column_name()
+    rec['x_analytic_account_name_id'] = rec.x_analytic_line_id[fname]
+      ]]></field>
+      <field name="ttype">many2one</field>
+      <field name="relation">account.analytic.account</field>
+      <field name="depends">x_amount</field>
+      <field name="field_description">Account name test</field>
+      <field name="model_id" ref="model_x_analytic_account_wizard_line"/>
   </record>
 
 </odoo>
