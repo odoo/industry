@@ -1,0 +1,150 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="odoo_studio_planning_91313395-1d4d-4602-8b6e-328b5abfacb5" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='sale_line_id']" position="replace">
+          <field name="sale_order_id" display="full" widget="many2one" class="d-block"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.planning_view_kanban"/>
+    <field name="mode">extension</field>
+    <field name="model">planning.slot</field>
+    <field name="name">Odoo Studio: planning.slot.kanban customization</field>
+    <field name="priority">200</field>
+    <field name="type">kanban</field>
+  </record>
+  <record id="odoo_studio_planning_3c53e31c-3363-4923-a5af-d83d58f0c052" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//gantt[1]" position="attributes">
+          <attribute name="default_group_by">resource_id</attribute>
+          <attribute name="default_range">month</attribute>
+          <attribute name="precision">{"day":"hour:full","week":"day:half","month":"day:half","year":"day:full"}</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.planning_view_gantt"/>
+    <field name="mode">extension</field>
+    <field name="model">planning.slot</field>
+    <field name="name">Odoo Studio: planning.slot.gantt customization</field>
+    <field name="priority">1000</field>
+    <field name="type">gantt</field>
+  </record>
+  <record id="odoo_studio_planning_dc3d8e36-fdf3-4dc4-8136-28bf4da51942" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='sync_shift_rental']" position="after">
+          <field name="x_is_a_room_offer" invisible="not sync_shift_rental"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.planning_role_view_form"/>
+    <field name="mode">extension</field>
+    <field name="model">planning.role</field>
+    <field name="name">Odoo Studio: planning.role.form customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_res_part_b0c24ff8-a7fd-41f4-8509-e357c01e3be8" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//form[1]/sheet[1]/group[1]" position="after">
+          <group name="studio_group_46h_1ivl20neu">
+            <group name="studio_group_46h_left" string="Identity">
+              <field name="x_nationality"/>
+              <field name="x_document_type"/>
+              <field name="x_document_number"/>
+              <field name="x_identity_check" force_save="1" readonly="True" invisible="True"/>
+            </group>
+            <group name="studio_group_46h_right"/>
+          </group>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="mode">extension</field>
+    <field name="model">res.partner</field>
+    <field name="name">Odoo Studio: res.partner.form customization</field>
+    <field name="priority">200</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_rental_o_b521ca7b-6765-47ab-b9f4-d92f16426d1d" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='is_rental_order']" position="after">
+          <button string="City Tax" name="%(industry_add_update)d" type="action"/>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+          <page string="Guests" name="studio_page_6u3_1ivl25dvn">
+            <field name="x_many2many_field_6dg_1ivl265ih">
+              <list string="Contacts" sample="1" multi_edit="1">
+                <field name="avatar_128" widget="image" options="{'size': [24, 24], 'img_class': 'o_avatar rounded'}" width="30" nolabel="1"/>
+                <field name="complete_name" string="Name"/>
+                <field name="vat" optional="hide" readonly="1" string="VAT"/>
+                <field name="invoice_sending_method" optional="hide"/>
+                <field name="invoice_edi_format" string="EDI Format" optional="hide"/>
+                <field name="email" optional="show"/>
+                <field name="phone" class="o_force_ltr" optional="show"/>
+                <field name="x_nationality" optional="show"/>
+                <field name="user_id" optional="hide" widget="many2one_avatar_user" domain="[('share', '=', False)]"/>
+                <field name="street" optional="hide"/>
+                <field name="city" optional="hide"/>
+                <field name="state_id" optional="hide" readonly="1"/>
+                <field name="x_identity_check" optional="show" widget="badge" decoration-success="x_identity_check == 'OK'" decoration-warning="x_identity_check == 'NA'" decoration-danger="x_identity_check == 'Invalid'"/>
+                <field name="application_statistics" widget="contact_statistics" nolabel="1" optional="show" width="270"/>
+                <field name="category_id" optional="hide" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="company_id" groups="base.group_multi_company" readonly="1" optional="hide"/>
+                <field name="followup_responsible_id" widget="many2one_avatar_user" optional="hide"/>
+                <field name="followup_reminder_type" optional="hide"/>
+                <field name="followup_status" widget="badge" optional="hide" decoration-danger="followup_status == 'in_need_of_action'" decoration-warning="followup_status == 'with_overdue_invoices'" decoration-info="followup_status == 'no_action_needed'"/>
+                <field name="followup_next_action_date" optional="hide" widget="remaining_days"/>
+                <field name="followup_line_id" optional="hide"/>
+                <field name="total_due" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total" optional="hide"/>
+                <field name="total_overdue" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total" optional="hide"/>
+              </list>
+            </field>
+          </page>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="sale_renting.rental_order_primary_form_view"/>
+    <field name="mode">extension</field>
+    <field name="model">sale.order</field>
+    <field name="name">Odoo Studio: rental.order.form customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_product__163baf17-c735-4d16-9bff-3c7a428693a4" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//kanban[1]" position="attributes">
+          <attribute name="default_group_by">categ_id</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="product.product_template_kanban_view"/>
+    <field name="mode">extension</field>
+    <field name="model">product.template</field>
+    <field name="name">Odoo Studio: Product.template.product.kanban customization</field>
+    <field name="priority">160</field>
+    <field name="type">kanban</field>
+  </record>
+  <record id="odoo_studio_product__7207f70b-b6ff-4fa3-87df-4532ff40e2a8" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='default_code']" position="after">
+          <field name="x_is_a_room_offer" string="Is Room Offer"/>
+          <field name="x_is_stay_tax" string="Is City Tax"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="product.product_template_only_form_view"/>
+    <field name="mode">extension</field>
+    <field name="model">product.template</field>
+    <field name="name">Odoo Studio: product.template.product.form customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+</odoo>
