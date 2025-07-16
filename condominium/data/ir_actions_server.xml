@@ -9,7 +9,6 @@
 records.action_confirm()
 ]]>        </field>
     </record>
-
     <record id="confirm_analytic_account_item_split_action" model="ir.actions.server">
         <field name="name">Confirm</field>
         <field name="state">code</field>
@@ -28,12 +27,17 @@ if round(total_share) != 100:
     raise UserError(total_share)
 
 for line in records.x_line_ids:
+    project_plan, other_plans  = line.x_analytic_line_id.env['account.analytic.plan']._get_all_plans()
+    for plan in other_plans:
+        if plan.name == 'Properties':
+            fname = plan._column_name()
+
     analytic_id = line.x_analytic_account_name_id
     analytic_name = analytic_id.name
     original_id = line.x_analytic_line_id.id
 
     new_analytic_item_id = new_analytic_item.create({
-        "x_plan2_id": analytic_id.id,
+        fname: analytic_id.id or '',
         "name": analytic_id.name,
         "amount": line.x_amount
     })
@@ -68,7 +72,6 @@ for cell, new_analytic_lines in occupied_cells.items():
                 new_analytic_line.write({"x_notes": note_html.strip()})
 
 for Aid, values in note_details.items():
-    raise UserError(values)
     note_html = f"""
         <i>{datetime.date.today().strftime("%d %B %Y")}</i><br/>
         <p><b>Analytic item splited</b><br/>
@@ -96,7 +99,6 @@ for record in records:
 
     for _ in range(2):
         analytic_account_lines.append((0, 0, {
-            "x_analytic_account_name_id": record.x_plan2_id.id,
             "x_analytic_line_id": record.id,
             "x_amount": split_amount
         }))
@@ -183,7 +185,7 @@ for mr in mrs:
         <field name="code"><![CDATA[for line in record.x_property_id.x_studio_owner_ids:
     if line.x_studio_end_date == False: record['x_property_id']['x_studio_current_owner'] = line.x_studio_owner
     account = env['account.analytic.account'].search([('x_studio_property','=',record.x_property_id.id),('partner_id','=',line.x_studio_owner.id)])
-    if not account: line['x_studio_account'] = env['account.analytic.account'].create({ 'name': record.x_property_id.x_name + " - " + line.x_studio_owner.name, 'x_studio_property': record.x_property_id.id, 'partner_id': line.x_studio_owner.id, 'x_studio_owner_line': line.id}).id
+    if not account: line['x_studio_account'] = env['account.analytic.account'].create({ 'name': str(record.x_property_id.x_name) + " - " + str(line.x_studio_owner.name), 'x_studio_property': record.x_property_id.id, 'partner_id': line.x_studio_owner.id, 'x_studio_owner_line': line.id}).id
 ]]>        </field>
         <field name="model_id" ref="property_line_58f38056-6793-42e3-8f7a-f3db6e3da145"/>
         <field name="state">code</field>
