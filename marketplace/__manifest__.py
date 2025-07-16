@@ -8,12 +8,16 @@
         'hr',
         'knowledge',
         'project',
-        'purchase',
+        'sale_purchase',
         'stock',
+        'web_studio',
         'website',
         'website_sale',
     ],
     'data': [
+        'data/knowledge_article.xml',
+        'data/knowledge_article_favorite.xml',
+        'data/mail_message.xml',
         'data/ir_model_fields.xml',
         'data/res_config_settings.xml',
         'data/res_config_settings_views.xml',
@@ -30,4 +34,10 @@
     ],
     'license': 'OPL-1',
     'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "data/products_portal_templates.xml",
+        "data/website_view.xml",
+    ],
+    'images': ['images/main.png'],
 }
