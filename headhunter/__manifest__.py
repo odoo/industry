@@ -45,7 +45,6 @@
     'demo': [
         'demo/res_partner.xml',
         'demo/calendar_event.xml',
-        'demo/website.xml',
         'demo/crm_lead.xml',
         'demo/hr_job.xml',
         'demo/sale_order.xml',
@@ -56,6 +55,7 @@
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
+        'demo/website.xml',
         'demo/hr_candidate.xml',
         'demo/hr_applicant.xml',
     ],

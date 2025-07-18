@@ -41,7 +41,6 @@
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/calendar_event.xml',
-        'demo/website.xml',
         'demo/website_views.xml',
         'demo/hr_department.xml',
         'demo/hr_employee.xml',
@@ -51,6 +50,7 @@
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
+        'demo/website.xml',
     ],
     'assets': {
         'web.assets_backend': [
