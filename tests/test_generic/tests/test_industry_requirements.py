@@ -33,21 +33,21 @@ class TestEnv(IndustryCase):
             )
 
     def test_welcome_article_exists(self):
-        for module in self.installed_modules:
+        for module in self.installed_industries:
             ref = self.env.ref(f"{module}.welcome_article", raise_if_not_found=False)
             self.assertTrue(
                 ref, f"You forgot to define a record with id='welcome_article' in module '{module}'."
             )
 
     def test_welcome_article_body_exists(self):
-        for module in self.installed_modules:
+        for module in self.installed_industries:
             ref = self.env.ref(f"{module}.welcome_article_body", raise_if_not_found=False)
             self.assertTrue(
                 ref, f"You forgot to define a template with id='welcome_article_body' in module '{module}'."
             )
 
     def test_knowledge_article_notification(self):
-        for module in self.installed_modules:
+        for module in self.installed_industries:
             if not self.env.ref(module + '.knowledge_tour', raise_if_not_found=False):
                 _logger.warning("You forgot to define a `knowledge.tour` with `id=knowledge_tour`.")
 
