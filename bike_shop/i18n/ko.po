@@ -3,9 +3,9 @@
 # 	* bike_shop
 # 
 # Translators:
-# Sarah Park, 2025
-# Wil Odoo, 2025
 # Daye Jeong, 2025
+# Wil Odoo, 2025
+# Sarah Park, 2025
 # 
 msgid ""
 msgstr ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-14 12:55+0000\n"
 "PO-Revision-Date: 2025-07-19 15:03+0000\n"
-"Last-Translator: Daye Jeong, 2025\n"
+"Last-Translator: Sarah Park, 2025\n"
 "Language-Team: Korean (https://app.transifex.com/odoo/teams/41243/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -49,17 +49,17 @@ msgstr "04"
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "119€"
-msgstr ""
+msgstr "119€"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "169&amp;nbsp;€"
-msgstr ""
+msgstr "169&amp;nbsp;€"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "89€"
-msgstr ""
+msgstr "89€"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
@@ -122,6 +122,48 @@ msgid ""
 "            <t t-out=\"object.company_id.name\"/> \n"
 "            </div> "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\" data-oe-version=\"1.0\"> \n"
+"            <p style=\"box-sizing:border-box;margin: 0px; padding: 0px; font-size: 12px;\"> \n"
+"            안녕하세요 <span style=\"font-weight:bold;\" t-out=\"object.partner_id.name or ''\"/>님,<br/>\n"
+"            <br/> \n"
+"            저희 고객님의 워런티 신청서를 제출합니다.\n"
+"            </p><ul>\n"
+"                <t t-if=\"object.properties and object.properties.get('order_line_id')\">\n"
+"                    <t t-set=\"order_line\" t-value=\"env['sale.order.line'].browse(object.properties['order_line_id'])\"/>\n"
+"                    <li>\n"
+"                        고객명: <t t-out=\"order_line.order_id.partner_id.display_name or 'N/A'\"/>\n"
+"                    </li>\n"
+"                </t>\n"
+"                <t t-if=\"object.properties and object.properties.get('task_id')\">\n"
+"                    <t t-set=\"task\" t-value=\"env['project.task'].browse(object.properties['task_id'])\"/>\n"
+"                    <t t-if=\"task.task_properties and task.task_properties.get('serial_number_id')\">\n"
+"                        <t t-set=\"serial\" t-value=\"env['stock.lot'].browse(task.task_properties['serial_number_id'])\"/>\n"
+"\n"
+"                        <t t-set=\"move_lines\" t-value=\"env['stock.move.line'].search([('lot_id', '=', serial.id)])\"/>\n"
+"                        <t t-set=\"sale_date\" t-value=\"False\"/>\n"
+"                        <t t-foreach=\"move_lines\" t-as=\"ml\">\n"
+"                            <t t-if=\"ml.move_id.sale_line_id\">\n"
+"                                <t t-set=\"sale_date\" t-value=\"ml.move_id.sale_line_id.order_id.date_order\"/>\n"
+"                                <t t-break=\"True\"/>\n"
+"                            </t>\n"
+"                        </t>\n"
+"                        <li>\n"
+"                            일련번호: <t t-out=\"serial.name or 'N/A'\"/>\n"
+"                        </li>\n"
+"                        <li t-if=\"sale_date\">\n"
+"                            구매일: <t t-out=\"format_date(sale_date) if sale_date else 'N/A'\"/>\n"
+"                        </li>\n"
+"                    </t>\n"
+"                </t>\n"
+"            </ul>\n"
+"            관련 문제: <t t-out=\"object.description\"/>\n"
+"            <br/>\n"
+"            첨부의 결함 관련 사진을 확인 부탁드립니다.<br/>\n"
+"            <br/>\n"
+"            감사합니다. <br/>\n"
+"            <t t-out=\"object.user_id.display_name\"/> <br/>\n"
+"            <t t-out=\"object.company_id.name\"/> \n"
+"            </div> "
 
 #. module: bike_shop
 #: model:mail.template,body_html:bike_shop.mail_template_order_ready
@@ -143,6 +185,22 @@ msgid ""
 "    </t>\n"
 "    </p></div>"
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\" data-oe-version=\"1.0\"> \n"
+"    <p style=\"box-sizing:border-box;margin: 0px; padding: 0px; font-size: 12px;\"> \n"
+"    안녕하세요 <span style=\"font-weight:bold;\" t-out=\"object.partner_id.display_name or ''\"/>님,<br/>\n"
+"    <br/> \n"
+"    주문하신 <span style=\"font-weight:bold;\" t-out=\"object.name or ''\"/> 상품 준비가 완료되었습니다.\n"
+"    <br/>\n"
+"    편하신 시간에 저희 매장에서 수령해 주시기 바랍니다.\n"
+"    <br/>\n"
+"    항상 저희를 믿고 구매해 주셔서 감사합니다!<br/>\n"
+"    <br/> \n"
+"    궁금한 점이 있을 경우 언제든지 문의주시기 바랍니다. <br/>\n"
+"    <br/>\n"
+"    <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-mail-quote-container=\"1\">\n"
+"        <span style=\"font-weight:bold;\" t-out=\"object.user_id.signature\"/>\n"
+"    </t>\n"
+"    </p></div>"
 
 #. module: bike_shop
 #: model_terms:product.template,out_of_stock_message:bike_shop.product_template_13
@@ -180,6 +238,8 @@ msgid ""
 "<i class=\"fa fa-1x fa-fw fa-envelope me-2\"/>\n"
 "                                                info@yourcompany.example.com"
 msgstr ""
+"<i class=\"fa fa-1x fa-fw fa-envelope me-2\"/>\n"
+"                                                info@yourcompany.example.com"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -188,6 +248,9 @@ msgid ""
 "                                                <span class=\"o_force_ltr\">3575 Fake Buena Vista\n"
 "                                                    Avenue</span>"
 msgstr ""
+"<i class=\"fa fa-map-marker fa-fw me-2\"/>\n"
+"                                                <span class=\"o_force_ltr\">3575 Fake Buena Vista\n"
+"                                                    Avenue</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -202,6 +265,8 @@ msgid ""
 "<i class=\"o_editor_banner_icon mb-3 fst-normal\" data-oe-aria-"
 "label=\"Banner Info\">✅</i>"
 msgstr ""
+"<i class=\"o_editor_banner_icon mb-3 fst-normal\" data-oe-aria-"
+"label=\"Banner Info\">✅</i>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -297,6 +362,8 @@ msgid ""
 "<span class=\"s_website_form_label_content\">\n"
 "                                                                    Company</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">\n"
+"                                                                    회사</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -305,6 +372,9 @@ msgid ""
 "                                                                    Email</span>\n"
 "                                                                <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">\n"
+"                                                                    이메일</span>\n"
+"                                                                <span class=\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -313,6 +383,9 @@ msgid ""
 "                                                                    Name</span>\n"
 "                                                                <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">\n"
+"                                                                    이름</span>\n"
+"                                                                <span class=\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -321,6 +394,9 @@ msgid ""
 "                                                                    Question</span>\n"
 "                                                                <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">\n"
+"                                                                    문의 사항</span>\n"
+"                                                                <span class=\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -329,6 +405,9 @@ msgid ""
 "                                                                    Subject</span>\n"
 "                                                                <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">\n"
+"                                                                    제목</span>\n"
+"                                                                <span class=\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -336,6 +415,8 @@ msgid ""
 "<span class=\"s_website_form_label_content\">\n"
 "                                                        Attachment</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">\n"
+"                                                        첨부 파일</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -343,6 +424,8 @@ msgid ""
 "<span class=\"s_website_form_label_content\">Ask\n"
 "                                                        Your Question</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">문의\n"
+"                                                        연락하기</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -350,6 +433,8 @@ msgid ""
 "<span class=\"s_website_form_label_content\">Bike\n"
 "                                                        Model</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">바이크\n"
+"                                                        모델명</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -357,6 +442,8 @@ msgid ""
 "<span class=\"s_website_form_label_content\">Email\n"
 "                                                                        To</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">이메일\n"
+"                                                                        수신자명</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -365,6 +452,9 @@ msgid ""
 "                                                        Address</span>\n"
 "                                                    <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">이메일\n"
+"                                                        주소</span>\n"
+"                                                    <span class=\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -373,6 +463,9 @@ msgid ""
 "                                                        Name</span>\n"
 "                                                    <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">성명\n"
+"                                                        </span>\n"
+"                                                    <span class=\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -380,6 +473,8 @@ msgid ""
 "<span class=\"s_website_form_label_content\">Helpdesk\n"
 "                                                        Team</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">헬프데스크\n"
+"                                                        팀</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -388,6 +483,9 @@ msgid ""
 "                                                        Subject</span>\n"
 "                                                    <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">메시지\n"
+"                                                        제목\n"
+"                                                    <span class=\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -395,6 +493,8 @@ msgid ""
 "<span class=\"s_website_form_label_content\">Phone\n"
 "                                                                    Number</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">전화\n"
+"                                                                    번호</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -403,6 +503,9 @@ msgid ""
 "                                                        Number</span>\n"
 "                                                    <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">전화\n"
+"                                                        번호</span>\n"
+"                                                    <span class=\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -410,6 +513,8 @@ msgid ""
 "<span class=\"s_website_form_label_content\">Purchase\n"
 "                                                        date</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">구입\n"
+"                                                        날짜</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -418,6 +523,9 @@ msgid ""
 "                                                        Number</span>\n"
 "                                                    <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">일련\n"
+"                                                        번호</span>\n"
+"                                                    <span class=\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -427,6 +535,10 @@ msgid ""
 "            </strong>\n"
 "            <br/>"
 msgstr ""
+"<strong>\n"
+"                <strong><span class=\"display-4-fs\">자전거 매장</span></strong>\n"
+"            </strong>\n"
+"            <br/>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -529,6 +641,8 @@ msgid ""
 "<strong>Link the ticket</strong> to the related <strong>Sales Order Line</strong> and the matching <strong>Workshop task</strong> (e.g. repair on the client’s Cube bike). Move the ticket to the\n"
 "                        <strong>“Sent to Brand”</strong> column and use an <strong>Email Template</strong> to contact the brand for warranty confirmation."
 msgstr ""
+"관련된 <strong>판매주문서 내역</strong> 및 매칭되는 <strong>워크샵 작업</strong>(예: 고객의 Cube 자전거 수리)으로 <strong>티켓을 연결합니다</strong>. 티켓을 이동하여\n"
+"                          <strong>“브랜드로 전송”</strong> 열로 보낸 후 <strong>이메일 템플릿</strong>을 활용하여 브랜드로 연락한 후 보증 확인을 받습니다."
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -543,7 +657,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
 msgid "<strong>Manual Purchase Orders</strong>"
-msgstr ""
+msgstr "<strong>수기 구매발주서</strong>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -605,7 +719,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "<strong>Typical Repair Fees</strong>"
-msgstr ""
+msgstr "<strong>기본 수리비</strong>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
@@ -674,7 +788,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Basic Bike Maintenance&amp;nbsp;"
-msgstr ""
+msgstr "기본 바이크 관리&amp;nbsp;"
 
 #. module: bike_shop
 #: model:product.attribute.value,name:bike_shop.product_attribute_value_14
@@ -702,6 +816,8 @@ msgid ""
 "Bike Shops can handle customer orders, schedule test rides, receive and track service requests, and follow up on repairs. Inventory and parts can be monitored and reordered when needed. And all customer communication and invoicing are\n"
 "            handled directly within the system, keeping everything organized and connected."
 msgstr ""
+"자전거 매장에서는 고객 주문 처리, 시승 일정 예약, 서비스 요청에 대한 접수 및 추적, 수리에 대한 후속 조치 등의 작업을 진행할 수 있습니다. 재고 및 부품을 모니터링하여 필요할 때 재주문이 가능합니다. 또한 모든 고객과의 커뮤니케이션과 \n"
+"            청구서 발행이 시스템 내에서 직접 처리되므로 모든 작업이 체계적으로 연결됩니다.."
 
 #. module: bike_shop
 #: model:appointment.type,name:bike_shop.appointment_type_1
@@ -749,12 +865,12 @@ msgstr "이 모듈의 데모 데이터를 업로드하면 데이터베이스가 
 #. module: bike_shop
 #: model_terms:product.template,description:bike_shop.product_template_11
 msgid "CEXP-6S"
-msgstr ""
+msgstr "CEXP-6S"
 
 #. module: bike_shop
 #: model_terms:product.template,description:bike_shop.product_template_9
 msgid "CRP-2023"
-msgstr ""
+msgstr "CRP-2023"
 
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_13
@@ -764,7 +880,7 @@ msgstr ""
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_10
 msgid "Canyon Roadlite 7 "
-msgstr ""
+msgstr "Canyon Roadlite 7 "
 
 #. module: bike_shop
 #: model:pos.payment.method,name:bike_shop.pos_payment_method_2
@@ -776,7 +892,7 @@ msgstr "카드"
 #: model:product.public.category,name:bike_shop.product_public_category_7
 #: model:product.tag,name:bike_shop.product_tag_7
 msgid "Cargo"
-msgstr ""
+msgstr "카고"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
@@ -903,12 +1019,12 @@ msgstr "작성일자"
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_12
 msgid "Cube Kathmandu Hybrid"
-msgstr ""
+msgstr "Cube Kathmandu Hybrid"
 
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_9
 msgid "Cube Reaction Pro "
-msgstr ""
+msgstr "Cube Reaction Pro "
 
 #. module: bike_shop
 #: model:pos.payment.method,name:bike_shop.pos_payment_method_3
@@ -929,7 +1045,7 @@ msgstr "날짜"
 #. module: bike_shop
 #: model:helpdesk.stage,name:bike_shop.helpdesk_stage_11
 msgid "Denied"
-msgstr ""
+msgstr "금지"
 
 #. module: bike_shop
 #: model:ir.model.fields,field_description:bike_shop.worksheet_template_ir_model_fields_10
@@ -941,7 +1057,7 @@ msgstr ""
 #. module: bike_shop
 #: model:ir.model,name:bike_shop.x_worksheet_template_model
 msgid "Device Installation and Maintenance"
-msgstr ""
+msgstr "장치 설치 및 유지관리"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -972,7 +1088,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "E-Bike&amp;nbsp;Maintenance&amp;nbsp;"
-msgstr ""
+msgstr "E-Bike&amp;nbsp;Maintenance&amp;nbsp;"
 
 #. module: bike_shop
 #: model:pos.category,name:bike_shop.pos_category_4
@@ -1027,7 +1143,7 @@ msgstr ""
 #: model:product.public.category,name:bike_shop.product_public_category_3
 #: model:product.tag,name:bike_shop.product_tag_3
 msgid "Folding"
-msgstr ""
+msgstr "접이식"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1074,7 +1190,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:product.template,description:bike_shop.product_template_26
 msgid "GSD S10 LX"
-msgstr ""
+msgstr "GSD S10 LX"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1102,7 +1218,7 @@ msgstr ""
 #. module: bike_shop
 #: model:mail.template,name:bike_shop.mail_template_warranty_claim
 msgid "Helpdesk: Warranty Claim"
-msgstr ""
+msgstr "헬프데스크: 보증 요청"
 
 #. module: bike_shop
 #: model:website.menu,name:bike_shop.website_menu_5
@@ -1194,7 +1310,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:product.template,description:bike_shop.product_template_12
 msgid "KH-500-E"
-msgstr ""
+msgstr "KH-500-E"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
@@ -1205,11 +1321,16 @@ msgid ""
 "                                    fast, and fun</strong>. We service all types of bikes with care\n"
 "                                    and precision."
 msgstr ""
+"전문 수리 및 유지보수 서비스를 통해 자전거 관리를 더욱 원활하게 진행할 \n"
+"                                    수 있습니다. 간단한 <strong>튠업부터\n"
+"                                    전체 점검</strong>에 이르기까지, 전문 정비사가 <strong>안전하고\n"
+"                                    신속하고 즐거운</strong> 라이딩을 보장합니다. 모든 유형의 자전거를 세심하고 정확하게\n"
+"                                    정비해 드립니다."
 
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_16
 msgid "LED Light Set"
-msgstr ""
+msgstr "LED 라이트 세트"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1222,7 +1343,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Lighting system check"
-msgstr ""
+msgstr "라이트 시스템 체크"
 
 #. module: bike_shop
 #: model_terms:product.template,description:bike_shop.product_template_24
@@ -1243,7 +1364,7 @@ msgstr "유지보수"
 #. module: bike_shop
 #: model:website.menu,name:bike_shop.website_menu_8
 msgid "Maintenance & Repairs"
-msgstr ""
+msgstr "유지보수 및 수리"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1275,7 +1396,7 @@ msgstr "내 회사"
 #. module: bike_shop
 #: model_terms:product.template,description:bike_shop.product_template_13
 msgid "NAL6-29"
-msgstr ""
+msgstr "NAL6-29"
 
 #. module: bike_shop
 #: model:ir.model.fields,field_description:bike_shop.worksheet_template_ir_model_fields_8
@@ -1296,7 +1417,7 @@ msgstr "아니오"
 #. module: bike_shop
 #: model:project.tags,name:bike_shop.project_tags_2
 msgid "Non-Electric"
-msgstr ""
+msgstr "비전기식"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1402,7 +1523,7 @@ msgstr "품목"
 #. module: bike_shop
 #: model:sale.order.template.line,name:bike_shop.sale_order_template_line_12
 msgid "Products "
-msgstr ""
+msgstr "제품"
 
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_17
@@ -1412,7 +1533,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:product.template,description:bike_shop.product_template_10
 msgid "RL7-2023"
-msgstr ""
+msgstr "RL7-2023"
 
 #. module: bike_shop
 #: model:helpdesk.stage,legend_done:bike_shop.helpdesk_stage_10
@@ -1539,7 +1660,7 @@ msgstr "서비스"
 #. module: bike_shop
 #: model:sale.order.template.line,name:bike_shop.sale_order_template_line_6
 msgid "Services "
-msgstr ""
+msgstr "서비스"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1603,7 +1724,7 @@ msgstr "상담 요청"
 #. module: bike_shop
 #: model:product.attribute.value,name:bike_shop.product_attribute_value_15
 msgid "Tabasco"
-msgstr ""
+msgstr "타바스코"
 
 #. module: bike_shop
 #: model:ir.model.fields,field_description:bike_shop.worksheet_template_ir_model_fields_9
@@ -1624,7 +1745,7 @@ msgstr "기술자"
 #. module: bike_shop
 #: model:ir.model.fields,field_description:bike_shop.worksheet_template_ir_model_fields_11
 msgid "Technician "
-msgstr ""
+msgstr "기술자"
 
 #. module: bike_shop
 #: model:ir.model.fields,field_description:bike_shop.worksheet_template_ir_model_fields_13
@@ -1651,7 +1772,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:survey.survey,description_done:bike_shop.survey_survey_1
 msgid "Thanks for your feedback! 😀🚲"
-msgstr ""
+msgstr "의견을 주셔서 감사합니다! 😀🚲"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1728,6 +1849,8 @@ msgid ""
 "This module offers all the essential tools a bike shop needs to run daily operations in one place. It covers everything from selling bikes; both online through an eCommerce website and in-store with a point of sale system, to managing\n"
 "            repairs, maintenance services, and inventory."
 msgstr ""
+"이 모듈은 자전거 매장의 일상적인 운영에 필요한 모든 필수 도구를 한곳에서 제공합니다. 이 모듈에서는 이커머스 웹사이트를 통한 온라인 및 POS 시스템을 갖춘 매장 내 자전거 판매부터 수리, 유지보수 서비스 및 \n"
+"            재고 관리까지 모든 기능을 다룹니다."
 
 #. module: bike_shop
 #: model_terms:survey.survey,description:bike_shop.survey_survey_1
@@ -1739,7 +1862,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Tire pressure check and inflation"
-msgstr ""
+msgstr "타이어 공기압 점검 및 주입"
 
 #. module: bike_shop
 #: model:website.menu,name:bike_shop.website_menu_4
@@ -1754,7 +1877,7 @@ msgstr ""
 #. module: bike_shop
 #: model:survey.question.answer,value:bike_shop.survey_question_answer_4
 msgid "Unsatisfied"
-msgstr ""
+msgstr "불만족"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1775,7 +1898,7 @@ msgstr ""
 #: model:product.public.category,name:bike_shop.product_public_category_1
 #: model:product.tag,name:bike_shop.product_tag_1
 msgid "VTT"
-msgstr ""
+msgstr "VTT"
 
 #. module: bike_shop
 #: model:survey.question.answer,value:bike_shop.survey_question_answer_1
@@ -1790,7 +1913,7 @@ msgstr ""
 #. module: bike_shop
 #: model:helpdesk.team,name:bike_shop.helpdesk_team_1
 msgid "Warranties / After-Sales / SAV"
-msgstr ""
+msgstr "품질 보증 / 애프터서비스 / SAV"
 
 #. module: bike_shop
 #: model:mail.template,subject:bike_shop.mail_template_warranty_claim
@@ -1878,7 +2001,7 @@ msgstr "고객에게 제안하는 사항"
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Wheel alignment and spoke tension"
-msgstr ""
+msgstr "휠 얼라이먼트 및 스포크 장력 측정"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1909,7 +2032,7 @@ msgstr "작업 계획표"
 #. module: bike_shop
 #: model:project.project,name:bike_shop.project_project_4
 msgid "Workshop"
-msgstr ""
+msgstr "작업장"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1978,7 +2101,7 @@ msgstr "검정색"
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "black and gray road bike"
-msgstr ""
+msgstr "검정색과 회색의 로드 바이크"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
@@ -2008,7 +2131,7 @@ msgstr "초록색"
 #. module: bike_shop
 #: model:product.attribute.value,name:bike_shop.product_attribute_value_8
 msgid "grey"
-msgstr ""
+msgstr "회색"
 
 #. module: bike_shop
 #: model:product.attribute.value,name:bike_shop.product_attribute_value_9
@@ -2078,9 +2201,9 @@ msgstr "작은"
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
 msgid "yellow and black love print"
-msgstr ""
+msgstr "노란색과 검은색 러브 프린트"
 
 #. module: bike_shop
 #: model_terms:product.template,description_ecommerce:bike_shop.product_template_13
 msgid "​<br>"
-msgstr ""
+msgstr "​<br>"

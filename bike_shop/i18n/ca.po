@@ -3,8 +3,9 @@
 # 	* bike_shop
 # 
 # Translators:
-# Noemi Pla, 2025
+# EstudiTIC - estuditic.com <odoo@estuditic.com>, 2025
 # Wil Odoo, 2025
+# Noemi Pla, 2025
 # 
 msgid ""
 msgstr ""
@@ -12,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-14 12:55+0000\n"
 "PO-Revision-Date: 2025-07-19 15:03+0000\n"
-"Last-Translator: Wil Odoo, 2025\n"
+"Last-Translator: Noemi Pla, 2025\n"
 "Language-Team: Catalan (https://app.transifex.com/odoo/teams/41243/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,7 +34,7 @@ msgstr "01"
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
 msgid "02"
-msgstr ""
+msgstr "02"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
@@ -121,6 +122,48 @@ msgid ""
 "            <t t-out=\"object.company_id.name\"/> \n"
 "            </div> "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\" data-oe-version=\"1.0\"> \n"
+"            <p style=\"box-sizing:border-box;margin: 0px; padding: 0px; font-size: 12px;\"> \n"
+"            Benvolgut/da <span style=\"font-weight:bold;\" t-out=\"object.partner_id.name or ''\"/>:<br/>\n"
+"            <br/> \n"
+"            Estem gestionant una sol·licitud de garantia d'un client.\n"
+"            </p><ul>\n"
+"                <t t-if=\"object.properties and object.properties.get('order_line_id')\">\n"
+"                    <t t-set=\"order_line\" t-value=\"env['sale.order.line'].browse(object.properties['order_line_id'])\"/>\n"
+"                    <li>\n"
+"                        Nom del client: <t t-out=\"order_line.order_id.partner_id.display_name or 'N/A'\"/>\n"
+"                    </li>\n"
+"                </t>\n"
+"                <t t-if=\"object.properties and object.properties.get('task_id')\">\n"
+"                    <t t-set=\"task\" t-value=\"env['project.task'].browse(object.properties['task_id'])\"/>\n"
+"                    <t t-if=\"task.task_properties and task.task_properties.get('serial_number_id')\">\n"
+"                        <t t-set=\"serial\" t-value=\"env['stock.lot'].browse(task.task_properties['serial_number_id'])\"/>\n"
+"\n"
+"                        <t t-set=\"move_lines\" t-value=\"env['stock.move.line'].search([('lot_id', '=', serial.id)])\"/>\n"
+"                        <t t-set=\"sale_date\" t-value=\"False\"/>\n"
+"                        <t t-foreach=\"move_lines\" t-as=\"ml\">\n"
+"                            <t t-if=\"ml.move_id.sale_line_id\">\n"
+"                                <t t-set=\"sale_date\" t-value=\"ml.move_id.sale_line_id.order_id.date_order\"/>\n"
+"                                <t t-break=\"True\"/>\n"
+"                            </t>\n"
+"                        </t>\n"
+"                        <li>\n"
+"                            Número de sèrie: <t t-out=\"serial.name or 'N/A'\"/>\n"
+"                        </li>\n"
+"                        <li t-if=\"sale_date\">\n"
+"                            Data de compra: <t t-out=\"format_date(sale_date) if sale_date else 'N/A'\"/>\n"
+"                        </li>\n"
+"                    </t>\n"
+"                </t>\n"
+"            </ul>\n"
+"            Descripció del problema: <t t-out=\"object.description\"/>\n"
+"            <br/>\n"
+"            Adjuntes trobarà imatges del defecte.<br/>\n"
+"            <br/>\n"
+"            Gràcies, <br/>\n"
+"            <t t-out=\"object.user_id.display_name\"/> <br/>\n"
+"            <t t-out=\"object.company_id.name\"/> \n"
+"            </div> "
 
 #. module: bike_shop
 #: model:mail.template,body_html:bike_shop.mail_template_order_ready
@@ -142,6 +185,22 @@ msgid ""
 "    </t>\n"
 "    </p></div>"
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\" data-oe-version=\"1.0\"> \n"
+"    <p style=\"box-sizing:border-box;margin: 0px; padding: 0px; font-size: 12px;\"> \n"
+"    Benvolgut/da <span style=\"font-weight:bold;\" t-out=\"object.partner_id.display_name or ''\"/>:<br/>\n"
+"    <br/> \n"
+"    La seva comanda <span style=\"font-weight:bold;\" t-out=\"object.name or ''\"/> està llesta.\n"
+"    <br/>\n"
+"    Pot recollir-la a la nostra botiga.\n"
+"    <br/>\n"
+"    Gràcies per confiar en nosaltres i per la seva paciència!<br/>\n"
+"    <br/> \n"
+"    No dubti a contactar amb nosaltres si té alguna pregunta. <br/>\n"
+"    <br/>\n"
+"    <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-mail-quote-container=\"1\">\n"
+"        <span style=\"font-weight:bold;\" t-out=\"object.user_id.signature\"/>\n"
+"    </t>\n"
+"    </p></div>"
 
 #. module: bike_shop
 #: model_terms:product.template,out_of_stock_message:bike_shop.product_template_13
@@ -766,7 +825,7 @@ msgstr ""
 #. module: bike_shop
 #: model:pos.payment.method,name:bike_shop.pos_payment_method_2
 msgid "Card"
-msgstr ""
+msgstr "Targeta "
 
 #. module: bike_shop
 #: model:pos.category,name:bike_shop.pos_category_7
@@ -793,7 +852,7 @@ msgstr "Caixa"
 #. module: bike_shop
 #: model:helpdesk.stage,name:bike_shop.helpdesk_stage_12
 msgid "Close"
-msgstr ""
+msgstr "Tancar"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
@@ -938,7 +997,7 @@ msgstr ""
 #. module: bike_shop
 #: model:ir.model,name:bike_shop.x_worksheet_template_model
 msgid "Device Installation and Maintenance"
-msgstr ""
+msgstr "Instal·lació i manteniment del dispositiu"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1397,7 +1456,7 @@ msgstr ""
 #. module: bike_shop
 #: model:sale.order.template.line,name:bike_shop.sale_order_template_line_3
 msgid "Products"
-msgstr ""
+msgstr "Productes"
 
 #. module: bike_shop
 #: model:sale.order.template.line,name:bike_shop.sale_order_template_line_12
@@ -1559,7 +1618,7 @@ msgstr ""
 #. module: bike_shop
 #: model:website.menu,name:bike_shop.website_menu_6
 msgid "Shop"
-msgstr ""
+msgstr "Botiga"
 
 #. module: bike_shop
 #: model:hr.job,name:bike_shop.hr_job_3
@@ -1608,7 +1667,7 @@ msgstr ""
 #. module: bike_shop
 #: model:ir.model.fields,field_description:bike_shop.worksheet_template_ir_model_fields_9
 msgid "Task"
-msgstr ""
+msgstr "Tasca"
 
 #. module: bike_shop
 #: model:project.project,label_tasks:bike_shop.project_project_4
@@ -1929,6 +1988,8 @@ msgid ""
 "You can access every installed App in your Odoo database on your main "
 "dashboard."
 msgstr ""
+"Pots accedir a totes les aplicacions instal·lades a la teva base de dades "
+"d'Odoo des del tauler principal."
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -2034,7 +2095,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
 msgid "if you need help!"
-msgstr ""
+msgstr "si necessites ajuda!"
 
 #. module: bike_shop
 #: model:product.attribute.value,name:bike_shop.product_attribute_value_3
