@@ -22,19 +22,23 @@ class FileTest(IndustryCase):
     def test_required_files(self):
         for module in self.installed_modules:
             required_files = {
-                'icon': '/static/description/icon.png',
-                'image': '/images/main.png',
                 'pot file': f'/i18n/{module}.pot',
-                'tour': '/static/src/js/my_tour.js',
                 'index html file': '/static/description/index.html',
             }
+            if module in self.installed_industries:
+                required_files.update({
+                    'icon': '/static/description/icon.png',
+                    'image': '/images/main.png',
+                    'tour': '/static/src/js/my_tour.js',
+                })
             for f, path in required_files.items():
                 if not os.path.isfile(get_industry_path() + module + path):
                     _logger.warning("Missing %s at %s", f, module + path)
 
             tx_config = Path(get_industry_path() + '.tx/config').read_text(encoding="utf-8")
             if not re.search(module, tx_config):
-                _logger.warning("Missing module in .tx/config")
+                _logger.error("Missing module in .tx/config")
+                continue
             if release.version_info[3] != 'final':
                 # skip test if master
                 continue
