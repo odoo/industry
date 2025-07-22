@@ -4,6 +4,8 @@ import os
 
 from odoo.tests.common import TransactionCase
 
+CATEGORIES = ('Services', 'Retail', 'Construction', 'Hospitality', 'Health and Fitness', 'Supply Chain')
+
 
 def get_industry_path():
     return os.path.abspath(__file__).split('tests/test_generic/')[0]
@@ -23,6 +25,8 @@ class IndustryCase(TransactionCase):
 
     def setUp(cls):
         super().setUp()
-        cls.installed_modules = cls.env['ir.module.module'].search(
+        modules = cls.env['ir.module.module'].search(
             [('name', 'in', get_modules()), ('state', '=', 'installed')]
-        ).mapped('name')
+        )
+        cls.installed_modules = modules.mapped('name')
+        cls.installed_industries = modules.filtered(lambda m: m.category_id.name in CATEGORIES).mapped('name')
