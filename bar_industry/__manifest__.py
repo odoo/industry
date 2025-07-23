@@ -18,6 +18,7 @@
         'stock_account',
     ],
     'data': [
+        'data/res_config_settings.xml',
         'data/res_partner.xml',
         'data/hr_department.xml',
         'data/hr_employee.xml',
@@ -38,7 +39,6 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/knowledge_tour.xml',
-        'data/res_config_settings.xml',
     ],
     'demo': [
         'demo/pos_preparation_display_display.xml',
