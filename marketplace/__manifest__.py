@@ -29,6 +29,8 @@
     ],
     'demo': [
         'demo/res_config_settings.xml',
+        'demo/res_partner.xml',
+        'demo/res_users.xml',
         'demo/product_template.xml',
         'demo/product_product.xml',
     ],
