@@ -40,6 +40,8 @@
         'data/sign_template.xml',
         'data/sign_item_role.xml',
         'data/sign_item.xml',
+        # 'data/sign_request_item.xml',
+        # 'data/sign_request.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
         'data/res_partner_category.xml',
