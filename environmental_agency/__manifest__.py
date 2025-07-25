@@ -36,7 +36,6 @@
     'demo': [
         'demo/ir_attachment_post.xml',
         'demo/res_company.xml',
-        'demo/website.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
         'demo/hr_department.xml',
@@ -51,6 +50,7 @@
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
         'demo/account_analytic_line.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [

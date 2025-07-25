@@ -105,6 +105,11 @@ class ManifestTest(ManifestLinter, IndustryCase):
         if (not_found := manifest_files - data_files):
             _logger.error("Files listed in manifest %s not found: %s", folder_name, ', '.join(not_found))
 
+        website_xml = f"{folder_name}/website.xml"
+        if website_xml in manifest_files_list:
+            if manifest_files_list[-1] != website_xml:
+                _logger.error(f"{website_xml} must be the last entry in the '{folder_name}' list of the manifest")
+
     def _test_dependencies(self, manifest_data):
         dependencies = manifest_data.get('depends', [])
         self.assertTrue(dependencies, "The 'depends' list must not be empty")
