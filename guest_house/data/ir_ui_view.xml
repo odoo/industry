@@ -1,0 +1,325 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="planning_search_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//search[1]/group[1]/separator[1]" position="replace"/><xpath expr="//filter[@name='group_by_manager']" position="replace"/><xpath expr="//filter[@name='group_by_department']" position="replace"/><xpath expr="//search[1]/separator[7]" position="replace"/><xpath expr="//filter[@name='published_shifts']" position="replace"/><xpath expr="//filter[@name='unpublished_shifts']" position="replace"/><xpath expr="//search[1]/separator[6]" position="replace"/><xpath expr="//search[1]/separator[5]" position="replace"/><xpath expr="//filter[@name='non_billable']" position="replace"/><xpath expr="//filter[@name='billable']" position="replace"/><xpath expr="//search[1]/separator[4]" position="replace"/><xpath expr="//filter[@name='materials']" position="replace"/><xpath expr="//filter[@name='employees']" position="replace"/><xpath expr="//filter[@name='my_sale_orders']" position="replace"/><xpath expr="//filter[@name='my_role']" position="replace"/><xpath expr="//filter[@name='unwanted_shifts']" position="replace"/><xpath expr="//filter[@name='my_department_shifts']" position="replace"/><xpath expr="//filter[@name='my_team_shifts']" position="replace"/><xpath expr="//filter[@name='my_shifts']" position="replace"/><xpath expr="//filter[@name='open_shifts']" position="replace"/><xpath expr="//field[@name='employee_skill_ids']" position="replace"/><xpath expr="//field[@name='job_title']" position="replace"/><xpath expr="//field[@name='manager_id']" position="replace"/><xpath expr="//field[@name='department_id']" position="replace"/>
+        <xpath expr="//field[@name='resource_id']" position="before">
+          <field name="partner_id"/>
+        </xpath>
+        <xpath expr="//filter[@name='group_by_role']" position="after">
+          <filter string="Customer" name="Customer" context="{'group_by':'partner_id'}"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.planning_view_search"/>
+    <field name="mode">extension</field>
+    <field name="model">planning.slot</field>
+    <field name="name">Odoo Studio: planning.slot.search customization</field>
+    <field name="priority">99</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="planning_kanban_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='sale_line_id']" position="replace">
+          <field name="sale_order_id" display="full" widget="many2one" class="d-block"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.planning_view_kanban"/>
+    <field name="mode">extension</field>
+    <field name="model">planning.slot</field>
+    <field name="name">Odoo Studio: planning.slot.kanban customization</field>
+    <field name="priority">200</field>
+    <field name="type">kanban</field>
+    <field name="active" eval="True"/>
+  </record>
+
+  <record id="res_partner_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//form[1]/sheet[1]/group[1]" position="after">
+          <group name="studio_group_46h_1ivl20neu">
+            <group name="studio_group_46h_left" string="Identity">
+              <field name="x_nationality"/>
+              <field name="x_document_type"/>
+              <field name="x_document_number"/>
+              <field name="x_identity_check" force_save="1" readonly="True" invisible="True"/>
+            </group>
+            <group name="studio_group_46h_right"/>
+          </group>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="mode">extension</field>
+    <field name="model">res.partner</field>
+    <field name="name">Odoo Studio: res.partner.form customization</field>
+    <field name="priority">200</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="sale_order_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='product_template_id']" position="after">
+          <field name="x_nights" optional="show"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="mode">extension</field>
+    <field name="model">sale.order</field>
+    <field name="name">Odoo Studio: sale.order.form customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="rental_order_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='is_rental_order']" position="after">
+          <button string="City Tax" name="%(industry_add_update)d" class="btn btn-primary" type="action"/>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+          <page string="Guests" name="studio_page_6u3_1ivl25dvn">
+            <field name="x_many2many_field_6dg_1ivl265ih">
+              <list string="Contacts" sample="1" multi_edit="1">
+                <field name="avatar_128" widget="image" options="{'size': [24, 24], 'img_class': 'o_avatar rounded'}" width="30" nolabel="1"/><field name="complete_name" string="Name"/><field name="vat" optional="hide" readonly="1" string="VAT"/><field name="invoice_sending_method" optional="hide"/><field name="invoice_edi_format" string="EDI Format" optional="hide"/><field name="email" optional="show"/><field name="phone" class="o_force_ltr" optional="show"/><field name="x_nationality" optional="show"/><field name="user_id" optional="hide" widget="many2one_avatar_user" domain="[('share', '=', False)]"/><field name="street" optional="hide"/><field name="city" optional="hide"/><field name="state_id" optional="hide" readonly="1"/><field name="x_identity_check" optional="show" widget="badge" decoration-success="x_identity_check == 'OK'" decoration-warning="x_identity_check == 'NA'" decoration-danger="x_identity_check == 'Invalid'"/><field name="application_statistics" widget="contact_statistics" nolabel="1" optional="show" width="270"/><field name="category_id" optional="hide" widget="many2many_tags" options="{'color_field': 'color'}"/><field name="company_id" groups="base.group_multi_company" readonly="1" optional="hide"/><field name="followup_responsible_id" widget="many2one_avatar_user" optional="hide"/><field name="followup_reminder_type" optional="hide"/><field name="followup_status" widget="badge" optional="hide" decoration-danger="followup_status == 'in_need_of_action'" decoration-warning="followup_status == 'with_overdue_invoices'" decoration-info="followup_status == 'no_action_needed'"/><field name="followup_next_action_date" optional="hide" widget="remaining_days"/><field name="followup_line_id" optional="hide"/><field name="total_due" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total" optional="hide"/><field name="total_overdue" widget="monetary" options="{'currency_field': 'currency_id'}" sum="Total" optional="hide"/>
+              </list>
+            </field>
+          </page>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="sale_renting.rental_order_primary_form_view"/>
+    <field name="mode">extension</field>
+    <field name="model">sale.order</field>
+    <field name="name">Odoo Studio: rental.order.form customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="product_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='default_code']" position="after">
+          <field name="x_is_a_room_offer" string="Is Room Offer"/>
+          <field name="x_is_stay_tax" string="Is City Tax"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="product.product_template_only_form_view"/>
+    <field name="mode">extension</field>
+    <field name="model">product.template</field>
+    <field name="name">Odoo Studio: product.template.product.form customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="sale_planning.planning_role_view_tree_inherit_sale_planning" model="ir.ui.view">
+    <field name="name">planning.role.list.inherit.sale.planning</field>
+    <field name="model">planning.role</field>
+    <field name="inherit_id" ref="planning.planning_role_view_tree"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='resource_ids']" position="after">
+            <field name="product_ids" widget="many2many_tags" placeholder="e.g. Cleaning Services" context="{'default_type': 'service', 'default_planning_enabled': True, 'default_planning_role_id': id, 'default_uom_id': 4}"/>
+        </xpath>
+    </field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="planning_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='sync_shift_rental']" position="after">
+          <field name="x_is_a_room_offer" invisible="not sync_shift_rental"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.planning_role_view_form"/>
+    <field name="mode">extension</field>
+    <field name="model">planning.role</field>
+    <field name="name">Odoo Studio: planning.role.form customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_orders_kanban" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//kanban[1]/templates[1]/t[@t-name='card']/div[1]" position="after">
+          <field name="rental_start_date" display="full" widget="daterange" options="{&quot;end_date_field&quot;:&quot;rental_return_date&quot;,&quot;max_precision&quot;:&quot;days&quot;,&quot;condensed&quot;:false,&quot;min_precision&quot;:&quot;days&quot;,&quot;show_time&quot;:false}"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="sale_renting.rental_order_view_kanban"/>
+    <field name="mode">primary</field>
+    <field name="model">sale.order</field>
+    <field name="name">Odoo Studio: rental.order.kanban customization</field>
+    <field name="priority">160</field>
+    <field name="type">kanban</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_offers_search" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//filter[@name='group_by_product_properties']" position="replace"/><xpath expr="//filter[@name='groupby_public_category']" position="replace"/><xpath expr="//filter[@name='group_by_type']" position="replace"/><xpath expr="//search[1]/separator[8]" position="replace"/><xpath expr="//filter[@name='activities_exception']" position="replace"/><xpath expr="//search[1]/separator[7]" position="replace"/><xpath expr="//search[1]/separator[6]" position="replace"/><xpath expr="//search[1]/separator[5]" position="replace"/><xpath expr="//search[1]/separator[4]" position="replace"/><xpath expr="//filter[@name='filter_to_rent']" position="replace"/><xpath expr="//filter[@name='filter_to_purchase']" position="replace"/><xpath expr="//filter[@name='filter_to_sell']" position="replace"/><xpath expr="//search[1]/separator[3]" position="replace"/><xpath expr="//filter[@name='is_storable']" position="replace"/><xpath expr="//search[1]/separator[2]" position="replace"/><xpath expr="//filter[@name='combo']" position="replace"/><xpath expr="//filter[@name='goods']" position="replace"/><xpath expr="//filter[@name='services']" position="replace"/>
+      </data>
+    </field>
+    <field name="inherit_id" ref="product.product_template_search_view"/>
+    <field name="mode">primary</field>
+    <field name="model">product.template</field>
+    <field name="name">Odoo Studio: product.template.search customization</field>
+    <field name="priority">160</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_offers_list" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='default_code']" position="after">
+          <field name="display_price" optional="show"/>
+          <field name="planning_role_id" optional="show"/>
+        </xpath>
+        <xpath expr="//field[@name='list_price']" position="attributes">
+          <attribute name="optional">hide</attribute>
+        </xpath>
+        <xpath expr="//field[@name='standard_price']" position="attributes">
+          <attribute name="optional">hide</attribute>
+        </xpath>
+        <xpath expr="//field[@name='qty_available']" position="attributes">
+          <attribute name="optional">hide</attribute>
+        </xpath>
+        <xpath expr="//field[@name='virtual_available']" position="attributes">
+          <attribute name="optional">hide</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="product.product_template_tree_view"/>
+    <field name="mode">primary</field>
+    <field name="model">product.template</field>
+    <field name="name">Odoo Studio: product.template.list customization</field>
+    <field name="priority">160</field>
+    <field name="type">list</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_offers_kanban" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='list_price']" position="attributes">
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//kanban[1]/templates[1]/t[@t-name='card']/main[1]/div[2]" position="after">
+          <field name="display_price" display="full"/>
+        </xpath>
+        <xpath expr="//field[@name='product_properties']" position="after">
+          <field name="planning_role_id" display="full" widget="badge"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="product.product_template_kanban_view"/>
+    <field name="mode">primary</field>
+    <field name="model">product.template</field>
+    <field name="name">Odoo Studio: product.template.kanban customization</field>
+    <field name="priority">160</field>
+    <field name="type">kanban</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_planning_role_view_search" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//search[1]/separator[2]" position="replace"/><xpath expr="//filter[@name='role_for_material']" position="replace"/><xpath expr="//filter[@name='role_for_employee']" position="replace"/><xpath expr="//filter[@name='my_department']" position="replace"/><xpath expr="//filter[@name='my_team']" position="replace"/><xpath expr="//filter[@name='my_roles']" position="replace"/>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.planning_role_view_search"/>
+    <field name="mode">primary</field>
+    <field name="model">planning.role</field>
+    <field name="name">Odoo Studio: planning.role.view.search customization</field>
+    <field name="priority">160</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_planning_resource_view_search" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//filter[@name='working_period']" position="replace"/>
+        <xpath expr="//search[1]/group[1]/filter[@name='default_role_id']" position="replace"/>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.resource_resource_search_view_inherit"/>
+    <field name="mode">primary</field>
+    <field name="model">resource.resource</field>
+    <field name="name">Odoo Studio: resource.resource.view.search customization</field>
+    <field name="priority">160</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_order_search" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//search[1]/separator[1]" position="after">
+          <filter domain="[&quot;|&quot;, &quot;&amp;&quot;, &quot;&amp;&quot;, &quot;&amp;&quot;, (&quot;rental_status&quot;, &quot;=&quot;, &quot;return&quot;), (&quot;rental_return_date&quot;, &quot;&gt;=&quot;, datetime.datetime.combine(context_today(), datetime.time(0, 0, 0)).to_utc().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)), (&quot;rental_return_date&quot;, &quot;&lt;&quot;, datetime.datetime.combine(context_today() + relativedelta(days = 1), datetime.time(0, 0, 0)).to_utc().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)), (&quot;state&quot;, &quot;=&quot;, &quot;sale&quot;), &quot;&amp;&quot;, &quot;&amp;&quot;, &quot;&amp;&quot;, (&quot;rental_status&quot;, &quot;=&quot;, &quot;pickup&quot;), (&quot;rental_start_date&quot;, &quot;&gt;=&quot;, datetime.datetime.combine(context_today(), datetime.time(0, 0, 0)).to_utc().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)), (&quot;rental_start_date&quot;, &quot;&lt;&quot;, datetime.datetime.combine(context_today() + relativedelta(days = 1), datetime.time(0, 0, 0)).to_utc().strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)), (&quot;state&quot;, &quot;=&quot;, &quot;sale&quot;)]" name="studio_filter_3r7_1j0tnc3sc" string="Today"/>
+          <separator name="studio_separator_8er_1j0tndtst"/>
+        </xpath>
+        <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+          <separator name="studio_separator_2ql_1j0tne55a"/>
+          <filter domain="[&quot;|&quot;, (&quot;rental_status&quot;, &quot;=&quot;, &quot;sent&quot;), (&quot;rental_status&quot;, &quot;=&quot;, &quot;draft&quot;)]" name="studio_filter_1vh_1j0tng4tk" string="Draft"/>
+          <filter domain="[&quot;&amp;&quot;, (&quot;rental_status&quot;, &quot;=&quot;, &quot;pickup&quot;), (&quot;state&quot;, &quot;=&quot;, &quot;sale&quot;)]" name="studio_filter_3k0_1j0tniek5" string="To Pick Up"/>
+          <filter domain="[&quot;&amp;&quot;, (&quot;rental_status&quot;, &quot;=&quot;, &quot;return&quot;), (&quot;state&quot;, &quot;=&quot;, &quot;sale&quot;)]" name="studio_filter_44f_1j0tnj142" string="To Return"/>
+        </xpath>
+        <xpath expr="//filter[@name='salesperson']" position="before">
+          <filter name="studio_group_by_8hf_1j0tnksah" string="Status" context="{'group_by': 'rental_status'}"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+    <field name="mode">primary</field>
+    <field name="model">sale.order</field>
+    <field name="name">Odoo Studio: sale.order.list.select customization</field>
+    <field name="priority">320</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_schedule_form" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='resource_id']" position="attributes">
+          <attribute name="domain">[("role_ids.x_is_a_room_offer", "=", True)]</attribute>
+        </xpath>
+        <xpath expr="//field[@name='role_id']" position="attributes">
+          <attribute name="domain">[("x_is_a_room_offer", "=", True)]</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.planning_view_form_in_gantt"/>
+    <field name="mode">primary</field>
+    <field name="model">planning.slot</field>
+    <field name="name">Odoo Studio: planning.slot.form customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="planning_gantt_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//gantt[1]" position="attributes">
+          <attribute name="default_group_by">resource_id</attribute>
+          <attribute name="default_range">month</attribute>
+          <attribute name="precision">{"day":"hour:full","week":"day:half","month":"day:half","year":"day:full"}</attribute>
+        </xpath>
+        <xpath expr="/gantt" position="attributes">
+          <attribute name="form_view_id">%(guest_house_schedule_form)d</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.planning_view_gantt"/>
+    <field name="mode">primary</field>
+    <field name="model">planning.slot</field>
+    <field name="name">Odoo Studio: planning.slot.gantt customization</field>
+    <field name="priority">1000</field>
+    <field name="type">gantt</field>
+    <field name="active" eval="True"/>
+  </record>
+</odoo>
