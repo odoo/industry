@@ -63,10 +63,10 @@
         'demo/account_analytic_line.xml',
         'demo/mail_activity.xml',
         'demo/planning_slot.xml',
-        'demo/website.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
         'demo/payment_provider_demo_post.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [

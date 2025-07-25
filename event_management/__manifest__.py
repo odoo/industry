@@ -78,12 +78,12 @@
         'demo/project_task.xml',
         'demo/mail_activity.xml',
         'demo/stock_quant.xml',
-        'demo/website.xml',
         'demo/website_view.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
         'demo/product_supplierinfo.xml',
         'demo/payment_provider_demo_post.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [
