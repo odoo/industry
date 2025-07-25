@@ -35,7 +35,6 @@
             'demo/payment_provider_demo_post.xml',
             'demo/res_partner.xml',
             'demo/delivery_carrier.xml',
-            'demo/website.xml',
             'demo/website_view.xml',
             'demo/website_theme_apply.xml',
             'demo/res_partner_category.xml',
@@ -52,6 +51,7 @@
             'demo/ir_attachment_post.xml',
             'demo/sale_order_confirm.xml',
             'demo/product_template.xml',
+            'demo/website.xml',
             ],
     'assets': {
             'web.assets_backend': [

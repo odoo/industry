@@ -43,7 +43,6 @@
     ],
     'demo': [
         'demo/res_config_settings.xml',
-        'demo/website.xml',
         'demo/stock_lot.xml',
         'demo/res_partner.xml',
         'demo/loyalty_program.xml',
@@ -70,6 +69,7 @@
         'demo/pos_order_line.xml',
         'demo/pos_confirm.xml',
         'demo/payment_provider_demo_post.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'assets': {
