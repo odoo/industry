@@ -39,7 +39,6 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
-        'demo/website.xml',
         'demo/res_partner.xml',
         'demo/hr_leave.xml',
         'demo/crm_tag.xml',
@@ -49,6 +48,7 @@
         'demo/sale_order_line.xml',
         'demo/sale_order_post_action.xml',
         'demo/x_control_charging_station.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'assets': {
