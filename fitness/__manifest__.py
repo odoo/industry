@@ -43,7 +43,6 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
-        'demo/website.xml',
         'demo/res_partner.xml',
         'demo/hr_employee.xml',
         'demo/appointment_type.xml',
@@ -66,6 +65,7 @@
         'demo/website_menu.xml',
         'demo/product_pricelist.xml',
         'demo/payment_provider_demo_post.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'assets': {

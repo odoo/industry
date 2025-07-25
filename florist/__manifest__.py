@@ -72,9 +72,9 @@
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
         'demo/product_supplierinfo.xml',
-        'demo/website.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [

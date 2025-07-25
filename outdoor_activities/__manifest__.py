@@ -27,7 +27,6 @@
     ],
     'demo': [
         'demo/res_partner.xml',
-        'demo/website.xml',
         'demo/appointment_type.xml',
         'demo/website_theme_apply.xml',
         'demo/website_views.xml',
@@ -45,6 +44,7 @@
         'demo/website_menu.xml',
         'demo/ir_attachment_post.xml',
         'demo/payment_provider_demo_post.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'assets': {

@@ -33,7 +33,6 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
-        'demo/website.xml',
         'demo/res_partner.xml',
         'demo/hr_employee.xml',
         'demo/product_template.xml',
@@ -53,6 +52,7 @@
         'demo/purchase_order_confirm.xml',
         'demo/stock_warehouse_orderpoint.xml',
         'demo/payment_provider_demo_post.xml',
+        'demo/website.xml',
     ],
     'assets': {
         'web.assets_backend': [
