@@ -80,10 +80,10 @@
         'demo/res_partner_category.xml',
         'demo/sale_commission_plan_user.xml',
         'demo/ir_attachment_post.xml',
-        'demo/website.xml',
         'demo/website_view.xml',
         'demo/website_page.xml',
         'demo/website_theme_apply.xml',
+        'demo/website.xml',
     ],
     'assets': {
         'web.assets_backend': [
