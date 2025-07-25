@@ -43,7 +43,6 @@
         'demo/product_template.xml',
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
-        'demo/website.xml',
         'demo/purchase_order_confirm.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
@@ -52,6 +51,7 @@
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
         'demo/payment_provider_demo_post.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'assets': {

@@ -62,7 +62,6 @@
         'demo/product_template.xml',
         'demo/appointment_type.xml',
         'demo/survey_survey.xml',
-        'demo/website.xml',
         'demo/website_view.xml',
         'demo/hr_department.xml',
         'demo/survey_question.xml',
@@ -91,6 +90,7 @@
         'demo/mail_alias.xml',
         'demo/helpdesk_team.xml',
         'demo/helpdesk_ticket.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [

@@ -32,13 +32,13 @@
     'demo': [
         'demo/event_event.xml',
         'demo/event_event_ticket.xml',
-        'demo/website.xml',
         'demo/website_view.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
         'demo/website_attachment.xml',
         'demo/payment_provider_demo_post.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'assets': {

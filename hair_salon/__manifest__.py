@@ -47,7 +47,6 @@
         'demo/appointment_type.xml',
         'demo/calendar_event.xml',
         'demo/purchase_order.xml',
-        'demo/website.xml',
         'demo/loyalty_program.xml',
         'demo/loyalty_rule.xml',
         'demo/loyalty_reward.xml',
@@ -57,6 +56,7 @@
         'demo/purchase_order_line.xml',
         'demo/purchase_order_confirm.xml',
         'demo/delivery_confirm.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'assets': {
