@@ -33,7 +33,6 @@
     ],
     'demo': [
         'demo/product_product.xml',
-        'demo/website.xml',
         'demo/event_event.xml',
         'demo/ir_attachment_post.xml',
         'demo/pos_config.xml',
@@ -45,6 +44,7 @@
         'demo/website_theme_apply.xml',
         'demo/sale_order_confirm.xml',
         'demo/payment_provider_demo.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [
