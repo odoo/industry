@@ -59,11 +59,11 @@
         'demo/hr_expense.xml',
         'demo/hr_expense_action.xml',
         'demo/event_event.xml',
-        'demo/website.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
         'demo/sale_order_confirm.xml',
         'demo/payment_provider_demo.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [

@@ -39,7 +39,6 @@
   ],
   'demo': [
         'demo/payment_provider_demo_post.xml',
-        'demo/website.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
         'demo/res_partner_category.xml',
@@ -55,7 +54,8 @@
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/ir_attachment_post.xml',
-        'demo/sale_order_confirm.xml'
+        'demo/sale_order_confirm.xml',
+        'demo/website.xml',
   ],
   'author': 'Odoo S.A.',
   "cloc_exclude": [
