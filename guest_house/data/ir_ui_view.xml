@@ -1,0 +1,408 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="rental_order_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//button[@name='action_open_pickup']" position="attributes">
+          <attribute name="string">Check In</attribute>
+        </xpath>
+        <xpath expr="//form[1]/header[1]/button[@name='action_open_return']" position="attributes">
+          <attribute name="string">Check Out</attribute>
+        </xpath>
+        <xpath expr="//field[@name='is_rental_order']" position="after">
+          <button string="City Tax" name="%(industry_add_update)d" type="action"/>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+          <page string="Guests">
+            <field name="x_guests">
+              <list string="Contacts" sample="1" multi_edit="1">
+                <field name="avatar_128" widget="image" options="{'size': [24, 24], 'img_class': 'o_avatar rounded'}" width="30" nolabel="1"/>
+                <field name="complete_name" string="Name"/>
+                <field name="email" optional="show"/>
+                <field name="phone" class="o_force_ltr" optional="show"/>
+                <field name="x_nationality" optional="show"/>
+                <field name="x_identity_check" optional="show" widget="badge" decoration-success="x_identity_check == 'ok'" decoration-warning="x_identity_check == 'na'" decoration-danger="x_identity_check == 'invalid'"/>
+                <field name="application_statistics" widget="contact_statistics" nolabel="1" optional="show" width="270"/>
+              </list>
+            </field>
+          </page>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="sale_renting.rental_order_primary_form_view"/>
+    <field name="mode">extension</field>
+    <field name="model">sale.order</field>
+    <field name="name">rental.order.form.inherit.guest_house</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="res_partner_stays_action" model="ir.actions.act_window">
+    <field name="context">{'search_default_x_guests': active_id,'default_x_guests': [active_id], 'form_view_ref': 'guest_house.rental_order_view'}</field>
+    <field name="domain">[('x_guests', '=', active_id)]</field>
+    <field name="name">Stays</field>
+    <field name="res_model">sale.order</field>
+  </record>
+  <record id="res_partner_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='is_published']" position="after">
+          <button class="oe_stat_button" icon="fa-hotel" type="action" name="%(res_partner_stays_action)d">
+            <field widget="statinfo" name="x_guests_count" string="Stays"/>
+          </button>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/group[1]" position="after">
+          <group>
+            <group string="Identity">
+              <field name="x_nationality"/>
+              <field name="x_document_type"/>
+              <field name="x_document_number"/>
+            </group>
+          </group>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="mode">extension</field>
+    <field name="model">res.partner</field>
+    <field name="name">res.partner.form.inherit.guest_house</field>
+    <field name="priority">200</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="planning_search_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//search[1]/group[1]/separator[1]" position="replace"/>
+        <xpath expr="//filter[@name='group_by_manager']" position="replace"/>
+        <xpath expr="//filter[@name='group_by_department']" position="replace"/>
+        <xpath expr="//search[1]/separator[7]" position="replace"/>
+        <xpath expr="//filter[@name='published_shifts']" position="replace"/>
+        <xpath expr="//filter[@name='unpublished_shifts']" position="replace"/>
+        <xpath expr="//search[1]/separator[6]" position="replace"/>
+        <xpath expr="//search[1]/separator[5]" position="replace"/>
+        <xpath expr="//filter[@name='non_billable']" position="replace"/>
+        <xpath expr="//filter[@name='billable']" position="replace"/>
+        <xpath expr="//search[1]/separator[4]" position="replace"/>
+        <xpath expr="//filter[@name='materials']" position="replace"/>
+        <xpath expr="//filter[@name='employees']" position="replace"/>
+        <xpath expr="//filter[@name='my_sale_orders']" position="replace"/>
+        <xpath expr="//filter[@name='my_role']" position="replace"/>
+        <xpath expr="//filter[@name='unwanted_shifts']" position="replace"/>
+        <xpath expr="//filter[@name='my_department_shifts']" position="replace"/>
+        <xpath expr="//filter[@name='my_team_shifts']" position="replace"/>
+        <xpath expr="//filter[@name='my_shifts']" position="replace"/>
+        <xpath expr="//filter[@name='open_shifts']" position="replace"/>
+        <xpath expr="//field[@name='employee_skill_ids']" position="replace"/>
+        <xpath expr="//field[@name='job_title']" position="replace"/>
+        <xpath expr="//field[@name='manager_id']" position="replace"/>
+        <xpath expr="//field[@name='department_id']" position="replace"/>
+        <xpath expr="//field[@name='resource_id']" position="before">
+          <field name="partner_id"/>
+        </xpath>
+        <xpath expr="//filter[@name='group_by_role']" position="after">
+          <filter string="Customer" name="Customer" context="{'group_by':'partner_id'}"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.planning_view_search"/>
+    <field name="mode">primary</field>
+    <field name="model">planning.slot</field>
+    <field name="name">planning.slot.search.inherit.guest_house</field>
+    <field name="priority">99</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="sale_order_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='product_template_id']" position="after">
+          <field name="x_nights" optional="show"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="mode">extension</field>
+    <field name="model">sale.order</field>
+    <field name="name">sale.order.form.inherit.guest_house</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="planning_kanban_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='sale_line_id']" position="replace">
+          <field name="sale_order_id" display="full" widget="many2one" class="d-block" context="{'form_view_ref': 'guest_house.rental_order_view', 'in_rental_app': 1}"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.planning_view_kanban"/>
+    <field name="mode">extension</field>
+    <field name="model">planning.slot</field>
+    <field name="name">planning.slot.kanban.inherit.guest_house</field>
+    <field name="priority">200</field>
+    <field name="type">kanban</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="product_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='default_code']" position="after">
+          <field name="x_is_a_room_offer" string="Is Room Offer"/>
+          <field name="x_is_stay_tax" string="Is City Tax"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="product.product_template_only_form_view"/>
+    <field name="mode">extension</field>
+    <field name="model">product.template</field>
+    <field name="name">product.template.product.form.inherit.guest_house</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="sale_planning.planning_role_view_tree_inherit_sale_planning" model="ir.ui.view">
+    <field name="name">planning.role.list.inherit.sale.planning</field>
+    <field name="model">planning.role</field>
+    <field name="inherit_id" ref="planning.planning_role_view_tree"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='resource_ids']" position="after">
+            <field name="product_ids" widget="many2many_tags" placeholder="e.g. Cleaning Services" context="{'default_type': 'service', 'default_planning_enabled': True, 'default_planning_role_id': id}"/>
+        </xpath>
+    </field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="planning_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='sync_shift_rental']" position="after">
+          <field name="x_is_a_room_offer" invisible="not sync_shift_rental"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.planning_role_view_form"/>
+    <field name="mode">extension</field>
+    <field name="model">planning.role</field>
+    <field name="name">planning.role.form.inherit.guest_house</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_orders_kanban" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//t[@t-name='card']/div[1]" position="after">
+          <field name="rental_start_date" display="full" widget="daterange" options="{'end_date_field':'rental_return_date','max_precision':'days','condensed':false,'min_precision':'days','show_time':false}"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="sale_renting.rental_order_view_kanban"/>
+    <field name="mode">primary</field>
+    <field name="model">sale.order</field>
+    <field name="name">rental.order.kanban.inherit.guest_house</field>
+    <field name="priority">160</field>
+    <field name="type">kanban</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_offers_search" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//filter[@name='group_by_product_properties']" position="replace"/>
+        <xpath expr="//filter[@name='groupby_public_category']" position="replace"/>
+        <xpath expr="//filter[@name='group_by_type']" position="replace"/>
+        <xpath expr="//search[1]/separator[8]" position="replace"/>
+        <xpath expr="//filter[@name='activities_exception']" position="replace"/>
+        <xpath expr="//search[1]/separator[7]" position="replace"/>
+        <xpath expr="//search[1]/separator[6]" position="replace"/>
+        <xpath expr="//search[1]/separator[5]" position="replace"/>
+        <xpath expr="//search[1]/separator[4]" position="replace"/>
+        <xpath expr="//filter[@name='filter_to_rent']" position="replace"/>
+        <xpath expr="//filter[@name='filter_to_purchase']" position="replace"/>
+        <xpath expr="//filter[@name='filter_to_sell']" position="replace"/>
+        <xpath expr="//search[1]/separator[3]" position="replace"/>
+        <xpath expr="//search[1]/separator[2]" position="replace"/>
+        <xpath expr="//filter[@name='combo']" position="replace"/>
+        <xpath expr="//filter[@name='goods']" position="replace"/>
+        <xpath expr="//filter[@name='services']" position="replace"/>
+      </data>
+    </field>
+    <field name="inherit_id" ref="product.product_template_search_view"/>
+    <field name="mode">primary</field>
+    <field name="model">product.template</field>
+    <field name="name">product.template.search.inherit.guest_house</field>
+    <field name="priority">160</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_offers_list" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='default_code']" position="after">
+          <field name="display_price" optional="show"/>
+          <field name="planning_role_id" optional="show"/>
+        </xpath>
+        <xpath expr="//field[@name='list_price']" position="attributes">
+          <attribute name="optional">hide</attribute>
+        </xpath>
+        <xpath expr="//field[@name='standard_price']" position="attributes">
+          <attribute name="optional">hide</attribute>
+        </xpath>  
+      </data>
+    </field>
+    <field name="inherit_id" ref="product.product_template_tree_view"/>
+    <field name="mode">primary</field>
+    <field name="model">product.template</field>
+    <field name="name">product.template.list.inherit.guest_house</field>
+    <field name="priority">160</field>
+    <field name="type">list</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_offers_kanban" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='list_price']" position="replace">
+          <field name="display_price" display="full"/>
+        </xpath>
+        <xpath expr="//field[@name='product_properties']" position="after">
+          <field name="planning_role_id" display="full" widget="badge"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="product.product_template_kanban_view"/>
+    <field name="mode">primary</field>
+    <field name="model">product.template</field>
+    <field name="name">product.template.kanban.inherit.guest_house</field>
+    <field name="priority">160</field>
+    <field name="type">kanban</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_planning_role_view_search" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//filter[@name='role_for_material']" position="replace"/>
+        <xpath expr="//filter[@name='role_for_employee']" position="replace"/>
+        <xpath expr="//filter[@name='my_department']" position="replace"/>
+        <xpath expr="//filter[@name='my_team']" position="replace"/>
+        <xpath expr="//filter[@name='my_roles']" position="replace"/>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.planning_role_view_search"/>
+    <field name="mode">primary</field>
+    <field name="model">planning.role</field>
+    <field name="name">planning.role.view.search.inherit.guest_house</field>
+    <field name="priority">160</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_planning_resource_view_search" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//filter[@name='working_period']" position="replace"/>
+        <xpath expr="//filter[@name='default_role_id']" position="replace"/>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.resource_resource_search_view_inherit"/>
+    <field name="mode">primary</field>
+    <field name="model">resource.resource</field>
+    <field name="name">resource.resource.view.search.inherit.guest_house</field>
+    <field name="priority">160</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_order_search" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//filter[@name='my_sale_orders_filter']" position="before">
+          <filter domain="['|', 
+            '&amp;', '&amp;', '&amp;', 
+            ('rental_status', '=', 'return'), 
+            ('rental_return_date', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0, 0, 0)).to_utc().strftime('%Y-%m-%d %H:%M:%S')), 
+            ('rental_return_date', '&lt;', datetime.datetime.combine(context_today() + relativedelta(days = 1), datetime.time(0, 0, 0)).to_utc().strftime('%Y-%m-%d %H:%M:%S')), 
+            ('state', '=', 'sale'), 
+            '&amp;', '&amp;', '&amp;', 
+            ('rental_status', '=', 'pickup'), 
+            ('rental_start_date', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0, 0, 0)).to_utc().strftime('%Y-%m-%d %H:%M:%S')), 
+            ('rental_start_date', '&lt;', datetime.datetime.combine(context_today() + relativedelta(days = 1), datetime.time(0, 0, 0)).to_utc().strftime('%Y-%m-%d %H:%M:%S')), 
+            ('state', '=', 'sale')]" 
+            name="filter_today" string="Today"/>
+          <separator/>
+        </xpath>
+        <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+          <separator/>
+          <filter domain="[('rental_status', 'in', ['sent', 'draft'])]" name="filter_draft" string="Draft"/>
+          <filter domain="[('rental_status', '=', 'pickup'), ('state', '=', 'sale')]" name="filter_check_in" string="To Check In"/>
+          <filter domain="[('rental_status', '=', 'return'), ('state', '=', 'sale')]" name="filter_check_out" string="To Check Out"/>
+        </xpath>
+        <xpath expr="//filter[@name='salesperson']" position="before">
+          <filter string="Status" name="rental_status_group" context="{'group_by': 'rental_status'}"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+    <field name="mode">primary</field>
+    <field name="model">sale.order</field>
+    <field name="name">sale.order.list.select.inherit.guest_house</field>
+    <field name="priority">320</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_schedule_form" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='resource_id']" position="attributes">
+          <attribute name="domain">[("role_ids.x_is_a_room_offer", "=", True)]</attribute>
+        </xpath>
+        <xpath expr="//field[@name='role_id']" position="attributes">
+          <attribute name="domain">[("x_is_a_room_offer", "=", True)]</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.planning_view_form_in_gantt"/>
+    <field name="mode">primary</field>
+    <field name="model">planning.slot</field>
+    <field name="name">planning.slot.form.inherit.guest_house</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_planning_gantt_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//gantt[1]" position="attributes">
+          <attribute name="default_group_by">resource_id</attribute>
+          <attribute name="default_range">month</attribute>
+          <attribute name="precision">{"day":"hour:full","week":"day:half","month":"day:half","year":"day:full"}</attribute>
+        </xpath>
+        <xpath expr="/gantt" position="attributes">
+          <attribute name="form_view_id">%(guest_house_schedule_form)d</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.planning_view_gantt"/>
+    <field name="mode">primary</field>
+    <field name="model">planning.slot</field>
+    <field name="name">planning.slot.gantt.inherit.guest_house</field>
+    <field name="priority">1000</field>
+    <field name="type">gantt</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="guest_house_planning_list_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='sale_line_id']" position="replace"/>
+        <xpath expr="//field[@name='start_datetime']" position="after">
+          <field name="sale_order_id" optional="show"/>
+          <field name="partner_id" optional="show"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="planning.planning_view_tree"/>
+    <field name="mode">primary</field>
+    <field name="model">planning.slot</field>
+    <field name="name">planning.slot.list.inherit.guest_house</field>
+    <field name="priority">160</field>
+    <field name="type">list</field>
+    <field name="active" eval="True"/>
+  </record>
+</odoo>
