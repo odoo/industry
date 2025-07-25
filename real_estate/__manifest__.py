@@ -8,6 +8,7 @@
         'base_automation',
         'base_industry_data',
         'crm_enterprise',
+        'documents',
         'hr',
         'knowledge',
         'project_enterprise',
