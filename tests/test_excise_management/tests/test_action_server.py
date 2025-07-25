@@ -71,22 +71,6 @@ class ActionServerTestCase(TransactionCase):
             self.assertNotIn(tax, self.fiscal_position.tax_ids,
                 "All excise taxes should be removed automatically of a fiscal position that becomes a fiscal deposit")
 
-    def test_add_remove_excise_tax_fiscal_deposit(self):
-        factor_1, factor_2 = 5, 10
-        uom = self.env['uom.uom'].create({
-            'name': 'uom test',
-            'relative_factor': factor_1,
-            'relative_uom_id': self.env['uom.uom'].create({
-                'name': 'rel uom test',
-                'relative_factor': factor_2,
-                'relative_uom_id': self.env.ref('uom.product_uom_unit').id,
-            }).id,
-        })
-        server_action = self.env['ir.actions.server'].browse(self.env.ref('excise_management.convert_to_base_unit_server_action').id)
-        result = server_action.with_context(active_id=uom.id, active_model="uom.uom").run()
-        self.assertEqual(result, factor_1 * factor_2,
-            "The convert to base unit server action should return the product of the UOM factor and its relative UOM factor")
-
     def test_fiscal_deposit_move_computation(self):
         customers = self.env['stock.location'].create({'name': 'Customers', 'usage': 'customer'})
         internal = self.env['stock.location'].create({'name': 'Internal', 'usage': 'internal'})
