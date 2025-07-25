@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="industry_on_so_line" model="base.automation">
+    <field name="model_id" ref="sale.model_sale_order"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('industry_add_update')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">On SO line edit, add/edit city tax</field>
+    <field name="trigger_field_ids" eval="[(6, 0, [ref('sale_model_sale_order_x_picked_up')])]"/>
+    <field name="filter_pre_domain">[('x_picked_up', '=', False)]</field>
+    <field name="filter_domain">[('x_picked_up', '=', True)]</field>
+  </record>
+  <record id="industry_on_slot_fix_times" model="base.automation">
+    <field name="model_id" ref="planning.model_planning_slot"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('industry_fix_slot_times'), ref('industry_trigger_so_update_from_slot')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">Fix Slot Times</field>
+    <field name="trigger_field_ids" eval="[(6, 0, [ref('planning.field_planning_slot__end_datetime'), ref('planning.field_planning_slot__start_datetime'), ref('sale_planning.field_planning_slot__sale_line_id')])]"/>
+  </record>
+</odoo>
