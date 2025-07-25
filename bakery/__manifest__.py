@@ -25,7 +25,6 @@
         'data/hr_job.xml',
     ],
     'demo': [
-        'demo/website.xml',
         'demo/website_view.xml',
         'demo/delivery_carrier.xml',
         'demo/crm_tag.xml',
@@ -42,6 +41,7 @@
         'demo/ir_attachment_post.xml',
         'demo/sale_order_confirm.xml',
         'demo/payment_provider_demo_post.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'assets': {

@@ -33,7 +33,6 @@
         'demo/res_company.xml',
         'demo/delivery_carrier.xml',
         'demo/ir_attachment.xml',
-        'demo/website.xml',
         'demo/res_partner.xml',
         'demo/product_supplierinfo.xml',
         'demo/product_product.xml',
@@ -42,6 +41,7 @@
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
         'demo/payment_provider_demo_post.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'assets': {

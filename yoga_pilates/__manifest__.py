@@ -58,12 +58,12 @@
         'demo/survey_question_answer.xml',
         'demo/ir_attachment_post.xml',
         'demo/sale_order_confirm.xml',
-        'demo/website.xml',
         'demo/website_view.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
         'demo/payment_provider_demo_post.xml',
+        'demo/website.xml',
     ],
     "cloc_exclude": [
         "data/knowledge_article.xml",
