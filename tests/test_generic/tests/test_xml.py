@@ -137,6 +137,7 @@ class TestEnv(IndustryCase):
                 self._check_website_published_false(tree, file_name)
                 self._check_static_files_usage_in_xml(tree, in_use_files)
                 self._check_fields(tree, file_name)
+                self._check_change_theme_method(tree, file_name)
                 if root.split('/')[-1] == 'data':
                     self._check_view_active(tree, file_name)
                     self._check_is_published_false(tree, file_name)
@@ -429,3 +430,11 @@ class TestEnv(IndustryCase):
         for record, has_user in records.items():
             if not has_user:
                 _logger.warning("You forgot to assign user_id(s) to the record with id=%s.", record)
+
+    def _check_change_theme_method(self, root, file_name):
+        for record in root.xpath("//function[@name='button_immediate_install' and @model='ir.module.module']"):
+            if 'theme' in record.get('eval', ''):
+                _logger.warning(
+                    "You should use button_choose_theme instead of button_immediate_install in %s.",
+                    file_name,
+                )
