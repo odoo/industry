@@ -1,4 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo noupdate="1">
-    <function model="purchase.order" name="button_confirm" eval="[ref('purchase_order_1')]"/>
+    <function model="purchase.order" name="button_confirm" eval="[[ref('purchase_order_1'), ref('purchase_order_2'), ref('purchase_order_3')]]"/>
+    <function name="button_validate" model="stock.picking">
+        <value model="stock.picking" eval="
+        (
+            obj().env.ref('construction.purchase_order_1') +
+            obj().env.ref('construction.purchase_order_2') +
+            obj().env.ref('construction.purchase_order_3')
+        ).group_id.stock_move_ids.picking_id.ids"/>
+    </function>
+
+    <function model="purchase.order" name="action_create_invoice" eval="[[ref('purchase_order_2')]]"/>
 </odoo>
