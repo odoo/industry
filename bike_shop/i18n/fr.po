@@ -121,6 +121,48 @@ msgid ""
 "            <t t-out=\"object.company_id.name\"/> \n"
 "            </div> "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\" data-oe-version=\"1.0\"> \n"
+"            <p style=\"box-sizing:border-box;margin: 0px; padding: 0px; font-size: 12px;\"> \n"
+"            Bonjour <span style=\"font-weight:bold;\" t-out=\"object.partner_id.name or ''\"/>,<br/>\n"
+"            <br/> \n"
+"            Nous soumettons une demande de garantie pour un client.\n"
+"            </p><ul>\n"
+"                <t t-if=\"object.properties and object.properties.get('order_line_id')\">\n"
+"                    <t t-set=\"order_line\" t-value=\"env['sale.order.line'].browse(object.properties['order_line_id'])\"/>\n"
+"                    <li>\n"
+"                        Nom du client : <t t-out=\"order_line.order_id.partner_id.display_name or 'N/A'\"/>\n"
+"                    </li>\n"
+"                </t>\n"
+"                <t t-if=\"object.properties and object.properties.get('task_id')\">\n"
+"                    <t t-set=\"task\" t-value=\"env['project.task'].browse(object.properties['task_id'])\"/>\n"
+"                    <t t-if=\"task.task_properties and task.task_properties.get('serial_number_id')\">\n"
+"                        <t t-set=\"serial\" t-value=\"env['stock.lot'].browse(task.task_properties['serial_number_id'])\"/>\n"
+"\n"
+"                        <t t-set=\"move_lines\" t-value=\"env['stock.move.line'].search([('lot_id', '=', serial.id)])\"/>\n"
+"                        <t t-set=\"sale_date\" t-value=\"False\"/>\n"
+"                        <t t-foreach=\"move_lines\" t-as=\"ml\">\n"
+"                            <t t-if=\"ml.move_id.sale_line_id\">\n"
+"                                <t t-set=\"sale_date\" t-value=\"ml.move_id.sale_line_id.order_id.date_order\"/>\n"
+"                                <t t-break=\"True\"/>\n"
+"                            </t>\n"
+"                        </t>\n"
+"                        <li>\n"
+"                            Numéro de série : <t t-out=\"serial.name or 'N/A'\"/>\n"
+"                        </li>\n"
+"                        <li t-if=\"sale_date\">\n"
+"                            Date d'achat : <t t-out=\"format_date(sale_date) if sale_date else 'N/A'\"/>\n"
+"                        </li>\n"
+"                    </t>\n"
+"                </t>\n"
+"            </ul>\n"
+"            Description du problème : <t t-out=\"object.description\"/>\n"
+"            <br/>\n"
+"            Veuillez trouver en pièce jointe des photos du défaut.<br/>\n"
+"            <br/>\n"
+"            Merci, <br/>\n"
+"            <t t-out=\"object.user_id.display_name\"/> <br/>\n"
+"            <t t-out=\"object.company_id.name\"/> \n"
+"            </div> "
 
 #. module: bike_shop
 #: model:mail.template,body_html:bike_shop.mail_template_order_ready
@@ -142,6 +184,22 @@ msgid ""
 "    </t>\n"
 "    </p></div>"
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\" data-oe-version=\"1.0\"> \n"
+"    <p style=\"box-sizing:border-box;margin: 0px; padding: 0px; font-size: 12px;\"> \n"
+"    Bonjour <span style=\"font-weight:bold;\" t-out=\"object.partner_id.display_name or ''\"/>,<br/>\n"
+"    <br/> \n"
+"    Votre commande <span style=\"font-weight:bold;\" t-out=\"object.name or ''\"/> est prête.\n"
+"    <br/>\n"
+"    Vous pouvez la récupérer en magasin à votre convenance.\n"
+"    <br/>\n"
+"    Merci pour votre confiance et votre patience !<br/>\n"
+"    <br/> \n"
+"    N'hésitez pas à nous contacter si vous avez la moindre question. <br/>\n"
+"    <br/>\n"
+"    <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-mail-quote-container=\"1\">\n"
+"        <span style=\"font-weight:bold;\" t-out=\"object.user_id.signature\"/>\n"
+"    </t>\n"
+"    </p></div>"
 
 #. module: bike_shop
 #: model_terms:product.template,out_of_stock_message:bike_shop.product_template_13
@@ -149,6 +207,8 @@ msgid ""
 "<em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em>This product is currently out of stock. Please check back soon or contact us for\n"
 "            availability.</em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em><br>"
 msgstr ""
+"<em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em>Ce produit est actuellement en rupture de stock. Veuillez revenir prochainement ou nous contacter pour\n"
+"            connaître sa disponibilité.</em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em><br>"
 
 #. module: bike_shop
 #: model_terms:product.template,out_of_stock_message:bike_shop.product_template_11
@@ -157,6 +217,8 @@ msgid ""
 "<em><em><em><em><em><em><em><em><em><em>This product is currently out of stock. Please check back soon or contact us for\n"
 "            availability.</em></em></em></em></em></em></em></em></em></em><br>"
 msgstr ""
+"<em><em><em><em><em><em><em><em><em><em>Ce produit est actuellement en rupture de stock. Veuillez revenir prochainement ou nous contacter pour\n"
+"            connaître sa disponibilité.</em></em></em></em></em></em></em></em></em></em><br>"
 
 #. module: bike_shop
 #: model_terms:product.template,out_of_stock_message:bike_shop.product_template_10
@@ -165,6 +227,9 @@ msgid ""
 "Please check back soon or contact us for "
 "availability.</em></em></em></em></em></em></em></em>"
 msgstr ""
+"<em><em><em><em><em><em><em><em>Ce produit est actuellement en rupture de "
+"stock. N'hésitez pas à revenir prochainement ou à nous contacter pour en "
+"connaître la disponibilité.</em></em></em></em></em></em></em></em>"
 
 #. module: bike_shop
 #: model_terms:product.template,out_of_stock_message:bike_shop.product_template_9
@@ -172,6 +237,9 @@ msgid ""
 "<em><em>This product is currently out of stock. Please check back soon or "
 "contact us for availability.</em></em>"
 msgstr ""
+"<em><em>Ce produit est actuellement en rupture de stock. N'hésitez pas à "
+"revenir prochainement ou à nous contacter pour en connaître la "
+"disponibilité.</em></em>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -1813,6 +1881,8 @@ msgid ""
 "Warranty Claim - {{(object.env['sale.order.line'].browse(object.properties['order_line_id']).order_id.partner_id.display_name + \" - \" + object.env['sale.order.line'].browse(object.properties['order_line_id']).name)if object.properties and object.properties.get('order_line_id') else ''  }}\n"
 "        "
 msgstr ""
+"Demande de service sous garantie - {{(object.env['sale.order.line'].browse(object.properties['order_line_id']).order_id.partner_id.display_name + \" - \" + object.env['sale.order.line'].browse(object.properties['order_line_id']).name)if object.properties and object.properties.get('order_line_id') else ''  }}\n"
+"        "
 
 #. module: bike_shop
 #: model:survey.question,title:bike_shop.survey_question_2
@@ -1978,7 +2048,7 @@ msgstr ""
 #. module: bike_shop
 #: model:mail.template,subject:bike_shop.mail_template_order_ready
 msgid "Your order {{ object.name or 'n/a' }} is ready for pickup"
-msgstr ""
+msgstr "Votre commande {{ object.name or 'n/a' }} vous attend en magasin"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
