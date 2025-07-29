@@ -50,7 +50,7 @@ class FileTest(IndustryCase):
                 _logger.warning("Wrong version in .tx/config")
 
             db_name = get_db_name()
-            if not db_name.endswith('imported_with_demo'):
+            if db_name.endswith('imported_no_demo'):
                 return
             with io.BytesIO() as buf:
                 trans_export(False, [module], buf, 'po', self.env)
