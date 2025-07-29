@@ -22,6 +22,7 @@
         'data/res_config_settings.xml',
         'data/product_category.xml',
         'data/project_task_type.xml',
+        'data/ir_ui_view.xml',
         'data/project_project.xml',
         'data/ir_attachment_pre.xml',
         'data/uom_uom.xml',
