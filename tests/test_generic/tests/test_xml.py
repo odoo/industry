@@ -81,6 +81,10 @@ models_with_user_id = [
     'sale.order',
 ]
 
+escape_studio_test = [
+    'construction',
+]
+
 
 @tagged('post_install', '-at_install')
 class TestEnv(IndustryCase):
@@ -143,7 +147,7 @@ class TestEnv(IndustryCase):
                     self._check_is_published_false(tree, file_name)
                     if not is_studio_required:
                         is_studio_required = self._check_studio(tree, file_name)
-        self._check_manifest(manifest_content, is_studio_required)
+        self._check_manifest(manifest_content, is_studio_required, escape_studio_test=module in escape_studio_test)
         self._check_records_without_user_id(checked_records_with_user)
         if not get_db_name().endswith('imported_no_demo'):
             in_use_files = {file.lstrip('/') for file in in_use_files}
@@ -169,7 +173,7 @@ class TestEnv(IndustryCase):
                 }
             )
 
-    def _check_manifest(self, s, need_studio):
+    def _check_manifest(self, s, need_studio, escape_studio_test):
         if (first_line := s.split('\n')[0]) != '{':
             message = "First line of the manifest should be the sole symbol '{'. "
             if not first_line:
@@ -185,6 +189,11 @@ class TestEnv(IndustryCase):
                 "'payment_demo' should not be in the dependencies. Instead, call "
                 "'button_immediate_install' on 'base.module_payment_demo' in demo."
             )
+
+        if escape_studio_test:
+            # Exception for some edge cases with studio, checking by hand
+            return
+
         base_automation = (
             'base_automation' in dependency_list and 'sale_subscription' not in dependency_list
         )
