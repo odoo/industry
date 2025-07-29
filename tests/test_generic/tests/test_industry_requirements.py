@@ -16,7 +16,7 @@ class TestEnv(IndustryCase):
 
     def test_payment_demo(self):
         db_name = get_db_name()
-        if not db_name.endswith('imported_with_demo'):
+        if db_name.endswith('imported_no_demo'):
             return
         no_online_payment_industries = [
             'bike_leasing',
