@@ -74,12 +74,12 @@
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
         'demo/stock_quant.xml',
-        'demo/website.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
         'demo/product_supplierinfo.xml',
         'demo/payment_provider_demo.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [
