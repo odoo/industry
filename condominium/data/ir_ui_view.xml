@@ -21,6 +21,10 @@
         <button class="oe_stat_button" icon="fa-home" type="action" name="%(properties_parent_act_window)d">
           <field widget="statinfo" name="x_parent_account_analytic_account_count" string="Properties" />
         </button>
+        <button class="oe_stat_button" type="object" name="action_view_vendor_bill"
+            icon="fa-file-text-o">
+            <field string="Vendor Bills" name="vendor_bill_count" widget="statinfo"/>
+        </button>
       </xpath>
       <xpath expr="//form[1]/sheet[1]/div[not(@name)][1]/h1[1]/field[@name='name']" position="attributes">
         <attribute name="string">Apartment...</attribute>
@@ -393,14 +397,14 @@
     <field name="arch" type="xml">
       <xpath expr="//sheet" position="before">
         <div role="alert" class="alert alert-info" groups="base.group_system" invisible="not ref_company_ids">
-                    New condominiums should be created as companies from the settings <button name="%(base.action_res_company_form)d" icon="oi-arrow-right" type="action" string="Manage Companies" class="btn-link"/>
+          New condominiums should be created as companies from the settings <button name="%(base.action_res_company_form)d" icon="oi-arrow-right" type="action" string="Manage Companies" class="btn-link"/>
         </div>
         <header>
           <button string="Create Condominium" name="%(ir_action_create_condominium)d" type="action" invisible="company_type == 'person' or ref_company_ids"/>
         </header>
       </xpath>
       <xpath expr="//button[@name='action_open_employees']" position="after">
-        <button class="oe_stat_button" icon="fa-home" type="action" name="%(properties_act_window_view)d">
+        <button class="oe_stat_button" icon="fa-home" type="action" name="%(properties_act_window_account)d">
           <field widget="statinfo" name="x_condominium_account_analytic_account_count" string="Properties" />
         </button>
       </xpath>
@@ -453,13 +457,6 @@
       </field>
     </field>
   </record>
-  <record id="properties_act_window_view" model="ir.actions.act_window">
-    <field name="view_ids" eval="[
-            (5, 0, 0),
-            (0, 0, {'view_mode': 'kanban', 'view_id': ref('analytic_account_custom_kanban_view')}),
-            (0, 0, {'view_mode': 'form', 'view_id': ref('analytic_account_custom_form_view')}),
-        ]"/>
-  </record>
   <record id="properties_parent_act_window" model="ir.actions.act_window">
     <field name="view_ids" eval="[
             (5, 0, 0),
@@ -474,13 +471,13 @@
             (0, 0, {'view_mode': 'form', 'view_id': ref('analytic_account_custom_form_view')}),
         ]"/>
   </record>
-  <record id="properties_act_window" model="ir.actions.act_window">
+  <!-- <record id="properties_act_window" model="ir.actions.act_window">
     <field name="view_ids" eval="[
             (5, 0, 0),
             (0, 0, {'view_mode': 'kanban', 'view_id': ref('analytic_account_custom_kanban_view')}),
             (0, 0, {'view_mode': 'form', 'view_id': ref('analytic_account_custom_form_view')}),
         ]"/>
-  </record>
+  </record> -->
   <record id="odoo_studio_analytic_e24d1766-3331-491b-9f50-16cd3518f693" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
@@ -885,19 +882,40 @@
     <field name="name">Default search view for x_property_line_07bf7</field>
     <field name="type">search</field>
   </record>
+
+
+
+  <record id="x_property_kanban_view" model="ir.ui.view">
+    <field name="name">x_property.kanban customization</field>
+    <field name="mode">primary</field>
+    <field name="active" eval="True"/>
+    <field name="model">x_property</field>
+    <field name="priority">99</field>
+    <field name="type">kanban</field>
+    <field name="arch" type="xml">
+    <!-- quick_create_view="condominium.quick_create_account_form" -->
+      <kanban default_group_by="x_studio_building">
+        <templates>
+          <t t-name="card">
+            <field name="x_name" class="fw-bold"/>
+            <field name="x_studio_type" display="full"/>
+            <field name="x_studio_current_owner" display="full" widget="many2one_avatar"/>
+            <field name="x_studio_tags" display="full"/>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+
   <!-- <record id="odoo_studio_default__0b41b371-7e01-4ca4-bb33-6cf1258f2a9c" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
         <xpath expr="//field[@name='x_name']" position="attributes">
           <attribute name="class">fw-bold</attribute>
         </xpath>
-        <xpath expr="//field[@name='x_name']" position="after">
-          <field name="x_studio_type" display="full"/>
-          <field name="x_studio_current_owner" display="full" widget="many2one_avatar"/>
-          <field name="x_studio_tags" display="full"/>
-        </xpath>
       </data>
     </field>
+    <field name="inherit_id" ref="x_property_kanban_view"/>
     <field name="mode">extension</field>
     <field name="model">x_property</field>
     <field name="name">Default kanban view for ir.model(847,) customization</field>
@@ -1833,7 +1851,7 @@
             <list editable="bottom">
               <field name="x_sequence" widget="handle"/>
               <field name="x_studio_property" optional="show"/>
-              <field name="x_owner" optional="show"/>
+              <field name="x_owner" strinng="Current Owner" optional="show"/>
               <field name="x_building" optional="show"/>
               <field name="x_type" optional="show"/>
               <field name="x_floor" optional="show"/>
