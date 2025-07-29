@@ -259,8 +259,8 @@ for record in self:
   <record id="x_condominium_account_analytic_account_count" model="ir.model.fields">
     <field name="name">x_condominium_account_analytic_account_count</field>
     <field name="compute"><![CDATA[
-for record in self:
-    record['x_condominium_account_analytic_account_count'] = self.env['account.analytic.account'].search_count([('x_condominium', '=', record.id)])
+for record in self:#meet
+    record['x_condominium_account_analytic_account_count'] = self.env['x_property'].search_count([('x_studio_condominium', '=', record.id)])
 ]]>    </field>
     <field name="ttype">integer</field>
     <field name="field_description">Building Condominium count</field>
@@ -438,62 +438,6 @@ for record in self:
     <field name="model_id" ref="ratios_model" />
     <field name="name">x_ratio</field>
   </record>
-  <record id="x_area_related_field" model="ir.model.fields">
-    <field name="name">x_area</field>
-    <field name="ttype">float</field>
-    <field name="related">x_property.x_area</field>
-    <field name="field_description">Area</field>
-    <field name="model_id" ref="ratios_model"/>
-    <field name="readonly" eval="True"/>
-    <field name="store" eval="False"/>
-  </record>
-  <record id="x_building_related_field" model="ir.model.fields">
-    <field name="name">x_building</field>
-    <field name="ttype">many2one</field>
-    <field name="related">x_property.x_building</field>
-    <field name="field_description">Building</field>
-    <field name="model_id" ref="ratios_model" />
-    <field name="readonly" eval="True" />
-    <field name="relation">x_buildings</field>
-    <field name="store" eval="False" />
-  </record>
-  <record id="x_type_related_field" model="ir.model.fields">
-    <field name="name">x_type</field>
-    <field name="ttype">many2one</field>
-    <field name="related">x_property.x_type</field>
-    <field name="field_description">Type</field>
-    <field name="model_id" ref="ratios_model"/>
-    <field name="readonly" eval="True"/>
-    <field name="relation">x_properties_types</field>
-    <field name="store" eval="False" />
-  </record>
-  <record id="x_floor_related_field" model="ir.model.fields">
-    <field name="name">x_floor</field>
-    <field name="ttype">char</field>
-    <field name="related">x_property.x_floor</field>
-    <field name="field_description">Floor</field>
-    <field name="model_id" ref="ratios_model" />
-    <field name="readonly" eval="True"/>
-    <field name="store" eval="False"/>
-  </record>
-  <record id="x_owner_field" model="ir.model.fields">
-    <field name="name">x_owner</field>
-    <field name="ttype">many2one</field>
-    <field name="related">x_property.partner_id</field>
-    <field name="field_description">Owner</field>
-    <field name="model_id" ref="ratios_model"/>
-    <field name="readonly" eval="True"/>
-    <field name="relation">res.partner</field>
-    <field name="store" eval="False"/>
-  </record>
-  <record id="x_ratios_field" model="ir.model.fields">
-    <field name="name">x_ratios</field>
-    <field name="ttype">one2many</field>
-    <field name="field_description">Ratios</field>
-    <field name="model_id" ref="product.model_product_pricelist" />
-    <field name="relation">x_ratios</field>
-    <field name="relation_field">x_pricelist</field>
-  </record>
 
   <!-- not found -->
   <record id="x_distribution_key_field" model="ir.model.fields">
@@ -583,7 +527,6 @@ for record in self:
     <field name="model_id" ref="model_meters"/>
     <field name="ttype">integer</field>
   </record>
-
   <record id="field_current_owner_property" model="ir.model.fields">
     <field name="ttype">many2one</field>
     <field name="copied" eval="True"/>
@@ -591,14 +534,6 @@ for record in self:
     <field name="model_id" ref="property_9abd67e7-492e-4fac-9aef-812e565e196e"/>
     <field name="name">x_studio_current_owner</field>
     <field name="relation">res.partner</field>
-  </record>
-  <record id="field_ratios_property" model="ir.model.fields">
-    <field name="ttype">many2one</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Property</field>
-    <field name="model_id" ref="ratios_model"/>
-    <field name="name">x_studio_property</field>
-    <field name="relation">x_property</field>
   </record>
   <record id="field_property_name" model="ir.model.fields">
     <field name="ttype">char</field>
@@ -663,6 +598,70 @@ for record in self:
     <field name="model_id" ref="property_9abd67e7-492e-4fac-9aef-812e565e196e"/>
     <field name="name">x_studio_parent</field>
     <field name="relation">x_property</field>
+  </record>
+  <record id="field_ratios_property" model="ir.model.fields">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Property</field>
+    <field name="model_id" ref="ratios_model"/>
+    <field name="name">x_studio_property</field>
+    <field name="relation">x_property</field>
+  </record>
+  <record id="x_owner_field" model="ir.model.fields">
+    <field name="name">x_owner</field>
+    <field name="ttype">many2one</field>
+    <field name="related">x_studio_property.x_studio_current_owner</field>
+    <field name="field_description">Owner</field>
+    <field name="model_id" ref="ratios_model"/>
+    <field name="readonly" eval="True"/>
+    <field name="relation">res.partner</field>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="x_building_related_field" model="ir.model.fields">
+    <field name="name">x_building</field>
+    <field name="ttype">many2one</field>
+    <field name="related">x_studio_property.x_studio_building</field>
+    <field name="field_description">Building</field>
+    <field name="model_id" ref="ratios_model" />
+    <field name="readonly" eval="True" />
+    <field name="relation">x_buildings</field>
+    <field name="store" eval="False" />
+  </record>
+  <record id="x_type_related_field" model="ir.model.fields">
+    <field name="name">x_type</field>
+    <field name="ttype">many2one</field>
+    <field name="related">x_studio_property.x_studio_type</field>
+    <field name="field_description">Type</field>
+    <field name="model_id" ref="ratios_model"/>
+    <field name="readonly" eval="True"/>
+    <field name="relation">x_properties_types</field>
+    <field name="store" eval="False" />
+  </record>
+  <record id="x_floor_related_field" model="ir.model.fields">
+    <field name="name">x_floor</field>
+    <field name="ttype">char</field>
+    <field name="related">x_studio_property.x_studio_floor</field>
+    <field name="field_description">Floor</field>
+    <field name="model_id" ref="ratios_model" />
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="x_area_related_field" model="ir.model.fields">
+    <field name="name">x_area</field>
+    <field name="ttype">float</field>
+    <field name="related">x_studio_property.x_studio_area</field>
+    <field name="field_description">Area</field>
+    <field name="model_id" ref="ratios_model"/>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="x_ratios_field" model="ir.model.fields">
+    <field name="name">x_ratios</field>
+    <field name="ttype">one2many</field>
+    <field name="field_description">Ratios</field>
+    <field name="model_id" ref="product.model_product_pricelist" />
+    <field name="relation">x_ratios</field>
+    <field name="relation_field">x_pricelist</field>
   </record>
   <record id="field_property_line_sequence" model="ir.model.fields">
     <field name="ttype">integer</field>
@@ -1212,7 +1211,7 @@ for record in self: record['x_x_studio_condominium_x_property_count'] = self.env
         for attendee in record.attendee_ids:
             if attendee.x_studio_attending or attendee.x_studio_delegating: x_studio_attending_ratio += attendee.x_studio_ratio
         total_ratio = sum(
-            ratio.x_ratio for ratio in record.x_studio_voting_key.x_studio_ratio_ids
+            x_studio_ratio.x_ratio for x_studio_ratio in record.x_studio_voting_key.x_studio_ratio_ids
         )
         if total_ratio > 0:
           record['x_studio_attending_ratio'] =  x_studio_attending_ratio / total_ratio
