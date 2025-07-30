@@ -1,6 +1,6 @@
 {
     'name': 'Custom Furniture Production',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Supply Chain',
     'depends': [
         'account_followup',
@@ -30,6 +30,7 @@
         'data/planning_role.xml',
         'data/uom_uom.xml',
         'data/product_template.xml',
+        'data/product_attribute.xml',
         'data/product_attribute_value.xml',
         'data/product_template_attribute_line.xml',
         'data/product_template_attribute_value.xml',
@@ -41,6 +42,7 @@
         'data/mrp_routing_workcenter.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
+        'data/quotation_document.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
@@ -56,7 +58,6 @@
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
-        'demo/mail_activity.xml',
         'demo/stock_warehouse_orderpoint.xml',
         'demo/mrp_production.xml',
         'demo/purchase_order.xml',
