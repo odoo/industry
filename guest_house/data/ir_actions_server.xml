@@ -50,7 +50,7 @@ if sale_order:
     return int(x) if x == int(x) else int(x) + 1
 start_datetime = record.start_datetime.astimezone(tz=dateutil.tz.UTC)
 end_datetime = record.end_datetime.astimezone(tz=dateutil.tz.UTC)
-tz = env.context.get("tz") or 'Europe/Brussels'
+tz = env.ref('website.default_website').tz
 if record.role_id.x_is_a_room_offer:
     if record.start_datetime and str(record.start_datetime.time()) != "18:00:00":
         start = timezone(tz).localize(datetime.datetime(year=start_datetime.year, month=start_datetime.month, day=start_datetime.day, hour=18, minute=0, second=0))
@@ -74,6 +74,25 @@ if record.sale_line_id:
     rent_unit_price = env['product.pricing'].search([('product_template_id', '=', record.sale_line_id.product_id.product_tmpl_id.id)], limit=1).price
     if rent_unit_price:
         record['sale_line_id']['price_unit'] = rent_unit_price * nights
+]]></field>
+    </record>
+    <record id="industry_set_rental_hours" model="ir.actions.server">
+        <field name="name">Set Rental Start/Return Hours</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for record in records:
+    tz = env.ref('website.default_website').tz
+    rental_start_date = record.rental_start_date.astimezone(tz=dateutil.tz.gettz(tz))
+    rental_return_date = record.rental_return_date.astimezone(tz=dateutil.tz.gettz(tz))
+    start = rental_start_date.replace(hour=18, minute=0, second=0, microsecond=0)
+    start_datetime = start.astimezone(tz=dateutil.tz.UTC)
+    record['rental_start_date'] = start_datetime.replace(tzinfo=None)
+    end = rental_return_date.replace(hour=9, minute=0, second=0, microsecond=0)
+    end_datetime = end.astimezone(tz=dateutil.tz.UTC)
+    record['rental_return_date'] = end_datetime.replace(tzinfo=None)
+    record.action_update_rental_prices()
 ]]></field>
     </record>
 </odoo>
