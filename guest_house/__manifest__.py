@@ -35,7 +35,6 @@
         'data/ir_ui_menu.xml',
         'data/sale_temporal_recurrence.xml',
         'data/product_template.xml',
-        'data/product_image.xml',
         'data/product_product.xml',
         'data/product_template_attribute_line.xml',
         'data/product_template_attribute_value.xml',
