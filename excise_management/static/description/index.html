@@ -1,130 +1,110 @@
 <h1>Excises Module</h1>
 <div>
-    
-    <div">
-        <p><i>⚠️</i>The Excises Module is not part of Odoo standard but uses Odoo Studio and leverages lines of python code; therefore installing this module may increase your subscription.</p>
-    </div>
-</div>
-<h2>Purpose</h2>
-<p>Excises Module aims at enabling the management and reporting of excise related products, more specifically alcohol goods.</p>
-<p>It enables:</p>
-<ul>
-    <li>The <strong>definition of excise categories</strong> with the details of their computation;</li>
-    <li>The <strong>assignation of excise categories</strong> to products;</li>
-    <li>The <strong>reporting of excises</strong> related products in volume to fulfill legal requirements of declaration;</li>
-    <li><strong>Accounting for excises</strong> in product price definition in order to offer discounts independently of the excise taxes.</li>
-</ul>
-<p><br/></p>
-<h2>Definition of excise categories</h2>
-<p>Excise categories are defined as a custom model with Studio and can be found in the inventory menu.</p>
-<p>Excise category consists of:</p>
-<ul>
-    <li>A name, often using the excise category code;</li>
-    <li>A description of the excise category;</li>
-</ul>
-<p> <br/></p>
-<h2>Assignation of excise categories</h2>
-<p>Once defined, excise categories can be assigned to products with the Excise amount.</p>
-<div>
-    
-    <div>
-        <p><i>⚠️</i>It is paramount that the Product unit of measure (beside Sales Price and Cost) shall be of volume quantity for the computation of the Excise reporting.  <br/></p>
-    </div>
-</div>
-<div> <br/></div>
-<h2>Excises reporting</h2>
-<p>The excises reporting concern organisation managing their stock with fiscal deposits.</p>
-<h4>Fiscal deposit warehouse</h4>
-<p>The reporting of excises consist in monitoring entering, exiting and currently located excises concerned products in a fiscal deposit.
-    <br/>To monitor such fiscal deposit with this module, set the field Is Fiscal Deposit from the warehouse form.</p>
-<div>
-    
-    <div>
-        <p><i>💡</i>With this setting, all stock moves related to excises concerned products and this warehouse will be reported.</p>
-        <p>Note that you can have multiple fiscal deposit warehouses and transfers between them are accounting in the reporting.</p>
-    </div>
-</div>
-<p><img class="img-fluid" src="3.png"></p>
-<h4>Excise reporting unit</h4>
-<div>
-    
-    <div>
-        <p><i>⚠️</i>You shall select the excise reporting unit of your choice before any stock move related to excises.</p>
-    </div>
-</div>
-<p>To do so, follow those steps:</p>
-<ol>
-    <li>Open the list of units from the Inventory Configuration menu.</li>
-    <li>Open the unit of reporting of your choice or create a new one.</li>
-    <li>Set the Excise reporting unit field.</li>
-    <li>Open the currently selected reporting unit, hL by default, and unset this field.</li>
-</ol>
-<p><img class="img-fluid" src="4.png"></p>
-<h4>Providers and customers</h4>
-<p>In the excises declaration, origin and destination might have an impact and you shall therefore know ahead if you purchase from a supplier or sell to a customer having a fiscal deposit.</p>
-<p>To capture this information on the contact and never have to worry about this in the future, this information is captured in the contact fiscal position.</p>
-<p>This way, both transactions and reporting will account for the fiscal deposit of your contact and therefore exclude the excises from the price and categorize appropriately the fiscal deposit move.</p>
-<p>If not existing yet, to capture a contact has a fiscal deposit, duplicate its fiscal position and set the Is Fiscal Deposit setting. Excise taxes are assigned to all non fiscal deposit fiscal position thanks to an automation.</p>
-<div>
-    <div>
-        <p><i>⚠️</i>When installing this module, all Fiscal Positions are set as Fiscal Deposit.<br/>
-            Adjust the Fiscal Positions which are not to consider the Excise Taxes in your orders.</p>
-    </div>
-</div>
-<h4>Excise reporting reading</h4>
-<div>
-    <div>
-        <p><i>💡</i>As a reminder, the excise reporting has nothing to deal with sales and purchase but focus on entering, exiting and available products in fiscal deposit warehouses. </p>
-    </div>
-</div>
-<p>The excise report is available from the Inventory Reporting menu and consists of a pivot table summarizing the volumes monitored through the fiscal deposit warehouses in the excise reporting unit (hL by default).</p>
-<p>The columns correspond to excise categories and rows are split by periods and then by fiscal deposit moves.
-    <br/>The entries are summed positively and exits negatively which enables to compute balances when aggregated:</p>
-<ul>
-    <li>A line with a period provides by product category the excise volume entering the fiscal deposit warehouse during this period when positive or leaving when negative.</li>
-    <li>The total line, when all periods are accounted in, provides the current stock in the fiscal deposit warehouse by product category.</li>
-</ul>
-<p>The fiscal deposit moves are:</p>
-<ul>
-    <li><strong>Exit</strong>: The products have exited the fiscal deposit warehouse for a location which is not a fiscal deposit.
-        <br/>This is the case when:</li>
+    <p>The Excises Module is not part of Odoo standard but uses Odoo Studio and leverages lines of python code; therefore installing this module may increase your subscription.</p>
+    <p o-we-hint-text="Type &quot;/&quot; for commands" class="o-we-hint"><br></p>
+    <h2>Purpose</h2>
+    <p>Excises Module aims at enabling the management and reporting of excise related products.</p>
+    <p>It enables:</p>
     <ul>
-        <li>Transferring some products from a "back office warehouse" to a "front store" where the front store is not a fiscal deposit.</li>
-        <li>Delivering to a contact not having a fiscal deposit.</li>
+        <li>The&nbsp;<strong>definition of excise categories</strong>&nbsp;with the associated reporting unit;</li>
+        <li>The&nbsp;<strong>assignation of excise categories</strong>&nbsp;to products;</li>
+        <li>The&nbsp;<strong>reporting of excises</strong>&nbsp;related products&nbsp;to fulfill legal requirements of declaration;</li>
+        <li><strong>Accounting for excises</strong>&nbsp;in product price definition in order to offer discounts independently of the excise taxes.</li>
     </ul>
-    <li><strong>Exit to FD</strong>: The products have exited the fiscal deposit warehouse for a location which is a fiscal deposit.
-        <br/>This is the case when delivering to a contact having a fiscal deposit.</li>
-    <li><strong>Entry from FD</strong>: The products have entered the fiscal deposit warehouse from a location which is a fiscal deposit.
-        <br/>This is the case when being delivered by a contact having a fiscal deposit, typically a larger supplier or product manufacturer.</li>
-    <li><strong>Entry</strong>: The products have entered the fiscal deposit warehouse from a location which is not a fiscal deposit.
-        <br/>This case is less standard and enable excise credit request. An example of it might be: 100 boxes of wine have been sold for a wedding to an end customer (without fiscal deposit); after the wedding the customer comes back to be refunded the 20 boxes which were not consumed; when placing those in the fiscal deposit warehouses, the corresponding excises could be claimed as credit.</li>
-    <li><strong>Transfer</strong>: The products have been transferred between two fiscal deposit warehouses of yours.
-        <br/>This is the case when having multiple fiscal deposit warehouses and dispatching your stock.
-        <br/>Those lines are null given those products exit on the one end but enter on the other one.</li>
-</ul>
-<p> <br/></p>
-<h2>Accounting for excises in sales</h2>
-<p>Finally, excises impact as well the sales in two manners:</p>
-<ul>
-    <li>If your customers have a fiscal deposit, there is no need to impose them the excises in the price of the product.</li>
-    <li>When applying a discount to a customer, this shall be applied beside the excises.</li>
-</ul>
-<p>To ensure that products submitted to excises account for it in module, an automation is setup so that as soon as an excise category is applied, the Excise tax is added to the product.</p>
-<h4>Billing or not billing the excises</h4>
-<p>Similarly to VAT and other taxes, not all sales are submitted to them. This applies as well to excises given this can be considered as a local tax, where the product will be consumed by end customers.</p>
-<p>Odoo easily handle this through fiscal position of contacts, in their Sales tab.</p>
-<p><a href="https://www.odoo.com/documentation/latest/applications/finance/accounting/taxes/fiscal_positions.html" class="btn btn-fill-primary">Fiscal Position</a></p>
-<h4>Discount beside excises</h4>
-<p>As always, including a tax in the product price or not will depend on your primary business.
-    <br/>If B2B, you might want to exclude the excises, similarly to VAT, while if B2C, on the other hand you might want to include it in the price.</p>
-<p>To apply discount beside the excises, you shall setup your excise tax as excluded from price.</p>
-<p>On the other hand, if including the excise tax in the price, discounts will apply on the product price while the excises tax is not shrinking, lowering your margin ultimately.</p>
-<p>To change this setting, open the excise tax, and adjust the Included in Price setting from the Advanced Options.</p>
-<p><a class="btn btn-fill-primary" href="https://www.odoo.com/documentation/latest/applications/finance/accounting/taxes/B2B_B2C.html">B2B vs B2C taxes</a></p>
-<p> <br/></p>
-<h2>Last word</h2>
-<p>As stated in the Purpose section, this module aims at enabling at first the management of alcohol products.
-    <br/>However, numerous products are submitted to excises such as tobacco, e-liquid and more.</p>
-<p>Don't hesitate to contact us in case this does not yet meet your needs!</p>
-<p><a href="https://www.odoo.com/contactus" class="btn btn-primary">Reach us</a></p>
-<p> <br/></p>
+    <div class="o-paragraph"><br></div>
+    <h2>Definition of excise categories</h2>
+    <p>Excise categories are defined as a custom model with Studio and can be found in the inventory menu.</p>
+    <p>Excise category consists of:</p>
+    <ul>
+        <li>A name, often using the excise category code;</li>
+        <li>A description of the excise category;</li>
+        <li>A reporting unit;</li>
+    </ul>
+    <div class="o-paragraph"><br></div>
+    <h2>Assignation of excise categories</h2>
+    <p>Excise categories can be assigned to products.</p>
+    <p>When an excise category is assigned to a product, then additional excise related inputs are needed:</p>
+    <ul>
+        <li>The excise tax amount for this product;</li>
+        <li>The product quantity to be reported, in the excise category reporting unit;</li>
+    </ul>
+    <div class="o-paragraph"><br></div>
+    <h2>Excises reporting</h2>
+    <p>The excises reporting concern organisations managing their stock with fiscal deposits.</p>
+    <h4>Fiscal deposit warehouse</h4>
+    <p>The reporting of excises consist in monitoring entering, exiting and currently located excises concerned products in a fiscal deposit.</p>
+    <p>To monitor such fiscal deposit with this module, set the field Is Fiscal Deposit from the warehouse form.</p>
+    <p>With this setting, all stock moves related to excises concerned products and this warehouse will be reported.</p>
+    <p>Note that you can have multiple fiscal deposit warehouses and transfers between them are accounting in the reporting.</p>
+    <h4>Providers and customers</h4>
+    <p>In the excises declaration, origin and destination might have an impact and you shall therefore know ahead if you purchase from a supplier or sell to a customer having a fiscal deposit.</p>
+    <p>To capture this information on the contact and never have to worry about this in the future, this information is captured in the contact fiscal position.</p>
+    <p>This way, both transactions and reporting will account for the fiscal deposit of your contact and therefore exclude the excise taxes&nbsp;and categorize appropriately the fiscal deposit move.</p>
+    <p>If not existing yet, to capture a contact has a fiscal deposit, duplicate its fiscal position and set the Is Fiscal Deposit setting. Excise taxes are assigned to all non fiscal deposit fiscal position thanks to an automation.</p>
+    <div class="o_editor_banner user-select-none o-contenteditable-false lh-1 d-flex align-items-center alert alert-warning pb-0 pt-3" data-oe-role="status" contenteditable="false" role="status">
+        <i class="o_editor_banner_icon mb-3 fst-normal" data-oe-aria-label="Banner Warning" aria-label="Banner Warning">⚠️</i>
+        <div class="o_editor_banner_content o-contenteditable-true w-100 px-3 mb-3" contenteditable="true">
+            <p>When installing this module, all Fiscal Positions are set as Fiscal Deposit.</p>
+        </div>
+    </div>
+    <p>Adjust the Fiscal Positions which are not to consider the Excise Taxes in your orders.</p>
+    <h4>Excise reporting reading</h4>
+    <p>As a reminder, the excise reporting has nothing to deal with sales and purchase but focus on entering, exiting and available products in fiscal deposit warehouses.</p>
+    <p>The excise report is available from the Inventory Reporting menu and consists of a pivot table summarizing the quantity&nbsp;and excise tax amount monitored through the fiscal deposit warehouses.</p>
+    <p>The columns correspond to excise categories and rows are split by periods and then by fiscal deposit moves.</p>
+    <p>The entries are summed positively and exits negatively which enables to compute balances when aggregated:</p>
+    <ul>
+        <li>A line with a period provides by product category the excise quantity&nbsp;entering the fiscal deposit warehouse during this period when positive or leaving when negative.</li>
+    </ul>
+    <div class="o_editor_banner user-select-none o-contenteditable-false lh-1 d-flex align-items-center alert alert-info pb-0 pt-3" data-oe-role="status" contenteditable="false" role="status">
+        <i class="o_editor_banner_icon mb-3 fst-normal" data-oe-aria-label="Banner Info" aria-label="Banner Info">💡</i>
+        <div class="o_editor_banner_content o-contenteditable-true w-100 px-3 mb-3" contenteditable="true">
+            <div class="o-paragraph">The total line, when all periods are accounted in, provides the current stock in the fiscal deposit warehouse by product category.</div>
+        </div>
+    </div>
+    <p>The fiscal deposit moves are:</p>
+    <ul>
+        <li><strong>Exit</strong>: The products have exited the fiscal deposit warehouse for a location which is not a fiscal deposit.<br>This is the case when:</li>
+        <li class="oe-nested">
+            <ul>
+                <li>Transferring some products from a "back office warehouse" to a "front store" where the front store is not a fiscal deposit.</li>
+                <li>Delivering to a contact not having a fiscal deposit.</li>
+            </ul>
+        </li>
+        <li><strong>Exit to FD</strong>: The products have exited the fiscal deposit warehouse for a location which is a fiscal deposit.<br>This is the case when delivering to a contact having a fiscal deposit.</li>
+        <li><strong>Entry from FD</strong>: The products have entered the fiscal deposit warehouse from a location which is a fiscal deposit.<br>This is the case when being delivered by a contact having a fiscal deposit, typically a larger supplier or product manufacturer.</li>
+        <li><strong>Entry</strong>: The products have entered the fiscal deposit warehouse from a location which is not a fiscal deposit.<br>This case is less standard and enable excise credit request. An example of it might be: 100 boxes of wine have been sold for a wedding to an end customer (without fiscal deposit); after the wedding the customer comes back to be refunded the 20 boxes which were not consumed; when placing those in the fiscal deposit warehouses, the corresponding excises could be claimed as credit.</li>
+        <li><strong>Transfer</strong>: The products have been transferred between two fiscal deposit warehouses of yours.<br>This is the case when having multiple fiscal deposit warehouses and dispatching your stock.<br>Those lines are null given those products exit on the one end but enter on the other one.</li>
+    </ul>
+    <div class="o_editor_banner user-select-none o-contenteditable-false lh-1 d-flex align-items-center alert alert-warning pb-0 pt-3" data-oe-role="status" contenteditable="false" role="status">
+        <i class="o_editor_banner_icon mb-3 fst-normal" data-oe-aria-label="Banner Warning" aria-label="Banner Warning">⚠️</i>
+        <div class="o_editor_banner_content o-contenteditable-true w-100 px-3 mb-3" contenteditable="true">
+            <div class="o-paragraph">In absence of Fiscal Position for a provider or a customer, it is considered having a fiscal deposit.</div>
+        </div>
+    </div>
+    <div class="o-paragraph"><br></div>
+    <h2>Accounting for excises in sales</h2>
+    <p>Finally, excises impact as well the sales in two manners:</p>
+    <ul>
+        <li>If your customers have a fiscal deposit, there is no need to impose them the excises in the price of the product.</li>
+        <li>When applying a discount to a customer, this shall be applied beside the excises.</li>
+    </ul>
+    <p>To ensure that products submitted to excises account for it in module, an automation is setup so that as soon as an excise category is applied, the Excise tax is added to the product.</p>
+    <h4>Billing or not billing the excises</h4>
+    <p>Similarly to VAT and other taxes, not all sales are submitted to them. This applies as well to excises given this can be considered as a local tax, where the product will be consumed by end customers.</p>
+    <p>Odoo easily handle this through fiscal position of contacts, in their Sales tab.</p>
+    <p>&#xFEFF;<a class="btn btn-fill-primary" href="https://www.odoo.com/documentation/latest/applications/finance/accounting/taxes/fiscal_positions.html">&#xFEFF;Fiscal Position&#xFEFF;</a>&#xFEFF;</p>
+    <h4>Discount beside excises</h4>
+    <p>As always, including a tax in the product price or not will depend on your primary business.</p>
+    <p>If B2B, you might want to exclude the excises, similarly to VAT, while if B2C, on the other hand you might want to include it in the price.</p>
+    <p>To apply discount beside the excises, you shall setup your excise tax as excluded from price.</p>
+    <p>On the other hand, if including the excise tax in the price, discounts will apply on the product price while the excises tax is not shrinking, lowering your margin ultimately.</p>
+    <p>To change this setting, open the excise tax, and adjust the Included in Price setting from the Advanced Options.</p>
+    <p>&#xFEFF;<a href="https://www.odoo.com/documentation/latest/applications/finance/accounting/taxes/B2B_B2C.html" class="btn btn-fill-primary">&#xFEFF;B2B vs B2C taxes&#xFEFF;</a>&#xFEFF;</p>
+    <p><br></p>
+    <h2>Last word</h2>
+    <p>As stated in the Purpose section, this module aims at enabling at first the management of alcohol products.</p>
+    <p>However, numerous products are submitted to excises such as tobacco, e-liquid and more.</p>
+    <p>Don't hesitate to contact us in case this does not yet meet your needs!</p>
+    <p>&#xFEFF;<a class="btn btn-primary" href="https://www.odoo.com/contactus">&#xFEFF;Reach us&#xFEFF;</a>&#xFEFF;</p>
+</div>
