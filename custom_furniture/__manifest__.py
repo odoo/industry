@@ -55,6 +55,7 @@
         'demo/hr_employee.xml',
         'demo/crm_lead.xml',
         'demo/product_supplierinfo.xml',
+        'demo/stock_quant.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
