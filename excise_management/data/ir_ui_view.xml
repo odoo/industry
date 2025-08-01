@@ -10,6 +10,7 @@
                 <field name="x_sequence" widget="handle"/>
                 <field name="x_name"/>
                 <field name="x_description" optional="show"/>
+                <field name="x_unit_id" string="Reporting unit"/>
             </list>
         </field>
     </record>
@@ -26,29 +27,21 @@
                     <group name="excise" string="Excises">
                         <label for="x_excise_category"/>
                         <div class="d-flex" name="deposit">
-                            <field class="oe_inline" name="x_excise_category" options="{'no_open': True, 'no_create': True}"/>
+                            <field name="x_excise_category" class="oe_inline" options="{'no_open': True, 'no_create': True}"/>
                             <field name="x_excise_description" force_save="1" readonly="True"/>
                         </div>
                         <label for="x_excise_amount" invisible="not x_excise_category"/>
                         <div class="d-flex" name="excise_amount" invisible="not x_excise_category">
                             <field name="x_currency_symbol" class="oe_inline" force_save="1"/>
                             <field name="x_excise_amount" class="oe_inline" force_save="1" options="{'digits':[8,4]}"/>
+                        </div>
+                        <label for="x_excise_quantity" invisible="not x_excise_category"/>
+                        <div class="d-flex" name="excise_quantity" invisible="not x_excise_category">
+                            <field name="x_excise_quantity" class="oe_inline" force_save="1" options="{'digits':[8,6]}"/>
+                            <field name="x_excise_unit" force_save="1" readonly="True" options="{'no_open': True}"/>
                         </div> 
                     </group>
                 </group>
-            </xpath>
-        </field>
-    </record>
-    <record id="uom_uom_view_form" model="ir.ui.view">
-        <field name="name">uom.uom.view.form.inherit.excise</field>
-        <field name="inherit_id" ref="uom.product_uom_form_view"/>
-        <field name="model">uom.uom</field>
-        <field name="priority">160</field>
-        <field name="type">form</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <xpath expr="//group[@name='uom_details']" position="inside">
-                <field name="x_excise_reporting_unit"/>
             </xpath>
         </field>
     </record>
@@ -60,9 +53,10 @@
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <pivot string="Excises Analysis">
-                <field name="x_excise_volume" type="measure" options="{'digits':[8,4]}"/>
+                <field name="x_excise_quantity" type="measure" options="{'digits':[8,4]}"/>
                 <field name="x_excise_amount" type="measure"/>
                 <field name="x_excise_category" type="col"/>
+                <field name="x_excise_unit" type="col"/>
                 <field name="date" interval="week" type="row"/>
                 <field name="x_fiscal_deposit_move" type="row"/>
             </pivot>
@@ -125,7 +119,7 @@
                 <field name="x_excise_category" optional="show"/>
                 <field name="x_excise_amount" optional="show"/>
                 <field name="x_currency_id" column_invisible="True"/>
-                <field name="x_excise_volume" optional="show" options="{'digits':[8,4]}"/>
+                <field name="x_excise_quantity" optional="show" options="{'digits':[8,6]}"/>
                 <field name="x_excise_unit" optional="show"/>
             </list>
         </field>
