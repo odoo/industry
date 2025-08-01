@@ -247,7 +247,7 @@
     <field name="arch" type="xml">
         <pivot string="Leads" display_quantity="1" sample="1">
             <field name="x_interested_in_id" type="row"/>
-            <field name="stage_id" type="row"/>
+            <field name="stage_id" type="col"/>
         </pivot>
     </field>
   </record>
@@ -396,6 +396,24 @@
         (5, 0, 0),
         (0, 0, {'view_mode': 'pivot', 'view_id': ref('crm_lead_view_pivot')}),
         (0, 0, {'view_mode': 'graph', 'view_id': ref('crm_opportunity_view_graph')}),
+    ]"/>
+  </record>
+  <record id="calendar_view_for_appointment_type" model="ir.ui.view">
+      <field name="name">calendar view for appointment.type</field>
+      <field name="model">appointment.type</field>
+      <field name="active" eval="True"/>
+      <field name="arch" type="xml">
+        <calendar date_start="start_datetime" date_stop="end_datetime" string="Calendar"/>
+      </field>
+  </record>
+  <record id="visits_appointment_act_window" model="ir.actions.act_window">
+    <field name="name">Visits</field>
+    <field name="res_model">appointment.type</field>
+    <field name="view_mode">calendar,kanban,list,form</field>
+    <field name="domain">[("x_property_id", "!=", False)]</field>
+    <field name="view_ids" eval="[
+        (5, 0, 0),
+        (0, 0, {'view_mode': 'calendar', 'view_id': ref('calendar_view_for_appointment_type')}),
     ]"/>
   </record>
 </odoo>
