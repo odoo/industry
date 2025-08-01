@@ -26,4 +26,5 @@
         'data/res_config_setting.xml',
     ],
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }
