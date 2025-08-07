@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+    <template id="portal_my_home_products" name="Your products" inherit_id="portal.portal_my_home">
+        <div id="portal_common_category" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/web/image/3pl_logistic_company.ir_attachment_3'"/>
+                <t t-set="title">Your Products</t>
+                <t t-set="text">Manage you products and stock</t>
+                <t t-set="url" t-value="'/website/action/products'"/>
+                <t t-set="config_card" t-value="True"/>
+            </t>
+        </div>
+    </template>
+
+    <template id="portal_products" name="Your Products">
+        <t t-call="portal.portal_layout">
+            <t t-set="logged_user" t-value="request.env.user"/>
+            <t t-set="user_products" t-value="request.env['stock.quant'].sudo().search([('product_id.x_owner_id', 'in', [logged_user.partner_id.id, logged_user.partner_id.parent_id.id]), ('location_id.usage', '=', 'internal'), ('quantity', '!=', '0')])"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Products</t>
+            </t>
+            <div t-if="not user_products" class="alert alert-info">
+                There are currently no products for your account.
+            </div>
+            <t t-else="">
+                <t t-call="portal.portal_table">
+                    <thead>
+                        <tr>
+                            <th>Display Name</th>
+                            <th>Lot</th>
+                            <th>Expiration date</th>
+                            <th>Available quantity</th>
+                            <th>Reserved quantity</th>
+                            <th>Uom</th>
+                            <th>Packages</th>
+                        </tr>
+                    </thead>
+                    <t t-foreach="user_products" t-as="stock_quant">
+                        <tr>
+                            <td><t t-esc="stock_quant.product_id.display_name"/></td>
+                            <td><t t-esc="stock_quant.lot_id.name"/></td>
+                            <td><t t-esc="stock_quant.expiration_date"/></td>
+                            <td><t t-esc="stock_quant.available_quantity"/></td>
+                            <td><t t-esc="stock_quant.reserved_quantity"/></td>
+                            <td><t t-esc="stock_quant.product_id.uom_id.name"/></td>
+                            <td><t t-esc="stock_quant.package_id.complete_name"/></td>
+                        </tr>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
