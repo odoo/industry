@@ -3,15 +3,18 @@
   <record id="odoo_studio_stock_pi_a2f93bf4-089e-4696-bcea-c76b0da99856" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
+        <xpath expr="//kanban" position="attributes">
+          <attribute name="create">0</attribute>
+        </xpath>
         <xpath expr="//field[@name='user_id']" position="replace"/>
         <xpath expr="//field[@name='activity_ids']" position="replace"/>
         <xpath expr="//field[@name='state']" position="replace">
           <field name="move_ids" display="full" widget="x2_many_media_viewer" string="Products" options="{}"/>
-          <field widget="statinfo" class="ms-auto" name="activity_type_icon" display="full" string="Late"
-            invisible="state in ['assigned', 'waiting', 'confirmed']
+          <field widget="statinfo" class="bg-danger text-white fw-bold text-uppercase ms-auto" name="activity_type_icon" display="full" string="Late"
+            invisible="state not in ['assigned', 'waiting', 'confirmed']
                     and (has_deadline_issue
-                    or date_deadline &lt;= datetime.date.today().strftime('%Y-%m-%d')
-                    or scheduled_date &lt;= datetime.date.today().strftime('%Y-%m-%d'))"/>
+                    or date_deadline and date_deadline &lt; current_date
+                    or scheduled_date and scheduled_date &lt; current_date)"/>
         </xpath>
         <!-- <xpath expr="//kanban[1]/templates[1]/t[@t-name='card']/div[1]/field[@name='name']" position="replace"/> -->
       </data>
@@ -27,10 +30,10 @@
   <record id="odoo_studio_stock_ru_8d7cc849-104d-4b24-b4e7-d9ca7ed9f5f7" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
-        <!-- <xpath expr="//list" position="attributes">
-            <attribute name="editable">bottom</attribute>
-            <attribute name="open_form_view">True</attribute>
-        </xpath> -->
+        <xpath expr="//list" position="attributes">
+          <attribute name="multi_edit">1</attribute>
+          <!-- <attribute name="open_form_view">1</attribute> -->
+        </xpath>
         <xpath expr="//field[@name='route_id']" position="replace">
           <field name="delay" optional="show"/>
           <field name="x_studio_pos_product_category_ids" widget="many2many_tags"/>
@@ -38,8 +41,13 @@
         <xpath expr="//field[@name='location_dest_id']" position="replace"/>
         <xpath expr="//field[@name='location_src_id']" position="replace"/>
         <xpath expr="//field[@name='action']" position="replace">
-          <xpath expr="//field[@name='name']" position="move" optional="show"/>
-          <field name="x_studio_standard_rule" invisible="True"/>
+          <xpath expr="//field[@name='name']" position="move"/>
+        </xpath>
+        <xpath expr="//field[@name='name']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//list" position="inside">
+          <field name="x_studio_standard_rule" optional="hide"/>
         </xpath>
       </data>
     </field>
@@ -110,11 +118,12 @@
       <data>
         <xpath expr="//search[1]/field[@name='name']" position="before">
           <xpath expr="//field[@name='partner_id']" position="move"/>
-          <xpath expr="//field[@name='product_id']" position="move"/>
-          <!-- filter_domain="['|', '|', '|', ('default_code', 'ilike', 'sfh'), ('product_variant_ids.default_code', 'ilike', 'sfh'), ('name', 'ilike', 'sfh'), ('barcode', 'ilike', 'sfh')]" -->
+          <xpath expr="//field[@name='product_id']" filter_domain="['|', '|', '|', ('default_code', 'ilike', 'sfh'), ('product_variant_ids.default_code', 'ilike', 'sfh'), ('name', 'ilike', 'sfh'), ('barcode', 'ilike', 'sfh')]" position="move"/>
         </xpath>
         <xpath expr="//field[@name='partner_id']" position="attributes">
-          <attribute name="filter_domain"/>
+          <attribute name="filter_domain">
+                ['|', '|', '|', '|', ('partner_id.complete_name', 'ilike', 'dgj'), ('partner_id.ref', 'ilike', 'dgj'), ('partner_id.email', 'ilike', 'dgj'), ('partner_id.company_registry', 'ilike', 'dgj'), ('partner_id.barcode', 'ilike', 'dgj')]
+          </attribute>
         </xpath>
         <xpath expr="//search[1]/field[@name='name']" position="after">
           <field name="return_count"/>
@@ -136,17 +145,23 @@
   <record id="stock_picking_list_view_inherit" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
-        <!-- <xpath expr="//list" position="attributes">
+        <xpath expr="//list" position="attributes">
             <attribute name="create">0</attribute>
-        </xpath> -->
+            <attribute name="multi_edit">1</attribute>
+        </xpath>
+        <xpath expr="//field[@name='scheduled_date']" position="attributes">
+          <attribute name="widget"/>
+          <attribute name="options">{'show_time': false}</attribute>
+        </xpath>
         <xpath expr="//field[@name='name']" position="replace"/>
         <xpath expr="//field[@name='origin']" position="replace"/>
         <xpath expr="//field[@name='state']" position="replace">
-          <field  widget="statinfo" class="bg-danger text-white" name="activity_type_icon" string="Late"
-            invisible="state in ['assigned', 'waiting', 'confirmed']
+          <field name="date_deadline"/>
+          <field  widget="statinfo" class="bg-danger text-white fw-bold text-uppercase" name="activity_type_icon" string="Late"
+            invisible="state not in ['assigned', 'waiting', 'confirmed']
                     and (has_deadline_issue
-                    or date_deadline &lt;= datetime.date.today().strftime('%Y-%m-%d')
-                    or scheduled_date &lt;= datetime.date.today().strftime('%Y-%m-%d'))"/>
+                    or date_deadline and date_deadline &lt; current_date
+                    or scheduled_date and scheduled_date &lt; current_date)"/>
         </xpath>
       </data>
     </field>
