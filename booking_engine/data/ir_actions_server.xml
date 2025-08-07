@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="industry_add_update" model="ir.actions.server">
+        <field name="name">Add/Update City Tax</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[for record in records:
+    stay_taxes = 0
+    stay_tax_line = False
+    for so_line in record.order_line:
+        if so_line.product_id.x_is_a_room_offer:
+            if so_line.x_nights > 0: stay_taxes += so_line.x_nights
+        if so_line.product_id.x_is_stay_tax: stay_tax_line = so_line
+    if stay_taxes > 0:
+        if stay_tax_line: stay_tax_line['product_uom_qty'] = stay_taxes
+        else: # Add stay tax product
+            product = env['product.product'].search([('x_is_stay_tax', '=', True)], limit=1)
+            env['sale.order.line'].create({'order_id': record.id, 'product_id': product.id, 'product_uom_qty': stay_taxes})
+        ]]></field>
+    </record>
+    <record id="industry_trigger_so_update_from_slot" model="ir.actions.server">
+        <field name="name">Trigger SO Update from Slot</field>
+        <field name="model_id" ref="planning.model_planning_slot"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+sale_order = record.sale_order_id
+if sale_order:
+    stay_taxes = 0
+    stay_tax_line = False
+    for so_line in sale_order.order_line:
+        if so_line.product_id.x_is_a_room_offer:
+            if so_line.x_nights > 0:
+                stay_taxes += so_line.x_nights
+        if so_line.product_id.x_is_stay_tax:
+            stay_tax_line = so_line
+    if stay_taxes > 0:
+        if stay_tax_line:
+            stay_tax_line['product_uom_qty'] = stay_taxes
+]]></field>
+    </record>
+  <record id="industry_fix_slot_times" model="ir.actions.server">
+    <field name="binding_model_id" ref="planning.model_planning_slot"/>
+    <field name="model_id" ref="planning.model_planning_slot"/>
+    <field name="usage">base_automation</field>
+    <field name="state">code</field>
+    <field name="name">Fix Slot Times</field>
+    <field name="code"><![CDATA[def ceil(x):
+    return int(x) if x == int(x) else int(x) + 1
+start_datetime = record.start_datetime.astimezone(tz=dateutil.tz.UTC)
+end_datetime = record.end_datetime.astimezone(tz=dateutil.tz.UTC)
+tz = env.ref('website.default_website').tz
+if record.role_id.x_is_a_room_offer:
+    if record.start_datetime and str(record.start_datetime.time()) != "18:00:00":
+        start = timezone(tz).localize(datetime.datetime(year=start_datetime.year, month=start_datetime.month, day=start_datetime.day, hour=18, minute=0, second=0))
+        start_datetime = start.astimezone(tz=dateutil.tz.UTC)
+        if start_datetime >= end_datetime:
+            start_datetime = start_datetime - datetime.timedelta(days=1)
+    if record.end_datetime and str(record.end_datetime.time()) != "09:00:00":
+        end = timezone(tz).localize(datetime.datetime(year=end_datetime.year, month=end_datetime.month, day=end_datetime.day, hour=9, minute=0, second=0))
+        end_datetime = end.astimezone(tz=dateutil.tz.UTC)
+        if start_datetime >= end_datetime:
+            end_datetime = end_datetime + datetime.timedelta(days=1)
+    record['start_datetime'] = start_datetime.replace(tzinfo=None)
+    record['end_datetime'] = end_datetime.replace(tzinfo=None)
+if record.sale_line_id:
+    nights = 0
+    if record.sale_line_id.planning_slot_ids:
+        for slot in record.sale_line_id.planning_slot_ids:
+            if slot.start_datetime and slot.end_datetime:
+                nights += ceil((slot.end_datetime - slot.start_datetime).total_seconds() / (24 * 3600))
+    record['sale_line_id']['x_nights'] = nights
+    rent_unit_price = env['product.pricing'].search([('product_template_id', '=', record.sale_line_id.product_id.product_tmpl_id.id)], limit=1).price
+    if rent_unit_price:
+        record['sale_line_id']['price_unit'] = rent_unit_price * nights
+]]></field>
+    </record>
+    <record id="industry_set_rental_hours" model="ir.actions.server">
+        <field name="name">Set Rental Start/Return Hours</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for record in records:
+    tz = env.ref('website.default_website').tz
+    rental_start_date = record.rental_start_date.astimezone(tz=dateutil.tz.gettz(tz))
+    rental_return_date = record.rental_return_date.astimezone(tz=dateutil.tz.gettz(tz))
+    start = rental_start_date.replace(hour=18, minute=0, second=0, microsecond=0)
+    start_datetime = start.astimezone(tz=dateutil.tz.UTC)
+    record['rental_start_date'] = start_datetime.replace(tzinfo=None)
+    end = rental_return_date.replace(hour=9, minute=0, second=0, microsecond=0)
+    end_datetime = end.astimezone(tz=dateutil.tz.UTC)
+    record['rental_return_date'] = end_datetime.replace(tzinfo=None)
+    record.action_update_rental_prices()
+]]></field>
+    </record>
+</odoo>
