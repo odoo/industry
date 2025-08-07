@@ -27,10 +27,10 @@
   <record id="odoo_studio_stock_ru_8d7cc849-104d-4b24-b4e7-d9ca7ed9f5f7" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
-        <!-- <xpath expr="//list" position="attributes">
-            <attribute name="editable">bottom</attribute>
+        <xpath expr="//list" position="attributes">
+            <attribute name="edit">1</attribute>
             <attribute name="open_form_view">True</attribute>
-        </xpath> -->
+        </xpath>
         <xpath expr="//field[@name='route_id']" position="replace">
           <field name="delay" optional="show"/>
           <field name="x_studio_pos_product_category_ids" widget="many2many_tags"/>
@@ -38,8 +38,13 @@
         <xpath expr="//field[@name='location_dest_id']" position="replace"/>
         <xpath expr="//field[@name='location_src_id']" position="replace"/>
         <xpath expr="//field[@name='action']" position="replace">
-          <xpath expr="//field[@name='name']" position="move" optional="show"/>
-          <field name="x_studio_standard_rule" invisible="True"/>
+          <xpath expr="//field[@name='name']" position="move"/>
+        </xpath>
+        <xpath expr="//field[@name='name']" position="attributes">
+            <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//list" position="inside">
+            <field name="x_studio_standard_rule" optional="hide"/>
         </xpath>
       </data>
     </field>
@@ -110,11 +115,12 @@
       <data>
         <xpath expr="//search[1]/field[@name='name']" position="before">
           <xpath expr="//field[@name='partner_id']" position="move"/>
-          <xpath expr="//field[@name='product_id']" position="move"/>
-          <!-- filter_domain="['|', '|', '|', ('default_code', 'ilike', 'sfh'), ('product_variant_ids.default_code', 'ilike', 'sfh'), ('name', 'ilike', 'sfh'), ('barcode', 'ilike', 'sfh')]" -->
+          <xpath expr="//field[@name='product_id']" filter_domain="['|', '|', '|', ('default_code', 'ilike', 'sfh'), ('product_variant_ids.default_code', 'ilike', 'sfh'), ('name', 'ilike', 'sfh'), ('barcode', 'ilike', 'sfh')]" position="move"/>
         </xpath>
         <xpath expr="//field[@name='partner_id']" position="attributes">
-          <attribute name="filter_domain"/>
+          <attribute name="filter_domain">
+                ['|', '|', '|', ('partner_id.complete_name', 'ilike', 'dgj'), ('partner_id.ref', 'ilike', 'dgj'), ('partner_id.email', 'ilike', 'dgj'), ('partner_id.company_registry', 'ilike', 'dgj'), ('partner_id.barcode', 'ilike', 'dgj')]
+          </attribute>
         </xpath>
         <xpath expr="//search[1]/field[@name='name']" position="after">
           <field name="return_count"/>

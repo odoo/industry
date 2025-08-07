@@ -35,4 +35,17 @@ record.write({'route_ids': [(6, 0, [env.ref('libraries.stock_route_4').id])]})
         <field name="state">code</field>
         <field name="name">Execute Code</field>
     </record>
+
+    <record id="action_update_destination_location_on_picking" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for recrod in records:
+    if record.picking_type_id and record.picking_type_id.x_studio_overrule_customer_location:
+        record.write({
+            "location_dest_id": record.picking_type_id.default_location_dest_id.id
+        })
+]]></field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="state">code</field>
+        <field name="name">Execute Code</field>
+    </record>
 </odoo>
