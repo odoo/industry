@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="product_route" model="ir.actions.server">
+        <field name="name">Route displaying products</field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="state">code</field>
+        <field name="website_published">True</field>
+        <field name="website_path">products</field>
+        <field name="code"><![CDATA[
+response = request.render('3pl_logistic_company.portal_products')
+]]></field>
+    </record>
+    <record id="action_change_product_storable_lots" model="ir.actions.server">
+        <field name="code"><![CDATA[
+record.write({'is_storable': True, 'tracking': 'lot'})
+]]></field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="state">code</field>
+        <field name="name">Execute Code</field>
+    </record>
+    <record id="action_update_move_line_owner" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for move_line in records:
+    move_line['owner_id'] = move_line.product_id.x_owner_id
+]]></field>
+        <field name="model_id" ref="stock.model_stock_move_line"/>
+        <field name="state">code</field>
+        <field name="name">Execute Code</field>
+    </record>
+    <record id="action_update_stock_move_owner" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for pick in records:
+    first_owner = pick.move_ids[:1].product_id.x_owner_id
+    if first_owner and all(move.product_id.x_owner_id == first_owner for move in pick.move_ids):
+        pick.write({'owner_id': first_owner})
+]]></field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="state">code</field>
+        <field name="name">Execute Code</field>
+    </record>
+</odoo>
