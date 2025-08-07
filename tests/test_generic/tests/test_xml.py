@@ -69,7 +69,7 @@ MODELS_TO_UPDATE = [
     "website.controller.page",
 ]
 
-models_with_user_id = [
+MODELS_WITH_USER_ID = [
     'crm.lead',
     'event.event',
     'knowledge.article.favorite',
@@ -135,6 +135,7 @@ class TestEnv(IndustryCase):
                 self._check_static_files_usage_in_xml(tree, in_use_files)
                 self._check_fields(tree, file_name)
                 self._check_change_theme_method(tree, file_name)
+                self._check_dates_are_relative(tree, file_name)
                 if root.split('/')[-1] == 'data':
                     self._check_view_active(tree, file_name)
                     self._check_is_published_false(tree, file_name)
@@ -195,14 +196,14 @@ class TestEnv(IndustryCase):
             _logger.warning("'web_studio' should not be in the dependencies.")
 
     def _check_studio(self, root, file_name):
-        models_for_studio = [
+        MODELS_FOR_STUDIO = [
             "ir.actions.act_window",
             "ir.actions.server",
             "ir.model",
             "ir.model.fields",
             "ir.ui.menu",
         ]
-        for model in models_for_studio:
+        for model in MODELS_FOR_STUDIO:
             if root.xpath(f"//record[@model='{model}']"):
                 _logger.info("%s found in %s, needs studio", model, file_name)
                 return True
@@ -215,7 +216,7 @@ class TestEnv(IndustryCase):
         return False
 
     def _check_xml_style(self, s, root, module, file_name):
-        starts_with = [
+        STARTS_WITH = [
             "<?xml version='1.0' encoding='UTF-8'?>",
             "<?xml version='1.0' encoding=\"UTF-8\"?>",
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
@@ -223,10 +224,10 @@ class TestEnv(IndustryCase):
             "<?xml version=\"1.0\" encoding=\"utf-8\"?>",
         ]
         first_line = s.split('\n')[0]
-        if not any(first_line == start_line for start_line in starts_with):
+        if not any(first_line == start_line for start_line in STARTS_WITH):
             _logger.warning(
                 "XML files should begin with the following line: %s, but %s starts with %s",
-                starts_with[0],
+                STARTS_WITH[0],
                 file_name,
                 first_line,
             )
@@ -416,7 +417,7 @@ class TestEnv(IndustryCase):
 
     def _check_user_is_set(self, root, previous_records):
         records = previous_records
-        for model in models_with_user_id:
+        for model in MODELS_WITH_USER_ID:
             for record in root.xpath(f"//record[@model='{model}']"):
                 record_id = record.get('id')
                 user_field = record.xpath(".//field[@name='user_id']")
@@ -435,3 +436,31 @@ class TestEnv(IndustryCase):
                     "You should use button_choose_theme instead of button_immediate_install in %s.",
                     file_name,
                 )
+
+    def _check_dates_are_relative(self, root, file_name):
+        RELATIVE_DATES = [
+            'today()',
+            'now()',
+        ]
+        for record in root.xpath("//record"):
+            model_name = record.get('model')
+            if not model_name:
+                continue
+            model = self.env.get(model_name)
+            fields_set_in_record = {
+                field for field in record.xpath('.//field')
+                if field.getparent().get('id', False) == record.get('id')  # nested record definitions
+            }
+            for field in fields_set_in_record:
+                field_name = field.get('name')
+                field_type = model._fields.get(field_name).type
+                if field_type not in ('date', 'datetime'):
+                    continue
+                field_eval = field.get('eval')
+                if not field_eval or not any(date in field_eval for date in RELATIVE_DATES):
+                    _logger.warning(
+                        "Date field '%s' in model '%s' is hard coded (file: %s). ",
+                        field_name,
+                        model_name,
+                        file_name,
+                    )
