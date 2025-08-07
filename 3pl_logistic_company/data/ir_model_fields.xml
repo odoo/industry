@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="x_location_fee_rate_id_field_stock_location" model="ir.model.fields">
+        <field name="name">x_location_fee_rate_id</field>
+        <field name="field_description">Fee Rate</field>
+        <field name="model_id" ref="stock.model_stock_location"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">x_fee_rate</field>
+    </record>
+
+    <record id="x_name_field_x_fee_rate" model="ir.model.fields">
+        <field name="name">x_name</field>
+        <field name="field_description">Name</field>
+        <field name="model_id" ref="x_fee_rate_model"/>
+        <field name="ttype">char</field>
+    </record>
+
+    <record id="x_owner_field_product_template" model="ir.model.fields">
+        <field name="name">x_owner_id</field>
+        <field name="field_description">Owner</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.partner</field>
+        <field name="domain">['|', ('parent_id', '=', False), ('is_company', '!=', False)]</field>
+    </record>
+
+    <record id="x_partner_related_products_field_res_partner" model="ir.model.fields">
+        <field name="name">x_partner_related_products</field>
+        <field name="field_description">Products</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="ttype">one2many</field>
+        <field name="relation">product.template</field>
+        <field name="relation_field">x_owner_id</field>
+    </record>
+
+    <record id="x_point_id_title_field_quality_check" model="ir.model.fields">
+        <field name="name">x_point_id_title</field>
+        <field name="field_description">Control Point Title</field>
+        <field name="ttype">char</field>
+        <field name="related">point_id.title</field>
+        <field name="model_id" ref="quality.model_quality_check"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="x_quality_check_owner_sale_order_line" model="ir.model.fields">
+        <field name="name">x_quality_check_owner</field>
+        <field name="field_description">Owner</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.partner</field>
+        <field name="model_id" ref="quality.model_quality_check"/>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="depends">move_line_id, picking_id</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_quality_check_owner'] = record.move_line_id.owner_id or record.picking_id.owner_id
+]]></field>
+    </record>
+    <record id="x_stored_picking_type_id_field_stock_move_line" model="ir.model.fields">
+        <field name="name">x_stored_picking_type_id</field>
+        <field name="field_description">Operation Type</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.picking.type</field>
+        <field name="related">picking_type_id</field>
+        <field name="model_id" ref="stock.model_stock_move_line"/>
+    </record>
+
+    <!-- x_stock_history fields -->
+    <record id="x_date_field_x_stock_history" model="ir.model.fields">
+        <field name="name">x_date</field>
+        <field name="field_description">Date</field>
+        <field name="model_id" ref="x_stock_history_model"/>
+        <field name="ttype">date</field>
+    </record>
+    <record id="x_history_owner_id_field_x_stock_history" model="ir.model.fields">
+        <field name="name">x_history_owner_id</field>
+        <field name="field_description">Owner</field>
+        <field name="model_id" ref="x_stock_history_model"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.partner</field>
+    </record>
+    <record id="x_location_id_field_x_stock_history" model="ir.model.fields">
+        <field name="name">x_location_id</field>
+        <field name="field_description">Location</field>
+        <field name="model_id" ref="x_stock_history_model"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.location</field>
+    </record>
+    <record id="x_history_fee_rate_id_field_x_stock_history" model="ir.model.fields">
+        <field name="name">x_history_fee_rate_id</field>
+        <field name="field_description">Fee Rate</field>
+        <field name="model_id" ref="x_stock_history_model"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">x_fee_rate</field>
+    </record>
+    <record id="x_product_id_field_x_stock_history" model="ir.model.fields">
+        <field name="name">x_product_id</field>
+        <field name="field_description">Product</field>
+        <field name="model_id" ref="x_stock_history_model"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">product.template</field>
+    </record>
+    <record id="x_package_id_field_x_stock_history" model="ir.model.fields">
+        <field name="name">x_package_id</field>
+        <field name="field_description">Package</field>
+        <field name="model_id" ref="x_stock_history_model"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.package</field>
+    </record>
+    <record id="x_package_type_field_x_stock_history" model="ir.model.fields">
+        <field name="name">x_package_type</field>
+        <field name="field_description">Package type</field>
+        <field name="model_id" ref="x_stock_history_model"/>
+        <field name="ttype">char</field>
+    </record>
+    <record id="x_stock_lot_id_field_x_stock_history" model="ir.model.fields">
+        <field name="name">x_stock_lot_id</field>
+        <field name="field_description">Lot/SN</field>
+        <field name="model_id" ref="x_stock_history_model"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.lot</field>
+    </record>
+    <record id="x_quantity_field_x_stock_history" model="ir.model.fields">
+        <field name="name">x_quantity</field>
+        <field name="field_description">Quantity</field>
+        <field name="model_id" ref="x_stock_history_model"/>
+        <field name="ttype">integer</field>
+    </record>
+    <record id="x_package_master_container_id_field_stock_quants" model="ir.model.fields">
+        <field name="name">x_package_master_container_id</field>
+        <field name="field_description">Package Master Container</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.package</field>
+        <field name="model_id" ref="x_stock_history_model"/>
+        <field name="depends">x_package_id,x_package_id.parent_package_id</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    pack = record.x_package_id
+    while pack.parent_package_id:
+        pack = pack.parent_package_id
+    record['x_package_master_container_id'] = pack
+]]></field>
+    </record>
+    <record id="x_operation_type_field_stock_move_line" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="related">picking_type_id.name</field>
+        <field name="field_description">operation type</field>
+        <field name="model_id" ref="stock.model_stock_move_line"/>
+        <field name="name">x_operation_type</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
+</odoo>
