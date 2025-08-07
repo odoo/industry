@@ -7,7 +7,13 @@
         <xpath expr="//field[@name='activity_ids']" position="replace"/>
         <xpath expr="//field[@name='state']" position="replace">
           <field name="move_ids" display="full" widget="x2_many_media_viewer" string="Products" options="{}"/>
+          <field widget="statinfo" class="ms-auto" name="activity_type_icon" display="full" string="Late"
+            invisible="state in ['assigned', 'waiting', 'confirmed']
+                    and (has_deadline_issue
+                    or date_deadline &lt;= datetime.date.today().strftime('%Y-%m-%d')
+                    or scheduled_date &lt;= datetime.date.today().strftime('%Y-%m-%d'))"/>
         </xpath>
+        <!-- <xpath expr="//kanban[1]/templates[1]/t[@t-name='card']/div[1]/field[@name='name']" position="replace"/> -->
       </data>
     </field>
     <field name="inherit_id" ref="stock.stock_picking_kanban"/>
@@ -21,12 +27,20 @@
   <record id="odoo_studio_stock_ru_8d7cc849-104d-4b24-b4e7-d9ca7ed9f5f7" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
+        <!-- <xpath expr="//list" position="attributes">
+            <attribute name="editable">bottom</attribute>
+            <attribute name="open_form_view">True</attribute>
+        </xpath> -->
         <xpath expr="//field[@name='route_id']" position="replace">
           <field name="delay" optional="show"/>
+          <field name="x_studio_pos_product_category_ids" widget="many2many_tags"/>
         </xpath>
         <xpath expr="//field[@name='location_dest_id']" position="replace"/>
         <xpath expr="//field[@name='location_src_id']" position="replace"/>
-        <xpath expr="//field[@name='action']" position="replace"/>
+        <xpath expr="//field[@name='action']" position="replace">
+          <xpath expr="//field[@name='name']" position="move" optional="show"/>
+          <field name="x_studio_standard_rule" invisible="True"/>
+        </xpath>
       </data>
     </field>
     <field name="inherit_id" ref="stock.view_stock_rule_tree"/>
@@ -41,7 +55,7 @@
     <field name="arch" type="xml">
       <data>
         <xpath expr="//field[@name='product_selectable']" position="after">
-          <field name="x_studio_automatic_activation_on_product"/>
+          <field name="x_studio_automatic_activation_on_product" help="Assign the product's route during creation"/>
         </xpath>
       </data>
     </field>
@@ -57,7 +71,7 @@
     <field name="arch" type="xml">
       <data>
         <xpath expr="//label[@name='default_location_src_id_label']" position="before">
-          <field name="x_studio_overrule_customer_location" help="the destination location comes from the operation type, not the contact"/>
+          <field name="x_studio_overrule_customer_location" invisible="code != 'outgoing'" help="the destination location comes from the operation type, not the contact"/>
         </xpath>
       </data>
     </field>
@@ -75,6 +89,12 @@
         <xpath expr="//field[@name='auto']" position="after">
           <field name="x_studio_standard_rule"/>
         </xpath>
+        <xpath expr="//group/group[2]" position="inside">
+          <field name="x_studio_pos_product_category_ids" readonly="x_studio_standard_rule"/>
+        </xpath>
+        <xpath expr="//field[@name='push_domain']" position="attributes">
+          <attribute name="invisible">x_studio_standard_rule</attribute>
+        </xpath>
       </data>
     </field>
     <field name="inherit_id" ref="stock.view_stock_rule_form"/>
@@ -91,9 +111,16 @@
         <xpath expr="//search[1]/field[@name='name']" position="before">
           <xpath expr="//field[@name='partner_id']" position="move"/>
           <xpath expr="//field[@name='product_id']" position="move"/>
+          <!-- filter_domain="['|', '|', '|', ('default_code', 'ilike', 'sfh'), ('product_variant_ids.default_code', 'ilike', 'sfh'), ('name', 'ilike', 'sfh'), ('barcode', 'ilike', 'sfh')]" -->
         </xpath>
         <xpath expr="//field[@name='partner_id']" position="attributes">
           <attribute name="filter_domain"/>
+        </xpath>
+        <xpath expr="//search[1]/field[@name='name']" position="after">
+          <field name="return_count"/>
+        </xpath>
+        <xpath expr="//search/group" position="inside">
+          <filter name="group_by_partner" string="Contact" context="{'group_by': 'partner_id'}"/>
         </xpath>
       </data>
     </field>
@@ -104,5 +131,31 @@
     <field name="name">Odoo Studio: stock.picking.internal.search customization</field>
     <field name="priority">99</field>
     <field name="type">search</field>
+  </record>
+
+  <record id="stock_picking_list_view_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <!-- <xpath expr="//list" position="attributes">
+            <attribute name="create">0</attribute>
+        </xpath> -->
+        <xpath expr="//field[@name='name']" position="replace"/>
+        <xpath expr="//field[@name='origin']" position="replace"/>
+        <xpath expr="//field[@name='state']" position="replace">
+          <field  widget="statinfo" class="bg-danger text-white" name="activity_type_icon" string="Late"
+            invisible="state in ['assigned', 'waiting', 'confirmed']
+                    and (has_deadline_issue
+                    or date_deadline &lt;= datetime.date.today().strftime('%Y-%m-%d')
+                    or scheduled_date &lt;= datetime.date.today().strftime('%Y-%m-%d'))"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="stock.vpicktree"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">stock.picking</field>
+    <field name="name">stock.picking.list customization</field>
+    <field name="priority">99</field>
+    <field name="type">list</field>
   </record>
 </odoo>
