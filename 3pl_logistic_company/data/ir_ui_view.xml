@@ -1,0 +1,226 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="stock_location_form_custo_logistic_company" model="ir.ui.view">
+        <field name="name">stock.location.form.custo.logistic.company</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_form"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='replenish_location']" position="after">
+                <field name="x_location_fee_rate_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_template_form_custo_logistic_company" model="ir.ui.view">
+        <field name="name">product.template.form.custo.logistic.company</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='group_general']" position="inside">
+                <field name="x_owner_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_partner_form_custo_logistic_company" model="ir.ui.view">
+        <field name="name">res.partner.form.custo.logistic.company</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="calendar.view_partners_form"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="priority" eval="150"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@icon='fa-calendar']" position="before">
+                <button class="oe_stat_button" icon="fa-home" type="action" name="%(action_window_partner_see_products)d">
+                    <field widget="statinfo" name="x_partner_related_products" string="Products"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="quality_check_form_custo_logistic_company" model="ir.ui.view">
+        <field name="name">quality.check.form.custo.logistic.company</field>
+        <field name="model">quality.check</field>
+        <field name="inherit_id" ref="quality_control.quality_check_view_form"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='lot_ids']" position="after">
+                <field name="x_point_id_title"/>
+                <field name="x_quality_check_owner"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="x_fee_rate_form_view" model="ir.ui.view">
+        <field name="name">stock.storage.category.form.custo.logistic.company</field>
+        <field name="model">x_fee_rate</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <h1>
+                        <field name="x_name"/>
+                    </h1>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="x_fee_rate_list_view" model="ir.ui.view">
+        <field name="name">stock.storage.category.form.custo.logistic.company</field>
+        <field name="model">x_fee_rate</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list>
+                <field name="x_name"/>
+            </list>
+        </field>
+    </record>
+    
+    <record id="default_stock_occupation_pivot_view" model="ir.ui.view">
+        <field name="name">default.stock.occupation.pivot.view</field>
+        <field name="model">sale.order.line</field>
+        <field name="type">pivot</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <pivot string="Stock Occupation">
+                <field name="product_uom_qty" type="measure"/>
+                <field name="product_id" type="row"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="default_stock_occupation_list_view" model="ir.ui.view">
+        <field name="name">default.stock.occupation.list.view</field>
+        <field name="model">sale.order.line</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list>
+                <field name="subscription_start_date" optional="show"/>
+                <field name="subscription_end_date"/>
+                <field name="order_partner_id" optional="show"/>
+                <field name="name"/>
+                <field name="product_uom_qty" optional="show"/>
+                <field name="product_uom_id" optional="show"/>
+            </list>
+        </field>
+    </record>
+    <record id="extension_stock_occupation_search_view" model="ir.ui.view">
+        <field name="name">extension.stock.occupation.search.view</field>
+        <field name="model">sale.order.line</field>
+        <field name="type">search</field>
+        <field name="mode">extension</field>
+        <field name="inherit_id" ref="sale.view_sales_order_line_filter"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='to_invoice']" position="before">
+                <filter string="Current Occupation" name="current_occupation" domain="[('subscription_start_date', '&lt;=', 'today'), ('subscription_end_date', '>=', 'today')]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+    <record id="action_window_stock_occupation_list_view" model="ir.actions.act_window">
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'pivot', 'view_id': ref('3pl_logistic_company.default_stock_occupation_pivot_view')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('3pl_logistic_company.default_stock_occupation_list_view')}),
+        ]"/>
+    </record>
+
+    <!-- x_stock_history fields -->
+    <record id="default_stock_history_pivot_view" model="ir.ui.view">
+        <field name="name">default.stock.history.pivot.view</field>
+        <field name="model">x_stock_history</field>
+        <field name="type">pivot</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <pivot string="Stock History">
+                <field name="x_history_owner_id" type="col"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="default_stock_history_list_view" model="ir.ui.view">
+        <field name="name">default.stock.history.list.view</field>
+        <field name="model">x_stock_history</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list default_group_by="x_date:day" default_order="x_date DESC">
+                <field name="x_date"/>
+                <field name="x_history_owner_id" optional="show"/>
+                <field name="x_location_id" optional="show"/>
+                <field name="x_history_fee_rate_id" optional="show"/>
+                <field name="x_product_id"/>
+                <field name="x_package_master_container_id" optional="show"/>
+                <field name="x_package_type" optional="show"/>
+                <field name="x_stock_lot_id" optional="show"/>
+                <field name="x_quantity" optional="show"/>
+            </list>
+        </field>
+    </record>
+    <record id="default_stock_history_search_view" model="ir.ui.view">
+        <field name="name">default.stock.history.search.view</field>
+        <field name="model">x_stock_history</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <search>
+                <filter string="Current Month" name="current_month" domain="[('x_date', '>=', 'today -1m')]"/>
+            </search>
+        </field>
+    </record>
+  <record id="extension_stock_move_line_list_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='location_dest_id']" position="after">
+          <field name="x_operation_type" optional="show"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="stock.view_move_line_tree"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.move.line</field>
+    <field name="name">stock.move.line.list.inherit.3pl_logistic_company</field>
+    <field name="priority">160</field>
+    <field name="active" eval="True"/>
+    <field name="type">list</field>
+  </record>
+  <record id="extension_stock_move_line_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='owner_id']" position="after">
+          <field name="move_id"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="stock.view_move_line_form"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.move.line</field>
+    <field name="name">stock.move.line.form.inherit.3pl_logistic_company</field>
+    <field name="priority">10000</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+  </record>
+  <record id="view_product_kanban_extension" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//kanban" position="attributes">
+          <attribute name="default_group_by">x_owner_id</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="stock.product_template_kanban_stock_view"/>
+    <field name="mode">extension</field>
+    <field name="model">product.template</field>
+    <field name="name">product extension</field>
+    <field name="priority">10000</field>
+    <field name="active" eval="True"/>
+    <field name="type">kanban</field>
+  </record>
+</odoo>
