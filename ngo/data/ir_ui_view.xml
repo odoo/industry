@@ -1,7 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-
-
     <!-- x_petition Views -->
     <record id="default_list_view_fo_71cbaab1-b655-496d-9520-b638337d3d53" model="ir.ui.view">
     <field name="arch" type="xml">
@@ -13,7 +11,7 @@
         <field name="x_name"/>
         <field name="x_studio_date_stop" optional="show" widget="daterange" options="{&quot;start_date_field&quot;:&quot;x_studio_date_start&quot;,&quot;always_range&quot;:true}"/>
         <field name="x_studio_user_id" widget="many2one_avatar_user"/>
-        <field name="x_studio_current_signatures_1" optional="show"/>
+        <field name="x_current_signatures" optional="show"/>
         <field name="x_studio_target_signatures" optional="show"/>
         <field name="x_studio_progress" optional="show" readonly="True" widget="progressbar"/>
         <field name="x_studio_tag_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
@@ -53,21 +51,14 @@
                 <field name="x_is_published"/>
             </group>
             <group name="studio_group_b69ddc_right">
-                <field name="x_studio_current_signatures_1" force_save="1" readonly="True"/>
+                <field name="x_current_signatures" force_save="1" readonly="True"/>
                 <field name="x_studio_target_signatures"/>
-                <field name="x_studio_progress" force_save="1" readonly="True" options="{&quot;digits&quot;:[0,0],&quot;current_value&quot;:&quot;x_studio_current_signatures_1&quot;,&quot;max_value&quot;:&quot;x_studio_target_signatures&quot;}" widget="progressbar"/>
+                <field name="x_studio_progress" force_save="1" readonly="True" options="{&quot;digits&quot;:[0,0],&quot;current_value&quot;:&quot;x_current_signatures&quot;,&quot;max_value&quot;:&quot;x_studio_target_signatures&quot;}" widget="progressbar"/>
             </group>
           </group>
           <notebook name="studio_notebook_7ob_1j06p6na3">
             <page string="Description" name="studio_page_7ob">
-              <group name="studio_group_7ob"/>
-              <field name="x_studio_html_field_84b_1j06p9jft"/>
-            </page>
-            <page string="New Page" name="studio_page_90k_1j1d8j9af">
-              <group name="studio_group_90k">
-                <group name="studio_group_90k_left"/>
-                <group name="studio_group_90k_right"/>
-              </group>
+              <field name="x_description"/>
             </page>
           </notebook>
         </sheet>
@@ -88,7 +79,6 @@
     <field name="arch" type="xml">
       <search>
         <field name="x_name"/>
-        <field name="x_studio_partner_id" operator="child_of"/>
         <field name="x_studio_user_id"/>
         <field name="x_studio_tag_ids"/>
         <filter string="My Petition" name="my_x_petition" domain="[['x_studio_user_id', '=', uid]]"/>
@@ -106,7 +96,6 @@
         <separator/>
         <filter string="Archived" name="archived_x_petition" domain="[['x_active', '=', False]]"/>
         <separator/>
-        <filter name="groupby_x_partner" string="Partner" context="{'group_by': 'x_studio_partner_id'}" domain="[]"/>
         <filter name="groupby_x_user" string="Responsible" context="{'group_by': 'x_studio_user_id'}" domain="[]"/>
       </search>
     </field>
@@ -129,35 +118,32 @@
 
 
   
-  <!-- <record id="odoo_studio_default__e7a74316-a1f3-48ff-9d36-b235bb6e12b7" model="ir.ui.view">
+  <record id="odoo_studio_default__e7a74316-a1f3-48ff-9d36-b235bb6e12b7" model="ir.ui.view">
     <field name="arch" type="xml">
-      <data>
-        <xpath expr="//kanban[1]/templates[1]" position="before">
-          <header/>
-        </xpath>
-        <xpath expr="//kanban[1]/templates[1]/t[@t-name='card']" position="before">
-          <t t-name="menu">
-            <t t-if="widget.editable">
-              <a type="open" class="dropdown-item">Edit</a>
+      <kanban string="Petition">
+        <templates>
+            <header/>
+            <t t-name="menu">
+                <t t-if="widget.editable">
+                <a type="open" class="dropdown-item">Edit</a>
+                </t>
+                <t t-if="widget.deletable">
+                <a type="delete" class="dropdown-item">Delete</a>
+                </t>
             </t>
-            <t t-if="widget.deletable">
-              <a type="delete" class="dropdown-item">Delete</a>
-            </t>
-          </t>
-        </xpath>
-        <xpath expr="//field[@name='x_name']" position="after">
+            <t t-name="card">
+                <field name="x_name"/>
           <field name="x_studio_tag_ids" display="full"/>
-          <field name="x_studio_current_signatures_1" display="full" invisible="True"/>
-          <field name="x_studio_progress" display="full" widget="progressbar" options="{&quot;max_value&quot;:&quot;x_studio_target_signatures&quot;,&quot;current_value&quot;:&quot;x_studio_current_signatures_1&quot;}"/>
+          <field name="x_current_signatures" display="full" invisible="True"/>
+          <field name="x_studio_progress" display="full" widget="progressbar" options="{&quot;max_value&quot;:&quot;x_studio_target_signatures&quot;,&quot;current_value&quot;:&quot;x_current_signatures&quot;}"/>
           <field name="x_studio_date_stop" display="full" widget="daterange" options="{&quot;start_date_field&quot;:&quot;x_studio_date_start&quot;,&quot;show_time&quot;:false}"/>
-        </xpath>
-      </data>
+            </t>
+        </templates>
+        </kanban>
     </field>
-    <field name="mode">extension</field>
     <field name="model">x_petition</field>
-    <field name="name">Odoo Studio: Default kanban view for ir.model(947,) customization</field>
-    <field name="priority">99</field>
-        <field name="active" eval="True"/>
+    <field name="name">Odoo Studio: Default kanban view for x_petition</field>
+    <field name="active" eval="True"/>
     <field name="type">kanban</field>
   </record>
 
@@ -165,39 +151,31 @@
   
   <record id="odoo_studio_default__97669e0f-e971-4c31-b8e8-d3abbf8205f2" model="ir.ui.view">
     <field name="arch" type="xml">
-      <data>
-        <xpath expr="//graph[1]" position="attributes">
-          <attribute name="type">bar</attribute>
-        </xpath>
-        <xpath expr="//field[@name='x_name']" position="after">
-          <field name="x_studio_current_signatures_1" type="col"/>
-          <field name="x_studio_current_signatures_1" type="measure"/>
-        </xpath>
-      </data>
+        <graph string="Petition" sample="1" type="bar">
+            <field name="x_name"/>
+            <field name="x_current_signatures" type="col"/>
+          <field name="x_current_signatures" type="measure"/>
+        </graph>
     </field>
-    <field name="mode">extension</field>
     <field name="model">x_petition</field>
     <field name="name">Odoo Studio: Default graph view for ir.model(947,) customization</field>
-    <field name="priority">99</field>
-        <field name="active" eval="True"/>
+    <field name="active" eval="True"/>
     <field name="type">graph</field>
   </record>
+
+
   <record id="odoo_studio_default__f0a3cd0d-a269-4288-8312-5c8e40ba0e32" model="ir.ui.view">
     <field name="arch" type="xml">
-      <data>
-        <xpath expr="//pivot[1]" position="inside">
-          <field name="x_studio_current_signatures_1" type="col"/>
+        <pivot string="Petition" sample="1">
+            <field name="x_current_signatures" type="col"/>
           <field name="x_name" type="row"/>
-        </xpath>
-      </data>
+          </pivot>
     </field>
-    <field name="mode">extension</field>
     <field name="model">x_petition</field>
     <field name="name">Odoo Studio: Default pivot view for ir.model(947,) customization</field>
-    <field name="priority">99</field>
         <field name="active" eval="True"/>
     <field name="type">pivot</field>
-  </record> -->
+  </record>
   
 
 
@@ -336,7 +314,7 @@
             <group name="studio_group_17e8fe">
                 <group name="studio_group_17e8fe_left">
                 <field name="x_studio_partner_id" force_save="1" readonly="1" string="Donor"/>
-                <field name="x_studio_total_amount" force_save="1" readonly="True"/>
+                <field name="x_studio_value" force_save="1" readonly="True"/>
                 <field name="x_studio_year" force_save="1" readonly="True"/>
                 
                 </group>
@@ -405,7 +383,7 @@
         <field name="active" eval="True"/>
         <field name="type">map</field>
     </record> -->
-    <!-- <record id="default_pivot_view_f_d246256a-1093-4a6d-93a3-1987f04a1bf3" model="ir.ui.view">
+    <record id="default_pivot_view_f_d246256a-1093-4a6d-93a3-1987f04a1bf3" model="ir.ui.view">
         <field name="arch" type="xml">
         <pivot sample="1">
             <field name="x_studio_value" type="measure"/>
@@ -416,7 +394,7 @@
         <field name="name">Default pivot view for x_fiscal_attestation</field>
         <field name="active" eval="True"/>
         <field name="type">pivot</field>
-    </record> -->
+    </record>
     <record id="default_graph_view_f_06572b7e-da15-49a1-b94b-0f493108e13f" model="ir.ui.view">
         <field name="arch" type="xml">
         <graph sample="1">
@@ -430,91 +408,26 @@
         <field name="type">graph</field>
     </record>
     
-    
-    
-    
-    <!-- <record id="odoo_studio_default__35c51142-26f5-4901-b3b5-4acd0bf390b8" model="ir.ui.view">
+    <record id="odoo_studio_default__35c51142-26f5-4901-b3b5-4acd0bf390b8" model="ir.ui.view">
         <field name="arch" type="xml">
-        <data>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/field[1]" position="before">
-            <field name="x_studio_partner_id" display="full"/>
-            </xpath>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/field[2]" position="replace"/>
-            <xpath expr="//t[@t-name=&quot;card&quot;]" position="replace" mode="outer">
-            <t t-name="card">
-                <main>$0</main>
-            </t>
-            </xpath>
-            <xpath expr="//t[@t-name=&quot;card&quot;]" position="attributes">
-            <attribute name="class">row g-0</attribute>
-            </xpath>
-            <xpath expr="//main" position="attributes">
-            <attribute name="class">col-10</attribute>
-            </xpath>
-            <xpath expr="//main/t[@t-name=&quot;card&quot;]" position="attributes">
-            <attribute name="t-name"/>
-            </xpath>
-            <xpath expr="//main[not(ancestor::field)]" position="before">
-            <aside class="col-2"/>
-            </xpath>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/aside[1]" position="replace"/>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[1]" position="after">
-            <field name="x_name" display="full"/>
-            </xpath>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[2]" position="after">
-            <field name="x_studio_date" display="full"/>
-            </xpath>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[2]" position="replace"/>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[1]" position="after">
-            <field name="x_name" display="full"/>
-            </xpath>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[3]" position="after">
-            <field name="x_studio_selection_field_2si_1j094a736" display="full"/>
-            </xpath>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[3]" position="after">
-            <field name="x_studio_currency_id"/>
-            </xpath>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[3]" position="after">
-            <field name="x_studio_value" display="full"/>
-            </xpath>
-            <xpath expr="//main[not(ancestor::field)]" position="after">
-            <aside class="col-2"/>
-            </xpath>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[5]" position="replace"/>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[4]" position="replace"/>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/aside[1]" position="inside">
-            <field name="x_studio_currency_id"/>
-            </xpath>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/aside[1]" position="inside">
-            <field name="x_studio_value" display="full"/>
-            </xpath>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/aside[1]" position="attributes">
-            <attribute name="class">col-1</attribute>
-            </xpath>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/aside[1]" position="attributes">
-            <attribute name="class">col-3</attribute>
-            </xpath>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/aside[1]" position="attributes">
-            <attribute name="class">col-2</attribute>
-            </xpath>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[4]" position="replace"/>
-            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[3]" position="after">
-            <field name="x_studio_selection_field_2si_1j094a736" display="full"/>
-            </xpath>
-            <xpath expr="/kanban[1]" position="attributes">
-            <attribute name="create">false</attribute>
-            </xpath>
-        </data>
+            <kanban string="Fiscal Attestation">
+                <templates>
+                    <t t-name="card" class="row g-0 col-10" name="t-name">
+                        <field name="x_studio_partner_id" display="full"/>
+                        <field name="x_name" display="full"/>
+                        <field name="x_studio_date" display="full"/>
+                        <field name="x_studio_value" display="full"/>
+                        <field name="x_studio_currency_id"/>
+                        <field name="x_studio_selection_field_2si_1j094a736" display="full"/>
+                    </t>
+                    </templates>
+            </kanban>
         </field>
-        <field name="mode">extension</field>
         <field name="model">x_fiscal_attestation</field>
         <field name="name">Odoo Studio: Default kanban view for ir.model(957,) customization</field>
-        <field name="priority">99</field>
         <field name="active" eval="True"/>
         <field name="type">kanban</field>
-    </record> -->
-    
-
+    </record>
 
 <!-- account.payment Views -->
     <record id="odoo_studio_account__4eef38e3-028e-40e6-9aaf-56c5ba3d7aa8" model="ir.ui.view">
