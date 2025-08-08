@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-	<function name="button_choose_theme" model="ir.module.module" eval="[ref('base.module_theme_orchid', raise_if_not_found=False)]"/>
+	<function name="button_choose_theme" model="ir.module.module" eval="[ref('base.module_theme_orchid', raise_if_not_found=False) or ref('base.module_theme_default')]"/>
 
   <function model="web_editor.assets" name="make_scss_customization" context="{'website_id': ref('website.default_website')}">
       <value eval="'/website/static/src/scss/options/colors/user_color_palette.scss'"/>
@@ -61,9 +61,12 @@
     <value model="ir.ui.view" eval="{'arch': obj().env.ref('takeaway_restaurant.ir_ui_view_3205').arch}"/>
   </function>
 
-  <function model="website.menu" name="unlink">
-    <value model="website.menu" eval="obj().search([('website_id', '=', ref('website.default_website')), ('url', '=', '/contactus')]).id" />
-  </function>
+  <data noupdate="1">
+    <function model="website.menu" name="unlink">
+      <value model="website.menu" eval="obj().search([('website_id', '=', ref('website.default_website')), ('url', '=', '/contactus')]).id" />
+    </function>
+  </data>
+
 
   <!-- <function model="ir.ui.view" name="write">
     <value model="ir.ui.view" eval="obj().with_context(active_test=False).search([('key', '=', 'website.template_header_boxed')], limit=1).id"/>
