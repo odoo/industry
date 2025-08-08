@@ -1,0 +1,778 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+
+
+    <!-- x_petition Views -->
+    <record id="default_list_view_fo_71cbaab1-b655-496d-9520-b638337d3d53" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <list>
+        <header>
+            <button string="New" type="action"/>
+        </header>
+        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_name"/>
+        <field name="x_studio_date_stop" optional="show" widget="daterange" options="{&quot;start_date_field&quot;:&quot;x_studio_date_start&quot;,&quot;always_range&quot;:true}"/>
+        <field name="x_studio_user_id" widget="many2one_avatar_user"/>
+        <field name="x_studio_current_signatures_1" optional="show"/>
+        <field name="x_studio_target_signatures" optional="show"/>
+        <field name="x_studio_progress" optional="show" readonly="True" widget="progressbar"/>
+        <field name="x_studio_tag_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+      </list>
+    </field>
+    <field name="model">x_petition</field>
+    <field name="name">Default list view for x_petition</field>
+    <field name="type">list</field>
+  </record>
+
+  <record id="default_form_view_fo_886be015-01d3-4306-87dc-74c85b6784e4" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <form>
+        <header>
+            <field widget="statusbar" options="{'clickable': '1'}" name="x_studio_selection_field_1kn_1j070021k"/>
+        </header>
+        <sheet string="Petition">
+        <div name="button_box" class="oe_button_box">
+            <button class="oe_stat_button" icon="fa-pencil" type="action" name="%(signatures_c7917ceb-09eb-4f0e-b8f2-95b6728866bc)d">
+              <field widget="statinfo" name="x_x_studio_petition_id_x_signature_count" string="Signatures"/>
+            </button>
+          </div>
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <field class="oe_avatar" widget="image" name="x_studio_image"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" string="Petition Name" required="1" placeholder="e.g. Raise the minimum wage to a living wage"/>
+            </h1>
+          </div>
+          <group name="studio_group_b69ddc">
+            <group name="studio_group_b69ddc_left">
+              <field name="x_studio_date_stop" optional="show" widget="daterange" options="{&quot;start_date_field&quot;:&quot;x_studio_date_start&quot;,&quot;always_range&quot;:true}"/>
+                <field name="x_studio_user_id" widget="many2one_avatar"/>
+                <field name="x_studio_tag_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+                <field name="x_is_published"/>
+            </group>
+            <group name="studio_group_b69ddc_right">
+                <field name="x_studio_current_signatures_1" force_save="1" readonly="True"/>
+                <field name="x_studio_target_signatures"/>
+                <field name="x_studio_progress" force_save="1" readonly="True" options="{&quot;digits&quot;:[0,0],&quot;current_value&quot;:&quot;x_studio_current_signatures_1&quot;,&quot;max_value&quot;:&quot;x_studio_target_signatures&quot;}" widget="progressbar"/>
+            </group>
+          </group>
+          <notebook name="studio_notebook_7ob_1j06p6na3">
+            <page string="Description" name="studio_page_7ob">
+              <group name="studio_group_7ob"/>
+              <field name="x_studio_html_field_84b_1j06p9jft"/>
+            </page>
+            <page string="New Page" name="studio_page_90k_1j1d8j9af">
+              <group name="studio_group_90k">
+                <group name="studio_group_90k_left"/>
+                <group name="studio_group_90k_right"/>
+              </group>
+            </page>
+          </notebook>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+    <field name="model">x_petition</field>
+    <field name="name">Default form view for x_petition</field>
+    <field name="type">form</field>
+  </record>
+
+
+
+
+
+  <record id="default_search_view__67a44058-3751-454f-9328-4138706dd740" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <field name="x_studio_partner_id" operator="child_of"/>
+        <field name="x_studio_user_id"/>
+        <field name="x_studio_tag_ids"/>
+        <filter string="My Petition" name="my_x_petition" domain="[['x_studio_user_id', '=', uid]]"/>
+        <separator name="studio_separator_5n3_1j1dcqdle"/>
+        <filter domain="[(&quot;x_studio_selection_field_1kn_1j070021k&quot;, &quot;=&quot;, &quot;status2&quot;)]" name="studio_filter_5tf_1j1dcq5lm" string="Published"/>
+        <filter domain="[(&quot;x_studio_selection_field_1kn_1j070021k&quot;, &quot;=&quot;, &quot;status1&quot;)]" name="studio_filter_80t_1j1dct99o" string="Drafts"/>
+        <filter domain="[(&quot;x_studio_selection_field_1kn_1j070021k&quot;, &quot;=&quot;, &quot;status3&quot;)]" name="studio_filter_81q_1j1dcuq2p" string="Closed Petitions"/>
+        <filter domain="[(&quot;x_studio_selection_field_1kn_1j070021k&quot;, &quot;=&quot;, &quot;status4&quot;)]" name="studio_filter_631_1j1dcv8k1" string="Submitted"/>
+        <separator name="studio_separator_o6_1j1dcnc6t"/>
+        <filter domain="[&quot;|&quot;, (&quot;x_studio_progress&quot;, &quot;=&quot;, 100), (&quot;x_studio_progress&quot;, &quot;&gt;&quot;, 100)]" name="studio_filter_6hp_1j1dcmnt5" string="Reached Goal"/>
+        <filter domain="[(&quot;x_studio_progress&quot;, &quot;&lt;&quot;, 100)]" name="studio_filter_6ds_1j1dco605" string="Not Reached"/>
+        <separator/>
+        <filter date="x_studio_date_start" name="studio_filter_date_start" string="Start Date"/>
+        <filter date="x_studio_date_stop" name="studio_filter_date_stop" string="End Date"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_petition" domain="[['x_active', '=', False]]"/>
+        <separator/>
+        <filter name="groupby_x_partner" string="Partner" context="{'group_by': 'x_studio_partner_id'}" domain="[]"/>
+        <filter name="groupby_x_user" string="Responsible" context="{'group_by': 'x_studio_user_id'}" domain="[]"/>
+      </search>
+    </field>
+    <field name="model">x_petition</field>
+    <field name="name">Default search view for x_petition</field>
+    <field name="type">search</field>
+  </record>
+
+
+  <record id="default_gantt_view_f_03ce4837-2c9f-4c7f-a0f8-32d3e81d1571" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <gantt date_start="x_studio_date_start" date_stop="x_studio_date_stop"/>
+    </field>
+    <field name="model">x_petition</field>
+    <field name="name">Default gantt view for x_petition</field>
+    <field name="type">gantt</field>
+  </record>
+
+
+  
+  <!-- <record id="odoo_studio_default__e7a74316-a1f3-48ff-9d36-b235bb6e12b7" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//kanban[1]/templates[1]" position="before">
+          <header/>
+        </xpath>
+        <xpath expr="//kanban[1]/templates[1]/t[@t-name='card']" position="before">
+          <t t-name="menu">
+            <t t-if="widget.editable">
+              <a type="open" class="dropdown-item">Edit</a>
+            </t>
+            <t t-if="widget.deletable">
+              <a type="delete" class="dropdown-item">Delete</a>
+            </t>
+          </t>
+        </xpath>
+        <xpath expr="//field[@name='x_name']" position="after">
+          <field name="x_studio_tag_ids" display="full"/>
+          <field name="x_studio_current_signatures_1" display="full" invisible="True"/>
+          <field name="x_studio_progress" display="full" widget="progressbar" options="{&quot;max_value&quot;:&quot;x_studio_target_signatures&quot;,&quot;current_value&quot;:&quot;x_studio_current_signatures_1&quot;}"/>
+          <field name="x_studio_date_stop" display="full" widget="daterange" options="{&quot;start_date_field&quot;:&quot;x_studio_date_start&quot;,&quot;show_time&quot;:false}"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="mode">extension</field>
+    <field name="model">x_petition</field>
+    <field name="name">Odoo Studio: Default kanban view for ir.model(947,) customization</field>
+    <field name="priority">99</field>
+    <field name="type">kanban</field>
+  </record>
+
+
+  
+  <record id="odoo_studio_default__97669e0f-e971-4c31-b8e8-d3abbf8205f2" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//graph[1]" position="attributes">
+          <attribute name="type">bar</attribute>
+        </xpath>
+        <xpath expr="//field[@name='x_name']" position="after">
+          <field name="x_studio_current_signatures_1" type="col"/>
+          <field name="x_studio_current_signatures_1" type="measure"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="mode">extension</field>
+    <field name="model">x_petition</field>
+    <field name="name">Odoo Studio: Default graph view for ir.model(947,) customization</field>
+    <field name="priority">99</field>
+    <field name="type">graph</field>
+  </record>
+  <record id="odoo_studio_default__f0a3cd0d-a269-4288-8312-5c8e40ba0e32" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//pivot[1]" position="inside">
+          <field name="x_studio_current_signatures_1" type="col"/>
+          <field name="x_name" type="row"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="mode">extension</field>
+    <field name="model">x_petition</field>
+    <field name="name">Odoo Studio: Default pivot view for ir.model(947,) customization</field>
+    <field name="priority">99</field>
+    <field name="type">pivot</field>
+  </record> -->
+  
+
+
+<!-- x_signature Views -->
+    <record id="default_list_view_fo_13169c68-79b7-412d-b486-625c88b10130" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <list>
+            <field name="x_studio_partner_id"/>
+            <field name="x_studio_sequence" widget="handle"/>
+            <field optional="show" name="x_studio_petition_name"/>
+            <field optional="show" name="x_studio_country"/>
+            <field optional="show" name="x_studio_newsletter"/>
+        </list>
+        </field>
+        <field name="model">x_signature</field>
+        <field name="name">Default list view for x_signature</field>
+        <field name="type">list</field>
+    </record>
+    <record id="default_form_view_fo_60c327af-54e3-4c44-8d98-0bcfc1e10124" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <form>
+            <header/>
+            <sheet string="Signature">
+            <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+            <group>
+                <h1>
+                <field name="x_studio_partner_id" required="1" placeholder="Contact"/>
+                </h1>
+            </group>
+            <group name="studio_group_56b442">
+                <group name="studio_group_56b442_left">
+                <field name="x_studio_country" force_save="1" readonly="True"/>
+                <field name="x_studio_date" string="Date Signed"/>
+                </group>
+                <group name="studio_group_56b442_right">
+                    <field name="x_studio_petition_id" options="{'create_name_field': 'x_name'}"/>
+                    <field name="x_studio_newsletter"/>
+                </group>
+            </group>
+            </sheet>
+            <chatter/>
+        </form>
+        </field>
+        <field name="model">x_signature</field>
+        <field name="name">Default form view for x_signature</field>
+        <field name="type">form</field>
+    </record>
+    <record id="default_search_view__ee7518d9-6828-4e57-b537-1557d1051384" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <search>
+            <field name="x_name"/>
+            <field name="x_studio_partner_id" operator="child_of"/>
+            <separator/>
+            <filter date="x_studio_date" name="studio_filter_date" string="Date"/>
+            <filter domain="[(&quot;x_studio_newsletter&quot;, &quot;!=&quot;, False)]" name="studio_filter_n0_1j1dp3cpn" string="Newsletter Subscriber"/>
+            <separator/>
+            <filter string="Archived" name="archived_x_signature" domain="[['x_active', '=', False]]"/>
+            <separator/>
+            <filter name="groupby_x_partner" string="Partner" context="{'group_by': 'x_studio_partner_id'}" domain="[]"/>
+            <filter name="studio_group_by_7uf_1j1dp5sb7" string="Petition Name" context="{'group_by': 'x_studio_petition_name'}"/>
+            <filter name="studio_group_by_3j9_1j1dp6hp0" string="Date Signed" context="{'group_by': 'x_studio_date'}"/>
+            <filter name="studio_group_by_54d_1j1dp6od7" string="Country" context="{'group_by': 'x_studio_country'}"/>
+        </search>
+        </field>
+        <field name="model">x_signature</field>
+        <field name="name">Default search view for x_signature</field>
+        <field name="type">search</field>
+    </record>
+    <record id="default_calendar_vie_b7cb970c-bd79-4473-9199-60f0ad787e00" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <calendar date_start="x_studio_date" create_name_field="x_name"/>
+        </field>
+        <field name="model">x_signature</field>
+        <field name="name">Default calendar view for x_signature</field>
+        <field name="type">calendar</field>
+    </record>
+    <!-- <record id="default_map_view_for_e146347e-a188-4c33-98e7-e3d5af25b099" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <map res_partner="x_studio_partner_id">
+            <field name="x_studio_partner_id" string="Partner"/>
+        </map>
+        </field>
+        <field name="model">x_signature</field>
+        <field name="name">Default map view for x_signature</field>
+        <field name="type">map</field>
+    </record> -->
+
+
+<!-- x_fiscal_attesttation Views -->
+    <record id="default_list_view_fo_79490779-e684-444e-9b44-4936437bd247" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <list create="0" delete="0" edit="0">
+            <field name="x_studio_sequence" widget="handle"/>
+            <field name="x_studio_year" optional="show"/>
+            <field name="x_name"/>
+            <field name="x_studio_partner_id" string="Donor"/>
+            <field name="x_studio_currency_id" invisible="1" required="0"/>
+            <field name="x_studio_value" sum="Total" string="Total Value"/>
+            <field name="x_studio_selection_field_2si_1j094a736" optional="show" string="State"/>
+            <field name="x_studio_date" optional="hide"/>
+        </list>
+        </field>
+        <field name="model">x_fiscal_attestation</field>
+        <field name="name">Default list view for x_fiscal_attestation</field>
+        <field name="type">list</field>
+    </record>
+    <record id="default_form_view_fo_643fef0d-557b-4ec6-b9cc-099297f17f27" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <form create="false">
+            <header>
+                <field widget="statusbar" options="{'clickable': '1'}" name="x_studio_selection_field_2si_1j094a736"/>
+                <button string="Send" type="object"/>
+                <button string="Print" type="object"/>
+                <button string="Preview" type="object"/>
+            </header>
+            <sheet string="Fiscal Attestation">
+            <div name="button_box" class="oe_button_box">
+                <button class="oe_stat_button" icon="fa-money" type="action" name="%(donations_0969ab37-2e67-4908-8ffd-856548ffe57e)d">
+                <field widget="statinfo" name="x_x_studio_fiscal_attestation_id_account_payment_count" string="Donations"/>
+                </button>
+            </div>
+            <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+            <field name="x_active" invisible="1"/>
+            <div class="oe_title">
+                <h1>
+                <field name="x_name" required="1" readonly= "1" placeholder="Number..." string="Number" force_save="1"/>
+                </h1>
+            </div>
+            <group name="studio_group_17e8fe">
+                <group name="studio_group_17e8fe_left">
+                <field name="x_studio_partner_id" force_save="1" readonly="1" string="Donor"/>
+                <field name="x_studio_total_amount" force_save="1" readonly="True"/>
+                <field name="x_studio_year" force_save="1" readonly="True"/>
+                <field name="x_studio_currency_id" invisible="True"/>
+                
+                </group>
+                <group name="studio_group_17e8fe_right">
+                <field name="x_studio_currency_id" invisible="1"/>
+                <field widget="file" filename="x_studio_document_pdf_filename" name="x_studio_document_pdf" force_save="1" readonly="True"/>
+                <field widget="file" invisible="True" name="x_studio_document_pdf_filename"/>
+                <field name="x_studio_date" force_save="1" readonly="1" string="Sent Date"/>
+                </group>
+            </group>
+            </sheet>
+            <chatter/>
+        </form>
+        </field>
+        <field name="model">x_fiscal_attestation</field>
+        <field name="name">Default form view for x_fiscal_attestation</field>
+        <field name="type">form</field>
+    </record>
+    <record id="default_search_view__c336d1f8-46b0-45fe-854e-ef79712d69ef" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <search>
+            <field name="x_name"/>
+            <field name="x_studio_partner_id" operator="child_of"/>
+            <separator/>
+            <filter date="x_studio_date" name="studio_filter_date" string="Date"/>
+            <separator/>
+            <group string="Fiscal Year">
+                <filter domain="[(&quot;x_studio_year&quot;, &quot;=&quot;, &quot;2025&quot;)]" name="studio_filter_fiscal_attestation_2025" string="2025"/>
+                <filter domain="[(&quot;x_studio_year&quot;, &quot;=&quot;, &quot;2024&quot;)]" name="studio_filter_fiscal_attestation_2024" string="2024"/>
+                <filter domain="[(&quot;x_studio_year&quot;, &quot;=&quot;, &quot;2023&quot;)]" name="studio_filter_fiscal_attestation_2023" string="2023"/>
+            </group>
+            <separator name="studio_separator_755_1j1fnhmgh"/>
+            <filter domain="[(&quot;x_studio_selection_field_2si_1j094a736&quot;, &quot;=&quot;, &quot;status2&quot;)]" name="studio_filter_1f5_1j1fnfsn9" string="Generated"/>
+            <filter domain="[(&quot;x_studio_selection_field_2si_1j094a736&quot;, &quot;=&quot;, &quot;Sent&quot;)]" name="studio_filter_3bl_1j1fngj1h" string="Sent"/>
+            <filter domain="[(&quot;x_studio_selection_field_2si_1j094a736&quot;, &quot;=&quot;, &quot;Cancelled&quot;)]" name="studio_filter_2q8_1j1fnhami" string="Cancelled"/>
+            <separator/>
+            <filter name="studio_group_by_6p9_1j1v7ahh6" string="Year" context="{'group_by': 'x_studio_year'}"/>
+            <filter string="Archived" name="archived_x_fiscal_attestation" domain="[['x_active', '=', False]]"/>
+            <separator/>
+            <filter name="groupby_x_partner" string="Donor" context="{'group_by': 'x_studio_partner_id'}" domain="[]"/>
+            <filter name="studio_group_by_1k6_1j1v7b0fm" string="State" context="{'group_by': 'x_studio_selection_field_2si_1j094a736'}"/>
+        </search>
+        </field>
+        <field name="model">x_fiscal_attestation</field>
+        <field name="name">Default search view for x_fiscal_attestation</field>
+        <field name="type">search</field>
+    </record>
+    <record id="default_calendar_vie_f91064fc-0ec1-4953-8d92-fdbd4e6366ff" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <calendar date_start="x_studio_date" create_name_field="x_name"/>
+        </field>
+        <field name="model">x_fiscal_attestation</field>
+        <field name="name">Default calendar view for x_fiscal_attestation</field>
+        <field name="type">calendar</field>
+    </record>
+    <!-- <record id="default_map_view_for_9b8cbc1a-e944-417d-8f1d-5403205b9a79" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <map res_partner="x_studio_partner_id">
+            <field name="x_studio_partner_id" string="Partner"/>
+        </map>
+        </field>
+        <field name="model">x_fiscal_attestation</field>
+        <field name="name">Default map view for x_fiscal_attestation</field>
+        <field name="type">map</field>
+    </record> -->
+    <!-- <record id="default_pivot_view_f_d246256a-1093-4a6d-93a3-1987f04a1bf3" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <pivot sample="1">
+            <field name="x_studio_value" type="measure"/>
+            <field name="x_studio_date" type="row"/>
+        </pivot>
+        </field>
+        <field name="model">x_fiscal_attestation</field>
+        <field name="name">Default pivot view for x_fiscal_attestation</field>
+        <field name="type">pivot</field>
+    </record> -->
+    <record id="default_graph_view_f_06572b7e-da15-49a1-b94b-0f493108e13f" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <graph sample="1">
+            <field name="x_studio_value" type="measure"/>
+            <field name="create_date" type="row"/>
+        </graph>
+        </field>
+        <field name="model">x_fiscal_attestation</field>
+        <field name="name">Default graph view for x_fiscal_attestation</field>
+        <field name="type">graph</field>
+    </record>
+    
+    
+    
+    
+    <!-- <record id="odoo_studio_default__35c51142-26f5-4901-b3b5-4acd0bf390b8" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <data>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/field[1]" position="before">
+            <field name="x_studio_partner_id" display="full"/>
+            </xpath>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/field[2]" position="replace"/>
+            <xpath expr="//t[@t-name=&quot;card&quot;]" position="replace" mode="outer">
+            <t t-name="card">
+                <main>$0</main>
+            </t>
+            </xpath>
+            <xpath expr="//t[@t-name=&quot;card&quot;]" position="attributes">
+            <attribute name="class">row g-0</attribute>
+            </xpath>
+            <xpath expr="//main" position="attributes">
+            <attribute name="class">col-10</attribute>
+            </xpath>
+            <xpath expr="//main/t[@t-name=&quot;card&quot;]" position="attributes">
+            <attribute name="t-name"/>
+            </xpath>
+            <xpath expr="//main[not(ancestor::field)]" position="before">
+            <aside class="col-2"/>
+            </xpath>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/aside[1]" position="replace"/>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[1]" position="after">
+            <field name="x_name" display="full"/>
+            </xpath>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[2]" position="after">
+            <field name="x_studio_date" display="full"/>
+            </xpath>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[2]" position="replace"/>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[1]" position="after">
+            <field name="x_name" display="full"/>
+            </xpath>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[3]" position="after">
+            <field name="x_studio_selection_field_2si_1j094a736" display="full"/>
+            </xpath>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[3]" position="after">
+            <field name="x_studio_currency_id"/>
+            </xpath>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[3]" position="after">
+            <field name="x_studio_value" display="full"/>
+            </xpath>
+            <xpath expr="//main[not(ancestor::field)]" position="after">
+            <aside class="col-2"/>
+            </xpath>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[5]" position="replace"/>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[4]" position="replace"/>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/aside[1]" position="inside">
+            <field name="x_studio_currency_id"/>
+            </xpath>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/aside[1]" position="inside">
+            <field name="x_studio_value" display="full"/>
+            </xpath>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/aside[1]" position="attributes">
+            <attribute name="class">col-1</attribute>
+            </xpath>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/aside[1]" position="attributes">
+            <attribute name="class">col-3</attribute>
+            </xpath>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/aside[1]" position="attributes">
+            <attribute name="class">col-2</attribute>
+            </xpath>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[4]" position="replace"/>
+            <xpath expr="/kanban[1]/templates[1]/t[1]/main[1]/t[1]/field[3]" position="after">
+            <field name="x_studio_selection_field_2si_1j094a736" display="full"/>
+            </xpath>
+            <xpath expr="/kanban[1]" position="attributes">
+            <attribute name="create">false</attribute>
+            </xpath>
+        </data>
+        </field>
+        <field name="mode">extension</field>
+        <field name="model">x_fiscal_attestation</field>
+        <field name="name">Odoo Studio: Default kanban view for ir.model(957,) customization</field>
+        <field name="priority">99</field>
+        <field name="type">kanban</field>
+    </record> -->
+    
+
+
+<!-- account.payment Views -->
+    <record id="odoo_studio_account__4eef38e3-028e-40e6-9aaf-56c5ba3d7aa8" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <data>
+            <!-- <div name="button_box" position="inside">
+            <button class="oe_stat_button" type="action" name="960" icon="fa-usd"/>
+            </div> -->
+            <xpath expr="//form[1]" position="attributes">
+            <attribute name="create">true</attribute>
+            <attribute name="delete">true</attribute>
+            <attribute name="edit">true</attribute>
+            </xpath>
+        </data>
+        </field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="mode">extension</field>
+        <field name="model">account.payment</field>
+        <field name="name">Odoo Studio: account.payment.form customization</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+    </record>
+    <record id="odoo_studio_account__220a81f0-8b40-420d-957d-9f0baeeba827" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <data>
+            <xpath expr="//filter[@name='outbound_filter']" position="after">
+            <separator name="studio_separator_3om_1j1vo6lvh"/>
+            <filter domain="[(&quot;x_studio_fiscal_attestation_id&quot;, &quot;!=&quot;, False)]" name="studio_filter_6vc_1j1vo5q2h" string="With Fiscal Attestation"/>
+            <filter domain="[(&quot;x_studio_fiscal_attestation_id&quot;, &quot;=&quot;, False)]" name="studio_filter_12s_1j1vo6hi9" string="Without Attestation"/>
+            </xpath>
+            <xpath expr="//filter[@name='partner']" position="attributes">
+            <attribute name="string">Donor</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='groupby_date']" position="attributes">
+            <attribute name="string">Donation Date</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='groupby_date']" position="after">
+            <filter name="studio_group_by_8l7_1j21ssti2" string="Country" context="{'group_by': 'x_country_name'}"/>
+            </xpath>
+        </data>
+        </field>
+        <field name="inherit_id" ref="account.view_account_payment_search"/>
+        <field name="mode">extension</field>
+        <field name="model">account.payment</field>
+        <field name="name">Odoo Studio: account.payment.search customization</field>
+        <field name="priority">99</field>
+        <field name="type">search</field>
+    </record>
+        <!-- <xpath expr="//button[@name='action_post']" position="after">
+            <button string="Generate Fiscal Attestation" type="action" name="%(open_fiscal_attestat_6f7e5e8b-5b6a-4f2e-ae04-adf270df3e4e)d"/>
+        </xpath> -->
+    <record id="odoo_studio_account__d8925fdc-7c26-4396-894d-10c4a9ba3c12" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <data>
+            <xpath expr="//list[1]" position="attributes">
+            <attribute name="create">true</attribute>
+            <attribute name="delete">true</attribute>
+            <attribute name="edit">true</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+            <attribute name="string">Donor</attribute>
+            </xpath>
+        </data>
+        </field>
+        <field name="inherit_id" ref="account.view_account_payment_tree"/>
+        <field name="mode">extension</field>
+        <field name="model">account.payment</field>
+        <field name="name">Odoo Studio: account.payment.list customization</field>
+        <field name="priority">160</field>
+        <field name="type">list</field>
+    </record>
+    <record id="odoo_studio_account__ce9eae81-50a5-494d-97eb-14256e8eed9b" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <data>
+            <xpath expr="//field[@name='journal_id']" position="replace">
+            <field name="date" type="col"/>
+            </xpath>
+            <xpath expr="//field[@name='payment_type']" position="replace"/>
+        </data>
+        </field>
+        <field name="inherit_id" ref="account.view_account_payment_graph"/>
+        <field name="mode">extension</field>
+        <field name="model">account.payment</field>
+        <field name="name">Odoo Studio: account.payment.graph customization</field>
+        <field name="priority">99</field>
+        <field name="type">graph</field>
+    </record>
+<!-- x_petition_tag Views -->
+    <record id="default_list_view_fo_86ff6216-2c74-41b6-907f-5f931a5abf49" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <list editable="bottom">
+            <field name="x_name"/>
+            <field name="x_color" widget="color_picker"/>
+        </list>
+        </field>
+        <field name="model">x_petition_tag</field>
+        <field name="name">Default list view for x_petition_tag</field>
+        <field name="type">list</field>
+    </record>
+    <record id="default_form_view_fo_3a2bf852-f4cd-4cef-ace7-1a4b42ff9aeb" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <form>
+            <header/>
+            <sheet string="Petition Tags">
+            <div class="oe_title">
+                <h1>
+                <field name="x_name" required="1" placeholder="Name..."/>
+                </h1>
+            </div>
+            <group name="studio_group_2ebb59">
+                <group name="studio_group_2ebb59_left"/>
+                <group name="studio_group_2ebb59_right"/>
+            </group>
+            </sheet>
+        </form>
+        </field>
+        <field name="model">x_petition_tag</field>
+        <field name="name">Default form view for x_petition_tag</field>
+        <field name="type">form</field>
+    </record>
+    <record id="default_search_view__2dfa48a1-18cb-46f2-a558-70d8bfdb0e6d" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <search>
+            <field name="x_name"/>
+        </search>
+        </field>
+        <field name="model">x_petition_tag</field>
+        <field name="name">Default search view for x_petition_tag</field>
+        <field name="type">search</field>
+    </record>
+
+
+<!-- res.partner Views -->
+    <record id="odoo_studio_res_part_b1588617-b32e-4945-88a9-1e17a0dc2521" model="ir.ui.view" context="{'studio': True}">
+        <field name="arch" type="xml">
+        <data>
+            <xpath expr="//button[hasclass('oe_stat_button')]" position="before">
+            <button class="oe_stat_button" icon="fa-pencil" type="action" name="%(signatures_d34fdf50-1857-449b-8330-f0173e5ee1db)d">
+                <field widget="statinfo" name="x_x_studio_partner_id_x_signature_count" string="Signatures"/>
+            </button>
+            </xpath>
+        </data>
+        </field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="mode">extension</field>
+        <field name="model">res.partner</field>
+        <field name="name">Odoo Studio: res.partner.form customization</field>
+        <field name="priority">200</field>
+        <field name="type">form</field>
+    </record>
+  <!-- Reports -->
+    <record id="web.basic_layout" model="ir.ui.view" context="{'studio': True}" forcecreate="1">
+        <field name="arch" type="xml">
+        <t t-name="web.basic_layout">
+            <t t-call="web.html_container">
+            <div class="page">
+                <h1>Fiscal Attestation Document</h1>
+                <p>
+                Name: <span t-field="doc.x_studio_partner_id"/>
+                <br/> Legal Number...
+                </p>
+            </div>
+            </t>
+        </t>
+        </field>
+        <field name="key">web.basic_layout</field>
+        <field name="name">basic_layout</field>
+        <field name="type">qweb</field>
+    </record>
+     <record id="studio_report_docume_a25093bf-c19e-409c-b262-a5be41086c11" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <t t-name="studio_report_document">
+        <t t-call="web.external_layout">
+          <div class="page">
+            <div class="oe_structure"/>
+          </div>
+        </t>
+      </t>
+    </field>
+    <field name="key">studio_report_docume_a25093bf-c19e-409c-b262-a5be41086c11_document</field>
+    <field name="name">studio_report_docume_a25093bf-c19e-409c-b262-a5be41086c11_document</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="studio_main_report_732a2694-c9d0-4319-aa27-41f52e070d7c" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <t t-name="studio_main_report">
+        <t t-call="web.html_container">
+          <t t-foreach="docs" t-as="doc">
+            <t t-call="studio_report_docume_a25093bf-c19e-409c-b262-a5be41086c11_document"/>
+          </t>
+        </t>
+      </t>
+    </field>
+    <field name="key">studio_report_docume_a25093bf-c19e-409c-b262-a5be41086c11</field>
+    <field name="name">studio_report_docume_a25093bf-c19e-409c-b262-a5be41086c11</field>
+    <field name="type">qweb</field>
+  </record>
+   <record id="studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <t t-name="studio_report_document">
+        <div class="page">
+          <div class="oe_structure"/>
+        </div>
+      </t>
+    </field>
+    <field name="key">studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd_document</field>
+    <field name="name">studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd_document</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="studio_main_report_2bb610c3-fd34-4aac-8dc8-ff61a7a1d68d" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <t t-name="studio_main_report">
+        <t t-foreach="docs" t-as="doc">
+          <t t-call="web.basic_layout">
+            <t t-call="studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd_document"/>
+            <p style="page-break-after: always;"/>
+          </t>
+        </t>
+      </t>
+    </field>
+    <field name="key">studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd</field>
+    <field name="name">studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd</field>
+    <field name="type">qweb</field>
+  </record>
+   <record id="studio_report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <t t-name="studio_report_document">
+        <t t-call="web.internal_layout">
+          <div class="page">
+            <div class="oe_structure"/>
+          </div>
+        </t>
+      </t>
+    </field>
+    <field name="key">studio_report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2_document</field>
+    <field name="name">studio_report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2_document</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="studio_main_report_9d372fcd-0318-4585-95bb-3b27f83b7085" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <t t-name="studio_main_report">
+        <t t-call="web.html_container">
+          <t t-foreach="docs" t-as="doc">
+            <t t-call="studio_report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2_document"/>
+          </t>
+        </t>
+      </t>
+    </field>
+    <field name="key">studio_report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2</field>
+    <field name="name">studio_report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <t t-name="studio_report_document">
+        <div class="page">
+          <div class="oe_structure"/>
+        </div>
+      </t>
+    </field>
+    <field name="key">studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd_document</field>
+    <field name="name">studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd_document</field>
+    <field name="type">qweb</field>
+  </record>
+  <record id="studio_main_report_2bb610c3-fd34-4aac-8dc8-ff61a7a1d68d" model="ir.ui.view" context="{'studio': True}">
+    <field name="arch" type="xml">
+      <t t-name="studio_main_report">
+        <t t-foreach="docs" t-as="doc">
+          <t t-call="web.basic_layout">
+            <t t-call="studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd_document"/>
+            <p style="page-break-after: always;"/>
+          </t>
+        </t>
+      </t>
+    </field>
+    <field name="key">studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd</field>
+    <field name="name">studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd</field>
+    <field name="type">qweb</field>
+  </record>
+</odoo>
