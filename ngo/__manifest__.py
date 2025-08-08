@@ -52,8 +52,8 @@
     'demo': [
         'demo/event_event_ticket.xml',
         'demo/payment_provider_demo_post.xml',
-        'demo/website_theme_apply.xml',
         'demo/ir_ui_view.xml',
+        'demo/website_theme_apply.xml',
         'demo/crm_tag.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
