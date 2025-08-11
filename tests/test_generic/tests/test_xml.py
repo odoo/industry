@@ -140,6 +140,7 @@ class TestEnv(IndustryCase):
                 self._check_fields(tree, file_name)
                 self._check_change_theme_method(tree, file_name)
                 self._check_dates_are_relative(tree, file_name)
+                self._check_static_values_in_inputs(tree, file_name)
                 if root.split('/')[-1] == 'data':
                     self._check_view_active(tree, file_name)
                     self._check_is_published_false(tree, file_name)
@@ -498,3 +499,42 @@ class TestEnv(IndustryCase):
                         model_name,
                         file_name,
                     )
+
+    def _check_static_values_in_inputs(self, root, file_name):
+        ALLOWED_INPUTS = {"resourceCapacity"}
+        for tag in root.xpath("//input[@value] | //option[@value]"):
+            value = tag.get("value")
+            if not (value and value.isdigit()):
+                continue
+            if tag.get("t-att-value"):
+                continue
+            name = tag.get("name")
+            if name in ALLOWED_INPUTS:
+                continue
+
+            line = getattr(tag, "sourceline", "?")
+            _logger.warning(
+                "Static value '%s' found in <%s name='%s'> in %s (line %s). "
+                "Please use t-att-value=\"request.env.ref('module.record').id\" instead.",
+                value,
+                tag.tag,
+                name or tag.get("id") or "",
+                file_name,
+                line,
+            )
+
+        for tag in root.xpath("//a[@href]"):
+            href = tag.get("href")
+            if tag.get("t-att-href") or tag.get("t-attf-href"):
+                continue
+            if href and (href.startswith(("tel:", "mailto:", "javascript:", "#", "http://", "https://"))):
+                continue
+            if href and re.search(r"-\d+$", href):
+                line = getattr(tag, "sourceline", "?")
+                _logger.warning(
+                    "Static record link '%s' found in <a> in %s (line %s). "
+                    "Please use t-att-href=\"request.env.ref('module.record').website_url\" instead.",
+                    href,
+                    file_name,
+                    line,
+                )
