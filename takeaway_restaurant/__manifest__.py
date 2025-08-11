@@ -5,9 +5,9 @@
     'author': 'Odoo S.A.',
     'depends': [
         'knowledge',
+        'pos_enterprise',
         'pos_hr',
         'pos_online_payment_self_order',
-        'pos_self_order_preparation_display',
         'purchase_stock',
         'website',
     ],
