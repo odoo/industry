@@ -1,0 +1,653 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="ir_ui_view_3974" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t name="Event Navbar" t-name="website_event.navbar">
+        <t t-set="is_rendering_cta" t-value="event.event_registrations_open and not hide_register_cta"/>
+        <section id="o_wevent_event_submenu">
+          <!-- Mobile -->
+          <div id="o_wevent_submenu_mobile" class="container d-flex d-lg-none align-items-center py-3 pb-lg-2">
+            <a t-if="navbar__back_url" t-att-href="navbar__back_url" t-att-title="navbar__back_title or 'Go back'">
+              <i class="oi oi-chevron-left"/>
+              <span t-out="navbar__back_text or 'Go back'"/>
+            </a>
+            <a t-else="" href="/event" title="All Events">
+              <i class="oi oi-chevron-left"/>
+              <span>All Events</span>
+            </a>
+            <!-- Add Register additional CTA button, in addition to menus -->
+            <a t-if="is_rendering_cta" t-att-href="'/event/%s/register' % (slug(event))" t-attf-class="btn btn-primary ms-auto" title="Registration">
+                Registration
+            </a>
+            <t t-call="website_event.navbar_dropdown"/>
+          </div>
+          <!-- Desktop -->
+          <div id="o_wevent_submenu_desktop" class="d-none d-lg-block mt-1 py-3 py-lg-2">
+            <div class="container">
+              <div class="d-flex align-items-center justify-content-between">
+                <nav class="d-flex flex-wrap justify-content-between align-items-center gap-2 flex-grow-1">
+                  <ul class="breadcrumb p-0 m-0">
+                    <li class="breadcrumb-item" t-if="event.header_visible">
+                      <a href="/event" title="Back to All Events">All Concerts</a>
+                    </li>
+                    <t t-if="navbar__back_url">
+                      <li class="breadcrumb-item">
+                        <a t-attf-href="/event/{{slug(event)}}" t-attf-title="Back to {{event.name}}" t-field="event.name"/>
+                      </li>
+                      <li class="breadcrumb-item">
+                        <a t-att-href="navbar__back_url" t-att-title="navbar__back_title" t-out="navbar__back_text"/>
+                      </li>
+                    </t>
+                    <t t-else="">
+                      <li t-attf-class="breadcrumb-item active #{'fw-bold' if not event.header_visible else ''}" aria-current="page">
+                        <span class="pe-3" t-field="event.name"/>
+                      </li>
+                    </t>
+                  </ul>
+                  <ul t-if="not navbar__back_url" class="nav" t-att-data-menu_name="editable and 'Event Menu'" t-att-data-content_menu_id="editable and event.menu_id.id">
+                    <t t-foreach="event.menu_id.child_id" t-as="submenu">
+                      <t t-call="website.submenu">
+                        <t t-set="item_class" t-value="'nav-item'"/>
+                        <t t-set="link_class" t-value="'nav-link text-nowrap'"/>
+                      </t>
+                    </t>
+                  </ul>
+                </nav>
+                <!-- Workaround to avoid flickering while navigating between pages with and without CTA -->
+                <span t-if="not is_rendering_cta" aria-hidden="true" class="btn invisible w-0 px-0"> </span>
+                <div t-else="" class="ms-3">
+                  <t t-call="website_event.registration_template"/>
+                </div>
+                <t t-if="navbar__back_url" t-call="website_event.navbar_dropdown"/>
+              </div>
+            </div>
+          </div>
+        </section>
+      </t>
+    </field>
+    <field name="key">website_event.navbar</field>
+    <field name="name">Event Navbar</field>
+    <field name="type">qweb</field>
+    <field name="website_id" ref="website.default_website"/>
+  </record>
+  <record id="ir_ui_view_3471" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data inherit_id="website.placeholder_header_call_to_action" name="Header Call to Action" active="True">
+        <xpath expr="." position="inside">
+          <li t-attf-class="#{_item_class}">
+            <div t-attf-class="oe_structure oe_structure_solo #{_div_class}" class="oe_structure oe_structure_solo">
+              <section class="oe_unremovable oe_unmovable s_text_block o_colored_level" data-snippet="s_text_block" data-name="Text">
+                <div class="container">
+                  <a href="/event" class="oe_unremovable btn btn-primary btn_cta">Upcoming Concerts</a>
+                </div>
+              </section>
+            </div>
+          </li>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="website.placeholder_header_call_to_action"/>
+    <field name="key">website.header_call_to_action</field>
+    <field name="mode">extension</field>
+    <field name="name">Header Call to Action</field>
+    <field name="type">qweb</field>
+    <field name="website_id" ref="website.default_website"/>
+  </record>
+  <record id="homepage" model="ir.ui.view">
+    <field name="name">Home</field>
+    <field name="key">concert_halls.homepage</field>
+    <field name="type">qweb</field>
+    <field name="website_id" ref="website.default_website"/>
+    <field name="arch" type="xml">
+      <t name="Homepage" t-name="website.homepage">
+        <t t-call="website.layout">
+          <t t-set="pageName" t-value="'homepage'"/>
+          <div id="wrap" class="oe_structure">
+            <section class="s_sidegrid pt56 pb56 o_cc3 o_colored_level" data-snippet="s_sidegrid">
+              <div class="container">
+                <div class="row o_grid_mode" data-row-count="13">
+                  <div class="o_grid_item g-col-lg-5 g-height-9 col-lg-5 o_colored_level" style="z-index: 1; grid-area: 1 / 8 / 10 / 13; --grid-item-padding-x: 24px">
+                    <h1 class="display-4">Unforgettable experiences</h1>
+                    <p class="lead"><br/>Music is a journey of expression, where every note and lyric tells a story waiting to be shared.<br/><br/></p>
+                  </div>
+                  <div class="o_grid_item o_grid_item_image g-height-4 g-col-lg-4 col-lg-4 o_colored_level" style="z-index: 2; grid-area: 1 / 1 / 5 / 5;">
+                    <img class="img img-fluid" src="/web/image/concert_halls.configurator_1_s_sidegrid_default_image_1" alt="" loading="lazy"/>
+                  </div>
+                  <div class="o_grid_item o_grid_item_image o_snippet_mobile_invisible g-height-9 g-col-lg-3 col-lg-3 d-lg-block d-none o_colored_level" style="z-index: 3; grid-area: 1 / 5 / 10 / 8;" data-invisible="1">
+                    <img class="img img-fluid" src="/web/image/concert_halls.ir_attachment_1265" alt="" loading="lazy"/>
+                  </div>
+                  <div class="o_grid_item o_grid_item_image o_snippet_mobile_invisible g-height-9 g-col-lg-4 col-lg-4 d-lg-block d-none o_colored_level" style="z-index: 4; grid-area: 5 / 1 / 14 / 5;" data-invisible="1">
+                    <img class="img img-fluid" src="/web/image/concert_halls.configurator_1_s_sidegrid_default_image_4" alt="" loading="lazy"/>
+                  </div>
+                  <div class="o_grid_item o_grid_item_image o_snippet_mobile_invisible g-height-4 g-col-lg-8 col-lg-8 d-lg-block d-none o_colored_level" style="z-index: 5; grid-area: 10 / 5 / 14 / 13;" data-invisible="1">
+                    <img class="img img-fluid" src="/web/image/concert_halls.ir_attachment_1266" alt="" loading="lazy"/>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section data-snippet="s_events" class="s_events s_event_upcoming_snippet s_dynamic s_dynamic_empty pt32 pb32 s_event_event_picture o_colored_level" data-custom-template-data="{&quot;events_event_time_active&quot;:true}" data-name="Events" data-number-of-records="3" data-filter-id="2" data-template-key="website_event.dynamic_filter_template_event_event_picture" data-extra-classes="g-3" data-column-classes="col-12 col-sm-6 col-lg-4">
+              <div class="container">
+                <div class="row s_nb_column_fixed">
+                  <section class="s_dynamic_snippet_title oe_unremovable oe_unmovable d-flex flex-column flex-md-row mb-lg-0 pb-3 pb-md-0 o_colored_level justify-content-between">
+                    <div>
+                      <h3>TICKETS NOW AVAILABLE</h3>
+                    </div>
+                    <div>
+                      <a title="See All" href="/event">See all<span class="fa fa-long-arrow-right ms-2"/></a>
+                    </div>
+                  </section>
+                  <section class="s_dynamic_snippet_content oe_unremovable oe_unmovable o_not_editable col o_colored_level">
+                    <div class="css_non_editable_mode_hidden">
+                      <div class="missing_option_warning alert alert-info fade show d-none d-print-none rounded-0">
+                                Your Dynamic Snippet will be displayed here... This message is displayed because you did not provide both a filter and a template to use.<br/>
+                            </div>
+                    </div>
+                    <div class="dynamic_snippet_template"/>
+                  </section>
+                </div>
+              </div>
+            </section>
+            <section class="s_product_catalog oe_custom_bg o_cc3 pt0 pb40 o_colored_level" data-vcss="002" data-snippet="s_product_catalog">
+              <div class="container">
+                <h2 style="text-align: left !important;">
+                  <br/>
+                </h2>
+                <h2 style="text-align: left !important;">CONCERT SCHEDULE</h2>
+                <div class="row">
+                  <div class="col-lg-6 pt16 pb16 o_colored_level">
+                    <ul class="list-unstyled my-3">
+                      <li class="s_product_catalog_dish mb-4" data-name="Product">
+                        <p class="s_product_catalog_dish_title d-flex align-items-baseline fw-bold">
+                          <span class="s_product_catalog_dish_name">The Beatles</span>
+                          <span class="s_product_catalog_dish_dot_leaders flex-grow-1 ms-2 border-top">
+                            <br/>
+                          </span>
+                          <span class="s_product_catalog_dish_price ms-auto ps-3">02.08.2025</span>
+                        </p>
+                        <p class="s_product_catalog_dish_description d-block mt-2 pe-5 text-muted">The Apollo Theater</p>
+                      </li>
+                      <li class="s_product_catalog_dish mb-4" data-name="Product">
+                        <p class="s_product_catalog_dish_title d-flex align-items-baseline fw-bold">
+                          <span class="s_product_catalog_dish_name">Vulfpeck</span>
+                          <span class="s_product_catalog_dish_dot_leaders flex-grow-1 ms-2 border-top">
+                            <br/>
+                          </span>
+                          <span class="s_product_catalog_dish_price ms-auto ps-3">09.09.2025</span>
+                        </p>
+                        <p class="s_product_catalog_dish_description d-block mt-2 pe-5 text-muted">Live Music New York</p>
+                      </li>
+                      <li class="s_product_catalog_dish mb-4" data-name="Product">
+                        <p class="s_product_catalog_dish_title d-flex align-items-baseline fw-bold">
+                          <span class="s_product_catalog_dish_name">Rolling Stones</span>
+                          <span class="s_product_catalog_dish_dot_leaders flex-grow-1 ms-2 border-top">
+                            <br/>
+                          </span>
+                          <span class="s_product_catalog_dish_price ms-auto ps-3">12.11.2025</span>
+                        </p>
+                        <p class="s_product_catalog_dish_description d-block mt-2 pe-5 text-muted">Concert Hall of Excellence</p>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="col-lg-6 pt16 pb16 o_colored_level">
+                    <ul class="list-unstyled my-3">
+                      <li class="s_product_catalog_dish mb-4" data-name="Product">
+                        <p class="s_product_catalog_dish_title d-flex align-items-baseline fw-bold">
+                          <span class="s_product_catalog_dish_name">Bob Dylan</span>
+                          <span class="s_product_catalog_dish_dot_leaders flex-grow-1 ms-2 border-top">
+                            <br/>
+                          </span>
+                          <span class="s_product_catalog_dish_price ms-auto ps-3">02.08.2025</span>
+                        </p>
+                        <p class="s_product_catalog_dish_description d-block mt-2 pe-5 text-muted">Concert Hall Productions</p>
+                      </li>
+                      <li class="s_product_catalog_dish mb-4" data-name="Product">
+                        <p class="s_product_catalog_dish_title d-flex align-items-baseline fw-bold">
+                          <span class="s_product_catalog_dish_name">Edith Piaf</span>
+                          <span class="s_product_catalog_dish_dot_leaders flex-grow-1 ms-2 border-top">
+                            <br/>
+                          </span>
+                          <span class="s_product_catalog_dish_price ms-auto ps-3">12.12.2025</span>
+                        </p>
+                        <p class="s_product_catalog_dish_description d-block mt-2 pe-5 text-muted">Summer Music Festival</p>
+                      </li>
+                      <li class="s_product_catalog_dish mb-4" data-name="Product">
+                        <p class="s_product_catalog_dish_title d-flex align-items-baseline fw-bold">
+                          <span class="s_product_catalog_dish_name">Odoo Band</span>
+                          <span class="s_product_catalog_dish_dot_leaders flex-grow-1 ms-2 border-top">
+                            <br/>
+                          </span>
+                          <span class="s_product_catalog_dish_price ms-auto ps-3">03.01.2026</span>
+                        </p>
+                        <p class="s_product_catalog_dish_description d-block mt-2 pe-5 text-muted">Rhythmic Harmony</p>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section class="s_cta_box o_cc o_cc4 pt56 pb56 o_colored_level" data-snippet="s_cta_box">
+              <div class="container">
+                <div class="s_card o_card_img_horizontal flex-lg-row-reverse card o_cc o_cc4 o_colored_level" data-snippet="s_card" data-vxml="001" data-name="Card" style="--card-spacer-y: 64px;border-width: 0px !important;border-radius: 0px !important;--card-spacer-x: 0px">
+                  <figure class="o_card_img_wrapper ratio ratio-1x1 mb-0">
+                    <img class="o_card_img" src="/web/image/concert_halls.configurator_1_s_cta_box_default_image" alt="" loading="lazy"/>
+                  </figure>
+                  <div class="card-body">
+                    <h2 class="card-title">
+        Discover new artists<br/>and unforgettable performances!
+    </h2>
+                    <p class="card-text">
+        Enhance your experience with the captivating energy of live music.<br/><br/>
+    </p>
+                    <a class="btn btn-lg btn-secondary" href="/event">&amp;nbsp;Discover&amp;nbsp;</a>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section class="s_title o_cc3 pb0 pt64 o_colored_level" data-vcss="001" data-scroll-background-ratio="0" data-snippet="s_title">
+              <div class="container s_allow_columns">
+                <h2 style="text-align: center;">
+        It's all about the experience
+    </h2>
+              </div>
+            </section>
+            <section class="s_image_frame o_colored_level o_cc3 pt40 pb0" data-snippet="s_image_frame">
+              <div class="container">
+                <div class="row o_grid_mode" data-row-count="11">
+                  <div class="o_grid_item o_grid_item_image g-col-lg-12 order-lg-0 overflow-hidden o_colored_level g-height-11 col-lg-12" style="grid-area: 1 / 1 / 12 / 13; --grid-item-padding-x: 0px; --grid-item-padding-y: 0px; order: 1;">
+                    <img src="/web/image/concert_halls.configurator_1_s_image_frame_default_image" class="img img-fluid mx-auto" alt="" loading="lazy"/>
+                  </div>
+                  <div class="o_grid_item g-col-lg-5 offset-1 offset-lg-0 order-lg-0 o_cc o_cc1 o_colored_level col-lg-5 g-height-4" style="z-index: 1; grid-area: 7 / 7 / 11 / 12; --grid-item-padding-x: 32px; order: 0; --grid-item-padding-y: 32px !important;">
+                    <h3>Musical Moments</h3>
+                    <p class="lead">Incredible shared experiences in our beautiful concert hall.&amp;nbsp;</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section class="s_image_gallery o_spc-small o_masonry o_cc3 pb56 pt16 o_colored_level" data-vcss="002" data-columns="3" style="overflow: hidden;" data-snippet="s_images_wall">
+              <div class="container">
+                <div class="row s_nb_column_fixed">
+                  <div class="o_masonry_col o_snippet_not_selectable col-lg-4">
+                    <img class="img img-fluid d-block" src="/web/image/concert_halls.configurator_1_s_sidegrid_default_image_1" data-index="0" data-name="Image" alt="" loading="lazy"/>
+                    <img src="/web/image/concert_halls.ir_attachment_1096" alt="" data-attachment-id="1093" class="img img-fluid d-block o_we_custom_image" data-format-mimetype="image/webp" data-original-id="1093" data-original-src="/web/image/1093-b59a624c/CleanShot%202025-07-28%20at%2012.59.46%402x.png" data-mimetype-before-conversion="image/png" data-resize-width="690" data-mimetype="image/webp" loading="lazy"/>
+                  </div>
+                  <div class="o_masonry_col o_snippet_not_selectable col-lg-4">
+                    <img src="/web/image/concert_halls.ir_attachment_1097" alt="" data-attachment-id="1090" class="img img-fluid d-block o_we_custom_image" data-format-mimetype="image/webp" data-original-id="1090" data-original-src="/web/image/1090-1b3569e6/CleanShot%202025-07-28%20at%2012.58.25%402x.png" data-mimetype-before-conversion="image/png" data-resize-width="690" data-mimetype="image/webp" loading="lazy"/>
+                    <img src="/web/image/concert_halls.ir_attachment_1094" alt="" data-attachment-id="1091" class="img img-fluid d-block o_we_custom_image" data-format-mimetype="image/webp" data-original-id="1091" data-original-src="/web/image/1091-296b8423/CleanShot%202025-07-28%20at%2012.58.54%402x.png" data-mimetype-before-conversion="image/png" data-resize-width="690" data-mimetype="image/webp" loading="lazy"/>
+                  </div>
+                  <div class="o_masonry_col o_snippet_not_selectable col-lg-4">
+                    <img class="img img-fluid d-block" src="/web/image/concert_halls.configurator_1_library_image_14" data-index="2" data-name="Image" alt="" loading="lazy"/>
+                    <img src="/web/image/concert_halls.ir_attachment_1095" alt="" data-attachment-id="1092" class="img img-fluid d-block o_we_custom_image" data-format-mimetype="image/webp" data-original-id="1092" data-original-src="/web/image/1092-5f074ee6/CleanShot%202025-07-28%20at%2012.59.19%402x.png" data-mimetype-before-conversion="image/png" data-resize-width="690" data-mimetype="image/webp" loading="lazy"/>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </t>
+      </t>
+    </field>
+  </record>
+  <record id="contactus" model="ir.ui.view">
+    <field name="name">Contact Us</field>
+    <field name="key">concert_halls.contactus</field>
+    <field name="type">qweb</field>
+    <field name="active" eval="True"/>
+    <field name="website_id" ref="website.default_website" />
+    <field name="arch" type="xml">
+      <t name="Contact Us" t-name="website.contactus">
+          <t t-call="website.layout">
+              <t t-set="logged_partner" t-value="request.env['website.visitor']._get_visitor_from_request().partner_id" />
+              <t
+                  t-set="contactus_form_values"
+                  t-value="{                 'email_to': res_company.email,                 'name': request.params.get('name', ''),                 'phone': request.params.get('phone', ''),                 'email_from': request.params.get('email_from', ''),                 'company': request.params.get('company', ''),                 'subject': request.params.get('subject', ''),             }"
+              />
+              <span class="hidden" data-for="contactus_form" t-att-data-values="contactus_form_values" />
+              <div id="wrap" class="oe_structure oe_empty">
+                  <section class="s_title parallax s_parallax_is_fixed bg-black-50 pt24 pb24 o_colored_level" data-vcss="001" data-snippet="s_title" data-scroll-background-ratio="1">
+                      <span class="s_parallax_bg oe_img_bg" style="background-image: url('/web/image/concert_halls.configurator_1_s_sidegrid_default_image_3'); background-position: 50% 0;" />
+                      <div class="o_we_bg_filter bg-black-50">
+                          <br />
+                      </div>
+                      <div class="container">
+                          <h1>Contact us</h1>
+                      </div>
+                  </section>
+                  <section class="s_text_block pt40 pb40 o_colored_level" data-snippet="s_text_block">
+                      <div class="s_allow_columns container">
+                          <div class="row">
+                              <div class="col-lg-7 mt-4 mt-lg-0 o_colored_level">
+                                  <h3>Opening Hours</h3>
+                                  <p>Monday to Friday — 10:00 a.m. to 6:00 p.m.</p>
+                                  <p>
+                                      📅 <em>Summer Closure:</em> Closed from July 1 to September 1<br />
+                                      <br />
+                                  </p>
+                                  <h3>Get in Touch</h3>
+                                  <p>
+                                      📞 <strong>Phone:</strong> +32 81 81 37 00<br />
+                                      📧 <strong>Email:</strong> <a href="mailto:@example.com">caseyadmin@example.com</a>
+                                  </p>
+                                  <p>Have a question? You might find the answer right away:</p>
+                                  <ul>
+                                      <li>
+                                          <p>❓<strong>General info</strong> about seats, mobility, accessibility, and tickets — <a>Check our Help Center</a></p>
+                                      </li>
+                                      <li>
+                                          <p>🎟️ <strong>Lost your ticket?</strong> Retrieve it via your <a>MyConcertHall profile</a></p>
+                                      </li>
+                                      <li>
+                                          <p>🕘 <strong>Concert timings?</strong> Visit the concert page on the day of the event</p>
+                                      </li>
+                                      <li>
+                                          <p>🎒 <strong>Lost something?</strong> <a>Let us know here</a></p>
+                                      </li>
+                                      <li>
+                                          <p>♿ <strong>Need assistance or a seat?</strong> We’re here to help — just ask</p>
+                                      </li>
+                                      <li>
+                                          <p>🏢 <strong>Business inquiries?</strong> <a>Explore our services</a></p>
+                                      </li>
+                                  </ul>
+                                  <p>
+                                      <br />
+                                  </p>
+                                  <h3>Still need help?</h3>
+                                  <p>Fill out the form below and we’ll get back to you as soon as possible.</p>
+                                  <section class="s_website_form" data-vcss="001" data-snippet="s_website_form">
+                                      <div class="container">
+                                          <form
+                                              id="contactus_form"
+                                              action="/website/form/"
+                                              method="post"
+                                              enctype="multipart/form-data"
+                                              class="o_mark_required"
+                                              data-mark="*"
+                                              data-model_name="mail.mail"
+                                              data-success-mode="redirect"
+                                              data-success-page="/contactus-thank-you"
+                                              data-pre-fill="true"
+                                          >
+                                              <div class="s_website_form_rows row s_col_no_bgcolor">
+                                                  <div class="mb-3 col-lg-6 s_website_form_field s_website_form_custom s_website_form_required" data-type="char" data-name="Field">
+                                                      <label class="s_website_form_label" style="width: 200px;" for="contact1">
+                                                          <span class="s_website_form_label_content">Name</span>
+                                                          <span class="s_website_form_mark"> *</span>
+                                                      </label>
+                                                      <input id="contact1" type="text" class="form-control s_website_form_input" name="name" required="" data-fill-with="name" />
+                                                  </div>
+                                                  <div class="mb-3 col-lg-6 s_website_form_field s_website_form_custom" data-type="char" data-name="Field">
+                                                      <label class="s_website_form_label" style="width: 200px;" for="contact2">
+                                                          <span class="s_website_form_label_content">Phone Number</span>
+                                                      </label>
+                                                      <input id="contact2" type="tel" class="form-control s_website_form_input" name="phone" data-fill-with="phone" />
+                                                  </div>
+                                                  <div class="mb-3 col-lg-6 s_website_form_field s_website_form_required s_website_form_model_required" data-type="email" data-name="Field">
+                                                      <label class="s_website_form_label" style="width: 200px;" for="contact3">
+                                                          <span class="s_website_form_label_content">Email</span>
+                                                          <span class="s_website_form_mark"> *</span>
+                                                      </label>
+                                                      <input id="contact3" type="email" class="form-control s_website_form_input" name="email_from" required="" data-fill-with="email" />
+                                                  </div>
+                                                  <div class="mb-3 col-lg-6 s_website_form_field s_website_form_custom" data-type="char" data-name="Field">
+                                                      <label class="s_website_form_label" style="width: 200px;" for="contact4">
+                                                          <span class="s_website_form_label_content">Company</span>
+                                                      </label>
+                                                      <input id="contact4" type="text" class="form-control s_website_form_input" name="company" data-fill-with="commercial_company_name" />
+                                                  </div>
+                                                  <div class="mb-3 col-12 s_website_form_field s_website_form_required s_website_form_model_required" data-type="char" data-name="Field">
+                                                      <label class="s_website_form_label" style="width: 200px;" for="contact5">
+                                                          <span class="s_website_form_label_content">Subject</span>
+                                                          <span class="s_website_form_mark"> *</span>
+                                                      </label>
+                                                      <input id="contact5" type="text" class="form-control s_website_form_input" name="subject" required="" />
+                                                  </div>
+                                                  <div class="mb-3 col-12 s_website_form_field s_website_form_custom s_website_form_required" data-type="text" data-name="Field">
+                                                      <label class="s_website_form_label" style="width: 200px;" for="contact6">
+                                                          <span class="s_website_form_label_content">Question</span>
+                                                          <span class="s_website_form_mark"> *</span>
+                                                      </label>
+                                                  </div>
+                                                  <div class="mb-3 col-12 s_website_form_field s_website_form_dnone">
+                                                      <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                          <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px;" for="contact7">
+                                                              <span class="s_website_form_label_content">Email To</span>
+                                                          </label>
+                                                          <div class="col-sm">
+                                                              <input id="contact7" type="hidden" class="form-control s_website_form_input" name="email_to" />
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                                  <div class="mb-0 py-2 col-12 s_website_form_submit s_website_form_no_submit_label text-end" data-name="Submit Button">
+                                                      <div style="width: 200px;" class="s_website_form_label"><br /></div>
+                                                      <a href="#" role="button" class="btn btn-primary s_website_form_send">Submit</a>
+                                                      <span id="s_website_form_result" />
+                                                  </div>
+                                              </div>
+                                          </form>
+                                      </div>
+                                  </section>
+                              </div>
+                              <div class="col-lg-4 offset-lg-1 mt-4 mt-lg-0 o_colored_level">
+                                  <h5>MyConcerthall</h5>
+                                  <ul class="list-unstyled mb-0 ps-2">
+                                      <li>
+                                          <i class="fa fa-map-marker fa-fw me-2" />
+                                          <span class="o_force_ltr">3575 Fake Buena Vista Avenue</span>
+                                      </li>
+                                      <li>
+                                          <i class="fa fa-phone fa-fw me-2" />
+                                          <span class="o_force_ltr">+1 555-555-5556</span>
+                                      </li>
+                                      <li>
+                                          <i class="fa fa-1x fa-fw fa-envelope me-2" />
+                                          <span>info@yourcompany.example.com</span>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                      </div>
+                  </section>
+              </div>
+          </t>
+      </t>
+    </field>
+  </record>
+  <record id="ir_ui_view_3983" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t name="Topbar" t-name="website_event.index_topbar">
+        <div class="container">
+          <section class="o_wevent_index_topbar_filters d-flex d-print-none align-items-center justify-content-lg-end flex-wrap gap-2 mt-4 mb-3">
+            <h2 class="me-auto mb-0 h4">Concerts</h2>
+            <t t-foreach="categories" t-as="category">
+              <div t-if="category.is_published and category.tag_ids and any(tag.color for tag in category.tag_ids)" class="dropdown d-none d-lg-block">
+                <t t-set="searched_category_tags" t-value="search_tags.filtered(lambda tag: tag.category_id == category)"/>
+                <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" title="Filter by category" aria-label="Filter by category" aria-expanded="false">
+                  <t t-out="category.name"/>
+                  <span t-if="len(searched_category_tags)" t-out="len(searched_category_tags)" class="badge bg-primary ms-1"/>
+                </button>
+                <div class="dropdown-menu">
+                  <span t-att-data-post="keep_event_url(tags=slugify_tags((search_tags - searched_category_tags).ids), prevent_redirect=True)" t-attf-class="post_link cursor-pointer dropdown-item d-flex align-items-center justify-content-between #{'active' if not searched_category_tags else ''}">
+                            All
+                        </span>
+                  <t t-foreach="category.tag_ids" t-as="tag">
+                    <span t-if="tag.color" t-att-data-post="keep_event_url(tags=slugify_tags(search_tags.ids, toggle_tag_id=tag.id), prevent_redirect=True)" t-attf-class="post_link cursor-pointer dropdown-item d-flex align-items-center justify-content-between #{'active' if tag in search_tags else ''}">
+                      <t t-out="tag.name"/>
+                    </span>
+                  </t>
+                </div>
+              </div>
+            </t>
+            <div class="o_wevent_search d-flex w-100 w-lg-25">
+              <t t-call="website.website_search_box_input">
+                <t t-set="_form_classes" t-valuef="flex-grow-1"/>
+                <t t-set="_classes" t-valuef="o_wevent_event_searchbar_form"/>
+                <t t-set="search_type">events</t>
+                <t t-set="action" t-value="'/event/'"/>
+                <t t-set="display_description" t-valuef="true"/>
+                <t t-set="display_detail" t-valuef="false"/>
+                <t t-set="search" t-value="search or searches and searches['search']"/>
+                <t t-set="placeholder">Search an event..</t>
+                <t t-foreach="searches" t-as="item">
+                  <input t-if="item != 'search' and item_value != 'all'" type="hidden" t-att-name="item" t-att-value="item_value"/>
+                </t>
+              </t>
+              <button class="o_not_editable btn btn-light position-relative ms-2 d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#o_wevent_index_offcanvas">
+                <i class="fa fa-sliders"/>
+              </button>
+            </div>
+            <t t-if="search_tags" t-call="website_event.searched_tags"/>
+          </section>
+          <!-- Off canvas filters on mobile-->
+          <div id="o_wevent_index_offcanvas" class="o_website_offcanvas offcanvas offcanvas-end d-lg-none p-0 overflow-visible">
+            <div class="offcanvas-header">
+              <h5 class="offcanvas-title">Filters</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"/>
+            </div>
+            <div class="offcanvas-body p-0">
+              <div class="accordion accordion-flush">
+                <div class="accordion-item" t-foreach="categories" t-as="category">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" t-attf-aria-controls="o_wevent_offcanvas_cat_#{category.id}" t-att-data-bs-target="'.o_wevent_offcanvas_cat_%s' % category.id" aria-expanded="false">
+                      <t t-out="category.name"/>
+                    </button>
+                  </h2>
+                  <div t-attf-id="o_wevent_offcanvas_cat_#{category.id}" t-attf-class="o_wevent_offcanvas_cat_#{category.id} accordion-collapse collapse">
+                    <div class="accordion-body pt-0">
+                      <ul class="list-group list-group-flush">
+                        <t t-if="category.is_published and category.tag_ids and any(tag.color for tag in category.tag_ids)" t-foreach="category.tag_ids" t-as="tag">
+                          <li t-if="tag.color" class="list-group-item border-0 px-0">
+                            <span t-att-data-post="keep_event_url(tags=slugify_tags(search_tags.ids, toggle_tag_id=tag.id), prevent_redirect=True)" class="post_link text-reset cursor-pointer" t-att-title="tag.name">
+                              <div class="form-check">
+                                <input class="form-check-input pe-none" type="checkbox" t-attf-name="#{tag.color}" t-att-checked="tag in search_tags"/>
+                                <label class="form-check-label" t-attf-for="#{tag.color}" t-out="tag.name"/>
+                              </div>
+                            </span>
+                          </li>
+                        </t>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </t>
+    </field>
+    <field name="key">website_event.index_topbar</field>
+    <field name="name">Topbar</field>
+    <field name="type">qweb</field>
+    <field name="website_id" ref="website.default_website"/>
+  </record>
+  <record id="ir_ui_view_3972" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t t-name="website.record_cover">
+        <t t-set="_cp" t-value="_cp or json.loads(_record.cover_properties)"/>
+        <t t-set="_name" t-value="_name or _record._name"/>
+        <t t-set="_id" t-value="_id or _record.id"/>
+        <t t-set="_bg" t-value="_bg or _record._get_background(height=_resize_height, width=_resize_width)"/>
+        <t t-set="default_cover_name">Cover</t>
+        <div t-att-data-name="display_opt_name or default_cover_name" t-att-style="_cp.get('background_color_style')" t-att-data-use_size="use_size" t-att-data-use_filters="use_filters" t-att-data-use_text_align="use_text_align" t-att-data-res-model="_name" t-att-data-res-id="_id" t-attf-class="o_record_cover_container d-flex flex-column h-100 o_colored_level o_cc #{_cp.get('background_color_class')} #{use_size and _cp.get('resize_class')} #{use_text_align and _cp.get('text_align_class')} #{additionnal_classes}">
+          <div t-attf-class="o_record_cover_component o_record_cover_image #{snippet_autofocus and 'o_we_snippet_autofocus'}" t-attf-style="background-image: #{_bg};" style="background-image: url(&quot;/web/image/1129-a15ea36f/Event%20%27The%20Rolling%20Stones%27%20cover%20image.webp&quot;);" class="o_record_cover_component o_record_cover_image"/>
+          <div t-if="use_filters" t-attf-class="o_record_cover_component o_record_cover_filter oe_black" t-attf-style="opacity: #{_cp.get('opacity', 0.0)};"/>
+          <t t-out="0"/>
+        </div>
+      </t>
+    </field>
+    <field name="key">website.record_cover</field>
+    <field name="name">record_cover</field>
+    <field name="type">qweb</field>
+    <field name="website_id" ref="website.default_website"/>
+  </record>
+  <record id="ir_ui_view_3978" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data inherit_id="website_event.index_sidebar" active="True" name="About us" priority="20">
+        <xpath expr="//div[@id='o_wevent_index_sidebar']" position="inside">
+          <div class="o_wevent_sidebar_block">
+            <h6 class="o_wevent_sidebar_title">About us</h6>
+            <p>We bring world-class artists to life on stage—loud, raw, and unforgettable. Every show, a moment.</p>
+          </div>
+          <div id="oe_structure_website_event_about_us_1" class="oe_structure"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="website_event.index_sidebar"/>
+    <field name="key">website_event.index_sidebar_about_us</field>
+    <field name="mode">extension</field>
+    <field name="name">About us</field>
+    <field name="priority">20</field>
+    <field name="type">qweb</field>
+    <field name="website_id" ref="website.default_website"/>
+  </record>
+  <record id="ir_ui_view_3981" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data inherit_id="website_event.index_sidebar" active="True" name="Quotes" priority="60">
+        <xpath expr="//div[@id='o_wevent_index_sidebar']" position="inside">
+          <div class="o_wevent_sidebar_block card">
+            <div class="card-body">
+              <blockquote class="blockquote mb-0">
+                <p>
+                  <em>
+                    <strong>The energy was insane—every song hit like a thunderbolt. Easily one of the best nights of my life.</strong>
+                  </em>
+                  <br/>
+                </p>
+                <footer class="blockquote-footer text-muted">Fan after The Rolling Stones Live in Brussels 2023</footer>
+              </blockquote>
+            </div>
+          </div>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="website_event.index_sidebar"/>
+    <field name="key">website_event.index_sidebar_quotes</field>
+    <field name="mode">extension</field>
+    <field name="name">Quotes</field>
+    <field name="priority">60</field>
+    <field name="type">qweb</field>
+    <field name="website_id" ref="website.default_website"/>
+  </record>
+  <record id="customfooter_view" model="ir.ui.view">
+    <field name="name">Centered</field>
+    <field name="key">website.template_footer_centered</field>
+    <field name="inherit_id" ref="website.layout"/>
+    <field name="mode">extension</field>
+    <field name="type">qweb</field>
+    <field name="website_id" ref="website.default_website"/>
+    <field name="arch" type="xml">
+        <data inherit_id="website.layout" name="Centered" active="False">
+            <xpath expr="//div[@id='footer']" position="replace">
+              <div id="footer" class="oe_structure oe_structure_solo" t-ignore="true" t-if="not no_footer">
+                  <section class="s_text_block pt32" data-snippet="s_text_block" data-name="Text">
+                      <div class="container s_allow_columns">
+                          <div class="s_social_media text-center mb-4 o_not_editable" data-snippet="s_social_media" data-name="Social Media" contenteditable="false">
+                              <h5 class="s_social_media_title d-none" contenteditable="true">Follow us</h5>
+                              <a href="/website/social/facebook" class="s_social_media_facebook" target="_blank" aria-label="Facebook">
+                                  <i class="fa fa-facebook rounded-circle rounded shadow-sm o_editable_media"/>
+                              </a>
+                              <a href="/website/social/twitter" class="s_social_media_twitter" target="_blank" aria-label="X">
+                                  <i class="fa fa-twitter rounded-circle rounded shadow-sm o_editable_media"/>
+                              </a>
+                              <a href="/website/social/linkedin" class="s_social_media_linkedin" target="_blank" aria-label="LinkedIn">
+                                  <i class="fa fa-linkedin rounded-circle rounded shadow-sm o_editable_media"/>
+                              </a>
+                          </div>
+                          <p class="text-center mb-1">250 Executive Park Blvd, Suite 3400 • San Francisco CA 94134 • United States</p>
+                          <ul class="list-inline text-center">
+                              <li class="list-inline-item mx-3"><i class="fa fa-1x fa-fw fa-phone me-2"/><span class="o_force_ltr"><a href="tel:+1 555-555-5556">+1 555-555-5556</a></span></li>
+                              <li class="list-inline-item mx-3"><i class="fa fa-1x fa-fw fa-envelope me-2"/><span><a href="mailto:info@yourcompany.example.com">info@yourcompany.example.com</a></span></li>
+                          </ul>
+                          <div class="row">
+                              <div class="col-lg-2 offset-lg-5">
+                                  <a href="/" class="o_footer_logo logo">
+                                      <img src="/concert_halls/static/description/icon.png" class="img-fluid mx-auto" aria-label="Logo of MyCompany" title="MyCompany" role="img"/>
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                  </section>
+              </div>
+            </xpath>
+        </data>
+    </field>
+  </record>
+</odoo>
