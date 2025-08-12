@@ -73,26 +73,15 @@
         <field name="name">x_studio_petition_id</field>
         <field name="relation">x_petition</field>
     </record>
-    <record id="x_signatures_field_x_petition" model="ir.model.fields">
-        <field name="ttype">one2many</field>
-        <field name="field_description">Signatures</field>
-        <field name="model_id" ref="x_petition_model"/>
-        <field name="name">x_signatures_ids</field>
-        <field name="on_delete" eval="False"/>
-        <field name="relation">x_signature</field>
-        <field name="relation_field">x_studio_petition_id</field>
-    </record>
-    <record id="new_integer_petition_4a18161c-85c6-4954-bb85-36d705f324a2" model="ir.model.fields">
-        <field name="compute"><![CDATA[for record in self:
-        record['x_current_signatures'] = len(record.x_signatures_ids)]]></field>
+    <!-- <record id="new_integer_petition_4a18161c-85c6-4954-bb85-36d705f324a2" model="ir.model.fields">
+        <field name="related">x_x_studio_petition_id_x_signature_count</field>
         <field name="ttype">integer</field>
-        <field name="depends">x_signatures_ids</field>
         <field name="field_description">Current Signatures </field>
         <field name="model_id" ref="x_petition_model"/>
         <field name="name">x_current_signatures</field>
         <field name="on_delete" eval="False"/>
         <field name="readonly" eval="True"/>
-    </record>
+    </record> -->
     <record id="new_html_petition_9761b86f-4836-4512-b845-5d7c3046ba24" model="ir.model.fields">
         <field name="ttype">html</field>
         <field name="copied" eval="True"/>
@@ -140,7 +129,18 @@
         <field name="model_id" ref="x_petition_model"/>
         <field name="name">x_website_description</field>
     </record>  
-
+    <record id="x_website_url_field_x_petition" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self: record['x_website_url'] = '/model/petition/'+str(record.env["ir.http"]._slug(record))
+]]></field>
+        <field name="ttype">char</field>
+        <field name="field_description">Website URL</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_website_url</field>
+        <field name="on_delete" eval="False"/>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
 
 
     <!-- x_signature fields -->
@@ -314,18 +314,7 @@
 
 
 
-    <record id="new_decimal_petition_68600b8e-ea3d-48b1-ad40-ad99acc07e2c" model="ir.model.fields">
-        <field name="compute"><![CDATA[for record in self:
-        if record.x_studio_target_signatures > 0:
-            record['x_studio_progress'] = record.x_current_signatures/record.x_studio_target_signatures]]></field>
-        <field name="ttype">float</field>
-        <field name="depends">x_current_signatures, x_studio_target_signatures</field>
-        <field name="field_description">Progress</field>
-        <field name="model_id" ref="x_petition_model"/>
-        <field name="name">x_studio_progress</field>
-        <field name="on_delete" eval="False"/>
-        <field name="readonly" eval="True"/>
-    </record>
+    
 
     <record id="new_many2one_payment_205c7703-d38c-4dd0-903d-bb33b2f9e65e" model="ir.model.fields">
         <field name="ttype">many2one</field>
@@ -354,17 +343,30 @@
 
     <record id="petition_count_petit_36ce9d3e-97bd-468d-967e-d8ab8296214e" model="ir.model.fields">
         <field name="compute"><![CDATA[
-for record in self: record['x_x_studio_petition_id_x_signature_count'] = self.env['x_signature'].search_count([('x_studio_petition_id', '=', record.id)])
+for record in self: record['x_current_signatures'] = self.env['x_signature'].search_count([('x_studio_petition_id', '=', record.id)])
 ]]></field>
         <field name="ttype">integer</field>
-        <field name="field_description">petition count</field>
+        <field name="field_description">Current Signatures</field>
         <field name="model_id" ref="x_petition_model"/>
-        <field name="name">x_x_studio_petition_id_x_signature_count</field>
+        <field name="name">x_current_signatures</field>
         <field name="on_delete" eval="False"/>
         <field name="selectable" eval="False"/>
         <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
     </record>
 
+    <record id="new_decimal_petition_68600b8e-ea3d-48b1-ad40-ad99acc07e2c" model="ir.model.fields">
+        <field name="compute"><![CDATA[for record in self:
+        if record.x_studio_target_signatures > 0:
+            record['x_studio_progress'] = record.x_current_signatures/record.x_studio_target_signatures]]></field>
+        <field name="ttype">float</field>
+        <field name="depends">x_current_signatures, x_studio_target_signatures</field>
+        <field name="field_description">Progress</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_studio_progress</field>
+        <field name="on_delete" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
 
     <record id="contact_count_contac_bea4cd45-5c69-4a8b-ae3a-f6349156473e" model="ir.model.fields">
         <field name="compute"><![CDATA[

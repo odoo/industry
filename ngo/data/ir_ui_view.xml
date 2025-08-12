@@ -9,7 +9,7 @@
         </header>
         <field name="x_studio_sequence" widget="handle"/>
         <field name="x_name"/>
-        <field name="x_studio_date_stop" optional="show" widget="daterange" options="{&quot;start_date_field&quot;:&quot;x_studio_date_start&quot;,&quot;always_range&quot;:true}"/>
+        <field name="x_studio_date_stop" string="Date" optional="show" widget="daterange" options="{&quot;start_date_field&quot;:&quot;x_studio_date_start&quot;,&quot;always_range&quot;:true}"/>
         <field name="x_studio_user_id" widget="many2one_avatar_user"/>
         <field name="x_current_signatures" optional="show"/>
         <field name="x_studio_target_signatures" optional="show"/>
@@ -31,8 +31,9 @@
         </header>
         <sheet string="Petition">
         <div name="button_box" class="oe_button_box">
+            <button class="oe_stat_button" name="%(open_x_petition_website_page)d" context="{'record_url': 'x_website_url'}" invisible="not x_is_published" title="Go to Website" icon="fa-globe" type="action"/>
             <button class="oe_stat_button" icon="fa-pencil" type="action" name="%(signatures_c7917ceb-09eb-4f0e-b8f2-95b6728866bc)d">
-              <field widget="statinfo" name="x_x_studio_petition_id_x_signature_count" string="Signatures"/>
+              <field widget="statinfo" name="x_current_signatures" string="Signatures"/>
             </button>
           </div>
           <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
@@ -48,7 +49,7 @@
               <field name="x_studio_date_stop" optional="show" widget="daterange" options="{&quot;start_date_field&quot;:&quot;x_studio_date_start&quot;,&quot;always_range&quot;:true}"/>
                 <field name="x_studio_user_id" widget="many2one_avatar"/>
                 <field name="x_studio_tag_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
-                <field name="x_is_published"/>
+                <field name="x_is_published" help="Is the petition published on the website ?"/>
             </group>
             <group name="studio_group_b69ddc_right">
                 <field name="x_current_signatures" force_save="1" readonly="True"/>
@@ -70,8 +71,6 @@
         <field name="active" eval="True"/>
     <field name="type">form</field>
   </record>
-
-
 
 
 
@@ -153,8 +152,7 @@
     <field name="arch" type="xml">
         <graph string="Petition" sample="1" type="bar">
             <field name="x_name"/>
-            <field name="x_current_signatures" type="col"/>
-          <field name="x_current_signatures" type="measure"/>
+            <field name="x_current_signatures" type="measure"/>
         </graph>
     </field>
     <field name="model">x_petition</field>
@@ -433,9 +431,10 @@
     <record id="odoo_studio_account__4eef38e3-028e-40e6-9aaf-56c5ba3d7aa8" model="ir.ui.view">
         <field name="arch" type="xml">
         <data>
-            <!-- <div name="button_box" position="inside">
-            <button class="oe_stat_button" type="action" name="960" icon="fa-usd"/>
-            </div> -->
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" icon="fa-money" invisible="not x_studio_fiscal_attestation_id" type="action" name="%(donation_related_x_fiscal_attestation_form)d">Fiscal Attestation</button>
+            </div>
+            
             <xpath expr="//form[1]" position="attributes">
             <attribute name="create">true</attribute>
             <attribute name="delete">true</attribute>

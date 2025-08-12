@@ -220,8 +220,7 @@
               <div class="s_allow_columns container">
                 <div class="row">
                   <div class="col-lg-7 mt-4 mt-lg-0 o_colored_level">
-                    <p class="lead">
-                                    Got a question, idea, or want to get involved? We’d love to hear from you.&amp;nbsp;</p>
+                    <p class="lead">Got a question, idea, or want to get involved? We’d love to hear from you.&amp;nbsp;</p>
                     <section class="s_website_form" data-vcss="001" data-snippet="s_website_form">
                       <div class="container">
                         <form id="contactus_form" action="/website/form/" method="post" enctype="multipart/form-data" class="o_mark_required" data-mark="*" data-model_name="mail.mail" data-success-mode="redirect" data-success-page="/contactus-thank-you" data-pre-fill="true">
@@ -271,9 +270,9 @@
                               </div>
                             </div>
                             <div class="mb-0 py-2 col-12 s_website_form_submit s_website_form_no_submit_label text-end" data-name="Submit Button"><div style="width: 200px;" class="s_website_form_label"/>
-                                                    ﻿<a href="#" role="button" class="btn btn-primary s_website_form_send">Submit</a>﻿
-                                                    <span id="s_website_form_result"/>
-                                                </div>
+                                ﻿<a href="#" role="button" class="btn btn-primary s_website_form_send">Submit</a>﻿
+                                <span id="s_website_form_result"/>
+                            </div>
                           </div>
                         </form>
                       </div>
@@ -848,7 +847,233 @@
     <field name="key">website_studio.petition</field>
     <field name="model">x_petition</field>
     <field name="name">Petition</field>
-        <field name="active" eval="True"/>
+    <field name="active" eval="True"/>
+    <field name="type">qweb</field>
+    <field name="website_id" ref="website.default_website"/>
+  </record>
+  <record id="ir_ui_view_4800" model="ir.ui.view">
+    <field name="arch" type="xml">
+        <t t-name="website_studio.petition-1">
+            <t t-call="website.layout">
+                <div id="o_website_record_page wrap">
+                <t t-set="editor_message">Drag building blocks to customize the header of single record pages.</t>
+                <div class="oe_structure oe_empty oe_new" t-att-data-editor-message="editor_message"/>
+                <div class="container">
+                    <ol t-if="listing" class="breadcrumb p-0 my-2">
+                    <li class="breadcrumb-item o_not_editable">
+                        <a t-att-href="listing['href']">
+                        <span t-out="listing['name']"/>
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">
+                        <span t-field="record.x_name"/>
+                    </li>
+                    </ol>
+                    <div class="d-flex flex-row my-4 flex-wrap align-items-center justify-content-between">
+                        <div class="col-lg-12 mt-lg-12 col-sm-12">
+                            <div class="s_progress_bar s_progress_bar_label_inline mb-2" data-display="inline" data-vcss="001" data-snippet="s_progress_bar" data-name="Progress Bar">
+                                <t t-set="current_progress" t-value="record.x_studio_progress*100"/>
+                                <div class="s_progress_bar_wrapper d-flex gap-2">
+                                    <div class="progress" role="progressbar" aria-label="Progress bar" aria-valuenow="current_progress" aria-valuemin="0" aria-valuemax="100">
+                                        <div class="progress-bar overflow-visible" style="min-width: 0%">
+                                            <span class="s_progress_bar_text small"><t t-esc="current_progress"/>%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <div class="col-lg-4 mt-lg-4 col-sm-12">
+                        <h1 class="h1">
+                        <span t-field="record.x_name"/>
+                        </h1>
+                        <div class="o_website_tags ">
+                            <t t-if="record.x_studio_tag_ids" t-foreach="record.x_studio_tag_ids" t-as="tag">
+                                <span t-field="tag.display_name" t-attf-class="badge o_website_tag #{'o_tag_color_'+str(tag.x_color)}"/>
+                            </t>
+                        </div>
+                    </div>
+                    <div t-if="record.x_studio_image" t-field="record.x_studio_image" t-options-widget="'image'" t-options-qweb_img_raw_data="True" t-options-class="'o_website_image h-100 w-100 rounded-3'" class="col-lg-6 mt-md-4 col-sm-12 me-2"/>
+                    <div t-else="" class="col-lg-6 mt-md-4 col-sm-12 me-2 bg-light o_website_image rounded-3"/>
+                    <span t-field="record.x_website_description"/>
+                    </div>
+                    <t t-set="new_signature_values" t-value="{
+                        'name': request.params.get('name', ''),
+                        'country': request.params.get('country', ''),
+                        'email': request.params.get('email', ''),
+                        'date': request.params.get('date', ''),
+                        'petition_id': record.id,
+                        'newsletter': request.params.get('newsletter', ''),
+                    }"/>
+                    <span class="hidden" data-for="new_signature_form" t-att-data-values="new_signature_values"/>
+                    <div class="o_website_html">
+                        <section class="s_website_form pt16 pb16 o_colored_level" data-vcss="001" data-snippet="s_website_form" data-name="Form" id="Form" data-anchor="true">
+                            <div class="container-fluid">
+                                <form id="new_signature_form" action="/website/action/new_signature/" method="post" enctype="multipart/form-data" class="o_mark_required" data-mark="*" data-pre-fill="true" data-model_name="x_signature" data-success-mode="redirect" data-success-page="/contactus-thank-you">
+                                    <div class="s_website_form_rows row s_col_no_bgcolor">
+                                        <div data-name="Field"
+                                            class="s_website_form_field mb-3 col-12 s_website_form_custom s_website_form_required"
+                                            data-type="char">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label
+                                                    class="col-form-label col-sm-auto s_website_form_label"
+                                                    style="width: 200px" for="omz21bc4ypc">
+                                                    <span class="s_website_form_label_content">Your Name</span>
+                                                    <span class="s_website_form_mark"> *</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <input
+                                                        class="form-control s_website_form_input"
+                                                        type="text" name="name"
+                                                        id="omz21bc4ypc" required=""/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div data-name="Field"
+                                            class="s_website_form_field mb-3 col-12 s_website_form_custom s_website_form_required"
+                                            data-type="email">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label
+                                                    class="col-form-label col-sm-auto s_website_form_label"
+                                                    style="width: 200px" for="ofpexjxucp4k">
+                                                    <span class="s_website_form_label_content">Your Email</span>
+                                                    <span class="s_website_form_mark"> *</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <input
+                                                        class="form-control s_website_form_input"
+                                                        type="email" name="email"
+                                                        placeholder="" id="ofpexjxucp4k"
+                                                        data-fill-with="undefined"
+                                                        required=""/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div data-name="Field"
+                                            class="s_website_form_field mb-3 col-12 s_website_form_custom s_website_form_required"
+                                            data-type="date">
+                                            <div
+                                                class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label
+                                                    class="col-form-label col-sm-auto s_website_form_label"
+                                                    style="width: 200px" for="oikxthijk19">
+                                                    <span class="s_website_form_label_content">Date</span>
+                                                    <span class="s_website_form_mark"> *</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <div class="s_website_form_date input-group date">
+                                                        <input type="text"
+                                                            class="form-control datetimepicker-input s_website_form_input"
+                                                            name="date" placeholder=""
+                                                            id="oikxthijk19"
+                                                            data-fill-with=""
+                                                            required=""/>
+                                                        <div class="input-group-text o_input_group_date_icon">
+                                                            <i class="fa fa-calendar"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div data-name="Field"
+                                            class="s_website_form_field mb-3 col-12 s_website_form_custom"
+                                            data-type="char">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label
+                                                    class="col-form-label col-sm-auto s_website_form_label"
+                                                    style="width: 200px" for="oomtyt2gz2d">
+                                                    <span class="s_website_form_label_content">Your Country</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <input
+                                                        class="form-control s_website_form_input"
+                                                        type="text" name="country"
+                                                        id="oomtyt2gz2d"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div data-name="Field"
+                                            class="s_website_form_field mb-3 col-12 s_website_form_custom"
+                                            data-type="text">
+                                            <div
+                                                class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label
+                                                    class="col-form-label col-sm-auto s_website_form_label"
+                                                    style="width: 200px" for="opcial6seyki">
+                                                    <span class="s_website_form_label_content">Comments</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <textarea
+                                                        class="form-control s_website_form_input"
+                                                        name="comments" placeholder=""
+                                                        id="opcial6seyki" rows="3"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div data-name="Field"
+                                            class="s_website_form_field mb-3 col-12 s_website_form_custom"
+                                            data-type="integer"
+                                            t-att-style="'display: none;'">
+                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label
+                                                    class="col-form-label col-sm-auto s_website_form_label"
+                                                    style="width: 200px" for="qfqfl6seyki">
+                                                    <span class="s_website_form_label_content">Record</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <input
+                                                        type="number"
+                                                        class="form-control s_website_form_input"
+                                                        name="petition_id" placeholder=""
+                                                        data-fill-with="petition_id"
+                                                        t-att-readonly="1"
+                                                        id="qfqfl6seyki"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div data-name="Field"
+                                            class="s_website_form_field mb-3 col-12 s_website_form_custom s_website_form_required"
+                                            data-type="boolean">
+                                            <div
+                                                class="row s_col_no_resize s_col_no_bgcolor">
+                                                <label
+                                                    class="col-sm-auto s_website_form_label"
+                                                    style="width: 200px" for="oknvhj0blab">
+                                                    <span class="s_website_form_label_content">Keep me informed on this action</span>
+                                                </label>
+                                                <div class="col-sm">
+                                                    <div class="form-check">
+                                                        <input type="checkbox" value="Yes"
+                                                            class="s_website_form_input form-check-input"
+                                                            name="newsletter"
+                                                            id="oknvhj0blab"
+                                                            data-fill-with="undefined"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="mb-0 py-2 col-12 s_website_form_submit text-end s_website_form_no_submit_label"
+                                            data-name="Submit Button">
+                                            <div style="width: 200px;" class="s_website_form_label"/>
+                                            <span id="s_website_form_result"></span>
+                                            <a href="#" role="button" class="btn btn-primary s_website_form_send">Submit</a>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                <t t-set="editor_message">Drag building blocks to customize the footer of single record pages.</t>
+                <div class="oe_structure oe_empty oe_new" t-att-data-editor-message="editor_message"/>
+                </div>
+            </t>
+        </t>
+    </field>
+    <field name="key">website_studio.petition-1</field>
+    <field name="model">x_petition</field>
+    <field name="name">Petition</field>
+    <field name="active" eval="True"/>
     <field name="type">qweb</field>
     <field name="website_id" ref="website.default_website"/>
   </record>

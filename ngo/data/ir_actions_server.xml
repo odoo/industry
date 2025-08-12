@@ -10,4 +10,38 @@
         <field name="usage">base_automation</field>
         <field name="value" ref="partner_category_signatory"/><!--TOTEST-->
     </record>
+    <record id="action_create_x_signature" model="ir.actions.server">
+        <field name="code"><![CDATA[
+partner = env['res.partner'].search([('name', '=', request.params.get('name'))], limit=1)
+if not partner:
+    partner = env['res.partner'].create({
+        'name': request.params.get('name'), 
+        'email': request.params.get('email'), 
+        'country_id': env['res.country'].search([('name', '=', request.params.get('country'))], limit=1).id
+    })
+new_signature = env['x_signature'].create({
+    "x_studio_partner_id": partner.id,
+    "x_studio_date": datetime.datetime.today().strftime('%Y-%m-%d'),
+    "x_studio_petition_id": request.params.get('petition_id'),
+    "x_studio_newsletter": request.params.get('newsletter'),
+})
+response = request.make_json_response({'id': new_signature.id}, status=200)]]></field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="website_published">True</field>
+        <field name="website_path">new_signature</field>
+        <field name="name">Create Signature</field>
+    </record>
+    <record id="open_x_petition_website_page" model="ir.actions.server">
+        <field name="code"><![CDATA[
+response = {
+   'type': 'ir.actions.act_url',
+   'target': 'self',
+   'url': record.x_website_url,
+}
+]]></field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="state">code</field>
+        <field name="name">Open Petition Website Page</field>
+    </record>
 </odoo>
