@@ -1,74 +1,55 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-  <record id="analytic_account_custom_form_view" model="ir.ui.view">
-    <field name="name">analytic.analytic.account.form customization</field>
-    <field name="inherit_id" ref="analytic.view_account_analytic_account_form" />
-    <field name="mode">primary</field>
-    <field name="active" eval="True"/>
+  <record id="odoo_studio_analytic_e24d1766-3331-491b-9f50-16cd3518f693" model="ir.ui.view">
+    <field name="inherit_id" ref="analytic.view_account_analytic_account_form"/>
+    <field name="mode">extension</field>
     <field name="model">account.analytic.account</field>
-    <field name="priority">400</field>
+    <field name="name">analytic.analytic.account.form customization customization</field>
+    <field name="priority">99</field>
+    <field name="active" eval="True"/>
     <field name="type">form</field>
     <field name="arch" type="xml">
-      <xpath expr="//field[@name='name']" position="attributes">
-        <attribute name="placeholder">e.g. Apartment A0</attribute>
-      </xpath>
-      <xpath expr="//field[@name='code']" position="replace">
-        <field name="x_tenant" />
-      </xpath>
-      <xpath expr="//form[1]/sheet[1]/div[not(@name)][1]/label[1]" position="replace" />
-      <xpath expr="//button[@name='action_view_projects']" position="replace" />
-      <xpath expr="//button[@name='subscriptions_action']" position="after">
-        <button class="oe_stat_button" icon="fa-home" type="action" name="%(properties_parent_act_window)d">
-          <field widget="statinfo" name="x_parent_account_analytic_account_count" string="Properties" />
-        </button>
-        <button class="oe_stat_button" type="object" name="action_view_vendor_bill"
-            icon="fa-file-text-o">
-            <field string="Vendor Bills" name="vendor_bill_count" widget="statinfo"/>
-        </button>
-      </xpath>
-      <xpath expr="//form[1]/sheet[1]/div[not(@name)][1]/h1[1]/field[@name='name']" position="attributes">
-        <attribute name="string">Apartment...</attribute>
-      </xpath>
-      <xpath expr="//field[@name='active']" position="after">
-        <xpath expr="//form[1]/sheet[1]/group[@name='main']/group[2]/field[@name='company_id']" position="move" />
-        <field name="x_condominium" />
-        <field name="x_building" options='{"create_name_field":"x_name","no_create":true}' required="x_is_a_property"/>
-        <field name="x_type" options="{'create_name_field': 'x_name'}" required="x_is_a_property" />
-      </xpath>
-      <xpath expr="//field[@name='partner_id']" position="attributes">
-        <attribute name="required">x_is_a_property</attribute>
-        <attribute name="string">Owner</attribute>
-      </xpath>
-      <xpath expr="//field[@name='plan_id']" position="before">
-        <field widget="many2many_tags" name="x_tags" options='{"color_field": "x_color"}' />
-        <field name="x_parent" options='{"no_create":true}' domain='[("x_is_a_property", "=", True)]' />
-        <field name="x_floor"/>
-        <field name="x_area"/>
-      </xpath>
-      <xpath expr="//field[@name='plan_id']" position="attributes">
-        <attribute name="invisible">True</attribute>
-      </xpath>
-      <xpath expr="//form[1]/sheet[1]/group[@name='main']/group[1]/field[@name='company_id']" position="attributes">
-        <attribute name="force_save">1</attribute>
-        <attribute name="groups">base.group_no_one</attribute>
-        <attribute name="readonly">True</attribute>
-      </xpath>
-      <notebook>
-        <page string="Meter Readings">
-          <field name="x_property_meter_reading_ids" context="{'default_x_account_analytic_account_id': id}">
-            <list editable="bottom">
-              <field name="x_meter_id" required="True"/>
-              <field name="x_date"/>
-              <field name="x_quantity"/>
-              <field name="x_usage" optional="show"/>
-              <field name="x_description" optional="show"/>
-              <field name="x_image" optional="show"/>
-            </list>
-          </field>
-        </page>
-      </notebook>
+      <data>
+        <xpath expr="//field[@name='code']" position="replace"/>
+        <xpath expr="//field[@name='name']" position="attributes">
+            <attribute name="placeholder">e.g. Apartment A0</attribute>
+        </xpath>
+        <xpath expr="//button[@name='subscriptions_action']" position="after">
+          <button class="oe_stat_button" type="object" name="action_view_vendor_bill"
+              icon="fa-file-text-o">
+              <field string="Vendor Bills" name="vendor_bill_count" widget="statinfo"/>
+          </button>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/div[not(@name)][1]/label[1]" position="replace"/>
+        <xpath expr="//button[@name='action_view_projects']" position="replace"/>
+        <xpath expr="//field[@name='active']" position="after">
+            <xpath expr="//form[1]/sheet[1]/group[@name='main']/group[2]/field[@name='company_id']" position="move"/>
+            <field name="x_condominium"/>
+        </xpath>
+        <xpath expr="//field[@name='currency_id']" position="replace">
+          <field name="x_studio_property" options="{&quot;create_name_field&quot;:&quot;x_name&quot;,&quot;no_create&quot;:true}"/>
+          <xpath expr="//field[@name='partner_id']" position="move"/>
+          <field name="x_studio_start_date" force_save="1" readonly="True"/>
+          <field name="x_studio_end_date" force_save="1" readonly="True"/>
+        </xpath>
+        <xpath expr="//field[@name='partner_id']" position="attributes">
+            <attribute name="required">x_is_a_property</attribute>
+            <attribute name="string">Owner</attribute>
+        </xpath>
+        <xpath expr="//field[@name='plan_id']" position="attributes">
+            <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//form[1]/sheet[1]/group[@name='main']/group[1]/field[@name='company_id']" position="attributes">
+            <attribute name="force_save">1</attribute>
+            <attribute name="groups">base.group_no_one</attribute>
+            <attribute name="readonly">True</attribute>
+        </xpath>
+      </data>
     </field>
   </record>
+
+
+
   <record id="sale_order_form_custom" model="ir.ui.view">
     <field name="name">Custom form view for sale order</field>
     <field name="model">sale.order</field>
@@ -201,21 +182,6 @@
             </h1>
           </div>
         </sheet>
-      </form>
-    </field>
-  </record>
-  <record id="quick_create_account_form" model="ir.ui.view">
-    <field name="name">account.analytic.account.quick_create</field>
-    <field name="model">account.analytic.account</field>
-    <field name="priority">1000</field>
-    <field name="active" eval="True"/>
-    <field name="arch" type="xml">
-      <form>
-        <group>
-          <field name="name" string="Building" placeholder="e.g. Apartment A0"/>
-          <field name="x_type" placeholder="e.g. Apartment"/>
-          <field name="partner_id" string="Owner" placeholder="e.g. John Smith"/>
-        </group>
       </form>
     </field>
   </record>
@@ -404,8 +370,8 @@
         </header>
       </xpath>
       <xpath expr="//button[@name='action_open_employees']" position="after">
-        <button class="oe_stat_button" icon="fa-home" type="action" name="%(properties_act_window_account)d">
-          <field widget="statinfo" name="x_condominium_account_analytic_account_count" string="Properties" />
+        <button class="oe_stat_button" icon="fa-home" type="action" name="%(properties_bcdebf3d-1009-4ec1-b263-329f31ab8376)d">
+          <field widget="statinfo" name="x_x_studio_condominium_x_property_count" string="Properties" />
         </button>
       </xpath>
       <xpath expr="//field[@name='property_product_pricelist']" position="after">
@@ -457,7 +423,8 @@
       </field>
     </field>
   </record>
-  <record id="properties_parent_act_window" model="ir.actions.act_window">
+
+  <!-- <record id="properties_parent_act_window" model="ir.actions.act_window">
     <field name="view_ids" eval="[
             (5, 0, 0),
             (0, 0, {'view_mode': 'kanban', 'view_id': ref('analytic_account_custom_kanban_view')}),
@@ -470,7 +437,8 @@
             (0, 0, {'view_mode': 'kanban', 'view_id': ref('analytic_account_custom_kanban_view')}),
             (0, 0, {'view_mode': 'form', 'view_id': ref('analytic_account_custom_form_view')}),
         ]"/>
-  </record>
+  </record> -->
+
   <!-- <record id="properties_act_window" model="ir.actions.act_window">
     <field name="view_ids" eval="[
             (5, 0, 0),
@@ -478,41 +446,6 @@
             (0, 0, {'view_mode': 'form', 'view_id': ref('analytic_account_custom_form_view')}),
         ]"/>
   </record> -->
-  <record id="odoo_studio_analytic_e24d1766-3331-491b-9f50-16cd3518f693" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <data>
-        <xpath expr="//form[1]/sheet[1]/notebook[1]" position="replace">
-          <group name="studio_group_6pd_1ipk0qiuk"/>
-        </xpath>
-        <xpath expr="//field[@name='currency_id']" position="replace">
-          <field name="x_studio_property" options="{&quot;create_name_field&quot;:&quot;x_name&quot;,&quot;no_create&quot;:true}"/>
-          <xpath expr="//field[@name='partner_id']" position="move"/>
-          <field name="x_studio_start_date" force_save="1" readonly="True"/>
-          <field name="x_studio_end_date" force_save="1" readonly="True"/>
-        </xpath>
-        <xpath expr="//field[@name='x_area']" position="replace"/>
-        <xpath expr="//field[@name='x_floor']" position="replace"/>
-        <xpath expr="//field[@name='x_parent']" position="replace"/>
-        <xpath expr="//field[@name='x_tags']" position="replace"/>
-        <xpath expr="//field[@name='x_tenant']" position="replace"/>
-        <xpath expr="//field[@name='x_type']" position="replace"/>
-        <xpath expr="//field[@name='x_building']" position="replace"/>
-        <!-- meet1130 -->
-        <!-- <xpath expr="//button[@name='properties_parent_act_window']" position="replace" /> -->
-        <xpath expr="//field[@name='partner_id']" position="attributes">
-          <attribute name="force_save">0</attribute>
-          <attribute name="readonly">False</attribute>
-        </xpath>
-      </data>
-    </field>
-    <field name="inherit_id" ref="analytic_account_custom_form_view"/>
-    <field name="mode">extension</field>
-    <field name="model">account.analytic.account</field>
-    <field name="name">analytic.analytic.account.form customization customization</field>
-    <field name="priority">99</field>
-    <field name="active" eval="True"/>
-    <field name="type">form</field>
-  </record>
   <record id="odoo_studio_sale_ord_51c6b4e1-3957-4613-b5ea-db8fba2b8957" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
@@ -712,7 +645,7 @@
             </page>
             <page string="Owners" name="studio_page_7sn_1ipjs3r3u">
               <field name="x_studio_owner_ids">
-                <list editable="top" open_form_view="true">
+                <list editable="top">
                   <field name="x_studio_sequence" widget="handle"/>
                   <field optional="show" name="x_studio_start_date" required="True"/>
                   <field optional="show" name="x_studio_end_date"/>
@@ -1380,6 +1313,9 @@
           <attribute name="force_save">0</attribute>
           <attribute name="readonly">False</attribute>
         </xpath>
+        <xpath expr="//page[@name='page_invitations']" position="attributes">
+            <attribute name="groups"/>
+        </xpath>
         <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/list[1]/field[@name='partner_id']" position="attributes">
           <attribute name="readonly">True</attribute>
         </xpath>
@@ -1436,6 +1372,7 @@
               <group name="studio_group_no_left">
                 <field name="x_studio_voting_key" options="{'create_name_field': 'x_name'}"/>
                 <field name="x_studio_attending_ratio" widget="percentage" force_save="1" readonly="True" string="Attending and Delegating Ratio"/>
+                <!-- <field name="x_studio_attending_ratio_copy" widget="percentage" force_save="1" readonly="True" string="Attending and Delegating Ratio test"/> -->
                 <field name="x_studio_attending_owners" string="Attending and Delegating Owners"/>
               </group>
               <group name="studio_group_no_right"/>
@@ -1745,8 +1682,8 @@
         <xpath expr="//filter[@name='in_payment']" position="replace"/>
         <xpath expr="//filter[@name='open']" position="replace"/>
         <xpath expr="//filter[@name='to_check']" position="replace"/>
-        <xpath expr="//filter[@name='out_refund']" position="replace"/>
-        <xpath expr="//filter[@name='out_invoice']" position="replace"/>
+        <!-- <xpath expr="//filter[@name='out_refund']" position="replace"/> -->
+        <!-- <xpath expr="//filter[@name='out_invoice']" position="replace"/> -->
         <xpath expr="//filter[@name='not_sent']" position="replace"/>
         <xpath expr="//field[@name='line_ids']" position="replace"/>
         <xpath expr="//field[@name='next_payment_date']" position="replace"/>
@@ -1754,12 +1691,12 @@
         <xpath expr="//field[@name='invoice_user_id']" position="replace"/>
         <xpath expr="//field[@name='journal_group_id']" position="replace"/>
         <xpath expr="//field[@name='journal_id']" position="replace"/>
-        <xpath expr="//filter[@name='salesperson']" position="replace">
+        <xpath expr="//filter[@name='salesperson']" position="after">
           <filter name="studio_group_by_g8_1iqqi7ti8" string="Allocation" context="{'group_by': 'x_studio_analytic_category'}"/>
           <filter name="studio_group_by_5c1_1iqqi93k0" string="Distribution Key" context="{'group_by': 'x_distribution_key'}"/>
           <filter name="studio_group_by_7oi_1iqqibl90" string="Meter" context="{'group_by': 'x_studio_meter'}"/>
         </xpath>
-        <xpath expr="//filter[@name='myinvoices']" position="replace">
+        <xpath expr="//filter[@name='myinvoices']" position="after">
           <filter domain="[('x_studio_analytic_category', '=', False)]" name="unallocated" help="Unallocated"/>
           <filter domain="[('x_distribution_key', '=', False), ('x_studio_meter', '=', False)]" name="undistributed" help="Without distribution"/>
           <!-- <filter domain="[('x_studio_to_distribute', '=', True)]" name="undistributed" help="To distribute"/> -->
@@ -2005,9 +1942,9 @@
           <attribute name="domain">[("x_studio_is_distributed", "=", False)]</attribute>
         </xpath>
         <xpath expr="/search[1]/filter[3]" position="replace"/>
-        <xpath expr="/search[1]/filter[1]" position="attributes">
+        <!-- <xpath expr="/search[1]/filter[1]" position="attributes">
           <attribute name="string">Without allocation</attribute>
-        </xpath>
+        </xpath> -->
       </data>
     </field>
     <field name="mode">extension</field>
@@ -2022,7 +1959,7 @@
     <field name="arch" type="xml">
       <data>
         <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
-          <page string="Distribution and Allocation" name="studio_page_8lb_1iqq9bhcp" invisible="False">
+          <page string="Distribution" name="studio_page_8lb_1iqq9bhcp" invisible="False">
             <group name="studio_group_8lb">
               <group name="studio_group_8lb_left" string="Distribution">
                 <field name="x_studio_distribution_key" options="{&quot;create_name_field&quot;:&quot;x_name&quot;,&quot;no_create&quot;:true}"/>
@@ -2040,9 +1977,12 @@
         <xpath expr="//button[@name='action_cancel_peppol_documents']" position="after">
           <button string="Distribute Costs" name="%(distribute_costs)d" type="action"/>
         </xpath>
-        <xpath expr="//field[@name='invoice_vendor_bill_id']" position="after">
+
+        <!-- Remove the x_distribution key from the invoices (no longer used since the x_studio_distribution_key is leveraged from the distribution tab) -->
+        <!-- <xpath expr="//field[@name='invoice_vendor_bill_id']" position="after">
           <field name="x_distribution_key" options="{'no_create': true}" placeholder="Area as distribution key"/>
-        </xpath>
+        </xpath> -->
+
         <xpath expr="//field[@name='x_studio_period_start']" position="attributes">
           <attribute name="required">x_studio_based_on == "Meter Readings"</attribute>
         </xpath>
@@ -2244,15 +2184,26 @@
     <field name="active" eval="True"/>
     <field name="model">x_analytic_account_wizard</field>
     <field name="arch" type="xml">
-      <form string="Split">
-        <field name="x_line_ids" nolabel="1" widget="one2many_list">
-          <list editable="bottom" delete="false">
-            <field name="x_analytic_account_name_id"/>
-            <field name="x_share" sum="Total Share" string="Share (%)" readonly="1"/>
-            <field name="x_currency_id" invisible='1'/>
-            <field name="x_amount" sum="Total Amount"/>
-          </list>
-        </field>
+      <form string="Analytic item split">
+        <div style="max-height:250px; overflow-y:auto;">
+          <field name="x_line_ids" nolabel="1" widget="one2many_list">
+            <list editable="bottom">
+              <field name="x_analytic_account_name_id"/>
+              <field name="x_share" string="Share (%)"/>
+              <field name="x_currency_id" invisible='1'/>
+              <field name="x_amount"/>
+            </list>
+          </field>
+        </div>
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; text-align: right;">
+          <div></div>
+          <div>
+            <field name="x_share_total" nolabel="1" readonly="1" class="oe_inline"/>
+          </div>
+          <div>
+            <field name="x_total" nolabel="1" readonly="1" class="oe_inline"/>
+          </div>
+        </div>
         <footer>
           <button string="Confirm" type="action" name="%(confirm_analytic_account_item_split_action)d" class="btn-primary"/>
           <button string="Cancel" special="cancel" class="btn-secondary"/>
