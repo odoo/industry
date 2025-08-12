@@ -14,74 +14,72 @@ records.action_confirm()
         <field name="state">code</field>
         <field name="model_id" ref="model_analytic_account_wizard"/>
         <field name="binding_model_id" ref="model_analytic_account_wizard"/>
-        <field name="code"><![CDATA[total_share = 0
-note_lines = []
+        <field name="code"><![CDATA[
+total_share = sum(line.x_share for line in records.x_line_ids)
+
+if round(total_share) != 100:
+    raise UserError("The Share sum shall equal 100% to confirm the split.")
+
 new_analytic_item = env['account.analytic.line']
 note_details = {}
 occupied_cells = {}
 
+project_plan, other_plans = records.env['account.analytic.plan']._get_all_plans()
+for plan in other_plans:
+    if plan.name == 'Properties':
+        fname = plan._column_name()
+
 for line in records.x_line_ids:
-    total_share += line.x_share
-
-if round(total_share) != 100:
-    raise UserError("Total share must be 100%. Current: %s" % total_share)
-
-for line in records.x_line_ids:
-    project_plan, other_plans  = line.x_analytic_line_id.env['account.analytic.plan']._get_all_plans()
-    for plan in other_plans:
-        if plan.name == 'Properties':
-            fname = plan._column_name()
-
+    original_analytic = line.x_analytic_line_id or original_analytic
     analytic_id = line.x_analytic_account_name_id
     analytic_name = analytic_id.name
-    original_id = line.x_analytic_line_id.id
+    original_analytic_id = original_analytic.id
 
-    new_analytic_item_id = new_analytic_item.create({
-        fname: analytic_id.id or '',
-        "name": analytic_id.name,
-        "amount": line.x_amount
-    })
-    # new_analytic_item += new_analytic_item_id
-    # occupied_cells.append((original_id, new_analytic_item_id))
+    if original_analytic:
+        new_analytic_item_id = original_analytic.copy({
+            fname: analytic_id.id or '',
+            "name": analytic_name,
+            "amount": line.x_amount
+        })
 
-    if original_id in occupied_cells:
-        occupied_cells[original_id].update(new_analytic_item_id)
+    if original_analytic_id in occupied_cells:
+        occupied_cells[original_analytic_id].update(new_analytic_item_id)
     else:
-        occupied_cells.update({original_id: set(new_analytic_item_id)})
+        occupied_cells.update({original_analytic_id: set(new_analytic_item_id)})
 
-    if original_id in note_details:
+    if original_analytic_id in note_details:
         analytic_url = f"/odoo/analytic-items/{new_analytic_item_id.id}"
         note_line = f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{analytic_name}</a>"
-        note_details[original_id].add(note_line)
+        note_details[original_analytic_id].add(note_line)
     else:
         analytic_url = f"/odoo/analytic-items/{new_analytic_item_id.id}"
         note_line = {f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{analytic_name}</a>"}
-        note_details.update({original_id: set(note_line)})
+        note_details.update({original_analytic_id: set(note_line)})
 
-for cell, new_analytic_lines in occupied_cells.items():
-    for new_analytic_line in list(new_analytic_lines):
+for original_id, new_lines in occupied_cells.items():
+    for new_analytic_line in list(new_lines):
         for Aid, values in note_details.items():
-            if cell == Aid:
+            if original_id == Aid:
                 note_html = f"""
                     <i>{datetime.date.today().strftime("%d %B %Y")}</i><br/>
                     <p><b>Analytic item coming from a split</b><br/>
                     {'<br/>'.join(list(values))}<br/>
-                    See <a href='/odoo/analytic-items/{cell}' target='_blank'> original analytic item:</a>
+                    See <a href='/odoo/analytic-items/{original_id}' target='_blank'> original analytic item</a>
                     </p>
                     """
                 new_analytic_line.write({"x_notes": note_html.strip()})
 
-for Aid, values in note_details.items():
+for original_id, values in note_details.items():
+    original_item = new_analytic_item.browse(original_id)
     note_html = f"""
         <i>{datetime.date.today().strftime("%d %B %Y")}</i><br/>
         <p><b>Analytic item splited</b><br/>
         {'<br/>'.join(list(values))}<br/>
+        Original amount: {original_item.amount}
         </p>
         """
-    new_analytic_item.browse(Aid).write({"x_notes": note_html.strip()})
-
-# new_analytic_item.write({"x_notes": note_html.strip()})]]>
-        </field>
+    new_analytic_item.browse(original_id).write({"x_notes": note_html.strip(), "amount": 0.0,})
+            ]]></field>
     </record>
 
     <record id="split_analytic_item_action" model="ir.actions.server">
@@ -97,10 +95,16 @@ for record in records:
     amount_total += record.amount
     split_amount = record.amount / 2
 
+    project_plan, other_plans = record.env['account.analytic.plan']._get_all_plans()
+    for plan in other_plans:
+        if plan.name == 'Properties':
+            fname = plan._column_name()
+
     for _ in range(2):
         analytic_account_lines.append((0, 0, {
             "x_analytic_line_id": record.id,
-            "x_amount": split_amount
+            "x_amount": split_amount,
+            "x_analytic_account_name_id": record[fname].id if record[fname] else False
         }))
 
 if amount_total == 0:
@@ -239,11 +243,13 @@ record['x_studio_attendee_vote_ids'] = env['x_calendar_event_line_a1bce_line_a3f
         <field name="binding_model_id" ref="calendar.model_calendar_event"/>
         <field name="model_id" ref="calendar.model_calendar_event"/>
         <field name="state">mail_post</field>
-        <field name="name">Send General Meeting Report</field>
+        <field name="template_id" ref="mail_template_51"/>
+        <field name="name">Industry: Send General Meeting Report</field>
     </record>
     <record id="industry_send_genera_636204d5-33e7-437e-99cb-fbc897d72c0e" model="ir.actions.server">
         <field name="binding_model_id" ref="calendar.model_calendar_event"/>
         <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="template_id" ref="mail_template_52"/>
         <field name="state">mail_post</field>
         <field name="name">Send General Meeting Agenda</field>
     </record>
@@ -312,7 +318,7 @@ else:
     <record id="industry_populate_di_1bcb08fe-f6dc-4ea0-9ffc-d4607055470e" model="ir.actions.server">
         <field name="binding_model_id" ref="distribution_key_ebf70cee-4475-4921-a5f1-85e747bc5842"/>
         <field name="code"><![CDATA[for distribution_key in records:
-    properties = env['x_property'].search([])
+    properties = env['x_property'].search([('x_studio_company_id', 'in', record.x_studio_company_id.id)])
     if properties:
         total_distribution = sum(properties.mapped('x_studio_area'))
         for property in properties:
@@ -349,9 +355,8 @@ if server_action: server_action.run()]]></field>
     </record>
     <record id="industry_create_task_47e0cf69-8b12-4e53-b7d5-794639319f20" model="ir.actions.server">
         <field name="binding_model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
-        <field name="code"><![CDATA[customer_id = record.x_calendar_event_id.x_studio_partner_id.id
-action = { 'type': 'ir.actions.act_window', 'name': 'Create Task', 'res_model': 'project.task', 'view_mode': 'form', 'view_type': 'form', 'target': 'new', 'context': { 'default_project_id': env['project.project'].search([('partner_id', '=', customer_id)]).id, 'default_name': record.x_name, 'default_user_ids': [env.user.id], 'default_partner_id': customer_id } }
-]]>        </field>
+        <field name="code"><![CDATA[customer_id = record.x_calendar_event_id.x_studio_condominium.partner_id.id
+action = { 'type': 'ir.actions.act_window', 'name': 'Create Task', 'res_model': 'project.task', 'view_mode': 'form', 'view_type': 'form', 'target': 'new', 'context': { 'default_project_id': env['project.project'].search([('partner_id', '=', customer_id)]).id, 'default_name': record.x_name, 'default_user_ids': [env.user.id], 'default_partner_id': customer_id } }]]></field>
         <field name="model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
         <field name="state">code</field>
         <field name="name">Create Task from Motion</field>
