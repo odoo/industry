@@ -71,11 +71,11 @@
         'data/x_property_line_07bf7.xml',
         'data/x_property_line_bfb14.xml',
         'data/x_ratios.xml',
-        'data/account_move.xml',
-        'data/account_move_line.xml',
         'data/account_analytic_line.xml'
     ],
     'demo': [
+        'demo/account_move.xml',
+        'demo/account_move_line.xml',
         'demo/res_company.xml',
         'demo/x_calendar_event_line_a1bce_line_a3f04.xml',
         'demo/calendar_event.xml',
