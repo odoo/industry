@@ -44,4 +44,17 @@ response = {
         <field name="state">code</field>
         <field name="name">Open Petition Website Page</field>
     </record>
+    <record id="action_generate_fiscal_attestation" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for record in self:
+    concerned_donations = record.env['account.payment'].search([('date.year', '=', record.x_wizard_fiscal_year),('amount', '>=', record.x_wizard_tax_minimum)])
+    if not record.x_wizard_show_warning and concerned_donations.filtered(lambda d: d.x_fiscal_attestation or not d.partner_id.street or not d.partner_id.city or not d.partner_id.state or not d.partner_id.country_id):
+        record['x_wizard_show_warning'] = True
+    else:
+        pass
+]]></field>
+        <field name="model_id" ref="x_wizard_generate_fiscal_attestation_model"/>
+        <field name="state">code</field>
+        <field name="name">Generate Fiscal Attestation</field>
+    </record>
 </odoo>
