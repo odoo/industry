@@ -1,0 +1,980 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="ir_ui_view_3491" model="ir.ui.view">
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <t name="Appointment: Appointment Info" t-name="appointment.appointment_info">
+                <t t-set="no_breadcrumbs" t-value="True"/>
+                <t t-call="portal.portal_layout">
+                    <div id="wrap" class="h-100">
+                        <t t-set="o_portal_fullwidth_alert" groups="appointment.group_appointment_manager">
+                            <t t-call="appointment.appointment_edit_in_backend"/>
+                        </t>
+                        <div class="container-lg h-100">
+                            <div t-attf-class="row #{'mt-4' if website else ''}">
+                                <div t-attf-class="col-12 col-md-8 #{'p-4' if not website else ''}">
+                                    <nav class="d-print-none d-flex justify-content-between mb-4" name="navbar">
+                                        <t t-call="appointment.appointment_progress_bar">
+                                            <t t-set="step" t-value="20"/>
+                                        </t>
+                                    </nav>
+                                    <div class="o_appointment o_appointment_info">
+                                        <div class="o_appointment_info_main o_wappointment_type_options o_not_editable" t-att-data-appointment-type-id="appointment_type.id" t-att-data-timezone="timezone">
+                                            <h4 class="pb-3">Select a date &amp; time</h4>
+                                            <div t-if="state in ['failed-staff-user', 'failed-resource']" class="alert alert-danger" role="alert">
+                                                <p>
+                                                    <strong>Appointment failed!</strong>
+                                            The selected timeslot is not available anymore.
+                                            Someone has booked the same time slot a few
+                                            seconds before you.
+                                                </p>
+                                                <p class="mb-0">
+                                            Please, select another date.
+                                                </p>
+                                            </div>
+                                            <div t-if="state == 'failed-partner'" class="alert alert-danger" role="alert">
+                                                <p>
+                                                    <strong>Appointment failed!</strong>
+                                            The selected timeslot is not available.
+                                            It appears you already have another meeting with us at that date.
+                                                </p>
+                                                <p class="mb-0">
+                                            Please, select another date.
+                                                </p>
+                                            </div>
+                                            <div t-if="state == 'cancel'" role="alert" class="o_appointment_cancelled alert alert-danger">
+                                                <strong>Appointment cancelled!</strong>
+                                        You can now choose a different schedule that suits you better.
+                                            </div>
+                                            <div t-if="user_forced and state != 'cancel'" role="alert" class="o_appointment_forced_staff_user_assigned alert alert-info">
+                                        We will book you with
+                                                <span class="fw-bold" t-out="user_forced.name"/>
+                                        as you are already in touch with them.
+                                            </div>
+                                            <div class="clearfix"/>
+                                            <t t-set="based_on_users" t-value="appointment_type.schedule_based_on == 'users'"/>
+                                            <t t-set="no_users" t-value="not appointment_type.staff_user_ids if based_on_users else 1"/>
+                                            <t t-set="no_resources" t-value="not appointment_type.resource_ids if not based_on_users else 1"/>
+                                            <t t-set="no_slots" t-value="not appointment_type.slot_ids"/>
+                                            <div t-if="(not based_on_users and no_resources) or (based_on_users and no_users) or no_slots" class="col-12 o_appointment_missing_configuration d-none">
+                                                <div class="alert alert-info rounded-0 mb-3 o_not_editable" groups="appointment.group_appointment_manager">
+                                                    <t t-if="based_on_users">
+                                                        <t t-if="no_users and no_slots">
+                                                    This appointment type has no availabilities because it has no staff assigned and does not have any opening hours configured
+                                                        </t>
+                                                        <t t-elif="no_users">
+                                                    This appointment type has no availabilities because it has no staff assigned
+                                                        </t>
+                                                        <t t-elif="no_slots">
+                                                    This appointment type has no availabilities because it does not have any opening hours configured
+                                                        </t>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <t t-if="no_resources and no_slots">
+                                                    This appointment type has no availabilities because it has no resource assigned and does not have any opening hours configured
+                                                        </t>
+                                                        <t t-elif="no_resources">
+                                                    This appointment type has no availabilities because it has no resource assigned
+                                                        </t>
+                                                        <t t-elif="no_slots">
+                                                    This appointment type has no availabilities because it does not have any opening hours configured
+                                                        </t>
+                                                    </t>
+                                                    <a t-attf-href="/odoo/{{main_object._name}}/{{main_object.id}}?menu_id={{backend_menu_id}}" class="d-block">
+                                                        <i class="oi oi-arrow-right me-2"/>
+                                                        <em>Configure <t t-out="appointment_type.name"/>
+                                                        </em>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="o_appointment_upcoming_appointment_alert"/>
+                                            <div class="row">
+                                                <div class="o_appointment_calendar col-12 col-xl-8">
+                                                    <t t-call="appointment.appointment_calendar"/>
+                                                    <div t-if="not appointment_type.hide_timezone" t-attf-class="o_appointment_timezone_selection #{'d-none' if month_first_available is False or not appointment_type.active else ''}">
+                                                        <form autocomplete="off">
+                                                            <div class="d-flex gap-2 align-items-center mt-2">
+                                                                <label class="small fw-normal" for="timezone">Timezone: </label>
+                                                                <select class="form-select form-select-sm w-50" id="timezone" name="timezone">
+                                                                    <t t-foreach="appointment_type._fields['appointment_tz'].selection(appointment_type)" t-as="tz">
+                                                                        <option t-att-value="tz[0]" t-out="tz[1]" t-att-selected="(tz[0] == timezone) or None"/>
+                                                                    </t>
+                                                                </select>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                                <div t-attf-class="o_appointment_calendar_form o_not_editable #{'d-none' if month_first_available is False or not appointment_type.active else 'col-12 col-xl-4'}">
+                                                    <form id="slots_form" class="form o_appointment_appointment_info_form" autocomplete="off">
+                                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                                        <input type="hidden" name="active" t-att-value="appointment_type.active"/>
+                                                        <input type="hidden" name="appointment_type_id" t-att-value="appointment_type.id"/>
+                                                        <input type="hidden" name="schedule_based_on" t-att-value="appointment_type.schedule_based_on"/>
+                                                        <input type="hidden" name="assign_method" t-att-value="appointment_type.assign_method"/>
+                                                        <input type="hidden" name="resource_selected_id" t-att-value="resource_selected.id"/>
+                                                        <input type="hidden" name="invite_token" t-att-value="invite_token"/>
+                                                        <input type="hidden" name="filter_appointment_type_ids" t-att-value="filter_appointment_type_ids"/>
+                                                        <input type="hidden" name="filter_staff_user_ids" t-att-value="filter_staff_user_ids"/>
+                                                        <input type="hidden" name="filter_resource_ids" t-att-value="filter_resource_ids"/>
+                                                        <input type="hidden" name="hide_select_dropdown" t-att-value="hide_select_dropdown"/>
+                                                        <t t-if="appointment_type.assign_method == 'resource_time' and based_on_users" t-call="appointment.staff_user_select"/>
+                                                        <div t-if="appointment_type.assign_method == 'resource_time' and not based_on_users" name="resource_select" t-attf-class="mb-4 #{'d-none' if hide_select_dropdown else ''}">
+                                                            <label for="selectAppointmentResource" class="mb-2">For</label>
+                                                            <select class="form-select" name="resource_id" id="selectAppointmentResource">
+                                                                <t t-foreach="resources_possible" t-as="resource">
+                                                                    <option t-att-value="resource.id" t-out="resource.name" t-att-selected="resource.id == (resource_selected.id or resources_possible[0].id) and 'selected'"/>
+                                                                </t>
+                                                            </select>
+                                                        </div>
+                                                    </form>
+                                                    <div t-if="appointment_type.manage_capacity">
+                                                        <div t-if="slots and max_capacity" class="mb-4">
+                                                            <input type="hidden" name="max_capacity" t-att-value="max_capacity"/>
+                                                            <label class="mb-2 o_editable" for="resourceCapacity">Number of people</label>
+                                                            <select class="form-select cursor-pointer" name="resourceCapacity" id="resourceCapacity">
+                                                                <option value="1" t-att-selected="not asked_capacity and 'selected'" data-placeholder-option="True">-</option>
+                                                                <option t-foreach="range(1, max_capacity + 1)" t-as="counter" t-att-value="counter" t-att-selected="counter == asked_capacity and 'selected'">
+                                                                    <t t-out="counter"/>
+                                                                </option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="o_appointment_no_capacity d-flex mt-2 pb-0 text-center"/>
+                                                    </div>
+                                                    <div id="slotsList" class="o_appointment_availabilities o_not_editable my-3 my-xl-0" t-att-data-appointments-count="len(available_appointments)"/>
+                                                    <div class="o_appointment_slot_list_loading d-flex align-items-center py-5 my-5 d-none">
+                                                        <i class="fa fa-2x fa-circle-o-notch fa-spin mx-auto text-o-color-2"/>
+                                                    </div>
+                                                    <div t-if="appointment_type.assign_method == 'time_resource'" class="mt-3">
+                                                        <div id="resourceSelection" class="d-none"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="o_appointment_no_slot_overall_helper col-12"/>
+                                        </div>
+                                        <t t-set="editor_message">DROP BUILDING BLOCKS HERE TO MAKE THEM AVAILABLE ACROSS ALL APPOINTMENTS</t>
+                                        <div class="oe_structure oe_empty" t-att-data-editor-message="editor_message"/>
+                                    </div>
+                                    <div t-attf-class="o_appointment_intro border-top pt-4 mt-4 #{'d-none' if not appointment_type.active or is_html_empty(appointment_type.message_intro) else ''}">
+                                        <h5 class="mb-3">
+                                            <h3>👋 Meet a Camp Counsellor</h3>
+                                        </h5>
+                                        <div t-field="appointment_type.message_intro" placeholder="Add an intro message here..."/>
+                                    </div>
+                                </div>
+                                <t t-call="appointment.appointment_details_column">
+                                    <!-- Used to check if we are on "Date & Time" step -->
+                                    <t t-set="isDate" t-value="True"/>
+                                    <t t-set="staff_user" t-value="user_selected"/>
+                                    <t t-set="resource" t-value="resource_selected"/>
+                                    <t t-set="selectionPossible" t-value="appointment_type.assign_method != 'time_auto_assign' and len(users_possible or resources_possible) &gt; 1"/>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </field>
+        <field name="key">appointment.appointment_info</field>
+        <field name="name">Appointment: Appointment Info</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+    <record id="ir_ui_view_3420" model="ir.ui.view">
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <data inherit_id="website.layout" name="Centered" active="False">
+                <xpath expr="//div[@id='footer']" position="replace">
+                    <div id="footer" class="oe_structure oe_structure_solo" t-ignore="true" t-if="not no_footer">
+                        <section class="s_text_block pt32" data-snippet="s_text_block" data-name="Text">
+                            <div class="container s_allow_columns">
+                                <div class="s_social_media text-center mb-4 o_not_editable" data-snippet="s_social_media" data-name="Social Media">
+                                    <h5 class="s_social_media_title d-none">Follow us</h5>
+                                    <a href="/website/social/facebook" class="s_social_media_facebook" target="_blank" aria-label="Facebook">
+                                        <i class="fa fa-facebook rounded-circle rounded shadow-sm o_editable_media"/>
+                                    </a>
+                                    <a href="/website/social/twitter" class="s_social_media_twitter" target="_blank" aria-label="X">
+                                        <i class="fa fa-twitter rounded-circle rounded shadow-sm o_editable_media"/>
+                                    </a>
+                                    <a href="/website/social/linkedin" class="s_social_media_linkedin" target="_blank" aria-label="LinkedIn">
+                                        <i class="fa fa-linkedin rounded-circle rounded shadow-sm o_editable_media"/>
+                                    </a>
+                                </div>
+                                <p class="text-center mb-1">250 Executive Park Blvd, Suite 3400 • San Francisco CA 94134 • United States</p>
+                                <ul class="list-inline text-center">
+                                    <li class="list-inline-item mx-3">
+                                        <i class="fa fa-1x fa-fw fa-phone me-2"/>
+                                        <span class="o_force_ltr">
+                                            <a href="tel:+1 555-555-5556">+1 555-555-5556</a>
+                                        </span>
+                                    </li>
+                                    <li class="list-inline-item mx-3">
+                                        <i class="fa fa-1x fa-fw fa-envelope me-2"/>
+                                        <span>
+                                            <a href="mailto:info@yourcompany.example.com">info@yourcompany.example.com</a>
+                                        </span>
+                                    </li>
+                                </ul>
+                                <div class="row">
+                                    <div class="col-lg-2 offset-lg-5 o_colored_level">
+                                        <a href="/" class="o_footer_logo logo">
+                                            <img src="/website/static/src/img/website_logo.svg" class="img-fluid mx-auto" aria-label="Logo of MyCompany" title="MyCompany" role="img" loading="lazy"/>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </xpath>
+            </data>
+        </field>
+        <field name="inherit_id" ref="website.layout"/>
+        <field name="key">website.template_footer_centered</field>
+        <field name="mode">extension</field>
+        <field name="name">Centered</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+    <record id="ir_ui_view_3493" model="ir.ui.view">
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <t name="Contact Us" t-name="website.contactus">
+                <t t-call="website.layout">
+                    <t t-set="logged_partner" t-value="request.env['website.visitor']._get_visitor_from_request().partner_id"/>
+                    <t t-set="contactus_form_values" t-value="{                 'email_to': res_company.email,                 'name': request.params.get('name', ''),                 'phone': request.params.get('phone', ''),                 'email_from': request.params.get('email_from', ''),                 'company': request.params.get('company', ''),                 'subject': request.params.get('subject', ''),             }"/>
+                    <span class="hidden" data-for="contactus_form" t-att-data-values="contactus_form_values"/>
+                    <div id="wrap" class="oe_structure oe_empty">
+                        <section class="s_title parallax s_parallax_is_fixed bg-black-50 pt24 pb24 o_colored_level" data-vcss="001" data-snippet="s_title" data-scroll-background-ratio="1">
+                            <span class="s_parallax_bg oe_img_bg" style="background-image: url('/web/image/website.s_parallax_default_image'); background-position: 50% 0;"/>
+                            <div class="o_we_bg_filter bg-black-50"/>
+                            <div class="container">
+                                <h1>Contact us</h1>
+                            </div>
+                        </section>
+                        <section class="s_text_block pt40 pb40 o_colored_level" data-snippet="s_text_block">
+                            <div class="s_allow_columns container">
+                                <div class="row">
+                                    <div class="col-lg-7 mt-4 mt-lg-0 o_colored_level">
+                                        <p class="lead">
+                                    Contact us about anything related to our company or services.<br/>
+                                    We'll do our best to get back to you as soon as possible.
+                                        </p>
+                                        <section class="s_website_form" data-vcss="001" data-snippet="s_website_form">
+                                            <div class="container">
+                                                <form id="contactus_form" action="/website/form/" method="post" enctype="multipart/form-data" class="o_mark_required" data-mark="*" data-model_name="crm.lead" data-success-mode="redirect" data-success-page="/contactus-thank-you" data-pre-fill="true">
+                                                    <div class="s_website_form_rows row s_col_no_bgcolor">
+                                                        <div data-name="Field" class="s_website_form_field mb-3 col-12 s_website_form_required" data-type="char">
+                                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                                <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="ou2k73c0tgj">
+                                                                    <span class="s_website_form_label_content">Your Name</span>
+                                                                    <span class="s_website_form_mark"> *</span>
+                                                                </label>
+                                                                <div class="col-sm">
+                                                                    <input class="form-control s_website_form_input" type="text" name="contact_name" required="1" data-fill-with="name" id="ou2k73c0tgj"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div data-name="Field" class="s_website_form_field mb-3 col-12" data-type="tel">
+                                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                                <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="ozkieh7fw2q">
+                                                                    <span class="s_website_form_label_content">Phone Number</span>
+                                                                </label>
+                                                                <div class="col-sm">
+                                                                    <input class="form-control s_website_form_input" type="tel" name="phone" data-fill-with="phone" id="ozkieh7fw2q"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div data-name="Field" class="s_website_form_field mb-3 col-12 s_website_form_required" data-type="email">
+                                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                                <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="o4tvv6jphs4">
+                                                                    <span class="s_website_form_label_content">Your Email</span>
+                                                                    <span class="s_website_form_mark"> *</span>
+                                                                </label>
+                                                                <div class="col-sm">
+                                                                    <input class="form-control s_website_form_input" type="email" name="email_from" required="1" data-fill-with="email" id="o4tvv6jphs4"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div data-name="Field" class="s_website_form_field mb-3 col-12 s_website_form_model_required" data-type="char">
+                                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                                <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="ocv8nl6u9m67">
+                                                                    <span class="s_website_form_label_content">Subject</span>
+                                                                    <span class="s_website_form_mark"> *</span>
+                                                                </label>
+                                                                <div class="col-sm">
+                                                                    <input class="form-control s_website_form_input" type="text" name="name" required="" id="ocv8nl6u9m67"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div data-name="Field" class="s_website_form_field mb-3 col-12 s_website_form_required" data-type="text">
+                                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                                <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="o6i0nq3hkmxd">
+                                                                    <span class="s_website_form_label_content">Your Question</span>
+                                                                    <span class="s_website_form_mark"> *</span>
+                                                                </label>
+                                                                <div class="col-sm">
+                                                                    <textarea class="form-control s_website_form_input" name="description" required="1" id="o6i0nq3hkmxd" rows="3"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-0 py-2 col-12 s_website_form_submit s_website_form_no_submit_label text-end" data-name="Submit Button">
+                                                            <div style="width: 200px;" class="s_website_form_label"/>
+                                                            <a href="#" role="button" class="btn btn-primary s_website_form_send">Submit</a>
+                                                            <span id="s_website_form_result"/>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </section>
+                                    </div>
+                                    <div class="col-lg-4 offset-lg-1 mt-4 mt-lg-0 o_colored_level">
+                                        <h5>My Company</h5>
+                                        <ul class="list-unstyled mb-0 ps-2">
+                                            <li>
+                                                <i class="fa fa-map-marker fa-fw me-2"/>
+                                                <span class="o_force_ltr">3575 Fake Buena Vista Avenue</span>
+                                            </li>
+                                            <li>
+                                                <i class="fa fa-phone fa-fw me-2"/>
+                                                <span class="o_force_ltr">+1 555-555-5556</span>
+                                            </li>
+                                            <li>
+                                                <i class="fa fa-1x fa-fw fa-envelope me-2"/>
+                                                <span>info@yourcompany.example.com</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </t>
+            </t>
+        </field>
+        <field name="key">website.contactus</field>
+        <field name="name">Contact Us</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+    <record id="ir_ui_view_3471" model="ir.ui.view">
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <t name="Event Description" track="1" t-name="website_event.event_description_full">
+                <t t-set="hide_submenu" t-value="True"/>
+                <t t-set="hide_register_cta" t-value="True"/>
+                <t t-set="opt_event_description_cover_hidden" t-value="is_view_active('website_event.opt_event_description_cover_hidden')"/>
+                <t t-set="opt_event_description_cover_top" t-value="is_view_active('website_event.opt_event_description_cover_top')"/>
+                <t t-set="opt_event_fixed_sidebar" t-value="is_view_active('website_event.opt_event_fixed_sidebar')"/>
+                <t t-set="opt_event_registration_block" t-value="is_view_active('website_event.opt_event_registration_block')"/>
+                <t t-set="opt_event_dates_block" t-value="is_view_active('website_event.opt_event_dates_block')"/>
+                <t t-set="opt_event_calendar_block" t-value="is_view_active('website_event.opt_event_calendar_block')"/>
+                <t t-set="opt_event_location_block" t-value="is_view_active('website_event.opt_event_location_block')"/>
+                <t t-set="opt_event_organizer_block" t-value="is_view_active('website_event.opt_event_organizer_block')"/>
+                <t t-set="opt_event_share_block" t-value="is_view_active('website_event.opt_event_share_block')"/>
+                <t t-set="edition_cover_only" t-value="opt_event_description_cover_hidden and request.env.user.has_group('event.group_event_manager')"/>
+                <t t-call="website_event.event_details">
+                    <div t-if="toast_message" class="o_wevent_register_toaster d-none" t-att-data-message="toast_message"/>
+                    <t t-if="opt_event_description_cover_top" t-call="website.record_cover">
+                        <t t-set="_record" t-value="event"/>
+                        <t t-set="use_filters" t-value="True"/>
+                        <t t-set="use_size" t-value="True"/>
+                        <t t-set="use_text_align" t-value="True"/>
+                        <t t-set="additionnal_classes" t-value="'o_wevent_event_main_cover o_wevent_event_main_cover_top overflow-hidden h-auto'"/>
+                        <div class="container d-flex flex-grow-1 h-100 w-100">
+                            <div id="o_wevent_event_main_cover_content" class="d-flex flex-column align-items-baseline w-100 py-3">
+                                <span t-if="event.is_participating" class="badge text-bg-success o_wevent_badge">
+                                    <i class="fa fa-check me-2" role="img"/>
+Registered
+                                </span>
+                                <div class="w-100 mt-auto">
+                                    <h2 t-field="event.name" itemprop="name" placeholder="Event Title" class="mt-3"/>
+                                    <p class="lead" t-field="event.subtitle" placeholder="Event Subtitle"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                    <section id="o_wevent_event_main" class="h-100" t-cache="(event, event.is_participating) if not editable and event.website_published else None">
+                        <div t-attf-class="container pb-5 {{'' if opt_event_fixed_sidebar else 'overflow-hidden'}}">
+                            <div class="row">
+                                <div class="col pe-xxl-5">
+                                    <t t-call="website_event.navbar"/>
+                                    <!-- Show the button tickets only on mobile -->
+                                    <div t-if="opt_event_registration_block" class="o_wevent_event_main_cta_block d-lg-none mb-3">
+                                        <t t-call="website_event.registration_template">
+                                            <t t-set="cta_additional_classes">w-100 py-sm-3 mt-sm-2</t>
+                                        </t>
+                                    </div>
+                                    <!-- Description -->
+                                    <div id="o_wevent_event_main_col">
+                                        <div t-if="edition_cover_only" class="css_non_editable_mode_hidden o_not_editable bg-info-light border border-info border-bottom-0 rounded-top p-2">
+                                            <em>Hidden for visitors</em>
+                                        </div>
+                                        <t t-if="not opt_event_description_cover_top" t-call="website.record_cover">
+                                            <t t-set="_record" t-value="event"/>
+                                            <t t-set="use_filters" t-value="True"/>
+                                            <t t-set="use_size" t-value="False"/>
+                                            <t t-set="use_text_align" t-value="True"/>
+                                            <t t-set="additionnal_classes" t-value="'o_wevent_event_main_cover overflow-hidden ' + ('css_non_editable_mode_hidden border border-info rounded-bottom' if edition_cover_only else 'd-none' if opt_event_description_cover_hidden else 'rounded')"/>
+                                            <div id="o_wevent_event_main_cover_content" class="p-3 mt-auto">
+                                                <span t-if="event.is_participating" class="badge text-bg-success o_wevent_badge">
+                                                    <i class="fa fa-check me-2" role="img"/>
+Registered
+                                                </span>
+                                                <h2 t-field="event.name" itemprop="name" placeholder="Event Title" class="mt-3"/>
+                                                <p class="lead" t-field="event.subtitle" placeholder="Event Subtitle"/>
+                                            </div>
+                                        </t>
+                                        <div class="o_wevent_event_main_dates_mobile d-lg-none mt-3">
+                                            <t t-call="website_event.event_description_dates"/>
+                                        </div>
+                                        <div class="mt-4" t-field="event.description" itemprop="description"/>
+                                    </div>
+                                </div>
+                                <!-- Sidebar -->
+                                <aside t-if="opt_event_registration_block or opt_event_dates_block or opt_event_calendar_block or                         opt_event_location_block or opt_event_organizer_block or opt_event_share_block" id="o_wevent_event_main_sidebar" t-attf-class="col-lg-4 py-3 pb-lg-0 d-print-none {{'sticky-top align-self-start' if opt_event_fixed_sidebar else ''}}">
+                                    <!-- CTA (desktop only) -->
+                                    <div t-if="opt_event_registration_block" class="d-none d-lg-block mb-3">
+                                        <t t-call="website_event.registration_template">
+                                            <t t-set="cta_additional_classes">w-100</t>
+                                        </t>
+                                    </div>
+                                    <!-- Date & Time (desktop only) -->
+                                    <div t-if="opt_event_dates_block or opt_event_calendar_block" class="o_wevent_bordered_block pb-3 mb-4 d-none d-lg-block">
+                                        <meta itemprop="startDate" t-att-content="event.date_begin.isoformat()"/>
+                                        <meta itemprop="endDate" t-att-content="event.date_end.isoformat()"/>
+                                        <t t-call="website_event.event_description_dates"/>
+                                    </div>
+                                    <header t-if="opt_event_location_block or opt_event_organizer_block or opt_event_share_block" class="d-lg-none mt-4 mb-2 py-3 border-top">
+                                        <h5 class="my-0">Event Info</h5>
+                                        <meta itemprop="eventStatus" content="https://schema.org/EventScheduled"/>
+                                    </header>
+                                    <!-- Location -->
+                                    <meta itemprop="eventAttendanceMode" t-attf-content="https://schema.org/{{'Offline' if event.address_id else 'Online'}}EventAttendanceMode"/>
+                                    <div t-if="opt_event_location_block and event.address_id" class="o_wevent_sidebar_block o_wevent_bordered_block pb-3 mb-4" itemprop="location" itemscope="itemscope" itemtype="https://schema.org/Place">
+                                        <div>
+                                            <h6 class="o_wevent_sidebar_title">Location</h6>
+                                        </div>
+                                        <div itemprop="name" class="mb-1" t-field="event.address_id"/>
+                                        <small class="d-block mb-2" t-field="event.address_id" t-options="{                                 'widget': 'contact',                                 'fields': ['address'],                                 'no_marker': True,                                 'with_microdata': True,                             }"/>
+                                        <small t-field="event.address_id" class="d-block mb-2" t-options="{                                 'widget': 'contact',                                 'fields': ['phone', 'mobile', 'email']                             }"/>
+                                        <a t-att-href="event._google_map_link()" target="_blank" class="btn btn-light" title="Get directions">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="align-text-top" role="img" style="height: 1em; width: 1em">
+                                                <rect width="24" height="24" opacity="0"/>
+                                                <path role="presentation" fill="currentColor" d="M13.67 22h-.06a1 1 0 0 1-.92-.8l-1.54-7.57a1 1 0 0 0-.78-.78L2.8 11.31a1 1 0 0 1-.12-1.93l16-5.33A1 1 0 0 1 20 5.32l-5.33 16a1 1 0 0 1-1 .68z"/>
+                                            </svg>
+                                Get directions
+                                        </a>
+                                    </div>
+                                    <div t-elif="opt_event_location_block" class="o_wevent_sidebar_block o_wevent_bordered_block pb-3 mb-4">
+                                        <h6 class="o_wevent_sidebar_title">Location</h6>
+                                        <i class="fa fa-map-marker" title="Location"/>
+ Online event
+                                    </div>
+                                    <!-- Organizer -->
+                                    <div t-if="opt_event_organizer_block and event.organizer_id" class="o_wevent_sidebar_block o_wevent_bordered_block pb-3 mb-4" itemprop="organizer" itemscope="itemscope" itemtype="http://schema.org/Organization">
+                                        <div>
+                                            <h6 class="o_wevent_sidebar_title">Organizer</h6>
+                                        </div>
+                                        <div itemprop="name" class="mb-1" t-field="event.organizer_id"/>
+                                        <small t-field="event.organizer_id" t-options="{'widget': 'contact', 'fields': ['phone', 'mobile', 'email'], 'with_microdata': True,}"/>
+                                    </div>
+                                    <!-- Social -->
+                                    <div t-if="opt_event_share_block" class="o_wevent_sidebar_block">
+                                        <div class="">
+                                            <h6 class="o_wevent_sidebar_title">Share</h6>
+                                            <p>Find out what people see and say about this event, and join the conversation.</p>
+                                        </div>
+                                        <t t-snippet-call="website.s_share">
+                                            <t t-set="_no_title" t-value="True"/>
+                                            <t t-set="_classes" t-valuef="o_wevent_sidebar_social mx-n1"/>
+                                            <t t-set="_link_classes" t-valuef="o_wevent_social_link"/>
+                                        </t>
+                                    </div>
+                                </aside>
+                            </div>
+                        </div>
+                    </section>
+                </t>
+            </t>
+        </field>
+        <field name="key">website_event.event_description_full</field>
+        <field name="name">Event Description</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+    <record id="ir_ui_view_3481" model="ir.ui.view">
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <t name="Event Navbar" t-name="website_event.navbar">
+                <t t-set="is_rendering_cta" t-value="event.event_registrations_open and not hide_register_cta"/>
+                <section id="o_wevent_event_submenu">
+                    <!-- Mobile -->
+                    <div id="o_wevent_submenu_mobile" class="container d-flex d-lg-none align-items-center py-3 pb-lg-2">
+                        <a t-if="navbar__back_url" t-att-href="navbar__back_url" t-att-title="navbar__back_title or 'Go back'">
+                            <i class="oi oi-chevron-left"/>
+                            <span t-out="navbar__back_text or 'Go back'"/>
+                        </a>
+                        <a t-else="" href="/event" title="All Events">
+                            <i class="oi oi-chevron-left"/>
+                            <span>All Events</span>
+                        </a>
+                        <!-- Add Register additional CTA button, in addition to menus -->
+                        <a t-if="is_rendering_cta" t-att-href="'/event/%s/register' % (slug(event))" t-attf-class="btn btn-primary ms-auto" title="Registration">
+                Registration
+                        </a>
+                        <t t-call="website_event.navbar_dropdown"/>
+                    </div>
+                    <!-- Desktop -->
+                    <div id="o_wevent_submenu_desktop" class="d-none d-lg-block mt-1 py-3 py-lg-2">
+                        <div class="container">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <nav class="d-flex flex-wrap justify-content-between align-items-center gap-2 flex-grow-1">
+                                    <ul class="breadcrumb p-0 m-0">
+                                        <li class="breadcrumb-item" t-if="event.header_visible">
+                                            <a href="/event" title="Back to All Events">All Camps</a>
+                                        </li>
+                                        <t t-if="navbar__back_url">
+                                            <li class="breadcrumb-item">
+                                                <a t-attf-href="/event/{{slug(event)}}" t-attf-title="Back to {{event.name}}" t-field="event.name"/>
+                                            </li>
+                                            <li class="breadcrumb-item">
+                                                <a t-att-href="navbar__back_url" t-att-title="navbar__back_title" t-out="navbar__back_text"/>
+                                            </li>
+                                        </t>
+                                        <t t-else="">
+                                            <li t-attf-class="breadcrumb-item active #{'fw-bold' if not event.header_visible else ''}" aria-current="page">
+                                                <span class="pe-3" t-field="event.name"/>
+                                            </li>
+                                        </t>
+                                    </ul>
+                                    <ul t-if="not navbar__back_url" class="nav" t-att-data-menu_name="editable and 'Event Menu'" t-att-data-content_menu_id="editable and event.menu_id.id">
+                                        <t t-foreach="event.menu_id.child_id" t-as="submenu">
+                                            <t t-call="website.submenu">
+                                                <t t-set="item_class" t-value="'nav-item'"/>
+                                                <t t-set="link_class" t-value="'nav-link text-nowrap'"/>
+                                            </t>
+                                        </t>
+                                    </ul>
+                                </nav>
+                                <!-- Workaround to avoid flickering while navigating between pages with and without CTA -->
+                                <span t-if="not is_rendering_cta" aria-hidden="true" class="btn invisible w-0 px-0"></span>
+                                <div t-else="" class="ms-3">
+                                    <t t-call="website_event.registration_template"/>
+                                </div>
+                                <t t-if="navbar__back_url" t-call="website_event.navbar_dropdown"/>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </t>
+        </field>
+        <field name="key">website_event.navbar</field>
+        <field name="name">Event Navbar</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+    <record id="ir_ui_view_3422" model="ir.ui.view">
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <data inherit_id="website.placeholder_header_call_to_action" name="Header Call to Action" active="True">
+                <xpath expr="." position="inside">
+                    <li t-attf-class="#{_item_class}">
+                        <div t-attf-class="oe_structure oe_structure_solo #{_div_class}" class="oe_structure oe_structure_solo">
+                            <section class="oe_unremovable oe_unmovable s_text_block o_colored_level" data-snippet="s_text_block" data-name="Text">
+                                <div class="container">
+                                    <a href="/contactus" class="oe_unremovable btn btn-primary btn_cta">Contact Us</a>
+                                </div>
+                            </section>
+                        </div>
+                    </li>
+                </xpath>
+            </data>
+        </field>
+        <field name="inherit_id" ref="website.placeholder_header_call_to_action"/>
+        <field name="key">website.header_call_to_action</field>
+        <field name="mode">extension</field>
+        <field name="name">Header Call to Action</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+    <record id="ir_ui_view_3443" model="ir.ui.view">
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <t name="Header Cart Link" t-name="website_sale.header_cart_link">
+                <t t-nocache="The number of products is dynamic, this rendering cannot be cached." t-nocache-_icon="_icon" t-nocache-_text="_text" t-nocache-_badge="_badge" t-nocache-_badge_class="_badge_class" t-nocache-_icon_wrap_class="_icon_wrap_class" t-nocache-_text_class="_text_class" t-nocache-_item_class="_item_class" t-nocache-_link_class="_link_class">
+                    <t t-set="website_sale_cart_quantity" t-value="request.session.get('website_sale_cart_quantity', request.cart.cart_quantity) or 0"/>
+                    <t t-set="show_cart" t-value="website.has_ecommerce_access()"/>
+                    <li t-attf-class="#{_item_class} divider d-none"/>
+                    <!-- Make sure the cart and related menus are not folded (see autohideMenu) -->
+                    <li t-attf-class="o_wsale_my_cart #{not show_cart and 'd-none'} #{_item_class}">
+                        <a href="/shop/cart" t-attf-class="#{_link_class}" aria-label="eCommerce cart">
+                            <div t-attf-class="#{_icon_wrap_class}">
+                                <i t-if="_icon" class="fa fa-shopping-cart fa-stack o_editable_media">​</i>
+                                <sup t-attf-class="my_cart_quantity badge bg-primary #{_badge_class} #{'d-none' if (website_sale_cart_quantity == 0) else ''}" t-esc="website_sale_cart_quantity" t-att-data-order-id="request.session.get('sale_order_id', '')"/>
+                            </div>
+                            <span t-if="_text" t-attf-class="#{_text_class}">My Cart</span>
+                        </a>
+                    </li>
+                </t>
+            </t>
+        </field>
+        <field name="key">website_sale.header_cart_link</field>
+        <field name="name">Header Cart Link</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+    <record id="ir_ui_view_3445" model="ir.ui.view">
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <t name="Header Cart Link" t-name="website_sale.header_cart_link">
+                <t t-nocache="The number of products is dynamic, this rendering cannot be cached." t-nocache-_icon="_icon" t-nocache-_text="_text" t-nocache-_badge="_badge" t-nocache-_badge_class="_badge_class" t-nocache-_icon_wrap_class="_icon_wrap_class" t-nocache-_text_class="_text_class" t-nocache-_item_class="_item_class" t-nocache-_link_class="_link_class">
+                    <t t-set="website_sale_cart_quantity" t-value="request.session.get('website_sale_cart_quantity', request.cart.cart_quantity) or 0"/>
+                    <t t-set="show_cart" t-value="website.has_ecommerce_access()"/>
+                    <li t-attf-class="#{_item_class} divider d-none"/>
+                    <!-- Make sure the cart and related menus are not folded (see autohideMenu) -->
+                    <li t-attf-class="o_wsale_my_cart #{not show_cart and 'd-none'} #{_item_class}">
+                        <a href="/shop/cart" t-attf-class="#{_link_class}" aria-label="eCommerce cart">
+                            <div t-attf-class="#{_icon_wrap_class}">
+                                <i t-if="_icon" class="fa fa-shopping-cart fa-stack o_editable_media">​</i>
+                                <sup t-attf-class="my_cart_quantity badge bg-primary #{_badge_class} #{'d-none' if (website_sale_cart_quantity == 0) else ''}" t-esc="website_sale_cart_quantity" t-att-data-order-id="request.session.get('sale_order_id', '')"/>
+                            </div>
+                            <span t-if="_text" t-attf-class="#{_text_class}">My Cart</span>
+                        </a>
+                    </li>
+                </t>
+            </t>
+        </field>
+        <field name="key">website_sale.header_cart_link</field>
+        <field name="name">Header Cart Link</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+    <record id="ir_ui_view_916" model="ir.ui.view">
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <t name="Homepage" t-name="website.homepage">
+                <t t-call="website.layout">
+                    <t t-set="pageName" t-value="'homepage'"/>
+                    <div id="wrap" class="oe_structure">
+                        <section class="s_banner oe_img_bg o_bg_img_center pt72 o_cc o_colored_level o_bg_img_origin_border_box o_cc5 pb256 o_full_screen_height" style="background-image: url('/web/image/summer_camps.ir_attachment_1109'); position: relative;" data-snippet="s_banner" data-attachment-id="1109" data-format-mimetype="image/webp" data-oe-shape-data="{'shape':'web_editor/Connections/12','colors':{'c5':'o-color-3'},'flip':[],'showOnMobile':false,'shapeAnimationSpeed':'0'}" data-mimetype-before-conversion="image/jpeg" data-resize-width="1920" data-mimetype="image/webp">
+                            <div class="o_we_bg_filter" style="background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.15) 100%) !important;"/>
+                            <div class="o_we_shape o_web_editor_Connections_12" style="background-image: url('/web_editor/shape/web_editor%2FConnections%2F12.svg?c5=o-color-3');"/>
+                            <div class="container">
+                                <div class="row">
+                                    <div class="pt32 pb32 o_colored_level col-lg-6" data-name="Box">
+                                        <h1 class="display-3">MySummerCamps</h1>
+                                        <div>Escape the screen, dive into the wild, and find your inner explorer.<br/>
+                                        <br/>
+                                    </div>
+                                    <p class="mb-0">
+                                        <a class="o_translate_inline btn btn-primary" href="/event">Discover this Summer's programme&amp;nbsp;<span class="fa fa-angle-right ms-2"/>
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="s_text_image o_cc o_cc2 pb64 pt64 o_colored_level" data-oe-shape-data="{'shape':'web_editor/Floats/13','flip':['x']}" data-snippet="s_image_text">
+                        <div class="o_we_shape o_web_editor_Floats_13" style="background-image: url('/web_editor/shape/web_editor/Floats/13.svg?c1=o-color-1&amp;c2=o-color-2&amp;c5=o-color-5&amp;flip=x'); background-position: 50% 50%;"/>
+                        <div class="container">
+                            <div class="row align-items-center">
+                                <div class="col-lg-6 pt16 pb16 o_colored_level">
+                                    <img src="/web_editor/image_shape/summer_camps.configurator_1_s_image_text_default_image/web_editor/geometric_round/geo_round_square_2.svg" class="img img-fluid mx-auto rounded" alt="" data-shape="web_editor/geometric_round/geo_round_square_2" data-file-name="s_image_text.svg" data-shape-colors=";;;;" loading="lazy" data-format-mimetype="image/jpeg"/>
+                                </div>
+                                <div class="col-lg-5 offset-lg-1 pt16 pb16 o_colored_level">
+                                    <h2 class="h3-fs">Why Choose Our Camps?</h2>
+                                    <div class="s_hr pb32 pt8" data-snippet="s_hr" data-name="Separator">
+                                        <hr class="w-50 me-auto" style="border-top: 4px dotted var(--o-color-2) !important;"/>
+                                    </div>
+                                    <div>
+        Our summer camps are designed to create unforgettable experiences for children of all ages. Whether it’s their first time away from home or their fifth year with us, every camper is welcomed like family.&amp;nbsp;</div>
+                                    <div>
+                                        <br/>
+                                    </div>
+                                    <div>We focus on confidence-building, creativity, nature immersion, and friendship—all in a safe, supervised, and joy-filled environment.</div>
+                                    <div>
+                                        <br/>
+                                    </div>
+                                    <p>
+                                        <br/>
+                                    </p>
+                                    <p>
+                                        <a href="#" class="btn btn-secondary o_translate_inline">Learn more</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="s_three_columns o_cc o_colored_level o_cc1 pt112 pb0" data-vxml="001" data-vcss="001" data-oe-shape-data="{'shape':'web_editor/Connections/06','colors':{'c5':'o-color-3'},'flip':['y'],'showOnMobile':true,'shapeAnimationSpeed':'0'}" data-snippet="s_three_columns">
+                        <div class="o_we_shape o_web_editor_Connections_06 o_shape_show_mobile" style="background-image: url('/web_editor/shape/web_editor/Connections/06.svg?c5=o-color-3&amp;flip=y'); background-position: 50% 0%;"/>
+                        <div class="container">
+                            <div class="row d-flex align-items-stretch">
+                                <div data-name="Card" class="col-lg-4 pt16 pb16">
+                                    <div class="s_card o_card_img_top card h-100 o_cc o_cc1 my-0 o_colored_level" data-vxml="001" data-snippet="s_card" data-name="Card" style="border-width: 0px !important;">
+                                        <figure class="o_card_img_wrapper ratio mb-0 ratio-1x1">
+                                            <img class="o_card_img card-img-top" src="/web_editor/image_shape/summer_camps.configurator_1_s_three_columns_default_image_1/web_editor/solid/solid_blob_1.svg?c2=o-color-1" alt="" data-shape="web_editor/solid/solid_blob_1" data-file-name="s_three_columns_default_image_1.svg" data-shape-colors=";o-color-1;;;" loading="lazy" data-format-mimetype="image/jpeg"/>
+                                        </figure>
+                                        <div class="card-body">
+                                            <h5 class="card-title" style="text-align: center;">Adventure Camps</h5>
+                                            <div class="s_hr pb32 pt8" data-snippet="s_hr" data-name="Separator">
+                                                <hr class="w-25 mx-auto" style="border-top: 5px dotted var(--o-color-2) !important;"/>
+                                            </div>
+                                            <div style="text-align: center;">Hikes, survival skills, kayaking, and nature games in a beautiful setting.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div data-name="Card" class="col-lg-4 pt16 pb16">
+                                    <div class="s_card o_card_img_top card h-100 o_cc o_cc1 my-0 o_colored_level" data-vxml="001" data-snippet="s_card" data-name="Card" style="border-width: 0px !important;">
+                                        <figure class="o_card_img_wrapper ratio mb-0 ratio-1x1">
+                                            <img class="o_card_img card-img-top" src="/web_editor/image_shape/summer_camps.configurator_1_s_three_columns_default_image_2/web_editor/composition/composition_organic_line.svg?c2=o-color-3" alt="" data-shape="web_editor/composition/composition_organic_line" data-file-name="s_three_columns_default_image_2.svg" data-shape-colors=";o-color-3;;;" loading="lazy" data-format-mimetype="image/jpeg"/>
+                                        </figure>
+                                        <div class="card-body">
+                                            <h5 class="card-title" style="text-align: center;">Creative Camps</h5>
+                                            <div class="s_hr pb32 pt8" data-snippet="s_hr" data-name="Separator">
+                                                <hr class="w-25 mx-auto" style="border-top: 5px dotted var(--o-color-1) !important;"/>
+                                            </div>
+                                            <div style="text-align: center;">Painting, theater, crafts, and music, all at your child's fingertips.</div>
+                                            <div>
+                                                <br/>
+                                            </div>
+                                            <p class="card-text" style="text-align: center;">
+                                                <br/>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div data-name="Card" class="col-lg-4 pt16 pb16">
+                                    <div class="s_card o_card_img_top card h-100 o_cc o_cc1 my-0 o_colored_level" data-vxml="001" data-snippet="s_card" data-name="Card" style="border-width: 0px !important;">
+                                        <figure class="o_card_img_wrapper ratio mb-0 ratio-1x1">
+                                            <img class="o_card_img card-img-top" src="/web_editor/image_shape/summer_camps.configurator_1_s_three_columns_default_image_3/web_editor/solid/solid_blob_3.svg?c5=o-color-2" alt="" data-shape="web_editor/solid/solid_blob_3" data-file-name="s_three_columns_default_image_3.svg" data-shape-colors=";;;;o-color-2" loading="lazy" data-format-mimetype="image/jpeg"/>
+                                        </figure>
+                                        <div class="card-body">
+                                            <h5 class="card-title" style="text-align: center;">Sports Camps</h5>
+                                            <div class="s_hr pb32 pt8" data-snippet="s_hr" data-name="Separator">
+                                                <hr class="w-25 mx-auto" style="border-top: 5px dotted var(--o-color-2) !important;"/>
+                                            </div>
+                                            <p class="card-text" style="text-align: center;">Your choice of sports between football, basketball and windsurfing</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="s_call_to_action o_cc o_cc2 pt152 pb152 o_colored_level" data-oe-shape-data="{'shape':'web_editor/Floats/14'}" data-snippet="s_call_to_action">
+                        <div class="o_we_shape o_web_editor_Floats_14 o_footer_extra_shape_mapping"/>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-10 offset-lg-1 pt48 pb24 o_colored_level">
+                                    <h3 style="text-align: center;">2,000 campers<br/>
+ have enjoyed our summer camp.</h3>
+                                    <p style="text-align: center;">Trust us with your children and enjoy your summer with peace of mind</p>
+                                    <p>
+                                        <br/>
+                                    </p>
+                                    <p style="text-align: center;">
+                                        <a class="btn btn-primary btn-lg o_translate_inline" href="/event">Upcoming Camp Sessions</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </t>
+        </t>
+    </field>
+    <field name="key">summer_camps.homepage</field>
+    <field name="name">Home</field>
+    <field name="type">qweb</field>
+    <field name="website_id" ref="website.default_website"/>
+</record>
+<record id="ir_ui_view_3444" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+        <t name="Portal User Dropdown" t-name="portal.user_dropdown">
+            <t t-nocache="Each user is different regardless of the page visited." t-nocache-_avatar="_avatar" t-nocache-_icon="_icon" t-nocache-_icon_class="_icon_class" t-nocache-_icon_wrap_class="_icon_wrap_class" t-nocache-_no_caret="_no_caret" t-nocache-_user_name="_user_name" t-nocache-_user_name_class="_user_name_class" t-nocache-_item_class="_item_class" t-nocache-_link_class="_link_class" t-nocache-_dropdown_menu_class="_dropdown_menu_class">
+                <t t-set="is_connected" t-value="not user_id._is_public()"/>
+                <li t-if="is_connected" t-attf-class="#{_item_class} o_no_autohide_item">
+                    <a href="#" role="button" data-bs-toggle="dropdown" t-attf-class="#{'' if _no_caret else 'dropdown-toggle'} #{_link_class}">
+                        <t t-if="_avatar">
+                            <t t-set="avatar_source" t-value="image_data_uri(user_id.avatar_256)"/>
+                            <img t-att-src="avatar_source" t-attf-class="rounded-circle o_object_fit_cover #{_avatar_class}" width="24" height="24" alt="" loading="eager"/>
+                        </t>
+                        <div t-if="_icon" t-attf-class="#{_icon_wrap_class}">
+                            <i t-attf-class="fa fa-1x fa-fw fa-user #{_icon_class}" class="fa fa-1x fa-fw fa-user o_editable_media">​</i>
+                        </div>
+                        <span t-if="_user_name" t-attf-class="#{_user_name_class}" t-esc="user_id.name[:23] + '...' if user_id.name and len(user_id.name) &gt; 25 else user_id.name"/>
+                    </a>
+                    <div t-attf-class="dropdown-menu js_usermenu #{_dropdown_menu_class}" role="menu">
+                        <a groups="base.group_user" href="/odoo" role="menuitem" class="dropdown-item ps-3" id="o_backend_user_dropdown_link">
+                            <i class="fa fa-fw fa-th me-1 small text-primary-emphasis"/>
+ Apps
+                        </a>
+                        <div id="o_logout_divider" class="dropdown-divider"/>
+                        <a t-attf-href="/web/session/logout?redirect=/" role="menuitem" id="o_logout" class="dropdown-item ps-3">
+                            <i class="fa fa-fw fa-sign-out me-1 small text-primary-emphasis"/>
+ Logout
+                        </a>
+                    </div>
+                </li>
+            </t>
+        </t>
+    </field>
+    <field name="key">portal.user_dropdown</field>
+    <field name="name">Portal User Dropdown</field>
+    <field name="type">qweb</field>
+    <field name="website_id" ref="website.default_website"/>
+</record>
+<record id="ir_ui_view_3447" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+        <t name="Portal User Dropdown" t-name="portal.user_dropdown">
+            <t t-nocache="Each user is different regardless of the page visited." t-nocache-_avatar="_avatar" t-nocache-_icon="_icon" t-nocache-_icon_class="_icon_class" t-nocache-_icon_wrap_class="_icon_wrap_class" t-nocache-_no_caret="_no_caret" t-nocache-_user_name="_user_name" t-nocache-_user_name_class="_user_name_class" t-nocache-_item_class="_item_class" t-nocache-_link_class="_link_class" t-nocache-_dropdown_menu_class="_dropdown_menu_class">
+                <t t-set="is_connected" t-value="not user_id._is_public()"/>
+                <li t-if="is_connected" t-attf-class="#{_item_class} o_no_autohide_item">
+                    <a href="#" role="button" data-bs-toggle="dropdown" t-attf-class="#{'' if _no_caret else 'dropdown-toggle'} #{_link_class}">
+                        <t t-if="_avatar">
+                            <t t-set="avatar_source" t-value="image_data_uri(user_id.avatar_256)"/>
+                            <img t-att-src="avatar_source" t-attf-class="rounded-circle o_object_fit_cover #{_avatar_class}" width="24" height="24" alt="" loading="eager"/>
+                        </t>
+                        <div t-if="_icon" t-attf-class="#{_icon_wrap_class}">
+                            <i t-attf-class="fa fa-1x fa-fw fa-user #{_icon_class}" class="fa fa-1x fa-fw fa-user me-2 o_editable_media">​</i>
+                        </div>
+                        <span t-if="_user_name" t-attf-class="#{_user_name_class}" t-esc="user_id.name[:23] + '...' if user_id.name and len(user_id.name) &gt; 25 else user_id.name"/>
+                    </a>
+                    <div t-attf-class="dropdown-menu js_usermenu #{_dropdown_menu_class}" role="menu">
+                        <a groups="base.group_user" href="/odoo" role="menuitem" class="dropdown-item ps-3" id="o_backend_user_dropdown_link">
+                            <i class="fa fa-fw fa-th me-1 small text-primary-emphasis"/>
+ Apps
+                        </a>
+                        <div id="o_logout_divider" class="dropdown-divider"/>
+                        <a t-attf-href="/web/session/logout?redirect=/" role="menuitem" id="o_logout" class="dropdown-item ps-3">
+                            <i class="fa fa-fw fa-sign-out me-1 small text-primary-emphasis"/>
+ Logout
+                        </a>
+                    </div>
+                </li>
+            </t>
+        </t>
+    </field>
+    <field name="key">portal.user_dropdown</field>
+    <field name="name">Portal User Dropdown</field>
+    <field name="type">qweb</field>
+    <field name="website_id" ref="website.default_website"/>
+</record>
+<record id="ir_ui_view_3458" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+        <t name="Topbar" t-name="website_event.index_topbar">
+            <div class="container">
+                <section class="o_wevent_index_topbar_filters d-flex d-print-none align-items-center justify-content-lg-end flex-wrap gap-2 mt-4 mb-3">
+                    <h2 class="me-auto mb-0 h4">Summer Camps</h2>
+                    <t t-foreach="categories" t-as="category">
+                        <div t-if="category.is_published and category.tag_ids and any(tag.color for tag in category.tag_ids)" class="dropdown d-none d-lg-block">
+                            <t t-set="searched_category_tags" t-value="search_tags.filtered(lambda tag: tag.category_id == category)"/>
+                            <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" title="Filter by category" aria-label="Filter by category" aria-expanded="false">
+                                <t t-out="category.name"/>
+                                <span t-if="len(searched_category_tags)" t-out="len(searched_category_tags)" class="badge bg-primary ms-1"/>
+                            </button>
+                            <div class="dropdown-menu">
+                                <span t-att-data-post="keep_event_url(tags=slugify_tags((search_tags - searched_category_tags).ids), prevent_redirect=True)" t-attf-class="post_link cursor-pointer dropdown-item d-flex align-items-center justify-content-between #{'active' if not searched_category_tags else ''}">
+                            All
+                                </span>
+                                <t t-foreach="category.tag_ids" t-as="tag">
+                                    <span t-if="tag.color" t-att-data-post="keep_event_url(tags=slugify_tags(search_tags.ids, toggle_tag_id=tag.id), prevent_redirect=True)" t-attf-class="post_link cursor-pointer dropdown-item d-flex align-items-center justify-content-between #{'active' if tag in search_tags else ''}">
+                                        <t t-out="tag.name"/>
+                                    </span>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+                    <div class="o_wevent_search d-flex w-100 w-lg-25">
+                        <t t-call="website.website_search_box_input">
+                            <t t-set="_form_classes" t-valuef="flex-grow-1"/>
+                            <t t-set="_classes" t-valuef="o_wevent_event_searchbar_form"/>
+                            <t t-set="search_type">events</t>
+                            <t t-set="action" t-value="'/event/'"/>
+                            <t t-set="display_description" t-valuef="true"/>
+                            <t t-set="display_detail" t-valuef="false"/>
+                            <t t-set="search" t-value="search or searches and searches['search']"/>
+                            <t t-set="placeholder">Search an event..</t>
+                            <t t-foreach="searches" t-as="item">
+                                <input t-if="item != 'search' and item_value != 'all'" type="hidden" t-att-name="item" t-att-value="item_value"/>
+                            </t>
+                        </t>
+                        <button class="o_not_editable btn btn-light position-relative ms-2 d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#o_wevent_index_offcanvas">
+                            <i class="fa fa-sliders"/>
+                        </button>
+                    </div>
+                    <t t-if="search_tags" t-call="website_event.searched_tags"/>
+                </section>
+                <!-- Off canvas filters on mobile-->
+                <div id="o_wevent_index_offcanvas" class="o_website_offcanvas offcanvas offcanvas-end d-lg-none p-0 overflow-visible">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title">Filters</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"/>
+                    </div>
+                    <div class="offcanvas-body p-0">
+                        <div class="accordion accordion-flush">
+                            <div class="accordion-item" t-foreach="categories" t-as="category">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" t-attf-aria-controls="o_wevent_offcanvas_cat_#{category.id}" t-att-data-bs-target="'.o_wevent_offcanvas_cat_%s' % category.id" aria-expanded="false">
+                                        <t t-out="category.name"/>
+                                    </button>
+                                </h2>
+                                <div t-attf-id="o_wevent_offcanvas_cat_#{category.id}" t-attf-class="o_wevent_offcanvas_cat_#{category.id} accordion-collapse collapse">
+                                    <div class="accordion-body pt-0">
+                                        <ul class="list-group list-group-flush">
+                                            <t t-if="category.is_published and category.tag_ids and any(tag.color for tag in category.tag_ids)" t-foreach="category.tag_ids" t-as="tag">
+                                                <li t-if="tag.color" class="list-group-item border-0 px-0">
+                                                    <span t-att-data-post="keep_event_url(tags=slugify_tags(search_tags.ids, toggle_tag_id=tag.id), prevent_redirect=True)" class="post_link text-reset cursor-pointer" t-att-title="tag.name">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input pe-none" type="checkbox" t-attf-name="#{tag.color}" t-att-checked="tag in search_tags"/>
+                                                            <label class="form-check-label" t-attf-for="#{tag.color}" t-out="tag.name"/>
+                                                        </div>
+                                                    </span>
+                                                </li>
+                                            </t>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </field>
+    <field name="key">website_event.index_topbar</field>
+    <field name="name">Topbar</field>
+    <field name="type">qweb</field>
+    <field name="website_id" ref="website.default_website"/>
+</record>
+<record id="ir_ui_view_3470" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+        <t t-name="website.record_cover">
+            <t t-set="_cp" t-value="_cp or json.loads(_record.cover_properties)"/>
+            <t t-set="_name" t-value="_name or _record._name"/>
+            <t t-set="_id" t-value="_id or _record.id"/>
+            <t t-set="_bg" t-value="_bg or _record._get_background(height=_resize_height, width=_resize_width)"/>
+            <t t-set="default_cover_name">Cover</t>
+            <div t-att-data-name="display_opt_name or default_cover_name" t-att-style="_cp.get('background_color_style')" t-att-data-use_size="use_size" t-att-data-use_filters="use_filters" t-att-data-use_text_align="use_text_align" t-att-data-res-model="_name" t-att-data-res-id="_id" t-attf-class="o_record_cover_container d-flex flex-column h-100 o_colored_level o_cc #{_cp.get('background_color_class')} #{use_size and _cp.get('resize_class')} #{use_text_align and _cp.get('text_align_class')} #{additionnal_classes}">
+                <div t-attf-class="o_record_cover_component o_record_cover_image #{snippet_autofocus and 'o_we_snippet_autofocus'}" t-attf-style="background-image: #{_bg};" style="background-image: url('/ir_attachment_1106/.jpg');" class="o_record_cover_component o_record_cover_image"/>
+                <div t-if="use_filters" t-attf-class="o_record_cover_component o_record_cover_filter oe_black" t-attf-style="opacity: #{_cp.get('opacity', 0.0)};"/>
+                <t t-out="0"/>
+            </div>
+        </t>
+    </field>
+    <field name="key">website.record_cover</field>
+    <field name="name">record_cover</field>
+    <field name="type">qweb</field>
+    <field name="website_id" ref="website.default_website"/>
+</record>
+<function model="ir.ui.view" name="write">
+    <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('website.default_website').id).viewref('website.template_footer_centered').id"/>
+    <value model="ir.ui.view" eval="{'arch': obj().env.ref('summer_camps.ir_ui_view_3420').arch}"/>
+</function>
+<function model="ir.ui.view" name="write">
+    <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('website.default_website').id).viewref('website.homepage').id"/>
+    <value model="ir.ui.view" eval="{'arch': obj().env.ref('summer_camps.ir_ui_view_916').arch}"/>
+</function>
+</odoo>
