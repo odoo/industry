@@ -74,6 +74,7 @@
         'demo/x_signature.xml',
         'demo/ir_attachment_post.xml',
         'demo/sale_order_confirm.xml',
+        'demo/account_payment.xml',
     ],
     'license': 'OPL-1',
     'author': 'Odoo S.A.',

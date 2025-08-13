@@ -8,7 +8,7 @@
         <field name="name">Update Contact</field>
         <field name="update_field_id" ref="base.field_res_partner__category_id"/>
         <field name="usage">base_automation</field>
-        <field name="value" ref="partner_category_signatory"/><!--TOTEST-->
+        <field name="value" ref="partner_category_signatory"/>
     </record>
     <record id="action_create_x_signature" model="ir.actions.server">
         <field name="code"><![CDATA[
@@ -46,12 +46,35 @@ response = {
     </record>
     <record id="action_generate_fiscal_attestation" model="ir.actions.server">
         <field name="code"><![CDATA[
-for record in self:
-    concerned_donations = record.env['account.payment'].search([('date.year', '=', record.x_wizard_fiscal_year),('amount', '>=', record.x_wizard_tax_minimum)])
-    if not record.x_wizard_show_warning and concerned_donations.filtered(lambda d: d.x_fiscal_attestation or not d.partner_id.street or not d.partner_id.city or not d.partner_id.state or not d.partner_id.country_id):
-        record['x_wizard_show_warning'] = True
-    else:
-        pass
+concerned_donations = record.env['account.payment'].search([('date.year_number', '=', record.x_wizard_fiscal_year)])
+if not record.x_wizard_show_warning and concerned_donations.filtered(lambda d: d.x_studio_fiscal_attestation_id or not d.partner_id.street or not d.partner_id.city or not d.partner_id.state or not d.partner_id.country_id):
+    response = {
+        'type': 'ir.actions.act_window',
+        'res_model': 'x_wizard_generate_fiscal_attestation',
+        'context': {'default_x_wizard_show_warning': True},
+        'view_mode': 'form',
+        'target': 'new',
+    }
+else:
+    all_partners = list(set(concerned_donations.mapped('partner_id')))
+    for partner in all_partners:
+        donation_sum = sum(concerned_donations.filtered(lambda d: d.partner_id == partner).mapped('amount'))
+        if donation_sum >= record.x_wizard_tax_minimum:
+            fiscal_attestation = record.env['x_fiscal_attestation'].create({
+                'x_name': 'new',
+                'x_studio_selection_field_2si_1j094a736': 'status2',
+                'x_studio_partner_id': partner.id,
+                'x_studio_date': datetime.datetime.today(),
+                'x_studio_value': donation_sum,
+                'x_studio_year': record.x_wizard_fiscal_year,
+            })
+            concerned_donations.filtered(lambda d: d.partner_id == partner)['x_studio_fiscal_attestation_id'] = fiscal_attestation
+    response = {
+        'type': 'ir.actions.act_window',
+        'res_model': 'x_fiscal_attestation',
+        'domain': [('x_studio_year', '=', record.x_wizard_fiscal_year)],
+        'view_mode': 'list,form',
+    }
 ]]></field>
         <field name="model_id" ref="x_wizard_generate_fiscal_attestation_model"/>
         <field name="state">code</field>
