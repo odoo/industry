@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="action_create_change_request_task" model="ir.actions.server">
+        <field name="code"><![CDATA[
+new_project_task = env['project.task'].create({
+    "name": "Review activity " + request.params.get('full_name'),
+    "project_id": request.env.ref('marketplace.project_product_management').id,
+    "user_ids": [request.env.ref('marketplace.project_product_management').user_id.id],
+    "description": "<p>Request from "+request.params.get('email_from')+" / "+request.params.get('phone')+"</p><p>Company: "\
+        +request.params.get('company')+"</p><p>"+request.params.get('question')+"</p>",
+})
+response = request.make_json_response({'id': new_project_task.id}, status=200)]]></field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="website_published">True</field>
+        <field name="website_path">new_change_request</field>
+        <field name="name">Create change request task</field>
+    </record>
+    <record id="action_create_product_template" model="ir.actions.server">
+        <field name="code"><![CDATA[
+if not request.env.user.partner_id:
+    request.env.user['partner_id'] = env['res.partner'].create({'name': request.env.user.name})
+new_product = env['product.template'].create({
+    "name": request.params.get('name'),
+    "description_ecommerce": request.params.get('ecommerce_description'),
+    "barcode": request.params.get('barcode'),
+    "standard_price": request.params.get('standard_price'),
+    "list_price": request.params.get('list_price'),
+    "image_1920": request.params.get('image_1920'),
+    "x_vendor": request.env.user.id,
+    "is_published": True,
+    "route_ids": [(6, 0, [env.ref("stock_dropshipping.route_drop_shipping").id, env.ref("purchase_stock.route_warehouse0_buy").id])],
+    "seller_ids": [(0, 0, {'partner_id':request.env.user.partner_id.id})],
+})
+new_project_task = env['project.task'].create({
+    "name": "Review activity " + request.params.get('name'),
+    "project_id": request.env.ref('marketplace.project_product_management').id,
+    "user_ids": [request.env.ref('marketplace.project_product_management').user_id.id],
+})
+response = request.make_json_response({'id': new_project_task.id}, status=200)]]></field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="state">code</field>
+        <field name="website_published">True</field>
+        <field name="website_path">create_product</field>
+        <field name="name">Create product</field>
+    </record>
+    <record id="product_route" model="ir.actions.server">
+        <field name="name">Route displaying products</field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="state">code</field>
+        <field name="website_published">True</field>
+        <field name="website_path">products</field>
+        <field name="code"><![CDATA[
+response = request.render('marketplace.portal_products')
+]]></field>
+    </record>
+    <record id="new_product_page_route" model="ir.actions.server">
+        <field name="name">Route displaying new product form</field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="state">code</field>
+        <field name="website_published">True</field>
+        <field name="website_path">new_product</field>
+        <field name="code"><![CDATA[
+response = request.render('marketplace.new_product_page')
+]]></field>
+    </record>
+    <record id="request_change_page_route" model="ir.actions.server">
+        <field name="name">Route displaying Request a change form</field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="state">code</field>
+        <field name="website_published">True</field>
+        <field name="website_path">change_request</field>
+        <field name="code"><![CDATA[
+response = request.render('marketplace.request_change_page')
+]]></field>
+    </record>
+</odoo>
