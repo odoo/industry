@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo auto_sequence="1">
+  <record id="booking_engine.booking_engine_menu_root" model="ir.ui.menu" forcecreate="1">
+    <field name="web_icon_data" type="base64" file="campsite/static/description/icon_no_border.png"/>
+    <field name="name">Campsite</field>
+  </record>
+  <record id="booking_engine.booking_engine_rooms_menu" model="ir.ui.menu" forcecreate="1">
+    <field name="name">Stay Offers</field>
+  </record>
+  <record id="booking_engine.planning_model_planning_role_x_is_a_room_offer_field" model="ir.model.fields" forcecreate="1">
+    <field name="field_description">Is stay offer</field>
+  </record>
+  <data noupdate="1">
+    <function model="website.menu" name="write">
+      <value model="website.menu" 
+      eval="obj().search([('website_id', '=', ref('website.default_website')), ('url', '=', '/shop')]).id" />
+      <value eval="{'name': 'Stay Offers'}"/>
+    </function>
+  </data>
+  <template id="custom_product_name" inherit_id="website_sale.products">
+    <xpath expr="//h1[@name='custom_product_title_name']" position="replace">
+      <h1 class="h4-fs" t-if="not category and not search">All Stay Offers</h1>
+    </xpath>
+  </template>
+  <record id="campsite_product_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='x_is_a_room_offer']" position="replace">
+            <field name="x_is_a_room_offer" string="Is Stay Offer"/>
+        </xpath>
+    </field>
+    <field name="inherit_id" ref="booking_engine.product_form_view"/>
+    <field name="mode">extension</field>
+    <field name="model">product.template</field>
+    <field name="name">product.template.product.form.inherit.booking_engine</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+</odoo>
