@@ -126,6 +126,7 @@ class TestEnv(IndustryCase):
                     return
 
                 self._check_xml_style(decoded_content, tree, module, file_name)
+                self._check_forcecreate_external_xmlid(tree, file_name, module)
                 self._check_update_status(tree, file_name)
                 self._check_knowledge_article_is_published(tree, file_name)
                 self._check_knowledge_article_is_locked(tree, file_name)
@@ -436,6 +437,17 @@ class TestEnv(IndustryCase):
                     "You should use button_choose_theme instead of button_immediate_install in %s.",
                     file_name,
                 )
+
+    def _check_forcecreate_external_xmlid(self, root, file_name, module):
+        for record in root.xpath("//record"):
+            record_id = record.get('id')
+            if '.' in record_id and not record_id.startswith(module + '.'):
+                if not record.get('forcecreate'):
+                    _logger.warning(
+                        "You should use forcecreate when using an external XML ID in %s: %s",
+                        file_name,
+                        record_id,
+                    )
 
     def _check_dates_are_relative(self, root, file_name):
         RELATIVE_DATES = [
