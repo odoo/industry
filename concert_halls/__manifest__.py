@@ -13,11 +13,13 @@
         'pos_online_payment',
         'project_enterprise',
         'sale_crm',
+        'social',
         'website_crm',
         'website_event',
         'website_sale',
     ],
     'data': [
+        'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/pos_category.xml',
         'data/product_category.xml',
