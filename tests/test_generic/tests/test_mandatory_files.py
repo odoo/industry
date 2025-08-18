@@ -34,20 +34,13 @@ class FileTest(IndustryCase):
                 if not os.path.isfile(get_industry_path() + module + path):
                     _logger.warning("Missing %s at %s", f, module + path)
 
-            tx_config = Path(get_industry_path() + '.tx/config').read_text(encoding="utf-8")
-            if not re.search(module, tx_config):
-                _logger.error("Missing module in .tx/config")
+            weblate_config = Path(get_industry_path() + '.weblate.json').read_text(encoding="utf-8")
+            if not re.search(module, weblate_config):
+                _logger.error("Missing module in .weblate.json")
                 continue
             if release.version_info[3] != 'final':
                 # skip test if master
                 continue
-            odoo_version = release.serie
-            if odoo_version.split('.')[1] != '0':
-                odoo_version = odoo_version.replace('.', '-').split('~')[-1]
-            else:
-                odoo_version = odoo_version.split('.')[0]
-            if not re.search(odoo_version + ':r:' + module, tx_config):
-                _logger.warning("Wrong version in .tx/config")
 
             db_name = get_db_name()
             if not db_name.endswith('imported_with_demo'):
