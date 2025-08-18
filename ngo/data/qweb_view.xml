@@ -1,5 +1,116 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+    <!-- Reports -->
+    <record id="web.basic_layout" model="ir.ui.view" forcecreate="1">
+        <field name="arch" type="xml">
+        <t t-name="web.basic_layout">
+            <t t-call="web.html_container">
+            <div class="page">
+                <h1>Fiscal Attestation Document</h1>
+                <p>
+                Name: <span t-field="doc.x_partner_id"/>
+                <br/> Legal Number...
+                </p>
+            </div>
+            </t>
+        </t>
+        </field>
+        <field name="key">web.basic_layout</field>
+        <field name="name">basic_layout</field>
+        <field name="active" eval="True"/>
+        <field name="type">qweb</field>
+    </record>
+     <record id="report_docume_a25093bf-c19e-409c-b262-a5be41086c11" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t t-name="report_document">
+        <t t-call="web.external_layout">
+          <div class="page">
+            <div class="oe_structure"/>
+          </div>
+        </t>
+      </t>
+    </field>
+    <field name="key">report_docume_a25093bf-c19e-409c-b262-a5be41086c11_document</field>
+    <field name="name">report_docume_a25093bf-c19e-409c-b262-a5be41086c11_document</field>
+        <field name="active" eval="True"/>
+    <field name="type">qweb</field>
+  </record>
+  <record id="main_report_732a2694-c9d0-4319-aa27-41f52e070d7c" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <t t-name="main_report">
+        <t t-call="web.html_container">
+          <t t-foreach="docs" t-as="doc">
+            <t t-call="report_docume_a25093bf-c19e-409c-b262-a5be41086c11_document"/>
+          </t>
+        </t>
+      </t>
+    </field>
+    <field name="key">report_docume_a25093bf-c19e-409c-b262-a5be41086c11</field>
+    <field name="name">report_docume_a25093bf-c19e-409c-b262-a5be41086c11</field>
+        <field name="active" eval="True"/>
+    <field name="type">qweb</field>
+  </record>
+    <record id="fiscal_attestation_report_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <t t-name="report_document">
+                <div class="page">
+                <div class="oe_structure"/>
+                </div>
+            </t>
+        </field>
+        <field name="key">fiscal_attestation_report_view_document</field>
+        <field name="name">fiscal_attestation_report_view_document</field>
+        <field name="active" eval="True"/>
+        <field name="type">qweb</field>
+    </record>
+    <record id="main_report_2bb610c3-fd34-4aac-8dc8-ff61a7a1d68d" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <t t-name="main_report">
+                <t t-foreach="docs" t-as="doc">
+                <t t-call="web.basic_layout">
+                    <t t-call="fiscal_attestation_report_view_document"/>
+                    <p style="page-break-after: always;"/>
+                </t>
+                </t>
+            </t>
+        </field>
+        <field name="key">fiscal_attestation_report_view</field>
+        <field name="name">fiscal_attestation_report_view</field>
+        <field name="active" eval="True"/>
+        <field name="type">qweb</field>
+    </record>
+    <record id="report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <t t-name="report_document">
+                <t t-call="web.internal_layout">
+                <div class="page">
+                    <div class="oe_structure"/>
+                </div>
+                </t>
+            </t>
+        </field>
+        <field name="key">report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2_document</field>
+        <field name="name">report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2_document</field>
+            <field name="active" eval="True"/>
+        <field name="type">qweb</field>
+    </record>
+    <record id="main_report_9d372fcd-0318-4585-95bb-3b27f83b7085" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <t t-name="main_report">
+                <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2_document"/>
+                </t>
+                </t>
+            </t>
+        </field>
+        <field name="key">report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2</field>
+        <field name="name">report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2</field>
+            <field name="active" eval="True"/>
+        <field name="type">qweb</field>
+    </record>
+
+    
   <record id="ir_ui_view_4279" model="ir.ui.view">
     <field name="arch" type="xml">
       <t name="About Us" t-name="website.about-us">
@@ -816,11 +927,11 @@
                 <div t-attf-class="#{'col-lg-3 col-md-4 col-sm-6 px-2 col-xs-12' if layout_mode == 'grid' else ''}">
                   <a class="o_website_record text-decoration-none d-grid card w-100 mb-3" t-att-href="record_to_url(record)">
                     <div class="d-flex">
-                      <div t-if="record.x_studio_image" t-field="record.x_studio_image" t-options-widget="'image'" t-options-qweb_img_raw_data="True" t-options-class="'o_website_image h-100 w-100 rounded-3'" class="h-100 w-100"/>
+                      <div t-if="record.x_image" t-field="record.x_image" t-options-widget="'image'" t-options-qweb_img_raw_data="True" t-options-class="'o_website_image h-100 w-100 rounded-3'" class="h-100 w-100"/>
                       <div t-else="" class="h-100 w-100 bg-light o_website_image rounded-3"/>
                     </div>
                     <div class="o_website_tags text-end me-1">
-                      <t t-if="record.x_studio_tag_ids" t-foreach="record.x_studio_tag_ids" t-as="tag">
+                      <t t-if="record.x_tag_ids" t-foreach="record.x_tag_ids" t-as="tag">
                         <span t-field="tag.display_name" t-attf-class="badge o_website_tag #{'o_tag_color_'+str(tag.x_color)}"/>
                       </t>
                     </div>
@@ -872,7 +983,7 @@
                     <div class="d-flex flex-row my-4 flex-wrap align-items-center justify-content-between">
                         <div class="col-lg-12 mt-lg-12 col-sm-12">
                             <div class="s_progress_bar s_progress_bar_label_inline mb-2" data-display="inline" data-vcss="001" data-snippet="s_progress_bar" data-name="Progress Bar">
-                                <t t-set="current_progress" t-value="record.x_studio_progress*100"/>
+                                <t t-set="current_progress" t-value="record.x_progress*100"/>
                                 <div class="s_progress_bar_wrapper d-flex gap-2">
                                     <div class="progress" role="progressbar" aria-label="Progress bar" aria-valuenow="current_progress" aria-valuemin="0" aria-valuemax="100">
                                         <div class="progress-bar overflow-visible" style="min-width: 0%">
@@ -887,15 +998,15 @@
                         <span t-field="record.x_name"/>
                         </h1>
                         <div class="o_website_tags ">
-                            <t t-if="record.x_studio_tag_ids" t-foreach="record.x_studio_tag_ids" t-as="tag">
+                            <t t-if="record.x_tag_ids" t-foreach="record.x_tag_ids" t-as="tag">
                                 <span t-field="tag.display_name" t-attf-class="badge o_website_tag #{'o_tag_color_'+str(tag.x_color)}"/>
                             </t>
                         </div>
                         <h1 class="h1">
-                        <span t-field="record.x_studio_progress"/>
+                        <span t-field="record.x_progress"/>
                         </h1>
                     </div>
-                    <div t-if="record.x_studio_image" t-field="record.x_studio_image" t-options-widget="'image'" t-options-qweb_img_raw_data="True" t-options-class="'o_website_image h-100 w-100 rounded-3'" class="col-lg-6 mt-md-4 col-sm-12 me-2"/>
+                    <div t-if="record.x_image" t-field="record.x_image" t-options-widget="'image'" t-options-qweb_img_raw_data="True" t-options-class="'o_website_image h-100 w-100 rounded-3'" class="col-lg-6 mt-md-4 col-sm-12 me-2"/>
                     <div t-else="" class="col-lg-6 mt-md-4 col-sm-12 me-2 bg-light o_website_image rounded-3"/>
                     <span t-field="record.x_website_description"/>
                     </div>
@@ -1490,7 +1601,7 @@
                               <span class="s_website_form_label_content">Your Country</span>
                             </label>
                             <div class="col-sm">
-                              <input class="form-control s_website_form_input" type="text" name="x_studio_country" value="" placeholder="" id="ozr6n7u0gjn" data-fill-with="undefined"/>
+                              <input class="form-control s_website_form_input" type="text" name="x_country" value="" placeholder="" id="ozr6n7u0gjn" data-fill-with="undefined"/>
                             </div>
                           </div>
                         </div>

@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="update_contact_00da941d-c74e-43ec-b5bd-a8da42ca8c6f" model="ir.actions.server">
+    <record id="action_server_add_signatory_tag_to_contact" model="ir.actions.server">
         <field name="model_id" ref="x_signature_model"/>
-        <field name="update_path">x_studio_partner_id.category_id</field>
+        <field name="update_path">x_partner_id.category_id</field>
         <field name="state">object_write</field>
         <field name="crud_model_id" ref="base.model_res_partner"/>
         <field name="name">Update Contact</field>
@@ -20,10 +20,10 @@ if not partner:
         'country_id': env['res.country'].search([('name', '=', request.params.get('country'))], limit=1).id
     })
 new_signature = env['x_signature'].create({
-    "x_studio_partner_id": partner.id,
-    "x_studio_date": datetime.datetime.today().strftime('%Y-%m-%d'),
-    "x_studio_petition_id": request.params.get('petition_id'),
-    "x_studio_newsletter": request.params.get('newsletter'),
+    "x_partner_id": partner.id,
+    "x_date": datetime.datetime.today().strftime('%Y-%m-%d'),
+    "x_petition_id": request.params.get('petition_id'),
+    "x_newsletter": request.params.get('newsletter'),
 })
 response = request.make_json_response({'id': new_signature.id}, status=200)]]></field>
         <field name="model_id" ref="project.model_project_task"/>
@@ -47,7 +47,7 @@ response = {
     <record id="action_generate_fiscal_attestation" model="ir.actions.server">
         <field name="code"><![CDATA[
 concerned_donations = record.env['account.payment'].search([('date.year_number', '=', record.x_wizard_fiscal_year)])
-if not record.x_wizard_show_warning and concerned_donations.filtered(lambda d: d.x_studio_fiscal_attestation_id or not d.partner_id.street or not d.partner_id.city or not d.partner_id.state or not d.partner_id.country_id):
+if not record.x_wizard_show_warning and concerned_donations.filtered(lambda d: d.x_fiscal_attestation_id or not d.partner_id.street or not d.partner_id.city or not d.partner_id.state or not d.partner_id.country_id):
     response = {
         'type': 'ir.actions.act_window',
         'res_model': 'x_wizard_generate_fiscal_attestation',
@@ -62,18 +62,20 @@ else:
         if donation_sum >= record.x_wizard_tax_minimum:
             fiscal_attestation = record.env['x_fiscal_attestation'].create({
                 'x_name': 'new',
-                'x_studio_selection_field_2si_1j094a736': 'status2',
-                'x_studio_partner_id': partner.id,
-                'x_studio_date': datetime.datetime.today(),
-                'x_studio_value': donation_sum,
-                'x_studio_year': record.x_wizard_fiscal_year,
+                'x_fiscal_attestation_status': 'status2',
+                'x_partner_id': partner.id,
+                'x_date': datetime.datetime.today(),
+                'x_value': donation_sum,
+                'x_year': record.x_wizard_fiscal_year,
             })
-            concerned_donations.filtered(lambda d: d.partner_id == partner)['x_studio_fiscal_attestation_id'] = fiscal_attestation
+            concerned_donations.filtered(lambda d: d.partner_id == partner)['x_fiscal_attestation_id'] = fiscal_attestation.id
     response = {
         'type': 'ir.actions.act_window',
         'res_model': 'x_fiscal_attestation',
-        'domain': [('x_studio_year', '=', record.x_wizard_fiscal_year)],
+        'domain': [('x_year', '=', record.x_wizard_fiscal_year)],
         'view_mode': 'list,form',
+        'target': 'self',
+        'name': 'Fiscal Attestation',
     }
 ]]></field>
         <field name="model_id" ref="x_wizard_generate_fiscal_attestation_model"/>

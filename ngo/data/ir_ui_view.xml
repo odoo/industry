@@ -7,14 +7,14 @@
         <header>
             <button string="New" type="action"/>
         </header>
-        <field name="x_studio_sequence" widget="handle"/>
+        <field name="x_sequence" widget="handle"/>
         <field name="x_name"/>
-        <field name="x_studio_date_stop" string="Date" optional="show" widget="daterange" options="{&quot;start_date_field&quot;:&quot;x_studio_date_start&quot;,&quot;always_range&quot;:true}"/>
-        <field name="x_studio_user_id" widget="many2one_avatar_user"/>
+        <field name="x_date_stop" string="Date" optional="show" widget="daterange" options="{&quot;start_date_field&quot;:&quot;x_date_start&quot;,&quot;always_range&quot;:true}"/>
+        <field name="x_user_id" widget="many2one_avatar_user"/>
         <field name="x_current_signatures" optional="show"/>
-        <field name="x_studio_target_signatures" optional="show"/>
-        <field name="x_studio_progress" optional="show" readonly="True" widget="progressbar"/>
-        <field name="x_studio_tag_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+        <field name="x_target_signatures" optional="show"/>
+        <field name="x_progress" optional="show" readonly="True" widget="progressbar"/>
+        <field name="x_tag_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
       </list>
     </field>
     <field name="model">x_petition</field>
@@ -27,38 +27,38 @@
     <field name="arch" type="xml">
       <form>
         <header>
-            <field widget="statusbar" options="{'clickable': '1'}" name="x_studio_selection_field_1kn_1j070021k"/>
+            <field widget="statusbar" options="{'clickable': '1'}" name="x_petition_status"/>
         </header>
         <sheet string="Petition">
         <div name="button_box" class="oe_button_box">
             <button class="oe_stat_button" name="%(open_x_petition_website_page)d" context="{'record_url': 'x_website_url'}" invisible="not x_is_published" title="Go to Website" icon="fa-globe" type="action"/>
-            <button class="oe_stat_button" icon="fa-pencil" type="action" name="%(signatures_c7917ceb-09eb-4f0e-b8f2-95b6728866bc)d">
+            <button class="oe_stat_button" icon="fa-pencil" type="action" name="%(petition_related_x_signature)d">
               <field widget="statinfo" name="x_current_signatures" string="Signatures"/>
             </button>
           </div>
           <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
           <field name="x_active" invisible="1"/>
-          <field class="oe_avatar" widget="image" name="x_studio_image"/>
+          <field class="oe_avatar" widget="image" name="x_image"/>
           <div class="oe_title">
             <h1>
               <field name="x_name" string="Petition Name" required="1" placeholder="e.g. Raise the minimum wage to a living wage"/>
             </h1>
           </div>
-          <group name="studio_group_b69ddc">
-            <group name="studio_group_b69ddc_left">
-              <field name="x_studio_date_stop" optional="show" widget="daterange" options="{&quot;start_date_field&quot;:&quot;x_studio_date_start&quot;,&quot;always_range&quot;:true}"/>
-                <field name="x_studio_user_id" widget="many2one_avatar"/>
-                <field name="x_studio_tag_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+          <group name="group_b69ddc">
+            <group name="group_b69ddc_left">
+              <field name="x_date_stop" optional="show" widget="daterange" options="{&quot;start_date_field&quot;:&quot;x_date_start&quot;,&quot;always_range&quot;:true}"/>
+                <field name="x_user_id" widget="many2one_avatar"/>
+                <field name="x_tag_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
                 <field name="x_is_published" help="Is the petition published on the website ?"/>
             </group>
-            <group name="studio_group_b69ddc_right">
+            <group name="group_b69ddc_right">
                 <field name="x_current_signatures" force_save="1" readonly="True"/>
-                <field name="x_studio_target_signatures"/>
-                <field name="x_studio_progress" force_save="1" readonly="True" options="{&quot;digits&quot;:[0,0],&quot;current_value&quot;:&quot;x_current_signatures&quot;,&quot;max_value&quot;:&quot;x_studio_target_signatures&quot;}" widget="progressbar"/>
+                <field name="x_target_signatures"/>
+                <field name="x_progress" force_save="1" readonly="True" options="{&quot;digits&quot;:[0,0],&quot;current_value&quot;:&quot;x_current_signatures&quot;,&quot;max_value&quot;:&quot;x_target_signatures&quot;}" widget="progressbar"/>
             </group>
           </group>
-          <notebook name="studio_notebook_7ob_1j06p6na3">
-            <page string="Description" name="studio_page_7ob">
+          <notebook name="notebook_7ob_1j06p6na3">
+            <page string="Description" name="page_7ob">
               <field name="x_description"/>
             </page>
           </notebook>
@@ -78,24 +78,24 @@
     <field name="arch" type="xml">
       <search>
         <field name="x_name"/>
-        <field name="x_studio_user_id"/>
-        <field name="x_studio_tag_ids"/>
-        <filter string="My Petition" name="my_x_petition" domain="[['x_studio_user_id', '=', uid]]"/>
-        <separator name="studio_separator_5n3_1j1dcqdle"/>
-        <filter domain="[(&quot;x_studio_selection_field_1kn_1j070021k&quot;, &quot;=&quot;, &quot;status2&quot;)]" name="studio_filter_5tf_1j1dcq5lm" string="Published"/>
-        <filter domain="[(&quot;x_studio_selection_field_1kn_1j070021k&quot;, &quot;=&quot;, &quot;status1&quot;)]" name="studio_filter_80t_1j1dct99o" string="Drafts"/>
-        <filter domain="[(&quot;x_studio_selection_field_1kn_1j070021k&quot;, &quot;=&quot;, &quot;status3&quot;)]" name="studio_filter_81q_1j1dcuq2p" string="Closed Petitions"/>
-        <filter domain="[(&quot;x_studio_selection_field_1kn_1j070021k&quot;, &quot;=&quot;, &quot;status4&quot;)]" name="studio_filter_631_1j1dcv8k1" string="Submitted"/>
-        <separator name="studio_separator_o6_1j1dcnc6t"/>
-        <filter domain="[&quot;|&quot;, (&quot;x_studio_progress&quot;, &quot;=&quot;, 100), (&quot;x_studio_progress&quot;, &quot;&gt;&quot;, 100)]" name="studio_filter_6hp_1j1dcmnt5" string="Reached Goal"/>
-        <filter domain="[(&quot;x_studio_progress&quot;, &quot;&lt;&quot;, 100)]" name="studio_filter_6ds_1j1dco605" string="Not Reached"/>
+        <field name="x_user_id"/>
+        <field name="x_tag_ids"/>
+        <filter string="My Petition" name="my_x_petition" domain="[['x_user_id', '=', uid]]"/>
+        <separator name="separator_5n3_1j1dcqdle"/>
+        <filter domain="[(&quot;x_petition_status&quot;, &quot;=&quot;, &quot;status2&quot;)]" name="filter_5tf_1j1dcq5lm" string="Published"/>
+        <filter domain="[(&quot;x_petition_status&quot;, &quot;=&quot;, &quot;status1&quot;)]" name="filter_80t_1j1dct99o" string="Drafts"/>
+        <filter domain="[(&quot;x_petition_status&quot;, &quot;=&quot;, &quot;status3&quot;)]" name="filter_81q_1j1dcuq2p" string="Closed Petitions"/>
+        <filter domain="[(&quot;x_petition_status&quot;, &quot;=&quot;, &quot;status4&quot;)]" name="filter_631_1j1dcv8k1" string="Submitted"/>
+        <separator name="separator_o6_1j1dcnc6t"/>
+        <filter domain="[&quot;|&quot;, (&quot;x_progress&quot;, &quot;=&quot;, 100), (&quot;x_progress&quot;, &quot;&gt;&quot;, 100)]" name="filter_6hp_1j1dcmnt5" string="Reached Goal"/>
+        <filter domain="[(&quot;x_progress&quot;, &quot;&lt;&quot;, 100)]" name="filter_6ds_1j1dco605" string="Not Reached"/>
         <separator/>
-        <filter date="x_studio_date_start" name="studio_filter_date_start" string="Start Date"/>
-        <filter date="x_studio_date_stop" name="studio_filter_date_stop" string="End Date"/>
+        <filter date="x_date_start" name="filter_date_start" string="Start Date"/>
+        <filter date="x_date_stop" name="filter_date_stop" string="End Date"/>
         <separator/>
         <filter string="Archived" name="archived_x_petition" domain="[['x_active', '=', False]]"/>
         <separator/>
-        <filter name="groupby_x_user" string="Responsible" context="{'group_by': 'x_studio_user_id'}" domain="[]"/>
+        <filter name="groupby_x_user" string="Responsible" context="{'group_by': 'x_user_id'}" domain="[]"/>
       </search>
     </field>
     <field name="model">x_petition</field>
@@ -107,7 +107,7 @@
 
   <record id="default_gantt_view_f_03ce4837-2c9f-4c7f-a0f8-32d3e81d1571" model="ir.ui.view">
     <field name="arch" type="xml">
-      <gantt date_start="x_studio_date_start" date_stop="x_studio_date_stop"/>
+      <gantt date_start="x_date_start" date_stop="x_date_stop"/>
     </field>
     <field name="model">x_petition</field>
     <field name="name">Default gantt view for x_petition</field>
@@ -117,7 +117,7 @@
 
 
   
-  <record id="odoo_studio_default__e7a74316-a1f3-48ff-9d36-b235bb6e12b7" model="ir.ui.view">
+  <record id="default_kanban_view_x_petition" model="ir.ui.view">
     <field name="arch" type="xml">
       <kanban string="Petition">
         <templates>
@@ -132,23 +132,23 @@
             </t>
             <t t-name="card">
                 <field name="x_name"/>
-          <field name="x_studio_tag_ids" display="full"/>
+          <field name="x_tag_ids" display="full"/>
           <field name="x_current_signatures" display="full" invisible="True"/>
-          <field name="x_studio_progress" display="full" widget="progressbar" options="{&quot;max_value&quot;:&quot;x_studio_target_signatures&quot;,&quot;current_value&quot;:&quot;x_current_signatures&quot;}"/>
-          <field name="x_studio_date_stop" display="full" widget="daterange" options="{&quot;start_date_field&quot;:&quot;x_studio_date_start&quot;,&quot;show_time&quot;:false}"/>
+          <field name="x_progress" display="full" widget="progressbar" options="{&quot;max_value&quot;:&quot;x_target_signatures&quot;,&quot;current_value&quot;:&quot;x_current_signatures&quot;}"/>
+          <field name="x_date_stop" display="full" widget="daterange" options="{&quot;start_date_field&quot;:&quot;x_date_start&quot;,&quot;show_time&quot;:false}"/>
             </t>
         </templates>
         </kanban>
     </field>
     <field name="model">x_petition</field>
-    <field name="name">Odoo Studio: Default kanban view for x_petition</field>
+    <field name="name">Default kanban view for x_petition</field>
     <field name="active" eval="True"/>
     <field name="type">kanban</field>
   </record>
 
 
   
-  <record id="odoo_studio_default__97669e0f-e971-4c31-b8e8-d3abbf8205f2" model="ir.ui.view">
+  <record id="default_graph_view_x_petition" model="ir.ui.view">
     <field name="arch" type="xml">
         <graph string="Petition" sample="1" type="bar">
             <field name="x_name"/>
@@ -156,13 +156,13 @@
         </graph>
     </field>
     <field name="model">x_petition</field>
-    <field name="name">Odoo Studio: Default graph view for ir.model(947,) customization</field>
+    <field name="name">Default graph view for x_petition</field>
     <field name="active" eval="True"/>
     <field name="type">graph</field>
   </record>
 
 
-  <record id="odoo_studio_default__f0a3cd0d-a269-4288-8312-5c8e40ba0e32" model="ir.ui.view">
+  <record id="default_pivot_view_x_petition" model="ir.ui.view">
     <field name="arch" type="xml">
         <pivot string="Petition" sample="1">
             <field name="x_current_signatures" type="col"/>
@@ -170,7 +170,7 @@
           </pivot>
     </field>
     <field name="model">x_petition</field>
-    <field name="name">Odoo Studio: Default pivot view for ir.model(947,) customization</field>
+    <field name="name">Default pivot view for x_petition</field>
         <field name="active" eval="True"/>
     <field name="type">pivot</field>
   </record>
@@ -181,12 +181,12 @@
     <record id="default_list_view_fo_13169c68-79b7-412d-b486-625c88b10130" model="ir.ui.view">
         <field name="arch" type="xml">
         <list>
-            <field name="x_studio_partner_id"/>
-            <field name="x_studio_sequence" widget="handle"/>
-            <field optional="show" name="x_studio_date"/>
-            <field optional="show" name="x_studio_petition_name"/>
-            <field optional="show" name="x_studio_country"/>
-            <field optional="show" name="x_studio_newsletter"/>
+            <field name="x_partner_id"/>
+            <field name="x_sequence" widget="handle"/>
+            <field optional="show" name="x_date"/>
+            <field optional="show" name="x_petition_name"/>
+            <field optional="show" name="x_country"/>
+            <field optional="show" name="x_newsletter"/>
         </list>
         </field>
         <field name="model">x_signature</field>
@@ -202,17 +202,17 @@
             <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
             <group>
                 <h1>
-                <field name="x_studio_partner_id" required="1" placeholder="Contact"/>
+                <field name="x_partner_id" required="1" placeholder="Contact"/>
                 </h1>
             </group>
-            <group name="studio_group_56b442">
-                <group name="studio_group_56b442_left">
-                <field name="x_studio_country" force_save="1" readonly="True"/>
-                <field name="x_studio_date" string="Date Signed"/>
+            <group name="group_56b442">
+                <group name="group_56b442_left">
+                <field name="x_country" force_save="1" readonly="True"/>
+                <field name="x_date" string="Date Signed"/>
                 </group>
-                <group name="studio_group_56b442_right">
-                    <field name="x_studio_petition_id" options="{'create_name_field': 'x_name'}"/>
-                    <field name="x_studio_newsletter"/>
+                <group name="group_56b442_right">
+                    <field name="x_petition_id" options="{'create_name_field': 'x_name'}"/>
+                    <field name="x_newsletter"/>
                 </group>
             </group>
             </sheet>
@@ -228,17 +228,17 @@
         <field name="arch" type="xml">
         <search>
             <field name="x_name"/>
-            <field name="x_studio_partner_id" operator="child_of"/>
+            <field name="x_partner_id" operator="child_of"/>
             <separator/>
-            <filter date="x_studio_date" name="studio_filter_date" string="Date"/>
-            <filter domain="[(&quot;x_studio_newsletter&quot;, &quot;!=&quot;, False)]" name="studio_filter_n0_1j1dp3cpn" string="Newsletter Subscriber"/>
+            <filter date="x_date" name="filter_date" string="Date"/>
+            <filter domain="[(&quot;x_newsletter&quot;, &quot;!=&quot;, False)]" name="filter_n0_1j1dp3cpn" string="Newsletter Subscriber"/>
             <separator/>
             <filter string="Archived" name="archived_x_signature" domain="[['x_active', '=', False]]"/>
             <separator/>
-            <filter name="groupby_x_partner" string="Partner" context="{'group_by': 'x_studio_partner_id'}" domain="[]"/>
-            <filter name="studio_group_by_7uf_1j1dp5sb7" string="Petition Name" context="{'group_by': 'x_studio_petition_name'}"/>
-            <filter name="studio_group_by_3j9_1j1dp6hp0" string="Date Signed" context="{'group_by': 'x_studio_date'}"/>
-            <filter name="studio_group_by_54d_1j1dp6od7" string="Country" context="{'group_by': 'x_studio_country'}"/>
+            <filter name="groupby_x_partner" string="Partner" context="{'group_by': 'x_partner_id'}" domain="[]"/>
+            <filter name="group_by_7uf_1j1dp5sb7" string="Petition Name" context="{'group_by': 'x_petition_name'}"/>
+            <filter name="group_by_3j9_1j1dp6hp0" string="Date Signed" context="{'group_by': 'x_date'}"/>
+            <filter name="group_by_54d_1j1dp6od7" string="Country" context="{'group_by': 'x_country'}"/>
         </search>
         </field>
         <field name="model">x_signature</field>
@@ -248,38 +248,26 @@
     </record>
     <record id="default_calendar_vie_b7cb970c-bd79-4473-9199-60f0ad787e00" model="ir.ui.view">
         <field name="arch" type="xml">
-        <calendar date_start="x_studio_date" create_name_field="x_name"/>
+        <calendar date_start="x_date" create_name_field="x_name"/>
         </field>
         <field name="model">x_signature</field>
         <field name="name">Default calendar view for x_signature</field>
         <field name="active" eval="True"/>
         <field name="type">calendar</field>
     </record>
-    <!-- <record id="default_map_view_for_e146347e-a188-4c33-98e7-e3d5af25b099" model="ir.ui.view">
-        <field name="arch" type="xml">
-        <map res_partner="x_studio_partner_id">
-            <field name="x_studio_partner_id" string="Partner"/>
-        </map>
-        </field>
-        <field name="model">x_signature</field>
-        <field name="name">Default map view for x_signature</field>
-        <field name="active" eval="True"/>
-        <field name="type">map</field>
-    </record> -->
-
 
 <!-- x_fiscal_attesttation Views -->
     <record id="default_list_view_fo_79490779-e684-444e-9b44-4936437bd247" model="ir.ui.view">
         <field name="arch" type="xml">
         <list create="0" delete="0" edit="0">
-            <field name="x_studio_sequence" widget="handle"/>
-            <field name="x_studio_year" optional="show"/>
+            <field name="x_sequence" widget="handle"/>
+            <field name="x_year" optional="show"/>
             <field name="x_name"/>
-            <field name="x_studio_partner_id" string="Donor"/>
-            <field name="x_studio_currency_id" invisible="1" required="0"/>
-            <field name="x_studio_value" sum="Total" string="Total Value"/>
-            <field name="x_studio_selection_field_2si_1j094a736" optional="show" string="State"/>
-            <field name="x_studio_date" optional="hide"/>
+            <field name="x_partner_id" string="Donor"/>
+            <field name="x_currency_id" invisible="1" required="0"/>
+            <field name="x_value" sum="Total" string="Total Value"/>
+            <field name="x_fiscal_attestation_status" optional="show" string="State"/>
+            <field name="x_date" optional="hide"/>
         </list>
         </field>
         <field name="model">x_fiscal_attestation</field>
@@ -291,15 +279,15 @@
         <field name="arch" type="xml">
         <form create="false">
             <header>
-                <field widget="statusbar" options="{'clickable': '1'}" name="x_studio_selection_field_2si_1j094a736"/>
+                <field widget="statusbar" options="{'clickable': '1'}" name="x_fiscal_attestation_status"/>
                 <button string="Send" type="object"/>
                 <button string="Print" type="object"/>
                 <button string="Preview" type="object"/>
             </header>
             <sheet string="Fiscal Attestation">
             <div name="button_box" class="oe_button_box">
-                <button class="oe_stat_button" icon="fa-money" type="action" name="%(donations_0969ab37-2e67-4908-8ffd-856548ffe57e)d">
-                    <field widget="statinfo" name="x_x_studio_fiscal_attestation_id_account_payment_count" string="Donations"/>
+                <button class="oe_stat_button" icon="fa-money" type="action" name="%(fiscal_attestation_related_donations)d">
+                    <field widget="statinfo" name="x_x_fiscal_attestation_id_account_payment_count" string="Donations"/>
                 </button>
             </div>
             <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
@@ -309,17 +297,17 @@
                 <field name="x_name" required="1" readonly= "1" placeholder="Number..." string="Number" force_save="1"/>
                 </h1>
             </div>
-            <group name="studio_group_17e8fe">
-                <group name="studio_group_17e8fe_left">
-                <field name="x_studio_partner_id" force_save="1" readonly="1" string="Donor"/>
-                <field name="x_studio_value" force_save="1" readonly="True"/>
-                <field name="x_studio_year" force_save="1" readonly="True"/>
+            <group name="group_17e8fe">
+                <group name="group_17e8fe_left">
+                <field name="x_partner_id" force_save="1" readonly="1" string="Donor"/>
+                <field name="x_value" force_save="1" readonly="True"/>
+                <field name="x_year" force_save="1" readonly="True"/>
                 
                 </group>
-                <group name="studio_group_17e8fe_right">
-                <field widget="file" filename="x_studio_document_pdf_filename" name="x_studio_document_pdf" force_save="1" readonly="True"/>
-                <field widget="file" invisible="True" name="x_studio_document_pdf_filename"/>
-                <field name="x_studio_date" force_save="1" readonly="1" string="Sent Date"/>
+                <group name="group_17e8fe_right">
+                <field widget="file" filename="x_document_pdf_filename" name="x_document_pdf" force_save="1" readonly="True"/>
+                <field widget="file" invisible="True" name="x_document_pdf_filename"/>
+                <field name="x_date" force_save="1" readonly="1" string="Sent Date"/>
                 </group>
             </group>
             </sheet>
@@ -335,25 +323,25 @@
         <field name="arch" type="xml">
         <search>
             <field name="x_name"/>
-            <field name="x_studio_partner_id" operator="child_of"/>
+            <field name="x_partner_id" operator="child_of"/>
             <separator/>
-            <filter date="x_studio_date" name="studio_filter_date" string="Date"/>
+            <filter date="x_date" name="filter_date" string="Date"/>
             <separator/>
             <group string="Fiscal Year">
-                <filter domain="[(&quot;x_studio_year&quot;, &quot;=&quot;, &quot;2025&quot;)]" name="studio_filter_fiscal_attestation_2025" string="2025"/>
-                <filter domain="[(&quot;x_studio_year&quot;, &quot;=&quot;, &quot;2024&quot;)]" name="studio_filter_fiscal_attestation_2024" string="2024"/>
-                <filter domain="[(&quot;x_studio_year&quot;, &quot;=&quot;, &quot;2023&quot;)]" name="studio_filter_fiscal_attestation_2023" string="2023"/>
+                <filter domain="[(&quot;x_year&quot;, &quot;=&quot;, &quot;2025&quot;)]" name="filter_fiscal_attestation_2025" string="2025"/>
+                <filter domain="[(&quot;x_year&quot;, &quot;=&quot;, &quot;2024&quot;)]" name="filter_fiscal_attestation_2024" string="2024"/>
+                <filter domain="[(&quot;x_year&quot;, &quot;=&quot;, &quot;2023&quot;)]" name="filter_fiscal_attestation_2023" string="2023"/>
             </group>
-            <separator name="studio_separator_755_1j1fnhmgh"/>
-            <filter domain="[(&quot;x_studio_selection_field_2si_1j094a736&quot;, &quot;=&quot;, &quot;status2&quot;)]" name="studio_filter_1f5_1j1fnfsn9" string="Generated"/>
-            <filter domain="[(&quot;x_studio_selection_field_2si_1j094a736&quot;, &quot;=&quot;, &quot;Sent&quot;)]" name="studio_filter_3bl_1j1fngj1h" string="Sent"/>
-            <filter domain="[(&quot;x_studio_selection_field_2si_1j094a736&quot;, &quot;=&quot;, &quot;Cancelled&quot;)]" name="studio_filter_2q8_1j1fnhami" string="Cancelled"/>
+            <separator name="separator_755_1j1fnhmgh"/>
+            <filter domain="[(&quot;x_fiscal_attestation_status&quot;, &quot;=&quot;, &quot;status2&quot;)]" name="filter_1f5_1j1fnfsn9" string="Generated"/>
+            <filter domain="[(&quot;x_fiscal_attestation_status&quot;, &quot;=&quot;, &quot;Sent&quot;)]" name="filter_3bl_1j1fngj1h" string="Sent"/>
+            <filter domain="[(&quot;x_fiscal_attestation_status&quot;, &quot;=&quot;, &quot;Cancelled&quot;)]" name="filter_2q8_1j1fnhami" string="Cancelled"/>
             <separator/>
-            <filter name="studio_group_by_6p9_1j1v7ahh6" string="Year" context="{'group_by': 'x_studio_year'}"/>
+            <filter name="group_by_6p9_1j1v7ahh6" string="Year" context="{'group_by': 'x_year'}"/>
             <filter string="Archived" name="archived_x_fiscal_attestation" domain="[['x_active', '=', False]]"/>
             <separator/>
-            <filter name="groupby_x_partner" string="Donor" context="{'group_by': 'x_studio_partner_id'}" domain="[]"/>
-            <filter name="studio_group_by_1k6_1j1v7b0fm" string="State" context="{'group_by': 'x_studio_selection_field_2si_1j094a736'}"/>
+            <filter name="groupby_x_partner" string="Donor" context="{'group_by': 'x_partner_id'}" domain="[]"/>
+            <filter name="group_by_1k6_1j1v7b0fm" string="State" context="{'group_by': 'x_fiscal_attestation_status'}"/>
         </search>
         </field>
         <field name="model">x_fiscal_attestation</field>
@@ -363,29 +351,18 @@
     </record>
     <record id="default_calendar_vie_f91064fc-0ec1-4953-8d92-fdbd4e6366ff" model="ir.ui.view">
         <field name="arch" type="xml">
-        <calendar date_start="x_studio_date" create_name_field="x_name"/>
+        <calendar date_start="x_date" create_name_field="x_name"/>
         </field>
         <field name="model">x_fiscal_attestation</field>
         <field name="name">Default calendar view for x_fiscal_attestation</field>
         <field name="active" eval="True"/>
         <field name="type">calendar</field>
     </record>
-    <!-- <record id="default_map_view_for_9b8cbc1a-e944-417d-8f1d-5403205b9a79" model="ir.ui.view">
-        <field name="arch" type="xml">
-        <map res_partner="x_studio_partner_id">
-            <field name="x_studio_partner_id" string="Partner"/>
-        </map>
-        </field>
-        <field name="model">x_fiscal_attestation</field>
-        <field name="name">Default map view for x_fiscal_attestation</field>
-        <field name="active" eval="True"/>
-        <field name="type">map</field>
-    </record> -->
     <record id="default_pivot_view_f_d246256a-1093-4a6d-93a3-1987f04a1bf3" model="ir.ui.view">
         <field name="arch" type="xml">
         <pivot sample="1">
-            <field name="x_studio_value" type="measure"/>
-            <field name="x_studio_date" type="row"/>
+            <field name="x_value" type="measure"/>
+            <field name="x_date" type="row"/>
         </pivot>
         </field>
         <field name="model">x_fiscal_attestation</field>
@@ -396,7 +373,7 @@
     <record id="default_graph_view_f_06572b7e-da15-49a1-b94b-0f493108e13f" model="ir.ui.view">
         <field name="arch" type="xml">
         <graph sample="1">
-            <field name="x_studio_value" type="measure"/>
+            <field name="x_value" type="measure"/>
             <field name="create_date" type="row"/>
         </graph>
         </field>
@@ -406,33 +383,33 @@
         <field name="type">graph</field>
     </record>
     
-    <record id="odoo_studio_default__35c51142-26f5-4901-b3b5-4acd0bf390b8" model="ir.ui.view">
+    <record id="default_kanban_view_x_fiscal_attestation" model="ir.ui.view">
         <field name="arch" type="xml">
             <kanban string="Fiscal Attestation">
                 <templates>
                     <t t-name="card" class="row g-0 col-10" name="t-name">
-                        <field name="x_studio_partner_id" display="full"/>
+                        <field name="x_partner_id" display="full"/>
                         <field name="x_name" display="full"/>
-                        <field name="x_studio_date" display="full"/>
-                        <field name="x_studio_value" display="full"/>
-                        <field name="x_studio_currency_id"/>
-                        <field name="x_studio_selection_field_2si_1j094a736" display="full"/>
+                        <field name="x_date" display="full"/>
+                        <field name="x_value" display="full"/>
+                        <field name="x_currency_id"/>
+                        <field name="x_fiscal_attestation_status" display="full"/>
                     </t>
                     </templates>
             </kanban>
         </field>
         <field name="model">x_fiscal_attestation</field>
-        <field name="name">Odoo Studio: Default kanban view for ir.model(957,) customization</field>
+        <field name="name">Default kanban view for ir.model(957,) customization</field>
         <field name="active" eval="True"/>
         <field name="type">kanban</field>
     </record>
 
 <!-- account.payment Views -->
-    <record id="odoo_studio_account__4eef38e3-028e-40e6-9aaf-56c5ba3d7aa8" model="ir.ui.view">
+    <record id="extension_form_view_account_payment" model="ir.ui.view">
         <field name="arch" type="xml">
         <data>
             <div name="button_box" position="inside">
-                <button class="oe_stat_button" icon="fa-money" invisible="not x_studio_fiscal_attestation_id" type="action" name="%(donation_related_x_fiscal_attestation_form)d">Fiscal Attestation</button>
+                <button class="oe_stat_button" icon="fa-money" invisible="not x_fiscal_attestation_id" type="action" name="%(donation_related_x_fiscal_attestation_form)d">Fiscal Attestation</button>
             </div>
             
             <xpath expr="//form[1]" position="attributes">
@@ -445,18 +422,18 @@
         <field name="inherit_id" ref="account.view_account_payment_form"/>
         <field name="mode">extension</field>
         <field name="model">account.payment</field>
-        <field name="name">Odoo Studio: account.payment.form customization</field>
+        <field name="name">account.payment.form customization</field>
         <field name="priority">160</field>
         <field name="active" eval="True"/>
         <field name="type">form</field>
     </record>
-    <record id="odoo_studio_account__220a81f0-8b40-420d-957d-9f0baeeba827" model="ir.ui.view">
+    <record id="extension_search_view_account_payment" model="ir.ui.view">
         <field name="arch" type="xml">
         <data>
             <xpath expr="//filter[@name='outbound_filter']" position="after">
-            <separator name="studio_separator_3om_1j1vo6lvh"/>
-            <filter domain="[(&quot;x_studio_fiscal_attestation_id&quot;, &quot;!=&quot;, False)]" name="studio_filter_6vc_1j1vo5q2h" string="With Fiscal Attestation"/>
-            <filter domain="[(&quot;x_studio_fiscal_attestation_id&quot;, &quot;=&quot;, False)]" name="studio_filter_12s_1j1vo6hi9" string="Without Attestation"/>
+            <separator name="separator_3om_1j1vo6lvh"/>
+            <filter domain="[(&quot;x_fiscal_attestation_id&quot;, &quot;!=&quot;, False)]" name="filter_6vc_1j1vo5q2h" string="With Fiscal Attestation"/>
+            <filter domain="[(&quot;x_fiscal_attestation_id&quot;, &quot;=&quot;, False)]" name="filter_12s_1j1vo6hi9" string="Without Attestation"/>
             </xpath>
             <xpath expr="//filter[@name='partner']" position="attributes">
             <attribute name="string">Donor</attribute>
@@ -465,22 +442,19 @@
             <attribute name="string">Donation Date</attribute>
             </xpath>
             <xpath expr="//filter[@name='groupby_date']" position="after">
-            <filter name="studio_group_by_8l7_1j21ssti2" string="Country" context="{'group_by': 'x_country_name'}"/>
+            <filter name="group_by_8l7_1j21ssti2" string="Country" context="{'group_by': 'x_country_name'}"/>
             </xpath>
         </data>
         </field>
         <field name="inherit_id" ref="account.view_account_payment_search"/>
         <field name="mode">extension</field>
         <field name="model">account.payment</field>
-        <field name="name">Odoo Studio: account.payment.search customization</field>
+        <field name="name">account.payment.search customization</field>
         <field name="priority">99</field>
         <field name="active" eval="True"/>
         <field name="type">search</field>
     </record>
-        <!-- <xpath expr="//button[@name='action_post']" position="after">
-            <button string="Generate Fiscal Attestation" type="action" name="%(open_fiscal_attestat_6f7e5e8b-5b6a-4f2e-ae04-adf270df3e4e)d"/>
-        </xpath> -->
-    <record id="odoo_studio_account__d8925fdc-7c26-4396-894d-10c4a9ba3c12" model="ir.ui.view">
+    <record id="extension_list_view_account_payment" model="ir.ui.view">
         <field name="arch" type="xml">
         <data>
             <xpath expr="//list[1]/header" position="inside">
@@ -503,12 +477,12 @@
         <field name="inherit_id" ref="account.view_account_payment_tree"/>
         <field name="mode">extension</field>
         <field name="model">account.payment</field>
-        <field name="name">Odoo Studio: account.payment.list customization</field>
+        <field name="name">account.payment.list customization</field>
         <field name="priority">160</field>
         <field name="active" eval="True"/>
         <field name="type">list</field>
     </record>
-    <record id="odoo_studio_account__ce9eae81-50a5-494d-97eb-14256e8eed9b" model="ir.ui.view">
+    <record id="extension_graph_view_account_payment" model="ir.ui.view">
         <field name="arch" type="xml">
         <data>
             <xpath expr="//field[@name='journal_id']" position="replace">
@@ -520,7 +494,7 @@
         <field name="inherit_id" ref="account.view_account_payment_graph"/>
         <field name="mode">extension</field>
         <field name="model">account.payment</field>
-        <field name="name">Odoo Studio: account.payment.graph customization</field>
+        <field name="name">account.payment.graph customization</field>
         <field name="priority">99</field>
         <field name="active" eval="True"/>
         <field name="type">graph</field>
@@ -548,9 +522,9 @@
                 <field name="x_name" required="1" placeholder="Name..."/>
                 </h1>
             </div>
-            <group name="studio_group_2ebb59">
-                <group name="studio_group_2ebb59_left"/>
-                <group name="studio_group_2ebb59_right"/>
+            <group name="group_2ebb59">
+                <group name="group_2ebb59_left"/>
+                <group name="group_2ebb59_right"/>
             </group>
             </sheet>
         </form>
@@ -574,12 +548,12 @@
 
 
 <!-- res.partner Views -->
-    <record id="odoo_studio_res_part_b1588617-b32e-4945-88a9-1e17a0dc2521" model="ir.ui.view">
+    <record id="extension_form_view_res_partner" model="ir.ui.view">
         <field name="arch" type="xml">
         <data>
             <xpath expr="//button[hasclass('oe_stat_button')]" position="before">
-            <button class="oe_stat_button" icon="fa-pencil" type="action" name="%(signatures_d34fdf50-1857-449b-8330-f0173e5ee1db)d">
-                <field widget="statinfo" name="x_x_studio_partner_id_x_signature_count" string="Signatures"/>
+            <button class="oe_stat_button" icon="fa-pencil" type="action" name="%(partner_related_x_signature)d">
+                <field widget="statinfo" name="x_x_partner_id_x_signature_count" string="Signatures"/>
             </button>
             </xpath>
         </data>
@@ -587,119 +561,10 @@
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="mode">extension</field>
         <field name="model">res.partner</field>
-        <field name="name">Odoo Studio: res.partner.form customization</field>
+        <field name="name">res.partner.form customization</field>
         <field name="priority">200</field>
         <field name="active" eval="True"/>
         <field name="type">form</field>
-    </record>
-  <!-- Reports -->
-    <record id="web.basic_layout" model="ir.ui.view" forcecreate="1">
-        <field name="arch" type="xml">
-        <t t-name="web.basic_layout">
-            <t t-call="web.html_container">
-            <div class="page">
-                <h1>Fiscal Attestation Document</h1>
-                <p>
-                Name: <span t-field="doc.x_studio_partner_id"/>
-                <br/> Legal Number...
-                </p>
-            </div>
-            </t>
-        </t>
-        </field>
-        <field name="key">web.basic_layout</field>
-        <field name="name">basic_layout</field>
-        <field name="active" eval="True"/>
-        <field name="type">qweb</field>
-    </record>
-     <record id="studio_report_docume_a25093bf-c19e-409c-b262-a5be41086c11" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <t t-name="studio_report_document">
-        <t t-call="web.external_layout">
-          <div class="page">
-            <div class="oe_structure"/>
-          </div>
-        </t>
-      </t>
-    </field>
-    <field name="key">studio_report_docume_a25093bf-c19e-409c-b262-a5be41086c11_document</field>
-    <field name="name">studio_report_docume_a25093bf-c19e-409c-b262-a5be41086c11_document</field>
-        <field name="active" eval="True"/>
-    <field name="type">qweb</field>
-  </record>
-  <record id="studio_main_report_732a2694-c9d0-4319-aa27-41f52e070d7c" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <t t-name="studio_main_report">
-        <t t-call="web.html_container">
-          <t t-foreach="docs" t-as="doc">
-            <t t-call="studio_report_docume_a25093bf-c19e-409c-b262-a5be41086c11_document"/>
-          </t>
-        </t>
-      </t>
-    </field>
-    <field name="key">studio_report_docume_a25093bf-c19e-409c-b262-a5be41086c11</field>
-    <field name="name">studio_report_docume_a25093bf-c19e-409c-b262-a5be41086c11</field>
-        <field name="active" eval="True"/>
-    <field name="type">qweb</field>
-  </record>
-    <record id="studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <t t-name="studio_report_document">
-                <div class="page">
-                <div class="oe_structure"/>
-                </div>
-            </t>
-        </field>
-        <field name="key">studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd_document</field>
-        <field name="name">studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd_document</field>
-        <field name="active" eval="True"/>
-        <field name="type">qweb</field>
-    </record>
-    <record id="studio_main_report_2bb610c3-fd34-4aac-8dc8-ff61a7a1d68d" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <t t-name="studio_main_report">
-                <t t-foreach="docs" t-as="doc">
-                <t t-call="web.basic_layout">
-                    <t t-call="studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd_document"/>
-                    <p style="page-break-after: always;"/>
-                </t>
-                </t>
-            </t>
-        </field>
-        <field name="key">studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd</field>
-        <field name="name">studio_report_docume_c2202b4b-0f71-46ad-abf6-29353f7784bd</field>
-        <field name="active" eval="True"/>
-        <field name="type">qweb</field>
-    </record>
-    <record id="studio_report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <t t-name="studio_report_document">
-                <t t-call="web.internal_layout">
-                <div class="page">
-                    <div class="oe_structure"/>
-                </div>
-                </t>
-            </t>
-        </field>
-        <field name="key">studio_report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2_document</field>
-        <field name="name">studio_report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2_document</field>
-            <field name="active" eval="True"/>
-        <field name="type">qweb</field>
-    </record>
-    <record id="studio_main_report_9d372fcd-0318-4585-95bb-3b27f83b7085" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <t t-name="studio_main_report">
-                <t t-call="web.html_container">
-                <t t-foreach="docs" t-as="doc">
-                    <t t-call="studio_report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2_document"/>
-                </t>
-                </t>
-            </t>
-        </field>
-        <field name="key">studio_report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2</field>
-        <field name="name">studio_report_docume_96480c16-bd47-4ecd-9396-69f0e2e77ce2</field>
-            <field name="active" eval="True"/>
-        <field name="type">qweb</field>
     </record>
 
     <record id="x_wizard_generate_fiscal_attestation_form_view" model="ir.ui.view">
