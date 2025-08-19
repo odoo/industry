@@ -6,6 +6,7 @@
         'knowledge',
         'purchase',
         'sale_management',
+        'sale_subscription',
         'stock',
         'web_studio',
         'website',

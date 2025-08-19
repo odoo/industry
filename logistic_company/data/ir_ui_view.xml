@@ -67,4 +67,55 @@
             </list>
         </field>
     </record>
+    
+    <record id="default_stock_occupation_pivot_view" model="ir.ui.view">
+        <field name="name">default.stock.occupation.pivot.view</field>
+        <field name="model">sale.order.line</field>
+        <field name="type">pivot</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <pivot string="Stock Occupation">
+                <field name="product_uom_qty" type="measure"/>
+                <field name="product_id" type="col"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="default_stock_occupation_list_view" model="ir.ui.view">
+        <field name="name">default.stock.occupation.list.view</field>
+        <field name="model">sale.order.line</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list>
+                <field name="subscription_start_date"/>
+                <field name="subscription_end_date"/>
+                <field name="order_partner_id"/>
+                <field name="name"/>
+                <field name="product_uom_qty"/>
+                <field name="product_uom_id"/>
+            </list>
+        </field>
+    </record>
+    <record id="extension_stock_occupation_search_view" model="ir.ui.view">
+        <field name="name">extension.stock.occupation.search.view</field>
+        <field name="model">sale.order.line</field>
+        <field name="type">search</field>
+        <field name="mode">extension</field>
+        <field name="inherit_id" ref="sale.view_sales_order_line_filter"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='salesman_id']" position="after">
+                    <field name="subscription_start_date" filter_domain="['&amp;', ('subscription_start_date', '&lt;=', self), ('subscription_end_date', '>=', self)]"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="action_window_stock_occupation_list_view" model="ir.actions.act_window">
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('logistic_company.default_stock_occupation_list_view')}),
+            (0, 0, {'view_mode': 'pivot', 'view_id': ref('logistic_company.default_stock_occupation_pivot_view')}),
+        ]"/>
+    </record>
  </odoo>
