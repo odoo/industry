@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server saas~18.2+e\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-14 12:55+0000\n"
-"PO-Revision-Date: 2025-08-18 23:10+0000\n"
+"PO-Revision-Date: 2025-08-19 14:34+0000\n"
 "Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
 "Language-Team: Polish <https://translate.odoo.com/projects/odoo-s18-4/"
 "bike_shop/pl/>\n"
@@ -72,6 +72,10 @@ msgid ""
 "                                            support team is always ready to assist, ensuring you\n"
 "                                            have a smooth and successful experience.<br/>"
 msgstr ""
+"<br/> Zadowolenie klientów jest dla nas najważniejsze. Nasz\n"
+"                                            zespół wsparcia jest zawsze "
+"gotowy do pomocy, zapewniając\n"
+"                                            płynną i skuteczną obsługę.<br/>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
@@ -79,6 +83,8 @@ msgid ""
 "<br/> Your expert partner for premium bikes, electric\n"
 "                                            rides, and professional servicing."
 msgstr ""
+"<br/> Twój partner w zakresie rowerów premium, pojazdów elektrycznych\n"
+"                                            i profesjonalnego serwisu.."
 
 #. module: bike_shop
 #: model:mail.template,body_html:bike_shop.mail_template_warranty_claim
@@ -126,6 +132,61 @@ msgid ""
 "            <t t-out=\"object.company_id.name\"/> \n"
 "            </div> "
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\" data-oe-version=\"1.0\"> \n"
+"            <p style=\"box-sizing:border-box;margin: 0px; padding: 0px; font-"
+"size: 12px;\"> \n"
+"            Dear <span style=\"font-weight:bold;\" t-out=\""
+"object.partner_id.name or ''\"/>,<br/>\n"
+"            <br/> \n"
+"            Składamy reklamację gwarancyjną w imieniu klienta.\n"
+"            </p><ul>\n"
+"                <t t-if="
+"\"object.properties and object.properties.get('order_line_id')\">\n"
+"                    <t t-set=\"order_line\" t-value="
+"\"env['sale.order.line'].browse(object.properties['order_line_id'])\"/>\n"
+"                    <li>\n"
+"                        Imię i nazwisko klienta: <t t-out="
+"\"order_line.order_id.partner_id.display_name or 'N/A'\"/>\n"
+"                    </li>\n"
+"                </t>\n"
+"                <t t-if="
+"\"object.properties and object.properties.get('task_id')\">\n"
+"                    <t t-set=\"task\" t-value="
+"\"env['project.task'].browse(object.properties['task_id'])\"/>\n"
+"                    <t t-if="
+"\"task.task_properties and task.task_properties.get('serial_number_id')\">\n"
+"                        <t t-set=\"serial\" t-value="
+"\"env['stock.lot'].browse(task.task_properties['serial_number_id'])\"/>\n"
+"\n"
+"                        <t t-set=\"move_lines\" t-value="
+"\"env['stock.move.line'].search([('lot_id', '=', serial.id)])\"/>\n"
+"                        <t t-set=\"sale_date\" t-value=\"False\"/>\n"
+"                        <t t-foreach=\"move_lines\" t-as=\"ml\">\n"
+"                            <t t-if=\"ml.move_id.sale_line_id\">\n"
+"                                <t t-set=\"sale_date\" t-value="
+"\"ml.move_id.sale_line_id.order_id.date_order\"/>\n"
+"                                <t t-break=\"True\"/>\n"
+"                            </t>\n"
+"                        </t>\n"
+"                        <li>\n"
+"                            Numer seryjny: <t t-out=\"serial.name or 'N/A'\""
+"/>\n"
+"                        </li>\n"
+"                        <li t-if=\"sale_date\">\n"
+"                            Data zakupu: <t t-out="
+"\"format_date(sale_date) if sale_date else 'N/A'\"/>\n"
+"                        </li>\n"
+"                    </t>\n"
+"                </t>\n"
+"            </ul>\n"
+"            Opis problemu: <t t-out=\"object.description\"/>\n"
+"            <br/>\n"
+"            W załączniku znajdują się zdjęcia defektu.<br/>\n"
+"            <br/>\n"
+"            Dziękujemy, <br/>\n"
+"            <t t-out=\"object.user_id.display_name\"/> <br/>\n"
+"            <t t-out=\"object.company_id.name\"/> \n"
+"            </div> "
 
 #. module: bike_shop
 #: model:mail.template,body_html:bike_shop.mail_template_order_ready
@@ -147,6 +208,27 @@ msgid ""
 "    </t>\n"
 "    </p></div>"
 msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\" data-oe-version=\"1.0\"> \n"
+"    <p style=\"box-sizing:border-box;margin: 0px; padding: 0px; font-size: "
+"12px;\"> \n"
+"    Dzień dobry <span style=\"font-weight:bold;\" t-out=\""
+"object.partner_id.display_name or ''\"/>,<br/>\n"
+"    <br/> \n"
+"    Twoje zamówienie <span style=\"font-weight:bold;\" t-out=\"object.name "
+"or ''\"/> jest gotowe.\n"
+"    <br/>\n"
+"    .Możesz je odebrać w naszym sklepie w dogodnym czasie.\n"
+"    <br/>\n"
+"    Dziękujemy za cierpliwość i zaufanie!<br/>\n"
+"    <br/> \n"
+"    W razie jakichkolwiek pytań, nie wahaj się z nami skontaktować. <br/>\n"
+"    <br/>\n"
+"    <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-mail-"
+"quote-container=\"1\">\n"
+"        <span style=\"font-weight:bold;\" t-out=\"object.user_id.signature\""
+"/>\n"
+"    </t>\n"
+"    </p></div>"
 
 #. module: bike_shop
 #: model_terms:product.template,out_of_stock_message:bike_shop.product_template_13
@@ -154,6 +236,12 @@ msgid ""
 "<em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em>This product is currently out of stock. Please check back soon or contact us for\n"
 "            availability.</em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em><br>"
 msgstr ""
+"<em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em><em>Ten "
+"produkt jest obecnie niedostępny. Sprawdź ponownie wkrótce lub skontaktuj "
+"się z nami,\n"
+"            aby uzyskać informacje o "
+"dostępności.</em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em></em><br>"
+""
 
 #. module: bike_shop
 #: model_terms:product.template,out_of_stock_message:bike_shop.product_template_11
@@ -162,6 +250,10 @@ msgid ""
 "<em><em><em><em><em><em><em><em><em><em>This product is currently out of stock. Please check back soon or contact us for\n"
 "            availability.</em></em></em></em></em></em></em></em></em></em><br>"
 msgstr ""
+"<em><em><em><em><em><em><em><em><em><em>Ten produkt jest obecnie "
+"niedostępny. Sprawdź ponownie wkrótce lub skontaktuj się z nami,\n"
+"            aby uzyskać informacje o "
+"dostępności.</em></em></em></em></em></em></em></em></em></em><br>"
 
 #. module: bike_shop
 #: model_terms:product.template,out_of_stock_message:bike_shop.product_template_10
@@ -170,6 +262,9 @@ msgid ""
 "Please check back soon or contact us for "
 "availability.</em></em></em></em></em></em></em></em>"
 msgstr ""
+"<em><em><em><em><em><em><em><em>Ten produkt jest obecnie niedostępny. "
+"Sprawdź ponownie wkrótce lub skontaktuj się z nami, aby uzyskać informacje o "
+"dostępności.</em></em></em></em></em></em></em></em>"
 
 #. module: bike_shop
 #: model_terms:product.template,out_of_stock_message:bike_shop.product_template_9
@@ -177,6 +272,8 @@ msgid ""
 "<em><em>This product is currently out of stock. Please check back soon or "
 "contact us for availability.</em></em>"
 msgstr ""
+"<em><em>Ten produkt jest obecnie niedostępny. Sprawdź ponownie wkrótce lub "
+"skontaktuj się z nami, aby uzyskać informacje o dostępności.</em></em>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -184,6 +281,8 @@ msgid ""
 "<i class=\"fa fa-1x fa-fw fa-envelope me-2\"/>\n"
 "                                                info@yourcompany.example.com"
 msgstr ""
+"<i class=\"fa fa-1x fa-fw fa-envelope me-2\"/>\n"
+"                                                info@twojafirma.naprzyklad.pl"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -192,6 +291,10 @@ msgid ""
 "                                                <span class=\"o_force_ltr\">3575 Fake Buena Vista\n"
 "                                                    Avenue</span>"
 msgstr ""
+"<i class=\"fa fa-map-marker fa-fw me-2\"/>\n"
+"                                                <span class=\"o_force_ltr\""
+">3575 Fake Buena Vista\n"
+"                                                    Avenue</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -199,6 +302,9 @@ msgid ""
 "<i class=\"fa fa-phone fa-fw me-2\"/>\n"
 "                                                <span class=\"o_force_ltr\">+1 555-555-5556</span>"
 msgstr ""
+"<i class=\"fa fa-phone fa-fw me-2\"/>\n"
+"                                                <span class=\"o_force_ltr\">+"
+"48 555-555-555</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -206,6 +312,8 @@ msgid ""
 "<i class=\"o_editor_banner_icon mb-3 fst-normal\" data-oe-aria-"
 "label=\"Banner Info\">✅</i>"
 msgstr ""
+"<i class=\"o_editor_banner_icon mb-3 fst-normal\" data-oe-aria-label="
+"\"Banner Informacyjny\">✅</i>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -252,6 +360,12 @@ msgid ""
 "                </strong>\n"
 "            </span>"
 msgstr ""
+"<span class=\"display-4-fs\">\n"
+"                <strong>\n"
+"                    <font class=\"text-800\"><span class=\"h1-fs\">Przypadek "
+"użycia</span></font>\n"
+"                </strong>\n"
+"            </span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -270,6 +384,9 @@ msgid ""
 "                                                <strong>Honest &amp;amp; Transparent Pricing</strong>\n"
 "                                            </span>"
 msgstr ""
+"<span class=\"h5-fs\">\n"
+"<strong>Uczciwe i przejrzyste ceny</strong>\n"
+"</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
@@ -278,6 +395,10 @@ msgid ""
 "                                                <strong>Rider-Focused Service</strong>\n"
 "                                            </span>"
 msgstr ""
+"<span class=\"h5-fs\">\n"
+"                                                <strong>Usługi zorientowane "
+"na klienta</strong>\n"
+"                                            </span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
@@ -286,6 +407,10 @@ msgid ""
 "                                                <strong>Skilled Technicians</strong>\n"
 "                                            </span>"
 msgstr ""
+"<span class=\"h5-fs\">\n"
+"                                                <strong>Wykwalifikowani "
+"technicy</strong>\n"
+"                                            </span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
@@ -294,6 +419,10 @@ msgid ""
 "                                                <strong>Sustainable Practices</strong>\n"
 "                                            </span>"
 msgstr ""
+"<span class=\"h5-fs\">\n"
+"                                                <strong>Zrównoważone "
+"praktyki</strong>\n"
+"                                            </span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -301,6 +430,9 @@ msgid ""
 "<span class=\"s_website_form_label_content\">\n"
 "                                                                    Company</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">\n"
+"                                                                    "
+"Firma</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -309,6 +441,11 @@ msgid ""
 "                                                                    Email</span>\n"
 "                                                                <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">\n"
+"                                                                    Adres "
+"e-mail</span>\n"
+"                                                                <span class="
+"\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -317,6 +454,11 @@ msgid ""
 "                                                                    Name</span>\n"
 "                                                                <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">\n"
+"                                                                    "
+"Imię</span>\n"
+"                                                                <span class="
+"\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -325,6 +467,11 @@ msgid ""
 "                                                                    Question</span>\n"
 "                                                                <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">\n"
+"                                                                    "
+"Pytanie</span>\n"
+"                                                                <span class="
+"\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -333,6 +480,11 @@ msgid ""
 "                                                                    Subject</span>\n"
 "                                                                <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">\n"
+"                                                                    "
+"Temat</span>\n"
+"                                                                <span class="
+"\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -340,6 +492,8 @@ msgid ""
 "<span class=\"s_website_form_label_content\">\n"
 "                                                        Attachment</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">\n"
+"                                                        Załącznik</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -347,6 +501,8 @@ msgid ""
 "<span class=\"s_website_form_label_content\">Ask\n"
 "                                                        Your Question</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">Zadaj\n"
+"                                                        pytanie</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -354,6 +510,8 @@ msgid ""
 "<span class=\"s_website_form_label_content\">Bike\n"
 "                                                        Model</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">Model\n"
+"                                                        roweru</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -361,6 +519,9 @@ msgid ""
 "<span class=\"s_website_form_label_content\">Email\n"
 "                                                                        To</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">E-mail\n"
+"                                                                        "
+"do</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -369,6 +530,10 @@ msgid ""
 "                                                        Address</span>\n"
 "                                                    <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">Adres\n"
+"                                                        e-mail</span>\n"
+"                                                    <span class="
+"\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -377,6 +542,10 @@ msgid ""
 "                                                        Name</span>\n"
 "                                                    <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">Imię\n"
+"                                                        i nazwisko</span>\n"
+"                                                    <span class="
+"\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -384,6 +553,8 @@ msgid ""
 "<span class=\"s_website_form_label_content\">Helpdesk\n"
 "                                                        Team</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">Zespół\n"
+"                                                        Helpdesk</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -392,6 +563,10 @@ msgid ""
 "                                                        Subject</span>\n"
 "                                                    <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">Temat\n"
+"                                                        wiadomości</span>\n"
+"                                                    <span class="
+"\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -399,6 +574,9 @@ msgid ""
 "<span class=\"s_website_form_label_content\">Phone\n"
 "                                                                    Number</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">Numer\n"
+"                                                                    "
+"telefonu</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -407,6 +585,10 @@ msgid ""
 "                                                        Number</span>\n"
 "                                                    <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">Numer\n"
+"                                                        telefonu</span>\n"
+"                                                    <span class="
+"\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -414,6 +596,8 @@ msgid ""
 "<span class=\"s_website_form_label_content\">Purchase\n"
 "                                                        date</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">Data\n"
+"                                                        zakupu</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -422,6 +606,10 @@ msgid ""
 "                                                        Number</span>\n"
 "                                                    <span class=\"s_website_form_mark\"> *</span>"
 msgstr ""
+"<span class=\"s_website_form_label_content\">Numer\n"
+"                                                        seryjny</span>\n"
+"                                                    <span class="
+"\"s_website_form_mark\"> *</span>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -431,6 +619,11 @@ msgid ""
 "            </strong>\n"
 "            <br/>"
 msgstr ""
+"<strong>\n"
+"                <strong><span class=\"display-4-fs\">Sklep "
+"rowerowy</span></strong>\n"
+"            </strong>\n"
+"            <br/>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -439,11 +632,14 @@ msgid ""
 "delivery delays and organize procurement planning accordingly (e.g., 5-day "
 "lead time for imported suspension forks)."
 msgstr ""
+"<strong>Dodaj czasy realizacji</strong> do każdego produktu, aby przewidzieć "
+"opóźnienia w dostawie i organizować planowanie zaopatrzenia(np. 5-dniowy "
+"czas realizacji na importowane haki do podwieszania)."
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
 msgid "<strong>Automated Reordering</strong>"
-msgstr ""
+msgstr "<strong>Zautomatyzowane zamawianie</strong>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -452,11 +648,14 @@ msgid ""
 "<strong>\"Warranty\" box</strong> on the Workshop task to reflect whether "
 "the repair is covered."
 msgstr ""
+"<strong>Na podstawie odpowiedzi marki</strong>, zaznacz lub odznacz pole "
+"<strong>\"Gwarancja\"</strong> w zadaniu warsztatu, aby odzwierciedlić, czy "
+"naprawa jest objęta gwarancją."
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "<strong>Common Repairs We Offer</strong>"
-msgstr ""
+msgstr "<strong>Typowe naprawy, które oferujemy</strong>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -465,6 +664,10 @@ msgid ""
 "such as helmets, locks, or lights by configuring them as <strong>optional "
 "products</strong>, which appear during checkout to encourage upselling."
 msgstr ""
+"<strong>Skonfiguruj produkty opcjonalne: </strong>Zaproponuj odpowiednie "
+"akcesoria, takie jak kaski, zamki lub światła, konfigurując je jako "
+"<strong>produkty opcjonalne</strong>, które pojawiają się podczas realizacji "
+"transakcji, aby zachęcić do dodatkowej sprzedaży."
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -472,6 +675,8 @@ msgid ""
 "<strong>Create a Sales Order</strong> for a maintenance or specific repair "
 "directly from the Sales app."
 msgstr ""
+"<strong>Stwórz zamówienie sprzedaży</strong> dla zadania konserwacyjnego lub "
+"konkretnej naprawy z aplikacji Sprzedaż."
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -479,6 +684,11 @@ msgid ""
 "<strong>Create a ticket</strong> to verify the warranty. You can also <strong>automate ticket creation</strong> by sharing the email alias (e.g. warranties@bike-shop.odoo.com); when clients send an email, a ticket is created\n"
 "                        automatically."
 msgstr ""
+"<strong>Utwórz zgłoszenie</strong> aby zweryfikować gwarancję. Możesz "
+"również <strong>zautomatyzować tworzenie zgłoszeń</strong> , udostępniając "
+"alias adresu e-mail (np. gwarancje@sklep-rowerowy.odoo.com); gdy klienci "
+"wyślą wiadomość e-mail, zgłoszenie zostanie utworzone\n"
+"                        automatycznie."
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -486,6 +696,15 @@ msgid ""
 "<strong>Customize customer notifications</strong>: Personalize the <strong>\"Order Ready\"</strong> email by enabling <strong>Debug Mode</strong>, navigating to <em>Email Templates</em>, and editing\n"
 "                    <strong>\"Sales Order: Order Ready\"</strong>. You can also configure automated messages via <strong>SMS</strong> and <strong>WhatsApp</strong> using Odoo’s marketing automation and messaging integrations"
 msgstr ""
+"<strong>Dostosuj powiadomienia dla klientów</strong>: spersonalizuj "
+"wiadomość e-mail <strong>\"Zamówienie gotowe\"</strong>, włączając "
+"<strong>tryb debugowania</strong>, przechodząc do <em>Szablony wiadomości "
+"e-mail</em> i edytując\n"
+"                                       <strong>"
+"\"Zamówienie sprzedaży: Zamówienie gotowe\"</strong>. Możesz również "
+"skonfigurować automatyczne wiadomości za pośrednictwem <strong>SMS-ów</"
+"strong> i <strong>WhatsApp</strong> przy użyciu integracji Odoo z "
+"automatyzacją marketingu i komunikacją."
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -521,11 +740,13 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
 msgid "<strong>Handle warranty cases through the Helpdesk app:</strong>"
 msgstr ""
+"<strong>Obsługuj zgłoszenia gwarancyjne za pośrednictwem aplikacji "
+"Helpdesk:</strong>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
 msgid "<strong>Inventory &amp; Stock Replenishment</strong>"
-msgstr ""
+msgstr "<strong>Uzupełnianie zapasów magazynowych</strong>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -533,21 +754,27 @@ msgid ""
 "<strong>Link the ticket</strong> to the related <strong>Sales Order Line</strong> and the matching <strong>Workshop task</strong> (e.g. repair on the client’s Cube bike). Move the ticket to the\n"
 "                        <strong>“Sent to Brand”</strong> column and use an <strong>Email Template</strong> to contact the brand for warranty confirmation."
 msgstr ""
+"<strong>Połącz zgłoszenie</strong> a powiązanym <strong>wierszem zamówienia "
+"sprzedaży</strong> oraz odpowiednim <strong>zadaniem Warsztatu</strong> (np. "
+"naprawa roweru Cube). Przenieś zgłoszenie do kolumny\n"
+"                        <strong>“Wysłane do marki”</strong> i skorzystaj z "
+"<strong>szablonu email</strong>, aby skontaktować się z marką w celu "
+"potwierdzenia gwarancji."
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
 msgid "<strong>Manage Orders via the Sales App</strong>"
-msgstr ""
+msgstr "<strong>Zarządzaj zamówieniami za pomocą aplikacji Sprzedaż</strong>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
 msgid "<strong>Managing Orders</strong><br/>"
-msgstr ""
+msgstr "<strong>Zarządzanie zamówieniami</strong><br/>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
 msgid "<strong>Manual Purchase Orders</strong>"
-msgstr ""
+msgstr "<strong>Ręczne zamówienie zakupu</strong>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -555,6 +782,8 @@ msgid ""
 "<strong>Odoo creates tasks automatically</strong> in the Workshop (Field "
 "Service app)."
 msgstr ""
+"<strong>Odoo automatycznie tworzy zadania</strong> w Warsztacie (aplikacja "
+"Usługi Terenowe)."
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -566,7 +795,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
 msgid "<strong>Repair and Maintenance Workflow</strong><br/>"
-msgstr ""
+msgstr "<strong>Procesy naprawy i konserwacji</strong><br/>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -578,12 +807,12 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
 msgid "<strong>Selling Bikes and Accessories In-Store</strong>"
-msgstr ""
+msgstr "<strong>Sprzedaż rowerów i akcesoriów w sklepie</strong>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
 msgid "<strong>Selling Bikes via the eCommerce</strong>"
-msgstr ""
+msgstr "<strong>Sprzedaż rowerów przy pomocy eCommerce</strong>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -605,16 +834,21 @@ msgid ""
 "<strong>Track and invoice parts added during repair</strong>: Using the <strong>Field Service</strong> project, you can log extra parts used during the repair. These parts are added to the Sales Order and invoiced when the\n"
 "                    customer collects their bike."
 msgstr ""
+"<strong>Śledzenie i fakturowanie części dodanych podczas naprawy</strong>: "
+"Korzystając z projektu <strong>Serwis terenowy</strong>, możesz rejestrować "
+"dodatkowe części użyte podczas naprawy. Części te są dodawane do zamówienia "
+"sprzedaży i fakturowane, gdy\n"
+"                    klient odbiera rower."
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "<strong>Typical Repair Fees</strong>"
-msgstr ""
+msgstr "<strong>Standardowe opłaty za naprawę</strong>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "<strong>What’s Included in the Maintenance Package?</strong>"
-msgstr ""
+msgstr "<strong>Co obejmuje pakiet konserwacji?</strong>"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -632,7 +866,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "A motorcycle parked on the side of a road"
-msgstr ""
+msgstr "Motocykl zaparkowany na poboczu"
 
 #. module: bike_shop
 #: model:pos.category,name:bike_shop.pos_category_5
@@ -647,6 +881,11 @@ msgid ""
 "Add products to the cart by scanning barcodes or searching manually and manage bikes with product variants (e.g. frame size, color) to keep a single product reference while tracking specific configurations for stock,\n"
 "                    pricing, and availability."
 msgstr ""
+"Dodawaj produkty do koszyka, skanując kody kreskowe lub wyszukując je "
+"ręcznie, i zarządzaj rowerami z wariantami produktów (np. rozmiar ramy, "
+"kolor), aby zachować jeden numer referencyjny produktu, jednocześnie śledząc "
+"konkretne konfiguracje pod kątem stanu magazynowego,\n"
+"                                 cen i dostępności."
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -659,11 +898,12 @@ msgstr ""
 #: model:base.automation,name:bike_shop.base_automation_turning_order_as_collectible
 msgid "After completing the last task make the order collectible"
 msgstr ""
+"Po wykonaniu ostatniego zadania ustaw zamówienie jako gotowe do odbioru."
 
 #. module: bike_shop
 #: model:survey.question,title:bike_shop.survey_question_3
 msgid "Any comments or suggestions to improve our service?"
-msgstr ""
+msgstr "Masz uwagi lub sugestie dotyczące poprawy jakości naszych usług?"
 
 #. module: bike_shop
 #: model:helpdesk.stage,name:bike_shop.helpdesk_stage_10
@@ -673,32 +913,32 @@ msgstr "Zatwierdzone"
 #. module: bike_shop
 #: model:helpdesk.stage,name:bike_shop.helpdesk_stage_9
 msgid "Awaiting Response"
-msgstr ""
+msgstr "Oczekuje na odpowiedź"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Basic Bike Maintenance&amp;nbsp;"
-msgstr ""
+msgstr "Podstawowa konserwacja roweru&amp;nbsp;"
 
 #. module: bike_shop
 #: model:product.attribute.value,name:bike_shop.product_attribute_value_14
 msgid "Beetle Blue"
-msgstr ""
+msgstr "Niebieski żuk"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Belt/chain and crankset inspection"
-msgstr ""
+msgstr "Inspekcja przerzutek i łańcucha/paska"
 
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_22
 msgid "Bike Chain – 11-Speed"
-msgstr ""
+msgstr "Łańcuch rowerowy – 11-biegowy"
 
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_18
 msgid "Bike Maintenance – Non-Electric"
-msgstr ""
+msgstr "Konserwacja roweru - Nie elektrycznego"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -706,12 +946,18 @@ msgid ""
 "Bike Shops can handle customer orders, schedule test rides, receive and track service requests, and follow up on repairs. Inventory and parts can be monitored and reordered when needed. And all customer communication and invoicing are\n"
 "            handled directly within the system, keeping everything organized and connected."
 msgstr ""
+"Sklepy rowerowe mogą obsługiwać zamówienia klientów, planować jazdy próbne, "
+"przyjmować i śledzić zgłoszenia serwisowe oraz monitorować naprawy. Zapasy i "
+"części można monitorować i zamawiać w razie potrzeby. Cała komunikacja z "
+"klientami i fakturowanie są\n"
+"obsługiwane bezpośrednio w systemie, dzięki czemu wszystko jest "
+"uporządkowane i połączone."
 
 #. module: bike_shop
 #: model:appointment.type,name:bike_shop.appointment_type_1
 #: model:website.menu,name:bike_shop.website_menu_9
 msgid "Bike Testing"
-msgstr ""
+msgstr "Testowanie roweru"
 
 #. module: bike_shop
 #: model:helpdesk.stage,legend_blocked:bike_shop.helpdesk_stage_10
@@ -726,22 +972,22 @@ msgstr "Zablokowane"
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_21
 msgid "Brake Pads – Shimano Resin"
-msgstr ""
+msgstr "Klocki hamulcowe – żywica Shimano"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Brake adjustment: from €15"
-msgstr ""
+msgstr "Korekcja hamulców: od 15€"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Brake check, cleaning, and adjustment"
-msgstr ""
+msgstr "Kontrola hamulców, czyszczenie i dostosowanie"
 
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_11
 msgid "Brompton C Line Explore"
-msgstr ""
+msgstr "Brompton C Line Explore"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -755,22 +1001,22 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:product.template,description:bike_shop.product_template_11
 msgid "CEXP-6S"
-msgstr ""
+msgstr "CEXP-6S"
 
 #. module: bike_shop
 #: model_terms:product.template,description:bike_shop.product_template_9
 msgid "CRP-2023"
-msgstr ""
+msgstr "CRP-2023"
 
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_13
 msgid "Canyon Neuron AL 6"
-msgstr ""
+msgstr "Canyon Neuron AL 6"
 
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_10
 msgid "Canyon Roadlite 7 "
-msgstr ""
+msgstr "Canyon Roadlite 7 "
 
 #. module: bike_shop
 #: model:pos.payment.method,name:bike_shop.pos_payment_method_2
@@ -781,18 +1027,19 @@ msgstr "Karta"
 #: model:pos.category,name:bike_shop.pos_category_7
 #: model:product.public.category,name:bike_shop.product_public_category_7
 #: model:product.tag,name:bike_shop.product_tag_7
+#, fuzzy
 msgid "Cargo"
-msgstr ""
+msgstr "Cargo"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Cargo / Speed Pedelec Maintenance"
-msgstr ""
+msgstr "Konserwacja rowerów Cargo / Speed Pedelec"
 
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_20
 msgid "Cargo or Speed Pedelec Maintenance"
-msgstr ""
+msgstr "Konserwacja rowerów Cargo lub Speed Pedelec"
 
 #. module: bike_shop
 #: model:pos.payment.method,name:bike_shop.pos_payment_method_1
@@ -807,7 +1054,7 @@ msgstr "Zamknij"
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Cockpit (handlebar and stem) alignment"
-msgstr ""
+msgstr "Wyrównanie kokpitu (kierownicy i mostka)"
 
 #. module: bike_shop
 #: model:ir.model.fields,field_description:bike_shop.worksheet_template_ir_model_fields_7
@@ -818,6 +1065,8 @@ msgstr "Komentarz"
 #: model_terms:product.template,description_ecommerce:bike_shop.product_template_11
 msgid "Compact 6-speed folding bike designed for city commuters."
 msgstr ""
+"Kompaktowy, 6-biegowy rower składany przeznaczony dla osób dojeżdżających do "
+"pracy w mieście."
 
 #. module: bike_shop
 #: model_terms:product.template,description_ecommerce:bike_shop.product_template_26
@@ -831,6 +1080,8 @@ msgstr ""
 msgid ""
 "Compatible with most Shimano calipers. Quiet, effective stopping power."
 msgstr ""
+"Kompatybilny z większością zacisków Shimano. Cicha i skuteczna siła "
+"hamowania."
 
 #. module: bike_shop
 #: model_terms:product.template,description:bike_shop.product_template_18
@@ -865,12 +1116,12 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
 msgid "Confirm the Sales Order to trigger the appropriate actions:"
-msgstr ""
+msgstr "Potwierdź zamówienie sprzedaży, aby uruchomić odpowiednie działania:"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Consumables and environmental contribution included"
-msgstr ""
+msgstr "Materiały eksploatacyjne i wpływ na środowisko wliczone w cenę"
 
 #. module: bike_shop
 #: model:website.menu,name:bike_shop.website_menu_10
@@ -909,12 +1160,13 @@ msgstr "Data utworzenia"
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_12
 msgid "Cube Kathmandu Hybrid"
-msgstr ""
+msgstr "Cube Kathmandu Hybrid"
 
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_9
+#, fuzzy
 msgid "Cube Reaction Pro "
-msgstr ""
+msgstr "Cube Reaction Pro "
 
 #. module: bike_shop
 #: model:pos.payment.method,name:bike_shop.pos_payment_method_3
@@ -924,7 +1176,7 @@ msgstr "Konto klienta"
 #. module: bike_shop
 #: model:hr.job,name:bike_shop.hr_job_2
 msgid "Customer Advisor"
-msgstr ""
+msgstr "Doradca klienta"
 
 #. module: bike_shop
 #: model:ir.model.fields,field_description:bike_shop.worksheet_template_ir_model_fields_14
@@ -935,14 +1187,14 @@ msgstr "Data"
 #. module: bike_shop
 #: model:helpdesk.stage,name:bike_shop.helpdesk_stage_11
 msgid "Denied"
-msgstr ""
+msgstr "Odrzucone"
 
 #. module: bike_shop
 #: model:ir.model.fields,field_description:bike_shop.worksheet_template_ir_model_fields_10
 #: model_terms:ir.ui.view,arch_db:bike_shop.report_custom_worksheet_template
 #: model_terms:ir.ui.view,arch_db:bike_shop.x_project_task_worksheet_template_ir_ui_view_1
 msgid "Description of the work done"
-msgstr ""
+msgstr "Opis wykonanej pracy"
 
 #. module: bike_shop
 #: model:ir.model,name:bike_shop.x_worksheet_template_model
@@ -957,23 +1209,27 @@ msgstr "Odkryj więcej na temat Odoo, sprawdź co kryje nasza"
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Drivetrain and gear cleaning and tuning"
-msgstr ""
+msgstr "Czyszczenie i regulacja układu napędowego i przekładni"
 
 #. module: bike_shop
 #: model_terms:product.template,description:bike_shop.product_template_22
 msgid ""
 "Durable 11-speed chain with quick-link. Ideal for road and gravel bikes."
 msgstr ""
+"Wytrzymały 11-biegowy łańcuch z szybkozłączką. Idealny do rowerów szosowych "
+"i gravelowych."
 
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_19
 msgid "E-Bike / Brompton Maintenance "
-msgstr ""
+msgstr "E-Rower / Brompton konserwacja "
 
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_25
 msgid "E-Bike Battery Diagnostic + Firmware Update "
 msgstr ""
+"Diagnostyka akumulatora roweru elektrycznego + aktualizacja oprogramowania "
+"sprzętowego "
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
@@ -994,6 +1250,8 @@ msgid ""
 "Electrical components check and software updates (if\n"
 "                                        applicable)"
 msgstr ""
+"Sprawdzenie elementów elektrycznych i aktualizacja oprogramowania (jeśli\n"
+"                                             dotyczy)"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1013,7 +1271,7 @@ msgstr ""
 #. module: bike_shop
 #: model:product.attribute.value,name:bike_shop.product_attribute_value_13
 msgid "Fairphone 5"
-msgstr ""
+msgstr "Fairphone 5"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -1026,7 +1284,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Flat tire repair: from €10"
-msgstr ""
+msgstr "Naprawa przebitej opony: od 10 €"
 
 #. module: bike_shop
 #: model:pos.category,name:bike_shop.pos_category_3
@@ -1066,21 +1324,32 @@ msgid ""
 "                                            cleaning or a wheel truing? We’ve got\n"
 "                                            you covered."
 msgstr ""
+"Od naprawy przebitej opony po regulację przerzutek lub\n"
+"                                            wymianę zużytych klocków "
+"hamulcowych – szybko i niezawodnie zajmujemy się\n"
+"                                            wszystkimi typowymi problemami z "
+"rowerem. Potrzebujesz pełnego czyszczenia\n"
+"                                            układu napędowego lub "
+"wycentrowania kół? Zajmiemy\n"
+"                                            się tym."
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Full bike safety inspection"
-msgstr ""
+msgstr "Pełna inspekcja bezpieczeństwa roweru"
 
 #. module: bike_shop
 #: model_terms:product.template,description_ecommerce:bike_shop.product_template_13
 msgid "Full-suspension trail bike for weekend explorers and alpine routes."
 msgstr ""
+"Rower szlakowy z pełnym zawieszeniem dla weekendowych odkrywców i tras "
+"alpejskich."
 
 #. module: bike_shop
 #: model_terms:product.template,description:bike_shop.product_template_26
+#, fuzzy
 msgid "GSD S10 LX"
-msgstr ""
+msgstr "GSD S10 LX"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1108,7 +1377,7 @@ msgstr ""
 #. module: bike_shop
 #: model:mail.template,name:bike_shop.mail_template_warranty_claim
 msgid "Helpdesk: Warranty Claim"
-msgstr ""
+msgstr "Helpdesk: Reklamacja gwarancyjna"
 
 #. module: bike_shop
 #: model:website.menu,name:bike_shop.website_menu_5
@@ -1118,12 +1387,12 @@ msgstr "Dom"
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Hourly rate for repairs: €50/hour"
-msgstr ""
+msgstr "Stawka godzinowa za naprawy: 50 € / godzina"
 
 #. module: bike_shop
 #: model:survey.question,title:bike_shop.survey_question_1
 msgid "How satisfied were you with your recent bike maintenance service?"
-msgstr ""
+msgstr "Jak bardzo jesteś zadowolony z ostatniego serwisu rowerowego?"
 
 #. module: bike_shop
 #: model:ir.model.fields,field_description:bike_shop.worksheet_template_ir_model_fields_12
@@ -1172,7 +1441,7 @@ msgstr ""
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_24
 msgid "Inner Tube – 700x25 Presta Valve"
-msgstr ""
+msgstr "Dętka – 700 x 25, zawór Presta"
 
 #. module: bike_shop
 #: model:ir.model.fields,field_description:bike_shop.worksheet_template_ir_model_fields_15
@@ -1183,12 +1452,12 @@ msgstr "Typ interwencji"
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
 msgid "Inventory levels update automatically after each sale."
-msgstr ""
+msgstr "Poziomy zapasów są aktualizowane automatycznie po każdej sprzedaży."
 
 #. module: bike_shop
 #: model:ir.model.fields,field_description:bike_shop.field_project_task_collectible
 msgid "Is order collectible"
-msgstr ""
+msgstr "Zamówienie do odebrania"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1211,11 +1480,20 @@ msgid ""
 "                                    fast, and fun</strong>. We service all types of bikes with care\n"
 "                                    and precision."
 msgstr ""
+"Dbaj o sprawne działanie swojego roweru dzięki naszym profesjonalnym usługom "
+"naprawczym i\n"
+"                                    konserwacyjnym. Niezależnie od tego, czy "
+"potrzebujesz szybkiego <strong>przeglądu, czy\n"
+"                                    kompleksowego remontu</strong>, nasi "
+"doświadczeni mechanicy zapewnią Ci <strong>bezpieczną,\n"
+"                                    szybką i przyjemną jazdę</strong>. "
+"Serwisujemy wszystkie rodzaje rowerów, dbając o\n"
+"                                    najmniejsze szczegóły."
 
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_16
 msgid "LED Light Set"
-msgstr ""
+msgstr "Zestaw świateł LED"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1228,7 +1506,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Lighting system check"
-msgstr ""
+msgstr "Kontrola systemu oświetlenia"
 
 #. module: bike_shop
 #: model_terms:product.template,description:bike_shop.product_template_24
@@ -1239,7 +1517,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:product.template,description_ecommerce:bike_shop.product_template_9
 msgid "Lightweight hardtail MTB ideal for cross-country adventures."
-msgstr ""
+msgstr "Lekki rower MTB typu hardtail, idealny do przygód w terenie."
 
 #. module: bike_shop
 #: model:project.tags,name:bike_shop.project_tags_1
@@ -1249,7 +1527,7 @@ msgstr "Konserwacja"
 #. module: bike_shop
 #: model:website.menu,name:bike_shop.website_menu_8
 msgid "Maintenance & Repairs"
-msgstr ""
+msgstr "Konserwacja i naprawy"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1302,7 +1580,7 @@ msgstr "Nie"
 #. module: bike_shop
 #: model:project.tags,name:bike_shop.project_tags_2
 msgid "Non-Electric"
-msgstr ""
+msgstr "Nie elektryczne"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1347,7 +1625,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
 msgid "Open the Sales app from the main dashboard."
-msgstr ""
+msgstr "Otwórz aplikację Sprzedaż z głównego pulpitu nawigacyjnego."
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1366,7 +1644,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
 msgid "Our Brands"
-msgstr ""
+msgstr "Nasze marki"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
@@ -1378,7 +1656,7 @@ msgstr ""
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_15
 msgid "Pannier Bag 20L"
-msgstr ""
+msgstr "Torba rowerowa 20L"
 
 #. module: bike_shop
 #: model:pos.payment.method,name:bike_shop.pos_payment_method_4
@@ -1388,12 +1666,14 @@ msgstr "Pay Later"
 #. module: bike_shop
 #: model:product.attribute,name:bike_shop.product_attribute_10
 msgid "Phone model"
-msgstr ""
+msgstr "Model telefonu"
 
 #. module: bike_shop
 #: model_terms:product.template,description_ecommerce:bike_shop.product_template_12
 msgid "Powerful e-trekking bike built for long-distance comfort."
 msgstr ""
+"Mocny rower elektryczny typu e-trekking, stworzony z myślą o komforcie "
+"podczas długich tras."
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1416,7 +1696,7 @@ msgstr "Produkty "
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_17
 msgid "Quad Lock"
-msgstr ""
+msgstr "Zabezpieczenie Quad Lock"
 
 #. module: bike_shop
 #: model_terms:product.template,description:bike_shop.product_template_10
@@ -1437,7 +1717,7 @@ msgstr "Gotowe"
 #: model:ir.model.fields,field_description:bike_shop.field_sale_order_collectible
 #: model:project.task.type,name:bike_shop.project_task_type_19
 msgid "Ready for Pickup"
-msgstr ""
+msgstr "Gotowe do odbioru"
 
 #. module: bike_shop
 #: model:project.tags,name:bike_shop.project_tags_3
@@ -1447,17 +1727,17 @@ msgstr "Naprawa"
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
 msgid "Repair Smarter"
-msgstr ""
+msgstr "Naprawiaj inteligentnie"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Repairs and Maintenance"
-msgstr ""
+msgstr "Naprawy i konserwacja"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
 msgid "Ride Better,"
-msgstr ""
+msgstr "Jeździj lepiej,"
 
 #. module: bike_shop
 #: model:pos.category,name:bike_shop.pos_category_2
@@ -1469,17 +1749,17 @@ msgstr "Droga"
 #. module: bike_shop
 #: model:mail.template,name:bike_shop.mail_template_order_ready
 msgid "Sales Order: Order Ready"
-msgstr ""
+msgstr "Zamówienie sprzedaży: Zamówienie gotowe"
 
 #. module: bike_shop
 #: model:product.attribute.value,name:bike_shop.product_attribute_value_12
 msgid "Samsung Galaxy A16"
-msgstr ""
+msgstr "Samsung Galaxy A16"
 
 #. module: bike_shop
 #: model:survey.survey,title:bike_shop.survey_survey_1
 msgid "Satisfaction Survey"
-msgstr ""
+msgstr "Ankieta zadowolenia"
 
 #. module: bike_shop
 #: model:survey.question.answer,value:bike_shop.survey_question_answer_2
@@ -1517,17 +1797,17 @@ msgstr ""
 #. module: bike_shop
 #: model:ir.actions.server,name:bike_shop.action_send_email_order_ready
 msgid "Send email: Sales Order: Order Ready"
-msgstr ""
+msgstr "Wyślij e-mail: Zamówienie sprzedaży: Zamówienie gotowe"
 
 #. module: bike_shop
 #: model:hr.job,name:bike_shop.hr_job_1
 msgid "Senior Mechanic"
-msgstr ""
+msgstr "Starszy mechanik"
 
 #. module: bike_shop
 #: model:helpdesk.stage,name:bike_shop.helpdesk_stage_8
 msgid "Sent to Brand"
-msgstr ""
+msgstr "Wysłane do marki"
 
 #. module: bike_shop
 #: model:ir.model.fields,field_description:bike_shop.worksheet_template_ir_model_fields_16
@@ -1573,7 +1853,7 @@ msgstr "Sklep"
 #. module: bike_shop
 #: model:hr.job,name:bike_shop.hr_job_3
 msgid "Shop Manager"
-msgstr ""
+msgstr "Menadżer sklepu"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1581,6 +1861,8 @@ msgid ""
 "Simplify accounting and financial tracking with the <strong>Accounting "
 "App</strong>."
 msgstr ""
+"Uprość księgowość i śledzenie finansów dzięki aplikacji "
+"<strong>Księgowość</strong>."
 
 #. module: bike_shop
 #: model_terms:product.template,description_ecommerce:bike_shop.product_template_10
@@ -1590,7 +1872,7 @@ msgstr ""
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_27
 msgid "Specific Reparation"
-msgstr ""
+msgstr "Konkretna naprawa"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.contactus
@@ -1603,6 +1885,8 @@ msgid ""
 "Submit\n"
 "                                                Ticket"
 msgstr ""
+"Prześlij\n"
+"                                                zgłoszenie"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.team_form_2
@@ -1633,34 +1917,35 @@ msgstr "Technik"
 #. module: bike_shop
 #: model:ir.model.fields,field_description:bike_shop.worksheet_template_ir_model_fields_11
 msgid "Technician "
-msgstr ""
+msgstr "Technik "
 
 #. module: bike_shop
 #: model:ir.model.fields,field_description:bike_shop.worksheet_template_ir_model_fields_13
 #: model_terms:ir.ui.view,arch_db:bike_shop.report_custom_worksheet_template
 #: model_terms:ir.ui.view,arch_db:bike_shop.x_project_task_worksheet_template_ir_ui_view_1
 msgid "Technician Signature"
-msgstr ""
+msgstr "Podpis technika"
 
 #. module: bike_shop
 #: model_terms:survey.question,description:bike_shop.survey_question_3
 msgid "Tell us more about your experience or specific needs..."
 msgstr ""
+"Opowiedz nam więcej o swoich doświadczeniach lub konkretnych potrzebach..."
 
 #. module: bike_shop
 #: model:product.template,name:bike_shop.product_template_26
 msgid "Tern GSD S10 LX"
-msgstr ""
+msgstr "Tern GSD S10 LX"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Test ride to verify overall performance"
-msgstr ""
+msgstr "Jazda próbna w celu sprawdzenia ogólnej wydajności"
 
 #. module: bike_shop
 #: model_terms:survey.survey,description_done:bike_shop.survey_survey_1
 msgid "Thanks for your feedback! 😀🚲"
-msgstr ""
+msgstr "Dziękujemy za opinię! 😀🚲"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1737,6 +2022,11 @@ msgid ""
 "This module offers all the essential tools a bike shop needs to run daily operations in one place. It covers everything from selling bikes; both online through an eCommerce website and in-store with a point of sale system, to managing\n"
 "            repairs, maintenance services, and inventory."
 msgstr ""
+"Ten moduł oferuje wszystkie niezbędne narzędzia potrzebne sklepowi "
+"rowerowemu do codziennej działalności w jednym miejscu. Obejmuje wszystko, "
+"od sprzedaży rowerów, zarówno online za pośrednictwem strony internetowej "
+"eCommerce, jak i w sklepie stacjonarnym z systemem kasowym, po zarządzanie\n"
+"naprawami, usługami konserwacyjnymi i zapasami."
 
 #. module: bike_shop
 #: model_terms:survey.survey,description:bike_shop.survey_survey_1
@@ -1748,7 +2038,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Tire pressure check and inflation"
-msgstr ""
+msgstr "Sprawdzanie ciśnienia w oponach i pompowanie opon"
 
 #. module: bike_shop
 #: model:website.menu,name:bike_shop.website_menu_4
@@ -1758,12 +2048,12 @@ msgstr "Górne menu strony internetowej 1"
 #. module: bike_shop
 #: model:helpdesk.stage,name:bike_shop.helpdesk_stage_7
 msgid "Under Review"
-msgstr ""
+msgstr "Przebiega rewizja"
 
 #. module: bike_shop
 #: model:survey.question.answer,value:bike_shop.survey_question_answer_4
 msgid "Unsatisfied"
-msgstr ""
+msgstr "Niezadowolony"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1784,22 +2074,22 @@ msgstr ""
 #: model:product.public.category,name:bike_shop.product_public_category_1
 #: model:product.tag,name:bike_shop.product_tag_1
 msgid "VTT"
-msgstr ""
+msgstr "VTT"
 
 #. module: bike_shop
 #: model:survey.question.answer,value:bike_shop.survey_question_answer_1
 msgid "Very satisfied"
-msgstr ""
+msgstr "Bardzo zadowolony"
 
 #. module: bike_shop
 #: model:survey.question.answer,value:bike_shop.survey_question_answer_5
 msgid "Very unsatisfied"
-msgstr ""
+msgstr "Bardzo niezadowolony"
 
 #. module: bike_shop
 #: model:helpdesk.team,name:bike_shop.helpdesk_team_1
 msgid "Warranties / After-Sales / SAV"
-msgstr ""
+msgstr "Gwarancje / Obsługa posprzedażowa / SAV"
 
 #. module: bike_shop
 #: model:mail.template,subject:bike_shop.mail_template_warranty_claim
@@ -1811,7 +2101,7 @@ msgstr ""
 #. module: bike_shop
 #: model:survey.question,title:bike_shop.survey_question_2
 msgid "Was the service delivered on time and as expected?"
-msgstr ""
+msgstr "Czy usługa została zrealizowana na czas i zgodnie z oczekiwaniami?"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
@@ -1841,31 +2131,35 @@ msgid ""
 "Weight:\n"
 "            13.7 kg<em><em><em><em><em><em><em><em><em><em></em></em></em></em></em></em></em></em></em></em><br>"
 msgstr ""
+"Waga:\n"
+"            13.7 "
+"kg<em><em><em><em><em><em><em><em><em><em></em></em></em></em></em></em></em></em></em></em><br>"
+""
 
 #. module: bike_shop
 #: model_terms:product.template,description_ecommerce:bike_shop.product_template_12
 msgid "Weight: 25.4 kg"
-msgstr ""
+msgstr "Waga: 25.4 kg"
 
 #. module: bike_shop
 #: model_terms:product.template,description_ecommerce:bike_shop.product_template_26
 msgid "Weight: 33.2 kg"
-msgstr ""
+msgstr "Waga: 33.2 kg"
 
 #. module: bike_shop
 #: model_terms:product.template,description_ecommerce:bike_shop.product_template_10
 msgid "Weight: 10.5 kg"
-msgstr ""
+msgstr "Waga: 10.5 kg"
 
 #. module: bike_shop
 #: model_terms:product.template,description_ecommerce:bike_shop.product_template_11
 msgid "Weight: 11.8 kg"
-msgstr ""
+msgstr "Waga: 11.8 kg"
 
 #. module: bike_shop
 #: model_terms:product.template,description_ecommerce:bike_shop.product_template_9
 msgid "Weight: 12.3 kg"
-msgstr ""
+msgstr "Waga: 12.3 kg"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1877,7 +2171,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
 msgid "What matters to&amp;nbsp;us:"
-msgstr ""
+msgstr "Co jest dla nas ważne:"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
@@ -1887,7 +2181,7 @@ msgstr "Co proponujemy naszym klientom"
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "Wheel alignment and spoke tension"
-msgstr ""
+msgstr "Ustawienie kół i napięcie szprych"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1895,6 +2189,11 @@ msgid ""
 "When the customer returns to pick up the bike, open the <strong>Point of Sale (PoS) app</strong>, load the related Sales Order (quotation), and proceed with the payment. Odoo allows retrieving existing quotations in the PoS for\n"
 "                    seamless final payment processing."
 msgstr ""
+"Kiedy klient wróci po odbiór roweru, otwórz aplikację <strong>Punkt "
+"sprzedaży (PoS)</strong>, załaduj odpowiednie zamówienie sprzedaży (ofertę) "
+"i przystąp do realizacji płatności. Odoo umożliwia pobieranie istniejących "
+"ofert z PoS w celu\n"
+"                    płynnego przetworzenia płatności końcowej."
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1918,7 +2217,7 @@ msgstr "Arkusze robocze"
 #. module: bike_shop
 #: model:project.project,name:bike_shop.project_project_4
 msgid "Workshop"
-msgstr ""
+msgstr "Warsztat"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1973,7 +2272,7 @@ msgstr ""
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
 msgid "a couple of bikes tires sitting next to each other"
-msgstr ""
+msgstr "kilka opon rowerowych obok siebie"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -1993,12 +2292,12 @@ msgstr "czarny"
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "black and gray road bike"
-msgstr ""
+msgstr "czarny i szary rower szosowy"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
 msgid "black and white mountain bicycle near brown wall"
-msgstr ""
+msgstr "czarno-biały rower górski przy brązowej ścianie"
 
 #. module: bike_shop
 #: model:product.attribute.value,name:bike_shop.product_attribute_value_7
@@ -2013,7 +2312,7 @@ msgstr "dokumentacja"
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "gray fixie bike leaning on black wall"
-msgstr ""
+msgstr "szary rower typu fixie oparty o czarną ścianę"
 
 #. module: bike_shop
 #: model:product.attribute.value,name:bike_shop.product_attribute_value_5
@@ -2023,12 +2322,12 @@ msgstr "zielony"
 #. module: bike_shop
 #: model:product.attribute.value,name:bike_shop.product_attribute_value_8
 msgid "grey"
-msgstr ""
+msgstr "szary"
 
 #. module: bike_shop
 #: model:product.attribute.value,name:bike_shop.product_attribute_value_9
 msgid "iPhone 13 mini"
-msgstr ""
+msgstr "iPhone 13 mini"
 
 #. module: bike_shop
 #: model:product.attribute.value,name:bike_shop.product_attribute_value_10
@@ -2038,7 +2337,7 @@ msgstr "iPhone 14"
 #. module: bike_shop
 #: model:product.attribute.value,name:bike_shop.product_attribute_value_11
 msgid "iPhone 15 Pro"
-msgstr ""
+msgstr "iPhone 15 Pro"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -2053,12 +2352,12 @@ msgstr "duży"
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
 msgid "man in black and white helmet riding on bicycle"
-msgstr ""
+msgstr "mężczyzna w czarno-białym kasku jadący na rowerze"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
 msgid "man riding bike"
-msgstr ""
+msgstr "mężczyzna jadący na rowerze"
 
 #. module: bike_shop
 #: model:product.attribute.value,name:bike_shop.product_attribute_value_2
@@ -2073,12 +2372,12 @@ msgstr "pomarańczowy"
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
 msgid "pile of assorted-color bikes on concrete pavemenet"
-msgstr ""
+msgstr "stos rowerów w różnych kolorach na betonowym chodniku"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.repairs
 msgid "red bike beside sofa"
-msgstr ""
+msgstr "czerwony rower obok sofy"
 
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.welcome_article_body
@@ -2093,9 +2392,9 @@ msgstr "mały"
 #. module: bike_shop
 #: model_terms:ir.ui.view,arch_db:bike_shop.homepage
 msgid "yellow and black love print"
-msgstr ""
+msgstr "żółto-czarny nadruk z motywem miłości"
 
 #. module: bike_shop
 #: model_terms:product.template,description_ecommerce:bike_shop.product_template_13
 msgid "​<br>"
-msgstr ""
+msgstr "​<br>"
