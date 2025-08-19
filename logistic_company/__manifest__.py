@@ -8,6 +8,7 @@
         'sale_management',
         'stock',
         'web_studio',
+        'website',
     ],
     'data': [
         'data/res_config_settings.xml',
@@ -15,6 +16,7 @@
         'data/ir_model_access.xml',
         'data/ir_model_fields.xml',
         'data/ir_actions_act_window.xml',
+        'data/portal_templates.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
         'data/ir_ui_menu.xml',
