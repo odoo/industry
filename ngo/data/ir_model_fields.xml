@@ -88,7 +88,7 @@
         <field name="model_id" ref="x_petition_model"/>
         <field name="name">x_petition_status</field>
         <field name="on_delete" eval="False"/>
-        <field name="selection">[('status1', 'Draft'), ('status2', 'Published'), ('status3', 'Closed'), ('status4', 'Submitted')]</field>
+        <field name="selection">[('draft', 'Draft'), ('published', 'Published'), ('closed', 'Closed'), ('submitted', 'Submitted')]</field>
     </record>
     <record id="x_date_stop_field_x_petition" model="ir.model.fields">
         <field name="ttype">datetime</field>
@@ -105,21 +105,21 @@
         <field name="model_id" ref="x_petition_model"/>
         <field name="name">x_date_start</field>
         <field name="on_delete" eval="False"/>
-    </record>  
+    </record>
     <record id="x_is_published_field_x_petition" model="ir.model.fields">
         <field name="ttype">boolean</field>
         <field name="copied" eval="True"/>
         <field name="field_description">Is Published</field>
         <field name="model_id" ref="x_petition_model"/>
         <field name="name">x_is_published</field>
-    </record>  
+    </record>
     <record id="x_website_description_field_x_petition" model="ir.model.fields">
         <field name="ttype">html</field>
         <field name="copied" eval="True"/>
         <field name="field_description">Website Description</field>
         <field name="model_id" ref="x_petition_model"/>
         <field name="name">x_website_description</field>
-    </record>  
+    </record>
     <record id="x_website_url_field_x_petition" model="ir.model.fields">
         <field name="compute"><![CDATA[
 for record in self: record['x_website_url'] = '/model/petition/'+str(record.env["ir.http"]._slug(record))
@@ -163,7 +163,7 @@ for record in self: record['x_website_url'] = '/model/petition/'+str(record.env[
         <field name="relation">res.partner</field>
         <field name="tracking">1</field>
     </record>
-    
+
     <record id="x_sequence_field_x_signature" model="ir.model.fields">
         <field name="ttype">integer</field>
         <field name="copied" eval="True"/>
@@ -208,6 +208,43 @@ for record in self: record['x_website_url'] = '/model/petition/'+str(record.env[
         <field name="on_delete" eval="False"/>
     </record>
 
+    <record id="x_current_signatures_field_x_petition" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self: record['x_current_signatures'] = self.env['x_signature'].search_count([('x_petition_id', '=', record.id)])
+]]></field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Current Signatures</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_current_signatures</field>
+        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="x_progress_field_x_petition" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self:
+    if record.x_target_signatures > 0:
+        record['x_progress'] = record.x_current_signatures/record.x_target_signatures
+]]></field>
+        <field name="ttype">float</field>
+        <field name="depends">x_current_signatures, x_target_signatures</field>
+        <field name="field_description">Progress</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_progress</field>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="x_signature_count_field_res_partner" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self: record['x_x_partner_id_x_signature_count'] = self.env['x_signature'].search_count([('x_partner_id', '=', record.id)])
+]]></field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Contact count</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="name">x_x_partner_id_x_signature_count</field>
+        <field name="on_delete" eval="False"/>
+        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+    </record>
 
     <!-- x_fiscal_attestation fields -->
     <record id="x_name_field_x_fiscal_attestation" model="ir.model.fields">
@@ -294,18 +331,11 @@ for record in self: record['x_website_url'] = '/model/petition/'+str(record.env[
         <field name="field_description">State</field>
         <field name="model_id" ref="x_fiscal_attestation_model"/>
         <field name="name">x_fiscal_attestation_status</field>
-        <field name="selection">[('status2', 'Generated'), ('Sent', 'Sent'), ('Cancelled', 'Cancelled')]</field>
+        <field name="selection">[('generated', 'Generated'), ('Sent', 'Sent'), ('Cancelled', 'Cancelled')]</field>
     </record>
 
 
-
-
-
-
-
-
-    
-
+    <!-- account_payment fields -->
     <record id="x_fiscal_attestation_id_field_account_payment" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="copied" eval="True"/>
@@ -313,15 +343,6 @@ for record in self: record['x_website_url'] = '/model/petition/'+str(record.env[
         <field name="model_id" ref="account.model_account_payment"/>
         <field name="name">x_fiscal_attestation_id</field>
         <field name="relation">x_fiscal_attestation</field>
-    </record>
-    <record id="x_donation_ids_field_x_fiscal_attestation" model="ir.model.fields">
-        <field name="ttype">one2many</field>
-        <field name="field_description">Donation</field>
-        <field name="model_id" ref="x_fiscal_attestation_model"/>
-        <field name="name">x_donation_ids</field>
-        <field name="on_delete" eval="False"/>
-        <field name="relation">account.payment</field>
-        <field name="relation_field">x_fiscal_attestation_id</field>
     </record>
     <record id="x_country_name_field_account_payment" model="ir.model.fields">
         <field name="ttype">char</field>
@@ -331,48 +352,15 @@ for record in self: record['x_website_url'] = '/model/petition/'+str(record.env[
         <field name="related">partner_id.country_id.name</field>
     </record>
 
-    <record id="x_current_signatures_field_x_petition" model="ir.model.fields">
-        <field name="compute"><![CDATA[
-for record in self: record['x_current_signatures'] = self.env['x_signature'].search_count([('x_petition_id', '=', record.id)])
-]]></field>
-        <field name="ttype">integer</field>
-        <field name="field_description">Current Signatures</field>
-        <field name="model_id" ref="x_petition_model"/>
-        <field name="name">x_current_signatures</field>
+    <record id="x_donation_ids_field_x_fiscal_attestation" model="ir.model.fields">
+        <field name="ttype">one2many</field>
+        <field name="field_description">Donation</field>
+        <field name="model_id" ref="x_fiscal_attestation_model"/>
+        <field name="name">x_donation_ids</field>
         <field name="on_delete" eval="False"/>
-        <field name="selectable" eval="False"/>
-        <field name="store" eval="False"/>
-        <field name="readonly" eval="True"/>
+        <field name="relation">account.payment</field>
+        <field name="relation_field">x_fiscal_attestation_id</field>
     </record>
-
-    <record id="x_progress_field_x_petition" model="ir.model.fields">
-        <field name="compute"><![CDATA[for record in self:
-        if record.x_target_signatures > 0:
-            record['x_progress'] = record.x_current_signatures/record.x_target_signatures]]></field>
-        <field name="ttype">float</field>
-        <field name="depends">x_current_signatures, x_target_signatures</field>
-        <field name="field_description">Progress</field>
-        <field name="model_id" ref="x_petition_model"/>
-        <field name="name">x_progress</field>
-        <field name="on_delete" eval="False"/>
-        <field name="readonly" eval="True"/>
-    </record>
-
-    <record id="x_signature_count_field_res_partner" model="ir.model.fields">
-        <field name="compute"><![CDATA[
-for record in self: record['x_x_partner_id_x_signature_count'] = self.env['x_signature'].search_count([('x_partner_id', '=', record.id)])
-]]></field>
-        <field name="ttype">integer</field>
-        <field name="field_description">Contact count</field>
-        <field name="model_id" ref="base.model_res_partner"/>
-        <field name="name">x_x_partner_id_x_signature_count</field>
-        <field name="on_delete" eval="False"/>
-        <field name="selectable" eval="False"/>
-        <field name="store" eval="False"/>
-    </record>
-
-
-
     <record id="x_account_payment_count_field_x_fiscal_attestation" model="ir.model.fields">
         <field name="compute"><![CDATA[
 for record in self: record['x_x_fiscal_attestation_id_account_payment_count'] = self.env['account.payment'].search_count([('x_fiscal_attestation_id', '=', record.ids)])
@@ -418,7 +406,8 @@ for record in self: record['x_x_fiscal_attestation_id_account_payment_count'] = 
         <field name="name">x_wizard_tax_minimum</field>
         <field name="required" eval="True"/>
     </record>
-    <record id="x_wizard_show_warning_field_x_wizard_generate_fiscal_attestation" model="ir.model.fields">
+    <record id="x_wizard_show_warning_field_x_wizard_generate_fiscal_attestation"
+        model="ir.model.fields">
         <field name="ttype">boolean</field>
         <field name="field_description">Wizard Show Warning</field>
         <field name="model_id" ref="x_wizard_generate_fiscal_attestation_model"/>
