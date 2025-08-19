@@ -18,7 +18,7 @@
         'website_event_sale',
     ],
     'data': [
-        'data/ir_attachment_pre.xml',
+        'data/ir_attachment.xml',
         'data/crm_stage.xml',
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
@@ -73,7 +73,6 @@
         'demo/survey_question.xml',
         'demo/survey_question_answer.xml',
         'demo/x_signature.xml',
-        'demo/ir_attachment_post.xml',
         'demo/sale_order_confirm.xml',
         'demo/account_payment.xml',
     ],
