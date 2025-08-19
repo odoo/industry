@@ -1,6 +1,7 @@
 {
     'name': '3PL Logistic',
     'version': '1.0',
+    'category': 'Services',
     'depends': [
         'base_industry_data',
         'knowledge',
@@ -12,6 +13,9 @@
         'website',
     ],
     'data': [
+        'data/knowledge_article.xml',
+        'data/mail_message.xml',
+        'data/knowledge_article_favorite.xml',
         'data/res_config_settings.xml',
         'data/ir_model.xml',
         'data/ir_model_access.xml',
@@ -27,5 +31,10 @@
         'demo/product_template.xml',
     ],
     'license': 'OPL-1',
+    'cloc_exclude': [
+        'data/knowledge_article.xml',
+        'data/portal_templates.xml',
+    ],
     'author': 'Odoo S.A.',
+    'images': ['images/main.png'],
 }
