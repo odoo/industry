@@ -1,5 +1,5 @@
 {
-    'name': 'Wine Merchant',
+    'name': 'Wine Shop',
     'version': '1.0',
     'category': 'Retail',
     'author': 'Odoo S.A.',
