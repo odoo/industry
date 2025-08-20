@@ -8,7 +8,7 @@
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet//field[@name='company_id']" position="after">
-                <field name="x_fee_rate_id"/>
+                <field name="x_category_fee_rate_id"/>
             </xpath>
         </field>
     </record>
@@ -21,7 +21,7 @@
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <xpath expr="//group[@name='group_general']" position="inside">
-                <field name="x_owner_id"/>
+                <field name="x_owner_id" domain="['|', ('parent_id', '!=', False), ('is_company', '!=', False)]"/>
             </xpath>
         </field>
     </record>
@@ -106,7 +106,7 @@
         <field name="arch" type="xml">
             <data>
                 <xpath expr="//field[@name='salesman_id']" position="after">
-                    <field name="subscription_start_date" filter_domain="['&amp;', ('subscription_start_date', '&lt;=', self), ('subscription_end_date', '>=', self)]"/>
+                    <field name="subscription_start_date" string="Date" filter_domain="['&amp;', ('subscription_start_date', '&lt;=', self), ('subscription_end_date', '>=', self)]"/>
                 </xpath>
             </data>
         </field>
@@ -118,4 +118,50 @@
             (0, 0, {'view_mode': 'pivot', 'view_id': ref('logistic_company.default_stock_occupation_pivot_view')}),
         ]"/>
     </record>
- </odoo>
+
+    <!-- x_stock_history fields -->
+    <record id="default_stock_history_pivot_view" model="ir.ui.view">
+        <field name="name">default.stock.history.pivot.view</field>
+        <field name="model">x_stock_history</field>
+        <field name="type">pivot</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <pivot string="Stock History">
+                <field name="x_history_owner_id" type="col"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="default_stock_history_list_view" model="ir.ui.view">
+        <field name="name">default.stock.history.list.view</field>
+        <field name="model">x_stock_history</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list>
+                <field name="x_date"/>
+                <field name="x_history_owner_id"/>
+                <field name="x_location_id"/>
+                <field name="x_history_fee_rate_id"/>
+                <field name="x_product_id"/>
+                <field name="x_package_id"/>
+                <field name="x_package_type"/>
+                <field name="x_stock_lot_id"/>
+                <field name="x_quantity"/>
+            </list>
+        </field>
+    </record>
+    <record id="default_stock_history_search_view" model="ir.ui.view">
+        <field name="name">default.stock.history.search.view</field>
+        <field name="model">x_stock_history</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <search>
+                <filter string="Current Month" name="current_month" domain="[('x_date', '>=', (context_today() + relativedelta(months=-1)))]"/>
+            </search>
+        </field>
+    </record>
+    <record id="action_window_stock_history_list_view" model="ir.actions.act_window">
+        <field name="context">{'search_default_current_month': 1, 'edit': False, 'create': False, 'delete': False, 'duplicate': False}</field>
+    </record>
+</odoo>
