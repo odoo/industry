@@ -40,7 +40,6 @@
     ],
     'demo': [
         'demo/loyalty_program.xml',
-        'demo/website.xml',
         'demo/website_view.xml',
         'demo/crm_lead.xml',
         'demo/res_partner.xml',
@@ -60,6 +59,7 @@
         'demo/sale_order_confirm.xml',
         'demo/product_supplierinfo.xml',
         'demo/payment_provider_demo.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [
