@@ -26,9 +26,11 @@
         'data/base_automation.xml',
         'data/ir_ui_menu.xml',
         'data/ir_ui_view.xml',
+        'data/ir_cron.xml',
     ],
     'demo': [
         'demo/product_template.xml',
+        'demo/stock_quant.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [
