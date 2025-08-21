@@ -36,6 +36,7 @@
     'cloc_exclude': [
         'data/knowledge_article.xml',
         'data/portal_templates.xml',
+        'data/ir_cron.xml',
     ],
     'author': 'Odoo S.A.',
     'images': ['images/main.png'],
