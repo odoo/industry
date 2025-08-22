@@ -68,7 +68,7 @@
     <record id="x_petition_id_field_x_signature" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="copied" eval="True"/>
-        <field name="field_description">petition</field>
+        <field name="field_description">Petition</field>
         <field name="model_id" ref="x_signature_model"/>
         <field name="name">x_petition_id</field>
         <field name="relation">x_petition</field>
@@ -87,6 +87,7 @@
         <field name="field_description">Pipeline status bar</field>
         <field name="model_id" ref="x_petition_model"/>
         <field name="name">x_petition_status</field>
+        <field name="required" eval="True"/>
         <field name="on_delete" eval="False"/>
         <field name="selection">[('draft', 'Draft'), ('published', 'Published'), ('closed', 'Closed'), ('submitted', 'Submitted')]</field>
     </record>
@@ -182,12 +183,13 @@ for record in self: record['x_website_url'] = '/model/petition/'+str(record.env[
         <field name="related">x_petition_id.x_name</field>
         <field name="readonly" eval="1"/>
     </record>
-    <record id="x_country_field_x_signature" model="ir.model.fields">
-        <field name="ttype">char</field>
-        <field name="related">x_partner_id.country_id.name</field>
+    <record id="x_country_id_field_x_signature" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="relation">res.country</field>
+        <field name="related">x_partner_id.country_id</field>
         <field name="field_description">Country</field>
         <field name="model_id" ref="x_signature_model"/>
-        <field name="name">x_country</field>
+        <field name="name">x_country_id</field>
         <field name="on_delete" eval="False"/>
         <field name="readonly" eval="True"/>
     </record>
@@ -201,11 +203,11 @@ for record in self: record['x_website_url'] = '/model/petition/'+str(record.env[
     </record>
     <record id="x_date_field_x_signature" model="ir.model.fields">
         <field name="ttype">date</field>
-        <field name="copied" eval="True"/>
         <field name="field_description">Date Signed</field>
         <field name="model_id" ref="x_signature_model"/>
         <field name="name">x_date</field>
         <field name="on_delete" eval="False"/>
+        <field name="readonly" eval="True"/>
     </record>
 
     <record id="x_current_signatures_field_x_petition" model="ir.model.fields">
@@ -216,7 +218,6 @@ for record in self: record['x_current_signatures'] = self.env['x_signature'].sea
         <field name="field_description">Current Signatures</field>
         <field name="model_id" ref="x_petition_model"/>
         <field name="name">x_current_signatures</field>
-        <field name="selectable" eval="False"/>
         <field name="store" eval="False"/>
         <field name="readonly" eval="True"/>
     </record>
@@ -231,8 +232,10 @@ for record in self:
         <field name="field_description">Progress</field>
         <field name="model_id" ref="x_petition_model"/>
         <field name="name">x_progress</field>
+        <field name="store" eval="False"/>
         <field name="readonly" eval="True"/>
     </record>
+
     <record id="x_signature_count_field_res_partner" model="ir.model.fields">
         <field name="compute"><![CDATA[
 for record in self: record['x_x_partner_id_x_signature_count'] = self.env['x_signature'].search_count([('x_partner_id', '=', record.id)])

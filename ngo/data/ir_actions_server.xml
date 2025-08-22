@@ -17,13 +17,19 @@ if not partner:
     partner = env['res.partner'].create({
         'name': request.params.get('name'), 
         'email': request.params.get('email'), 
-        'country_id': env['res.country'].search([('name', '=', request.params.get('country'))], limit=1).id
+        'country_id': env['res.country'].search([('id', '=', request.params.get('country_id'))], limit=1).id,
     })
 new_signature = env['x_signature'].create({
     "x_partner_id": partner.id,
     "x_date": datetime.datetime.today().strftime('%Y-%m-%d'),
     "x_petition_id": request.params.get('petition_id'),
     "x_newsletter": request.params.get('newsletter'),
+})
+message = env['mail.message'].create({
+    'model': 'x_signature',
+    'res_id': new_signature.id,
+    'body': '<p>Comment: '+request.params.get('comments')+'</p>',
+    'message_type': 'comment',
 })
 response = request.make_json_response({'id': new_signature.id}, status=200)]]></field>
         <field name="model_id" ref="project.model_project_task"/>

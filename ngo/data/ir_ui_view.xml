@@ -10,7 +10,7 @@
                 <field name="x_sequence" widget="handle"/>
                 <field name="x_name"/>
                 <field name="x_date_stop" string="Date" optional="show" widget="daterange"
-                    options="{&quot;start_date_field&quot;:&quot;x_date_start&quot;,&quot;always_range&quot;:true}"/>
+                    options="{'start_date_field':'x_date_start','always_range':true}"/>
                 <field name="x_user_id" widget="many2one_avatar_user"/>
                 <field name="x_current_signatures" optional="show"/>
                 <field name="x_target_signatures" optional="show"/>
@@ -34,7 +34,7 @@
                     <div name="button_box" class="oe_button_box">
                         <button class="oe_stat_button" name="%(open_x_petition_website_page)d"
                             context="{'record_url': 'x_website_url'}" invisible="not x_is_published"
-                            title="Go to Website" icon="fa-globe" type="action"/>
+                            title="Go to Website" icon="fa-globe" type="action"><span>Go to website</span></button>
                         <button class="oe_stat_button" icon="fa-pencil" type="action"
                             name="%(petition_related_x_signature)d">
                             <field widget="statinfo" name="x_current_signatures" string="Signatures"/>
@@ -53,7 +53,7 @@
                     <group name="group_b69ddc">
                         <group name="group_b69ddc_left">
                             <field name="x_date_stop" optional="show" widget="daterange"
-                                options="{&quot;start_date_field&quot;:&quot;x_date_start&quot;,&quot;always_range&quot;:true}"/>
+                                options="{'start_date_field':'x_date_start','always_range':true}"/>
                             <field name="x_user_id" widget="many2one_avatar"/>
                             <field name="x_tag_ids" widget="many2many_tags"
                                 options="{'color_field': 'x_color'}"/>
@@ -64,7 +64,7 @@
                             <field name="x_current_signatures" force_save="1" readonly="True"/>
                             <field name="x_target_signatures"/>
                             <field name="x_progress" force_save="1" readonly="True"
-                                options="{&quot;digits&quot;:[0,0],&quot;current_value&quot;:&quot;x_current_signatures&quot;,&quot;max_value&quot;:&quot;x_target_signatures&quot;}"
+                                options="{'digits':[0,0],'current_value':'x_current_signatures','max_value':'x_target_signatures'}"
                                 widget="progressbar"/>
                         </group>
                     </group>
@@ -93,23 +93,23 @@
                 <filter string="My Petition" name="my_x_petition" domain="[['x_user_id', '=', uid]]"/>
                 <separator name="separator_5n3_1j1dcqdle"/>
                 <filter
-                    domain="[(&quot;x_petition_status&quot;, &quot;=&quot;, &quot;published&quot;)]"
+                    domain="[('x_petition_status', '=', 'published')]"
                     name="filter_5tf_1j1dcq5lm" string="Published"/>
                 <filter
-                    domain="[(&quot;x_petition_status&quot;, &quot;=&quot;, &quot;draft&quot;)]"
+                    domain="[('x_petition_status', '=', 'draft')]"
                     name="filter_80t_1j1dct99o" string="Drafts"/>
                 <filter
-                    domain="[(&quot;x_petition_status&quot;, &quot;=&quot;, &quot;closed&quot;)]"
+                    domain="[('x_petition_status', '=', 'closed')]"
                     name="filter_81q_1j1dcuq2p" string="Closed Petitions"/>
                 <filter
-                    domain="[(&quot;x_petition_status&quot;, &quot;=&quot;, &quot;submitted&quot;)]"
+                    domain="[('x_petition_status', '=', 'submitted')]"
                     name="filter_631_1j1dcv8k1" string="Submitted"/>
                 <separator name="separator_o6_1j1dcnc6t"/>
-                <filter
-                    domain="[&quot;|&quot;, (&quot;x_progress&quot;, &quot;=&quot;, 100), (&quot;x_progress&quot;, &quot;&gt;&quot;, 100)]"
+                <!-- <filter
+                    domain="[('x_progress', '&gt;=', 100)]"
                     name="filter_6hp_1j1dcmnt5" string="Reached Goal"/>
-                <filter domain="[(&quot;x_progress&quot;, &quot;&lt;&quot;, 100)]"
-                    name="filter_6ds_1j1dco605" string="Not Reached"/>
+                <filter domain="[('x_progress', '&lt;', 100)]"
+                    name="filter_6ds_1j1dco605" string="Not Reached"/> -->
                 <separator />
                 <filter date="x_date_start" name="filter_date_start" string="Start Date"/>
                 <filter date="x_date_stop" name="filter_date_stop" string="End Date"/>
@@ -141,7 +141,7 @@
 
     <record id="default_kanban_view_x_petition" model="ir.ui.view">
         <field name="arch" type="xml">
-            <kanban string="Petition">
+            <kanban string="Petition" default_group_by="x_petition_status">
                 <templates>
                     <header />
                     <t t-name="menu">
@@ -157,9 +157,9 @@
                         <field name="x_tag_ids" display="full"/>
                         <field name="x_current_signatures" display="full" invisible="True"/>
                         <field name="x_progress" display="full" widget="progressbar"
-                            options="{&quot;max_value&quot;:&quot;x_target_signatures&quot;,&quot;current_value&quot;:&quot;x_current_signatures&quot;}"/>
+                            options="{'max_value':'x_target_signatures','current_value':'x_current_signatures'}"/>
                         <field name="x_date_stop" display="full" widget="daterange"
-                            options="{&quot;start_date_field&quot;:&quot;x_date_start&quot;,&quot;show_time&quot;:false}"/>
+                            options="{'start_date_field':'x_date_start','show_time':false}"/>
                     </t>
                 </templates>
             </kanban>
@@ -175,7 +175,7 @@
         <field name="arch" type="xml">
             <graph string="Petition" sample="1" type="bar">
                 <field name="x_name"/>
-                <field name="x_current_signatures" type="measure"/>
+                <!-- <field name="x_current_signatures" type="measure"/> -->
             </graph>
         </field>
         <field name="model">x_petition</field>
@@ -188,7 +188,7 @@
     <record id="default_pivot_view_x_petition" model="ir.ui.view">
         <field name="arch" type="xml">
             <pivot string="Petition" sample="1">
-                <field name="x_current_signatures" type="col"/>
+                <!-- <field name="x_current_signatures" type="col"/> -->
                 <field name="x_name" type="row"/>
             </pivot>
         </field>
@@ -203,11 +203,11 @@
     <record id="default_list_view_fo_13169c68-79b7-412d-b486-625c88b10130" model="ir.ui.view">
         <field name="arch" type="xml">
             <list>
-                <field name="x_partner_id"/>
                 <field name="x_sequence" widget="handle"/>
+                <field name="x_partner_id"/>
                 <field optional="show" name="x_date"/>
                 <field optional="show" name="x_petition_name"/>
-                <field optional="show" name="x_country"/>
+                <field optional="show" name="x_country_id"/>
                 <field optional="show" name="x_newsletter"/>
             </list>
         </field>
@@ -230,7 +230,7 @@
                     </group>
                     <group name="group_56b442">
                         <group name="group_56b442_left">
-                            <field name="x_country" force_save="1" readonly="True"/>
+                            <field name="x_country_id" force_save="1"/>
                             <field name="x_date" string="Date Signed"/>
                         </group>
                         <group name="group_56b442_right">
@@ -254,7 +254,7 @@
                 <field name="x_partner_id" operator="child_of"/>
                 <separator />
                 <filter date="x_date" name="filter_date" string="Date"/>
-                <filter domain="[(&quot;x_newsletter&quot;, &quot;!=&quot;, False)]"
+                <filter domain="[('x_newsletter', '!=', False)]"
                     name="filter_n0_1j1dp3cpn" string="Newsletter Subscriber"/>
                 <separator />
                 <filter string="Archived" name="archived_x_signature"
@@ -267,7 +267,7 @@
                 <filter name="group_by_3j9_1j1dp6hp0" string="Date Signed"
                     context="{'group_by': 'x_date'}"/>
                 <filter name="group_by_54d_1j1dp6od7" string="Country"
-                    context="{'group_by': 'x_country'}"/>
+                    context="{'group_by': 'x_country_id'}"/>
             </search>
         </field>
         <field name="model">x_signature</field>
@@ -364,22 +364,22 @@
                 <filter date="x_date" name="filter_date" string="Date"/>
                 <separator />
                 <group string="Fiscal Year">
-                    <filter domain="[(&quot;x_year&quot;, &quot;=&quot;, &quot;2025&quot;)]"
+                    <filter domain="[('x_year', '=', '2025')]"
                         name="filter_fiscal_attestation_2025" string="2025"/>
-                    <filter domain="[(&quot;x_year&quot;, &quot;=&quot;, &quot;2024&quot;)]"
+                    <filter domain="[('x_year', '=', '2024')]"
                         name="filter_fiscal_attestation_2024" string="2024"/>
-                    <filter domain="[(&quot;x_year&quot;, &quot;=&quot;, &quot;2023&quot;)]"
+                    <filter domain="[('x_year', '=', '2023')]"
                         name="filter_fiscal_attestation_2023" string="2023"/>
                 </group>
                 <separator name="separator_755_1j1fnhmgh"/>
                 <filter
-                    domain="[(&quot;x_fiscal_attestation_status&quot;, &quot;=&quot;, &quot;published&quot;)]"
+                    domain="[('x_fiscal_attestation_status', '=', 'generated')]"
                     name="filter_1f5_1j1fnfsn9" string="Generated"/>
                 <filter
-                    domain="[(&quot;x_fiscal_attestation_status&quot;, &quot;=&quot;, &quot;Sent&quot;)]"
+                    domain="[('x_fiscal_attestation_status', '=', 'sent')]"
                     name="filter_3bl_1j1fngj1h" string="Sent"/>
                 <filter
-                    domain="[(&quot;x_fiscal_attestation_status&quot;, &quot;=&quot;, &quot;Cancelled&quot;)]"
+                    domain="[('x_fiscal_attestation_status', '=', 'cancelled')]"
                     name="filter_2q8_1j1fnhami" string="Cancelled"/>
                 <separator />
                 <filter name="group_by_6p9_1j1v7ahh6" string="Year" context="{'group_by': 'x_year'}"/>
@@ -461,7 +461,12 @@
                         invisible="not x_fiscal_attestation_id" type="action"
                         name="%(donation_related_x_fiscal_attestation_form)d">Fiscal Attestation</button>
                 </div>
-
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="string">Donor</attribute>
+                </xpath>
+                <xpath expr="//field[@name='date']" position="attributes">
+                    <attribute name="readonly">true</attribute>
+                </xpath>
                 <xpath expr="//form[1]" position="attributes">
                     <attribute name="create">true</attribute>
                     <attribute name="delete">true</attribute>
@@ -482,9 +487,9 @@
             <data>
                 <xpath expr="//filter[@name='outbound_filter']" position="after">
                     <separator name="separator_3om_1j1vo6lvh"/>
-                    <filter domain="[(&quot;x_fiscal_attestation_id&quot;, &quot;!=&quot;, False)]"
+                    <filter domain="[('x_fiscal_attestation_id', '!=', False)]"
                         name="filter_6vc_1j1vo5q2h" string="With Fiscal Attestation"/>
-                    <filter domain="[(&quot;x_fiscal_attestation_id&quot;, &quot;=&quot;, False)]"
+                    <filter domain="[('x_fiscal_attestation_id', '=', False)]"
                         name="filter_12s_1j1vo6hi9" string="Without Attestation"/>
                 </xpath>
                 <xpath expr="//filter[@name='partner']" position="attributes">
