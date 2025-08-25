@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="action_send_waiver" model="ir.actions.server">
+        <field name="name">Send Waiver</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+template = env['sign.template'].search([('x_is_waiver', '=', True)], limit=1)
+if not template:
+    raise UserError("No waiver template found.")
+
+for customer in records:
+    sign_request = env['sign.request'].create({
+        'template_id': template.id,
+        'reference': template.display_name,
+        'request_item_ids': [Command.create({
+            'partner_id': customer.id,
+            'role_id': env.ref('sign.sign_item_role_customer').id,
+        })],
+    })
+    sign_request.send_signature_accesses()
+        ]]></field>
+    </record>
+
+    <record id="action_use_session" model="ir.actions.server">
+        <field name="name">Use Session</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+product, discount = False, False
+
+if record.grade_id and record.grade_id.default_pricelist_id == record.property_product_pricelist:
+    product = env['product.pricelist.item'].search([('product_tmpl_id.x_is_base_entrance', '=', True), ('pricelist_id', '=', record.property_product_pricelist)], order='percent_price desc', limit=1).product_tmpl_id
+
+loyalty_card = env['loyalty.card'].search([('partner_id', '=', record.id), ('points', '>', 0), ('program_id', '!=', False)], limit=1)
+if not product and loyalty_card:
+    product = loyalty_card.program_id.reward_ids.filtered("discount_line_product_id.x_is_base_entrance")[:1].discount_line_product_id
+    discount = bool(product)
+
+if not product: raise UserError("No entrance available via membership or loyalty.")
+
+order = env['sale.order'].create({
+    'partner_id': record.id,
+    'order_line': [Command.create({'product_id': product.id, 'product_uom_qty': 1})],
+})
+
+if discount: order.action_open_reward_wizard()
+
+action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Use Session',
+    'res_model': 'sale.order',
+    'view_mode': 'form',
+    'res_id': order.id,
+    'target': 'new',
+}
+        ]]></field>
+    </record>
+</odoo>
