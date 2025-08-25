@@ -1,0 +1,419 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!-- x_petition fields -->
+    <record id="x_name_field_x_petition" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Petition Name</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_name</field>
+        <field name="on_delete" eval="False"/>
+        <field name="required" eval="True"/>
+        <field name="tracking">1</field>
+        <field name="translate" eval="True"/>
+    </record>
+    <record id="x_active_field_x_petition" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Active</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_active</field>
+        <field name="on_delete" eval="False"/>
+        <field name="tracking">1</field>
+    </record>
+    <record id="x_user_id_field_x_petition" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="domain">[('share', '=', False)]</field>
+        <field name="field_description">Responsible</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_user_id</field>
+        <field name="relation">res.users</field>
+        <field name="tracking">1</field>
+    </record>
+    <record id="x_image_field_x_petition" model="ir.model.fields">
+        <field name="ttype">binary</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Image</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_image</field>
+        <field name="on_delete" eval="False"/>
+    </record>
+    <record id="x_sequence_field_x_petition" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Sequence</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_sequence</field>
+        <field name="on_delete" eval="False"/>
+    </record>
+    <record id="x_tag_ids_field_x_petition" model="ir.model.fields">
+        <field name="ttype">many2many</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Tags</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_tag_ids</field>
+        <field name="on_delete" eval="False"/>
+        <field name="relation">x_petition_tag</field>
+        <field name="relation_table">x_petition_tag_rel</field>
+    </record>
+    <record id="x_target_signatures_field_x_petition" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Target Signatures</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_target_signatures</field>
+        <field name="on_delete" eval="False"/>
+    </record>
+    <record id="x_petition_id_field_x_signature" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Petition</field>
+        <field name="model_id" ref="x_signature_model"/>
+        <field name="name">x_petition_id</field>
+        <field name="relation">x_petition</field>
+    </record>
+    <record id="x_description_field_x_petition" model="ir.model.fields">
+        <field name="ttype">html</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Description</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_description</field>
+        <field name="on_delete" eval="False"/>
+    </record>
+    <record id="x_petition_state_field_x_petition" model="ir.model.fields">
+        <field name="ttype">selection</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Pipeline status bar</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_petition_status</field>
+        <field name="required" eval="True"/>
+        <field name="on_delete" eval="False"/>
+        <field name="selection">[('draft', 'Draft'), ('published', 'Published'), ('closed', 'Closed'), ('submitted', 'Submitted')]</field>
+    </record>
+    <record id="x_date_stop_field_x_petition" model="ir.model.fields">
+        <field name="ttype">datetime</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">End Date</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_date_stop</field>
+        <field name="on_delete" eval="False"/>
+    </record>
+    <record id="x_date_start_field_x_petition" model="ir.model.fields">
+        <field name="ttype">datetime</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Start Date</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_date_start</field>
+        <field name="on_delete" eval="False"/>
+    </record>
+    <record id="x_is_published_field_x_petition" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Is Published</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_is_published</field>
+    </record>
+    <record id="x_website_description_field_x_petition" model="ir.model.fields">
+        <field name="ttype">html</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Website Description</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_website_description</field>
+    </record>
+    <record id="x_website_url_field_x_petition" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self: record['x_website_url'] = '/model/petition/'+str(record.env["ir.http"]._slug(record))
+]]></field>
+        <field name="ttype">char</field>
+        <field name="field_description">Website URL</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_website_url</field>
+        <field name="on_delete" eval="False"/>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+
+
+    <!-- x_signature fields -->
+    <record id="x_name_field_x_signature" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Name</field>
+        <field name="model_id" ref="x_signature_model"/>
+        <field name="name">x_name</field>
+        <field name="on_delete" eval="False"/>
+        <field name="tracking">1</field>
+        <field name="translate" eval="True"/>
+    </record>
+    <record id="x_active_field_x_signature" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Active</field>
+        <field name="model_id" ref="x_signature_model"/>
+        <field name="name">x_active</field>
+        <field name="on_delete" eval="False"/>
+        <field name="tracking">1</field>
+    </record>
+    <record id="x_partner_id_field_x_signature" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Contact</field>
+        <field name="model_id" ref="x_signature_model"/>
+        <field name="name">x_partner_id</field>
+        <field name="relation">res.partner</field>
+        <field name="tracking">1</field>
+    </record>
+
+    <record id="x_sequence_field_x_signature" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Sequence</field>
+        <field name="model_id" ref="x_signature_model"/>
+        <field name="name">x_sequence</field>
+        <field name="on_delete" eval="False"/>
+    </record>
+    <record id="x_petition_name_field_x_signature" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Petition Name</field>
+        <field name="model_id" ref="x_signature_model"/>
+        <field name="name">x_petition_name</field>
+        <field name="on_delete" eval="False"/>
+        <field name="related">x_petition_id.x_name</field>
+        <field name="readonly" eval="1"/>
+    </record>
+    <record id="x_country_id_field_x_signature" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="relation">res.country</field>
+        <field name="related">x_partner_id.country_id</field>
+        <field name="field_description">Country</field>
+        <field name="model_id" ref="x_signature_model"/>
+        <field name="name">x_country_id</field>
+        <field name="on_delete" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="x_newsletter_field_x_signature" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Newsletter</field>
+        <field name="model_id" ref="x_signature_model"/>
+        <field name="name">x_newsletter</field>
+        <field name="on_delete" eval="False"/>
+    </record>
+    <record id="x_date_field_x_signature" model="ir.model.fields">
+        <field name="ttype">date</field>
+        <field name="field_description">Date Signed</field>
+        <field name="model_id" ref="x_signature_model"/>
+        <field name="name">x_date</field>
+        <field name="on_delete" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+
+    <record id="x_current_signatures_field_x_petition" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self: record['x_current_signatures'] = self.env['x_signature'].search_count([('x_petition_id', '=', record.id)])
+]]></field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Current Signatures</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_current_signatures</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="x_progress_field_x_petition" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self:
+    if record.x_target_signatures > 0:
+        record['x_progress'] = record.x_current_signatures/record.x_target_signatures
+]]></field>
+        <field name="ttype">float</field>
+        <field name="depends">x_current_signatures, x_target_signatures</field>
+        <field name="field_description">Progress</field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="name">x_progress</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+
+    <record id="x_signature_count_field_res_partner" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self: record['x_x_partner_id_x_signature_count'] = self.env['x_signature'].search_count([('x_partner_id', '=', record.id)])
+]]></field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Contact count</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="name">x_x_partner_id_x_signature_count</field>
+        <field name="on_delete" eval="False"/>
+        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+    </record>
+
+    <!-- x_fiscal_attestation fields -->
+    <record id="x_name_field_x_fiscal_attestation" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Number</field>
+        <field name="model_id" ref="x_fiscal_attestation_model"/>
+        <field name="name">x_name</field>
+        <field name="required" eval="True"/>
+        <field name="tracking">1</field>
+        <field name="translate" eval="True"/>
+    </record>
+    <record id="x_active_field_x_fiscal_attestation" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Active</field>
+        <field name="model_id" ref="x_fiscal_attestation_model"/>
+        <field name="name">x_active</field>
+        <field name="tracking">1</field>
+    </record>
+    <record id="x_partner_id_field_x_fiscal_attestation" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Donor</field>
+        <field name="model_id" ref="x_fiscal_attestation_model"/>
+        <field name="name">x_partner_id</field>
+        <field name="relation">res.partner</field>
+        <field name="tracking">1</field>
+    </record>
+    <record id="x_date_field_x_fiscal_attestation" model="ir.model.fields">
+        <field name="ttype">date</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Sent Date</field>
+        <field name="model_id" ref="x_fiscal_attestation_model"/>
+        <field name="name">x_date</field>
+    </record>
+    <record id="x_currency_id_field_x_fiscal_attestation" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Currency</field>
+        <field name="model_id" ref="x_fiscal_attestation_model"/>
+        <field name="name">x_currency_id</field>
+        <field name="relation">res.currency</field>
+    </record>
+    <record id="x_value_field_x_fiscal_attestation" model="ir.model.fields">
+        <field name="ttype">monetary</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Total Value</field>
+        <field name="model_id" ref="x_fiscal_attestation_model"/>
+        <field name="name">x_value</field>
+        <field name="tracking">1</field>
+        <field name="currency_field">x_currency_id</field>
+    </record>
+    <record id="x_sequence_field_x_fiscal_attestation" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Sequence</field>
+        <field name="model_id" ref="x_fiscal_attestation_model"/>
+        <field name="name">x_sequence</field>
+    </record>
+    <record id="x_year_field_x_fiscal_attestation" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Year</field>
+        <field name="model_id" ref="x_fiscal_attestation_model"/>
+        <field name="name">x_year</field>
+    </record>
+    <record id="x_document_pdf_field_x_fiscal_attestation" model="ir.model.fields">
+        <field name="ttype">binary</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Document (PDF)</field>
+        <field name="model_id" ref="x_fiscal_attestation_model"/>
+        <field name="name">x_document_pdf</field>
+    </record>
+    <record id="x_document_pdf_filename_field_x_fiscal_attestation" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="copied" eval="True"/>
+        <field name="model_id" ref="x_fiscal_attestation_model"/>
+        <field name="name">x_document_pdf_filename</field>
+    </record>
+    <record id="x_fiscal_attestation_status_field_x_fiscal_attestation" model="ir.model.fields">
+        <field name="ttype">selection</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">State</field>
+        <field name="model_id" ref="x_fiscal_attestation_model"/>
+        <field name="name">x_fiscal_attestation_status</field>
+        <field name="selection">[('generated', 'Generated'), ('Sent', 'Sent'), ('Cancelled', 'Cancelled')]</field>
+    </record>
+
+
+    <!-- account_payment fields -->
+    <record id="x_fiscal_attestation_id_field_account_payment" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Fiscal Attestation</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="name">x_fiscal_attestation_id</field>
+        <field name="relation">x_fiscal_attestation</field>
+    </record>
+    <record id="x_country_name_field_account_payment" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="field_description">Country Name</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="name">x_country_name</field>
+        <field name="related">partner_id.country_id.name</field>
+    </record>
+
+    <record id="x_donation_ids_field_x_fiscal_attestation" model="ir.model.fields">
+        <field name="ttype">one2many</field>
+        <field name="field_description">Donation</field>
+        <field name="model_id" ref="x_fiscal_attestation_model"/>
+        <field name="name">x_donation_ids</field>
+        <field name="on_delete" eval="False"/>
+        <field name="relation">account.payment</field>
+        <field name="relation_field">x_fiscal_attestation_id</field>
+    </record>
+    <record id="x_account_payment_count_field_x_fiscal_attestation" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self: record['x_x_fiscal_attestation_id_account_payment_count'] = self.env['account.payment'].search_count([('x_fiscal_attestation_id', '=', record.ids)])
+]]></field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Fiscal Attestation count</field>
+        <field name="model_id" ref="x_fiscal_attestation_model"/>
+        <field name="name">x_x_fiscal_attestation_id_account_payment_count</field>
+        <field name="on_delete" eval="False"/>
+        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+    </record>
+
+    <!-- x_petition_tag fields -->
+    <record id="x_name_field_x_petition_tag" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Name</field>
+        <field name="model_id" ref="x_petition_tag_model"/>
+        <field name="name">x_name</field>
+        <field name="required" eval="True"/>
+    </record>
+    <record id="x_color_field_x_petition_tag" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Color</field>
+        <field name="model_id" ref="x_petition_tag_model"/>
+        <field name="name">x_color</field>
+    </record>
+
+    <!-- x_wizard_generate_fiscal_attestation fields -->
+    <record id="x_fiscal_year_field_x_wizard_generate_fiscal_attestation" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="field_description">Fiscal Year</field>
+        <field name="model_id" ref="x_wizard_generate_fiscal_attestation_model"/>
+        <field name="name">x_wizard_fiscal_year</field>
+        <field name="required" eval="True"/>
+    </record>
+    <record id="x_tax_minimum_field_x_wizard_generate_fiscal_attestation" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="field_description">Tax-Eligible Minimum</field>
+        <field name="model_id" ref="x_wizard_generate_fiscal_attestation_model"/>
+        <field name="name">x_wizard_tax_minimum</field>
+        <field name="required" eval="True"/>
+    </record>
+    <record id="x_wizard_show_warning_field_x_wizard_generate_fiscal_attestation"
+        model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Wizard Show Warning</field>
+        <field name="model_id" ref="x_wizard_generate_fiscal_attestation_model"/>
+        <field name="name">x_wizard_show_warning</field>
+    </record>
+</odoo>
