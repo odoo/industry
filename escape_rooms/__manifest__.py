@@ -5,7 +5,6 @@
     'author': 'Odoo S.A.',
     'depends': [
         'base_industry_data',
-        'hr',
         'knowledge',
         'pos_loyalty',
         'sale_crm',
@@ -35,14 +34,9 @@
     'demo': [
         'demo/product_product.xml',
         'demo/loyalty_program.xml',
-        'demo/hr_employee.xml',
         'demo/loyalty_rule.xml',
-        'demo/pos_config.xml',
         'demo/website_view.xml',
         'demo/crm_lead.xml',
-        'demo/hr_department.xml',
-        'demo/pos_session.xml',
-        'demo/res_partner.xml',
         'demo/appointment_type.xml',
         'demo/calendar_event.xml',
         'demo/appointment_booking_line.xml',
