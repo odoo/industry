@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="stock_storage_category_form_custo_logistic_company" model="ir.ui.view">
+        <field name="name">stock.storage.category.form.custo.logistic.company</field>
+        <field name="model">stock.storage.category</field>
+        <field name="inherit_id" ref="stock.stock_storage_category_form"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet//field[@name='company_id']" position="after">
+                <field name="x_category_fee_rate_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_template_form_custo_logistic_company" model="ir.ui.view">
+        <field name="name">product.template.form.custo.logistic.company</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='group_general']" position="inside">
+                <field name="x_owner_id" domain="['|', ('parent_id', '=', False), ('is_company', '!=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_partner_form_custo_logistic_company" model="ir.ui.view">
+        <field name="name">res.partner.form.custo.logistic.company</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" icon="fa-home" type="action" name="%(action_window_partner_see_products)d">
+                    <field widget="statinfo" name="x_partner_related_products" string="Products"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="x_fee_rate_form_view" model="ir.ui.view">
+        <field name="name">stock.storage.category.form.custo.logistic.company</field>
+        <field name="model">x_fee_rate</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <h1>
+                        <field name="x_name"/>
+                    </h1>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="x_fee_rate_list_view" model="ir.ui.view">
+        <field name="name">stock.storage.category.form.custo.logistic.company</field>
+        <field name="model">x_fee_rate</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list>
+                <field name="x_name"/>
+            </list>
+        </field>
+    </record>
+    
+    <record id="default_stock_occupation_pivot_view" model="ir.ui.view">
+        <field name="name">default.stock.occupation.pivot.view</field>
+        <field name="model">sale.order.line</field>
+        <field name="type">pivot</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <pivot string="Stock Occupation">
+                <field name="product_uom_qty" type="measure"/>
+                <field name="product_id" type="row"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="default_stock_occupation_list_view" model="ir.ui.view">
+        <field name="name">default.stock.occupation.list.view</field>
+        <field name="model">sale.order.line</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list>
+                <field name="subscription_start_date"/>
+                <field name="subscription_end_date"/>
+                <field name="order_partner_id"/>
+                <field name="name"/>
+                <field name="product_uom_qty"/>
+                <field name="product_uom_id"/>
+            </list>
+        </field>
+    </record>
+    <record id="extension_stock_occupation_search_view" model="ir.ui.view">
+        <field name="name">extension.stock.occupation.search.view</field>
+        <field name="model">sale.order.line</field>
+        <field name="type">search</field>
+        <field name="mode">extension</field>
+        <field name="inherit_id" ref="sale.view_sales_order_line_filter"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='order_id']" position="before">
+                    <field name="subscription_start_date" string="Date" filter_domain="['&amp;', ('subscription_start_date', '&lt;=', self), ('subscription_end_date', '>=', self)]"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="action_window_stock_occupation_list_view" model="ir.actions.act_window">
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'pivot', 'view_id': ref('logistic_company.default_stock_occupation_pivot_view')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('logistic_company.default_stock_occupation_list_view')}),
+        ]"/>
+    </record>
+
+    <!-- x_stock_history fields -->
+    <record id="default_stock_history_pivot_view" model="ir.ui.view">
+        <field name="name">default.stock.history.pivot.view</field>
+        <field name="model">x_stock_history</field>
+        <field name="type">pivot</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <pivot string="Stock History">
+                <field name="x_history_owner_id" type="col"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="default_stock_history_list_view" model="ir.ui.view">
+        <field name="name">default.stock.history.list.view</field>
+        <field name="model">x_stock_history</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list>
+                <field name="x_date"/>
+                <field name="x_history_owner_id"/>
+                <field name="x_location_id"/>
+                <field name="x_history_fee_rate_id"/>
+                <field name="x_product_id"/>
+                <field name="x_package_id"/>
+                <field name="x_package_type"/>
+                <field name="x_stock_lot_id"/>
+                <field name="x_quantity"/>
+            </list>
+        </field>
+    </record>
+    <record id="default_stock_history_search_view" model="ir.ui.view">
+        <field name="name">default.stock.history.search.view</field>
+        <field name="model">x_stock_history</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <search>
+                <filter string="Current Month" name="current_month" domain="[('x_date', '>=', (context_today() + relativedelta(months=-1)))]"/>
+            </search>
+        </field>
+    </record>
+    <record id="action_window_stock_history_list_view" model="ir.actions.act_window">
+        <field name="context">{'search_default_current_month': 1, 'edit': False, 'create': False, 'delete': False, 'duplicate': False}</field>
+    </record>
+</odoo>
