@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_res_partner_form_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <div name="warning_tax" position="before">
+                <header>
+                    <button name="%(action_send_waiver)d"
+                            type="action"
+                            string="Send Waiver"
+                            class="oe_stat_button"
+                            icon="fa-envelope"
+                            invisible="not id or signature_count != 0 or is_company"
+                    />
+                    <button name="%(action_use_session)d"
+                            type="action"
+                            string="Use Session"
+                            icon="fa-ticket"
+                            class="oe_stat_button"
+                    />
+                </header>
+            </div>
+        </field>
+    </record>
+
+    <record id="sign_template_view_list" model="ir.ui.view">
+        <field name="name">sign.template.list</field>
+        <field name="model">sign.template</field>
+        <field name="inherit_id" ref="sign.sign_template_view_tree"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list[1]" position="attributes">
+                <attribute name="editable">bottom</attribute>
+                <attribute name="open_form_view">true</attribute>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="x_is_waiver" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
