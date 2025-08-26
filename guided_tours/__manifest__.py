@@ -45,6 +45,8 @@
     'demo': [
         'demo/event_stage.xml',
         'demo/appointment_type.xml',
+        'demo/event_event.xml',
+        'demo/product_template.xml',
         'demo/hr_employee.xml',
         'demo/pos_config.xml',
         'demo/pos_session.xml',
