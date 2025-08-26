@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <function name="action_confirm" model="sale.order">
+        <value eval="[
+            ref('sale_order_1'),
+            ref('sale_order_2'),
+            ref('sale_order_3'),
+        ]"/>
+    </function>
+
+    <record id="pickup_wizard_1" model="rental.order.wizard">
+        <field name="order_id" ref="sale_order_1"/>
+        <field name="rental_wizard_line_ids" eval="[(0, 0, {'order_line_id': ref('sale_order_line_1a'),'product_id': ref('standard_room_2p_breakfast'),'qty_delivered': 1})]"/>
+        <field name="status">pickup</field>
+    </record>
+    <record id="return_wizard_1" model="rental.order.wizard">
+        <field name="order_id" ref="sale_order_1"/>
+        <field name="rental_wizard_line_ids" eval="[(0, 0, {'order_line_id': ref('sale_order_line_1a'),'product_id': ref('standard_room_2p_breakfast'),'qty_delivered': 1,'qty_returned': 1})]"/>
+        <field name="status">return</field>
+    </record>
+
+    <record id="pickup_wizard_2" model="rental.order.wizard">
+        <field name="order_id" ref="sale_order_2"/>
+        <field name="rental_wizard_line_ids" eval="[(0, 0, {'order_line_id': ref('sale_order_line_2'), 'product_id': ref('deluxe_suite_2p_1c_breakfast'), 'qty_delivered': 1})]"/>
+        <field name="status">pickup</field>
+    </record>
+
+    <record id="pickup_wizard_3" model="rental.order.wizard">
+        <field name="order_id" ref="sale_order_3"/>
+        <field name="rental_wizard_line_ids" eval="[(0, 0, {'order_line_id': ref('sale_order_line_3a'), 'product_id': ref('deluxe_room_2p_breakfast'), 'qty_delivered': 1})]"/>
+        <field name="status">pickup</field>
+    </record>
+
+    <function name="apply" model="rental.order.wizard">
+        <value eval="[
+            ref('pickup_wizard_1'),
+            ref('return_wizard_1'),
+            ref('pickup_wizard_2'),
+            ref('pickup_wizard_3'),
+        ]"/>
+    </function>
+    <function name="write" model="sale.order.line">
+        <value model="sale.order.line" eval="obj().search([('order_id', '=', ref('sale_order_1')), ('product_id', '=', ref('booking_engine.product_product_city_tax'))], limit=1).id" />
+        <value eval="{'qty_delivered': 7}" />
+    </function>
+        <function name="write" model="sale.order.line">
+        <value model="sale.order.line" eval="obj().search([('order_id', '=', ref('sale_order_1')), ('product_id', '=', ref('product_product_17'))], limit=1).id" />
+        <value eval="{'qty_delivered': 2}" />
+    </function>
+    <function name="action_confirm" model="sale.order">
+        <value eval="[
+            ref('sale_order_4'),
+            ref('sale_order_5'),
+        ]"/>
+    </function>
+</odoo>
