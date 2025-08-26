@@ -5,6 +5,7 @@
     'depends': [
         'base_industry_data',
         'knowledge',
+        'product_expiry',
         'purchase',
         'sale_management',
         'sale_subscription',
@@ -31,6 +32,7 @@
     'demo': [
         'demo/product_template.xml',
         'demo/stock_quant.xml',
+        'demo/res_users.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [
