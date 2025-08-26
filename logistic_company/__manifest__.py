@@ -32,7 +32,6 @@
     'demo': [
         'demo/product_template.xml',
         'demo/stock_quant.xml',
-        'demo/res_users.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [
