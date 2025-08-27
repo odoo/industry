@@ -4,12 +4,12 @@
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
+        'base_industry_data',
         'crm_enterprise',
         'knowledge',
         'partnership',
         'purchase',
         'sale_subscription',
-        'survey',
         'website_event_sale',
         'website_sale_loyalty',
     ],
@@ -27,12 +27,13 @@
         'data/sale_order_template_line.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
-        'data/knowledge_tour.xml',
     ],
     'demo': [
+        'demo/product_product.xml',
         'demo/loyalty_program.xml',
         'demo/website_view.xml',
         'demo/crm_lead.xml',
+        'demo/mail_activity.xml',
         'demo/res_partner.xml',
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
@@ -52,15 +53,9 @@
         'demo/website.xml',
     ],
     'license': 'OPL-1',
-    'assets': {
-        'web.assets_backend': [
-            'diy_workshops/static/src/js/my_tour.js',
-        ]
-    },
     'cloc_exclude': [
         'data/knowledge_article.xml',
         'demo/website_view.xml',
-        'static/src/js/my_tour.js',
     ],
     'images': [
         'images/main.png',
