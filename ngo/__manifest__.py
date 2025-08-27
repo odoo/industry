@@ -83,6 +83,7 @@
         'demo/x_signature.xml',
         'demo/sale_order_confirm.xml',
         'demo/account_payment.xml',
+        'demo/mailing_mailing.xml',
     ],
     'license': 'OPL-1',
     'author': 'Odoo S.A.',
