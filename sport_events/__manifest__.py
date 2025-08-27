@@ -4,6 +4,7 @@
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
+        'base_industry_data',
         'documents_sign',
         'event_crm',
         'hr_expense',
@@ -13,7 +14,6 @@
         'sale_planning',
         'survey',
         'website_event_booth_sale',
-        # 'website_event_booth_exhibitor',
     ],
     'data': [
         'data/res_config_settings.xml',
@@ -39,7 +39,6 @@
         'data/sign_item.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
-        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/crm_tag.xml',
@@ -83,15 +82,9 @@
         'demo/website.xml',
     ],
     'license': 'OPL-1',
-    'assets': {
-        'web.assets_backend': [
-            'sport_events/static/src/js/my_tour.js',
-        ],
-    },
     'cloc_exclude': [
         'data/knowledge_article.xml',
         'demo/website_view.xml',
-        'static/src/js/my_tour.js',
     ],
     'images': [
         'images/main.png',
