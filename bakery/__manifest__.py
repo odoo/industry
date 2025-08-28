@@ -1,5 +1,5 @@
 {
-    'name': 'Bakery Shop',
+    'name': 'Bakery',
     'version': '1.0',
     'category': 'Retail',
     'author': 'Odoo S.A.',
