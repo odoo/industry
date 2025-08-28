@@ -4,15 +4,11 @@
     'category': 'Retail',
     'author': 'Odoo S.A.',
     'depends': [
+        'base_industry_data',
         'calendar',
         'knowledge',
         'pos_enterprise',
-        'pos_hr',
-        'pos_online_payment',
-        'product_expiry',
-        'sale_purchase_stock',
-        'sale_service',
-        'stock_barcode',
+        'sale_purchase',
         'website_sale_stock',
     ],
     'data': [
@@ -37,11 +33,8 @@
     ],
     'demo': [
         'demo/res_partner.xml',
-        'demo/hr_employee.xml',
-        'demo/pos_config.xml',
+        'demo/product_template.xml',
         'demo/website_view.xml',
-        'demo/hr_department.xml',
-        'demo/account_analytic_plan.xml',
         'demo/pos_session.xml',
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
@@ -51,7 +44,7 @@
         'demo/ir_attachment_post.xml',
         'demo/sale_order_line.xml',
         'demo/stock_lot.xml',
-        'demo/stock_quant.xml',
+        # 'demo/stock_quant.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
@@ -63,6 +56,7 @@
     'license': 'OPL-1',
     'cloc_exclude': [
         'data/knowledge_article.xml',
+        'demo/website_view.xml',
     ],
     'images': ['images/main.png'],
 }
