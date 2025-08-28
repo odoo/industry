@@ -59,6 +59,7 @@
         'demo/stock_warehouse_orderpoint.xml',
         'demo/purchase_order_line.xml',
         'demo/planning_slot_template.xml',
+        'demo/resource_resource.xml',
         'demo/hr_employee.xml',
         'demo/planning_slot.xml',
         'demo/sale_order.xml',
