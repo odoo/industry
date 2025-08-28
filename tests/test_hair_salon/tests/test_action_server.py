@@ -20,7 +20,7 @@ class ActionServerTestCase(TransactionCase):
             'name': 'Haircut and Color',
             'appointment_duration': 2.0,
             'appointment_tz': 'UTC',
-            'assign_method': 'time_auto_assign',
+            'is_auto_assign': True,
             'schedule_based_on': 'resources',
             'x_break': True,
             'x_break_start_appointment': 0.8,
@@ -56,7 +56,7 @@ class ActionServerTestCase(TransactionCase):
             'name': 'Haircut',
             'appointment_duration': 1.0,
             'appointment_tz': 'UTC',
-            'assign_method': 'time_auto_assign',
+            'is_auto_assign': True,
             'schedule_based_on': 'resources',
         })
         event = self.env['calendar.event'].create({
