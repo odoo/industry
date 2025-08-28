@@ -36,10 +36,8 @@
         'data/knowledge_article_favorite.xml',
     ],
     'demo': [
-        'demo/product_pricelist.xml',
         'demo/res_partner.xml',
         'demo/hr_employee.xml',
-        'demo/website.xml',
         'demo/pos_config.xml',
         'demo/website_view.xml',
         'demo/hr_department.xml',
@@ -60,6 +58,7 @@
         'demo/sale_order_confirm.xml',
         'demo/product_supplierinfo.xml',
         'demo/payment_provider_demo.xml',
+        'demo/website.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [
