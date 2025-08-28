@@ -43,7 +43,7 @@
                         <p>Whether you're a first-time visitor or rediscovering Belgium, our guided tours offer insider stories, hidden gems, and unforgettable moments.</p>
                       </div>
                       <div class="o_colored_level o_grid_item o_grid_item_image g-height-11 col-lg-4 g-col-lg-4" style="z-index: 2; grid-area: 1 / 9 / 12 / 13;">
-                        <img src="/web/image/guided_tours.ir_attachment_1339" alt="" data-attachment-id="1339" class="img img-fluid mx-auto rounded o_we_custom_image" data-format-mimetype="image/webp" data-original-id="1339" data-original-src="/web/image/1339-48685ffa/ghent2.webp" data-mimetype-before-conversion="image/webp" data-resize-width="690" data-mimetype="image/webp"/>
+                        <img src="/web/image/guided_tours.ir_attachment_7" alt="" data-attachment-id="1339" class="img img-fluid mx-auto rounded o_we_custom_image" data-format-mimetype="image/webp" data-original-id="1339" data-original-src="/web/image/1339-48685ffa/ghent2.webp" data-mimetype-before-conversion="image/webp" data-resize-width="690" data-mimetype="image/webp"/>
                       </div>
                     </div>
                   </div>
@@ -83,7 +83,6 @@
           <a t-if="len(available_appointments) != 1" class="text-truncate" t-attf-href="/appointment?#{keep_query('filter_appointment_type_ids', 'filter_staff_user_ids', 'invite_token')}" href="/appointment?"><i class="fa fa-long-arrow-left me-2"/>All Private Tours</a>
         </xpath>
         <xpath expr="//t[@t-set='selectionPossible']" position="after">
-          <!-- Selection is no longer possible if a selection screen was shown beforehand -->
           <t t-set="selectionPossible" t-value="selectionPossible and not (appointment_type.assign_method == 'resource_time' and appointment_type.avatars_display == 'show')"/>
         </xpath>
       </data>
@@ -110,7 +109,7 @@
                     <p>We are a team of passionate people whose goal is to improve everyone's life through disruptive products. We build great products to solve your business problems. Our products are designed for small to medium size companies willing to optimize their performance.</p>
                   </div>
                   <div class="col-lg-3 offset-lg-1 o_colored_level">
-                    <p class="text-muted"><b>MyGuidedTours</b><br/>250 Executive Park Blvd, Suite 3400 <br/> San Francisco CA 94134 <br/>United States</p>
+                    <p class="text-muted"><b t-esc="request.env.company.name"/><br/>250 Executive Park Blvd, Suite 3400 <br/> San Francisco CA 94134 <br/>United States</p>
                   </div>
                   <div class="col-lg-3 o_colored_level">
                     <ul class="list-unstyled mb-2">
@@ -211,13 +210,11 @@
               <div class="row">
                 <div class="col pe-xxl-5">
                   <t t-call="website_event.navbar"/>
-                  <!-- Show the button tickets only on mobile -->
                   <div t-if="opt_event_registration_block" class="o_wevent_event_main_cta_block d-lg-none mb-3">
                     <t t-call="website_event.registration_template">
                       <t t-set="cta_additional_classes">w-100 py-sm-3 mt-sm-2</t>
                     </t>
                   </div>
-                  <!-- Description -->
                   <div id="o_wevent_event_main_col">
                     <div t-if="edition_cover_only" class="css_non_editable_mode_hidden o_not_editable bg-info-light border border-info border-bottom-0 rounded-top p-2">
                       <em>Hidden for visitors</em>
@@ -229,8 +226,7 @@
                       <t t-set="use_text_align" t-value="True"/>
                       <t t-set="additionnal_classes" t-value="'o_wevent_event_main_cover overflow-hidden ' + ('css_non_editable_mode_hidden border border-info rounded-bottom' if edition_cover_only else 'd-none' if opt_event_description_cover_hidden else 'rounded')"/>
                       <div id="o_wevent_event_main_cover_content" class="p-3 mt-auto">
-                        <span t-if="event.is_participating" class="badge text-bg-success o_wevent_badge"><i class="fa fa-check me-2" role="img"/>Registered
-                                    </span>
+                        <span t-if="event.is_participating" class="badge text-bg-success o_wevent_badge"><i class="fa fa-check me-2" role="img"/>Registered</span>
                         <h2 t-field="event.name" itemprop="name" placeholder="Event Title" class="mt-3"/>
                         <p class="lead" t-field="event.subtitle" placeholder="Event Subtitle"/>
                       </div>
@@ -241,15 +237,12 @@
                     <div class="mt-4" t-field="event.description" itemprop="description"/>
                   </div>
                 </div>
-                <!-- Sidebar -->
                 <aside t-if="opt_event_registration_block or opt_event_dates_block or opt_event_calendar_block or                         opt_event_location_block or opt_event_organizer_block or opt_event_share_block" id="o_wevent_event_main_sidebar" t-attf-class="col-lg-4 py-3 pb-lg-0 d-print-none {{'sticky-top align-self-start' if opt_event_fixed_sidebar else ''}}">
-                  <!-- CTA (desktop only) -->
                   <div t-if="opt_event_registration_block" class="d-none d-lg-block mb-3">
                     <t t-call="website_event.registration_template">
                       <t t-set="cta_additional_classes">w-100</t>
                     </t>
                   </div>
-                  <!-- Date & Time (desktop only) -->
                   <div t-if="opt_event_dates_block or opt_event_calendar_block" class="o_wevent_bordered_block pb-3 mb-4 d-none d-lg-block">
                     <meta itemprop="startDate" t-att-content="event.date_begin.isoformat()"/>
                     <meta itemprop="endDate" t-att-content="event.date_end.isoformat()"/>
@@ -259,7 +252,6 @@
                     <h5 class="my-0">Event Info</h5>
                     <meta itemprop="eventStatus" content="https://schema.org/EventScheduled"/>
                   </header>
-                  <!-- Location -->
                   <meta itemprop="eventAttendanceMode" t-attf-content="https://schema.org/{{'Offline' if event.address_id else 'Online'}}EventAttendanceMode"/>
                   <div t-if="opt_event_location_block and event.address_id" class="o_wevent_sidebar_block o_wevent_bordered_block pb-3 mb-4" itemprop="location" itemscope="itemscope" itemtype="https://schema.org/Place">
                     <div>
@@ -269,12 +261,10 @@
                     <small class="d-block mb-2" t-field="event.address_id" t-options="{                                 &quot;widget&quot;: &quot;contact&quot;,                                 &quot;fields&quot;: [&quot;address&quot;],                                 &quot;no_marker&quot;: True,                                 &quot;with_microdata&quot;: True,                             }"/>
                     <small t-field="event.address_id" class="d-block mb-2" t-options="{                                 &quot;widget&quot;: &quot;contact&quot;,                                 &quot;fields&quot;: [&quot;phone&quot;, &quot;mobile&quot;, &quot;email&quot;]                             }"/>
                     <a t-att-href="event._google_map_link()" target="_blank" class="btn btn-light" title="Get directions"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="align-text-top" role="img" style="height: 1em; width: 1em"><rect width="24" height="24" opacity="0"/><path role="presentation" fill="currentColor" d="M13.67 22h-.06a1 1 0 0 1-.92-.8l-1.54-7.57a1 1 0 0 0-.78-.78L2.8 11.31a1 1 0 0 1-.12-1.93l16-5.33A1 1 0 0 1 20 5.32l-5.33 16a1 1 0 0 1-1 .68z"/></svg>
-                                Get directions
-                            </a>
+                      Get directions
+                    </a>
                   </div>
-                  <div t-elif="opt_event_location_block" class="o_wevent_sidebar_block o_wevent_bordered_block pb-3 mb-4"><h6 class="o_wevent_sidebar_title">Location</h6><i class="fa fa-map-marker" title="Location"/> Online event
-                        </div>
-                  <!-- Organizer -->
+                  <div t-elif="opt_event_location_block" class="o_wevent_sidebar_block o_wevent_bordered_block pb-3 mb-4"><h6 class="o_wevent_sidebar_title">Location</h6><i class="fa fa-map-marker" title="Location"/> Online event</div>
                   <div t-if="opt_event_organizer_block and event.organizer_id" class="o_wevent_sidebar_block o_wevent_bordered_block pb-3 mb-4" itemprop="organizer" itemscope="itemscope" itemtype="http://schema.org/Organization">
                     <div>
                       <h6 class="o_wevent_sidebar_title">Organizer</h6>
@@ -282,7 +272,6 @@
                     <div itemprop="name" class="mb-1" t-field="event.organizer_id"/>
                     <small t-field="event.organizer_id" t-options="{'widget': 'contact', 'fields': ['phone', 'mobile', 'email'], 'with_microdata': True,}"/>
                   </div>
-                  <!-- Social -->
                   <div t-if="opt_event_share_block" class="o_wevent_sidebar_block">
                     <div class="">
                       <h6 class="o_wevent_sidebar_title">Share</h6>
@@ -311,7 +300,6 @@
       <t name="Event Navbar" t-name="website_event.navbar">
         <t t-set="is_rendering_cta" t-value="event.event_registrations_open and not hide_register_cta"/>
         <section id="o_wevent_event_submenu">
-          <!-- Mobile -->
           <div id="o_wevent_submenu_mobile" class="container d-flex d-lg-none align-items-center py-3 pb-lg-2">
             <a t-if="navbar__back_url" t-att-href="navbar__back_url" t-att-title="navbar__back_title or 'Go back'">
               <i class="oi oi-chevron-left"/>
@@ -321,13 +309,11 @@
               <i class="oi oi-chevron-left"/>
               <span>All Events</span>
             </a>
-            <!-- Add Register additional CTA button, in addition to menus -->
             <a t-if="is_rendering_cta" t-att-href="'/event/%s/register' % (slug(event))" t-attf-class="btn btn-primary ms-auto" title="Registration">
                 Registration
             </a>
             <t t-call="website_event.navbar_dropdown"/>
           </div>
-          <!-- Desktop -->
           <div id="o_wevent_submenu_desktop" class="d-none d-lg-block mt-1 py-3 py-lg-2">
             <div class="container">
               <div class="d-flex align-items-center justify-content-between">
@@ -359,7 +345,6 @@
                     </t>
                   </ul>
                 </nav>
-                <!-- Workaround to avoid flickering while navigating between pages with and without CTA -->
                 <span t-if="not is_rendering_cta" aria-hidden="true" class="btn invisible w-0 px-0"> </span>
                 <div t-else="" class="ms-3">
                   <t t-call="website_event.registration_template"/>
@@ -425,7 +410,7 @@
             <t t-elif="_txt_elt_content == 'phone_mail'">
               <div t-attf-class="s_text_block #{_div_class}" data-name="Text">
                 <a href="tel:+1 555-555-5556" class="nav-link o_nav-link_secondary">
-                  <small><i class="fa fa-1x fa-fw fa-phone me-1"/>͏ <!-- Empty character needed to be able to delete the icon. -->
+                  <small><i class="fa fa-1x fa-fw fa-phone me-1"/>͏ 
                             <span class="o_force_ltr">+1 555-555-5556</span>
                         </small>
                 </a>
@@ -481,7 +466,7 @@
           <t t-set="pageName" t-value="'homepage'"/>
           <div id="wrap" class="oe_structure">
             <section class="s_discovery o_colored_level o_cc5 parallax pb256 pt216" style="background-position: 50% 46.8984%; position: relative;" data-oe-shape-data="{&quot;shape&quot;:&quot;web_editor/Connections/06&quot;,&quot;colors&quot;:{&quot;c5&quot;:&quot;rgba(0,0,0,0)&quot;},&quot;flip&quot;:[],&quot;showOnMobile&quot;:false,&quot;shapeAnimationSpeed&quot;:&quot;0&quot;}" data-snippet="s_discovery" data-attachment-id="1363" data-format-mimetype="image/webp" data-scroll-background-ratio="1.5">
-              <span class="s_parallax_bg oe_img_bg o_bg_img_center o_bg_img_origin_border_box" data-original-id="1363" data-original-src="/web/image/guided_tours.ir_attachment_1363" data-mimetype-before-conversion="image/jpeg" data-resize-width="1920" data-mimetype="image/webp" style="background-image: url(&quot;/web/image/guided_tours.ir_attachment_1363&quot;);" data-attachment-id="1363"/>
+              <span class="s_parallax_bg oe_img_bg o_bg_img_center o_bg_img_origin_border_box" data-original-id="1363" data-original-src="/web/image/guided_tours.ir_attachment_11" data-mimetype-before-conversion="image/jpeg" data-resize-width="1920" data-mimetype="image/webp" style="background-image: url(&quot;/web/image/guided_tours.ir_attachment_11&quot;);" data-attachment-id="1363"/>
               <div class="o_we_bg_filter" style="background-color: rgba(0, 0, 0, 0.15);">
                 <br/>
               </div>
@@ -489,8 +474,7 @@
                 <br/>
               </div>
               <div class="container" style="text-align: center;">
-                <h1 class="display-2" style="text-align: center;">
-        Experience the real Belgium</h1>
+                <h1 class="display-2" style="text-align: center;">Experience the real Belgium</h1>
                 <p class="lead" style="text-align: center;">Join expert local guides for unforgettable walking tours through Belgium.<br/>&amp;nbsp;Rich in history, full of charm, and never ordinary.</p>
                 <p style="text-align: center;">
                   <a class="btn btn-primary mb-2 o_translate_inline" href="/event">&amp;nbsp;Book Your Adventure </a>
@@ -501,57 +485,39 @@
             <section class="s_key_images o_cc o_cc2 o_colored_level pb24 pt120" data-snippet="s_key_images">
               <div class="container">
                 <h2>Why book with us</h2>
-                <p>
                   <br/>
-                </p>
                 <div class="row">
                   <div class="col-6 col-lg-3 o_colored_level">
                     <h4>Authentic, local experiences in every city</h4>
-                    <p>
-                      <br/>
-                    </p>
+                    <br/>
                     <p>
                       <img src="/web/image/guided_tours.ir_attachment_1" alt="" data-attachment-id="1339" class="img img-fluid rounded o_we_custom_image" style="width: 100% !important;" data-format-mimetype="image/webp" data-original-id="1339" data-original-src="/web/image/1339-48685ffa/ghent2.webp" data-mimetype-before-conversion="image/webp" data-resize-width="690" data-mimetype="image/svg+xml" data-shape="html_builder/geometric_round/geo_round_square" data-shape-colors=";;;;" data-aspect-ratio="1/1" data-file-name="ghent2.svg" loading="lazy"/>
                     </p>
-                    <p>
-                      <br/>
-                    </p>
+                    <br/>
                   </div>
                   <div class="col-6 col-lg-3 o_colored_level">
                     <h4>Small groups for a personal touch</h4>
-                    <p>
-                      <br/>
-                    </p>
+                    <br/>
                     <p>
                       <img src="/web/image/guided_tours.ir_attachment_2" alt="" data-attachment-id="1163" class="img img-fluid rounded o_we_custom_image" style="width: 100% !important;" data-format-mimetype="image/webp" data-original-id="1163" data-original-src="/web/image/1163-7bfa2b46/namur.jpg" data-mimetype-before-conversion="image/jpeg" data-resize-width="690" data-mimetype="image/svg+xml" data-shape="html_builder/geometric_round/geo_round_square" data-shape-colors=";;;;" data-aspect-ratio="1/1" data-file-name="namur.svg" loading="lazy"/>
                     </p>
-                    <p>
-                      <br/>
-                    </p>
+                    <br/>
                   </div>
                   <div class="col-6 col-lg-3 o_colored_level">
                     <h4>Handpicked routes, hidden gems, and real stories</h4>
-                    <p>
-                      <br/>
-                    </p>
+                    <br/>
                     <p>
                       <img src="/web/image/guided_tours.ir_attachment_3" alt="" data-attachment-id="1085" class="img img-fluid rounded o_we_custom_image" style="width: 100% !important;" data-format-mimetype="image/webp" data-original-id="1085" data-original-src="/web/image/1085-c66e3758/Event%20%27Brussels%20City%20Tour%27%20cover%20image.webp" data-mimetype-before-conversion="image/webp" data-resize-width="690" data-mimetype="image/svg+xml" data-shape="html_builder/geometric_round/geo_round_square" data-shape-colors=";;;;" data-aspect-ratio="1/1" data-file-name="Event%20%27Brussels%20City%20Tour%27%20cover%20image.svg" loading="lazy"/>
                     </p>
-                    <p>
-                      <br/>
-                    </p>
+                    <br/>
                   </div>
                   <div class="col-6 col-lg-3 o_colored_level">
                     <h4>Easy booking, flexible schedules</h4>
-                    <p>
-                      <br/>
-                    </p>
+                    <br/>
                     <p>
                       <img src="/web/image/guided_tours.ir_attachment_4" alt="" data-attachment-id="1158" class="img img-fluid o_we_custom_image rounded" style="width: 100% !important;" data-format-mimetype="image/webp" data-original-id="1158" data-original-src="/web/image/1158-8c168c12/ghent.webp" data-mimetype-before-conversion="image/webp" data-resize-width="690" data-mimetype="image/svg+xml" data-shape="html_builder/geometric_round/geo_round_square" data-shape-colors=";;;;" data-aspect-ratio="1/1" data-file-name="ghent.svg" loading="lazy"/>
                     </p>
-                    <p>
-                      <br/>
-                    </p>
+                    <br/>
                   </div>
                 </div>
               </div>
@@ -563,41 +529,27 @@
                     <div class="row">
                       <div class="col-12 pb32 o_colored_level">
                         <h3>Our travel expertise</h3>
-                        <p class="lead">
-        Our travel experts provide personalized itineraries to ensure unforgettable experiences.
-    </p>
+                        <p class="lead">Our travel experts provide personalized itineraries to ensure unforgettable experiences.</p>
                       </div>
                       <div class="col-12 pt8 pb8 o_colored_level" data-name="Feature">
                         <i class="s_showcase_icon fa fa-star-o me-auto rounded float-start bg-o-color-2 o_cc o_cc4" role="img"/>
                         <div class="d-flex flex-column">
-                          <h5 class="s_showcase_title">
-        Travel Excellence
-    </h5>
-                          <p>
-        We focus on crafting personalized itineraries, ensuring memorable and high-quality travel experiences that meet your expectations.
-    </p>
+                          <h5 class="s_showcase_title">Travel Excellence</h5>
+                          <p>We focus on crafting personalized itineraries, ensuring memorable and high-quality travel experiences that meet your expectations.</p>
                         </div>
                       </div>
                       <div class="col-12 pt8 pb8 o_colored_level" data-name="Feature">
                         <i class="s_showcase_icon fa fa-user-o me-auto rounded float-start bg-o-color-2 o_cc o_cc4" role="img"/>
                         <div class="d-flex flex-column">
-                          <h5 class="s_showcase_title">
-        Flexible Travel Options
-    </h5>
-                          <p>
-        Using flexible planning, we deliver tailored travel solutions that adapt quickly to your preferences and feedback.
-    </p>
+                          <h5 class="s_showcase_title">Flexible Travel Options</h5>
+                          <p>Using flexible planning, we deliver tailored travel solutions that adapt quickly to your preferences and feedback.</p>
                         </div>
                       </div>
                       <div class="col-12 pt8 pb8 o_colored_level" data-name="Feature">
                         <i class="s_showcase_icon fa fa-heart-o me-auto rounded float-start bg-o-color-2 o_cc o_cc4" role="img"/>
                         <div class="d-flex flex-column">
-                          <h5 class="s_showcase_title">
-        Safety First
-    </h5>
-                          <p>
-        We prioritize safety measures at every stage, ensuring your travel experience is secure and worry-free.
-    </p>
+                          <h5 class="s_showcase_title">Safety First</h5>
+                          <p>We prioritize safety measures at every stage, ensuring your travel experience is secure and worry-free.</p>
                         </div>
                       </div>
                       <div class="col-12 pt8 pb8 o_colored_level" style="text-align: right;">
@@ -609,7 +561,7 @@
                     </div>
                   </div>
                   <div class="o_snippet_mobile_invisible d-lg-block d-none col-lg-5 offset-lg-1 o_colored_level" data-invisible="1">
-                    <img src="/web/image/guided_tours.configurator_1_s_showcase_default_image" class="img img-fluid ms-auto rounded float-end shadow" alt="" loading="lazy"/>
+                    <img src="/web/image/guided_tours.ir_attachment_10" class="img img-fluid ms-auto rounded float-end shadow" alt="" loading="lazy"/>
                   </div>
                 </div>
               </div>
@@ -668,7 +620,6 @@
             </div>
             <t t-if="search_tags" t-call="website_event.searched_tags"/>
           </section>
-          <!-- Off canvas filters on mobile-->
           <div id="o_wevent_index_offcanvas" class="o_website_offcanvas offcanvas offcanvas-end d-lg-none p-0 overflow-visible">
             <div class="offcanvas-header">
               <h5 class="offcanvas-title">Filters</h5>
@@ -795,20 +746,16 @@
           </t>
 
           <div id="wrap" class="o_wevent_index">
-              <!-- Options -->
               <t t-set="opt_events_list_cards" t-value="is_view_active('website_event.opt_events_list_cards')"/>
               <t t-set="opt_events_list_columns" t-value="is_view_active('website_event.opt_events_list_columns')"/>
-              <!-- Topbar -->
               <t t-call="website_event.index_topbar">
                   <t t-set="search" t-value="original_search or search or searches['search']"/>
               </t>
-              <!-- Content -->
               <div class="o_wevent_events_list">
                   <div class="container">
                       <div class="row">
                           <div id="o_wevent_index_main_col" t-attf-class="col-md mb-3 #{opt_events_list_columns and 'opt_events_list_columns' or 'opt_events_list_rows'}">
                               <div class="row g-4 g-lg-3 g-xxl-4">
-                                  <!-- Events List -->
                                   <t t-call="website_event.events_list"/>
                               </div>
                           </div>

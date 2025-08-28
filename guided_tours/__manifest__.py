@@ -5,7 +5,6 @@
     'author': 'Odoo S.A.',
     'depends': [
         'appointment_account_payment',
-        'appointment_google_calendar',
         'appointment_hr',
         'base_industry_data',
         'contacts',
@@ -24,7 +23,6 @@
         'data/res_config_setting.xml',
         'data/appointment_resource.xml',
         'data/pos_category.xml',
-        'data/product_template.xml',
         'data/product_product.xml',
         'data/appointment_type.xml',
         'data/event_tag_category.xml',
@@ -40,13 +38,12 @@
         'data/product_public_category.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
-        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/event_stage.xml',
         'demo/appointment_type.xml',
         'demo/event_event.xml',
-        'demo/product_template.xml',
+        'demo/product_product.xml',
         'demo/hr_employee.xml',
         'demo/pos_config.xml',
         'demo/pos_session.xml',
@@ -58,17 +55,11 @@
         'demo/website.xml',
     ],
     'license': 'OPL-1',
-    'assets': {
-                'web.assets_backend': [
-                    'guided_tours/static/src/js/my_tour.js',
-                ],
-            },
-        'cloc_exclude': [
-            'data/knowledge_article.xml',
-            'static/src/js/my_tour.js',
-            'demo/website_view.xml',
-        ],
-        'images': [
-            'images/main.png',
-        ],
+    'cloc_exclude': [
+        'data/knowledge_article.xml',
+        'demo/website_view.xml',
+    ],
+    'images': [
+        'images/main.png',
+    ],
 }
