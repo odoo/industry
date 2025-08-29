@@ -11,12 +11,8 @@
         <xpath expr="//field[@name='state']" position="replace">
           <field name="move_ids" display="full" widget="x2_many_media_viewer" string="Products" options="{}"/>
           <field widget="statinfo" class="bg-danger text-white fw-bold text-uppercase ms-auto" name="activity_type_icon" display="full" string="Late"
-            invisible="state not in ['assigned', 'waiting', 'confirmed']
-                    and (has_deadline_issue
-                    or date_deadline and date_deadline &lt; current_date
-                    or scheduled_date and scheduled_date &lt; current_date)"/>
+            invisible="(state in ['assigned', 'waiting', 'confirmed']) and (scheduled_date and scheduled_date &gt;= current_date)"/>
         </xpath>
-        <!-- <xpath expr="//kanban[1]/templates[1]/t[@t-name='card']/div[1]/field[@name='name']" position="replace"/> -->
       </data>
     </field>
     <field name="inherit_id" ref="stock.stock_picking_kanban"/>
@@ -27,6 +23,27 @@
     <field name="priority">99</field>
     <field name="type">kanban</field>
   </record>
+
+  <!-- Custom kanban for Receipts -->
+  <!-- <record id="custom_receipt_kanban" model="ir.ui.view">
+      <field name="name">Custom: Receipt Kanban (no create)</field>
+      <field name="model">stock.picking</field>
+      <field name="inherit_id" ref="stock.stock_picking_kanban"/>
+      <field name="priority">1</field>
+      <field name="arch" type="xml">
+          <xpath expr="//kanban" position="attributes">
+              <attribute name="create">0</attribute>
+          </xpath>
+      </field>
+  </record>
+
+  <record id="custom_action_receipts" model="ir.actions.act_window.view">
+      <field name="act_window_id" ref="stock.action_picking_tree_all"/>
+      <field name="view_id" ref="custom_receipt_kanban"/>
+      <field name="view_mode">kanban</field>
+      <field name="sequence" eval="1"/>
+  </record> -->
+
   <record id="odoo_studio_stock_ru_8d7cc849-104d-4b24-b4e7-d9ca7ed9f5f7" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
@@ -118,11 +135,16 @@
       <data>
         <xpath expr="//search[1]/field[@name='name']" position="before">
           <xpath expr="//field[@name='partner_id']" position="move"/>
-          <xpath expr="//field[@name='product_id']" filter_domain="['|', '|', '|', ('default_code', 'ilike', 'sfh'), ('product_variant_ids.default_code', 'ilike', 'sfh'), ('name', 'ilike', 'sfh'), ('barcode', 'ilike', 'sfh')]" position="move"/>
+          <xpath expr="//field[@name='product_id']" position="move"/>
+        </xpath>
+        <xpath expr="//field[@name='product_id']" position="attributes">
+          <attribute name="filter_domain">
+              ['|', '|', '|', ('product_id.default_code', 'ilike', self), ('product_id.product_variant_ids.default_code', 'ilike', self), ('product_id.name', 'ilike', self), ('product_id.barcode', 'ilike', self)]
+          </attribute>
         </xpath>
         <xpath expr="//field[@name='partner_id']" position="attributes">
           <attribute name="filter_domain">
-                ['|', '|', '|', '|', ('partner_id.complete_name', 'ilike', 'dgj'), ('partner_id.ref', 'ilike', 'dgj'), ('partner_id.email', 'ilike', 'dgj'), ('partner_id.company_registry', 'ilike', 'dgj'), ('partner_id.barcode', 'ilike', 'dgj')]
+                ['|', '|', '|', '|', ('partner_id.complete_name', 'ilike', self), ('partner_id.ref', 'ilike', self), ('partner_id.email', 'ilike', self), ('partner_id.company_registry', 'ilike', self), ('partner_id.barcode', 'ilike', self)]
           </attribute>
         </xpath>
         <xpath expr="//search[1]/field[@name='name']" position="after">
@@ -141,7 +163,6 @@
     <field name="priority">99</field>
     <field name="type">search</field>
   </record>
-
   <record id="stock_picking_list_view_inherit" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
@@ -158,10 +179,7 @@
         <xpath expr="//field[@name='state']" position="replace">
           <field name="date_deadline"/>
           <field  widget="statinfo" class="bg-danger text-white fw-bold text-uppercase" name="activity_type_icon" string="Late"
-            invisible="state not in ['assigned', 'waiting', 'confirmed']
-                    and (has_deadline_issue
-                    or date_deadline and date_deadline &lt; current_date
-                    or scheduled_date and scheduled_date &lt; current_date)"/>
+              invisible="(state not in ['assigned', 'waiting', 'confirmed']) and (scheduled_date and scheduled_date &gt;= current_date)"/>
         </xpath>
       </data>
     </field>
