@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="industry_compute_run_45b86d65-fa80-4f7f-b0e1-2301ba896330" model="ir.actions.server">
+    <field name="code"><![CDATA[rtms = env['x_run_time_meter'].search([('id', 'in', record.x_serial.x_run_time_meters.ids)], order='x_date')
+previous_rtm = False
+for rtm in rtms:
+    rtm['x_run_time_increment_h'] = rtm['x_run_time'] - previous_rtm['x_run_time'] if previous_rtm else 0
+    previous_rtm = rtm
+
+
+]]></field>
+    <field name="model_id" ref="x_run_time_meter_model"/>
+    <field name="state">code</field>
+    <field name="name">Industry: Compute Run-Time Increment</field>
+    <field name="usage">base_automation</field>
+  </record>
+  <record id="industry_record_run__61707535-5357-4c39-a25a-ffbaf7cd8a96" model="ir.actions.server">
+    <field name="binding_model_id" ref="sale.model_sale_order"/>
+    <field name="code"><![CDATA[action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Record Run-Time Meter',
+    'res_model': 'x_run_time_meter',
+    'view_mode': 'form',
+    'target': 'new',
+}
+        ]]></field>
+    <field name="model_id" ref="sale.model_sale_order"/>
+    <field name="state">code</field>
+    <field name="name">Industry: Record Run-Time Meter</field>
+  </record>
+</odoo>
