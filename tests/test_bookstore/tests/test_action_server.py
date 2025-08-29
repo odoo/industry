@@ -59,7 +59,7 @@ class BookstoreAutomationsTestCase(TransactionCase):
             'picking_type_id': self.env.ref('stock.picking_type_in').id,
             'location_id': self.env.ref('stock.stock_location_suppliers').id,
             'location_dest_id': self.env.ref('stock.stock_location_stock').id,
-            'move_ids_without_package': [(0, 0, {
+            'move_ids': [(0, 0, {
                 'product_id': product.id,
                 'product_uom_qty': 1,
             })],
