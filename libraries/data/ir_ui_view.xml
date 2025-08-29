@@ -3,18 +3,16 @@
   <record id="odoo_studio_stock_pi_a2f93bf4-089e-4696-bcea-c76b0da99856" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
-        <xpath expr="//kanban" position="attributes">
+        <!-- <xpath expr="//kanban" position="attributes">
           <attribute name="create">0</attribute>
-        </xpath>
+        </xpath> -->
         <xpath expr="//field[@name='user_id']" position="replace"/>
         <xpath expr="//field[@name='activity_ids']" position="replace"/>
         <xpath expr="//field[@name='state']" position="replace">
           <field name="move_ids" display="full" widget="x2_many_media_viewer" string="Products" options="{}"/>
           <field widget="statinfo" class="bg-danger text-white fw-bold text-uppercase ms-auto" name="activity_type_icon" display="full" string="Late"
             invisible="state not in ['assigned', 'waiting', 'confirmed']
-                    and (has_deadline_issue
-                    or date_deadline and date_deadline &lt; current_date
-                    or scheduled_date and scheduled_date &lt; current_date)"/>
+                    and scheduled_date and scheduled_date &lt; current_date"/>
         </xpath>
         <!-- <xpath expr="//kanban[1]/templates[1]/t[@t-name='card']/div[1]/field[@name='name']" position="replace"/> -->
       </data>
@@ -118,11 +116,11 @@
       <data>
         <xpath expr="//search[1]/field[@name='name']" position="before">
           <xpath expr="//field[@name='partner_id']" position="move"/>
-          <xpath expr="//field[@name='product_id']" filter_domain="['|', '|', '|', ('default_code', 'ilike', 'sfh'), ('product_variant_ids.default_code', 'ilike', 'sfh'), ('name', 'ilike', 'sfh'), ('barcode', 'ilike', 'sfh')]" position="move"/>
+          <xpath expr="//field[@name='product_id']" filter_domain="['|', '|', '|', ('default_code', 'ilike', self), ('product_variant_ids.default_code', 'ilike', self), ('name', 'ilike', self), ('barcode', 'ilike', self)]" position="move"/>
         </xpath>
         <xpath expr="//field[@name='partner_id']" position="attributes">
           <attribute name="filter_domain">
-                ['|', '|', '|', '|', ('partner_id.complete_name', 'ilike', 'dgj'), ('partner_id.ref', 'ilike', 'dgj'), ('partner_id.email', 'ilike', 'dgj'), ('partner_id.company_registry', 'ilike', 'dgj'), ('partner_id.barcode', 'ilike', 'dgj')]
+                ['|', '|', '|', '|', ('partner_id.complete_name', 'ilike', self), ('partner_id.ref', 'ilike', self), ('partner_id.email', 'ilike', self), ('partner_id.company_registry', 'ilike', self), ('partner_id.barcode', 'ilike', self)]
           </attribute>
         </xpath>
         <xpath expr="//search[1]/field[@name='name']" position="after">
@@ -141,7 +139,6 @@
     <field name="priority">99</field>
     <field name="type">search</field>
   </record>
-
   <record id="stock_picking_list_view_inherit" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
@@ -158,10 +155,8 @@
         <xpath expr="//field[@name='state']" position="replace">
           <field name="date_deadline"/>
           <field  widget="statinfo" class="bg-danger text-white fw-bold text-uppercase" name="activity_type_icon" string="Late"
-            invisible="state not in ['assigned', 'waiting', 'confirmed']
-                    and (has_deadline_issue
-                    or date_deadline and date_deadline &lt; current_date
-                    or scheduled_date and scheduled_date &lt; current_date)"/>
+              invisible="state not in ['assigned', 'waiting', 'confirmed']
+                  and scheduled_date and scheduled_date &lt; current_date"/>
         </xpath>
       </data>
     </field>
