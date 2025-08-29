@@ -48,17 +48,19 @@ if sale_order:
     <field name="name">Fix Slot Times</field>
     <field name="code"><![CDATA[def ceil(x):
     return int(x) if x == int(x) else int(x) + 1
+pickup_time = env.ref('sale_renting.recurrence_nightly').pickup_time
+return_time = env.ref('sale_renting.recurrence_nightly').return_time
 start_datetime = record.start_datetime.astimezone(tz=dateutil.tz.UTC)
 end_datetime = record.end_datetime.astimezone(tz=dateutil.tz.UTC)
 tz = env.ref('website.default_website').tz
 if record.role_id.x_is_a_room_offer:
-    if record.start_datetime and str(record.start_datetime.time()) != "18:00:00":
-        start = timezone(tz).localize(datetime.datetime(year=start_datetime.year, month=start_datetime.month, day=start_datetime.day, hour=18, minute=0, second=0))
+    if record.start_datetime and str(record.start_datetime.time()) != f"{int(pickup_time):02d}:{int(pickup_time % 1 * 60):02d}:00":
+        start = timezone(tz).localize(datetime.datetime(year=start_datetime.year, month=start_datetime.month, day=start_datetime.day, hour=int(pickup_time), minute=int(pickup_time % 1 * 60), second=0))
         start_datetime = start.astimezone(tz=dateutil.tz.UTC)
         if start_datetime >= end_datetime:
             start_datetime = start_datetime - datetime.timedelta(days=1)
-    if record.end_datetime and str(record.end_datetime.time()) != "09:00:00":
-        end = timezone(tz).localize(datetime.datetime(year=end_datetime.year, month=end_datetime.month, day=end_datetime.day, hour=9, minute=0, second=0))
+    if record.end_datetime and str(record.end_datetime.time()) != f"{int(return_time):02d}:{int(return_time % 1 * 60):02d}:00":
+        end = timezone(tz).localize(datetime.datetime(year=end_datetime.year, month=end_datetime.month, day=end_datetime.day, hour=int(return_time), minute=int(return_time % 1 * 60), second=0))
         end_datetime = end.astimezone(tz=dateutil.tz.UTC)
         if start_datetime >= end_datetime:
             end_datetime = end_datetime + datetime.timedelta(days=1)
@@ -82,14 +84,16 @@ if record.sale_line_id:
         <field name="usage">base_automation</field>
         <field name="state">code</field>
         <field name="code"><![CDATA[
+pickup_time = env.ref('sale_renting.recurrence_nightly').pickup_time
+return_time = env.ref('sale_renting.recurrence_nightly').return_time
 for record in records:
     tz = env.ref('website.default_website').tz
     rental_start_date = record.rental_start_date.astimezone(tz=dateutil.tz.gettz(tz))
     rental_return_date = record.rental_return_date.astimezone(tz=dateutil.tz.gettz(tz))
-    start = rental_start_date.replace(hour=18, minute=0, second=0, microsecond=0)
+    start = rental_start_date.replace(hour=int(pickup_time), minute=int(pickup_time % 1 * 60), second=0, microsecond=0)
     start_datetime = start.astimezone(tz=dateutil.tz.UTC)
     record['rental_start_date'] = start_datetime.replace(tzinfo=None)
-    end = rental_return_date.replace(hour=9, minute=0, second=0, microsecond=0)
+    end = rental_return_date.replace(hour=int(return_time), minute=int(return_time % 1 * 60), second=0, microsecond=0)
     end_datetime = end.astimezone(tz=dateutil.tz.UTC)
     record['rental_return_date'] = end_datetime.replace(tzinfo=None)
     record.action_update_rental_prices()
