@@ -1,0 +1,176 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="odoo_studio_stock_pi_a2f93bf4-089e-4696-bcea-c76b0da99856" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//kanban" position="attributes">
+          <attribute name="create">0</attribute>
+        </xpath>
+        <xpath expr="//field[@name='user_id']" position="replace"/>
+        <xpath expr="//field[@name='activity_ids']" position="replace"/>
+        <xpath expr="//field[@name='state']" position="replace">
+          <field name="move_ids" display="full" widget="x2_many_media_viewer" string="Products" options="{}"/>
+          <field widget="statinfo" class="bg-danger text-white fw-bold text-uppercase ms-auto" name="activity_type_icon" display="full" string="Late"
+            invisible="state not in ['assigned', 'waiting', 'confirmed']
+                    and (has_deadline_issue
+                    or date_deadline and date_deadline &lt; current_date
+                    or scheduled_date and scheduled_date &lt; current_date)"/>
+        </xpath>
+        <!-- <xpath expr="//kanban[1]/templates[1]/t[@t-name='card']/div[1]/field[@name='name']" position="replace"/> -->
+      </data>
+    </field>
+    <field name="inherit_id" ref="stock.stock_picking_kanban"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">stock.picking</field>
+    <field name="name">Odoo Studio: stock.picking.kanban customization</field>
+    <field name="priority">99</field>
+    <field name="type">kanban</field>
+  </record>
+  <record id="odoo_studio_stock_ru_8d7cc849-104d-4b24-b4e7-d9ca7ed9f5f7" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//list" position="attributes">
+          <attribute name="multi_edit">1</attribute>
+          <!-- <attribute name="open_form_view">1</attribute> -->
+        </xpath>
+        <xpath expr="//field[@name='route_id']" position="replace">
+          <field name="delay" optional="show"/>
+          <field name="x_studio_pos_product_category_ids" widget="many2many_tags"/>
+        </xpath>
+        <xpath expr="//field[@name='location_dest_id']" position="replace"/>
+        <xpath expr="//field[@name='location_src_id']" position="replace"/>
+        <xpath expr="//field[@name='action']" position="replace">
+          <xpath expr="//field[@name='name']" position="move"/>
+        </xpath>
+        <xpath expr="//field[@name='name']" position="attributes">
+          <attribute name="optional">show</attribute>
+        </xpath>
+        <xpath expr="//list" position="inside">
+          <field name="x_studio_standard_rule" optional="hide"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="stock.view_stock_rule_tree"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">stock.rule</field>
+    <field name="name">Odoo Studio: stock.rule.list customization</field>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+  </record>
+  <record id="odoo_studio_stock_lo_9552f7f8-ccb5-4db5-841a-d2abe7f56825" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='product_selectable']" position="after">
+          <field name="x_studio_automatic_activation_on_product" help="Assign the product's route during creation"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="stock.stock_location_route_form_view"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">stock.route</field>
+    <field name="name">Odoo Studio: stock.location.route.form customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_operatio_90f43cd8-6331-4f53-9ff8-2c98d9372f9c" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//label[@name='default_location_src_id_label']" position="before">
+          <field name="x_studio_overrule_customer_location" invisible="code != 'outgoing'" help="the destination location comes from the operation type, not the contact"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="stock.view_picking_type_form"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">stock.picking.type</field>
+    <field name="name">Odoo Studio: Operation Types customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_stock_ru_16e06a3f-f447-4f3b-af48-e2f5608dba14" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='auto']" position="after">
+          <field name="x_studio_standard_rule"/>
+        </xpath>
+        <xpath expr="//group/group[2]" position="inside">
+          <field name="x_studio_pos_product_category_ids" readonly="x_studio_standard_rule"/>
+        </xpath>
+        <xpath expr="//field[@name='push_domain']" position="attributes">
+          <attribute name="invisible">x_studio_standard_rule</attribute>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="stock.view_stock_rule_form"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">stock.rule</field>
+    <field name="name">Odoo Studio: stock.rule.form customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+  <record id="odoo_studio_stock_pi_6f20ed12-5640-46f2-9931-b48c86a49a21" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//search[1]/field[@name='name']" position="before">
+          <xpath expr="//field[@name='partner_id']" position="move"/>
+          <xpath expr="//field[@name='product_id']" filter_domain="['|', '|', '|', ('default_code', 'ilike', 'sfh'), ('product_variant_ids.default_code', 'ilike', 'sfh'), ('name', 'ilike', 'sfh'), ('barcode', 'ilike', 'sfh')]" position="move"/>
+        </xpath>
+        <xpath expr="//field[@name='partner_id']" position="attributes">
+          <attribute name="filter_domain">
+                ['|', '|', '|', '|', ('partner_id.complete_name', 'ilike', 'dgj'), ('partner_id.ref', 'ilike', 'dgj'), ('partner_id.email', 'ilike', 'dgj'), ('partner_id.company_registry', 'ilike', 'dgj'), ('partner_id.barcode', 'ilike', 'dgj')]
+          </attribute>
+        </xpath>
+        <xpath expr="//search[1]/field[@name='name']" position="after">
+          <field name="return_count"/>
+        </xpath>
+        <xpath expr="//search/group" position="inside">
+          <filter name="group_by_partner" string="Contact" context="{'group_by': 'partner_id'}"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">stock.picking</field>
+    <field name="name">Odoo Studio: stock.picking.internal.search customization</field>
+    <field name="priority">99</field>
+    <field name="type">search</field>
+  </record>
+
+  <record id="stock_picking_list_view_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//list" position="attributes">
+            <attribute name="create">0</attribute>
+            <attribute name="multi_edit">1</attribute>
+        </xpath>
+        <xpath expr="//field[@name='scheduled_date']" position="attributes">
+          <attribute name="widget"/>
+          <attribute name="options">{'show_time': false}</attribute>
+        </xpath>
+        <xpath expr="//field[@name='name']" position="replace"/>
+        <xpath expr="//field[@name='origin']" position="replace"/>
+        <xpath expr="//field[@name='state']" position="replace">
+          <field name="date_deadline"/>
+          <field  widget="statinfo" class="bg-danger text-white fw-bold text-uppercase" name="activity_type_icon" string="Late"
+            invisible="state not in ['assigned', 'waiting', 'confirmed']
+                    and (has_deadline_issue
+                    or date_deadline and date_deadline &lt; current_date
+                    or scheduled_date and scheduled_date &lt; current_date)"/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="stock.vpicktree"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">stock.picking</field>
+    <field name="name">stock.picking.list customization</field>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+  </record>
+</odoo>
