@@ -4,7 +4,6 @@ import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 
 registry.category("web_tour.tours").add("bar_industry_knowledge_tour", {
-    url: "/odoo",
     
     steps: () => [
         {
