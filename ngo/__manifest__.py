@@ -28,6 +28,7 @@
         'data/ir_actions_report.xml',
         'data/mail_template.xml',
         'data/res_partner_category.xml',
+        'data/ir_sequence.xml',
         'data/ir_actions_server.xml',
         'data/ir_ui_view.xml',
         'data/hr_employee_category.xml',
@@ -51,6 +52,7 @@
         'data/website_menu.xml',
         'data/website_theme_apply.xml',
         'data/x_petition_tag.xml',
+        'data/website.xml',
     ],
     'demo': [
         'demo/product_template.xml',

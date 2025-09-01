@@ -28,7 +28,7 @@ new_signature = env['x_signature'].create({
 message = env['mail.message'].create({
     'model': 'x_signature',
     'res_id': new_signature.id,
-    'body': '<p>Comment: '+request.params.get('comments')+'</p>',
+    'body': '<p>Comment: '+ request.params.get('comments', '')+'</p>',
     'message_type': 'comment',
 })
 response = request.make_json_response({'id': new_signature.id}, status=200)]]></field>
@@ -52,12 +52,12 @@ response = {
     </record>
     <record id="action_generate_fiscal_attestation" model="ir.actions.server">
         <field name="code"><![CDATA[
-concerned_donations = record.env['account.payment'].search([('date.year_number', '=', record.x_wizard_fiscal_year)])
+concerned_donations = record.env['account.payment'].search([('date.year_number', '=', record.x_wizard_fiscal_year), ('state', '!=', 'draft')])
 if not record.x_wizard_show_warning and concerned_donations.filtered(lambda d: d.x_fiscal_attestation_id or not d.partner_id.street or not d.partner_id.city or not d.partner_id.state or not d.partner_id.country_id):
     response = {
         'type': 'ir.actions.act_window',
         'res_model': 'x_wizard_generate_fiscal_attestation',
-        'context': {'default_x_wizard_show_warning': True},
+        'context': {'default_x_wizard_show_warning': True, 'default_x_wizard_fiscal_year': record.x_wizard_fiscal_year, 'default_x_wizard_tax_minimum': record.x_wizard_tax_minimum},
         'view_mode': 'form',
         'target': 'new',
     }
@@ -67,7 +67,7 @@ else:
         donation_sum = sum(concerned_donations.filtered(lambda d: d.partner_id == partner).mapped('amount'))
         if donation_sum >= record.x_wizard_tax_minimum:
             fiscal_attestation = record.env['x_fiscal_attestation'].create({
-                'x_name': 'new',
+                'x_name': record.env['ir.sequence'].next_by_code('x_fiscal_attestation.seq'),
                 'x_fiscal_attestation_status': 'generated',
                 'x_partner_id': partner.id,
                 'x_date': datetime.datetime.today(),
