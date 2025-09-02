@@ -632,18 +632,20 @@
     <record id="x_wizard_generate_fiscal_attestation_form_view" model="ir.ui.view">
         <field name="arch" type="xml">
             <form>
-                <group>
-                    <div>
-                        <div class="alert alert-danger" role="alert" invisible="not x_wizard_show_warning">
+                <sheet>
+                    <group>
+                        <div class="alert alert-danger " role="alert" invisible="not x_wizard_show_warning">
                             Some fiscal attestations cannot be generated<br/><br/>There are donations already included in existing fiscal attestations.<br/>Some donors are missing required information, such as address or national ID.<br/><br/>These records will be excluded from the generation.
                         </div>
+                    </group>
+                    <group>
                         <div>Generate official fiscal attestations for donors based on their contributions during a selected fiscal year.</div>
-                        <label string="Fiscal Year" for="x_wizard_fiscal_year"/>
-                        <label string="Tax-Eligible Minimum" for="x_wizard_tax_minimum"/>
+                    </group>
+                    <group>
                         <field name="x_wizard_fiscal_year" required="1" options="{'type': 'number'}"/>
                         <field name="x_wizard_tax_minimum" required="1"/>
-                    </div>
-                </group>
+                    </group>
+                </sheet>
                 <footer>
                     <button string="Generate" name="%(action_generate_fiscal_attestation)d"
                         type="action" class="btn-primary" data-hotkey="q"/>
@@ -655,5 +657,17 @@
         <field name="name">Default form view for x_wizard_generate_fiscal_attestation</field>
         <field name="active" eval="True"/>
         <field name="type">form</field>
+    </record>
+
+    <record id="res_partner_form_view" model="ir.ui.view">
+        <field name="name">res.partner.form.view.inherited.ngo</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field eval="17" name="priority"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('o_address_format')]" position="after">
+                <field name="x_citizen_id_number"/>
+            </xpath>
+        </field>
     </record>
 </odoo>
