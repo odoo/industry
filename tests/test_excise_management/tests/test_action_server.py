@@ -56,20 +56,37 @@ class ActionServerTestCase(TransactionCase):
             "The purchase tax of the excise category should have its type equal to 'purchase'")
         self.assertEqual(excise_category.x_purchase_tax_id.tax_group_id, self.env.ref('excise_management.excises_tax_group'),
             "The purchase tax of the excise category should have its tax group set to the excises tax group")
-        self.assertIn(excise_category.x_sales_tax_id, self.fiscal_position.tax_ids,
-            "Fiscal positions that are not deposit should contains the sales taxes of the current category")
-        self.assertIn(excise_category.x_purchase_tax_id, self.fiscal_position.tax_ids,
-            "Fiscal positions that are not deposit should contains the purchase taxes of the current category")
 
     def test_add_excise_taxes_fiscal_position_server_action(self):
         excise_taxes = self.env['account.tax'].search([('x_is_excise', '=', True)])
-        for tax in excise_taxes:
-            self.assertIn(tax, self.fiscal_position.tax_ids,
-                "All excise taxes should be added automatically to a fiscal position that is not a deposit")
+        sale_excise_taxes = excise_taxes.filtered(lambda t: t.type_tax_use == 'sale')
+        purchase_excise_taxes = excise_taxes.filtered(lambda t: t.type_tax_use == 'purchase')
+        no_excise_sale = self.env.ref('excise_management.no_excise_tax_sale')
+        no_excise_purchase = self.env.ref('excise_management.no_excise_tax_purchase')
+        for tax in sale_excise_taxes:
+            if tax != no_excise_sale:
+                self.assertIn(tax, no_excise_sale.original_tax_ids, "All sale excise taxes should be automatically replaced by the no excise tax")
+            else:
+                self.assertNotIn(tax, no_excise_sale.original_tax_ids, "No excise tax should not replace itself")
+        for tax in purchase_excise_taxes:
+            if tax != no_excise_purchase:
+                self.assertIn(tax, no_excise_purchase.original_tax_ids, "All purchase excise taxes should be automatically replaced by the no excise tax")
+            else:
+                self.assertNotIn(tax, no_excise_sale.original_tax_ids, "No excise tax should not replace itself")
+
+        self.assertNotIn(self.fiscal_position, no_excise_sale.fiscal_position_ids,
+            "Fiscal positions that are not deposit does not contain the sales no excises tax")
+        self.assertNotIn(self.fiscal_position, no_excise_purchase.fiscal_position_ids,
+            "Fiscal positions that are not deposit does not contain the purchase no excises tax")
         self.fiscal_position.x_is_fiscal_deposit = True
         for tax in excise_taxes:
-            self.assertNotIn(tax, self.fiscal_position.tax_ids,
-                "All excise taxes should be removed automatically of a fiscal position that becomes a fiscal deposit")
+            if tax.id not in [no_excise_sale.id, no_excise_purchase.id]:
+                self.assertNotIn(tax, self.fiscal_position.tax_ids,
+                    "All excise taxes should be removed automatically of a fiscal position that becomes a fiscal deposit")
+        self.assertIn(self.fiscal_position, no_excise_sale.fiscal_position_ids,
+            "Fiscal positions that are deposit contains the sales no excises tax")
+        self.assertIn(self.fiscal_position, no_excise_purchase.fiscal_position_ids,
+            "Fiscal positions that are deposit contains the purchase no excises tax")
 
     def test_fiscal_deposit_move_computation(self):
         customers = self.env['stock.location'].create({'name': 'Customers', 'usage': 'customer'})
@@ -199,7 +216,7 @@ class ActionServerTestCase(TransactionCase):
                 'name': 'move',
             })]
         })
-        self.assertEqual(picking.move_ids[0].x_fiscal_deposit_move, 'exit fd')
+        self.assertEqual(picking.move_ids[0].x_fiscal_deposit_move, 'exit')
         picking = self.env['stock.picking'].create({
             'picking_type_id': self.env.ref('stock.picking_type_out').id,
             'partner_id': partner.id,
@@ -212,4 +229,4 @@ class ActionServerTestCase(TransactionCase):
                 'name': 'move',
             })]
         })
-        self.assertEqual(picking.move_ids[0].x_fiscal_deposit_move, 'entry fd')
+        self.assertEqual(picking.move_ids[0].x_fiscal_deposit_move, 'entry')

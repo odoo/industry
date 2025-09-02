@@ -17,20 +17,24 @@ if (categ := record.x_excise_category):
 common_values = {'name': 'Ex. ' + record.x_name, 'description': record.x_description, 'amount_type': 'code',
     'price_include_override': 'tax_included', 'include_base_amount': True, 'formula': 'quantity * product.x_excise_amount',
     'tax_group_id': env.ref('excise_management.excises_tax_group').id}
-record['x_sales_tax_id'] = env['account.tax'].create(common_values | {'type_tax_use': 'sale'})
-record['x_purchase_tax_id'] = env['account.tax'].create(common_values | {'type_tax_use': 'purchase'})
-env['account.fiscal.position'].search([('x_is_fiscal_deposit', '=', False)]).write({'tax_ids': [Command.link(record.x_sales_tax_id.id), Command.link(record.x_purchase_tax_id.id)]})
+sale_tax, purchase_tax = env['account.tax'].create([common_values | {'type_tax_use': 'sale'}, common_values | {'type_tax_use': 'purchase'}])
+record.write({'x_sales_tax_id': sale_tax.id, 'x_purchase_tax_id': purchase_tax.id})
+env.ref('excise_management.no_excise_tax_sale')['original_tax_ids'] = [Command.link(sale_tax.id)]
+env.ref('excise_management.no_excise_tax_purchase')['original_tax_ids'] = [Command.link(purchase_tax.id)]
+env['account.fiscal.position'].search([('x_is_fiscal_deposit', '=', False)])['tax_ids'] = [Command.link(sale_tax.id), Command.link(purchase_tax.id)]
     ]]></field>
         <field name="model_id" ref="excise_category"/>
         <field name="state">code</field>
         <field name="name">Create excise tax</field>
     </record>
     <record id="add_excise_taxes_fiscal_position_server_action" model="ir.actions.server">
-        <field name="code"><![CDATA[for fp in records:
-    if fp.x_is_fiscal_deposit and (taxes := fp.tax_ids.filtered('x_is_excise')):
-        fp['tax_ids'] = [Command.unlink(id) for id in taxes.ids]
-    elif not fp.x_is_fiscal_deposit and (taxes := env['account.tax'].search([('x_is_excise', '=', True)])):
-        fp['tax_ids'] = [Command.link(id) for id in taxes.ids]
+        <field name="code"><![CDATA[
+no_excises_taxes = env.ref('excise_management.no_excise_tax_sale') | env.ref('excise_management.no_excise_tax_purchase')
+for fp in records:
+    if fp.x_is_fiscal_deposit:
+        no_excises_taxes['fiscal_position_ids'] = [Command.link(fp.id)]
+    else:
+        no_excises_taxes['fiscal_position_ids'] = [Command.unlink(fp.id)]
 ]]></field>
         <field name="model_id" ref="account.model_account_fiscal_position"/>
         <field name="state">code</field>
