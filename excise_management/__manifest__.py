@@ -1,6 +1,6 @@
 {
     'name': 'Excise Management',
-    'version': '2.0',
+    'version': '2.1',
     'category': 'Inventory/Inventory',
     'author': 'Odoo S.A.',
     'depends': [
@@ -14,12 +14,12 @@
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
         'data/ir_actions_act_window.xml',
+        'data/account_tax_group.xml',
         'data/ir_actions_server.xml',
         'data/ir_ui_menu.xml',
         'data/base_automation.xml',
         'data/ir_model_access.xml',
         'data/ir_default.xml',
-        'data/account_tax_group.xml',
         'data/stock_warehouse.xml',
         'data/uom_uom.xml',
         'data/x_excise_category.xml',
