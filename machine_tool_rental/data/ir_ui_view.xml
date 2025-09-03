@@ -1,17 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-  <record id="x_run_time_meter_list_view" model="ir.ui.view">
-    <field name="name">Default list view for x_run_time_meter</field>
-    <field name="model">x_run_time_meter</field>
-    <field name="type">list</field>
-    <field name="active" eval="True"/>
-    <field name="arch" type="xml">
-      <list>
-        <field name="x_sequence" widget="handle"/>
-        <!-- <field name="x_name"/> -->
-      </list>
-    </field>
-  </record>
   <record id="x_run_time_meter_form_view" model="ir.ui.view">
     <field name="name">Default form view for x_run_time_meter</field>
     <field name="model">x_run_time_meter</field>
@@ -23,9 +11,9 @@
         <sheet string="Run-Time Meter">
           <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
           <field name="x_active" invisible="1"/>
-          <group name="studio_group_e9eb4f">
-            <group name="studio_group_e9eb4f_left"/>
-            <group name="studio_group_e9eb4f_right"/>
+          <group name="main_details">
+            <group name="left_column"/>
+            <group name="right_column"/>
           </group>
           <group>
             <field name="x_notes" placeholder="Type down your notes here..." nolabel="1" colspan="2"/>
@@ -59,11 +47,11 @@
     <field name="type">form</field>
     <field name="arch" type="xml">
       <data>
-        <xpath expr="//group[@name='studio_group_e9eb4f_left']" position="inside">
+        <xpath expr="//group[@name='left_column']" position="inside">
           <field name="x_product" required="True" domain="[(&quot;rent_ok&quot;, &quot;!=&quot;, False)]"/>
           <field name="x_serial" required="True" domain="[]"/>
         </xpath>
-        <xpath expr="//group[@name='studio_group_e9eb4f_right']" position="inside">
+        <xpath expr="//group[@name='right_column']" position="inside">
           <field name="x_date" options="{&quot;warn_future&quot;:true}" required="True"/>
           <field name="x_run_time" options="{&quot;digits&quot;:[2,1]}" required="True" string="Run-Time (h)"/>
           <field name="x_run_time_increment_h"/>
@@ -73,48 +61,31 @@
   </record>
   <record id="x_run_time_meter_list_custom" model="ir.ui.view">
     <field name="name">Default list view for x_run_time_meter customization</field>
-    <field name="inherit_id" ref="x_run_time_meter_list_view"/>
-    <field name="mode">extension</field>
     <field name="model">x_run_time_meter</field>
     <field name="active" eval="True"/>
     <field name="priority">99</field>
-    <field name="type">list</field>
     <field name="arch" type="xml">
-      <data>
-        <xpath expr="//field[@name='x_sequence']" position="replace">
-          <field name="x_date" optional="show"/>
-          <field name="x_product" optional="show"/>
-          <field name="x_serial" optional="show"/>
-          <field name="x_run_time_increment_h" optional="show"/>
-          <field name="x_run_time" optional="show"/>
-        </xpath>
-        <xpath expr="//list[1]" position="attributes">
-          <attribute name="default_group_by">x_serial</attribute>
-          <attribute name="default_order">x_date desc</attribute>
-        </xpath>
-      </data>
+       <list default_group_by="x_serial" default_order="x_date desc">
+         <field name="x_date" optional="show"/>
+         <field name="x_product" optional="show"/>
+         <field name="x_serial" optional="show"/>
+         <field name="x_run_time_increment_h" optional="show"/>
+         <field name="x_run_time" optional="show"/>
+       </list>
     </field>
   </record>
-  <!-- <record id="x_run_time_meter_graph_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <data>
-        <xpath expr="//graph[1]" position="attributes">
-          <attribute name="stacked">False</attribute>
-          <attribute name="type">line</attribute>
-        </xpath>
-        <xpath expr="//field[@name='id']" position="after">
-          <field name="x_date" type="col"/>
-          <field name="x_serial" type="col"/>
-          <field name="x_run_time_increment_h" type="measure"/>
-        </xpath>
-      </data>
-    </field>
-    <field name="mode">extension</field>
+  <record id="x_run_time_meter_graph_view" model="ir.ui.view" context="{'studio': True}">
+    <field name="name">Graph view for Run Time Meter</field>
     <field name="model">x_run_time_meter</field>
-    <field name="name">Default graph view for ir.model(913,) customization</field>
     <field name="priority">99</field>
-    <field name="type">graph</field>
-  </record> -->
+    <field name="arch" type="xml">
+      <graph string="Run Time Meter" type="line" stacked="False">
+            <field name="x_date" type="col"/>
+            <field name="x_serial" type="col"/>
+            <field name="x_run_time_increment_h" type="measure"/>
+      </graph>
+    </field>
+  </record>
   <record id="stock_production_lot_form_custom" model="ir.ui.view">
     <field name="name">stock.production.lot.form customization</field>
     <field name="inherit_id" ref="stock.view_production_lot_form"/>
@@ -218,18 +189,6 @@
       </data>
     </field>
   </record>
-  <record id="x_maintenance_rules_list_view" model="ir.ui.view">
-    <field name="name">Default list view for x_maintenance_rules</field>
-    <field name="model">x_maintenance_rules</field>
-    <field name="type">list</field>
-    <field name="active" eval="True"/>
-    <field name="arch" type="xml">
-      <list>
-        <field name="x_sequence" widget="handle"/>
-        <!-- <field name="x_name"/> -->
-      </list>
-    </field>
-  </record>
   <record id="x_maintenance_rules_form_view" model="ir.ui.view">
     <field name="name">Default form view for x_maintenance_rules</field>
     <field name="model">x_maintenance_rules</field>
@@ -277,25 +236,17 @@
       </data>
     </field>
   </record>
-  <!-- <record id="odoo_studio_default__ea8f1a84-133d-41e6-ac00-2032039415f6" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <data>
-        <xpath expr="//field[@name='x_name']" position="replace">
-          <field name="x_run_time_increment_h" optional="show"/>
-          <field name="x_product" optional="show"/>
-        </xpath>
-        <xpath expr="//list[1]" position="attributes">
-          <attribute name="editable">bottom</attribute>
-        </xpath>
-      </data>
-    </field>
-    <field name="inherit_id" ref="x_maintenance_rules_list_view"/>
-    <field name="mode">extension</field>
+  <record id="x_maintenance_rules_list_view" model="ir.ui.view">
+    <field name="name">List view for Maintenance Rules</field>
     <field name="model">x_maintenance_rules</field>
-    <field name="name">Default list view for x_maintenance_rules customization</field>
     <field name="priority">99</field>
-    <field name="type">list</field>
-  </record> -->
+    <field name="arch" type="xml">
+      <list editable="bottom">
+            <field name="x_run_time_increment_h" optional="show"/>
+            <field name="x_product" optional="show"/>
+        </list>
+    </field>
+  </record>
   <record id="stock_location_route_form_custom" model="ir.ui.view">
     <field name="name">stock.location.route.form customization</field>
     <field name="inherit_id" ref="stock.stock_location_route_form_view"/>
