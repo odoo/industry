@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="action_server_add_signatory_tag_to_contact" model="ir.actions.server">
+        <field name="model_id" ref="x_signature_model"/>
+        <field name="update_path">x_partner_id.category_id</field>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="base.model_res_partner"/>
+        <field name="name">Update Contact</field>
+        <field name="update_field_id" ref="base.field_res_partner__category_id"/>
+        <field name="usage">base_automation</field>
+        <field name="value" ref="partner_category_signatory"/>
+    </record>
+    <record id="action_create_x_signature" model="ir.actions.server">
+        <field name="code"><![CDATA[
+partner = env['res.partner'].search([('email', '=', request.params.get('email'))], limit=1)
+if not partner:
+    partner = env['res.partner'].create({
+        'name': request.params.get('name'), 
+        'email': request.params.get('email'), 
+        'country_id': env['res.country'].search([('id', '=', request.params.get('country_id'))], limit=1).id,
+    })
+new_signature = env['x_signature'].create({
+    "x_partner_id": partner.id,
+    "x_date": datetime.datetime.today().strftime('%Y-%m-%d'),
+    "x_petition_id": request.params.get('petition_id'),
+    "x_newsletter": request.params.get('newsletter'),
+})
+message = env['mail.message'].create({
+    'model': 'x_signature',
+    'res_id': new_signature.id,
+    'body': '<p>Comment: '+ request.params.get('comments', '')+'</p>',
+    'message_type': 'comment',
+})
+response = request.make_json_response({'id': new_signature.id}, status=200)]]></field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="website_published">True</field>
+        <field name="website_path">new_signature</field>
+        <field name="name">Create Signature</field>
+    </record>
+    <record id="open_x_petition_website_page" model="ir.actions.server">
+        <field name="code"><![CDATA[
+response = {
+   'type': 'ir.actions.act_url',
+   'target': 'self',
+   'url': record.x_website_url,
+}
+]]></field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="state">code</field>
+        <field name="name">Open Petition Website Page</field>
+    </record>
+    <record id="action_generate_fiscal_attestation" model="ir.actions.server">
+        <field name="code"><![CDATA[
+concerned_donations = record.env['account.payment'].search([('date.year_number', '=', record.x_wizard_fiscal_year), ('state', '!=', 'draft'), ('x_fiscal_attestation_id', '=', False)])
+if not record.x_wizard_show_warning and concerned_donations.filtered(lambda d: d.x_fiscal_attestation_id or not d.partner_id.street or not d.partner_id.city or not d.partner_id.state or not d.partner_id.country_id):
+    response = {
+        'type': 'ir.actions.act_window',
+        'res_model': 'x_wizard_generate_fiscal_attestation',
+        'context': {'default_x_wizard_show_warning': True, 'default_x_wizard_fiscal_year': record.x_wizard_fiscal_year, 'default_x_wizard_tax_minimum': record.x_wizard_tax_minimum},
+        'view_mode': 'form',
+        'target': 'new',
+    }
+else:
+    all_partners = list(set(concerned_donations.mapped('partner_id')))
+    for partner in all_partners:
+        donation_sum = sum(concerned_donations.filtered(lambda d: d.partner_id == partner).mapped('amount'))
+        if donation_sum >= record.x_wizard_tax_minimum:
+            fiscal_attestation = record.env['x_fiscal_attestation'].create({
+                'x_name': record.env['ir.sequence'].next_by_code('x_fiscal_attestation.seq'),
+                'x_fiscal_attestation_status': 'generated',
+                'x_partner_id': partner.id,
+                'x_date': datetime.datetime.today(),
+                'x_value': donation_sum,
+                'x_year': record.x_wizard_fiscal_year,
+            })
+            concerned_donations.filtered(lambda d: d.partner_id == partner)['x_fiscal_attestation_id'] = fiscal_attestation.id
+    response = {
+        'type': 'ir.actions.act_window',
+        'res_model': 'x_fiscal_attestation',
+        'domain': [('x_year', '=', record.x_wizard_fiscal_year)],
+        'view_mode': 'list,form',
+        'target': 'self',
+        'name': 'Fiscal Attestation',
+    }
+]]></field>
+        <field name="model_id" ref="x_wizard_generate_fiscal_attestation_model"/>
+        <field name="state">code</field>
+        <field name="name">Generate Fiscal Attestation</field>
+    </record>
+</odoo>
