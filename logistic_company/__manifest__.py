@@ -7,6 +7,7 @@
         'knowledge',
         'product_expiry',
         'purchase',
+        'quality_control',
         'sale_management',
         'sale_subscription',
         'stock',
