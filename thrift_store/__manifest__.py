@@ -1,0 +1,37 @@
+{
+    'name': 'Thrift Store',
+    'version': '1.0',
+    'category': 'Services',
+    'depends': [
+        'hr',
+        'knowledge',
+        'planning',
+        'pos_sale',
+        'purchase_stock',
+        'sale_purchase',
+    ],
+    'data': [
+        'data/ir_attachment.xml',
+        'data/knowledge_cover.xml',
+        'data/knowledge_article.xml',
+        'data/knowledge_article_favorite.xml',
+        'data/mail_message.xml',
+        'data/pos_category.xml',
+        'data/res_config_settings.xml',
+        'data/pos_config.xml',
+        'data/product_template.xml',
+        'data/product_product.xml',
+    ],
+    'demo': [
+        'demo/res_partner.xml',
+        'demo/hr_employee.xml',
+        'demo/planning_role.xml',
+        'demo/planning_slot_template.xml',
+    ],
+    'cloc_exclude': [
+        'data/knowledge_article.xml',
+    ],
+    'license': 'OPL-1',
+    'author': 'Odoo S.A.',
+    'images': [],
+}
