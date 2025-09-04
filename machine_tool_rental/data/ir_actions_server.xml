@@ -1,31 +1,67 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-  <record id="industry_compute_run_45b86d65-fa80-4f7f-b0e1-2301ba896330" model="ir.actions.server">
-    <field name="code"><![CDATA[rtms = env['x_run_time_meter'].search([('id', 'in', record.x_serial.x_run_time_meters.ids)], order='x_date')
+    <record id="industry_compute_run_45b86d65-fa80-4f7f-b0e1-2301ba896330" model="ir.actions.server">
+        <field name="code"><![CDATA[
+rtms = env['x_run_time_meter'].search([('id', 'in', record.x_serial.x_run_time_meters.ids)], order='x_date')
 previous_rtm = False
 for rtm in rtms:
     rtm['x_run_time_increment_h'] = rtm['x_run_time'] - previous_rtm['x_run_time'] if previous_rtm else 0
     previous_rtm = rtm
-
-
-]]></field>
-    <field name="model_id" ref="x_run_time_meter_model"/>
-    <field name="state">code</field>
-    <field name="name">Industry: Compute Run-Time Increment</field>
-    <field name="usage">base_automation</field>
-  </record>
-  <record id="industry_record_run__61707535-5357-4c39-a25a-ffbaf7cd8a96" model="ir.actions.server">
-    <field name="binding_model_id" ref="sale.model_sale_order"/>
-    <field name="code"><![CDATA[action = {
+    ]]></field>
+        <field name="model_id" ref="x_run_time_meter_model"/>
+        <field name="state">code</field>
+        <field name="name">Industry: Compute Run-Time Increment</field>
+        <field name="usage">base_automation</field>
+    </record>
+    <record id="industry_record_run__61707535-5357-4c39-a25a-ffbaf7cd8a96" model="ir.actions.server">
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="code"><![CDATA[action = {
     'type': 'ir.actions.act_window',
     'name': 'Record Run-Time Meter',
     'res_model': 'x_run_time_meter',
     'view_mode': 'form',
     'target': 'new',
 }
-        ]]></field>
-    <field name="model_id" ref="sale.model_sale_order"/>
-    <field name="state">code</field>
-    <field name="name">Industry: Record Run-Time Meter</field>
-  </record>
+    ]]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Industry: Record Run-Time Meter</field>
+    </record>
+    <record id="execute_code_6c62560d-1a52-4b77-8483-56622aca71cb" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for task in records: task['x_run_time_meter_when_done'] = task.x_serial.x_run_time_meter_h
+    ]]></field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="name">Execute Code</field>
+        <field name="usage">base_automation</field>
+    </record>
+    <record id="create_maintenance_tasks_server_action" model="ir.actions.server">
+        <field name="name">Create maintenance tasks based on maintenance rules</field>
+        <field name="model_id" ref="stock.model_stock_lot"/>
+        <field name="state">code</field>
+        <field name="usage">ir_cron</field>
+        <field name="code"><![CDATA[
+for serial in records:
+    for maintenance_rule in env['x_maintenance_rules'].search([('x_product', '=', serial.product_id), ('x_active', '!=', False)]):
+            tasks = env['project.task'].search([('x_serial', '=', serial), ('x_maintenance_rule', '=', maintenance_rule)])
+            last_maintenance = max(tasks.filtered(lambda t: t.stage_id.name == 'Done').mapped('x_run_time_meter_when_done')) or 0
+            on_maintenance = len(tasks.filtered(lambda t: t.stage_id.name not in ['Done', 'Cancelled'])) > 0
+            if not on_maintenance and serial.x_run_time_meter_h - last_maintenancee >= maintenance_rule.x_run_time_increment_h:
+                project_task = env['project.task'].create({
+                    'name': '[Maintenance] ' + serial.name,
+                    'x_serial': serial.id,
+                    'partner_id': base.main_company,
+                    'under_warranty': True,
+                    'x_maintenance': True,
+                    'x_maintenance_rule': maintenance_rule,
+                })
+    ]]></field>
+    </record>
+    <record id="create_maintenance_tasks_cron" model="ir.cron">
+        <field name="interval_type">days</field>
+        <field name="interval_number">1</field>
+        <field name="state">code</field>
+        <field name="ir_actions_server_id" ref="create_maintenance_tasks_server_action"/>
+    </record>
 </odoo>
