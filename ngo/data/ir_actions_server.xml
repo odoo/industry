@@ -12,27 +12,27 @@
     </record>
     <record id="action_create_x_signature" model="ir.actions.server">
         <field name="code"><![CDATA[
-partner = env['res.partner'].search([('email', '=', request.params.get('email'))], limit=1)
+partner = env['res.partner'].sudo().search([('email', '=', request.params.get('email'))], limit=1)
 if not partner:
-    partner = env['res.partner'].create({
+    partner = env['res.partner'].sudo().create({
         'name': request.params.get('name'), 
         'email': request.params.get('email'), 
-        'country_id': env['res.country'].search([('id', '=', request.params.get('country_id'))], limit=1).id,
+        'country_id': env['res.country'].sudo().search([('id', '=', request.params.get('country_id'))], limit=1).id,
     })
-new_signature = env['x_signature'].create({
+new_signature = env['x_signature'].sudo().create({
     "x_partner_id": partner.id,
     "x_date": datetime.datetime.today().strftime('%Y-%m-%d'),
     "x_petition_id": request.params.get('petition_id'),
     "x_newsletter": request.params.get('newsletter'),
 })
-message = env['mail.message'].create({
+message = env['mail.message'].sudo().create({
     'model': 'x_signature',
     'res_id': new_signature.id,
     'body': '<p>Comment: '+ request.params.get('comments', '')+'</p>',
     'message_type': 'comment',
 })
 response = request.make_json_response({'id': new_signature.id}, status=200)]]></field>
-        <field name="model_id" ref="project.model_project_task"/>
+        <field name="model_id" ref="mail.model_discuss_channel_member"/>
         <field name="state">code</field>
         <field name="website_published">True</field>
         <field name="website_path">new_signature</field>
