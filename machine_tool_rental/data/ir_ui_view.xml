@@ -34,6 +34,8 @@
         <separator/>
         <filter string="Archived" name="archived_x_run_time_meter" domain="[['x_active', '=', False]]"/>
         <separator/>
+        <group name="group_by"/>
+        <filter name="group_by_date" string="Date" context="{'group_by': 'x_date'}"/>
       </search>
     </field>
   </record>
@@ -48,12 +50,12 @@
     <field name="arch" type="xml">
       <data>
         <xpath expr="//group[@name='left_column']" position="inside">
-          <field name="x_product" required="True" domain="[(&quot;rent_ok&quot;, &quot;!=&quot;, False)]"/>
-          <field name="x_serial" required="True" domain="[]"/>
+          <field name="x_product" required="True" domain="[('rent_ok', '!=', False)]"/>
+          <field name="x_serial" required="True" domain="[('product_id', '=', x_product)]"/>
         </xpath>
         <xpath expr="//group[@name='right_column']" position="inside">
-          <field name="x_date" options="{&quot;warn_future&quot;:true}" required="True"/>
-          <field name="x_run_time" options="{&quot;digits&quot;:[2,1]}" required="True" string="Run-Time (h)"/>
+          <field name="x_date" options="{'warn_future':true}" required="True"/>
+          <field name="x_run_time" options="{'digits':[2,1]}" required="True" string="Run-Time (h)"/>
           <field name="x_run_time_increment_h"/>
         </xpath>
       </data>
@@ -65,7 +67,7 @@
     <field name="active" eval="True"/>
     <field name="priority">99</field>
     <field name="arch" type="xml">
-       <list default_group_by="x_serial" default_order="x_date desc">
+       <list default_order="x_date desc">
          <field name="x_date" optional="show"/>
          <field name="x_product" optional="show"/>
          <field name="x_serial" optional="show"/>
@@ -105,7 +107,7 @@
           </button>
         </xpath>
         <xpath expr="//field[@name='location_id']" position="after">
-          <field name="x_run_time_meter_h" options="{&quot;digits&quot;:[2,1]}"/>
+          <field name="x_run_time_meter_h" options="{'digits':[2,1]}"/>
         </xpath>
         <xpath expr="//field[@name='name']" position="after">
           <widget name="web_ribbon" title="Available" invisible="x_status != 'Available'"/>
@@ -147,7 +149,7 @@
     <field name="arch" type="xml">
       <data>
         <xpath expr="//field[@name='is_rental_order']" position="after">
-          <button string="Record Run-Time" type="action" invisible="rental_status != &quot;returned&quot;" name="%(industry_record_run__61707535-5357-4c39-a25a-ffbaf7cd8a96)d"/>
+          <button string="Record Run-Time" type="action" invisible="rental_status != 'returned'" name="%(industry_record_run__61707535-5357-4c39-a25a-ffbaf7cd8a96)d"/>
         </xpath>
       </data>
     </field>
@@ -180,6 +182,7 @@
       <data>
         <xpath expr="//field[@name='under_warranty']" position="after">
           <field name="x_maintenance"/>
+          <field name="x_maintenance_rule" invisible="not x_maintenance" required="x_maintenance"/>
           <label for="x_serial"/>
           <div class="d-flex" name="serial">
             <field class="oe_inline" name="x_serial"/>
@@ -231,7 +234,7 @@
       <data>
         <xpath expr="//group[@name='studio_group_656456']" position="inside">
           <field name="x_product" required="True" domain="[]"/>
-          <field name="x_run_time_increment_h" help="Run-time increment between two maintenance tasks " options="{&quot;digits&quot;:[0,0]}"/>
+          <field name="x_run_time_increment_h" help="Run-time increment between two maintenance tasks " options="{'digits':[0,0]}"/>
         </xpath>
       </data>
     </field>
@@ -293,7 +296,7 @@
     <field name="arch" type="xml">
       <data>
         <xpath expr="//button[@name='action_cancel']" position="after">
-          <button string="Plan Maintenance" type="action" class="oe_highlight" invisible="state != &quot;done&quot; or ( not quality_check_fail and state == &quot;assigned&quot; )"/>
+          <button string="Plan Maintenance" type="action" class="oe_highlight" invisible="state != 'done' or ( not quality_check_fail and state == 'assigned' )"/>
         </xpath>
       </data>
     </field>
@@ -312,6 +315,37 @@
           <field name="x_serial_status"/>
         </xpath>
       </data>
+    </field>
+  </record>
+  <record id="to_invoice_res_partner_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//button[@name='sale.act_res_partner_2_sale_order']" position="after">
+        <button class="oe_stat_button" icon="fa-envelope" type="action" name="%(to_invoice_act_window)d">
+          <div class="o_form_field o_stat_info">
+            <span class="o_stat_value">
+                <field name="x_to_invoice_balance" widget='monetary'/>
+            </span>
+            <span class="o_stat_text">To Invoice</span>
+          </div>
+        </button>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="mode">extension</field>
+    <field name="model">res.partner</field>
+    <field name="name">to_invoice_res_partner_form_view</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="contact_search_inherit_view" model="ir.ui.view">
+    <field name="name">res.partner.search.inherit</field>
+    <field name="model">res.partner</field>
+    <field name="active" eval="True"/>
+    <field name="inherit_id" ref="account.res_partner_view_search"/>
+    <field name="arch" type="xml">
+        <xpath expr="//filter[@name='customer']" position="before">
+            <filter string="To Invoice" name="x_to_invoice_balance" domain="[('x_to_invoice_balance', '!=', 0)]"/>
+        </xpath>
     </field>
   </record>
 </odoo>
