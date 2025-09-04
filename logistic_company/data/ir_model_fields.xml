@@ -40,6 +40,46 @@
         <field name="model_id" ref="sale.model_sale_order_line"/>
     </record>
 
+    <record id="x_point_id_title_field_quality_check" model="ir.model.fields">
+        <field name="name">x_point_id_title</field>
+        <field name="field_description">Control Point Title</field>
+        <field name="ttype">char</field>
+        <field name="related">point_id.title</field>
+        <field name="model_id" ref="quality.model_quality_check"/>
+    </record>
+    <record id="x_quality_check_owner_sale_order_line" model="ir.model.fields">
+        <field name="name">x_quality_check_owner</field>
+        <field name="field_description">Owner</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.partner</field>
+        <field name="model_id" ref="quality.model_quality_check"/>
+        <field name="readonly" eval="True"/>
+        <field name="depends">move_line_id, picking_id</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    if owner := record.move_line_id.owner_id: 
+        record['x_quality_check_owner'] = owner
+    else:
+        record['x_quality_check_owner'] = record.picking_id.owner_id
+]]></field>
+    </record>
+    <record id="x_stored_picking_type_id_field_stock_move_line" model="ir.model.fields">
+        <field name="name">x_stored_picking_type_id</field>
+        <field name="field_description">Operation Type</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.picking.type</field>
+        <field name="related">picking_type_id</field>
+        <field name="model_id" ref="stock.model_stock_move_line"/>
+    </record>
+    <record id="x_package_type_field_stock_move_line" model="ir.model.fields">
+        <field name="name">x_package_type</field>
+        <field name="field_description">Package Type</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.package.type</field>
+        <field name="related">result_package_id.package_type_id</field>
+        <field name="model_id" ref="stock.model_stock_move_line"/>
+    </record>
+
     <!-- x_stock_history fields -->
     <record id="x_date_field_x_stock_history" model="ir.model.fields">
         <field name="name">x_date</field>
