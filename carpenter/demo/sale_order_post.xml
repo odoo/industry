@@ -3,24 +3,28 @@
   <!--Update sale order stages-->
   <function model="sale.order" name="action_confirm" eval="[[ref('sale_order_1')]]"/>
 
+  <!-- Creating invoice -->
   <record id="sale_advance_payment_inv_1" model="sale.advance.payment.inv">
-    <field name="advance_payment_method">fixed</field>
-    <field name="fixed_amount">2130.00</field>
+    <field name="advance_payment_method">percentage</field>
+    <field name="amount">30</field>
     <field name="sale_order_ids" eval="[Command.set([ref('sale_order_1')])]"/>
   </record>
   <function name="create_invoices" model="sale.advance.payment.inv" eval="[[ref('sale_advance_payment_inv_1')]]"/>
 
+  <!-- Assigning user_id to project -->
   <function name="write" model="project.project">
     <value model="project.project" eval="obj().search([
       ('sale_order_id', '=', ref('sale_order_1'))
     ]).ids"/>
     <value eval="{'user_id': ref('base.user_admin')}"/>
   </function>
+
+  <!-- Updating stage of tasks -->
   <function name="write" model="project.task">
     <value model="project.task" eval="obj().search([
       ('sale_order_id', '=', ref('sale_order_1')),
       ('name', 'in', ['Down payment before ordering', 'Confirm measures and drawing', 'On site Material Supply and rental', 'External help'])
     ]).ids"/>
-    <value eval="{'stage_id': ref('project_task_type_10')}"/>
+    <value eval="{'stage_id': ref('project_task_type_2')}"/>
   </function>
 </odoo>
