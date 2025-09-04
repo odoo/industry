@@ -6,9 +6,6 @@
     'depends': [
         'appointment',
         'base_industry_data',
-        'crm',
-        'event',
-        'hr_homeworking',
         'hr_hourly_cost',
         'knowledge',
         'partnership',
@@ -16,7 +13,7 @@
         'sale_service',
         'sale_subscription',
         'web_studio',
-        'website_event_sale',
+        'website_event',
         'website_sale_collect',
     ],
     'data': [
