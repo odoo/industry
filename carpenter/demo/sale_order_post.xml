@@ -8,7 +8,14 @@
     <field name="fixed_amount">2130.00</field>
     <field name="sale_order_ids" eval="[Command.set([ref('sale_order_1')])]"/>
   </record>
-
   <function name="create_invoices" model="sale.advance.payment.inv" eval="[[ref('sale_advance_payment_inv_1')]]"/>
+
+  <function name="write" model="project.task">
+    <value model="project.task" eval="obj().search([
+      ('sale_order_id', '=', ref('sale_order_1')),
+      ('name', 'in', ['Down payment before ordering', 'Confirm measures and drawing', 'On site Material Supply and rental', 'External help'])
+    ]).ids"/>
+    <value eval="{'stage_id': ref('project_task_type_10')}"/>
+  </function>
 
 </odoo>
