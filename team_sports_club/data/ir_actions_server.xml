@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="generate_contribution_sale_order_action" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for rec in records:
+    if not rec.x_product_id: raise UserError('No product Selected!')
+    if not rec.x_partner_ids: raise UserError('No Contact selected!')
+    product = rec.x_product_id
+    tags = rec.x_tag_ids
+
+    for partner in rec.x_partner_ids:
+        invoice_address = partner.child_ids.filtered(lambda c: c.type == 'invoice')[:1] or partner
+
+        so = env['sale.order'].create({
+            'partner_id': invoice_address.id if invoice_address else partner.id,
+            'partner_invoice_id': invoice_address.id if invoice_address else partner.id,
+            'partner_shipping_id': partner.id,
+            'order_line': [(0, 0, {
+                'product_id': product.id,
+                'product_uom_qty': 1,
+            })],
+        })
+
+        so.action_confirm()
+
+        partner.write({
+            'category_id': [(4, tag.id) for tag in tags],
+        })
+]]></field>
+        <field name="model_id" ref="model_x_contri"/>
+        <field name="state">code</field>
+        <field name="name">Execute Code</field>
+    </record>
+</odoo>
