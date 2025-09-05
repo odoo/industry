@@ -1,5 +1,5 @@
 {
-    'name': 'Libraries',
+    'name': 'library',
     'version': '1.0',
     'category': 'Services',
     'author': 'Odoo S.A.',
