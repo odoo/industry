@@ -1,0 +1,229 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="x_run_time_meter_model_x_active_field" model="ir.model.fields">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Active</field>
+    <field name="model_id" ref="x_run_time_meter_model"/>
+    <field name="name">x_active</field>
+    </record>
+  <record id="x_run_time_meter_model_x_notes_field" model="ir.model.fields">
+    <field name="ttype">html</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Notes</field>
+    <field name="model_id" ref="x_run_time_meter_model"/>
+    <field name="name">x_notes</field>
+    </record>
+  <record id="x_run_time_meter_model_x_sequence_field" model="ir.model.fields">
+    <field name="ttype">integer</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Sequence</field>
+    <field name="model_id" ref="x_run_time_meter_model"/>
+    <field name="name">x_sequence</field>
+    </record>
+  <record id="x_run_time_meter_model_x_product_field" model="ir.model.fields">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Product</field>
+    <field name="model_id" ref="x_run_time_meter_model"/>
+    <field name="name">x_product</field>
+    <field name="relation">product.template</field>
+  </record>
+  <record id="x_run_time_meter_model_x_serial_field" model="ir.model.fields">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Serial</field>
+    <field name="model_id" ref="x_run_time_meter_model"/>
+    <field name="name">x_serial</field>
+    <field name="relation">stock.lot</field>
+  </record>
+  <record id="x_run_time_meter_model_x_date_field" model="ir.model.fields">
+    <field name="ttype">date</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Date</field>
+    <field name="model_id" ref="x_run_time_meter_model"/>
+    <field name="name">x_date</field>
+    </record>
+  <record id="x_run_time_meter_model_x_run_time_field" model="ir.model.fields">
+    <field name="ttype">float</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Run-Time (h)</field>
+    <field name="model_id" ref="x_run_time_meter_model"/>
+    <field name="name">x_run_time</field>
+  </record>
+  <record id="x_run_time_meter_model_x_name_field" model="ir.model.fields">
+    <field name="ttype">char</field>
+    <field name="field_description">Name</field>
+    <field name="model_id" ref="x_run_time_meter_model"/>
+    <field name="name">x_name</field>
+    <field name="compute"><![CDATA[for record in self:
+    date = record.x_date if record.x_date else fields.Datetime.today()
+    serial = record.x_serial.name if record.x_serial else 'unserialed'
+    record['x_name'] = date.strftime('%d/%m/%y ') + serial]]></field>
+    <field name="depends">x_date,x_serial</field>
+    <field name="copied" eval="True"/>
+    <field name="readonly" eval="True"/>
+  </record>
+  <record id="stock_model_stock_lot_x_x_serial_x_run_time_meter_count_field" model="ir.model.fields">
+    <field name="compute"><![CDATA[
+for record in self: record['x_x_serial_x_run_time_meter_count'] = self.env['x_run_time_meter'].search_count([('x_serial', '=', record.id)])
+]]></field>
+    <field name="ttype">integer</field>
+    <field name="field_description">Run-Time</field>
+    <field name="model_id" ref="stock.model_stock_lot"/>
+    <field name="name">x_x_serial_x_run_time_meter_count</field>
+    <field name="selectable" eval="False"/>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="stock_model_stock_lot_x_run_time_meters_field" model="ir.model.fields">
+    <field name="ttype">one2many</field>
+    <field name="field_description">Run-Time Meters</field>
+    <field name="model_id" ref="stock.model_stock_lot"/>
+    <field name="name">x_run_time_meters</field>
+    <field name="on_delete" eval="False"/>
+    <field name="relation">x_run_time_meter</field>
+    <field name="relation_field">x_serial</field>
+  </record>
+  <record id="stock_model_stock_lot_x_run_time_meter_h_field" model="ir.model.fields">
+    <field name="compute"><![CDATA[
+for record in self: record['x_run_time_meter_h'] = max(record.x_run_time_meters.mapped('x_run_time'))
+]]></field>
+    <field name="ttype">float</field>
+    <field name="depends">x_run_time_meters</field>
+    <field name="field_description">Run-Time Meter (h)</field>
+    <field name="model_id" ref="stock.model_stock_lot"/>
+    <field name="name">x_run_time_meter_h</field>
+    <field name="readonly" eval="True"/>
+    <field name="selectable" eval="False"/>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="x_run_time_meter_model_x_run_time_increment_h_field" model="ir.model.fields">
+    <field name="ttype">float</field>
+    <field name="field_description">Run-Time Increment (h)</field>
+    <field name="model_id" ref="x_run_time_meter_model"/>
+    <field name="name">x_run_time_increment_h</field>
+    <field name="readonly" eval="True"/>
+  </record>
+  <record id="project_model_project_task_x_maintenance_field" model="ir.model.fields">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Reccurent Maintenance</field>
+    <field name="model_id" ref="project.model_project_task"/>
+    <field name="name">x_maintenance</field>
+  </record>
+  <record id="project_model_project_task_x_maintenance_rule_field" model="ir.model.fields" context="{'studio': True}">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Maintenance Rule</field>
+    <field name="model_id" ref="project.model_project_task"/>
+    <field name="name">x_maintenance_rule</field>
+    <field name="relation">x_maintenance_rules</field>
+  </record>
+  <record id="project_model_project_task_x_run_time_meter_when_done_field" model="ir.model.fields">
+    <field name="ttype">integer</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Run-Time Increment (h) when done</field>
+    <field name="model_id" ref="project.model_project_task"/>
+    <field name="name">x_run_time_meter_when_done</field>
+  </record>
+  <record id="x_maintenance_rules_model_x_active_field" model="ir.model.fields">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Active</field>
+    <field name="model_id" ref="x_maintenance_rules_model"/>
+    <field name="name">x_active</field>
+    <field name="tracking">1</field>
+  </record>
+  <record id="x_maintenance_rules_model_x_sequence_field" model="ir.model.fields">
+    <field name="ttype">integer</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Sequence</field>
+    <field name="model_id" ref="x_maintenance_rules_model"/>
+    <field name="name">x_sequence</field>
+    </record>
+  <record id="x_maintenance_rules_model_x_product_field" model="ir.model.fields">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="domain">[("rent_ok", "!=", False)]</field>
+    <field name="field_description">Product</field>
+    <field name="model_id" ref="x_maintenance_rules_model"/>
+    <field name="name">x_product</field>
+    <field name="relation">product.template</field>
+  </record>
+  <record id="x_maintenance_rules_model_x_run_time_increment_h_field" model="ir.model.fields">
+    <field name="ttype">float</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Run-Time Increment (h)</field>
+    <field name="help">Run-time increment between two maintenance tasks</field>
+    <field name="model_id" ref="x_maintenance_rules_model"/>
+    <field name="name">x_run_time_increment_h</field>
+    </record>
+  <record id="project_model_project_task_x_serial_field" model="ir.model.fields">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Serial</field>
+    <field name="model_id" ref="project.model_project_task"/>
+    <field name="name">x_serial</field>
+    <field name="relation">stock.lot</field>
+  </record>
+  <record id="project_model_project_task_x_product_field" model="ir.model.fields">
+    <field name="ttype">many2one</field>
+    <field name="related">x_serial.product_id</field>
+    <field name="field_description">Product</field>
+    <field name="model_id" ref="project.model_project_task"/>
+    <field name="name">x_product</field>
+    <field name="readonly" eval="True"/>
+    <field name="relation">product.product</field>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="stock_model_stock_lot_x_x_serial_project_task_count_field" model="ir.model.fields">
+    <field name="compute"><![CDATA[
+for record in self: record['x_x_serial_project_task_count'] = self.env['project.task'].search_count([('x_serial', '=', record.id),('x_maintenance','=',True)])
+]]></field>
+    <field name="ttype">integer</field>
+    <field name="field_description">Serial count</field>
+    <field name="model_id" ref="stock.model_stock_lot"/>
+    <field name="name">x_x_serial_project_task_count</field>
+    <field name="readonly" eval="True"/>
+    <field name="selectable" eval="False"/>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="stock_model_stock_storage_category_x_serial_status_field" model="ir.model.fields">
+    <field name="ttype">selection</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Serial Status</field>
+    <field name="model_id" ref="stock.model_stock_storage_category"/>
+    <field name="name">x_serial_status</field>
+    <field name="selection">[('Available', 'Available'), ('Out', 'Out'), ('Reception', 'Reception'), ('Maintenance', 'Maintenance')]</field>
+  </record>
+  <record id="stock_model_stock_lot_x_status_field" model="ir.model.fields">
+    <field name="compute"><![CDATA[for record in self:
+    status = "Out"
+    if record.location_id.storage_category_id:
+        if record.location_id.storage_category_id.x_serial_status == "Available" : status = "Available"
+        if record.location_id.storage_category_id.x_serial_status == "Reception" : status = "Reception"
+        if record.location_id.storage_category_id.x_serial_status == "Maintenance" : status = "Maintenance"
+    record['x_status'] = status
+    ]]></field>
+    <field name="ttype">char</field>
+    <field name="depends">location_id</field>
+    <field name="field_description">Status</field>
+    <field name="model_id" ref="stock.model_stock_lot"/>
+    <field name="name">x_status</field>
+    <field name="readonly" eval="True"/>
+    <field name="selectable" eval="False"/>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="to_invoice_total_uninvoiced_balance" model="ir.model.fields">
+    <field name="compute"><![CDATA[
+for record in self: record['x_to_invoice_balance'] = sum(record.sale_order_ids.mapped('amount_to_invoice'))
+]]></field>
+    <field name="ttype">monetary</field>
+    <field name="field_description">Total uninvoiced balance</field>
+    <field name="depends">sale_order_ids</field>
+    <field name="model_id" ref="base.model_res_partner"/>
+    <field name="name">x_to_invoice_balance</field>
+    <field name="currency_field">currency_id</field>
+    <field name="selectable" eval="False"/>
+  </record>
+</odoo>
