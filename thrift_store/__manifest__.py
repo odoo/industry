@@ -4,6 +4,7 @@
     'category': 'Services',
     'depends': [
         'appointment_account_payment',
+        'base_industry_data',
         'hr_sign',
         'knowledge',
         'planning',
@@ -38,6 +39,7 @@
         'demo/pos_order_line.xml',
         'demo/pos_confirm.xml',
         'demo/pos_config.xml',
+        'demo/resource_calendar.xml',
     ],
     'cloc_exclude': [
         'data/knowledge_article.xml',
