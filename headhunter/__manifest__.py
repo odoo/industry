@@ -8,7 +8,7 @@
         'appointment_hr_recruitment',
         'base_automation',
         'crm_enterprise',
-        'documents_hr_recruitment',
+        'documents_hr',
         'documents_product',
         'knowledge',
         'sale_crm',
