@@ -69,7 +69,7 @@ MODELS_TO_UPDATE = [
     "theme.utils",
     "knowledge.article",
     "website.controller.page",
-    "web_editor.assets",
+    "website.assets",
 ]
 
 MODELS_WITH_USER_ID = [
