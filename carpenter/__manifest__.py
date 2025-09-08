@@ -15,6 +15,7 @@
     ],
     'data': [
         'data/res_config_settings.xml',
+        'data/ir_ui_menu.xml',
         'data/ir_attachment_pre.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
@@ -34,7 +35,6 @@
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
-        'demo/sale_order_spreadsheet.xml',
         'demo/product_supplierinfo.xml',
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
@@ -48,6 +48,7 @@
         'demo/documents_document.xml',
         'demo/account_analytic_line.xml',
         'demo/purchase_order_post.xml',
+        'demo/sale_order_spreadsheet.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [
