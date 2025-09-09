@@ -9,7 +9,6 @@
         'base_industry_data',
         'excise_management',
         'knowledge',
-        'mrp_plm',
         'mrp_subcontracting',
         'pos_restaurant',
         'pos_sale',
