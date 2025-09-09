@@ -72,10 +72,12 @@ if record.sale_line_id:
         for slot in record.sale_line_id.planning_slot_ids:
             if slot.start_datetime and slot.end_datetime:
                 nights += ceil((slot.end_datetime - slot.start_datetime).total_seconds() / (24 * 3600))
-    record['sale_line_id']['x_nights'] = nights
-    rent_unit_price = env['product.pricing'].search([('product_template_id', '=', record.sale_line_id.product_id.product_tmpl_id.id)], limit=1).price
-    if rent_unit_price:
-        record['sale_line_id']['price_unit'] = rent_unit_price * nights
+    record.sale_line_id.update({
+        'start_date': record.start_datetime,
+        'return_date': record.end_datetime,
+        'x_nights': nights,
+    })
+    record.sale_line_id._reset_price_unit()
 ]]></field>
     </record>
     <record id="industry_set_rental_hours" model="ir.actions.server">
