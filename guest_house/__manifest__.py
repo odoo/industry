@@ -6,7 +6,6 @@
     'depends': [
         'base_industry_data',
         'booking_engine',
-        'web_studio',
     ],
     'data': [
         'data/planning_role.xml',

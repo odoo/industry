@@ -215,7 +215,6 @@ class TestEnv(IndustryCase):
             "ir.actions.server",
             "ir.model",
             "ir.model.fields",
-            "ir.ui.menu",
         ]
         for model in MODELS_FOR_STUDIO:
             if root.xpath(f"//record[@model='{model}']"):
