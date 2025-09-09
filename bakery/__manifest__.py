@@ -13,6 +13,7 @@
         'website_sale_collect',
     ],
     'data': [
+        'data/res_config_settings.xml',
         'data/product_product.xml',
         'data/ir_attachment.xml',
         'data/knowledge_article_cover.xml',
