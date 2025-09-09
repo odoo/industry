@@ -43,7 +43,7 @@ USELESS_FIELDS = {
     'project.tags': ['color'],
     'project.task': ['company_id'],
     'purchase.order': ['currency_id', 'state'],
-    'purchase.order.line': ['date_planned', 'move_dest_ids', 'name', 'company_id'],
+    'purchase.order.line': ['date_planned', 'move_dest_ids', 'company_id'],
     'res.partner': ['tz'],
     'sale.order': [
         'access_token', 'date_order', 'health', 'origin', 'partner_invoice_id', 'partner_shipping_id',
