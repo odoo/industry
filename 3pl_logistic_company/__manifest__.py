@@ -10,6 +10,7 @@
         'logistic_company',
         'quality_mrp',
         'sale_service',
+        'web_studio',
     ],
     'data': [
         'data/ir_attachment_pre.xml',
@@ -27,6 +28,7 @@
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
         'data/stock_storage_category.xml',
+        'data/stock_location.xml',
         'data/ir_ui_view.xml',
         'data/qweb_view.xml',
         'data/website.xml',
@@ -34,6 +36,7 @@
         'data/website_menu.xml',
         'data/stock_warehouse.xml',
         'data/res_config_settings.xml',
+        'data/spreadsheet_dashboard.xml',
     ],
     'demo': [
         'demo/quality_point.xml',
@@ -50,6 +53,8 @@
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
+        'demo/stock_quant_package.xml',
+        'demo/account_move.xml',
     ],
     'license': 'OPL-1',
 }
