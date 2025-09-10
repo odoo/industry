@@ -30,6 +30,7 @@
         'data/ir_ui_view.xml',
         'data/ir_cron.xml',
     ],
+    'demo': ['demo/product_template.xml'],
     'license': 'OPL-1',
     'cloc_exclude': [
         'data/knowledge_article.xml',
