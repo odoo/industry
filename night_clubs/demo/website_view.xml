@@ -2,73 +2,129 @@
 <odoo>
     <record id="ir_ui_view_3858" model="ir.ui.view">
         <field name="arch" type="xml">
-            <t name="Event Navbar" t-name="website_event.navbar">
-                <t t-set="is_rendering_cta" t-value="event.event_registrations_open and not hide_register_cta" />
-                <section id="o_wevent_event_submenu">
-                    <!-- Mobile -->
-                    <div id="o_wevent_submenu_mobile" class="container d-flex d-lg-none align-items-center py-3 pb-lg-2">
-                        <a t-if="navbar__back_url" t-att-href="navbar__back_url" t-att-title="navbar__back_title or 'Go back'">
-                            <i class="oi oi-chevron-left" />
-                            <span t-out="navbar__back_text or 'Go back'" />
-                        </a>
-                        <a t-else="" href="/event" title="All Events">
-                            <i class="oi oi-chevron-left" />
-                            <span>All Events</span>
-                        </a>
-                        <!-- Add Register additional CTA button, in addition to menus -->
-                        <a t-if="is_rendering_cta" t-att-href="'/event/%s/register' % (slug(event))" t-attf-class="btn btn-primary ms-auto" title="Registration">
-                            Registration
-                        </a>
-                        <t t-call="website_event.navbar_dropdown" />
-                    </div>
-                    <!-- Desktop -->
-                    <div id="o_wevent_submenu_desktop" class="d-none d-lg-block mt-1 py-3 py-lg-2">
-                        <div class="container">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <nav class="d-flex flex-wrap justify-content-between align-items-center gap-2 flex-grow-1">
-                                    <ul class="breadcrumb p-0 m-0">
-                                        <li class="breadcrumb-item" t-if="event.header_visible">
-                                            <a href="/event" title="Back to All Events">All Parties</a>
-                                        </li>
-                                        <t t-if="navbar__back_url">
-                                            <li class="breadcrumb-item">
-                                                <a t-attf-href="/event/{{slug(event)}}" t-attf-title="Back to {{event.name}}" t-field="event.name" />
-                                            </li>
-                                            <li class="breadcrumb-item">
-                                                <a t-att-href="navbar__back_url" t-att-title="navbar__back_title" t-out="navbar__back_text" />
-                                            </li>
-                                        </t>
-                                        <t t-else="">
-                                            <li t-attf-class="breadcrumb-item active #{'fw-bold' if not event.header_visible else ''}" aria-current="page">
-                                                <span class="pe-3" t-field="event.name" />
-                                            </li>
-                                        </t>
-                                    </ul>
-                                    <ul t-if="not navbar__back_url" class="nav" t-att-data-menu_name="editable and 'Event Menu'" t-att-data-content_menu_id="editable and event.menu_id.id">
-                                        <t t-foreach="event.menu_id.child_id" t-as="submenu">
-                                            <t t-call="website.submenu">
-                                                <t t-set="item_class" t-value="'nav-item'" />
-                                                <t t-set="link_class" t-value="'nav-link text-nowrap'" />
-                                            </t>
-                                        </t>
-                                    </ul>
-                                </nav>
-                                <!-- Workaround to avoid flickering while navigating between pages with and without CTA -->
-                                <span t-if="not is_rendering_cta" aria-hidden="true" class="btn invisible w-0 px-0"></span>
-                                <div t-else="" class="ms-3">
-                                    <t t-call="website_event.registration_template" />
-                                </div>
-                                <t t-if="navbar__back_url" t-call="website_event.navbar_dropdown" />
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </t>
+            <xpath expr="//li[@t-if='event.header_visible']//a[contains(text(),'All Events')]" position="replace">
+                <a href="/event" title="Back to Parties">All Parties</a>
+            </xpath>
         </field>
         <field name="key">website_event.navbar</field>
         <field name="name">Event Navbar</field>
         <field name="type">qweb</field>
         <field name="website_id" ref="website.default_website" />
+        <field name="inherit_id" ref="website_event.navbar"/>
+    </record>
+    <record id="contactus" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <t name="Contact Us" t-name="website.contactus">
+                <t t-call="website.layout">
+                    <t t-set="logged_partner" t-value="request.env['website.visitor']._get_visitor_from_request().partner_id"/>
+                    <t t-set="contactus_form_values" t-value="{
+                        'email_to': res_company.email,
+                        'name': request.params.get('name', ''),
+                        'phone': request.params.get('phone', ''),
+                        'email_from': request.params.get('email_from', ''),
+                        'company': request.params.get('company', ''),
+                        'subject': request.params.get('subject', ''),
+                    }"/>
+                    <span class="hidden" data-for="contactus_form" t-att-data-values="contactus_form_values"/>
+                    <div id="wrap" class="oe_structure oe_empty">
+                        <section class="s_title parallax s_parallax_is_fixed bg-black-50 pt24 pb24" data-vcss="001" data-snippet="s_title" data-scroll-background-ratio="1">
+                            <span class="s_parallax_bg oe_img_bg" style="background-image: url('/web/image/website.s_parallax_default_image'); background-position: 50% 0;"/>
+                            <div class="o_we_bg_filter bg-black-50"/>
+                            <div class="container">
+                                <h1>Contact us</h1>
+                            </div>
+                        </section>
+                        <section class="s_text_block pt40 pb40 o_colored_level " data-snippet="s_text_block">
+                            <div class="container s_allow_columns">
+                                <div class="row">
+                                    <div class="col-lg-7 mt-4 mt-lg-0">
+                                        <p class="lead">
+                                            Contact us about anything related to our company or services.<br/>
+                                            We'll do our best to get back to you as soon as possible.
+                                        </p>
+                                        <section class="s_website_form" data-vcss="001" data-snippet="s_website_form">
+                                            <div class="container">
+                                                <form id="contactus_form" action="/website/form/" method="post" enctype="multipart/form-data" class="o_mark_required" data-mark="*" data-model_name="mail.mail" data-success-mode="redirect" data-success-page="/contactus-thank-you" data-pre-fill="true">
+                                                    <div class="s_website_form_rows row s_col_no_bgcolor">
+                                                        <div class="mb-3 col-lg-6 s_website_form_field s_website_form_custom s_website_form_required" data-type="char" data-name="Field">
+                                                            <label class="s_website_form_label" style="width: 200px" for="contact1">
+                                                                <span class="s_website_form_label_content">Name</span>
+                                                                <span class="s_website_form_mark"> *</span>
+                                                            </label>
+                                                            <input id="contact1" type="text" class="form-control s_website_form_input" name="name" required="" data-fill-with="name"/>
+                                                        </div>
+                                                        <div class="mb-3 col-lg-6 s_website_form_field s_website_form_custom" data-type="char" data-name="Field">
+                                                            <label class="s_website_form_label" style="width: 200px" for="contact2">
+                                                                <span class="s_website_form_label_content">Phone Number</span>
+                                                            </label>
+                                                            <input id="contact2" type="tel" class="form-control s_website_form_input" name="phone" data-fill-with="phone"/>
+                                                        </div>
+                                                        <div class="mb-3 col-lg-6 s_website_form_field s_website_form_required s_website_form_model_required" data-type="email" data-name="Field">
+                                                            <label class="s_website_form_label" style="width: 200px" for="contact3">
+                                                                <span class="s_website_form_label_content">Email</span>
+                                                                <span class="s_website_form_mark"> *</span>
+                                                            </label>
+                                                            <input id="contact3" type="email" class="form-control s_website_form_input" name="email_from" required="" data-fill-with="email"/>
+                                                        </div>
+                                                        <div class="mb-3 col-lg-6 s_website_form_field s_website_form_custom" data-type="char" data-name="Field">
+                                                            <label class="s_website_form_label" style="width: 200px" for="contact4">
+                                                                <span class="s_website_form_label_content">Company</span>
+                                                            </label>
+                                                            <input id="contact4" type="text" class="form-control s_website_form_input" name="company" data-fill-with="commercial_company_name"/>
+                                                        </div>
+                                                        <div class="mb-3 col-12 s_website_form_field s_website_form_required s_website_form_model_required" data-type="char" data-name="Field">
+                                                            <label class="s_website_form_label" style="width: 200px" for="contact5">
+                                                                <span class="s_website_form_label_content">Subject</span>
+                                                                <span class="s_website_form_mark"> *</span>
+                                                            </label>
+                                                            <input id="contact5" type="text" class="form-control s_website_form_input" name="subject" required=""/>
+                                                        </div>
+                                                        <div class="mb-3 col-12 s_website_form_field s_website_form_custom s_website_form_required" data-type="text" data-name="Field">
+                                                            <label class="s_website_form_label" style="width: 200px" for="contact6">
+                                                                <span class="s_website_form_label_content">Question</span>
+                                                                <span class="s_website_form_mark"> *</span>
+                                                            </label>
+                                                            <textarea id="contact6" class="form-control s_website_form_input" name="description" required="" rows="8"></textarea>
+                                                        </div>
+                                                        <div class="mb-3 col-12 s_website_form_field s_website_form_dnone">
+                                                            <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                                <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px" for="contact7">
+                                                                    <span class="s_website_form_label_content">Email To</span>
+                                                                </label>
+                                                                <div class="col-sm">
+                                                                    <input id="contact7" type="hidden" class="form-control s_website_form_input" name="email_to"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-0 py-2 col-12 s_website_form_submit s_website_form_no_submit_label text-end" data-name="Submit Button">
+                                                            <div style="width: 200px;" class="s_website_form_label"/>
+                                                            <a href="#" role="button" class="btn btn-primary s_website_form_send">Submit</a>
+                                                            <span id="s_website_form_result"></span>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </section>
+                                    </div>
+                                    <div class="col-lg-4 offset-lg-1 mt-4 mt-lg-0">
+                                        <h5 t-esc="request.env.company.name"/>
+                                        <ul class="list-unstyled mb-0 ps-2">
+                                            <li><i class="fa fa-map-marker fa-fw me-2"/><span class="o_force_ltr" t-esc="request.env.company.street"/></li>
+                                            <li><i class="fa fa-phone fa-fw me-2"/><span class="o_force_ltr" t-esc="request.env.company.phone"/></li>
+                                            <li><i class="fa fa-1x fa-fw fa-envelope me-2"/><span t-esc="request.env.company.email"/></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </t>
+            </t>
+        </field>
+        <field name="key">night_clubs.contactus</field>
+        <field name="name">Contact Us</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
     </record>
     <record id="ir_ui_view_3315" model="ir.ui.view">
         <field name="arch" type="xml">
@@ -134,7 +190,7 @@
                             data-custom-template-data='{"events_event_time_active":true}'
                             data-name="Events"
                             data-number-of-records="3"
-                            data-filter-id="3"
+                            data-filter-id="2"
                             data-template-key="website_event.dynamic_filter_template_event_event_picture"
                             data-extra-classes="g-3"
                             data-column-classes="col-12 col-sm-6 col-lg-4"
@@ -168,7 +224,7 @@
                                 data-bs-interval="10000"
                                 style="background-image : url('/web/image/night_clubs.ir_attachment_1');"
                                 data-oe-shape-data="{'shape':'web_editor/Bold/16','colors':{'c5':'o-color-1'},'flip':['x'],'showOnMobile':false,'shapeAnimationSpeed':'0'}"
-                                id="1"
+                                id="myQuoteCarousel970616"
                             >
                                 <div class="o_we_shape o_web_editor_Bold_16" style="background-image: url('/web_editor/shape/web_editor/Bold/16.svg?c5=o-color-1&amp;flip=x');" />
                                 <div class="carousel-inner">
@@ -281,303 +337,16 @@
         <field name="type">qweb</field>
         <field name="website_id" ref="website.default_website" />
     </record>
-    <record id="ir_ui_view_3856" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <t name="Modal for tickets registration" t-name="website_event.modal_ticket_registration">
-                <!-- Modal -->
-                <div
-                    id="modal_ticket_registration"
-                    t-attf-class="modal fade {{'o_wevent_modal_slot_ticket_registration' if event.is_multi_slots else ''}}"
-                    data-bs-backdrop="static"
-                    data-bs-keyboard="false"
-                    tabindex="-1"
-                    aria-labelledby="staticBackdropLabelTicket"
-                    aria-hidden="true"
-                >
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <div class="o_wevent_registration_title modal-title fs-5" id="staticBackdropLabelTicket">
-                                    <p>Get Tickets</p>
-                                </div>
-                                <div t-if="len(event.event_ticket_ids) &gt; 2" class="o_wevent_price_range ms-2" />
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-                            </div>
-                            <form
-                                t-if="event.event_registrations_open and (not event.event_ticket_ids or any(not ticket.is_expired for ticket in event.event_ticket_ids))"
-                                id="registration_form"
-                                t-attf-action="/event/#{slug(event)}/registration/new"
-                                method="post"
-                                itemscope="itemscope"
-                                itemprop="offers"
-                                itemtype="http://schema.org/AggregateOffer"
-                            >
-                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
-                                <input t-if="event_slot" type="hidden" name="event_slot_id" t-att-value="event_slot.id" />
-                                <div id="o_wevent_tickets" class="shadow-sm o_wevent_js_ticket_details">
-                                    <div t-if="registration_error_code == 'insufficient_seats'" class="alert alert-danger" role="alert">
-                                        <p class="mb-0">
-                                            Registration failed! These tickets are not available anymore.
-                                        </p>
-                                    </div>
-                                    <t t-set="tickets" t-value="event.event_ticket_ids.filtered(lambda ticket: not ticket.is_expired)" />
-                                    <!-- If some tickets expired and there is only one type left, we keep the same layout -->
-                                    <t t-if="len(event.event_ticket_ids) &gt; 1">
-                                        <span t-if="not event.event_registrations_open" class="text-danger"><i class="fa fa-ban me-2" />Sold Out </span>
-                                        <div id="o_wevent_tickets_collapse" class="modal-body collapse show">
-                                            <div t-foreach="tickets" t-as="ticket" t-attf-class="d-flex justify-content-between o_wevent_ticket_selector mb-2 pb-2 {{not ticket_last and 'border-bottom' or ''}}" t-att-name="ticket.name">
-                                                <div itemscope="itemscope" itemtype="http://schema.org/Offer">
-                                                    <h5 itemprop="name" t-field="ticket.name" class="h6 my-0" />
-                                                    <t t-if="ticket.description">
-                                                        <small t-field="ticket.description" class="text-muted py-2" />
-                                                        <br />
-                                                    </t>
-                                                    <small t-if="ticket.end_sale_datetime and ticket.sale_available and not ticket.is_expired" class="text-muted me-3" itemprop="availabilityEnds">
-                                                        Sales end on
-                                                        <span itemprop="priceValidUntil" t-out="ticket.end_sale_datetime" t-options="{'widget': 'datetime', 'tz_name': event.date_tz, 'format': 'short'}" />
-                                                        <span t-if="website_visitor_timezone != event.date_tz">(<t t-out="event.date_tz" />)</span>
-                                                    </small>
-                                                    <small t-if="ticket.start_sale_datetime and not ticket.sale_available and not ticket.is_expired" class="text-muted me-3" itemprop="availabilityEnds">
-                                                        Sales start on <span itemprop="priceValidUntil" t-out="ticket.start_sale_datetime" t-options="{'widget': 'datetime', 'tz_name': event.date_tz, 'format': 'short'}" />
-                                                        <span t-if="website_visitor_timezone != event.date_tz">(<t t-out="event.date_tz" />)</span>
-                                                    </small>
-                                                </div>
-                                                <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-2">
-                                                    <div class="o_wevent_registration_multi_select flex-md-grow-1 text-end" />
-                                                    <div class="ms-auto">
-                                                        <t t-set="seats_available_slot_ticket" t-value="seats_available_slot_tickets and seats_available_slot_tickets.get(ticket.id, 0) or 0" />
-                                                        <t t-set="seats_available_slot" t-value="event_slot and event_slot.seats_available or 0" />
-                                                        <t t-set="seats_max_slot_ticket" t-value="((not event.seats_limited and not ticket.seats_limited) or seats_available_slot_ticket &gt; 9) and 10 or seats_available_slot_ticket + 1" />
-                                                        <t t-set="seats_max_slot" t-value="(not event.seats_limited or seats_available_slot &gt; 9) and 10 or seats_available_slot + 1" />
-                                                        <t t-set="seats_max_ticket" t-value="(not ticket.seats_limited or ticket.seats_available &gt; 9) and 10 or ticket.seats_available + 1" />
-                                                        <t t-set="seats_max_event" t-value="(not event.seats_limited or event.seats_available &gt; 9) and 10 or event.seats_available + 1" />
-                                                        <t t-set="seats_max_event_or_slot" t-value="seats_max_slot if event_slot else seats_max_event" />
-                                                        <t t-set="seats_max" t-value="seats_available_slot_tickets and seats_max_slot_ticket or min(seats_max_ticket, seats_max_event_or_slot)" />
-                                                        <select t-if="(not ticket.is_expired and ticket.sale_available) or seats_available_slot_ticket" t-attf-name="nb_register-#{ticket.id}" class="w-auto form-select">
-                                                            <t t-foreach="range(0, seats_max)" t-as="nb">
-                                                                <option t-out="nb" t-att-selected="len(ticket) == 0 and nb == 0 and 'selected'" />
-                                                            </t>
-                                                        </select>
-                                                        <div t-else="" class="text-danger">
-                                                            <span t-if="not ticket.sale_available and not ticket.is_expired and ticket.is_launched">Sold Out</span>
-                                                            <span t-if="ticket.is_expired">Expired</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer flex-lg-row border-top">
-                                            <button type="button" class="btn btn-light js_goto_event" data-bs-dismiss="modal">
-                                                <t t-if="event.is_multi_slots">Cancel</t>
-                                                <t t-else="">Close</t>
-                                            </button>
-                                            <button type="submit" class="btn btn-primary a-submit" disabled="" t-attf-id="#{event.id}">
-                                                Register
-                                                <t t-if="event.seats_limited and event.seats_max and event.seats_available &lt;= (event.seats_max * 0.2)"> (only <t t-out="event.seats_available" /> available) </t>
-                                            </button>
-                                        </div>
-                                    </t>
-                                    <div t-else="" class="o_wevent_registration_single">
-                                        <div class="modal-body row px-3 py-2 mx-0">
-                                            <div class="col-12 col-md-8 p-0" itemscope="itemscope" itemtype="http://schema.org/Offer">
-                                                <h5 itemprop="name" class="my-0 pe-3 o_wevent_single_ticket_name">
-                                                    <span t-if="tickets" t-field="tickets.name" />
-                                                    <span t-else="">Registration</span>
-                                                </h5>
-                                                <t t-if="tickets.description">
-                                                    <small t-field="tickets.description" class="text-muted py-2" />
-                                                    <br />
-                                                </t>
-                                                <small t-if="tickets.end_sale_datetime and tickets.sale_available and not tickets.is_expired" class="text-muted" itemprop="availabilityEnds">
-                                                    Sales end on
-                                                    <span itemprop="priceValidUntil" t-out="tickets.end_sale_datetime" t-options="{'widget': 'datetime', 'tz_name': event.date_tz, 'format': 'short'}" />
-                                                    <span t-if="website_visitor_timezone != event.date_tz">(<t t-out="event.date_tz" />)</span>
-                                                </small>
-                                            </div>
-                                            <div class="col-md-4 d-flex align-items-center justify-content-between p-0">
-                                                <t t-if="event.event_registrations_open">
-                                                    <link itemprop="availability" content="http://schema.org/InStock" />
-                                                    <div class="o_wevent_registration_single_select w-auto ms-auto">
-                                                        <t t-set="seats_available_slot_ticket" t-value="seats_available_slot_tickets and tickets and seats_available_slot_tickets.get(tickets.id, 0) or 0" />
-                                                        <t t-set="seats_max_slot_ticket" t-value="((not event.seats_limited and not tickets.seats_limited) or seats_available_slot_ticket &gt; 9) and 10 or seats_available_slot_ticket + 1" />
-                                                        <t t-set="seats_available_slot" t-value="event_slot and event_slot.seats_available or 0" />
-                                                        <t t-set="seats_max_slot" t-value="(not event.seats_limited or seats_available_slot &gt; 9) and 10 or seats_available_slot + 1" />
-                                                        <t t-set="seats_max_ticket" t-value="(not tickets or not tickets.seats_limited or tickets.seats_available &gt; 9) and 10 or tickets.seats_available + 1" />
-                                                        <t t-set="seats_max_event" t-value="(not event.seats_limited or event.seats_available &gt; 9) and 10 or event.seats_available + 1" />
-                                                        <t t-set="seats_max_event_or_slot" t-value="seats_max_slot if event_slot else seats_max_event" />
-                                                        <t t-set="seats_max" t-value="(seats_available_slot_tickets and seats_max_slot_ticket or min(seats_max_ticket, seats_max_event_or_slot)) if tickets else seats_max_event_or_slot" />
-                                                        <select t-att-name="'nb_register-%s' % (tickets.id if tickets else 0)" class="d-inline w-auto form-select">
-                                                            <t t-foreach="range(0, seats_max)" t-as="nb">
-                                                                <option t-out="nb" t-att-selected="nb == 1 and 'selected'" />
-                                                            </t>
-                                                        </select>
-                                                    </div>
-                                                </t>
-                                                <t t-else="">
-                                                    <span itemprop="availability" content="http://schema.org/SoldOut" class="text-danger"><i class="fa fa-ban me-2" />Sold Out </span>
-                                                </t>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer flex-lg-row border-top">
-                                            <button type="button" class="btn btn-light js_goto_event" data-bs-dismiss="modal">
-                                                <t t-if="event.is_multi_slots">Cancel</t>
-                                                <t t-else="">Close</t>
-                                            </button>
-                                            <button type="submit" class="btn btn-primary a-submit" t-attf-id="#{event.id}" disabled="disabled">
-                                                Register
-                                                <t t-if="event.seats_limited and event.seats_max and event.seats_available &lt;= (event.seats_max * 0.2)"> (only <t t-out="event.seats_available" /> available) </t>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </t>
-        </field>
-        <field name="key">website_event.modal_ticket_registration</field>
-        <field name="name">Modal for tickets registration</field>
-        <field name="type">qweb</field>
-        <field name="website_id" ref="website.default_website" />
-    </record>
     <record id="ir_ui_view_3822" model="ir.ui.view">
         <field name="arch" type="xml">
-            <t name="Topbar" t-name="website_event.index_topbar">
-                <div class="container">
-                    <section class="o_wevent_index_topbar_filters d-flex d-print-none align-items-center justify-content-lg-end flex-wrap gap-2 mt-4 mb-3">
-                        <h2 class="me-auto mb-0 h4">Parties</h2>
-                        <t t-foreach="categories" t-as="category">
-                            <div t-if="category.is_published and category.tag_ids and any(tag.color for tag in category.tag_ids)" class="dropdown d-none d-lg-block">
-                                <t t-set="searched_category_tags" t-value="search_tags.filtered(lambda tag: tag.category_id == category)" />
-                                <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" title="Filter by category" aria-label="Filter by category" aria-expanded="false">
-                                    <t t-out="category.name" />
-                                    <span t-if="len(searched_category_tags)" t-out="len(searched_category_tags)" class="badge bg-primary ms-1" />
-                                </button>
-                                <div class="dropdown-menu">
-                                    <span
-                                        t-att-data-post="keep_event_url(tags=slugify_tags((search_tags - searched_category_tags).ids), prevent_redirect=True)"
-                                        t-attf-class="post_link cursor-pointer dropdown-item d-flex align-items-center justify-content-between #{'active' if not searched_category_tags else ''}"
-                                    >
-                                        All
-                                    </span>
-                                    <t t-foreach="category.tag_ids" t-as="tag">
-                                        <span
-                                            t-if="tag.color"
-                                            t-att-data-post="keep_event_url(tags=slugify_tags(search_tags.ids, toggle_tag_id=tag.id), prevent_redirect=True)"
-                                            t-attf-class="post_link cursor-pointer dropdown-item d-flex align-items-center justify-content-between #{'active' if tag in search_tags else ''}"
-                                        >
-                                            <t t-out="tag.name" />
-                                        </span>
-                                    </t>
-                                </div>
-                            </div>
-                        </t>
-                        <div class="o_wevent_search d-flex w-100 w-lg-25">
-                            <t t-call="website.website_search_box_input">
-                                <t t-set="_form_classes" t-valuef="flex-grow-1" />
-                                <t t-set="_classes" t-valuef="o_wevent_event_searchbar_form" />
-                                <t t-set="search_type">events</t>
-                                <t t-set="action" t-value="'/event/'" />
-                                <t t-set="display_description" t-valuef="true" />
-                                <t t-set="display_detail" t-valuef="false" />
-                                <t t-set="search" t-value="search or searches and searches['search']" />
-                                <t t-set="placeholder">Search an event..</t>
-                                <t t-foreach="searches" t-as="item">
-                                    <input t-if="item != 'search' and item_value != 'all'" type="hidden" t-att-name="item" t-att-value="item_value" />
-                                </t>
-                            </t>
-                            <button class="o_not_editable btn btn-light position-relative ms-2 d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#o_wevent_index_offcanvas">
-                                <i class="fa fa-sliders" />
-                            </button>
-                        </div>
-                        <t t-if="search_tags" t-call="website_event.searched_tags" />
-                    </section>
-                    <!-- Off canvas filters on mobile-->
-                    <div id="o_wevent_index_offcanvas" class="o_website_offcanvas offcanvas offcanvas-end d-lg-none p-0 overflow-visible">
-                        <div class="offcanvas-header">
-                            <h5 class="offcanvas-title">Filters</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close" />
-                        </div>
-                        <div class="offcanvas-body p-0">
-                            <div class="accordion accordion-flush">
-                                <div class="accordion-item" t-foreach="categories" t-as="category">
-                                    <h2 class="accordion-header">
-                                        <button
-                                            class="accordion-button collapsed"
-                                            type="button"
-                                            data-bs-toggle="collapse"
-                                            t-attf-aria-controls="o_wevent_offcanvas_cat_#{category.id}"
-                                            t-att-data-bs-target="'.o_wevent_offcanvas_cat_%s' % category.id"
-                                            aria-expanded="false"
-                                        >
-                                            <t t-out="category.name" />
-                                        </button>
-                                    </h2>
-                                    <div t-attf-id="o_wevent_offcanvas_cat_#{category.id}" t-attf-class="o_wevent_offcanvas_cat_#{category.id} accordion-collapse collapse">
-                                        <div class="accordion-body pt-0">
-                                            <ul class="list-group list-group-flush">
-                                                <t t-if="category.is_published and category.tag_ids and any(tag.color for tag in category.tag_ids)" t-foreach="category.tag_ids" t-as="tag">
-                                                    <li t-if="tag.color" class="list-group-item border-0 px-0">
-                                                        <span
-                                                            t-att-data-post="keep_event_url(tags=slugify_tags(search_tags.ids, toggle_tag_id=tag.id), prevent_redirect=True)"
-                                                            class="post_link text-reset cursor-pointer"
-                                                            t-att-title="tag.name"
-                                                        >
-                                                            <div class="form-check">
-                                                                <input class="form-check-input pe-none" type="checkbox" t-attf-name="#{tag.color}" t-att-checked="tag in search_tags" />
-                                                                <label class="form-check-label" t-attf-for="#{tag.color}" t-out="tag.name" />
-                                                            </div>
-                                                        </span>
-                                                    </li>
-                                                </t>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </t>
+            <xpath expr="//h2[contains(text(),'Events')]" position="replace">
+                <h2 class="me-auto mb-0 h4">Parties</h2>
+            </xpath>
         </field>
         <field name="key">website_event.index_topbar</field>
         <field name="name">Topbar</field>
         <field name="type">qweb</field>
         <field name="website_id" ref="website.default_website" />
-    </record>
-    <record id="ir_ui_view_3853" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <t t-name="website.record_cover">
-                <t t-set="_cp" t-value="_cp or json.loads(_record.cover_properties)" />
-                <t t-set="_name" t-value="_name or _record._name" />
-                <t t-set="_id" t-value="_id or _record.id" />
-                <t t-set="_bg" t-value="_bg or _record._get_background(height=_resize_height, width=_resize_width)" />
-                <t t-set="default_cover_name">Cover</t>
-                <div
-                    t-att-data-name="display_opt_name or default_cover_name"
-                    t-att-style="_cp.get('background_color_style')"
-                    t-att-data-use_size="use_size"
-                    t-att-data-use_filters="use_filters"
-                    t-att-data-use_text_align="use_text_align"
-                    t-att-data-res-model="_name"
-                    t-att-data-res-id="_id"
-                    t-attf-class="o_record_cover_container d-flex flex-column h-100 o_colored_level o_cc #{_cp.get('background_color_class')} #{use_size and _cp.get('resize_class')} #{use_text_align and _cp.get('text_align_class')} #{additionnal_classes}"
-                >
-                    <div
-                        t-attf-class="o_record_cover_component o_record_cover_image #{snippet_autofocus and 'o_we_snippet_autofocus'}"
-                        t-attf-style="background-image: #{_bg};"
-                        style="background-image: url('/web/image/1143-795f9245/Event%20%27Techno%20Undergound%27%20cover%20image.webp');"
-                        class="o_record_cover_component o_record_cover_image"
-                    />
-                    <div t-if="use_filters" t-attf-class="o_record_cover_component o_record_cover_filter oe_black" t-attf-style="opacity: #{_cp.get('opacity', 0.0)};" />
-                    <t t-out="0" />
-                </div>
-            </t>
-        </field>
-        <field name="key">website.record_cover</field>
-        <field name="name">record_cover</field>
-        <field name="type">qweb</field>
-        <field name="website_id" ref="website.default_website" />
+        <field name="inherit_id" ref="website_event.index_topbar"/>
     </record>
 </odoo>
