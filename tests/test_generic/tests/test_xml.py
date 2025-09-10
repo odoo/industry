@@ -81,7 +81,8 @@ MODELS_WITH_USER_ID = [
     'sale.order',
 ]
 
-escape_studio_test = [
+ESCAPE_STUDIO_TEST = [
+    'accounting_firm',
     'construction',
 ]
 
@@ -150,7 +151,7 @@ class TestEnv(IndustryCase):
                     self._check_is_published_false(tree, file_name)
                     if not is_studio_required:
                         is_studio_required = self._check_studio(tree, file_name)
-        self._check_manifest(manifest_content, is_studio_required, escape_studio_test=module in escape_studio_test)
+        self._check_manifest(manifest_content, is_studio_required, escape_studio_test=module in ESCAPE_STUDIO_TEST)
         self._check_records_without_user_id(checked_records_with_user)
         if not get_db_name().endswith('imported_no_demo'):
             in_use_files = {file.lstrip('/') for file in in_use_files}
