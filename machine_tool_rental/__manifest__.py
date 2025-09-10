@@ -29,6 +29,7 @@
         'data/product_product.xml',
         'data/quality_point.xml',
         'data/sale_order_template.xml',
+        'data/stock_location.xml',
         'data/x_maintenance_rules.xml',
         'data/x_run_time_meter.xml',
         'data/mail_message.xml',
@@ -38,7 +39,7 @@
         'demo/stock_lot.xml',
         'demo/x_run_time_meter.xml',
         'demo/stock_quant.xml',
-        'demo/res_partner.xml',
+        'demo/stock_move_line.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [
