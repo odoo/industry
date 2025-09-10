@@ -1,0 +1,583 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="ir_ui_view_3858" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <t name="Event Navbar" t-name="website_event.navbar">
+                <t t-set="is_rendering_cta" t-value="event.event_registrations_open and not hide_register_cta" />
+                <section id="o_wevent_event_submenu">
+                    <!-- Mobile -->
+                    <div id="o_wevent_submenu_mobile" class="container d-flex d-lg-none align-items-center py-3 pb-lg-2">
+                        <a t-if="navbar__back_url" t-att-href="navbar__back_url" t-att-title="navbar__back_title or 'Go back'">
+                            <i class="oi oi-chevron-left" />
+                            <span t-out="navbar__back_text or 'Go back'" />
+                        </a>
+                        <a t-else="" href="/event" title="All Events">
+                            <i class="oi oi-chevron-left" />
+                            <span>All Events</span>
+                        </a>
+                        <!-- Add Register additional CTA button, in addition to menus -->
+                        <a t-if="is_rendering_cta" t-att-href="'/event/%s/register' % (slug(event))" t-attf-class="btn btn-primary ms-auto" title="Registration">
+                            Registration
+                        </a>
+                        <t t-call="website_event.navbar_dropdown" />
+                    </div>
+                    <!-- Desktop -->
+                    <div id="o_wevent_submenu_desktop" class="d-none d-lg-block mt-1 py-3 py-lg-2">
+                        <div class="container">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <nav class="d-flex flex-wrap justify-content-between align-items-center gap-2 flex-grow-1">
+                                    <ul class="breadcrumb p-0 m-0">
+                                        <li class="breadcrumb-item" t-if="event.header_visible">
+                                            <a href="/event" title="Back to All Events">All Parties</a>
+                                        </li>
+                                        <t t-if="navbar__back_url">
+                                            <li class="breadcrumb-item">
+                                                <a t-attf-href="/event/{{slug(event)}}" t-attf-title="Back to {{event.name}}" t-field="event.name" />
+                                            </li>
+                                            <li class="breadcrumb-item">
+                                                <a t-att-href="navbar__back_url" t-att-title="navbar__back_title" t-out="navbar__back_text" />
+                                            </li>
+                                        </t>
+                                        <t t-else="">
+                                            <li t-attf-class="breadcrumb-item active #{'fw-bold' if not event.header_visible else ''}" aria-current="page">
+                                                <span class="pe-3" t-field="event.name" />
+                                            </li>
+                                        </t>
+                                    </ul>
+                                    <ul t-if="not navbar__back_url" class="nav" t-att-data-menu_name="editable and 'Event Menu'" t-att-data-content_menu_id="editable and event.menu_id.id">
+                                        <t t-foreach="event.menu_id.child_id" t-as="submenu">
+                                            <t t-call="website.submenu">
+                                                <t t-set="item_class" t-value="'nav-item'" />
+                                                <t t-set="link_class" t-value="'nav-link text-nowrap'" />
+                                            </t>
+                                        </t>
+                                    </ul>
+                                </nav>
+                                <!-- Workaround to avoid flickering while navigating between pages with and without CTA -->
+                                <span t-if="not is_rendering_cta" aria-hidden="true" class="btn invisible w-0 px-0"></span>
+                                <div t-else="" class="ms-3">
+                                    <t t-call="website_event.registration_template" />
+                                </div>
+                                <t t-if="navbar__back_url" t-call="website_event.navbar_dropdown" />
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </t>
+        </field>
+        <field name="key">website_event.navbar</field>
+        <field name="name">Event Navbar</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website" />
+    </record>
+    <record id="ir_ui_view_3315" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <data inherit_id="website.placeholder_header_call_to_action" name="Header Call to Action" active="True">
+                <xpath expr="." position="inside">
+                    <li t-attf-class="#{_item_class}">
+                        <div t-attf-class="oe_structure oe_structure_solo #{_div_class}" class="oe_structure oe_structure_solo">
+                            <section class="oe_unremovable oe_unmovable s_text_block o_colored_level" data-snippet="s_text_block" data-name="Text">
+                                <div class="container">
+                                    <a href="/event" class="oe_unremovable btn btn-primary">Upcoming Parties</a>
+                                </div>
+                            </section>
+                        </div>
+                    </li>
+                </xpath>
+            </data>
+        </field>
+        <field name="inherit_id" ref="website.placeholder_header_call_to_action" />
+        <field name="key">website.header_call_to_action</field>
+        <field name="mode">extension</field>
+        <field name="name">Header Call to Action</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website" />
+    </record>
+    <record id="homepage" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <t name="Homepage" t-name="website.homepage">
+                <t t-call="website.layout">
+                    <t t-set="pageName" t-value="'homepage'" />
+                    <div id="wrap" class="oe_structure">
+                        <section class="s_image_title o_cc o_cc5 oe_img_bg parallax o_colored_level pt104 pb192" data-scroll-background-ratio="-3" data-snippet="s_image_title">
+                            <span
+                                class="s_parallax_bg oe_img_bg o_bg_img_center o_bg_img_origin_border_box"
+                                style="background-image: url('/web/image/night_clubs.ir_attachment_2');"
+                                data-attachment-id="2"
+                                data-format-mimetype="image/jpeg"
+                                data-original-id="2"
+                                data-original-src="/web/image/night_clubs.ir_attachment_2"
+                                data-mimetype-before-conversion="image/jpeg"
+                                data-resize-width="1644"
+                                data-mimetype="image/jpeg"
+                            />
+                            <div class="o_we_bg_filter bg-black-50" />
+                            <div class="container">
+                                <div class="row o_grid_mode" data-row-count="9">
+                                    <div class="o_grid_item g-height-9 g-col-lg-8 col-lg-8 o_colored_level" style="--grid-item-padding-y: 32px; grid-area: 1 / 1 / 10 / 9; z-index: 1;">
+                                        <h1 class="display-3">
+                                            Your Night.&amp;nbsp;<br />
+                                            Your Club.
+                                        </h1>
+                                    </div>
+                                    <div class="o_grid_item g-height-3 o_colored_level g-col-lg-7 col-lg-7" style="--grid-item-padding-y: 24px; z-index: 2; grid-area: 5 / 1 / 8 / 8;">
+                                        <p class="lead" style="text-align: left;">
+                                            The city’s hottest DJs keep the floor alive all night long, from house to hip-hop anthems. Step into the lights and lose yourself in the energy of the crowd.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section
+                            data-snippet="s_events"
+                            class="s_events s_event_upcoming_snippet s_dynamic s_dynamic_empty pt32 pb32 s_event_event_picture o_colored_level o_cc o_cc5"
+                            data-custom-template-data='{"events_event_time_active":true}'
+                            data-name="Events"
+                            data-number-of-records="3"
+                            data-filter-id="3"
+                            data-template-key="website_event.dynamic_filter_template_event_event_picture"
+                            data-extra-classes="g-3"
+                            data-column-classes="col-12 col-sm-6 col-lg-4"
+                        >
+                            <div class="container">
+                                <div class="row s_nb_column_fixed">
+                                    <section class="s_dynamic_snippet_title oe_unremovable oe_unmovable d-flex flex-column flex-md-row mb-lg-0 pb-3 pb-md-0 o_colored_level justify-content-between">
+                                        <div>
+                                            <h4>Upcoming Parties</h4>
+                                            <p class="lead">Get your entrace tickets now!&amp;nbsp;</p>
+                                        </div>
+                                        <div>
+                                            <a title="See All" href="/event">See all<span class="fa fa-long-arrow-right ms-2" /></a>
+                                        </div>
+                                    </section>
+                                    <section class="s_dynamic_snippet_content oe_unremovable oe_unmovable o_not_editable col o_colored_level">
+                                        <div class="css_non_editable_mode_hidden">
+                                            <div class="missing_option_warning alert alert-info fade show d-none d-print-none rounded-0">
+                                                Your Dynamic Snippet will be displayed here... This message is displayed because you did not provide both a filter and a template to use.<br />
+                                            </div>
+                                        </div>
+                                        <div class="dynamic_snippet_template" />
+                                    </section>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="s_quotes_carousel_wrapper" data-vxml="001" data-vcss="002" data-preview-interaction-enabled="true" data-snippet="s_quotes_carousel">
+                            <div
+                                class="s_quotes_carousel carousel slide s_carousel_default oe_img_bg o_bg_img_center o_colored_level o_bg_img_origin_border_box"
+                                data-bs-ride="true"
+                                data-bs-interval="10000"
+                                style="background-image : url('/web/image/night_clubs.ir_attachment_1');"
+                                data-oe-shape-data="{'shape':'web_editor/Bold/16','colors':{'c5':'o-color-1'},'flip':['x'],'showOnMobile':false,'shapeAnimationSpeed':'0'}"
+                                id="1"
+                            >
+                                <div class="o_we_shape o_web_editor_Bold_16" style="background-image: url('/web_editor/shape/web_editor/Bold/16.svg?c5=o-color-1&amp;flip=x');" />
+                                <div class="carousel-inner">
+                                    <div class="carousel-item oe_img_bg o_bg_img_center pt120 pb120 o_colored_level active" style="background-image: none;" data-name="Slide">
+                                        <blockquote
+                                            data-name="Blockquote"
+                                            data-snippet="s_blockquote"
+                                            class="s_blockquote o_cc o_cc1 o_animable position-relative d-flex flex-column gap-4 w-50 mx-auto p-5 fst-normal s_blockquote_default o_colored_level"
+                                            data-vcss="001"
+                                        >
+                                            <div class="s_blockquote_line_elt position-absolute top-0 start-0 bottom-0 bg-o-color-1">
+                                                <br />
+                                            </div>
+                                            <div class="s_blockquote_wrap_icon position-absolute top-0 start-50 translate-middle w-100">
+                                                <i class="s_blockquote_icon fa fa-quote-right d-block mx-auto rounded bg-o-color-1" role="img" />
+                                            </div>
+                                            <p class="s_blockquote_quote my-auto h4-fs" style="text-align: center;">
+                                                Vibrant and energetic, great atmosphere and fantastic music. Especially the late-night dance parties.
+                                            </p>
+                                            <div class="s_blockquote_infos d-flex gap-2 flex-column align-items-center w-100 text-center">
+                                                <img src="/web/image/website.s_quotes_carousel_demo_image_3" class="s_blockquote_avatar img rounded-circle" alt="" loading="lazy" />
+                                                <div class="s_blockquote_author">
+                                                    <span class="o_small">
+                                                        <strong>Jane DOE</strong>
+                                                        <br />
+                                                        <span class="text-muted">Owner of NightClub</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </blockquote>
+                                    </div>
+                                    <div class="carousel-item oe_img_bg o_bg_img_center pt120 pb120 o_colored_level" style="background-image: none;" data-name="Slide">
+                                        <blockquote
+                                            data-name="Blockquote"
+                                            data-snippet="s_blockquote"
+                                            class="s_blockquote o_cc o_cc1 o_animable position-relative d-flex flex-column gap-4 w-50 mx-auto p-5 fst-normal s_blockquote_default o_colored_level"
+                                            data-vcss="001"
+                                        >
+                                            <div class="s_blockquote_line_elt position-absolute top-0 start-0 bottom-0 bg-o-color-1">
+                                                <br />
+                                            </div>
+                                            <div class="s_blockquote_wrap_icon position-absolute top-0 start-50 translate-middle w-100">
+                                                <i class="s_blockquote_icon fa fa-quote-right d-block mx-auto rounded bg-o-color-1" role="img" />
+                                            </div>
+                                            <p class="s_blockquote_quote my-auto h4-fs" style="text-align: center;">
+                                                This place is perfect for parties or a fun night out with friends.
+                                            </p>
+                                            <div class="s_blockquote_infos d-flex gap-2 flex-column align-items-center w-100 text-center">
+                                                <img src="/web/image/website.s_quotes_carousel_demo_image_4" class="s_blockquote_avatar img rounded-circle" alt="" loading="lazy" />
+                                                <div class="s_blockquote_author">
+                                                    <span class="o_small">
+                                                        <strong>John DOE</strong>
+                                                        <br />
+                                                        <span class="text-muted">Manager of NightClub</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </blockquote>
+                                    </div>
+                                    <div class="carousel-item oe_img_bg o_bg_img_center pt120 pb120 o_colored_level" style="background-image: none;" data-name="Slide">
+                                        <blockquote
+                                            data-name="Blockquote"
+                                            data-snippet="s_blockquote"
+                                            class="s_blockquote o_cc o_cc1 o_animable position-relative d-flex flex-column gap-4 w-50 mx-auto p-5 fst-normal s_blockquote_default o_colored_level"
+                                            data-vcss="001"
+                                        >
+                                            <div class="s_blockquote_line_elt position-absolute top-0 start-0 bottom-0 bg-o-color-1">
+                                                <br />
+                                            </div>
+                                            <div class="s_blockquote_wrap_icon position-absolute top-0 start-50 translate-middle w-100">
+                                                <i class="s_blockquote_icon fa fa-quote-right d-block mx-auto rounded bg-o-color-1" role="img" />
+                                            </div>
+                                            <p class="s_blockquote_quote my-auto h4-fs" style="text-align: center;">
+                                                An unforgettable nightlife experience. I highly recommend the signature cocktails, simply amazing.
+                                            </p>
+                                            <div class="s_blockquote_infos d-flex gap-2 flex-column align-items-center w-100 text-center">
+                                                <img src="/web/image/website.s_quotes_carousel_demo_image_5" class="s_blockquote_avatar img rounded-circle" alt="" loading="lazy" />
+                                                <div class="s_blockquote_author">
+                                                    <span class="o_small">
+                                                        <strong>Iris DOE</strong>
+                                                        <br />
+                                                        <span class="text-muted">Manager of Nightlife Club</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </blockquote>
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev o_not_editable" aria-label="Previous" title="Previous" data-bs-target="#myQuoteCarousel970616" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true" />
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next o_not_editable" aria-label="Next" title="Next" data-bs-target="#myQuoteCarousel970616" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true" />
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                                <div class="carousel-indicators o_not_editable">
+                                    <button type="button" class="active" aria-label="Carousel indicator" data-bs-target="#myQuoteCarousel970616" data-bs-slide-to="0" aria-current="true" />
+                                    <button type="button" aria-label="Carousel indicator" data-bs-target="#myQuoteCarousel970616" data-bs-slide-to="1" />
+                                    <button type="button" aria-label="Carousel indicator" data-bs-target="#myQuoteCarousel970616" data-bs-slide-to="2" />
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </t>
+            </t>
+        </field>
+        <field name="key">night_clubs.homepage</field>
+        <field name="name">Home</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website" />
+    </record>
+    <record id="ir_ui_view_3856" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <t name="Modal for tickets registration" t-name="website_event.modal_ticket_registration">
+                <!-- Modal -->
+                <div
+                    id="modal_ticket_registration"
+                    t-attf-class="modal fade {{'o_wevent_modal_slot_ticket_registration' if event.is_multi_slots else ''}}"
+                    data-bs-backdrop="static"
+                    data-bs-keyboard="false"
+                    tabindex="-1"
+                    aria-labelledby="staticBackdropLabelTicket"
+                    aria-hidden="true"
+                >
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <div class="o_wevent_registration_title modal-title fs-5" id="staticBackdropLabelTicket">
+                                    <p>Get Tickets</p>
+                                </div>
+                                <div t-if="len(event.event_ticket_ids) &gt; 2" class="o_wevent_price_range ms-2" />
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+                            </div>
+                            <form
+                                t-if="event.event_registrations_open and (not event.event_ticket_ids or any(not ticket.is_expired for ticket in event.event_ticket_ids))"
+                                id="registration_form"
+                                t-attf-action="/event/#{slug(event)}/registration/new"
+                                method="post"
+                                itemscope="itemscope"
+                                itemprop="offers"
+                                itemtype="http://schema.org/AggregateOffer"
+                            >
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                                <input t-if="event_slot" type="hidden" name="event_slot_id" t-att-value="event_slot.id" />
+                                <div id="o_wevent_tickets" class="shadow-sm o_wevent_js_ticket_details">
+                                    <div t-if="registration_error_code == 'insufficient_seats'" class="alert alert-danger" role="alert">
+                                        <p class="mb-0">
+                                            Registration failed! These tickets are not available anymore.
+                                        </p>
+                                    </div>
+                                    <t t-set="tickets" t-value="event.event_ticket_ids.filtered(lambda ticket: not ticket.is_expired)" />
+                                    <!-- If some tickets expired and there is only one type left, we keep the same layout -->
+                                    <t t-if="len(event.event_ticket_ids) &gt; 1">
+                                        <span t-if="not event.event_registrations_open" class="text-danger"><i class="fa fa-ban me-2" />Sold Out </span>
+                                        <div id="o_wevent_tickets_collapse" class="modal-body collapse show">
+                                            <div t-foreach="tickets" t-as="ticket" t-attf-class="d-flex justify-content-between o_wevent_ticket_selector mb-2 pb-2 {{not ticket_last and 'border-bottom' or ''}}" t-att-name="ticket.name">
+                                                <div itemscope="itemscope" itemtype="http://schema.org/Offer">
+                                                    <h5 itemprop="name" t-field="ticket.name" class="h6 my-0" />
+                                                    <t t-if="ticket.description">
+                                                        <small t-field="ticket.description" class="text-muted py-2" />
+                                                        <br />
+                                                    </t>
+                                                    <small t-if="ticket.end_sale_datetime and ticket.sale_available and not ticket.is_expired" class="text-muted me-3" itemprop="availabilityEnds">
+                                                        Sales end on
+                                                        <span itemprop="priceValidUntil" t-out="ticket.end_sale_datetime" t-options="{'widget': 'datetime', 'tz_name': event.date_tz, 'format': 'short'}" />
+                                                        <span t-if="website_visitor_timezone != event.date_tz">(<t t-out="event.date_tz" />)</span>
+                                                    </small>
+                                                    <small t-if="ticket.start_sale_datetime and not ticket.sale_available and not ticket.is_expired" class="text-muted me-3" itemprop="availabilityEnds">
+                                                        Sales start on <span itemprop="priceValidUntil" t-out="ticket.start_sale_datetime" t-options="{'widget': 'datetime', 'tz_name': event.date_tz, 'format': 'short'}" />
+                                                        <span t-if="website_visitor_timezone != event.date_tz">(<t t-out="event.date_tz" />)</span>
+                                                    </small>
+                                                </div>
+                                                <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-2">
+                                                    <div class="o_wevent_registration_multi_select flex-md-grow-1 text-end" />
+                                                    <div class="ms-auto">
+                                                        <t t-set="seats_available_slot_ticket" t-value="seats_available_slot_tickets and seats_available_slot_tickets.get(ticket.id, 0) or 0" />
+                                                        <t t-set="seats_available_slot" t-value="event_slot and event_slot.seats_available or 0" />
+                                                        <t t-set="seats_max_slot_ticket" t-value="((not event.seats_limited and not ticket.seats_limited) or seats_available_slot_ticket &gt; 9) and 10 or seats_available_slot_ticket + 1" />
+                                                        <t t-set="seats_max_slot" t-value="(not event.seats_limited or seats_available_slot &gt; 9) and 10 or seats_available_slot + 1" />
+                                                        <t t-set="seats_max_ticket" t-value="(not ticket.seats_limited or ticket.seats_available &gt; 9) and 10 or ticket.seats_available + 1" />
+                                                        <t t-set="seats_max_event" t-value="(not event.seats_limited or event.seats_available &gt; 9) and 10 or event.seats_available + 1" />
+                                                        <t t-set="seats_max_event_or_slot" t-value="seats_max_slot if event_slot else seats_max_event" />
+                                                        <t t-set="seats_max" t-value="seats_available_slot_tickets and seats_max_slot_ticket or min(seats_max_ticket, seats_max_event_or_slot)" />
+                                                        <select t-if="(not ticket.is_expired and ticket.sale_available) or seats_available_slot_ticket" t-attf-name="nb_register-#{ticket.id}" class="w-auto form-select">
+                                                            <t t-foreach="range(0, seats_max)" t-as="nb">
+                                                                <option t-out="nb" t-att-selected="len(ticket) == 0 and nb == 0 and 'selected'" />
+                                                            </t>
+                                                        </select>
+                                                        <div t-else="" class="text-danger">
+                                                            <span t-if="not ticket.sale_available and not ticket.is_expired and ticket.is_launched">Sold Out</span>
+                                                            <span t-if="ticket.is_expired">Expired</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer flex-lg-row border-top">
+                                            <button type="button" class="btn btn-light js_goto_event" data-bs-dismiss="modal">
+                                                <t t-if="event.is_multi_slots">Cancel</t>
+                                                <t t-else="">Close</t>
+                                            </button>
+                                            <button type="submit" class="btn btn-primary a-submit" disabled="" t-attf-id="#{event.id}">
+                                                Register
+                                                <t t-if="event.seats_limited and event.seats_max and event.seats_available &lt;= (event.seats_max * 0.2)"> (only <t t-out="event.seats_available" /> available) </t>
+                                            </button>
+                                        </div>
+                                    </t>
+                                    <div t-else="" class="o_wevent_registration_single">
+                                        <div class="modal-body row px-3 py-2 mx-0">
+                                            <div class="col-12 col-md-8 p-0" itemscope="itemscope" itemtype="http://schema.org/Offer">
+                                                <h5 itemprop="name" class="my-0 pe-3 o_wevent_single_ticket_name">
+                                                    <span t-if="tickets" t-field="tickets.name" />
+                                                    <span t-else="">Registration</span>
+                                                </h5>
+                                                <t t-if="tickets.description">
+                                                    <small t-field="tickets.description" class="text-muted py-2" />
+                                                    <br />
+                                                </t>
+                                                <small t-if="tickets.end_sale_datetime and tickets.sale_available and not tickets.is_expired" class="text-muted" itemprop="availabilityEnds">
+                                                    Sales end on
+                                                    <span itemprop="priceValidUntil" t-out="tickets.end_sale_datetime" t-options="{'widget': 'datetime', 'tz_name': event.date_tz, 'format': 'short'}" />
+                                                    <span t-if="website_visitor_timezone != event.date_tz">(<t t-out="event.date_tz" />)</span>
+                                                </small>
+                                            </div>
+                                            <div class="col-md-4 d-flex align-items-center justify-content-between p-0">
+                                                <t t-if="event.event_registrations_open">
+                                                    <link itemprop="availability" content="http://schema.org/InStock" />
+                                                    <div class="o_wevent_registration_single_select w-auto ms-auto">
+                                                        <t t-set="seats_available_slot_ticket" t-value="seats_available_slot_tickets and tickets and seats_available_slot_tickets.get(tickets.id, 0) or 0" />
+                                                        <t t-set="seats_max_slot_ticket" t-value="((not event.seats_limited and not tickets.seats_limited) or seats_available_slot_ticket &gt; 9) and 10 or seats_available_slot_ticket + 1" />
+                                                        <t t-set="seats_available_slot" t-value="event_slot and event_slot.seats_available or 0" />
+                                                        <t t-set="seats_max_slot" t-value="(not event.seats_limited or seats_available_slot &gt; 9) and 10 or seats_available_slot + 1" />
+                                                        <t t-set="seats_max_ticket" t-value="(not tickets or not tickets.seats_limited or tickets.seats_available &gt; 9) and 10 or tickets.seats_available + 1" />
+                                                        <t t-set="seats_max_event" t-value="(not event.seats_limited or event.seats_available &gt; 9) and 10 or event.seats_available + 1" />
+                                                        <t t-set="seats_max_event_or_slot" t-value="seats_max_slot if event_slot else seats_max_event" />
+                                                        <t t-set="seats_max" t-value="(seats_available_slot_tickets and seats_max_slot_ticket or min(seats_max_ticket, seats_max_event_or_slot)) if tickets else seats_max_event_or_slot" />
+                                                        <select t-att-name="'nb_register-%s' % (tickets.id if tickets else 0)" class="d-inline w-auto form-select">
+                                                            <t t-foreach="range(0, seats_max)" t-as="nb">
+                                                                <option t-out="nb" t-att-selected="nb == 1 and 'selected'" />
+                                                            </t>
+                                                        </select>
+                                                    </div>
+                                                </t>
+                                                <t t-else="">
+                                                    <span itemprop="availability" content="http://schema.org/SoldOut" class="text-danger"><i class="fa fa-ban me-2" />Sold Out </span>
+                                                </t>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer flex-lg-row border-top">
+                                            <button type="button" class="btn btn-light js_goto_event" data-bs-dismiss="modal">
+                                                <t t-if="event.is_multi_slots">Cancel</t>
+                                                <t t-else="">Close</t>
+                                            </button>
+                                            <button type="submit" class="btn btn-primary a-submit" t-attf-id="#{event.id}" disabled="disabled">
+                                                Register
+                                                <t t-if="event.seats_limited and event.seats_max and event.seats_available &lt;= (event.seats_max * 0.2)"> (only <t t-out="event.seats_available" /> available) </t>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </field>
+        <field name="key">website_event.modal_ticket_registration</field>
+        <field name="name">Modal for tickets registration</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website" />
+    </record>
+    <record id="ir_ui_view_3822" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <t name="Topbar" t-name="website_event.index_topbar">
+                <div class="container">
+                    <section class="o_wevent_index_topbar_filters d-flex d-print-none align-items-center justify-content-lg-end flex-wrap gap-2 mt-4 mb-3">
+                        <h2 class="me-auto mb-0 h4">Parties</h2>
+                        <t t-foreach="categories" t-as="category">
+                            <div t-if="category.is_published and category.tag_ids and any(tag.color for tag in category.tag_ids)" class="dropdown d-none d-lg-block">
+                                <t t-set="searched_category_tags" t-value="search_tags.filtered(lambda tag: tag.category_id == category)" />
+                                <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" title="Filter by category" aria-label="Filter by category" aria-expanded="false">
+                                    <t t-out="category.name" />
+                                    <span t-if="len(searched_category_tags)" t-out="len(searched_category_tags)" class="badge bg-primary ms-1" />
+                                </button>
+                                <div class="dropdown-menu">
+                                    <span
+                                        t-att-data-post="keep_event_url(tags=slugify_tags((search_tags - searched_category_tags).ids), prevent_redirect=True)"
+                                        t-attf-class="post_link cursor-pointer dropdown-item d-flex align-items-center justify-content-between #{'active' if not searched_category_tags else ''}"
+                                    >
+                                        All
+                                    </span>
+                                    <t t-foreach="category.tag_ids" t-as="tag">
+                                        <span
+                                            t-if="tag.color"
+                                            t-att-data-post="keep_event_url(tags=slugify_tags(search_tags.ids, toggle_tag_id=tag.id), prevent_redirect=True)"
+                                            t-attf-class="post_link cursor-pointer dropdown-item d-flex align-items-center justify-content-between #{'active' if tag in search_tags else ''}"
+                                        >
+                                            <t t-out="tag.name" />
+                                        </span>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                        <div class="o_wevent_search d-flex w-100 w-lg-25">
+                            <t t-call="website.website_search_box_input">
+                                <t t-set="_form_classes" t-valuef="flex-grow-1" />
+                                <t t-set="_classes" t-valuef="o_wevent_event_searchbar_form" />
+                                <t t-set="search_type">events</t>
+                                <t t-set="action" t-value="'/event/'" />
+                                <t t-set="display_description" t-valuef="true" />
+                                <t t-set="display_detail" t-valuef="false" />
+                                <t t-set="search" t-value="search or searches and searches['search']" />
+                                <t t-set="placeholder">Search an event..</t>
+                                <t t-foreach="searches" t-as="item">
+                                    <input t-if="item != 'search' and item_value != 'all'" type="hidden" t-att-name="item" t-att-value="item_value" />
+                                </t>
+                            </t>
+                            <button class="o_not_editable btn btn-light position-relative ms-2 d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#o_wevent_index_offcanvas">
+                                <i class="fa fa-sliders" />
+                            </button>
+                        </div>
+                        <t t-if="search_tags" t-call="website_event.searched_tags" />
+                    </section>
+                    <!-- Off canvas filters on mobile-->
+                    <div id="o_wevent_index_offcanvas" class="o_website_offcanvas offcanvas offcanvas-end d-lg-none p-0 overflow-visible">
+                        <div class="offcanvas-header">
+                            <h5 class="offcanvas-title">Filters</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close" />
+                        </div>
+                        <div class="offcanvas-body p-0">
+                            <div class="accordion accordion-flush">
+                                <div class="accordion-item" t-foreach="categories" t-as="category">
+                                    <h2 class="accordion-header">
+                                        <button
+                                            class="accordion-button collapsed"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            t-attf-aria-controls="o_wevent_offcanvas_cat_#{category.id}"
+                                            t-att-data-bs-target="'.o_wevent_offcanvas_cat_%s' % category.id"
+                                            aria-expanded="false"
+                                        >
+                                            <t t-out="category.name" />
+                                        </button>
+                                    </h2>
+                                    <div t-attf-id="o_wevent_offcanvas_cat_#{category.id}" t-attf-class="o_wevent_offcanvas_cat_#{category.id} accordion-collapse collapse">
+                                        <div class="accordion-body pt-0">
+                                            <ul class="list-group list-group-flush">
+                                                <t t-if="category.is_published and category.tag_ids and any(tag.color for tag in category.tag_ids)" t-foreach="category.tag_ids" t-as="tag">
+                                                    <li t-if="tag.color" class="list-group-item border-0 px-0">
+                                                        <span
+                                                            t-att-data-post="keep_event_url(tags=slugify_tags(search_tags.ids, toggle_tag_id=tag.id), prevent_redirect=True)"
+                                                            class="post_link text-reset cursor-pointer"
+                                                            t-att-title="tag.name"
+                                                        >
+                                                            <div class="form-check">
+                                                                <input class="form-check-input pe-none" type="checkbox" t-attf-name="#{tag.color}" t-att-checked="tag in search_tags" />
+                                                                <label class="form-check-label" t-attf-for="#{tag.color}" t-out="tag.name" />
+                                                            </div>
+                                                        </span>
+                                                    </li>
+                                                </t>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </field>
+        <field name="key">website_event.index_topbar</field>
+        <field name="name">Topbar</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website" />
+    </record>
+    <record id="ir_ui_view_3853" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <t t-name="website.record_cover">
+                <t t-set="_cp" t-value="_cp or json.loads(_record.cover_properties)" />
+                <t t-set="_name" t-value="_name or _record._name" />
+                <t t-set="_id" t-value="_id or _record.id" />
+                <t t-set="_bg" t-value="_bg or _record._get_background(height=_resize_height, width=_resize_width)" />
+                <t t-set="default_cover_name">Cover</t>
+                <div
+                    t-att-data-name="display_opt_name or default_cover_name"
+                    t-att-style="_cp.get('background_color_style')"
+                    t-att-data-use_size="use_size"
+                    t-att-data-use_filters="use_filters"
+                    t-att-data-use_text_align="use_text_align"
+                    t-att-data-res-model="_name"
+                    t-att-data-res-id="_id"
+                    t-attf-class="o_record_cover_container d-flex flex-column h-100 o_colored_level o_cc #{_cp.get('background_color_class')} #{use_size and _cp.get('resize_class')} #{use_text_align and _cp.get('text_align_class')} #{additionnal_classes}"
+                >
+                    <div
+                        t-attf-class="o_record_cover_component o_record_cover_image #{snippet_autofocus and 'o_we_snippet_autofocus'}"
+                        t-attf-style="background-image: #{_bg};"
+                        style="background-image: url('/web/image/1143-795f9245/Event%20%27Techno%20Undergound%27%20cover%20image.webp');"
+                        class="o_record_cover_component o_record_cover_image"
+                    />
+                    <div t-if="use_filters" t-attf-class="o_record_cover_component o_record_cover_filter oe_black" t-attf-style="opacity: #{_cp.get('opacity', 0.0)};" />
+                    <t t-out="0" />
+                </div>
+            </t>
+        </field>
+        <field name="key">website.record_cover</field>
+        <field name="name">record_cover</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website" />
+    </record>
+</odoo>
