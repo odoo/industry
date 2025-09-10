@@ -2,7 +2,7 @@
     'name': '3PL Logistic Company',
     'author': 'Odoo S.A.',
     'version': '1.0',
-    'category': 'services',
+    'category': 'Services',
     'depends': [
         'base_industry_data',
         'crm_sale_subscription',
@@ -37,6 +37,7 @@
         'data/stock_warehouse.xml',
         'data/res_config_settings.xml',
         'data/spreadsheet_dashboard.xml',
+        'data/mail_message.xml',
     ],
     'demo': [
         'demo/quality_point.xml',
@@ -55,6 +56,13 @@
         'demo/sale_order_confirm.xml',
         'demo/stock_quant_package.xml',
         'demo/account_move.xml',
+        'demo/stock_picking.xml',
+        'demo/stock_move.xml',
+    ],
+    'cloc_exclude': [
+        'data/knowledge_article.xml',
+        'data/qweb_view.xml',
     ],
     'license': 'OPL-1',
+    'images': ['images/main.png'],
 }
