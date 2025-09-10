@@ -52,6 +52,7 @@
         'data/website_menu.xml',
         'data/website_theme_apply.xml',
         'data/x_petition_tag.xml',
+        'data/crm_tag.xml',
         'data/website.xml',
     ],
     'demo': [
@@ -65,7 +66,6 @@
         'demo/event_event.xml',
         'demo/event_event_ticket.xml',
         'demo/payment_provider_demo_post.xml',
-        'demo/crm_tag.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/hr_employee.xml',
