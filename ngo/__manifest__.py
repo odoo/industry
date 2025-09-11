@@ -20,10 +20,13 @@
     ],
     'data': [
         'data/ir_attachment.xml',
+        'data/crm_tag.xml',
         'data/crm_stage.xml',
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
         'data/ir_default.xml',
+        'data/account_report.xml',
+        'data/account_journal.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_actions_report.xml',
         'data/mail_template.xml',
@@ -52,7 +55,6 @@
         'data/website_menu.xml',
         'data/website_theme_apply.xml',
         'data/x_petition_tag.xml',
-        'data/crm_tag.xml',
         'data/website.xml',
     ],
     'demo': [

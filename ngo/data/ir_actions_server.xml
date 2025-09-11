@@ -88,4 +88,17 @@ else:
         <field name="state">code</field>
         <field name="name">Generate Fiscal Attestation</field>
     </record>
+    <record id="action_server_assign_invoicing_journal_to_so" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for so in records:
+    products_is_donation = so.order_line.mapped('product_id.categ_id.x_product_category_is_donation')
+    if any(products_is_donation):
+        so['journal_id'] = env.ref('ngo.account_journal_donations')
+        if not all(products_is_donation):
+            so['tag_ids'] = env.ref('ngo.crm_tag_5')
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">action_server_assign_invoicing_journal_to_so</field>
+    </record>
 </odoo>
