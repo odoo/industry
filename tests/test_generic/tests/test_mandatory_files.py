@@ -38,7 +38,7 @@ class FileTest(IndustryCase):
             if not re.search(module, weblate_config):
                 _logger.error("Missing module in .weblate.json")
                 continue
-            if True  # release.version_info[3] != 'final':
+            if True:  # release.version_info[3] != 'final':
                 # skip test if master
                 continue
 
