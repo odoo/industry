@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+  <!--Update sale order stages-->
+  <function model="sale.order" name="action_confirm" eval="[[ref('sale_order_1')]]"/>
+
+  <!-- Creating invoice -->
+  <record id="sale_advance_payment_inv_1" model="sale.advance.payment.inv">
+    <field name="advance_payment_method">percentage</field>
+    <field name="amount">30</field>
+    <field name="sale_order_ids" eval="[Command.set([ref('sale_order_1')])]"/>
+  </record>
+  <function name="create_invoices" model="sale.advance.payment.inv" eval="[[ref('sale_advance_payment_inv_1')]]"/>
+
+  <function name="write" model="project.project">
+    <value model="project.project" search="[('sale_order_id', '=', ref('sale_order_1'))]"/>
+    <value eval="{'user_id': ref('base.user_admin')}"/>
+  </function>
+  <function name="write" model="project.task">
+    <function model="project.task" name="search" eval="[[
+      ('sale_order_id', '=', ref('sale_order_1')),
+      ('name', 'in', ['Down payment before ordering', 'Confirm measures and drawing', 'On site Material Supply and rental', 'External help'])
+    ]]"/>
+    <value eval="{'stage_id': ref('project_task_type_2')}"/>
+  </function>
+</odoo>
