@@ -41,7 +41,6 @@
     ],
     'demo': [
         'demo/quality_point.xml',
-        'demo/quality_check.xml',
         'demo/res_partner.xml',
         'demo/product_template.xml',
         'demo/mrp_bom.xml',
@@ -58,6 +57,8 @@
         'demo/account_move.xml',
         'demo/stock_picking.xml',
         'demo/stock_move.xml',
+        'demo/quality_check.xml',
+        'demo/stock_move_line.xml',
     ],
     'cloc_exclude': [
         'data/knowledge_article.xml',
