@@ -15,6 +15,7 @@
         'data/pos_config.xml',
         'data/product_category.xml',
         'data/product_public_category.xml',
+        'data/product_attribute.xml',
         'data/product_template.xml',
         'data/product_template_attribute_line.xml',
         'data/product_template_attribute_value.xml',
