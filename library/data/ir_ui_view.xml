@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="stock_picking_kanban_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//kanban" position="attributes">
+        <attribute name="create">0</attribute>
+      </xpath>
+      <xpath expr="//field[@name='user_id']" position="replace"/>
+      <xpath expr="//field[@name='activity_ids']" position="replace"/>
+      <xpath expr="//field[@name='state']" position="replace">
+        <field name="move_ids" display="full" widget="x2_many_media_viewer" string="Products"/>
+        <field widget="statinfo" class="bg-danger text-white fw-bold text-uppercase ms-auto" name="activity_type_icon" display="full" string="Late" invisible="(state in ['assigned', 'waiting', 'confirmed']) and (scheduled_date and scheduled_date &gt;= current_date)"/>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="stock.stock_picking_kanban"/>
+    <field name="mode">primary</field>
+    <field name="active" eval="True"/>
+    <field name="model">stock.picking</field>
+    <field name="name">stock.picking.kanban.library</field>
+    <field name="priority">99</field>
+    <field name="type">kanban</field>
+  </record>
+  <record id="stock_rule_list_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//list" position="attributes">
+        <attribute name="multi_edit">1</attribute>
+      </xpath>
+      <xpath expr="//field[@name='route_id']" position="replace">
+        <field name="delay" optional="show"/>
+        <field name="x_pos_product_category_ids" widget="many2many_tags"/>
+      </xpath>
+      <xpath expr="//field[@name='location_dest_id']" position="replace"/>
+      <xpath expr="//field[@name='location_src_id']" position="replace"/>
+      <xpath expr="//field[@name='action']" position="replace">
+        <xpath expr="//field[@name='name']" position="move"/>
+      </xpath>
+      <xpath expr="//field[@name='name']" position="attributes">
+        <attribute name="optional">show</attribute>
+      </xpath>
+      <xpath expr="//list" position="inside">
+        <field name="x_standard_rule" optional="hide"/>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="stock.view_stock_rule_tree"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">stock.rule</field>
+    <field name="name">stock.rule.list.library</field>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+  </record>
+  <record id="stock_route_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='product_selectable']" position="after">
+        <field name="x_automatic_activation_on_product" help="Assign the product's route during creation"/>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="stock.stock_location_route_form_view"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">stock.route</field>
+    <field name="name">stock.route.form.library</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+  <record id="stock_picking_type_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//label[@name='default_location_src_id_label']" position="before">
+        <field name="x_overrule_customer_location" invisible="code != 'outgoing'" help="the destination location comes from the operation type, not the contact"/>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="stock.view_picking_type_form"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">stock.picking.type</field>
+    <field name="name">Operation Types customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+  <record id="stock_rule_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='auto']" position="after">
+        <field name="x_standard_rule"/>
+      </xpath>
+      <xpath expr="//group/group[2]" position="inside">
+        <field name="x_pos_product_category_ids" readonly="x_standard_rule"/>
+      </xpath>
+      <xpath expr="//field[@name='push_domain']" position="attributes">
+        <attribute name="invisible">x_standard_rule</attribute>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="stock.view_stock_rule_form"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">stock.rule</field>
+    <field name="name">stock.rule.form.library</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+  </record>
+  <record id="stock_picking_search_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//search[1]/field[@name='name']" position="before">
+        <xpath expr="//field[@name='partner_id']" position="move"/>
+        <xpath expr="//field[@name='product_id']" position="move"/>
+      </xpath>
+      <xpath expr="//field[@name='product_id']" position="attributes">
+        <attribute name="filter_domain">
+            ['|', '|', '|', ('product_id.default_code', 'ilike', self), ('product_id.product_variant_ids.default_code', 'ilike', self), ('product_id.name', 'ilike', self), ('product_id.barcode', 'ilike', self)]
+        </attribute>
+      </xpath>
+      <xpath expr="//field[@name='partner_id']" position="attributes">
+        <attribute name="filter_domain">
+              ['|', '|', '|', '|', ('partner_id.complete_name', 'ilike', self), ('partner_id.ref', 'ilike', self), ('partner_id.email', 'ilike', self), ('partner_id.company_registry', 'ilike', self), ('partner_id.barcode', 'ilike', self)]
+        </attribute>
+      </xpath>
+      <xpath expr="//search[1]/field[@name='name']" position="after">
+        <field name="return_count"/>
+      </xpath>
+      <xpath expr="//search/group" position="inside">
+        <filter name="group_by_partner" string="Contact" context="{'group_by': 'partner_id'}"/>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">stock.picking</field>
+    <field name="name">stock.picking.search.library</field>
+    <field name="priority">99</field>
+    <field name="type">search</field>
+  </record>
+  <record id="stock_picking_list_view_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//list" position="attributes">
+        <attribute name="create">0</attribute>
+      </xpath>
+      <xpath expr="//field[@name='scheduled_date']" position="attributes">
+        <attribute name="widget"/>
+        <attribute name="options">{'show_time': false}</attribute>
+      </xpath>
+      <xpath expr="//field[@name='name']" position="replace"/>
+      <xpath expr="//field[@name='origin']" position="replace"/>
+      <xpath expr="//field[@name='state']" position="replace">
+        <field name="date_deadline"/>
+        <field widget="statinfo" class="bg-danger text-white fw-bold text-uppercase" name="activity_type_icon" string="Late" invisible="(state not in ['assigned', 'waiting', 'confirmed']) and (scheduled_date and scheduled_date &gt;= current_date)"/>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="stock.vpicktree"/>
+    <field name="mode">primary</field>
+    <field name="active" eval="True"/>
+    <field name="model">stock.picking</field>
+    <field name="name">stock.picking.list.library</field>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+  </record>
+</odoo>
