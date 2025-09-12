@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="stock_rule_set_push_domain_server_action" model="ir.actions.server">
+        <field name="name">Execute Code</field>
+        <field name="model_id" ref="stock.model_stock_rule"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for record in records:
+    if record.x_standard_rule or not record.x_pos_product_category_ids:
+        record['push_domain'] = []
+    else:
+        record['push_domain'] = [("product_id.pos_categ_ids", "in", record.x_pos_product_category_ids.ids)]
+]]></field>
+    </record>
+    <record id="action_update_automatic_activation_on_product" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for route in records:
+    route['x_automatic_activation_on_product'] = not route.product_selectable
+]]></field>
+        <field name="model_id" ref="stock.model_stock_route"/>
+        <field name="state">code</field>
+        <field name="name">Execute Code</field>
+    </record>
+    <record id="action_update_destination_location_on_picking" model="ir.actions.server">
+        <field name="code"><![CDATA[
+records.filtered('picking_type_id.x_overrule_customer_location').write({"location_dest_id": record.picking_type_id.default_location_dest_id.id})
+]]></field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="state">code</field>
+        <field name="name">Execute Code</field>
+    </record>
+    <record id="make_route_on_product_create" model="ir.actions.server">
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="state">object_write</field>
+        <field name="update_path">route_ids</field>
+        <field name="crud_model_id" ref="product.model_product_template"/>
+        <field name="update_field_id" ref="stock.field_product_template__route_ids"/>
+        <field name="name">Update Product</field>
+        <field name="resource_ref" ref="stock_route_4"/>
+    </record>
+</odoo>
