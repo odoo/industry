@@ -10,7 +10,6 @@
         <field name="inventory_name">Move 1</field>
         <field name="product_id" ref="product_product_17"/>
         <field name="product_uom_qty" eval="2"/>
-        <field name="product_uom" ref="uom_uom_28"/>
         <field name="picking_id" ref="stock_picking_1"/>
     </record>
     <record id="stock_picking_2" model="stock.picking">
@@ -52,16 +51,19 @@
     <function name="button_validate" model="stock.picking" context="{'skip_sms': True}">
         <value model="stock.picking" eval="[ref('stock_picking_1'), ref('stock_picking_2'), ref('stock_picking_3'), ref('stock_picking_4')]"/>
     </function>
-    <function model="ir.config_parameter" name="set_param">
-        <value eval="'pos_picking_type_id'"/>
-        <value eval="obj().env['stock.picking.type'].search([
-            ('name', '=', 'PoS Orders'),
-            ('code', '=', 'outgoing'),
-            ('warehouse_id', '=', ref('warehouse_1'))
-        ], limit=1).id"/>
-    </function>
-    <!-- <function name="write" model="stock.picking.type">
-        <value model="stock.picking.type" eval="obj().search([('name', '=', 'PoS Orders'), ('code', '=', 'outgoing'), ('warehouse_id', '=', ref('warehouse_1'))]).id"/>
+
+    <function name="write" model="stock.picking.type">
+        <value model="stock.picking.type" eval="obj().search([('code', '=', 'outgoing'), ('warehouse_id', '=', ref('warehouse_1'))], limit=1).id"/>
         <value model="stock.location" eval="{'default_location_dest_id': obj().env['stock.location'].search([('complete_name', '=', 'Bar/Stock')], limit=1).id}"/>
-    </function> -->
+    </function>
+
+    <function model="pos.config" name="write">
+        <value model="pos.config" eval="[ref('pos_config_main_bar_micro_brewery')]"/>
+        <value model="stock.picking.type" eval="{
+            'picking_type_id': obj().env['stock.picking.type'].search([
+                ('code', '=', 'outgoing'),
+                ('warehouse_id', '=', ref('warehouse_1')),
+            ], limit=1).id
+        }"/>
+    </function>
 </odoo>
