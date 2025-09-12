@@ -53,13 +53,13 @@
                     <t t-set="layout_document_title">
                         <t t-if="not proforma">
                             <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">
-                                <t name="invoice_title">Invoice</t>
+                                <t name="invoice_title">Fiscal Attestation</t>
                             </span>
                             <span t-elif="o.move_type == 'out_invoice' and o.state == 'draft'">
-                                <t name="draft_invoice_title">Draft Invoice</t>
+                                <t name="draft_invoice_title">Draft Fiscal Attestation</t>
                             </span>
                             <span t-elif="o.move_type == 'out_invoice' and o.state == 'cancel'">
-                                <t name="cancelled_invoice_title">Cancelled Invoice</t>
+                                <t name="cancelled_invoice_title">Cancelled Fiscal Attestation</t>
                             </span>
                             <span t-elif="o.move_type == 'out_refund' and o.state == 'posted'">
                                 <t name="credit_note_title">Credit Note</t>
@@ -79,13 +79,13 @@
                         </t>
                         <t t-else="">
                             <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">
-                                <t name="proforma_invoice_title">Proforma Invoice</t>
+                                <t name="proforma_invoice_title">Proforma Fiscal Attestation</t>
                             </span>
                             <span t-elif="o.move_type == 'out_invoice' and o.state == 'draft'">
-                                <t name="draft_proforma_invoice_title">Draft Proforma Invoice</t>
+                                <t name="draft_proforma_invoice_title">Draft Proforma Fiscal Attestation</t>
                             </span>
                             <span t-elif="o.move_type == 'out_invoice' and o.state == 'cancel'">
-                                <t name="cancelled_proforma_invoice_title">Cancelled Proforma Invoice</t>
+                                <t name="cancelled_proforma_invoice_title">Cancelled Proforma Fiscal Attestation</t>
                             </span>
                             <span t-elif="o.move_type == 'out_refund' and o.state == 'posted'">
                                 <t name="proforma_credit_note_title">Proforma Credit Note</t>
@@ -110,15 +110,11 @@
                         id="informations" class="row mb-4"
                         t-if="o.invoice_date or (o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted') or o.delivery_date or o.invoice_origin or o.partner_id.ref or o.ref or o.invoice_incoterm_id">
                         <div class="col" t-if="o.invoice_date" name="invoice_date">
-                            <t t-if="o.move_type == 'out_invoice'"><strong>Invoice Date</strong></t>
+                            <t t-if="o.move_type == 'out_invoice'"><strong>Fiscal Attestation Date</strong></t>
                             <t t-elif="o.move_type == 'out_refund'"><strong>Credit Note Date</strong></t>
                             <t t-elif="o.move_type == 'out_receipt'"><strong>Receipt Date</strong></t>
                             <t t-else=""><strong>Date</strong></t>
                             <div t-field="o.invoice_date">2023-09-12</div>
-                        </div>
-                        <div class="col" t-if="o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted'" name="due_date">
-                            <strong>Due Date</strong>
-                            <div t-field="o.invoice_date_due">2023-10-31</div>
                         </div>
                         <div class="col" t-if="o.delivery_date" name="delivery_date">
                             <strong>Delivery Date</strong>
@@ -377,6 +373,23 @@
                                 <span t-field="o.narration"/>
                             </div>
                         </div>
+                        <!-- <div id="company_certification" class="clearfix mt-3">
+                            <div>
+                                <t t-set="company" t-value="o.env['res.company'].search([],limit=1)" />
+                                <p>
+                                    Certified true and accurate<br/>
+                                    <t t-out="company.city"/>,<t t-out="datetime.datetime.today().date()"/>
+                                </p>
+                                <div t-if="company.x_company_signature" t-out="company.x_company_signature"
+                                    t-options-widget="'image'"
+                                    t-options-class="'o_website_image mh-100 mw-100 rounded-3'"
+                                    class="col-lg-6 mt-md-4 col-sm-12 me-2"/>
+                                <p>
+                                    <t t-out="company.x_signer_id.name"/><br/>
+                                    <t t-out="company.x_signer_id.job_title"/>
+                                </p>
+                            </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -386,95 +399,17 @@
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-set="lang" t-value="o.partner_id.lang"/>
-                <t t-if="o._get_name_invoice_report() == 'report_fiscal_attestation_document'"
-                    t-call="report_fiscal_attestation_document"
+                <t t-if="o._get_name_invoice_report() == 'ngo.report_fiscal_attestation_document'"
+                    t-call="ngo.report_fiscal_attestation_document"
                     t-lang="lang"/>
             </t>
         </t>
     </template>
-
     <template id="report_fiscal_attestation_with_payments">
-        <t t-call="report_fiscal_attestation">
+        <t t-call="ngo.report_fiscal_attestation">
             <t t-set="print_with_payments" t-value="True"/>
         </t>
     </template>
-
-    <!-- <record id="web.basic_layout" model="ir.ui.view" forcecreate="1">
-        <field name="arch" type="xml">
-            <t t-name="web.basic_layout">
-                <t t-call="web.html_container">
-                    <div class="page">
-                        <h1>Fiscal Attestation Document</h1>
-                        <p> Name: <span t-field="doc.x_partner_id"/>
-                        <br /> Legal Number... </p>
-                    </div>
-                </t>
-            </t>
-        </field>
-        <field name="key">web.basic_layout</field>
-        <field name="name">basic_layout</field>
-        <field name="active" eval="True"/>
-        <field name="type">qweb</field>
-    </record>
-    <record id="fiscal_attestation_document" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <t t-name="report_document">
-                <t t-call="web.external_layout">
-                    <div class="page">
-                        <div class="oe_structure"/>
-                    </div>
-                </t>
-            </t>
-        </field>
-        <field name="key">fiscal_attestation_document_document</field>
-        <field name="name">fiscal_attestation_document_document</field>
-        <field name="active" eval="True"/>
-        <field name="type">qweb</field>
-    </record>
-    <record id="main_report_0" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <t t-name="main_report">
-                <t t-call="web.html_container">
-                    <t t-foreach="docs" t-as="doc">
-                        <t t-call="fiscal_attestation_document_document"/>
-                    </t>
-                </t>
-            </t>
-        </field>
-        <field name="key">fiscal_attestation_document</field>
-        <field name="name">fiscal_attestation_document</field>
-        <field name="active" eval="True"/>
-        <field name="type">qweb</field>
-    </record>
-    <record id="fiscal_attestation_report_view" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <t t-name="report_document">
-                <div class="page">
-                    <div class="oe_structure"/>
-                </div>
-            </t>
-        </field>
-        <field name="key">fiscal_attestation_report_view_document</field>
-        <field name="name">fiscal_attestation_report_view_document</field>
-        <field name="active" eval="True"/>
-        <field name="type">qweb</field>
-    </record>
-    <record id="main_report" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <t t-name="main_report">
-                <t t-foreach="docs" t-as="doc">
-                    <t t-call="web.basic_layout">
-                        <t t-call="fiscal_attestation_report_view_document"/>
-                        <p style="page-break-after: always;"/>
-                    </t>
-                </t>
-            </t>
-        </field>
-        <field name="key">fiscal_attestation_report_view</field>
-        <field name="name">fiscal_attestation_report_view</field>
-        <field name="active" eval="True"/>
-        <field name="type">qweb</field>
-    </record> -->
 
     <!-- Website Views -->
     <record id="about_us_qweb_view" model="ir.ui.view">
