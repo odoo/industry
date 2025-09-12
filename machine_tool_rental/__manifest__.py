@@ -26,6 +26,7 @@
         'data/ir_default.xml',
         # 'data/knowledge_article.xml',
         'data/product_category.xml',
+        'data/product_pricing.xml',
         'data/product_product.xml',
         'data/sale_order_template.xml',
         'data/stock_location.xml',
@@ -37,7 +38,6 @@
     ],
     'demo': [
         'demo/stock_lot.xml',
-        'demo/quality_check.xml',
         'demo/x_run_time_meter.xml',
         'demo/stock_quant.xml',
         'demo/stock_move_line.xml',
@@ -45,6 +45,7 @@
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
+        'demo/quality_check.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [
