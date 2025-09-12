@@ -86,7 +86,7 @@ for record in self: record['x_x_serial_x_run_time_meter_count'] = self.env['x_ru
   </record>
   <record id="stock_model_stock_lot_x_run_time_meter_h_field" model="ir.model.fields">
     <field name="compute"><![CDATA[
-for record in self: record['x_run_time_meter_h'] = max(record.x_run_time_meters.mapped('x_run_time'))
+for record in self: record['x_run_time_meter_h'] = max(record.x_run_time_meters.mapped('x_run_time'), default=0.0)
 ]]></field>
     <field name="ttype">float</field>
     <field name="depends">x_run_time_meters</field>
@@ -198,12 +198,9 @@ for record in self: record['x_x_serial_project_task_count'] = self.env['project.
   </record>
   <record id="stock_model_stock_lot_x_status_field" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self:
-    status = "Out"
-    if record.location_id.storage_category_id:
-        if record.location_id.storage_category_id.x_serial_status == "Available" : status = "Available"
-        if record.location_id.storage_category_id.x_serial_status == "Reception" : status = "Reception"
-        if record.location_id.storage_category_id.x_serial_status == "Maintenance" : status = "Maintenance"
-    record['x_status'] = status
+    if record.location_id.storage_category_id and record.location_id.storage_category_id.x_serial_status:
+        record['x_status'] = record.location_id.storage_category_id.x_serial_status
+    else: record['x_status'] = "Out"
     ]]></field>
     <field name="ttype">char</field>
     <field name="depends">location_id</field>

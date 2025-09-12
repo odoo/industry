@@ -27,6 +27,7 @@
         # 'data/knowledge_article.xml',
         'data/product_category.xml',
         'data/product_pricing.xml',
+        'data/product_pricelist.xml',
         'data/product_product.xml',
         'data/sale_order_template.xml',
         'data/stock_location.xml',
@@ -50,7 +51,6 @@
     'license': 'OPL-1',
     'cloc_exclude': [
         'data/knowledge_article.xml',
-        'data/ir_actions_server.xml',
     ],
     'images': ['images/main.png'],
 }
