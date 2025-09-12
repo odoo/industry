@@ -34,7 +34,7 @@ for task in records: task['x_run_time_meter_when_done'] = task.x_serial.x_run_ti
     ]]></field>
         <field name="model_id" ref="project.model_project_task"/>
         <field name="state">code</field>
-        <field name="name">Execute Code</field>
+        <field name="name">Run-Time Meter When Done</field>
         <field name="usage">base_automation</field>
     </record>
     <record id="create_maintenance_tasks_server_action" model="ir.actions.server">
@@ -69,11 +69,11 @@ for serial in records:
         <field name="code"><![CDATA[
 for partner in records:
     invoice = False
-    for so in partner.sale_order_ids.filtered(lambda so: so.state == 'sent' and so.invoice_status == 'no'):
-        last_date = so.x_last_invoice or so.rental_start_date
-        next_date = min(so.rental_end_date, fields.Datetime.today())
-        ratio = so.duration_days / (next_date - last_date).days
-        if ratio <= 0: continue
+    for so in partner.sale_order_ids.filtered(lambda so: so.invoice_status == 'to invoice'):
+        last_date = (so.x_last_invoice or so.rental_start_date).date()
+        next_date = min(so.rental_return_date, datetime.datetime.today()).date()
+        if (next_date - last_date).days == 0: continue
+        ratio = (next_date - last_date).days / so.duration_days
         if not invoice:
             invoice = env['account.move'].create({
                 'move_type': 'out_invoice',
@@ -82,39 +82,37 @@ for partner in records:
         env['account.move.line'].create({
             'move_id': invoice.id,
             'display_type': 'line_section',
-            'name': '[SO] ' + last_date.strftime('%d/%m/%y - ') + next_date.strftime('%d/%m/%y'),
+            'name': '[' + so.display_name + last_date.strftime('] %d/%m/%y - ') + next_date.strftime('%d/%m/%y'),
         })
-        for sol in so.order_line.filtered(lambda sol: not sol.product_template_id.is_downpayment):
+        for sol in so.order_line.filtered(lambda sol: sol.product_id):
             env['account.move.line'].create({
                 'move_id': invoice.id,
-                'name': sol.product_template_id.name,
+                'name': sol.product_id.name,
                 'price_unit': ratio * sol.price_unit,
-                'quantity' : sol.product_uom_qty,
+                'quantity': sol.product_uom_qty,
+                'tax_ids': sol.tax_ids,
             })
         if len(so.invoice_ids) == 0: 
             env['sale.order.line'].create({
                 'order_id': so.id,
                 'display_type': 'line_section',
                 'name': 'Down Payments',
+                'product_updatable': True,
             })
-        so['invoice_ids'].link(invoice)
         so['x_last_invoice'] = next_date
         env['sale.order.line'].create({
             'order_id': so.id,
-            'product_template_id': {
-                'name': next_date.strftime('Down Payment %d/%m/%y %H:%M'),
-                'is_downpayment': True,
-            },
-            'qty_invoiced': 1,
-            'unit_price': ratio * so.amount_total,
+            'name': next_date.strftime('Down Payment: %d/%m/%y),
+            'price_unit': ratio * so.amount_total,
+            'product_uom_qty': 0,
         })
     if invoice:
         action = env['ir.actions.act_window']._for_xml_id('account.action_move_out_invoice_type')
-        action['views'] = [(env.ref('account.view_move_list').id, 'list')]
+        action['views'] = [(env.ref('account.view_move_tree').id, 'list')]
         action['res_id'] = invoice.id
     ]]></field>
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="state">code</field>
-        <field name="name">Execute Code</field>
+        <field name="name">Consolidated Down Payment</field>
     </record>
 </odoo>
