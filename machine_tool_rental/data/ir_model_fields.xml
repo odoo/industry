@@ -213,7 +213,14 @@ for record in self: record['x_x_serial_project_task_count'] = self.env['project.
   </record>
   <record id="to_invoice_total_uninvoiced_balance" model="ir.model.fields">
     <field name="compute"><![CDATA[
-for record in self: record['x_to_invoice_balance'] = sum(record.sale_order_ids.mapped('amount_to_invoice'))
+for record in self:
+    record['x_to_invoice_balance'] = 0
+    for so in record.sale_order_ids.filtered(lambda so: so.invoice_status == 'to invoice'):
+        next_date = min(so.rental_return_date, datetime.datetime.today()).date()
+        ratio = (next_date - so.rental_start_date.date()).days / so.duration_days
+        downpayments = sum(so.order_line.filtered(lambda sol: not sol.product_id).mapped('price_unit'))
+        record['x_to_invoice_balance'] += ratio * so.amount_total - downpayments
+
 ]]></field>
     <field name="ttype">monetary</field>
     <field name="field_description">Total Uninvoiced</field>
@@ -222,6 +229,7 @@ for record in self: record['x_to_invoice_balance'] = sum(record.sale_order_ids.m
     <field name="name">x_to_invoice_balance</field>
     <field name="currency_field">currency_id</field>
     <field name="selectable" eval="False"/>
+    <field name="store" eval="False"/>
   </record>
   <record id="sale_model_sale_order_x_last_invoice_field" model="ir.model.fields">
     <field name="ttype">date</field>
@@ -230,4 +238,12 @@ for record in self: record['x_to_invoice_balance'] = sum(record.sale_order_ids.m
     <field name="name">x_last_invoice</field>
     <field name="readonly" eval="True"/>
   </record>
+  <record id="field_product_template_serial_ids" model="ir.model.fields">
+    <field name="ttype">one2many</field>
+    <field name="field_description">Product Serials</field>
+    <field name="model_id" ref="product.model_product_template"/>
+    <field name="name">x_serial_ids</field>
+    <field name="relation">stock.lot</field>
+    <field name="relation_field">product_id</field>
+    </record>
 </odoo>
