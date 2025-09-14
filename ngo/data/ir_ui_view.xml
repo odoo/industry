@@ -106,11 +106,11 @@
                     domain="[('x_petition_status', '=', 'submitted')]"
                     name="filter_631_1j1dcv8k1" string="Submitted"/>
                 <separator name="separator_o6_1j1dcnc6t"/>
-                <!-- <filter
+                <filter
                     domain="[('x_progress', '&gt;=', 100)]"
-                    name="filter_6hp_1j1dcmnt5" string="Reached Goal"/>
+                    name="filter_goal_reached" string="Reached Goal"/>
                 <filter domain="[('x_progress', '&lt;', 100)]"
-                    name="filter_6ds_1j1dco605" string="Not Reached"/> -->
+                    name="filter_goal_not_reached" string="Not Reached"/>
                 <separator />
                 <filter date="x_date_start" name="filter_date_start" string="Start Date"/>
                 <filter date="x_date_stop" name="filter_date_stop" string="End Date"/>
@@ -176,7 +176,7 @@
         <field name="arch" type="xml">
             <graph string="Petition" sample="1" type="bar">
                 <field name="x_name"/>
-                <!-- <field name="x_current_signatures" type="measure"/> -->
+                <field name="x_current_signatures" type="measure"/>
             </graph>
         </field>
         <field name="model">x_petition</field>
@@ -189,7 +189,7 @@
     <record id="default_pivot_view_x_petition" model="ir.ui.view">
         <field name="arch" type="xml">
             <pivot string="Petition" sample="1">
-                <!-- <field name="x_current_signatures" type="col"/> -->
+                <field name="x_current_signatures" type="col"/>
                 <field name="x_name" type="row"/>
             </pivot>
         </field>
@@ -286,279 +286,6 @@
         <field name="type">calendar</field>
     </record>
 
-    <!-- x_fiscal_attesttation Views -->
-    <record id="default_list_view_fo_79490779-e684-444e-9b44-4936437bd247" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <list create="0" delete="0" edit="0">
-                <field name="x_sequence" widget="handle"/>
-                <field name="x_year" optional="show"/>
-                <field name="x_name"/>
-                <field name="x_partner_id" string="Donor"/>
-                <field name="x_currency_id" invisible="1" required="0"/>
-                <field name="x_value" sum="Total" string="Total Value"/>
-                <field name="x_fiscal_attestation_status" optional="show" string="State"/>
-                <field name="x_date" optional="hide"/>
-            </list>
-        </field>
-        <field name="model">x_fiscal_attestation</field>
-        <field name="name">Default list view for x_fiscal_attestation</field>
-        <field name="active" eval="True"/>
-        <field name="type">list</field>
-    </record>
-    <record id="default_form_view_fo_643fef0d-557b-4ec6-b9cc-099297f17f27" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <form create="false">
-                <header>
-                    <field widget="statusbar" options="{'clickable': '1'}"
-                        name="x_fiscal_attestation_status"/>
-                    <button string="Send" type="object"/>
-                    <button string="Print" type="object"/>
-                    <button string="Preview" type="object"/>
-                </header>
-                <sheet string="Fiscal Attestation">
-                    <div name="button_box" class="oe_button_box">
-                        <button class="oe_stat_button" icon="fa-money" type="action"
-                            name="%(fiscal_attestation_related_donations)d">
-                            <field widget="statinfo"
-                                name="x_x_fiscal_attestation_id_account_payment_count"
-                                string="Donations"/>
-                        </button>
-                    </div>
-                    <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger"
-                        invisible="x_active"/>
-                    <field name="x_active" invisible="1"/>
-                    <div class="oe_title">
-                        <h1>
-                            <field name="x_name" required="1" readonly="1" placeholder="Number..."
-                                string="Number" force_save="1"/>
-                        </h1>
-                    </div>
-                    <group name="group_17e8fe">
-                        <group name="group_17e8fe_left">
-                            <field name="x_partner_id" force_save="1" readonly="1" string="Donor"/>
-                            <field name="x_value" force_save="1" readonly="True"/>
-                            <field name="x_year" force_save="1" readonly="True"/>
-
-                        </group>
-                        <group name="group_17e8fe_right">
-                            <field widget="file" filename="x_document_pdf_filename"
-                                name="x_document_pdf" force_save="1" readonly="True"/>
-                            <field widget="file" invisible="True" name="x_document_pdf_filename"/>
-                            <field name="x_date" force_save="1" readonly="1" string="Sent Date"/>
-                        </group>
-                    </group>
-                </sheet>
-                <chatter />
-            </form>
-        </field>
-        <field name="model">x_fiscal_attestation</field>
-        <field name="name">Default form view for x_fiscal_attestation</field>
-        <field name="active" eval="True"/>
-        <field name="type">form</field>
-    </record>
-    <record id="default_search_view__c336d1f8-46b0-45fe-854e-ef79712d69ef" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <search>
-                <field name="x_name"/>
-                <field name="x_partner_id" operator="child_of"/>
-                <separator />
-                <filter date="x_date" name="filter_date" string="Date"/>
-                <separator />
-                <group string="Fiscal Year">
-                    <filter domain="[('x_year', '=', '2025')]"
-                        name="filter_fiscal_attestation_2025" string="2025"/>
-                    <filter domain="[('x_year', '=', '2024')]"
-                        name="filter_fiscal_attestation_2024" string="2024"/>
-                    <filter domain="[('x_year', '=', '2023')]"
-                        name="filter_fiscal_attestation_2023" string="2023"/>
-                </group>
-                <separator name="separator_755_1j1fnhmgh"/>
-                <filter
-                    domain="[('x_fiscal_attestation_status', '=', 'generated')]"
-                    name="filter_1f5_1j1fnfsn9" string="Generated"/>
-                <filter
-                    domain="[('x_fiscal_attestation_status', '=', 'sent')]"
-                    name="filter_3bl_1j1fngj1h" string="Sent"/>
-                <filter
-                    domain="[('x_fiscal_attestation_status', '=', 'cancelled')]"
-                    name="filter_2q8_1j1fnhami" string="Cancelled"/>
-                <separator />
-                <filter name="group_by_6p9_1j1v7ahh6" string="Year" context="{'group_by': 'x_year'}"/>
-                <filter string="Archived" name="archived_x_fiscal_attestation"
-                    domain="[['x_active', '=', False]]"/>
-                <separator />
-                <filter name="groupby_x_partner" string="Donor"
-                    context="{'group_by': 'x_partner_id'}" domain="[]"/>
-                <filter name="group_by_1k6_1j1v7b0fm" string="State"
-                    context="{'group_by': 'x_fiscal_attestation_status'}"/>
-            </search>
-        </field>
-        <field name="model">x_fiscal_attestation</field>
-        <field name="name">Default search view for x_fiscal_attestation</field>
-        <field name="active" eval="True"/>
-        <field name="type">search</field>
-    </record>
-    <record id="default_calendar_vie_f91064fc-0ec1-4953-8d92-fdbd4e6366ff" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <calendar date_start="x_date" create_name_field="x_name"/>
-        </field>
-        <field name="model">x_fiscal_attestation</field>
-        <field name="name">Default calendar view for x_fiscal_attestation</field>
-        <field name="active" eval="True"/>
-        <field name="type">calendar</field>
-    </record>
-    <record id="default_pivot_view_f_d246256a-1093-4a6d-93a3-1987f04a1bf3" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <pivot sample="1">
-                <field name="x_value" type="measure"/>
-                <field name="x_date" type="row"/>
-            </pivot>
-        </field>
-        <field name="model">x_fiscal_attestation</field>
-        <field name="name">Default pivot view for x_fiscal_attestation</field>
-        <field name="active" eval="True"/>
-        <field name="type">pivot</field>
-    </record>
-    <record id="default_graph_view_f_06572b7e-da15-49a1-b94b-0f493108e13f" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <graph sample="1">
-                <field name="x_value" type="measure"/>
-                <field name="create_date" type="row"/>
-            </graph>
-        </field>
-        <field name="model">x_fiscal_attestation</field>
-        <field name="name">Default graph view for x_fiscal_attestation</field>
-        <field name="active" eval="True"/>
-        <field name="type">graph</field>
-    </record>
-
-    <record id="default_kanban_view_x_fiscal_attestation" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <kanban string="Fiscal Attestation">
-                <templates>
-                    <t t-name="card" class="row g-0 col-10" name="t-name">
-                        <field name="x_partner_id" display="full"/>
-                        <field name="x_name" display="full"/>
-                        <field name="x_date" display="full"/>
-                        <field name="x_value" display="full"/>
-                        <field name="x_currency_id"/>
-                        <field name="x_fiscal_attestation_status" display="full"/>
-                    </t>
-                </templates>
-            </kanban>
-        </field>
-        <field name="model">x_fiscal_attestation</field>
-        <field name="name">Default kanban view for ir.model(957,) customization</field>
-        <field name="active" eval="True"/>
-        <field name="type">kanban</field>
-    </record>
-
-    <!-- account.payment Views -->
-    <record id="extension_form_view_account_payment" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <data>
-                <div name="button_box" position="inside">
-                    <button class="oe_stat_button" icon="fa-money"
-                        invisible="not x_fiscal_attestation_id" type="action"
-                        name="%(donation_related_x_fiscal_attestation_form)d">Fiscal Attestation</button>
-                </div>
-                <xpath expr="//field[@name='partner_id']" position="attributes">
-                    <attribute name="string">Donor</attribute>
-                </xpath>
-                <xpath expr="//field[@name='date']" position="attributes">
-                    <attribute name="readonly">true</attribute>
-                </xpath>
-                <xpath expr="//form[1]" position="attributes">
-                    <attribute name="create">true</attribute>
-                    <attribute name="delete">true</attribute>
-                    <attribute name="edit">true</attribute>
-                </xpath>
-            </data>
-        </field>
-        <field name="inherit_id" ref="account.view_account_payment_form"/>
-        <field name="mode">extension</field>
-        <field name="model">account.payment</field>
-        <field name="name">account.payment.form customization</field>
-        <field name="priority">160</field>
-        <field name="active" eval="True"/>
-        <field name="type">form</field>
-    </record>
-    <record id="extension_search_view_account_payment" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <data>
-                <xpath expr="//filter[@name='inbound_filter']" position="replace"/>
-                <xpath expr="//filter[@name='outbound_filter']" position="replace">
-                    <separator name="separator_3om_1j1vo6lvh"/>
-                    <filter domain="[('x_fiscal_attestation_id', '!=', False)]"
-                        name="filter_6vc_1j1vo5q2h" string="With Fiscal Attestation"/>
-                    <filter domain="[('x_fiscal_attestation_id', '=', False)]"
-                        name="filter_12s_1j1vo6hi9" string="Without Attestation"/>
-                </xpath>
-                <xpath expr="//filter[@name='partner']" position="attributes">
-                    <attribute name="string">Donor</attribute>
-                </xpath>
-                <xpath expr="//filter[@name='groupby_date']" position="attributes">
-                    <attribute name="string">Donation Date</attribute>
-                </xpath>
-                <xpath expr="//filter[@name='groupby_date']" position="after">
-                    <filter name="group_by_8l7_1j21ssti2" string="Country"
-                        context="{'group_by': 'x_country_name'}"/>
-                </xpath>
-            </data>
-        </field>
-        <field name="inherit_id" ref="account.view_account_payment_search"/>
-        <field name="mode">extension</field>
-        <field name="model">account.payment</field>
-        <field name="name">account.payment.search customization</field>
-        <field name="priority">99</field>
-        <field name="active" eval="True"/>
-        <field name="type">search</field>
-    </record>
-    <record id="extension_list_view_account_payment" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <data>
-                <xpath expr="//list[1]/header" position="inside">
-                    <button name="%(action_window_x_wizard_generate_fiscal_attestation_form)d"
-                        class="btn btn-secondary"
-                        string="Generate Fiscal Attestation"
-                        type="action"
-                        display="always"/>
-                </xpath>
-                <xpath expr="//list[1]" position="attributes">
-                    <attribute name="create">true</attribute>
-                    <attribute name="delete">true</attribute>
-                    <attribute name="edit">true</attribute>
-                </xpath>
-                <xpath expr="//field[@name='partner_id']" position="attributes">
-                    <attribute name="string">Donor</attribute>
-                </xpath>
-            </data>
-        </field>
-        <field name="inherit_id" ref="account.view_account_payment_tree"/>
-        <field name="mode">extension</field>
-        <field name="model">account.payment</field>
-        <field name="name">account.payment.list customization</field>
-        <field name="priority">160</field>
-        <field name="active" eval="True"/>
-        <field name="type">list</field>
-    </record>
-    <record id="extension_graph_view_account_payment" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <data>
-                <xpath expr="//field[@name='journal_id']" position="replace">
-                    <field name="date" type="col"/>
-                </xpath>
-                <xpath expr="//field[@name='payment_type']" position="replace"/>
-            </data>
-        </field>
-        <field name="inherit_id" ref="account.view_account_payment_graph"/>
-        <field name="mode">extension</field>
-        <field name="model">account.payment</field>
-        <field name="name">account.payment.graph customization</field>
-        <field name="priority">99</field>
-        <field name="active" eval="True"/>
-        <field name="type">graph</field>
-    </record>
     <!-- x_petition_tag Views -->
     <record id="default_list_view_fo_86ff6216-2c74-41b6-907f-5f931a5abf49" model="ir.ui.view">
         <field name="arch" type="xml">
@@ -627,52 +354,6 @@
         <field name="priority">200</field>
         <field name="active" eval="True"/>
         <field name="type">form</field>
-    </record>
-
-    <record id="x_wizard_generate_fiscal_attestation_form_view" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <group>
-                        <div class="alert alert-danger " role="alert" invisible="not x_wizard_show_warning">
-                            Some fiscal attestations cannot be generated<br/><br/>
-                            There are <a class="" type="action" name="%(action_window_donations_with_fiscal_attestation)d">donations</a> already included in existing fiscal attestations.<br/>
-                            Some <a class="" type="action" name="%(action_window_partners_with_incomplete_address_or_id)d">donors</a> are missing required information, such as address or national ID.<br/><br/>
-                            These records will be excluded from the generation.
-                        </div>
-                    </group>
-                    <group>
-                        <div>Generate official fiscal attestations for donors based on their contributions during a selected fiscal year.</div>
-                    </group>
-                    <group>
-                        <field name="x_wizard_fiscal_year" required="1" options="{'type': 'number'}"/>
-                        <field name="x_wizard_tax_minimum" required="1"/>
-                    </group>
-                </sheet>
-                <footer>
-                    <button string="Generate" name="%(action_generate_fiscal_attestation)d"
-                        type="action" class="btn-primary" data-hotkey="q"/>
-                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
-                </footer>
-            </form>
-        </field>
-        <field name="model">x_wizard_generate_fiscal_attestation</field>
-        <field name="name">Default form view for x_wizard_generate_fiscal_attestation</field>
-        <field name="active" eval="True"/>
-        <field name="type">form</field>
-    </record>
-
-    <record id="res_partner_form_view" model="ir.ui.view">
-        <field name="name">res.partner.form.view.inherited.ngo</field>
-        <field name="model">res.partner</field>
-        <field name="inherit_id" ref="base.view_partner_form"/>
-        <field eval="17" name="priority"/>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <xpath expr="//div[hasclass('o_address_format')]" position="after">
-                <field name="x_citizen_id_number"/>
-            </xpath>
-        </field>
     </record>
 
     <record id="res_company_form_view" model="ir.ui.view">

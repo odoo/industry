@@ -50,44 +50,6 @@ response = {
         <field name="state">code</field>
         <field name="name">Open Petition Website Page</field>
     </record>
-    <record id="action_generate_fiscal_attestation" model="ir.actions.server">
-        <field name="code"><![CDATA[
-concerned_donations = record.env['account.payment'].search([('date.year_number', '=', record.x_wizard_fiscal_year), ('state', '!=', 'draft'), ('x_fiscal_attestation_id', '=', False)])
-if not record.x_wizard_show_warning and concerned_donations.filtered(lambda d: d.x_fiscal_attestation_id or not d.partner_id.street or not d.partner_id.city or not d.partner_id.state_id or not d.partner_id.country_id or not d.partner_id.citizen_id_number):
-    response = {
-        'type': 'ir.actions.act_window',
-        'res_model': 'x_wizard_generate_fiscal_attestation',
-        'context': {'default_x_wizard_show_warning': True, 'default_x_wizard_fiscal_year': record.x_wizard_fiscal_year, 'default_x_wizard_tax_minimum': record.x_wizard_tax_minimum},
-        'view_mode': 'form',
-        'target': 'new',
-    }
-else:
-    all_partners = list(set(concerned_donations.mapped('partner_id')))
-    for partner in all_partners:
-        donation_sum = sum(concerned_donations.filtered(lambda d: d.partner_id == partner).mapped('amount'))
-        if donation_sum >= record.x_wizard_tax_minimum:
-            fiscal_attestation = record.env['x_fiscal_attestation'].create({
-                'x_name': record.env['ir.sequence'].next_by_code('x_fiscal_attestation.seq'),
-                'x_fiscal_attestation_status': 'generated',
-                'x_partner_id': partner.id,
-                'x_date': datetime.datetime.today(),
-                'x_value': donation_sum,
-                'x_year': record.x_wizard_fiscal_year,
-            })
-            concerned_donations.filtered(lambda d: d.partner_id == partner)['x_fiscal_attestation_id'] = fiscal_attestation.id
-    response = {
-        'type': 'ir.actions.act_window',
-        'res_model': 'x_fiscal_attestation',
-        'domain': [('x_year', '=', record.x_wizard_fiscal_year)],
-        'view_mode': 'list,form',
-        'target': 'self',
-        'name': 'Fiscal Attestation',
-    }
-]]></field>
-        <field name="model_id" ref="x_wizard_generate_fiscal_attestation_model"/>
-        <field name="state">code</field>
-        <field name="name">Generate Fiscal Attestation</field>
-    </record>
     <record id="action_server_assign_invoicing_journal_to_so" model="ir.actions.server">
         <field name="code"><![CDATA[
 for so in records:
