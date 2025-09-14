@@ -50,6 +50,7 @@
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
         'data/website_menu.xml',
+        'data/website_view.xml',
     ],
     'demo': [
         'demo/ir_attachment_post.xml',
@@ -77,6 +78,7 @@
     'license': 'OPL-1',
     'cloc_exclude': [
         'data/knowledge_article.xml',
+        'data/website_view.xml',
         'demo/website_view.xml',
     ],
     'images': [
