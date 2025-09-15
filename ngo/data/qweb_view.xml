@@ -1755,20 +1755,60 @@
         <field name="website_id" ref="website.default_website"/>
     </record>
 
-    <template id="website_checkout_extra_info" inherit_id="website_sale.extra_info">
-        <xpath expr="//form/div/div[1]" position="replace"/>
-        <xpath expr="//form/div/div[1]" position="replace"/>
-        <xpath expr="//form/div/div[1]" position="replace">
-            <div class="s_website_form_field col-12 pb-2 mb-0" data-type="char" data-name="Field">
-                <div class="s_col_no_resize s_col_no_bgcolor">
-                    <label class="s_website_form_label col-form-label col-sm-auto" style="width: 200px" for="citizen_id_number1">
-                        <span class="s_website_form_label_content">Citizen ID Number</span>
-                    </label>
-                    <div class="col-sm">
-                        <input id="citizen_id_number1" type="text" class="s_website_form_input form-control" name="x_related_citizen_id_number"/>
+    <record id="website_checkout_extra_info" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <t name="Checkout Extra Info" active="False" t-name="website_sale.extra_info">
+            <t t-call="website_sale.checkout_layout">
+            <t t-set="show_navigation_button" t-value="False"/>
+            <t t-set="redirect" t-valuef="/shop/extra_info"/>
+            <t t-set="oe_structure">
+                <div class="oe_structure" id="oe_structure_website_sale_extra_info_1"/>
+            </t>
+            <h3 class="mb-4">Extra info</h3>
+            <section class="s_website_form o_colored_level" data-vcss="001" data-snippet="s_website_form">
+                <div class="container">
+                <form action="/website/form/" method="post" enctype="multipart/form-data" class="o_mark_required s_website_form_no_recaptcha" data-mark="*" data-force_action="shop.sale.order" data-model_name="sale.order" data-success-mode="redirect" data-success-page="/shop/payment" hide-change-model="true">
+                    <div class="s_website_form_rows s_col_no_bgcolor row">
+                    <div class="s_website_form_field col-12 pb-2 mb-0" data-type="char" data-name="Field">
+                        <div class="row s_col_no_resize s_col_no_bgcolor">
+                            <label class="s_website_form_label col-form-label col-sm-auto" style="width: 200px" for="citizen_id_number1">
+                                <span class="s_website_form_label_content">Citizen Identification</span>
+                            </label>
+                            <div class="col-sm">
+                                <input id="citizen_id_number1" type="text" class="s_website_form_input form-control" name="x_related_citizen_id_number"/>
+                            </div>
+                        </div>
                     </div>
+                    <div class="s_website_form_submit s_website_form_no_submit_option d-flex flex-column flex-lg-row align-items-lg-center pt-4">
+                        <a role="button" name="website_sale_main_button" class="s_website_form_send btn btn-primary order-lg-3 w-100 w-lg-auto ms-lg-auto" href="/shop/confirm_order">
+                                        Continue checkout
+                                        <i class="fa fa-angle-right ms-2 fw-light"/>
+                                    </a>
+                        <div class="position-relative d-flex d-lg-none w-100 justify-content-center align-items-center my-2 opacity-75">
+                        <hr class="w-100"/>
+                        <span class="px-3">or</span>
+                        <hr class="w-100"/>
+                        </div>
+                        <a href="/shop/checkout" class="text-center"><i class="fa fa-angle-left me-2 fw-light"/>
+                                        Return to shipping
+                                    </a>
+                        <span id="s_website_form_result"/>
+                    </div>
+                    </div>
+                </form>
                 </div>
-            </div>
-        </xpath>
-    </template>
+            </section>
+            </t>
+        </t>
+        </field>
+        <field name="key">ngo.extra_info</field>
+        <field name="name">Checkout Extra Info</field>
+        <field name="type">qweb</field>
+        <field name="active" eval="True"/>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+    <function model="ir.ui.view" name="write">
+        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('website.default_website').id).viewref('website_sale.extra_info').id"/>
+        <value model="ir.ui.view" eval="{'arch': obj().env.ref('ngo.website_checkout_extra_info').arch}"/>
+    </function>
 </odoo>
