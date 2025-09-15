@@ -1,5 +1,17 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo noupdate="1">
+    <function model="ir.model.data" name="_update_xmlids">
+        <value model="base" eval="[{
+            'xml_id': 'stock.picking_type_stor',
+            'record': obj().env.ref('stock.warehouse0').store_type_id,
+            'noupdate': True,
+        }, {
+            'xml_id': 'stock.picking_type_pick',
+            'record': obj().env.ref('stock.warehouse0').pick_type_id,
+            'noupdate': True,
+        }]"/>
+    </function>
+
     <record id="stock_picking_in_12" model="stock.picking">
         <field name="name">WH/IN/00012</field>
         <field name="picking_type_id" ref="stock.picking_type_in"/>
@@ -68,7 +80,7 @@
         <field name="location_dest_id" ref="stock.stock_location_stock"/>
         <field name="user_id" eval="False"/>
         <field name="partner_id" ref="base_industry_data.res_partner_31"/>
-        <field name="picking_type_id" ref="stock.picking_type_internal"/>
+        <field name="picking_type_id" ref="stock.picking_type_stor"/>
     </record>
     <record id="stock_picking_stor_2" model="stock.picking">
         <field name="name">WH/STOR/00002</field>
@@ -80,7 +92,7 @@
         <field name="location_dest_id" ref="stock.stock_location_stock"/>
         <field name="user_id" eval="False"/>
         <field name="partner_id" ref="base_industry_data.res_partner_31"/>
-        <field name="picking_type_id" ref="stock.picking_type_internal"/>
+        <field name="picking_type_id" ref="stock.picking_type_stor"/>
     </record>
     <record id="stock_picking_stor_3" model="stock.picking">
         <field name="name">WH/STOR/00003</field>
@@ -92,16 +104,8 @@
         <field name="location_dest_id" ref="stock.stock_location_stock"/>
         <field name="user_id" eval="False"/>
         <field name="partner_id" ref="base_industry_data.res_partner_32"/>
-        <field name="picking_type_id" ref="stock.picking_type_internal"/>
+        <field name="picking_type_id" ref="stock.picking_type_stor"/>
     </record>
-    <function name="write" model="stock.picking">
-        <value model="stock.picking" eval="(
-            obj().env.ref('3pl_logistic_company.stock_picking_stor_1') +
-            obj().env.ref('3pl_logistic_company.stock_picking_stor_2') +
-            obj().env.ref('3pl_logistic_company.stock_picking_stor_3')
-        ).ids"/>
-        <value model="stock.picking.type" eval="{'picking_type_id': obj().search([('sequence_code', '=', 'STOR')]).id}"/>
-    </function>
     <record id="stock_picking_pick_2" model="stock.picking">
         <field name="name">WH/PICK/00002</field>
         <field name="move_type">direct</field>
@@ -112,7 +116,7 @@
         <field name="user_id" ref="base.user_admin"/>
         <field name="partner_id" ref="res_partner_27"/>
         <field name="owner_id" ref="base_industry_data.res_partner_32"/>
-        <field name="picking_type_id" ref="stock.picking_type_internal"/>
+        <field name="picking_type_id" ref="stock.picking_type_pick"/>
     </record>
     <record id="stock_picking_pick_4" model="stock.picking">
         <field name="name">WH/PICK/00004</field>
@@ -123,15 +127,8 @@
         <field name="user_id" ref="base.user_admin"/>
         <field name="partner_id" ref="res_partner_27"/>
         <field name="owner_id" ref="base_industry_data.res_partner_32"/>
-        <field name="picking_type_id" ref="stock.picking_type_internal"/>
+        <field name="picking_type_id" ref="stock.picking_type_pick"/>
     </record>
-    <function name="write" model="stock.picking">
-        <value model="stock.picking" eval="(
-            obj().env.ref('3pl_logistic_company.stock_picking_pick_2') +
-            obj().env.ref('3pl_logistic_company.stock_picking_pick_4')
-        ).ids"/>
-        <value model="stock.picking.type" eval="{'picking_type_id': obj().search([('sequence_code', '=', 'PICK')]).id}"/>
-    </function>
     <record id="stock_picking_out_6" model="stock.picking">
         <field name="name">WH/OUT/00006</field>
         <field name="origin">WH/PICK/00002</field>
