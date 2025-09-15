@@ -53,7 +53,7 @@
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
-        'demo/stock_quant_package.xml',
+        'demo/stock_package.xml',
         'demo/account_move.xml',
         'demo/stock_picking.xml',
         'demo/stock_move.xml',
