@@ -9,6 +9,7 @@ if record.x_unit_sale_product:
     reordering_rule = env['stock.warehouse.orderpoint'].search_count([('product_id', '=', record.x_unit_sale_product.product_variant_id.id)], limit=1)
     bom_vals = {
         'product_qty': quant,
+        'product_uom_id': record.x_unit_sale_product.uom_id.id,
         'type': 'normal',
         'x_parent_product': record.id,
         'x_auto_production': True,
@@ -28,9 +29,9 @@ if record.x_unit_sale_product:
         bom_vals['product_tmpl_id'] = record.x_unit_sale_product.id
         env['mrp.bom'].create(bom_vals)
     if not reordering_rule:
-        uom_id = env['uom.uom'].search([('relative_factor', '=', quant), ('relative_uom_id', '=', env.ref('uom.product_uom_unit').id)], limit=1)
+        uom_id = env['uom.uom'].search([('relative_factor', '=', quant), ('relative_uom_id', '=', record.x_unit_sale_product.uom_id.id)], limit=1)
         if not uom_id:
-            uom_id = env['uom.uom'].create({'relative_factor': quant, 'relative_uom_id': env.ref('uom.product_uom_unit').id, 'name': f"Pack of {quant}"})
+            uom_id = env['uom.uom'].create({'relative_factor': quant, 'relative_uom_id': record.x_unit_sale_product.uom_id.id, 'name': f"Pack of {quant} x {record.x_unit_sale_product.uom_id.name}"})
         env['stock.warehouse.orderpoint'].create({
             'product_id': record.x_unit_sale_product.product_variant_id.id,
             'x_parent_product': record.id,
