@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <function name="button_choose_theme" model="ir.module.module" eval="[ref('base.module_theme_anelusia', raise_if_not_found=False) or ref('base.module_theme_default')]"/>
+
+  <function model="website.assets" name="make_scss_customization">
+    <value eval="'/website/static/src/scss/options/user_values.scss'" />
+    <value eval="{
+        'menu-gradient': 'null',
+        'menu-secondary-gradient': 'null',
+        'footer-gradient': 'null',
+        'copyright-gradient': 'null',
+        'o-cc1-bg-gradient': 'null',
+        'o-cc2-bg-gradient': 'null',
+        'o-cc3-bg-gradient': 'null',
+        'o-cc4-bg-gradient': 'null',
+        'o-cc5-bg-gradient': 'null',
+        'font': 'null',
+        'headings-font': 'null',
+        'navbar-font': 'null',
+        'buttons-font': 'null',
+        'color-palettes-number': 'null',
+        'color-palettes-name': 'default-light-8',
+        'btn-ripple': 'null',
+        'header-template': 'hamburger',
+        'footer-template': 'null',
+        'footer-scrolltop': 'null',
+        'header-links-style': 'default',
+      }"/>
+  </function>
+
+  <function model="website.assets" name="make_scss_customization">
+    <value eval="'/website/static/src/scss/options/colors/user_theme_color_palette.scss'"/>
+    <value eval="{
+          'success': 'null',
+          'info': 'null',
+          'warning': 'null',
+          'danger': 'null',
+      }"/>
+  </function>
+
+  <function model="ir.ui.view" name="write">
+        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('website.default_website').id).viewref('website.homepage').id"/>
+        <value model="ir.ui.view" eval="{'arch': obj().env.ref('textile_manufacturing.homepage').arch}"/>
+  </function>
+  <function name="write" model="ir.ui.view">
+        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=ref('website.default_website')).viewref('website.contactus').id"/>
+        <value model="ir.ui.view" eval="{'arch': obj().env.ref('textile_manufacturing.contactus').arch}"/>
+  </function>
+  <function model="ir.ui.view" name="write">
+      <value model="ir.ui.view" eval="obj().search([('key', '=', 'website.footer_custom')]).ids"/>
+      <value eval="{'active': False}"/>
+  </function>
+  <function model="ir.ui.view" name="write">
+      <value model="ir.ui.view" eval="obj().with_context(active_test=False).search([('key', '=', 'website.template_footer_headline')]).ids"/>
+      <value eval="{'active': True}"/>
+  </function>
+  <data noupdate="1">
+    <function model="website.menu" name="unlink">
+        <value model="website.menu" eval="obj().search([('website_id', '=', ref('website.default_website')), ('url', '=', '/shop')]).id"/>
+    </function>
+  </data>
+</odoo>
