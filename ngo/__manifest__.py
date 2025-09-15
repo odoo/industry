@@ -53,6 +53,7 @@
         'data/website_menu.xml',
         'data/website_theme_apply.xml',
         'data/x_petition_tag.xml',
+        'data/mail_template.xml',
         'data/website.xml',
     ],
     'demo': [
