@@ -38,4 +38,17 @@ records.filtered('picking_type_id.x_overrule_customer_location').write({"locatio
         <field name="name">Update Product</field>
         <field name="resource_ref" ref="stock_route_4"/>
     </record>
+    <record id="add_qty_on_product_create" model="ir.actions.server">
+        <field name="code"><![CDATA[
+env["stock.quant"].create([{
+    "product_id": variant.id,
+    "inventory_quantity": 1.0,
+    "location_id": env.ref("stock.stock_location_stock").id,
+} for variant in records]).action_apply_inventory()
+]]></field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="state">code</field>
+        <field name="name">Execute Code</field>
+        <field name="usage">base_automation</field>
+    </record>
 </odoo>

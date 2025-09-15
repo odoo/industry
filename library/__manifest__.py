@@ -61,7 +61,6 @@
         'demo/sale_order.xml',
         'demo/ir_attachment_post.xml',
         'demo/sale_order_line.xml',
-        'demo/stock_quant.xml',
         'demo/website_page.xml',
         'demo/res_partner.xml',
         'demo/hr_employee.xml',
