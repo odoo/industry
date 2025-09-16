@@ -133,20 +133,6 @@
       <xpath expr="//field[@name='ref']" position="replace"/>
     </field>
   </record>
-  <record id="rental_order_form_custom" model="ir.ui.view">
-    <field name="name">rental.order.form customization</field>
-    <field name="inherit_id" ref="sale_renting.rental_order_primary_form_view"/>
-    <field name="mode">extension</field>
-    <field name="model">sale.order</field>
-    <field name="active" eval="True"/>
-    <field name="priority">160</field>
-    <field name="type">form</field>
-    <field name="arch" type="xml">
-      <xpath expr="//field[@name='is_rental_order']" position="after">
-        <button string="Record Run-Time" type="action" invisible="rental_status != 'returned'" name="%(record_run_time_meter)d"/>
-      </xpath>
-    </field>
-  </record>
   <record id="rental_order_kanban_custom" model="ir.ui.view">
     <field name="name">rental.order.kanban.customization</field>
     <field name="inherit_id" ref="sale_renting.rental_order_view_kanban"/>
@@ -278,6 +264,13 @@
     <field name="priority">160</field>
     <field name="type">form</field>
     <field name="arch" type="xml">
+      <xpath expr="//button[@name='action_cancel']" position="after">
+        <button string="Record Run-Time"
+                type="action"
+                invisible="not return_id or state != 'done'"
+                name="%(record_run_time_meter)d"
+        />
+      </xpath>
       <xpath expr="//field[@name='lot_ids']" position="attributes">
         <attribute name="optional">show</attribute>
       </xpath>
@@ -348,6 +341,4 @@
         </xpath>
     </field>
   </record> -->
-
-  <!-- UPDATE!! account.view_out_invoice_tree -->
 </odoo>
