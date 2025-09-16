@@ -41,4 +41,39 @@ for so in records:
 ]]></field>
         <field name="model_id" ref="sale.model_sale_order"/>
     </record>
+    <record id="add_new_device_to_customer" model="ir.actions.server">
+        <field name="name">Add new device to customer</field>
+        <field name="model_id" ref="x_new_devices"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for rec in records:
+    serial_exists = env['stock.lot'].search([
+        ('name', '=', rec.x_serial_number),
+        ('product_id', '=', rec.x_device.id)
+    ], limit=1)
+    if serial_exists:
+        raise UserError('Serial number already added. Try new serial number!')
+
+    warehouse = env['stock.warehouse'].search([('company_id', '=', env.company.id)], limit=1)
+    lot = env['stock.lot'].create({'name': rec.x_serial_number, 'product_id': rec.x_device.id, })
+    env['stock.quant'].create({
+        'product_id': rec.x_device.id,
+        'inventory_quantity': 1,
+        'lot_id': lot.id,
+        'location_id': warehouse.lot_stock_id.id,
+    }).action_apply_inventory()
+    picking = env['stock.picking'].create({
+        'partner_id': rec.x_customer.id,
+        'picking_type_id': warehouse.out_type_id.id,
+    })
+    env['stock.move.line'].create({
+        'picking_id': picking.id,
+        'lot_id': lot.id,
+        'product_id': rec.x_device.id,
+        'quantity': 1
+    })
+    picking.with_context(skip_sms=True).button_validate()
+    picking.write({'date_done': rec.x_delivery_date})
+    ]]></field>
+    </record>
 </odoo>
