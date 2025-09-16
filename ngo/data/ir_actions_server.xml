@@ -25,6 +25,9 @@ new_signature = env['x_signature'].sudo().create({
     "x_petition_id": request.params.get('petition_id'),
     "x_newsletter": request.params.get('newsletter'),
 })
+#Force compute the amount of signatures
+related_petition = env['x_petition'].sudo().browse([int(request.params.get('petition_id'))])
+related_petition.write({'x_current_signatures': len(related_petition.x_related_signatures_ids)})
 message = env['mail.message'].sudo().create({
     'model': 'x_signature',
     'res_id': new_signature.id,
