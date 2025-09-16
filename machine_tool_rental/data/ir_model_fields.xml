@@ -57,8 +57,8 @@
     <field name="model_id" ref="x_run_time_meter_model"/>
     <field name="name">x_name</field>
     <field name="compute"><![CDATA[for record in self:
-    date = record.x_date if record.x_date else fields.Datetime.today()
-    serial = record.x_serial.name if record.x_serial else 'unserialed'
+    date = record.x_date or fields.Datetime.today()
+    serial = record.x_serial.name or 'unserialed'
     record['x_name'] = date.strftime('%d/%m/%y ') + serial]]></field>
     <field name="depends">x_date,x_serial</field>
     <field name="copied" eval="True"/>
@@ -111,13 +111,13 @@ for record in self: record['x_run_time_meter_h'] = max(record.x_run_time_meters.
     <field name="model_id" ref="project.model_project_task"/>
     <field name="name">x_maintenance</field>
   </record>
-  <record id="project_model_project_task_x_maintenance_rule_field" model="ir.model.fields">
+  <record id="project_model_project_task_x_recurring_maintenance_rule_field" model="ir.model.fields">
     <field name="ttype">many2one</field>
     <field name="copied" eval="True"/>
-    <field name="field_description">Maintenance Rule</field>
+    <field name="field_description">Recurring Maintenance Rule</field>
     <field name="model_id" ref="project.model_project_task"/>
-    <field name="name">x_maintenance_rule</field>
-    <field name="relation">x_maintenance_rules</field>
+    <field name="name">x_recurring_maintenance_rule</field>
+    <field name="relation">x_recurring_maintenance_rules</field>
   </record>
   <record id="project_model_project_task_x_run_time_meter_when_done_field" model="ir.model.fields">
     <field name="ttype">integer</field>
@@ -126,36 +126,36 @@ for record in self: record['x_run_time_meter_h'] = max(record.x_run_time_meters.
     <field name="model_id" ref="project.model_project_task"/>
     <field name="name">x_run_time_meter_when_done</field>
   </record>
-  <record id="x_maintenance_rules_model_x_active_field" model="ir.model.fields">
+  <record id="x_recurring_maintenance_rules_model_x_active_field" model="ir.model.fields">
     <field name="ttype">boolean</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Active</field>
-    <field name="model_id" ref="x_maintenance_rules_model"/>
+    <field name="model_id" ref="x_recurring_maintenance_rules_model"/>
     <field name="name">x_active</field>
     <field name="tracking">1</field>
   </record>
-  <record id="x_maintenance_rules_model_x_sequence_field" model="ir.model.fields">
+  <record id="x_recurring_maintenance_rules_model_x_sequence_field" model="ir.model.fields">
     <field name="ttype">integer</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Sequence</field>
-    <field name="model_id" ref="x_maintenance_rules_model"/>
+    <field name="model_id" ref="x_recurring_maintenance_rules_model"/>
     <field name="name">x_sequence</field>
     </record>
-  <record id="x_maintenance_rules_model_x_product_field" model="ir.model.fields">
+  <record id="x_recurring_maintenance_rules_model_x_product_field" model="ir.model.fields">
     <field name="ttype">many2one</field>
     <field name="copied" eval="True"/>
     <field name="domain">[("rent_ok", "!=", False)]</field>
     <field name="field_description">Product</field>
-    <field name="model_id" ref="x_maintenance_rules_model"/>
+    <field name="model_id" ref="x_recurring_maintenance_rules_model"/>
     <field name="name">x_product</field>
     <field name="relation">product.template</field>
   </record>
-  <record id="x_maintenance_rules_model_x_run_time_increment_h_field" model="ir.model.fields">
+  <record id="x_recurring_maintenance_rules_model_x_run_time_increment_h_field" model="ir.model.fields">
     <field name="ttype">float</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Run-Time Increment (h)</field>
     <field name="help">Run-time increment between two maintenance tasks</field>
-    <field name="model_id" ref="x_maintenance_rules_model"/>
+    <field name="model_id" ref="x_recurring_maintenance_rules_model"/>
     <field name="name">x_run_time_increment_h</field>
     </record>
   <record id="project_model_project_task_x_serial_field" model="ir.model.fields">
@@ -220,7 +220,6 @@ for record in self:
         ratio = (next_date - so.rental_start_date.date()).days / so.duration_days
         downpayments = sum(so.order_line.filtered(lambda sol: not sol.product_id).mapped('price_unit'))
         record['x_to_invoice_balance'] += ratio * so.amount_total - downpayments
-
 ]]></field>
     <field name="ttype">monetary</field>
     <field name="field_description">Total Uninvoiced</field>
@@ -228,6 +227,7 @@ for record in self:
     <field name="model_id" ref="base.model_res_partner"/>
     <field name="name">x_to_invoice_balance</field>
     <field name="currency_field">currency_id</field>
+    <field name="readonly" eval="True"/>
     <field name="selectable" eval="False"/>
     <field name="store" eval="False"/>
   </record>
@@ -245,5 +245,28 @@ for record in self:
     <field name="name">x_serial_ids</field>
     <field name="relation">stock.lot</field>
     <field name="relation_field">product_id</field>
-    </record>
+  </record>
+  <record id="x_recurring_maintenance_rules_x_name_field" model="ir.model.fields">
+    <field name="ttype">char</field>
+    <field name="field_description">Name</field>
+    <field name="model_id" ref="x_recurring_maintenance_rules_model"/>
+    <field name="name">x_name</field>
+    <field name="compute"><![CDATA[for record in self:
+    product_name = record.x_product.display_name + ' ' if record.x_product else ''
+    record['x_name'] = product_name + str(record.x_run_time_increment_h) + '(h)']]></field>
+    <field name="depends">x_run_time_increment_h,x_product</field>
+    <field name="copied" eval="True"/>
+  </record>
+  <record id="product_model_product_template_x_recurring_maintenance_rules_count_field" model="ir.model.fields">
+    <field name="compute"><![CDATA[
+for record in self: record['x_recurring_maintenance_rules_count'] = self.env['x_recurring_maintenance_rules'].search_count([('x_product', '=', record.id)])
+]]></field>
+    <field name="ttype">integer</field>
+    <field name="field_description">Recurring Maintenance Rules count</field>
+    <field name="model_id" ref="product.model_product_template"/>
+    <field name="name">x_recurring_maintenance_rules_count</field>
+    <field name="readonly" eval="True"/>
+    <field name="selectable" eval="False"/>
+    <field name="store" eval="False"/>
+  </record>
 </odoo>
