@@ -32,13 +32,12 @@ for plan in other_plans:
 for line in records.x_line_ids:
     original_analytic = line.x_analytic_line_id or original_analytic
     analytic_id = line.x_analytic_account_name_id
-    analytic_name = analytic_id.name
+    original_analytic_name = original_analytic.name
     original_analytic_id = original_analytic.id
 
     if original_analytic:
         new_analytic_item_id = original_analytic.copy({
             fname: analytic_id.id or '',
-            "name": analytic_name,
             "amount": line.x_amount
         })
 
@@ -49,11 +48,11 @@ for line in records.x_line_ids:
 
     if original_analytic_id in note_details:
         analytic_url = f"/odoo/analytic-items/{new_analytic_item_id.id}"
-        note_line = f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{analytic_name}</a>"
+        note_line = f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{original_analytic_name}</a>"
         note_details[original_analytic_id].add(note_line)
     else:
         analytic_url = f"/odoo/analytic-items/{new_analytic_item_id.id}"
-        note_line = {f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{analytic_name}</a>"}
+        note_line = {f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{original_analytic_name}</a>"}
         note_details.update({original_analytic_id: set(note_line)})
 
 for original_id, new_lines in occupied_cells.items():
