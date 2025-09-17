@@ -42,7 +42,6 @@
         'demo/product_template.xml',
         'demo/loyalty_program.xml',
         'demo/hr_job.xml',
-        # 'demo/pos_config.xml',
         'demo/pos_session.xml',
         'demo/res_partner.xml',
         'demo/purchase_order.xml',
