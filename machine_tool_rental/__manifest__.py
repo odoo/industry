@@ -27,7 +27,6 @@
         'data/knowledge_article.xml',
         'data/product_category.xml',
         'data/product_pricing.xml',
-        'data/product_pricelist.xml',
         'data/product_product.xml',
         'data/sale_order_template.xml',
         'data/stock_storage_category.xml',
