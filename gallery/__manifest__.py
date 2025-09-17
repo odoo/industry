@@ -39,6 +39,7 @@
   ],
   'demo': [
         'demo/payment_provider_demo_post.xml',
+        'demo/product_template.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
         'demo/res_partner_category.xml',
