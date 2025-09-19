@@ -1,0 +1,887 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!-- Reports -->
+    <template id="report_fiscal_attestation_document">
+        <t t-call="web.external_layout">
+            <t t-set="o" t-value="o.with_context(lang=lang)" />
+            <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/> <!-- So that it appears in the footer of the report instead of the company VAT if it's set -->
+            <div class="row">
+                <t t-if="o.partner_shipping_id and (o.partner_shipping_id != o.partner_id)">
+                    <div class="col-6">
+                        <t t-set="information_block">
+                            <div groups="account.group_delivery_invoice_address" name="shipping_address_block">
+                                <strong class="d-block mt-3">Shipping Address</strong>
+                                <div t-field="o.partner_shipping_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                            </div>
+                        </t>
+                    </div>
+                    <div class="col-6" name="address_not_same_as_shipping">
+                        <t t-set="address">
+                            <address class="mb-0" t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                            <div t-if="o.partner_id.vat" id="partner_vat_address_not_same_as_shipping">
+                                <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-out="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
+                                <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+                <t t-elif="o.partner_shipping_id and (o.partner_shipping_id == o.partner_id)">
+                    <div class="offset-col-6 col-6" name="address_same_as_shipping">
+                        <t t-set="address">
+                            <address class="mb-0" t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                            <div t-if="o.partner_id.vat" id="partner_vat_address_same_as_shipping">
+                                <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-out="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
+                                <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+                <t t-else="">
+                    <div class="offset-col-6 col-6" name="no_shipping">
+                        <t t-set="address">
+                            <address class="mb-0" t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                            <div t-if="o.partner_id.vat" id="partner_vat_no_shipping">
+                                <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-out="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
+                                <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+            </div>
+            <div class="clearfix invoice_main">
+                <div class="page mb-4">
+                    <t t-set="layout_document_title">
+                        <t t-if="not proforma">
+                            <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">
+                                <t name="invoice_title">Fiscal Attestation</t>
+                            </span>
+                            <span t-elif="o.move_type == 'out_invoice' and o.state == 'draft'">
+                                <t name="draft_invoice_title">Draft Fiscal Attestation</t>
+                            </span>
+                            <span t-elif="o.move_type == 'out_invoice' and o.state == 'cancel'">
+                                <t name="cancelled_invoice_title">Cancelled Fiscal Attestation</t>
+                            </span>
+                            <span t-elif="o.move_type == 'out_refund' and o.state == 'posted'">
+                                <t name="credit_note_title">Credit Note</t>
+                            </span>
+                            <span t-elif="o.move_type == 'out_refund' and o.state == 'draft'">
+                                <t name="draft_credit_note_title">Draft Credit Note</t>
+                            </span>
+                            <span t-elif="o.move_type == 'out_refund' and o.state == 'cancel'">
+                                <t name="cancelled_credit_note_title">Cancelled Credit Note</t>
+                            </span>
+                            <span t-elif="o.move_type == 'in_refund'">
+                                <t name="vendor_credit_note_title">Vendor Credit Note</t>
+                            </span>
+                            <span t-elif="o.move_type == 'in_invoice'">
+                                <t name="vendor_bill_title">Vendor Bill</t>
+                            </span>
+                        </t>
+                        <t t-else="">
+                            <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">
+                                <t name="proforma_invoice_title">Proforma Fiscal Attestation</t>
+                            </span>
+                            <span t-elif="o.move_type == 'out_invoice' and o.state == 'draft'">
+                                <t name="draft_proforma_invoice_title">Draft Proforma Fiscal Attestation</t>
+                            </span>
+                            <span t-elif="o.move_type == 'out_invoice' and o.state == 'cancel'">
+                                <t name="cancelled_proforma_invoice_title">Cancelled Proforma Fiscal Attestation</t>
+                            </span>
+                            <span t-elif="o.move_type == 'out_refund' and o.state == 'posted'">
+                                <t name="proforma_credit_note_title">Proforma Credit Note</t>
+                            </span>
+                            <span t-elif="o.move_type == 'out_refund' and o.state == 'draft'">
+                                <t name="draft_proforma_credit_note_title">Draft Proforma Credit Note</t>
+                            </span>
+                            <span t-elif="o.move_type == 'out_refund' and o.state == 'cancel'">
+                                <t name="cancelled_proforma_credit_note_title">Cancelled Proforma Credit Note</t>
+                            </span>
+                            <span t-elif="o.move_type == 'in_refund'">
+                                <t name="proforma_vendor_credit_note_title">Proforma Vendor Credit Note</t>
+                            </span>
+                            <span t-elif="o.move_type == 'in_invoice'">
+                                <t name="proforma_vendor_bill_title">Proforma Vendor Bill</t>
+                            </span>
+                        </t>
+                        <span t-if="o.name and o.name != '/'" t-field="o.name">INV/2023/0001</span>
+                    </t>
+                    <div class="oe_structure"></div>
+                    <div
+                        id="informations" class="row mb-4"
+                        t-if="o.invoice_date or (o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted') or o.delivery_date or o.invoice_origin or o.partner_id.ref or o.ref or o.invoice_incoterm_id">
+                        <div class="col" t-if="o.invoice_date" name="invoice_date">
+                            <t t-if="o.move_type == 'out_invoice'"><strong>Fiscal Attestation Date</strong></t>
+                            <t t-elif="o.move_type == 'out_refund'"><strong>Credit Note Date</strong></t>
+                            <t t-elif="o.move_type == 'out_receipt'"><strong>Receipt Date</strong></t>
+                            <t t-else=""><strong>Date</strong></t>
+                            <div t-field="o.invoice_date">2023-09-12</div>
+                        </div>
+                        <div class="col" t-if="o.delivery_date" name="delivery_date">
+                            <strong>Delivery Date</strong>
+                            <div t-field="o.delivery_date">2023-09-25</div>
+                        </div>
+                        <div class="col" t-if="o.invoice_origin" name="origin">
+                            <strong>Source</strong>
+                            <div t-field="o.invoice_origin">SO123</div>
+                        </div>
+                        <div class="col" t-if="o.partner_id.ref" name="customer_code">
+                            <strong>Customer Code</strong>
+                            <div t-field="o.partner_id.ref"/>
+                        </div>
+                        <div class="col" t-if="o.ref" name="reference">
+                            <strong>Reference</strong>
+                            <div t-field="o.ref">INV/2023/00001</div>
+                        </div>
+                        <div class="col" t-if="o.invoice_incoterm_id" name="incoterm_id">
+                            <strong>Incoterm</strong>
+                            <div t-if="o.incoterm_location">
+                                <span t-field="o.invoice_incoterm_id.code"/> <br/>
+                                <span t-field="o.incoterm_location"/>
+                            </div>
+                            <div t-else="" t-field="o.invoice_incoterm_id.code" class="m-0"/>
+                        </div>
+                    </div>
+
+                    <t t-set="display_discount" t-value="any(l.discount for l in o.invoice_line_ids)"/>
+                    <t t-set="display_taxes" t-value="any(l.tax_ids for l in o.invoice_line_ids)"/>
+                    <div class="oe_structure"></div>
+                    <t t-set="has_long_desc" t-value="any(line.name and line.name.count('\n') > 30 for line in o.invoice_line_ids if line.name)"/>
+                    <table class="o_has_total_table table o_main_table table-borderless mb-0" name="invoice_line_table">
+                        <thead t-attf-style="#{has_long_desc and 'display: table-row-group;' or ''}">
+                            <tr>
+                                <th name="th_description" class="text-start"><span>Description</span></th>
+                                <th name="th_quantity" class="text-end"><span>Quantity</span></th>
+                                <th name="th_priceunit" t-attf-class="text-end text-nowrap {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"><span>Unit Price</span></th>
+                                <th name="th_discount" t-if="display_discount" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                                    <span>Disc.%</span>
+                                </th>
+                                <th name="th_taxes" t-if="display_taxes" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"><span>Taxes</span></th>
+                                <th name="th_subtotal" class="text-end">
+                                    <span>Amount</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="invoice_tbody">
+                            <t t-set="current_subtotal" t-value="0"/>
+                            <t t-set="current_total" t-value="0"/>
+                            <t t-set="lines" t-value="o.invoice_line_ids.sorted(key=lambda l: (-l.sequence, l.date, l.move_name, -l.id), reverse=True)"/>
+
+                            <t t-foreach="lines" t-as="line">
+                                <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal"/>
+                                <t t-set="current_total" t-value="current_total + line.price_total"/>
+
+                                <tr t-att-class="'fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
+                                    <t t-if="line.display_type == 'product'" name="account_invoice_line_accountable">
+                                        <td name="account_invoice_line_name">
+                                            <span t-if="line.name" t-field="line.name" t-options="{'widget': 'text'}">Bacon Burger</span>
+                                        </td>
+                                        <td name="td_quantity" class="o_td_quantity text-end">
+                                            <span t-field="line.quantity" class="text-nowrap">3.00</span>
+                                            <span t-field="line.product_uom_id"  groups="uom.group_uom">units</span>
+                                            <span t-if="line.product_uom_id != line.product_id.uom_id" groups="uom.group_uom" class="text-muted small">
+                                                <br/>
+                                                <t t-set="product_uom_qty" t-value="line.product_uom_id._compute_quantity(line.quantity, line.product_id.uom_id)"/>
+                                                <span t-out="product_uom_qty" t-options="{'widget': 'float', 'decimal_precision': 'Product Unit'}" data-oe-demo="3.00"/> <span t-field="line.product_id.uom_id" data-oe-demo="units"/>
+                                            </span>
+                                        </td>
+                                        <td name="td_price_unit" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                                            <span class="text-nowrap" t-field="line.price_unit">9.00</span>
+                                        </td>
+                                        <td name="td_discount" t-if="display_discount" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                                            <span class="text-nowrap" t-field="line.discount">0</span>
+                                        </td>
+                                        <t t-set="taxes" t-value="', '.join(tax.tax_label for tax in line.tax_ids if tax.tax_label)"/>
+                                        <td name="td_taxes" t-if="display_taxes" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }} {{ 'text-nowrap' if len(taxes) &lt; 10 else '' }}">
+                                            <span t-out="taxes" id="line_tax_ids">Tax 15%</span>
+                                        </td>
+                                        <td name="td_subtotal" class="text-end o_price_total">
+                                            <span t-if="o.company_price_include == 'tax_excluded'" class="text-nowrap" t-field="line.price_subtotal">27.00</span>
+                                            <span t-if="o.company_price_include == 'tax_included'" class="text-nowrap" t-field="line.price_total">31.05</span>
+                                        </td>
+                                    </t>
+                                    <t t-elif="line.display_type == 'line_section'">
+                                        <td colspan="99">
+                                            <span t-if="line.name" t-field="line.name" t-options="{'widget': 'text'}">A section title</span>
+                                        </td>
+                                        <t t-set="current_section" t-value="line"/>
+                                        <t t-set="current_subtotal" t-value="0"/>
+                                    </t>
+                                    <t t-elif="line.display_type == 'line_note'">
+                                        <td colspan="99">
+                                            <span t-if="line.name" t-field="line.name" t-options="{'widget': 'text'}">A note, whose content usually applies to the section or product above.</span>
+                                        </td>
+                                    </t>
+                                </tr>
+
+                                <t t-if="current_section and (line_last or lines[line_index+1].display_type == 'line_section')">
+                                    <tr class="is-subtotal text-end">
+                                        <td colspan="99">
+                                            <strong class="mr16">Subtotal</strong>
+                                            <span
+                                                t-out="current_subtotal"
+                                                t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+                                            >31.05</span>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </t>
+                        </tbody>
+                    </table>
+                    <div class="overflow-hidden">
+                        <div id="right-elements" t-attf-class="#{'col-5 mt-5' if report_type == 'pdf' else 'col-12 col-md-5'} ms-5 d-inline-block float-end">
+                            <div id="total" class="clearfix row">
+                                <div class="ms-auto">
+                                    <table class="o_total_table table table-borderless avoid-page-break-inside">
+
+                                        <!-- Tax totals summary (invoice currency) -->
+                                        <t t-if="o.tax_totals" t-call="account.document_tax_totals">
+                                            <t t-set="tax_totals" t-value="o.tax_totals"/>
+                                            <t t-set="currency" t-value="o.currency_id"/>
+                                        </t>
+
+                                        <!--Payments-->
+                                        <t t-if="print_with_payments">
+                                            <t t-if="o.payment_state != 'invoicing_legacy'">
+                                                <t t-set="payments_vals" t-value="o.sudo().invoice_payments_widget and o.sudo().invoice_payments_widget['content'] or []"/>
+                                                <t t-foreach="payments_vals" t-as="payment_vals">
+                                                    <tr t-if="payment_vals['is_exchange'] == 0">
+                                                        <td>
+                                                            <i class="oe_form_field text-end oe_payment_label">
+                                                                <t t-if="payment_vals['is_refund']">Reversed on </t>
+                                                                <t t-else="">Paid on </t>
+                                                                <t t-out="payment_vals['date']" t-options='{"widget": "date"}'>2021-09-19</t>
+                                                            </i>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <span t-out="payment_vals['amount']" t-options='{"widget": "monetary", "display_currency": o.currency_id}'>20.00</span>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="len(payments_vals) > 0">
+                                                    <tr class="fw-bold">
+                                                        <td>Amount Due</td>
+                                                        <td class="text-end">
+                                                            <span t-field="o.amount_residual">11.05</span>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </t>
+                                        </t>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <p class="text-end lh-sm" t-if="o.company_id.display_invoice_amount_total_words">
+                                    Total amount in words: <br/>
+                                    <small class="text-muted lh-sm"><span t-field="o.amount_total_words">Thirty one dollar and Five cents</span></small>
+                                </p>
+                            </div>
+
+                            <!-- Tax totals summary (company currency) -->
+                            <t t-if="o.tax_totals and o.tax_totals.get('display_in_company_currency')">
+                                <t t-set="tax_totals" t-value="o.tax_totals"/>
+                                <t t-call="account.document_tax_totals_company_currency_template"/>
+                            </t>
+                            <t t-else="">
+                                <div class="oe_structure"/>
+                            </t>
+                        </div>
+                        <div id="payment_term" class="clearfix mt-3">
+                            <div class="justify-text">
+                                <p t-if="not is_html_empty(o.fiscal_position_id.note)" name="note" class="mb-2">
+                                    <span t-field="o.fiscal_position_id.note"/>
+                                </p>
+                            </div>
+                            <div class="justify-text">
+                                <p t-if="not is_html_empty(o.taxes_legal_notes)" name="taxes_legal_notes" class="mb-2">
+                                    <span t-field="o.taxes_legal_notes"/>
+                                </p>
+                            </div>
+                            <t t-set="payment_term_details" t-value="o.payment_term_details"/>
+                            <div class="mb-3">
+                                <span id="payment_terms_note_id"
+                                        t-if="o.invoice_payment_term_id.note"
+                                        t-field="o.invoice_payment_term_id.note"
+                                        name="payment_term">Payment within 30 calendar day</span><br/>
+                                <t t-if="o.invoice_payment_term_id.display_on_invoice and payment_term_details">
+                                    <div t-if='o.show_payment_term_details' id="total_payment_term_details_table" class="row">
+                                        <div t-attf-class="#{'col-10' if report_type != 'html' else 'col-sm-10 col-md-9'}">
+                                            <t t-if="o._is_eligible_for_early_payment_discount(o.currency_id,o.invoice_date)">
+                                                <td>
+                                                    <span t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+                                                            t-out="o.invoice_payment_term_id._get_amount_due_after_discount(o.amount_total, o.amount_tax)">30.00</span> due if paid before
+                                                    <span t-out="o.invoice_payment_term_id._get_last_discount_date_formatted(o.invoice_date)">2024-01-01</span>
+                                                </td>
+                                            </t>
+                                            <t t-if="len(payment_term_details) > 1" t-foreach="payment_term_details" t-as="term">
+                                                <div>
+                                                    <span t-out="term_index + 1">1</span> - Installment of
+                                                    <t t-options='{"widget": "monetary", "display_currency": o.currency_id}' t-out="term.get('amount')" class="text-end">31.05</t>
+                                                    <span> due on </span>
+                                                    <t t-out="term.get('date')" class="text-start">2024-01-01</t>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                            <div class="mb-3" t-if="o.move_type in ('out_invoice', 'in_refund') and o.payment_reference">
+                                <p name="payment_communication">
+                                    Payment Communication: <span class="fw-bold" t-field="o.payment_reference">INV/2023/00001</span>
+                                    <t t-if="o.partner_bank_id">
+                                        <br/> on this account: <span t-field="o.partner_bank_id" class="fw-bold"/>
+                                    </t>
+                                </p>
+                            </div>
+                            <t t-set="show_qr" t-value="o.display_qr_code and o.amount_residual"/>
+                            <div t-if="not show_qr" name="qr_code_placeholder" class="oe_structure"></div>
+                            <div id="qrcode" class="d-flex mb-3 avoid-page-break-inside" t-else="">
+                                <div class="qrcode me-3" id="qrcode_image">
+                                    <t t-set="qr_code_url" t-value="o._generate_qr_code(silent_errors=True)"/>
+                                    <p t-if="qr_code_url" class="position-relative mb-0">
+                                        <img t-att-src="qr_code_url"/>
+                                        <img src="/non_profit_organization/static/src/binary/website/Odoo_logo_O.svg"
+                                                id="qrcode_odoo_logo"
+                                                class="top-50 start-50 position-absolute bg-white border border-3 rounded-circle"
+                                        />
+                                    </p>
+                                </div>
+                                <div class="d-inline text-muted lh-sm fst-italic" id="qrcode_info" t-if="qr_code_url">
+                                    <p>Scan this QR Code with<br/>your banking application</p>
+                                </div>
+                            </div>
+                            <t t-set="show_link_qr" t-value="o.display_link_qr_code and o.amount_residual"/>
+                            <div t-if="show_link_qr" id="payment_link_qrcode" class="d-flex mb-3 avoid-page-break-inside">
+                                <t t-set="portal_qr_code" t-value="o._generate_portal_payment_qr()"/>
+                                <div class="qrcode me-3 position-relative" id="qrcode_image">
+                                    <a t-att-href="o._get_portal_payment_link()" target="_blank" class="top-0 start-0 position-absolute w-100 h-100 z-1" />
+                                    <p class="position-relative mb-0">
+                                        <img t-att-src="portal_qr_code"/>
+                                        <img src="/non_profit_organization/static/src/binary/website/Odoo_logo_O.svg"
+                                                id="qrcode_odoo_logo"
+                                                class="top-50 start-50 position-absolute bg-white border border-3 rounded-circle"
+                                        />
+                                    </p>
+                                </div>
+                                <div class="d-inline lh-sm" id="qrcode_info" t-if="portal_qr_code">
+                                    <p class="fw-bold mb-0">PAY IN A FLASH!</p>
+                                    <p class="text-muted fst-italic">Scan the QR code<br/>or click to pay online</p>
+                                </div>
+                            </div>
+                            <!--terms and conditions-->
+                            <div class="text-muted mb-3" t-attf-style="#{'text-align:justify;text-justify:inter-word;' if o.company_id.terms_type != 'html' else ''}" t-if="not is_html_empty(o.narration)" name="comment">
+                                <span t-field="o.narration"/>
+                            </div>
+                        </div>
+                        <div id="company_certification" class="clearfix mt-3">
+                            <div>
+                                <p>
+                                    Certified true and accurate<br/>
+                                    <t t-out="o.company_id.city"/>, <t t-out="datetime.datetime.today().date()"/>
+                                </p>
+                                <div class="d-flex align-items-center">
+                                    <img t-if="o.company_id.x_company_signature" t-att-src="image_data_uri(o.company_id.sudo().x_company_signature)" style="max-height:80px"/>
+                                </div>
+                                <p>
+                                    <t t-out="o.company_id.x_signer_id.name"/><br/>
+                                    <t t-out="o.company_id.x_signer_id.job_title"/>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+    <template id="report_fiscal_attestation">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="lang" t-value="o.partner_id.lang"/>
+                <t t-call="non_profit_organization.report_fiscal_attestation_document"
+                    t-lang="lang"/>
+            </t>
+        </t>
+    </template>
+    <template id="report_fiscal_attestation_with_payments">
+        <t t-call="non_profit_organization.report_fiscal_attestation">
+            <t t-set="print_with_payments" t-value="True"/>
+        </t>
+    </template>
+
+    <!-- Website Views -->
+    <record id="petition_list_qweb_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <t t-name="non_profit_organization.petition_list">
+                <t t-call="website.layout">
+                    <div id="wrap" class="oe_structure oe_empty">
+                        <div class="container o_website_listing_layout">
+                            <div class="oe_structure oe_new"/>
+                            <section class="s_searchbar o_colored_level o_cc pt48 pb48">
+                                <div class="row">
+                                    <div class="col-lg-8 offset-lg-2">
+                                        <div class="btn-toolbar">
+                                            <form method="get"
+                                                class="o_searchbar_form s_searchbar_input me-auto flex-grow-1">
+                                                <div role="search" class="input-group">
+                                                    <input type="search" name="search"
+                                                        class="search-query form-control oe_search_box border-0 text-bg-light"
+                                                        placeholder="Search..." t-att-value="search"
+                                                        autocomplete="off"/>
+                                                    <button type="submit" aria-label="Search"
+                                                        title="Search"
+                                                        class="btn oe_search_button btn-light">
+                                                        <i class="oi oi-search"/>
+                                                        <span t-if="search" class="oe_search_found">
+                                                            <small>(<t t-out="search_count or 0"/>
+                                                                found)</small>
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                                <input name="order" type="hidden"
+                                                    class="o_search_order_by"
+                                                    t-att-value="order_by if order_by else 'name asc'"/>
+                                            </form>
+                                            <!-- <t t-call="website_studio.listing_layout_switcher"/> -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <div
+                                t-attf-class="row mx-n2 mt8 #{'o_website_grid' if layout_mode == 'grid' else 'o_website_list'}">
+                                <t t-foreach="records" t-as="record">
+                                    <div
+                                        t-attf-class="#{'col-lg-3 col-md-4 col-sm-6 px-2 col-xs-12' if layout_mode == 'grid' else ''}">
+                                        <a
+                                            class="o_website_record text-decoration-none d-grid card w-100 mb-3"
+                                            t-att-href="record_to_url(record)">
+                                            <div class="d-flex">
+                                                <div t-if="record.x_image" t-field="record.x_image"
+                                                    t-options-widget="'image'"
+                                                    t-options-qweb_img_raw_data="True"
+                                                    t-options-class="'o_website_image h-100 w-100 rounded-3'"
+                                                    class="h-100 w-100"/>
+                                                <div t-else=""
+                                                    class="h-100 w-100 bg-light o_website_image rounded-3"/>
+                                            </div>
+                                            <div class="o_website_tags text-end me-1">
+                                                <t t-if="record.x_tag_ids" t-foreach="record.x_tag_ids"
+                                                    t-as="tag">
+                                                    <span t-field="tag.display_name"
+                                                        t-attf-class="badge o_website_tag #{'o_tag_color_'+str(tag.x_color)}"/>
+                                                </t>
+                                            </div>
+                                            <div class="card-body py-2 px-3">
+                                                <h5 class="card-title">
+                                                    <span t-field="record.x_name"/>
+                                                </h5>
+                                                <div
+                                                    class="card-text d-flex flex-column flex-grow-1 mt-1">
+                                                    <span class="mb-0"/>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </t>
+                            </div>
+                            <div class="oe_structure oe_new"/>
+                            <div t-if="pager" class="o_portal_pager d-flex justify-content-center my-4">
+                                <t t-call="portal.pager"/>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </field>
+        <field name="key">non_profit_organization.petition.list</field>
+        <field name="model">x_petition</field>
+        <field name="name">Petition</field>
+        <field name="active" eval="True"/>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+    <record id="petition_form_qweb_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <t t-name="non_profit_organization.petition_form">
+                <t t-call="website.layout">
+                    <div id="o_website_record_page wrap">
+                        <t t-set="editor_message">Drag building blocks to customize the header of
+                            single record pages.</t>
+                        <div class="oe_structure oe_empty oe_new"
+                            t-att-data-editor-message="editor_message"/>
+                        <div class="container">
+                            <ol t-if="listing" class="breadcrumb p-0 my-2">
+                                <li class="breadcrumb-item o_not_editable">
+                                    <a t-att-href="listing['href']">
+                                        <span t-out="listing['name']"/>
+                                    </a>
+                                </li>
+                                <li class="breadcrumb-item active">
+                                    <span t-field="record.x_name"/>
+                                </li>
+                            </ol>
+                            <div
+                                class="d-flex flex-row my-4 flex-wrap align-items-center justify-content-between">
+                                <div class="col-lg-12 mt-lg-12 col-sm-12">
+                                    <div class="s_progress_bar s_progress_bar_label_inline mb-2"
+                                        data-display="inline" data-vcss="001"
+                                        data-snippet="s_progress_bar" data-name="Progress Bar">
+                                        <t t-set="current_progress" t-value="record.x_progress*100"/>
+                                        <div class="s_progress_bar_wrapper d-flex gap-2">
+                                            <div class="progress" role="progressbar"
+                                                aria-label="Progress bar"
+                                                t-att-aria-valuenow="current_progress" aria-valuemin="0"
+                                                aria-valuemax="100">
+                                                <div class="progress-bar overflow-visible" t-attf-style="width: {{current_progress}}%;"
+                                                    style="min-width: 0%">
+                                                    <span class="s_progress_bar_text small"><t
+                                                            t-esc="'%.2f'%current_progress"/>%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 mt-lg-4 col-sm-12">
+                                    <h1 class="h1">
+                                        <span t-field="record.x_name"/>
+                                    </h1>
+                                    <div class="o_website_tags ">
+                                        <t t-if="record.x_tag_ids" t-foreach="record.x_tag_ids"
+                                            t-as="tag">
+                                            <span t-field="tag.display_name"
+                                                t-attf-class="badge o_website_tag #{'o_tag_color_'+str(tag.x_color)}"/>
+                                        </t>
+                                    </div>
+                                </div>
+                                <div t-if="record.x_image" t-field="record.x_image"
+                                    t-options-widget="'image'" t-options-qweb_img_raw_data="True"
+                                    t-options-class="'o_website_image h-100 w-100 rounded-3'"
+                                    class="col-lg-6 mt-md-4 col-sm-12 me-2"/>
+                                <div t-else=""
+                                    class="col-lg-6 mt-md-4 col-sm-12 me-2 bg-light o_website_image rounded-3"/>
+                                <span t-field="record.x_website_description"/>
+                            </div>
+                            <div class="oe_structure oe_empty oe_new"
+                                t-att-data-editor-message="editor_message"/>
+                            <div t-if="record.x_date_start &lt;= datetime.datetime.now() and datetime.datetime.now() &lt; record.x_date_stop">
+                                <t t-set="new_signature_values"
+                                    t-value="{
+                                        'name': request.params.get('name', ''),
+                                        'country_id': request.params.get('country_id', ''),
+                                        'email': request.params.get('email', ''),
+                                        'petition_id': record.id,
+                                        'newsletter': request.params.get('newsletter', ''),
+                                        'comments': request.params.get('comments', ''),
+                                    }"/>
+                                <span class="hidden" data-for="new_signature_form"
+                                    t-att-data-values="new_signature_values"/>
+                                <div class="o_website_html">
+                                    <section class="s_website_form pt16 pb16 o_colored_level"
+                                        data-vcss="001" data-snippet="s_website_form" data-name="Form"
+                                        id="Form" data-anchor="true">
+                                        <div class="container-fluid">
+                                            <form id="new_signature_form"
+                                                action="/website/action/new_signature/" method="post"
+                                                enctype="multipart/form-data" class="o_mark_required"
+                                                data-mark="*" data-pre-fill="true"
+                                                data-model_name="x_signature"
+                                                data-success-mode="redirect"
+                                                data-success-page="/signature-thank-you">
+                                                <div class="s_website_form_rows row s_col_no_bgcolor">
+                                                    <div data-name="Field"
+                                                        class="s_website_form_field mb-3 col-12 s_website_form_custom s_website_form_required"
+                                                        data-type="char">
+                                                        <div
+                                                            class="row s_col_no_resize s_col_no_bgcolor">
+                                                            <label
+                                                                class="col-form-label col-sm-auto s_website_form_label"
+                                                                style="width: 200px" for="omz21bc4ypc">
+                                                                <span
+                                                                    class="s_website_form_label_content">Your
+                                                                    Name</span>
+                                                                <span class="s_website_form_mark"> *</span>
+                                                            </label>
+                                                            <div class="col-sm">
+                                                                <input
+                                                                    class="form-control s_website_form_input"
+                                                                    type="text" name="name"
+                                                                    id="omz21bc4ypc" required=""/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-name="Field"
+                                                        class="s_website_form_field mb-3 col-12 s_website_form_custom s_website_form_required"
+                                                        data-type="email">
+                                                        <div
+                                                            class="row s_col_no_resize s_col_no_bgcolor">
+                                                            <label
+                                                                class="col-form-label col-sm-auto s_website_form_label"
+                                                                style="width: 200px" for="ofpexjxucp4k">
+                                                                <span
+                                                                    class="s_website_form_label_content">Your
+                                                                    Email</span>
+                                                                <span class="s_website_form_mark"> *</span>
+                                                            </label>
+                                                            <div class="col-sm">
+                                                                <input
+                                                                    class="form-control s_website_form_input"
+                                                                    type="email" name="email"
+                                                                    placeholder="" id="ofpexjxucp4k"
+                                                                    data-fill-with="undefined"
+                                                                    required=""/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-name="Field"
+                                                        class="s_website_form_field mb-3 col-12"
+                                                        data-type="integer">
+                                                        <div
+                                                            class="row s_col_no_resize s_col_no_bgcolor">
+                                                            <label
+                                                                class="col-form-label col-sm-auto s_website_form_label"
+                                                                style="width: 200px" for="oomtyt2gz2d">
+                                                                <span class="s_website_form_label_content">Your Country</span>
+                                                            </label>
+                                                            <div class="col-sm">
+                                                                <select
+                                                                    class="form-select s_website_form_input"
+                                                                    name="country_id"
+                                                                    id="oomtyt2gz2d">
+                                                                    <t t-foreach="env['res.country'].search([])" t-as="country">
+                                                                        <option t-att-value="country.id" t-out="country.name"/>
+                                                                    </t>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-name="Field"
+                                                        class="s_website_form_field mb-3 col-12 s_website_form_custom"
+                                                        data-type="text">
+                                                        <div
+                                                            class="row s_col_no_resize s_col_no_bgcolor">
+                                                            <label
+                                                                class="col-form-label col-sm-auto s_website_form_label"
+                                                                style="width: 200px" for="opcial6seyki">
+                                                                <span
+                                                                    class="s_website_form_label_content">
+                                                                    Comments</span>
+                                                            </label>
+                                                            <div class="col-sm">
+                                                                <textarea
+                                                                    class="form-control s_website_form_input"
+                                                                    name="comments" placeholder=""
+                                                                    id="opcial6seyki" rows="3"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-name="Field"
+                                                        class="s_website_form_field mb-3 col-12 s_website_form_custom"
+                                                        data-type="integer"
+                                                        t-att-style="'display: none;'">
+                                                        <div
+                                                            class="row s_col_no_resize s_col_no_bgcolor">
+                                                            <label
+                                                                class="col-form-label col-sm-auto s_website_form_label"
+                                                                style="width: 200px" for="qfqfl6seyki">
+                                                                <span
+                                                                    class="s_website_form_label_content">
+                                                                    Record</span>
+                                                            </label>
+                                                            <div class="col-sm">
+                                                                <input
+                                                                    type="number"
+                                                                    class="form-control s_website_form_input"
+                                                                    name="petition_id" placeholder=""
+                                                                    data-fill-with="petition_id"
+                                                                    t-att-readonly="1"
+                                                                    id="qfqfl6seyki"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-name="Field"
+                                                        class="s_website_form_field mb-3 col-12 s_website_form_custom s_website_form_required"
+                                                        data-type="boolean">
+                                                        <div
+                                                            class="row s_col_no_resize s_col_no_bgcolor">
+                                                            <label
+                                                                class="col-sm-auto s_website_form_label"
+                                                                style="width: 200px" for="oknvhj0blab">
+                                                                <span
+                                                                    class="s_website_form_label_content">Keep
+                                                                    me informed on this action</span>
+                                                            </label>
+                                                            <div class="col-sm">
+                                                                <div class="form-check">
+                                                                    <input type="checkbox" value="Yes"
+                                                                        class="s_website_form_input form-check-input"
+                                                                        name="newsletter"
+                                                                        id="oknvhj0blab"
+                                                                        data-fill-with="undefined"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        class="mb-0 py-2 col-12 s_website_form_submit text-end s_website_form_no_submit_label"
+                                                        data-name="Submit Button">
+                                                        <div style="width: 200px;"
+                                                            class="s_website_form_label"/>
+                                                        <span id="s_website_form_result"></span>
+                                                        <a href="#" role="button"
+                                                            class="btn btn-primary s_website_form_send">
+                                                            Submit</a>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                            <div t-elif="record.x_date_start > datetime.datetime.now()">
+                                <div class="d-flex flex-column">
+                                    <h5 class="s_showcase_title">
+                                        This petition will open for signatures on <t t-esc="record.x_date_start"/>.
+                                    </h5>
+                                </div>
+                            </div>
+                            <div t-else="">
+                                <div class="d-flex flex-column">
+                                    <h5 class="s_showcase_title">
+                                        This petition is closed.
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                        <t t-set="editor_message">Drag building blocks to customize the footer of
+                            single record pages.</t>
+                        <div class="oe_structure oe_empty oe_new"
+                            t-att-data-editor-message="editor_message"/>
+                    </div>
+                </t>
+            </t>
+        </field>
+        <field name="key">non_profit_organization.petition.form</field>
+        <field name="model">x_petition</field>
+        <field name="name">Petition</field>
+        <field name="active" eval="True"/>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+    <record id="signature_thanks_qweb_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <t name="Thanks (Contact us)" t-name="website.contactus_thanks">
+                <t t-call="website.layout">
+                    <div id="wrap" class="oe_structure oe_empty">
+                        <section class="s_text_block pt40 pb40 o_colored_level"
+                            data-snippet="s_text_block">
+                            <div class="container s_allow_columns">
+                                <div class="row">
+                                    <div class="col-lg-6 offset-lg-1 text-center o_colored_level">
+                                        <div class="d-inline-block mx-auto p-4">
+                                            <span
+                                                class="fa fa-inbox mb-3 rounded-circle text-bg-success fa-2x"/>
+                                            <h1 class="fw-bolder">Thank You!</h1>
+                                            <em>Your voice has joined a growing movement for justice
+                                                and human rights. Together, we’re louder, stronger,
+                                                and driving real change.</em>
+                                            <p class="lead mb-0">
+                                                <br />
+                                            </p>
+                                            <a href="/">Go to Homepage</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 offset-lg-1 o_colored_level">
+                                        <h5>My Company</h5>
+                                        <ul class="list-unstyled mb-0 ps-2">
+                                            <li>
+                                                <i class="fa fa-map-marker fa-fw me-2"/>
+                                                <span class="o_force_ltr">3575 Fake Buena Vista
+                                                    Avenue</span>
+                                            </li>
+                                            <li>
+                                                <i class="fa fa-phone fa-fw me-2"/>
+                                                <span class="o_force_ltr">+1 555-555-5556</span>
+                                            </li>
+                                            <li>
+                                                <i class="fa fa-1x fa-fw fa-envelope me-2"/>
+                                                <span>info@yourcompany.example.com</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <input t-if="website.plausible_shared_key" type="hidden"
+                        class="js_plausible_push" data-event-name="Lead Generation"
+                        data-event-params="{&quot;CTA&quot;: &quot;Contact Us&quot;}"/>
+                </t>
+            </t>
+        </field>
+        <field name="key">website.contactus_thanks</field>
+        <field name="name">Thanks (Contact us)</field>
+        <field name="active" eval="True"/>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+
+    <record id="website_checkout_extra_info" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <t name="Checkout Extra Info" active="False" t-name="website_sale.extra_info">
+            <t t-call="website_sale.checkout_layout">
+            <t t-set="show_navigation_button" t-value="False"/>
+            <t t-set="redirect" t-valuef="/shop/extra_info"/>
+            <t t-set="oe_structure">
+                <div class="oe_structure" id="oe_structure_website_sale_extra_info_1"/>
+            </t>
+            <h3 class="mb-4">Extra info</h3>
+            <section class="s_website_form o_colored_level" data-vcss="001" data-snippet="s_website_form">
+                <div class="container">
+                <form action="/website/form/" method="post" enctype="multipart/form-data" class="o_mark_required s_website_form_no_recaptcha" data-mark="*" data-force_action="shop.sale.order" data-model_name="sale.order" data-success-mode="redirect" data-success-page="/shop/payment" hide-change-model="true">
+                    <div class="s_website_form_rows s_col_no_bgcolor row">
+                    <div class="s_website_form_field col-12 pb-2 mb-0" data-type="char" data-name="Field">
+                        <div class="row s_col_no_resize s_col_no_bgcolor">
+                            <label class="s_website_form_label col-form-label col-sm-auto" style="width: 200px" for="citizen_id_number1">
+                                <span class="s_website_form_label_content">Citizen ID Number</span>
+                            </label>
+                            <div class="col-sm">
+                                <input id="citizen_id_number1" type="text" class="s_website_form_input form-control" name="x_related_citizen_id_number"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="s_website_form_submit s_website_form_no_submit_option d-flex flex-column flex-lg-row align-items-lg-center pt-4">
+                        <a role="button" name="website_sale_main_button" class="s_website_form_send btn btn-primary order-lg-3 w-100 w-lg-auto ms-lg-auto" href="/shop/confirm_order">
+                                        Continue checkout
+                                        <i class="fa fa-angle-right ms-2 fw-light"/>
+                                    </a>
+                        <div class="position-relative d-flex d-lg-none w-100 justify-content-center align-items-center my-2 opacity-75">
+                        <hr class="w-100"/>
+                        <span class="px-3">or</span>
+                        <hr class="w-100"/>
+                        </div>
+                        <a href="/shop/checkout" class="text-center"><i class="fa fa-angle-left me-2 fw-light"/>
+                                        Return to shipping
+                                    </a>
+                        <span id="s_website_form_result"/>
+                    </div>
+                    </div>
+                </form>
+                </div>
+            </section>
+            </t>
+        </t>
+        </field>
+        <field name="key">non_profit_organization.extra_info</field>
+        <field name="name">Checkout Extra Info</field>
+        <field name="type">qweb</field>
+        <field name="active" eval="True"/>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+    <function model="ir.ui.view" name="write">
+        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('website.default_website').id).viewref('website_sale.extra_info').id"/>
+        <value model="ir.ui.view" eval="{'arch': obj().env.ref('non_profit_organization.website_checkout_extra_info').arch}"/>
+    </function>
+    <function model="ir.model.fields" name="formbuilder_whitelist">
+        <value eval="'sale.order'"/>
+        <value eval="['x_related_citizen_id_number']"/>
+    </function>
+</odoo>
