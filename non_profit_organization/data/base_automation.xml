@@ -1,21 +1,20 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="base_automation_1" model="base.automation">
-        <field name="name">Update pricelist of customer with ongoing membership subscription</field>
-        <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="action_server_ids" eval="[(6, 0, [ref('ir_act_server_711')])]"/>
-        <field name="filter_domain">["|", ("subscription_state", "=", "3_progress"), ("subscription_state", "=", "5_renewed")]</field>
-        <field name="filter_pre_domain" eval="['&amp;', ('plan_id', '!=', False), ('order_line.product_id', '=', ref('product_product_1'))]"/>
+    <record id="add_signatory_category_to_signing_partner" model="base.automation">
+        <field name="model_id" ref="x_signature_model"/>
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('action_server_add_signatory_category_to_contact')])]"/>
         <field name="trigger">on_create_or_write</field>
-        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale_subscription.field_sale_order__subscription_state')])]"/>
+        <field name="name">Add signatory category to signing partner</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_partner_id_field_x_signature')])]"/>
     </record>
-    <record id="base_automation_2" model="base.automation">
-        <field name="name">Update pricelist of customer with closing subscription</field>
+    <record id="base_automation_on_so_confirmation" model="base.automation">
         <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="action_server_ids" eval="[(6, 0, [ref('ir_act_server_712')])]"/>
-        <field name="filter_domain">["|", "|", ("subscription_state", "=", "4_paused"), ("subscription_state", "=", "6_churn"), ("subscription_state", "=", "1_draft")]</field>
-        <field name="filter_pre_domain" eval="['&amp;', ('plan_id', '!=', False), ('order_line.product_id', '=', ref('product_product_1'))]"/>
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('action_server_assign_invoicing_journal_to_so')])]"/>
         <field name="trigger">on_create_or_write</field>
-        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale_subscription.field_sale_order__subscription_state')])]"/>
+        <field name="name">On Sale Order Confirmation</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale.field_sale_order__state')])]"/>
+        <field name="filter_domain" eval="[('state', '=', 'sale')]"/>
     </record>
 </odoo>

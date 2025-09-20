@@ -1,21 +1,77 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="ir_act_server_711" model="ir.actions.server">
-        <field name="name">Update pricelist of customer with ongoing membership subscription</field>
-        <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-PRICELIST_ID = env.ref('non_profit_organization.product_pricelist_1').id
-record.partner_id.write({'property_product_pricelist': PRICELIST_ID })
-]]></field>
+    <record id="action_server_add_signatory_category_to_contact" model="ir.actions.server">
+        <field name="model_id" ref="x_signature_model"/>
+        <field name="update_path">x_partner_id.category_id</field>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="base.model_res_partner"/>
+        <field name="name">Update Contact</field>
+        <field name="update_field_id" ref="base.field_res_partner__category_id"/>
+        <field name="usage">base_automation</field>
+        <field name="value" ref="partner_category_signatory"/>
     </record>
-    <record id="ir_act_server_712" model="ir.actions.server">
-        <field name="name">Update pricelist of customer with closing subscription</field>
+    <record id="action_create_x_signature" model="ir.actions.server">
+        <field name="code"><![CDATA[
+partner = env['res.partner'].sudo().search([('email', '=', request.params.get('email'))], limit=1)
+country = env['res.country'].sudo().search([('id', '=', request.params.get('country_id'))], limit=1)
+if not partner:
+    partner = env['res.partner'].sudo().create({
+        'name': request.params.get('name'), 
+        'email': request.params.get('email'), 
+        'country_id': country.id,
+    })
+else:
+    partner.write({'name': request.params.get('name'), 'country_id': country.id})
+existing_signature = env['x_signature'].sudo().search([('x_partner_id', '=', partner.id), ('x_petition_id', '=', int(request.params.get('petition_id')))], limit=1)
+if existing_signature:
+    response = request.make_json_response({'id': existing_signature.id}, status=200)
+elif request.params.get('petition_id'):
+    new_signature = env['x_signature'].sudo().create({
+        "x_partner_id": partner.id,
+        "x_date": datetime.datetime.today().strftime('%Y-%m-%d'),
+        "x_petition_id": request.params.get('petition_id'),
+        "x_newsletter": request.params.get('newsletter'),
+    })
+    #Force compute the amount of signatures
+    related_petition = env['x_petition'].sudo().browse([int(request.params.get('petition_id'))])
+    related_petition.write({'x_current_signatures': env['x_signature'].sudo().search_count([('x_petition_id', '=', int(request.params.get('petition_id')))])})
+    message = env['mail.message'].sudo().create({
+        'model': 'x_signature',
+        'res_id': new_signature.id,
+        'body': '<p>Comment: '+ request.params.get('comments', '')+'</p>',
+        'message_type': 'comment',
+    })
+    response = request.make_json_response({'id': new_signature.id}, status=200)
+]]></field>
+        <field name="model_id" ref="mail.model_discuss_channel_member"/>
+        <field name="state">code</field>
+        <field name="website_published">True</field>
+        <field name="website_path">new_signature</field>
+        <field name="name">Create Signature</field>
+    </record>
+    <record id="open_x_petition_website_page" model="ir.actions.server">
+        <field name="code"><![CDATA[
+response = {
+   'type': 'ir.actions.act_url',
+   'target': 'self',
+   'url': record.x_website_url,
+}
+]]></field>
+        <field name="model_id" ref="x_petition_model"/>
+        <field name="state">code</field>
+        <field name="name">Open Petition Website Page</field>
+    </record>
+    <record id="action_server_assign_invoicing_journal_to_so" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for so in records:
+    products_is_donation = so.order_line.mapped('product_id.categ_id.x_product_category_is_donation')
+    if any(products_is_donation):
+        so['journal_id'] = env.ref('non_profit_organization.account_journal_donations')
+        if not all(products_is_donation):
+            so['tag_ids'] = [Command.link(env.ref('non_profit_organization.crm_tag_5').id)]
+]]></field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
-        <field name="code"><![CDATA[
-PRICELIST_ID = env['product.pricelist'].search([('id', '!=', env.ref('non_profit_organization.product_pricelist_1').id), ('company_id', '=', record.company_id.id)], limit=1).id
-record.partner_id.write({'property_product_pricelist': PRICELIST_ID })
-]]></field>
+        <field name="name">action_server_assign_invoicing_journal_to_so</field>
     </record>
 </odoo>
