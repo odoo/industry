@@ -22,17 +22,11 @@ class FileTest(IndustryCase):
     def test_required_files(self):
         for module in self.installed_modules:
             required_files = {
-<<<<<<< 493c8aa5c78bee86eedeed9f21e6345fab354536
-                'pot file': f'/i18n/{module}.pot',
+                'icon': '/static/description/icon.png',
+                'image': '/images/main.png',
                 'index html file': '/static/description/index.html',
-||||||| bdbd9d193a888eec94c6bd6686b002866c0d230a
-                'icon': '/static/description/icon.png',
-                'image': '/images/main.png',
-=======
-                'icon': '/static/description/icon.png',
-                'image': '/images/main.png',
                 'init': '/__init__.py',
->>>>>>> c02c7eedc7449bf9903755e92ef7bee1586bef91
+                'pot file': f'/i18n/{module}.pot',
             }
             if module in self.installed_industries:
                 required_files.update({
