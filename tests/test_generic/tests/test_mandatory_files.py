@@ -22,8 +22,11 @@ class FileTest(IndustryCase):
     def test_required_files(self):
         for module in self.installed_modules:
             required_files = {
-                'pot file': f'/i18n/{module}.pot',
+                'icon': '/static/description/icon.png',
+                'image': '/images/main.png',
                 'index html file': '/static/description/index.html',
+                'init': '/__init__.py',
+                'pot file': f'/i18n/{module}.pot',
             }
             if module in self.installed_industries:
                 required_files.update({
