@@ -15,6 +15,11 @@ _logger = logging.getLogger(__name__)
 
 MAX_FILE_SIZE = 100 * 1024 * 1024  # in megabytes
 
+ALLOWED_PYTHON_FILES = [
+    '__manifest__.py',
+    '__init__.py',
+]
+
 
 @tagged('post_install', '-at_install')
 class TestEnv(IndustryCase):
@@ -42,13 +47,12 @@ class TestEnv(IndustryCase):
                     raise "Max file size exceeded"
                 content = pathlib.Path(file_path).read_bytes().decode('utf8')
                 if ext == '.py':
-                    if file_name != '__manifest__.py':
+                    if file_name not in ALLOWED_PYTHON_FILES:
                         _logger.warning(
-                            "No python file is allowed in an industry module, except __manifest__.py."
-                            " Please remove %s.",
+                            "Python file %s is not allowed in industry modules.",
                             file_name,
                         )
-                    else:
+                    elif file_name == '__manifest__.py':
                         manifest_content = content
                     continue
 
