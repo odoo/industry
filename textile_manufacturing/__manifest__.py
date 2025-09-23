@@ -60,6 +60,7 @@
         'demo/project_task.xml',
         'demo/mail_activity.xml',
         'demo/sale_order_line.xml',
+        'demo/stock_picking.xml',
         'demo/stock_move.xml',
         'demo/stock_quant.xml',
         'demo/hr_employee.xml',
