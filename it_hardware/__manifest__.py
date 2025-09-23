@@ -4,11 +4,10 @@
     'category': 'Services',
     'depends': [
         'account_followup',
-        'helpdesk_stock',
+        'helpdesk_repair',
         'industry_fsm_sale',
         'knowledge',
         'purchase_stock',
-        'repair',
         'sale_crm',
         'sale_purchase',
         'web_studio',
