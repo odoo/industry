@@ -15,6 +15,7 @@ class FileTest(IndustryCase):
             required_files = {
                 'icon': '/static/description/icon.png',
                 'image': '/images/main.png',
+                'init': '/__init__.py',
             }
             for f, path in required_files.items():
                 is_file = os.path.isfile(get_industry_path() + module + path)
