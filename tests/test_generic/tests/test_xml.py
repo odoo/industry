@@ -15,6 +15,7 @@ _logger = logging.getLogger(__name__)
 
 MAX_FILE_SIZE = 100 * 1024 * 1024  # in megabytes
 
+<<<<<<< 493c8aa5c78bee86eedeed9f21e6345fab354536
 EXCLUDED_READONLY_FIELDS = {
     'factor_inv',
     'is_cash_count',
@@ -84,6 +85,14 @@ MODELS_WITH_USER_ID = [
     'sale.order',
 ]
 
+||||||| bdbd9d193a888eec94c6bd6686b002866c0d230a
+=======
+ALLOWED_PYTHON_FILES = [
+    '__manifest__.py',
+    '__init__.py',
+]
+
+>>>>>>> c02c7eedc7449bf9903755e92ef7bee1586bef91
 
 @tagged('post_install', '-at_install')
 class TestEnv(IndustryCase):
@@ -113,14 +122,21 @@ class TestEnv(IndustryCase):
                 encoded_content = pathlib.Path(file_path).read_bytes()
                 decoded_content = encoded_content.decode('utf8')
                 if ext == '.py':
-                    if file_name != '__manifest__.py':
+                    if file_name not in ALLOWED_PYTHON_FILES:
                         _logger.warning(
-                            "No python file is allowed in an industry module, except __manifest__.py."
-                            " Please remove %s.",
+                            "Python file %s is not allowed in industry modules.",
                             file_name,
                         )
+<<<<<<< 493c8aa5c78bee86eedeed9f21e6345fab354536
                     else:
                         manifest_content = decoded_content
+||||||| bdbd9d193a888eec94c6bd6686b002866c0d230a
+                    else:
+                        manifest_content = content
+=======
+                    elif file_name == '__manifest__.py':
+                        manifest_content = content
+>>>>>>> c02c7eedc7449bf9903755e92ef7bee1586bef91
                     continue
 
                 if root.split('/')[-1] == 'demo' and get_db_name().endswith('imported_no_demo'):
