@@ -78,6 +78,11 @@ MODELS_WITH_USER_ID = [
     'sale.order',
 ]
 
+ALLOWED_PYTHON_FILES = [
+    '__manifest__.py',
+    '__init__.py',
+]
+
 
 @tagged('post_install', '-at_install')
 class TestEnv(IndustryCase):
@@ -107,13 +112,12 @@ class TestEnv(IndustryCase):
                 encoded_content = pathlib.Path(file_path).read_bytes()
                 decoded_content = encoded_content.decode('utf8')
                 if ext == '.py':
-                    if file_name != '__manifest__.py':
+                    if file_name not in ALLOWED_PYTHON_FILES:
                         _logger.warning(
-                            "No python file is allowed in an industry module, except __manifest__.py."
-                            " Please remove %s.",
+                            "Python file %s is not allowed in industry modules.",
                             file_name,
                         )
-                    else:
+                    elif file_name == '__manifest__.py':
                         manifest_content = decoded_content
                     continue
 
