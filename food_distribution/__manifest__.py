@@ -61,4 +61,5 @@
         'images/main.png',
     ],
     'url': "https://www.odoo.com/trial?industry&selected_app=food_distribution",
+    'website': "https://www.odoo.com/industries/food-distribution",
 }

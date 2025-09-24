@@ -80,4 +80,5 @@
     'license': 'OPL-1',
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=custom_furniture",
+    'website': "https://www.odoo.com/industries/custom-furniture-production",
 }

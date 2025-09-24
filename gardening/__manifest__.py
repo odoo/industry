@@ -58,4 +58,5 @@
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=gardening",
+    'website': "https://www.odoo.com/industries/gardening",
 }

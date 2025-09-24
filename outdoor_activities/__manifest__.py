@@ -60,4 +60,5 @@
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=outdoor_activities",
+    'website': "https://www.odoo.com/all-industries",
 }

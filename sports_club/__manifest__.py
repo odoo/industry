@@ -73,4 +73,5 @@
         'demo/website_view.xml',
     ],
     'url': "https://www.odoo.com/trial?industry&selected_app=sports_club",
+    'website': "https://www.odoo.com/industries/sports-club",
 }
