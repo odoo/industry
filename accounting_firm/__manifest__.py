@@ -63,4 +63,5 @@
     ],
     'license': 'OPL-1',
     'url': "https://www.odoo.com/trial?industry&selected_app=accounting_firm",
+    'website': "https://www.odoo.com/industries/accounting-firm",
 }

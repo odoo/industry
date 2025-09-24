@@ -86,4 +86,5 @@
         'images/main.png',
     ],
     'url': "https://www.odoo.com/trial?industry&selected_app=florist",
+    'website': "https://www.odoo.com/all-industries",
 }

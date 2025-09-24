@@ -72,4 +72,5 @@
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=headhunter",
+    'website': "https://www.odoo.com/industries/talent-acquisition",
 }

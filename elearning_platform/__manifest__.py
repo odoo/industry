@@ -56,4 +56,5 @@
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=elearning_platform",
+    'website': "https://www.odoo.com/all-industries",
 }

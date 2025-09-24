@@ -72,4 +72,5 @@
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=hair_salon",
+    'website': "https://www.odoo.com/industries/hair-salon",
 }

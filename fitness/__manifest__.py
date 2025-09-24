@@ -82,4 +82,5 @@
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=fitness",
+    'website': "https://www.odoo.com/industries/fitness-center",
 }

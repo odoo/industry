@@ -84,4 +84,5 @@
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=art_craft",
+    'website': "https://www.odoo.com/industries/arts-and-crafts",
 }
