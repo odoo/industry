@@ -68,7 +68,6 @@ MODELS_TO_UPDATE = {
     "ir.ui.view",
     "knowledge.article",
     "theme.utils",
-    "web_editor.assets",
     "website.assets",
     "website.controller.page",
 }

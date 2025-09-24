@@ -58,5 +58,6 @@
         "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
-    'license': 'OPL-1'
+    'license': 'OPL-1',
+    'url': "https://www.odoo.com/trial?industry&selected_app=dropshipping",
 }
