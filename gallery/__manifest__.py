@@ -1,8 +1,8 @@
 {
-  'name': 'Gallery',
-  'version': '1.0',
-  'category': 'Retail',
-  'depends': [
+    'name': 'Gallery',
+    'version': '1.0',
+    'category': 'Retail',
+    'depends': [
         'base_industry_data',
         'knowledge',
         'partner_commission',
@@ -10,8 +10,8 @@
         'sale_purchase_project',
         'sign',
         'website_event_sale'
-  ],
-  'data': [
+    ],
+    'data': [
         'data/crm_stage.xml',
         'data/pos_category.xml',
         'data/pos_payment_method.xml',
@@ -36,8 +36,8 @@
         'data/res_partner_grade.xml',
         'data/crm_tag.xml',
         'data/commission_plan.xml',
-  ],
-  'demo': [
+    ],
+    'demo': [
         'demo/payment_provider_demo_post.xml',
         'demo/product_template.xml',
         'demo/website_view.xml',
@@ -57,12 +57,13 @@
         'demo/ir_attachment_post.xml',
         'demo/sale_order_confirm.xml',
         'demo/website.xml',
-  ],
-  'author': 'Odoo S.A.',
-  "cloc_exclude": [
-      "data/knowledge_article.xml",
-      "demo/website_view.xml",
-  ],
-  'images': ['images/main.png'],
-  'license': 'OPL-1'
+    ],
+    'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "data/knowledge_article.xml",
+        "demo/website_view.xml",
+    ],
+    'images': ['images/main.png'],
+    'license': 'OPL-1',
+    'url': "https://www.odoo.com/trial?industry&selected_app=gallery",
 }

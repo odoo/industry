@@ -62,4 +62,5 @@
     'images': [
         'images/main.png',
     ],
+    'url': "https://www.odoo.com/trial?industry&selected_app=diy_workshops",
 }
