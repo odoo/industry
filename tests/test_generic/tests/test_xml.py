@@ -54,7 +54,7 @@ USELESS_FIELDS = {
     'worksheet.template': ['color'],
 }
 
-MODELS_TO_UPDATE = [
+MODELS_TO_UPDATE = {
     "base.automation",
     "ir.actions.act_window",
     "ir.actions.report",
@@ -70,15 +70,20 @@ MODELS_TO_UPDATE = [
     "knowledge.article",
     "website.controller.page",
     "web_editor.assets",
-]
+}
 
-MODELS_WITH_USER_ID = [
+MODELS_WITH_USER_ID = {
     'crm.lead',
     'event.event',
     'knowledge.article.favorite',
     'project.project',
     'purchase.order',
     'sale.order',
+}
+
+ALLOWED_PYTHON_FILES = [
+    '__manifest__.py',
+    '__init__.py',
 ]
 
 
@@ -110,13 +115,12 @@ class TestEnv(IndustryCase):
                 encoded_content = pathlib.Path(file_path).read_bytes()
                 decoded_content = encoded_content.decode('utf8')
                 if ext == '.py':
-                    if file_name != '__manifest__.py':
+                    if file_name not in ALLOWED_PYTHON_FILES:
                         _logger.warning(
-                            "No python file is allowed in an industry module, except __manifest__.py."
-                            " Please remove %s.",
+                            "Python file %s is not allowed in industry modules.",
                             file_name,
                         )
-                    else:
+                    elif file_name == '__manifest__.py':
                         manifest_content = decoded_content
                     continue
 
