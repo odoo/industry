@@ -66,4 +66,5 @@
     'images': ['images/main.png'],
     'license': 'OPL-1',
     'url': "https://www.odoo.com/trial?industry&selected_app=gallery",
+    'website': "https://www.odoo.com/all-industries",
 }

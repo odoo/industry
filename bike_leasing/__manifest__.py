@@ -78,4 +78,5 @@
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=bike_leasing",
+    'website': "https://www.odoo.com/industries/bike-leasing",
 }

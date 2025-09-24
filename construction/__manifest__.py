@@ -69,4 +69,5 @@
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=construction",
+    'website': "https://www.odoo.com/industries/construction",
 }

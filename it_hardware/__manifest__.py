@@ -77,4 +77,5 @@
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=it_hardware",
+    'website': "https://www.odoo.com/industries/it-hardware-support",
 }

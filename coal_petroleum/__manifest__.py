@@ -67,4 +67,5 @@
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=coal_petroleum",
+    'website': "https://www.odoo.com/industries/fossil-fuel-trading",
 }

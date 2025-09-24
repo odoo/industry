@@ -38,4 +38,5 @@
     ],
     'license': 'OPL-1',
     'url': "https://www.odoo.com/trial?industry&selected_app=wellness_practitioner",
+    'website': "https://www.odoo.com/industries/wellness-practitioners",
 }

@@ -100,4 +100,5 @@
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=bike_shop",
+    'website': "https://www.odoo.com/all-industries",
 }

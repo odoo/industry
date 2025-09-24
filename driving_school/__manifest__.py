@@ -72,4 +72,5 @@
         'images/main.png',
     ],
     'url': "https://www.odoo.com/trial?industry&selected_app=driving_school",
+    'website': "https://www.odoo.com/all-industries",
 }

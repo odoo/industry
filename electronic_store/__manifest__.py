@@ -95,4 +95,5 @@
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=electronic_store",
+    'website': "https://www.odoo.com/industries/electronics-store",
 }

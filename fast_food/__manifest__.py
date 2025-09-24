@@ -59,4 +59,5 @@
     'author': 'Odoo S.A.',
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=fast_food",
+    'website': "https://www.odoo.com/industries/fast-food",
 }
