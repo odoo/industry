@@ -2,54 +2,12 @@
 <odoo noupdate="1">
     <function model="ir.model.data" name="_update_xmlids">
         <value model="base" eval="[{
-            'xml_id': 'stock.picking_type_stor',
-            'record': obj().env.ref('stock.warehouse0').store_type_id,
-            'noupdate': True,
-        }, {
             'xml_id': 'stock.picking_type_pick',
             'record': obj().env.ref('stock.warehouse0').pick_type_id,
-            'noupdate': True,
         }]"/>
     </function>
 
-    <record id="stock_picking_in_12" model="stock.picking">
-        <field name="name">WH/IN/00012</field>
-        <field name="picking_type_id" ref="stock.picking_type_in"/>
-        <field name="move_type">direct</field>
-        <field name="scheduled_date" eval="datetime.today().date() + relativedelta(days=-9, minutes=-1)"/>
-        <field name="date_done" eval="datetime.today().date() + relativedelta(days=-9, minutes=-1)"/>
-        <field name="location_id" ref="stock.stock_location_suppliers"/>
-        <field name="location_dest_id" ref="stock.stock_location_company"/>
-        <field name="user_id" ref="base.user_admin"/>
-        <field name="partner_id" ref="base_industry_data.res_partner_31"/>
-        <field name="owner_id" ref="base_industry_data.res_partner_31"/>
-    </record>
-    <record id="stock_picking_in_13" model="stock.picking">
-        <field name="name">WH/IN/00013</field>
-        <field name="picking_type_id" ref="stock.picking_type_in"/>
-        <field name="move_type">direct</field>
-        <field name="scheduled_date" eval="datetime.today().date() + relativedelta(days=-7)"/>
-        <field name="date_done" eval="datetime.today().date() + relativedelta(days=-7)"/>
-        <field name="location_id" ref="stock.stock_location_suppliers"/>
-        <field name="location_dest_id" ref="stock.stock_location_company"/>
-        <field name="user_id" ref="base.user_admin"/>
-        <field name="partner_id" ref="base_industry_data.res_partner_31"/>
-        <field name="owner_id" ref="base_industry_data.res_partner_31"/>
-    </record>
-    <record id="stock_picking_in_14" model="stock.picking">
-        <field name="name">WH/IN/00014</field>
-        <field name="picking_type_id" ref="stock.picking_type_in"/>
-        <field name="move_type">direct</field>
-        <field name="scheduled_date" eval="datetime.today().date() + relativedelta(days=-9)"/>
-        <field name="date_done" eval="datetime.today().date() + relativedelta(days=-9)"/>
-        <field name="location_id" ref="stock.stock_location_suppliers"/>
-        <field name="location_dest_id" ref="stock.stock_location_company"/>
-        <field name="user_id" ref="base.user_admin"/>
-        <field name="partner_id" ref="base_industry_data.res_partner_32"/>
-        <field name="owner_id" ref="base_industry_data.res_partner_32"/>
-    </record>
     <record id="stock_picking_in_2" model="stock.picking">
-        <field name="name">WH/IN/00002</field>
         <field name="picking_type_id" ref="stock.picking_type_in"/>
         <field name="move_type">direct</field>
         <field name="scheduled_date" eval="datetime.today().date() + relativedelta(days=2)"/>
@@ -59,8 +17,165 @@
         <field name="partner_id" ref="base_industry_data.res_partner_31"/>
         <field name="owner_id" ref="base_industry_data.res_partner_31"/>
     </record>
+    <record id="stock_move_14" model="stock.move">
+        <field name="picking_id" ref="stock_picking_in_2"/>
+        <field name="product_id" ref="product_product_2"/>
+        <field name="product_uom_qty">16.0</field>
+    </record>
+    <record id="stock_move_15" model="stock.move">
+        <field name="picking_id" ref="stock_picking_in_2"/>
+        <field name="product_id" ref="product_product_3"/>
+        <field name="product_uom_qty">15.0</field>
+    </record>
+    <record id="stock_move_16" model="stock.move">
+        <field name="picking_id" ref="stock_picking_in_2"/>
+        <field name="product_id" ref="product_product_4"/>
+        <field name="product_uom_qty">15.0</field>
+    </record>
+    <function name="action_confirm" model="stock.picking">
+        <value eval="[
+            ref('stock_picking_in_2'),
+        ]"/>
+    </function>
+
+    <record id="stock_picking_in_12" model="stock.picking">
+        <field name="picking_type_id" ref="stock.picking_type_in"/>
+        <field name="move_type">direct</field>
+        <field name="scheduled_date" eval="datetime.today().date() + relativedelta(days=-9, minutes=-1)"/>
+        <field name="location_id" ref="stock.stock_location_suppliers"/>
+        <field name="location_dest_id" ref="stock.stock_location_company"/>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="partner_id" ref="base_industry_data.res_partner_31"/>
+        <field name="owner_id" ref="base_industry_data.res_partner_31"/>
+    </record>
+    <record id="stock_move_65" model="stock.move">
+        <field name="picking_id" ref="stock_picking_in_12"/>
+        <field name="product_id" ref="product_product_2"/>
+        <field name="product_uom_qty">40.0</field>
+        <field name="move_line_ids" model="stock.move.line" eval="[(0, 0, {
+            'product_id': obj().env.ref('3pl_logistic_company.product_product_2').id,
+            'lot_id': obj().env.ref('3pl_logistic_company.stock_lot_6').id,
+            'quantity': 40,
+        })]"/>
+    </record>
+    <function name="button_validate" model="stock.picking">
+        <value eval="[
+            ref('stock_picking_in_12'),
+        ]"/>
+    </function>
+    <record id="stock_picking_in_12" model="stock.picking">
+        <field name="date_done" eval="datetime.today().date() + relativedelta(days=-9, minutes=-1)"/>
+    </record>
+    <function name="do_pass" model="quality.check">
+        <value model="quality.check" eval="obj().search([('picking_id', '=', ref('stock_picking_in_12'))], limit=1).id"/>
+    </function>
+    <function name="button_validate" model="stock.picking">
+        <value model="stock.picking" eval="obj().search([('picking_type_id', '!=',ref('stock.picking_type_pick')), ('lot_id', '=', ref('stock_lot_6'))], limit=1).id"/>
+    </function>
+    <function name="write" model="stock.picking">
+        <value model="stock.picking" eval="obj().search([('picking_type_id', '!=',ref('stock.picking_type_pick')), ('lot_id', '=', ref('stock_lot_6'))], limit=1).id"/>
+        <value eval="{'date_done': datetime.today().date() + relativedelta(days=-9, minutes=-1), 'scheduled_date': datetime.today().date() + relativedelta(days=-9, minutes=-1)}"/>
+    </function>
+
+
+    <record id="stock_picking_in_13" model="stock.picking">
+        <field name="picking_type_id" ref="stock.picking_type_in"/>
+        <field name="move_type">direct</field>
+        <field name="scheduled_date" eval="datetime.today().date() + relativedelta(days=-7)"/>
+        <field name="location_id" ref="stock.stock_location_suppliers"/>
+        <field name="location_dest_id" ref="stock.stock_location_company"/>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="partner_id" ref="base_industry_data.res_partner_31"/>
+        <field name="owner_id" ref="base_industry_data.res_partner_31"/>
+    </record>
+    <record id="stock_move_67" model="stock.move">
+        <field name="picking_id" ref="stock_picking_in_13"/>
+        <field name="product_id" ref="product_product_3"/>
+        <field name="product_uom_qty">140.0</field>
+        <field name="move_line_ids" model="stock.move.line" eval="[(0, 0, {
+            'product_id': obj().env.ref('3pl_logistic_company.product_product_3').id,
+            'lot_id': obj().env.ref('3pl_logistic_company.stock_lot_5').id,
+            'quantity': 140,
+        })]"/>
+    </record>
+    <function name="button_validate" model="stock.picking">
+        <value eval="[
+            ref('stock_picking_in_13'),
+        ]"/>
+    </function>
+    <record id="stock_picking_in_13" model="stock.picking">
+        <field name="date_done" eval="datetime.today().date() + relativedelta(days=-7)"/>
+    </record>
+    <function name="do_pass" model="quality.check">
+        <value model="quality.check" eval="obj().search([('picking_id', '=', ref('stock_picking_in_13'))], limit=1).id"/>
+    </function>
+    <function name="button_validate" model="stock.picking">
+        <value model="stock.picking" eval="obj().search([('picking_type_id', '!=',ref('stock.picking_type_pick')), ('lot_id', '=', ref('stock_lot_5'))], limit=1).id"/>
+    </function>
+    <function name="write" model="stock.picking">
+        <value model="stock.picking" eval="obj().search([('picking_type_id', '!=',ref('stock.picking_type_pick')), ('lot_id', '=', ref('stock_lot_5'))], limit=1).id"/>
+        <value eval="{'date_done': datetime.today().date() + relativedelta(days=-7), 'scheduled_date': datetime.today().date() + relativedelta(days=-7)}"/>
+    </function>
+
+
+
+    <record id="stock_picking_in_14" model="stock.picking">
+        <field name="picking_type_id" ref="stock.picking_type_in"/>
+        <field name="move_type">direct</field>
+        <field name="scheduled_date" eval="datetime.today().date() + relativedelta(days=-9)"/>
+        <field name="location_id" ref="stock.stock_location_suppliers"/>
+        <field name="location_dest_id" ref="stock.stock_location_company"/>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="partner_id" ref="base_industry_data.res_partner_32"/>
+        <field name="owner_id" ref="base_industry_data.res_partner_32"/>
+    </record>
+    <record id="stock_move_69" model="stock.move">
+        <field name="picking_id" ref="stock_picking_in_14"/>
+        <field name="product_id" ref="product_product_7"/>
+        <field name="product_uom_qty">120.0</field>
+        <field name="move_line_ids" model="stock.move.line" eval="[(0, 0, {
+            'product_id': obj().env.ref('3pl_logistic_company.product_product_7').id,
+            'lot_id': obj().env.ref('3pl_logistic_company.stock_lot_1').id,
+            'quantity': 120,
+        })]"/>
+    </record>
+    <record id="stock_move_70" model="stock.move">
+        <field name="picking_id" ref="stock_picking_in_14"/>
+        <field name="product_id" ref="product_product_5"/>
+        <field name="product_uom_qty">150.0</field>
+        <field name="move_line_ids" model="stock.move.line" eval="[(0, 0, {
+            'product_id': obj().env.ref('3pl_logistic_company.product_product_5').id,
+            'lot_id': obj().env.ref('3pl_logistic_company.stock_lot_2').id,
+            'quantity': 150,
+        })]"/>
+    </record>
+    <record id="stock_move_71" model="stock.move">
+        <field name="picking_id" ref="stock_picking_in_14"/>
+        <field name="product_id" ref="product_product_6"/>
+        <field name="product_uom_qty">80.0</field>
+        <field name="move_line_ids" model="stock.move.line" eval="[(0, 0, {
+            'product_id': obj().env.ref('3pl_logistic_company.product_product_6').id,
+            'lot_id': obj().env.ref('3pl_logistic_company.stock_lot_3').id,
+            'quantity': 80,
+        })]"/>
+    </record>
+    <function name="button_validate" model="stock.picking">
+        <value eval="[
+            ref('stock_picking_in_14'),
+        ]"/>
+    </function>
+    <record id="stock_picking_in_14" model="stock.picking">
+        <field name="date_done" eval="datetime.today().date() + relativedelta(days=-9)"/>
+    </record>
+    <function name="button_validate" model="stock.picking">
+        <value model="stock.picking" eval="obj().search([('picking_type_id', '!=',ref('stock.picking_type_pick')), ('lot_id', '=', ref('stock_lot_2'))], limit=1).id"/>
+    </function>
+    <function name="write" model="stock.picking">
+        <value model="stock.picking" eval="obj().search([('picking_type_id', '!=',ref('stock.picking_type_pick')), ('lot_id', '=', ref('stock_lot_2'))], limit=1).id"/>
+        <value eval="{'date_done': datetime.today().date() + relativedelta(days=-9), 'scheduled_date': datetime.today().date() + relativedelta(days=-9)}"/>
+    </function>
+
     <record id="stock_picking_in_15" model="stock.picking">
-        <field name="name">WH/IN/00015</field>
         <field name="picking_type_id" ref="stock.picking_type_in"/>
         <field name="move_type">direct</field>
         <field name="scheduled_date" eval="datetime.today().date() + relativedelta(days=3)"/>
@@ -70,47 +185,21 @@
         <field name="partner_id" ref="base_industry_data.res_partner_32"/>
         <field name="owner_id" ref="base_industry_data.res_partner_32"/>
     </record>
-    <record id="stock_picking_stor_1" model="stock.picking">
-        <field name="name">WH/STOR/00001</field>
-        <field name="origin">WH/IN/00012</field>
-        <field name="move_type">direct</field>
-        <field name="scheduled_date" eval="datetime.today().date() + relativedelta(days=-9)"/>
-        <field name="date_done" eval="datetime.today().date() + relativedelta(days=-9)"/>
-        <field name="location_id" ref="stock.stock_location_company"/>
-        <field name="location_dest_id" ref="stock.stock_location_stock"/>
-        <field name="user_id" eval="False"/>
-        <field name="partner_id" ref="base_industry_data.res_partner_31"/>
-        <field name="picking_type_id" ref="stock.picking_type_stor"/>
+    <record id="stock_move_75" model="stock.move">
+        <field name="picking_id" ref="stock_picking_in_15"/>
+        <field name="product_id" ref="product_product_6"/>
+        <field name="product_uom_qty">120.0</field>
     </record>
-    <record id="stock_picking_stor_2" model="stock.picking">
-        <field name="name">WH/STOR/00002</field>
-        <field name="origin">WH/IN/00013</field>
-        <field name="move_type">direct</field>
-        <field name="scheduled_date" eval="datetime.today().date() + relativedelta(days=-7)"/>
-        <field name="date_done" eval="datetime.today().date() + relativedelta(days=-7)"/>
-        <field name="location_id" ref="stock.stock_location_company"/>
-        <field name="location_dest_id" ref="stock.stock_location_stock"/>
-        <field name="user_id" eval="False"/>
-        <field name="partner_id" ref="base_industry_data.res_partner_31"/>
-        <field name="picking_type_id" ref="stock.picking_type_stor"/>
-    </record>
-    <record id="stock_picking_stor_3" model="stock.picking">
-        <field name="name">WH/STOR/00003</field>
-        <field name="origin">WH/IN/00014</field>
-        <field name="move_type">direct</field>
-        <field name="scheduled_date" eval="datetime.today().date() + relativedelta(days=-9)"/>
-        <field name="date_done" eval="datetime.today().date() + relativedelta(days=-9)"/>
-        <field name="location_id" ref="stock.stock_location_company"/>
-        <field name="location_dest_id" ref="stock.stock_location_stock"/>
-        <field name="user_id" eval="False"/>
-        <field name="partner_id" ref="base_industry_data.res_partner_32"/>
-        <field name="picking_type_id" ref="stock.picking_type_stor"/>
-    </record>
+    <function name="action_confirm" model="stock.picking">
+        <value eval="[
+            ref('stock_picking_in_15'),
+        ]"/>
+    </function>
+
+
     <record id="stock_picking_pick_2" model="stock.picking">
-        <field name="name">WH/PICK/00002</field>
         <field name="move_type">direct</field>
         <field name="scheduled_date" eval="datetime.today().date() + relativedelta(days=-2)"/>
-        <field name="date_done" eval="datetime.today().date() + relativedelta(days=-2)"/>
         <field name="location_id" ref="stock.stock_location_stock"/>
         <field name="location_dest_id" ref="stock.stock_location_output"/>
         <field name="user_id" ref="base.user_admin"/>
@@ -118,8 +207,52 @@
         <field name="owner_id" ref="base_industry_data.res_partner_32"/>
         <field name="picking_type_id" ref="stock.picking_type_pick"/>
     </record>
+    <record id="stock_move_82" model="stock.move">
+        <field name="picking_id" ref="stock_picking_pick_2"/>
+        <field name="product_id" ref="product_product_7"/>
+        <field name="product_uom_qty">10.0</field>
+        <field name="move_line_ids" model="stock.move.line" eval="[(0, 0, {
+            'product_id': obj().env.ref('3pl_logistic_company.product_product_7').id,
+            'lot_id': obj().env.ref('3pl_logistic_company.stock_lot_1').id,
+            'quantity': 10,
+        })]"/>
+    </record>
+    <record id="stock_move_83" model="stock.move">
+        <field name="picking_id" ref="stock_picking_pick_2"/>
+        <field name="product_id" ref="product_product_5"/>
+        <field name="product_uom_qty">10.0</field>
+        <field name="move_line_ids" model="stock.move.line" eval="[(0, 0, {
+            'product_id': obj().env.ref('3pl_logistic_company.product_product_5').id,
+            'lot_id': obj().env.ref('3pl_logistic_company.stock_lot_2').id,
+            'quantity': 10,
+        })]"/>
+    </record>
+    <record id="stock_move_84" model="stock.move">
+        <field name="picking_id" ref="stock_picking_pick_2"/>
+        <field name="product_id" ref="product_product_6"/>
+        <field name="product_uom_qty">20.0</field>
+        <field name="move_line_ids" model="stock.move.line" eval="[(0, 0, {
+            'product_id': obj().env.ref('3pl_logistic_company.product_product_6').id,
+            'lot_id': obj().env.ref('3pl_logistic_company.stock_lot_3').id,
+            'quantity': 20,
+        })]"/>
+    </record>
+    <function name="button_validate" model="stock.picking">
+        <value eval="[
+            ref('stock_picking_pick_2'),
+        ]"/>
+    </function>
+    <record id="stock_picking_pick_2" model="stock.picking">
+        <field name="date_done" eval="datetime.today().date() + relativedelta(days=-2)"/>
+    </record>
+    <function name="button_validate" model="stock.picking">
+        <value model="stock.picking" eval="obj().search([('picking_type_id', '=',ref('stock.picking_type_out')), ('lot_id', '=', ref('stock_lot_2'))], limit=1).id"/>
+    </function>
+    <function name="write" model="stock.picking">
+        <value model="stock.picking" eval="obj().search([('picking_type_id', '=',ref('stock.picking_type_out')), ('lot_id', '=', ref('stock_lot_2'))], limit=1).id"/>
+        <value eval="{'date_done': datetime.today().date() + relativedelta(days=-2), 'scheduled_date': datetime.today().date() + relativedelta(days=-2)}"/>
+    </function>
     <record id="stock_picking_pick_4" model="stock.picking">
-        <field name="name">WH/PICK/00004</field>
         <field name="move_type">direct</field>
         <field name="scheduled_date" eval="datetime.today().date() + relativedelta(days=1)"/>
         <field name="location_id" ref="stock.stock_location_stock"/>
@@ -129,16 +262,29 @@
         <field name="owner_id" ref="base_industry_data.res_partner_32"/>
         <field name="picking_type_id" ref="stock.picking_type_pick"/>
     </record>
-    <record id="stock_picking_out_6" model="stock.picking">
-        <field name="name">WH/OUT/00006</field>
-        <field name="origin">WH/PICK/00002</field>
-        <field name="picking_type_id" ref="stock.picking_type_out"/>
-        <field name="move_type">direct</field>
-        <field name="scheduled_date" eval="datetime.today().date()"/>
-        <field name="date_done" eval="datetime.today().date()"/>
-        <field name="location_id" ref="stock.stock_location_output"/>
-        <field name="location_dest_id" ref="stock.stock_location_customers"/>
-        <field name="user_id" eval="False"/>
-        <field name="partner_id" ref="res_partner_27"/>
+    <record id="stock_move_95" model="stock.move">
+        <field name="picking_id" ref="stock_picking_pick_4"/>
+        <field name="product_id" ref="product_product_7"/>
+        <field name="product_uom_qty">40.0</field>
     </record>
+    <record id="stock_move_96" model="stock.move">
+        <field name="picking_id" ref="stock_picking_pick_4"/>
+        <field name="product_id" ref="product_product_5"/>
+        <field name="product_uom_qty">40.0</field>
+    </record>
+    <record id="stock_move_97" model="stock.move">
+        <field name="picking_id" ref="stock_picking_pick_4"/>
+        <field name="product_id" ref="product_product_6"/>
+        <field name="product_uom_qty">80.0</field>
+    </record>
+    <record id="stock_move_98" model="stock.move">
+        <field name="picking_id" ref="stock_picking_pick_4"/>
+        <field name="product_id" ref="product_product_9"/>
+        <field name="product_uom_qty">40.0</field>
+    </record>
+    <function name="action_confirm" model="stock.picking">
+        <value eval="[
+            ref('stock_picking_pick_4'),
+        ]"/>
+    </function>
 </odoo>
