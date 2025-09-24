@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="industry_on_harvest_c49e5fbd-d0b4-427c-80d2-679edf97a9f5" model="base.automation">
+    <field name="model_id" ref="mrp.model_mrp_production"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('industry__harvest_and_transfer_server_action')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="filter_domain">[("state", "=", "done")]</field>
+    <field name="filter_pre_domain">["&amp;", ("picking_type_id", "in", [13]), ("state", "=", "confirmed")]</field>
+    <field name="name">Industry: On harvest</field>
+    <field name="trigger_field_ids" eval="[(6, 0, [ref('mrp.field_mrp_production__state')])]"/>
+  </record>
+  <record id="industry_on_harvest__8cf801c4-ce7c-4ea4-860a-b572251e3f2c" model="base.automation">
+    <field name="model_id" ref="stock.model_stock_picking"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('industry__check_harvest_is_from_harvest_location_server_action')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="filter_domain">[]</field>
+    <field name="filter_pre_domain">["&amp;", ("picking_type_id.x_is_harvest", "!=", False), ("state", "not in", ["done", "cancel"])]</field>
+    <field name="name">Industry: On Harvest Validation</field>
+    <field name="trigger_field_ids" eval="[(6, 0, [ref('stock.field_stock_picking__state')])]"/>
+  </record>
+</odoo>
