@@ -37,4 +37,5 @@
         "static/src/js/my_tour.js",
     ],
     'license': 'OPL-1',
+    'url': "https://www.odoo.com/trial?industry&selected_app=wellness_practitioner",
 }
