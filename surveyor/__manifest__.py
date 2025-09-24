@@ -61,4 +61,5 @@
         "static/src/js/my_tour.js",
         "demo/website_view.xml",
     ],
+    'url': "https://www.odoo.com/trial?industry&selected_app=surveyor",
 }
