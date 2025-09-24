@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="project_project_form_customization" model="ir.ui.view">
-        <field name="name">project.project.form customization</field>
+    <record id="project_project_form_view" model="ir.ui.view">
+        <field name="name">project.project.form.software_reseller</field>
         <field name="model">project.project</field>
         <field name="inherit_id" ref="project.edit_project"/>
         <field name="mode">extension</field>
@@ -21,7 +21,7 @@
         </field>
     </record>
     <record id="view_project_task_form_inherit_project" model="ir.ui.view">
-        <field name="name">project.task.form customization</field>
+        <field name="name">project.task.form.software_reseller</field>
         <field name="model">project.task</field>
         <field name="inherit_id" ref="project.view_task_form2"/>
         <field name="active" eval="True"/>
@@ -36,17 +36,6 @@
                 <xpath expr="//group/field[@name='sale_order_id']" position="attributes">
                     <attribute name="invisible">False</attribute>
                 </xpath>
-                <xpath expr="//sheet/group" position="after">
-                    <group name="studio_group_6tg_1ip1u4p6l">
-                        <group name="studio_group_6tg_left" string="License" invisible="not x_studio_is_license">
-                            <field name="x_studio_users"/>
-                            <field name="x_studio_environment" invisible="x_studio_software == &quot;Odoo&quot;"/>
-                            <field name="x_studio_hosted_on" invisible="x_studio_software != &quot;Odoo&quot;"/>
-                            <field name="x_studio_version" placeholder="20.0.1"/>
-                            <field name="x_studio_license_key"/>
-                        </group>
-                    </group>
-                </xpath>
             </data>
         </field>
     </record>
@@ -55,13 +44,13 @@
         <field name="mode">extension</field>
         <field name="active" eval="True"/>
         <field name="model">project.task.type</field>
-        <field name="name">project.task.type.form customization</field>
+        <field name="name">project.task.type.form.software_reseller</field>
         <field name="priority">160</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
             <data>
                 <xpath expr="//field[@name='sequence']" position="after">
-                    <field name="x_studio_expiration_check"/>
+                    <field name="x_expiration_check"/>
                 </xpath>
             </data>
         </field>
@@ -71,7 +60,7 @@
         <field name="mode">extension</field>
         <field name="model">res.partner</field>
         <field name="active" eval="True"/>
-        <field name="name">res.partner.form customization</field>
+        <field name="name">res.partner.form.software_reseller</field>
         <field name="priority">360</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
@@ -86,11 +75,11 @@
     </record>
     <record id="view_project_task_list_inherit" model="ir.ui.view">
         <field name="inherit_id" ref="project.view_task_tree2"/>
-        <field name="mode">extension</field>
+        <field name="mode">primary</field>
         <field name="model">project.task</field>
         <field name="active" eval="True"/>
-        <field name="name">project.task.list customization</field>
-        <field name="priority">160</field>
+        <field name="name">project.task.list.software_reseller</field>
+        <field name="priority">16</field>
         <field name="type">list</field>
         <field name="arch" type="xml">
             <data>
@@ -99,10 +88,16 @@
                 <xpath expr="//field[@name='activity_ids']" position="replace"/>
                 <xpath expr="//list[1]/field[@name='progress'][2]" position="replace"/>
                 <xpath expr="//list[1]/field[@name='effective_hours'][2]" position="replace"/>
-                <!-- <xpath expr="//field[@name='project_id']" position="replace"/> -->
                 <xpath expr="//field[@name='state']" position="after">
-                    <field name="x_studio_software" optional="show"/>
-                    <field name="x_studio_version" optional="show"/>
+                    <field name="x_software" optional="show"/>
+                    <field name="x_version" optional="show"/>
+                </xpath>
+                <xpath expr="//field[@name='project_id']" position="attributes">
+                    <attribute name="optional">hide</attribute>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="optional">show</attribute>
+                    <attribute name="invisible">False</attribute>
                 </xpath>
                 <xpath expr="//field[@name='date_deadline']" position="attributes">
                     <attribute name="column_invisible">False</attribute>
@@ -117,7 +112,7 @@
         <field name="mode">extension</field>
         <field name="model">hr.employee</field>
         <field name="active" eval="True"/>
-        <field name="name">hr.employee.kanban customization</field>
+        <field name="name">hr.employee.kanban.software_reseller</field>
         <field name="priority">99</field>
         <field name="type">kanban</field>
         <field name="arch" type="xml">
@@ -127,5 +122,12 @@
                 </xpath>
             </data>
         </field>
+    </record>
+    <record id="all_licenses_act_window" model="ir.actions.act_window">
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_project_task_list_inherit')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_project_task_form_inherit_project')}),
+        ]"/>
     </record>
 </odoo>
