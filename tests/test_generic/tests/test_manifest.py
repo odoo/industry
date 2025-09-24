@@ -29,6 +29,7 @@ MANDATORY_KEYS_INDUSTRIES = {
     'demo': [],
     'images': ['images/main.png'],
     'url': '',
+    'website': '',
 }
 
 
@@ -71,6 +72,10 @@ class ManifestTest(ManifestLinter, IndustryCase):
                     self.assertNotIn(value, CATEGORIES, f"Module category '{value}' should not be an industry category: {CATEGORIES}")
             elif key == 'url' and module in self.installed_industries:
                 self.assertEqual(value, f"https://www.odoo.com/trial?industry&selected_app={module}", f"The url should link to the trial page: https://www.odoo.com/trial?industry&selected_app={module}")
+            elif key == 'website' and module in self.installed_industries:
+                self.assertTrue(
+                    value.startswith("https://www.odoo.com/industries/") or value == "https://www.odoo.com/all-industries", "The url should link to the odoo.com page."
+                )
             elif key in ['data', 'demo']:
                 self.assertTrue(all(val.startswith(f'{key}/') for val in value), f"Files must be in '{key}/' directory")
         self._test_files_in_manifest(manifest_data, 'data')

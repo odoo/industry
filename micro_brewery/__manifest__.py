@@ -100,4 +100,5 @@
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=micro_brewery",
+    'website': "https://www.odoo.com/industries/micro-brewery",
 }

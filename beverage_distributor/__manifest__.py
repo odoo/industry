@@ -85,4 +85,5 @@
     'author': 'Odoo S.A.',
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=beverage_distributor",
+    'website': "https://www.odoo.com/industries/beverage-distributor",
 }

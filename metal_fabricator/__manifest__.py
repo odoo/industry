@@ -55,4 +55,5 @@
         'images/main.png',
     ],
     'url': "https://www.odoo.com/trial?industry&selected_app=metal_fabricator",
+    'website': "https://www.odoo.com/industries/metal-fabricator",
 }

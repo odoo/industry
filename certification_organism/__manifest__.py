@@ -65,4 +65,5 @@
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=certification_organism",
+    'website': "https://www.odoo.com/industries/audit-certification",
 }
