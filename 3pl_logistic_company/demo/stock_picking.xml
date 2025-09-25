@@ -7,7 +7,7 @@
         }]"/>
     </function>
 
-    <record id="stock_picking_in_2" model="stock.picking">
+    <!-- <record id="stock_picking_in_2" model="stock.picking">
         <field name="picking_type_id" ref="stock.picking_type_in"/>
         <field name="move_type">direct</field>
         <field name="scheduled_date" eval="datetime.today().date() + relativedelta(days=2)"/>
@@ -36,7 +36,7 @@
         <value eval="[
             ref('stock_picking_in_2'),
         ]"/>
-    </function>
+    </function> -->
 
     <record id="stock_picking_in_12" model="stock.picking">
         <field name="picking_type_id" ref="stock.picking_type_in"/>
@@ -55,19 +55,29 @@
         <field name="move_line_ids" model="stock.move.line" eval="[(0, 0, {
             'product_id': obj().env.ref('3pl_logistic_company.product_product_2').id,
             'lot_id': obj().env.ref('3pl_logistic_company.stock_lot_6').id,
+            'lot_name': obj().env.ref('3pl_logistic_company.stock_lot_6').name,
             'quantity': 40,
         })]"/>
     </record>
-    <function name="button_validate" model="stock.picking">
+    <function name="action_confirm" model="stock.picking">
         <value eval="[
             ref('stock_picking_in_12'),
         ]"/>
     </function>
-    <record id="stock_picking_in_12" model="stock.picking">
+    <!-- <function name="button_validate" model="stock.picking">
+        <value eval="[
+            ref('stock_picking_in_12'),
+        ]"/>
+    </function> -->
+    <!-- <record id="stock_picking_in_12" model="stock.picking">
         <field name="date_done" eval="datetime.today().date() + relativedelta(days=-9, minutes=-1)"/>
     </record>
     <function name="do_pass" model="quality.check">
         <value model="quality.check" eval="obj().search([('picking_id', '=', ref('stock_picking_in_12'))], limit=1).id"/>
+    </function>
+    <function name="write" model="quality.check">
+        <value model="quality.check" eval="obj().search([('picking_id', '=', ref('stock_picking_in_12'))], limit=1).id"/>
+        <value eval="{'control_date': datetime.today().date() + relativedelta(days=-9, minutes=-1)}"/>
     </function>
     <function name="button_validate" model="stock.picking">
         <value model="stock.picking" eval="obj().search([('picking_type_id', '!=',ref('stock.picking_type_pick')), ('lot_id', '=', ref('stock_lot_6'))], limit=1).id"/>
@@ -75,7 +85,7 @@
     <function name="write" model="stock.picking">
         <value model="stock.picking" eval="obj().search([('picking_type_id', '!=',ref('stock.picking_type_pick')), ('lot_id', '=', ref('stock_lot_6'))], limit=1).id"/>
         <value eval="{'date_done': datetime.today().date() + relativedelta(days=-9, minutes=-1), 'scheduled_date': datetime.today().date() + relativedelta(days=-9, minutes=-1)}"/>
-    </function>
+    </function> -->
 
 
     <record id="stock_picking_in_13" model="stock.picking">
@@ -88,6 +98,11 @@
         <field name="partner_id" ref="base_industry_data.res_partner_31"/>
         <field name="owner_id" ref="base_industry_data.res_partner_31"/>
     </record>
+    <function name="action_confirm" model="stock.picking">
+        <value eval="[
+            ref('stock_picking_in_13'),
+        ]"/>
+    </function>
     <record id="stock_move_67" model="stock.move">
         <field name="picking_id" ref="stock_picking_in_13"/>
         <field name="product_id" ref="product_product_3"/>
@@ -95,10 +110,11 @@
         <field name="move_line_ids" model="stock.move.line" eval="[(0, 0, {
             'product_id': obj().env.ref('3pl_logistic_company.product_product_3').id,
             'lot_id': obj().env.ref('3pl_logistic_company.stock_lot_5').id,
+            'lot_name': obj().env.ref('3pl_logistic_company.stock_lot_5').name,
             'quantity': 140,
         })]"/>
     </record>
-    <function name="button_validate" model="stock.picking">
+    <!-- <function name="button_validate" model="stock.picking">
         <value eval="[
             ref('stock_picking_in_13'),
         ]"/>
@@ -109,13 +125,21 @@
     <function name="do_pass" model="quality.check">
         <value model="quality.check" eval="obj().search([('picking_id', '=', ref('stock_picking_in_13'))], limit=1).id"/>
     </function>
+    <function name="write" model="quality.check">
+        <value model="quality.check" eval="obj().search([('picking_id', '=', ref('stock_picking_in_13'))], limit=1).id"/>
+        <value eval="{'control_date': datetime.today().date() + relativedelta(days=-7)}"/>
+    </function>
     <function name="button_validate" model="stock.picking">
-        <value model="stock.picking" eval="obj().search([('picking_type_id', '!=',ref('stock.picking_type_pick')), ('lot_id', '=', ref('stock_lot_5'))], limit=1).id"/>
+        <value model="stock.picking" eval="obj().search([('picking_type_id', '!=', ref('stock.picking_type_pick')), ('lot_id', '=', ref('stock_lot_5'))], limit=1).id"/>
     </function>
     <function name="write" model="stock.picking">
-        <value model="stock.picking" eval="obj().search([('picking_type_id', '!=',ref('stock.picking_type_pick')), ('lot_id', '=', ref('stock_lot_5'))], limit=1).id"/>
+        <value model="stock.picking" eval="obj().search([('picking_type_id', '!=', ref('stock.picking_type_pick')), ('lot_id', '=', ref('stock_lot_5'))], limit=1).id"/>
         <value eval="{'date_done': datetime.today().date() + relativedelta(days=-7), 'scheduled_date': datetime.today().date() + relativedelta(days=-7)}"/>
-    </function>
+    </function> -->
+    <!-- <function name="write" model="stock.move.line">
+        <value model="stock.move.line" eval="obj().search([('picking_type_id', '!=', ref('stock.picking_type_pick')), ('lot_id', '=', ref('stock_lot_5'))], limit=1).id"/>
+        <value eval="{'result_package_id': ref('stock_package_22')}"/>
+    </function> -->
 
 
 
@@ -129,6 +153,11 @@
         <field name="partner_id" ref="base_industry_data.res_partner_32"/>
         <field name="owner_id" ref="base_industry_data.res_partner_32"/>
     </record>
+    <function name="action_confirm" model="stock.picking">
+        <value eval="[
+            ref('stock_picking_in_14'),
+        ]"/>
+    </function>
     <record id="stock_move_69" model="stock.move">
         <field name="picking_id" ref="stock_picking_in_14"/>
         <field name="product_id" ref="product_product_7"/>
@@ -136,6 +165,7 @@
         <field name="move_line_ids" model="stock.move.line" eval="[(0, 0, {
             'product_id': obj().env.ref('3pl_logistic_company.product_product_7').id,
             'lot_id': obj().env.ref('3pl_logistic_company.stock_lot_1').id,
+            'lot_name': obj().env.ref('3pl_logistic_company.stock_lot_1').name,
             'quantity': 120,
         })]"/>
     </record>
@@ -146,6 +176,7 @@
         <field name="move_line_ids" model="stock.move.line" eval="[(0, 0, {
             'product_id': obj().env.ref('3pl_logistic_company.product_product_5').id,
             'lot_id': obj().env.ref('3pl_logistic_company.stock_lot_2').id,
+            'lot_name': obj().env.ref('3pl_logistic_company.stock_lot_2').name,
             'quantity': 150,
         })]"/>
     </record>
@@ -156,10 +187,11 @@
         <field name="move_line_ids" model="stock.move.line" eval="[(0, 0, {
             'product_id': obj().env.ref('3pl_logistic_company.product_product_6').id,
             'lot_id': obj().env.ref('3pl_logistic_company.stock_lot_3').id,
+            'lot_name': obj().env.ref('3pl_logistic_company.stock_lot_3').name,
             'quantity': 80,
         })]"/>
     </record>
-    <function name="button_validate" model="stock.picking">
+    <!-- <function name="button_validate" model="stock.picking">
         <value eval="[
             ref('stock_picking_in_14'),
         ]"/>
@@ -173,9 +205,9 @@
     <function name="write" model="stock.picking">
         <value model="stock.picking" eval="obj().search([('picking_type_id', '!=',ref('stock.picking_type_pick')), ('lot_id', '=', ref('stock_lot_2'))], limit=1).id"/>
         <value eval="{'date_done': datetime.today().date() + relativedelta(days=-9), 'scheduled_date': datetime.today().date() + relativedelta(days=-9)}"/>
-    </function>
+    </function> -->
 
-    <record id="stock_picking_in_15" model="stock.picking">
+    <!-- <record id="stock_picking_in_15" model="stock.picking">
         <field name="picking_type_id" ref="stock.picking_type_in"/>
         <field name="move_type">direct</field>
         <field name="scheduled_date" eval="datetime.today().date() + relativedelta(days=3)"/>
@@ -194,7 +226,7 @@
         <value eval="[
             ref('stock_picking_in_15'),
         ]"/>
-    </function>
+    </function> -->
 
 
     <record id="stock_picking_pick_2" model="stock.picking">
