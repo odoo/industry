@@ -106,6 +106,7 @@
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
+        'data/ir_actions_server.xml',
         'data/qweb_view.xml',
         "data/knowledge_article.xml",
         "static/src/js/acquisition.js",
