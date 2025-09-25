@@ -55,7 +55,7 @@ class ManifestTest(ManifestLinter, IndustryCase):
         self._test_manifest_values(fake_Manifest)
         self.assertNotIn('description', manifest_data, "Module description should be defined in /static/description/index.html, not in the manifest.")
         mandatory_keys = MANDATORY_KEYS.copy()
-        if module in self.installed_industries:
+        if (is_industry := module in self.installed_industries):
             mandatory_keys.update(MANDATORY_KEYS_INDUSTRIES)
         for key, expected_value in mandatory_keys.items():
             value = manifest_data.get(key)
@@ -65,19 +65,19 @@ class ManifestTest(ManifestLinter, IndustryCase):
             self.assertIsInstance(value, expected_type, f"Wrong type for '{key}', expected {expected_type}")
             if expected_value:
                 self.assertEqual(value, expected_value, f"Wrong {key} '{value}' in manifest, it should be {expected_value}")
-            if key == 'category':
-                if module in self.installed_industries:
-                    self.assertIn(value, CATEGORIES, f"Invalid category '{value}' not in {CATEGORIES}")
-                else:
-                    self.assertNotIn(value, CATEGORIES, f"Module category '{value}' should not be an industry category: {CATEGORIES}")
-            elif key == 'url' and module in self.installed_industries:
-                self.assertEqual(value, f"https://www.odoo.com/trial?industry&selected_app={module}", f"The url should link to the trial page: https://www.odoo.com/trial?industry&selected_app={module}")
-            elif key == 'website' and module in self.installed_industries:
-                self.assertTrue(
-                    value.startswith("https://www.odoo.com/industries/") or value == "https://www.odoo.com/all-industries", "The url should link to the odoo.com page."
-                )
-            elif key in ['data', 'demo']:
+            if key in ['data', 'demo']:
                 self.assertTrue(all(val.startswith(f'{key}/') for val in value), f"Files must be in '{key}/' directory")
+            if is_industry:
+                if key == 'category':
+                    self.assertIn(value, CATEGORIES, f"Invalid category '{value}' not in {CATEGORIES}")
+                elif key == 'url':
+                    self.assertEqual(value, f"https://www.odoo.com/trial?industry&selected_app={module}", f"The url should link to the trial page: https://www.odoo.com/trial?industry&selected_app={module}")
+                elif key == 'website':
+                    self.assertTrue(
+                        value.startswith("https://www.odoo.com/industries/") or value == "https://www.odoo.com/all-industries", "The url should link to the odoo.com page."
+                    )
+            elif key == 'category':
+                self.assertNotIn(value, CATEGORIES, f"Module category '{value}' should not be an industry category: {CATEGORIES}")
         self._test_files_in_manifest(manifest_data, 'data')
         if manifest_data.get('demo'):
             self._test_files_in_manifest(manifest_data, 'demo')
