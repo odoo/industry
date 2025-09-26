@@ -80,4 +80,6 @@
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
+    'url': "https://www.odoo.com/trial?industry&selected_app=3pl_logistic_company",
+    'website': "https://www.odoo.com/industries/3pl-logistic-company",
 }
