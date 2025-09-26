@@ -2,10 +2,10 @@
 <odoo>
     <record id="action_create_change_request_task" model="ir.actions.server">
         <field name="code"><![CDATA[
-new_project_task = env['project.task'].create({
+new_project_task = env['project.task'].sudo().create({
     "name": "Review activity " + request.params.get('full_name'),
     "project_id": request.env.ref('marketplace.project_product_management').id,
-    "user_ids": [request.env.ref('marketplace.project_product_management').user_id.id],
+    "user_ids": [request.env.ref('marketplace.project_product_management').user_id.id], #NOT THE CORRECT ONE; TO CHANGE
     "description": "<p>Request from "+request.params.get('email_from')+" / "+request.params.get('phone')+"</p><p>Company: "\
         +request.params.get('company')+"</p><p>"+request.params.get('question')+"</p>",
 })
@@ -19,8 +19,8 @@ response = request.make_json_response({'id': new_project_task.id}, status=200)]]
     <record id="action_create_product_template" model="ir.actions.server">
         <field name="code"><![CDATA[
 if not request.env.user.partner_id:
-    request.env.user['partner_id'] = env['res.partner'].create({'name': request.env.user.name})
-new_product = env['product.template'].create({
+    request.env.user['partner_id'] = env['res.partner'].sudo().create({'name': request.env.user.name})
+new_product = env['product.template'].sudo().create({
     "name": request.params.get('name'),
     "description_ecommerce": request.params.get('ecommerce_description'),
     "barcode": request.params.get('barcode'),
@@ -32,7 +32,7 @@ new_product = env['product.template'].create({
     "route_ids": [(6, 0, [env.ref("stock_dropshipping.route_drop_shipping").id, env.ref("purchase_stock.route_warehouse0_buy").id])],
     "seller_ids": [(0, 0, {'partner_id':request.env.user.partner_id.id})],
 })
-new_project_task = env['project.task'].create({
+new_project_task = env['project.task'].sudo().create({
     "name": "Review activity " + request.params.get('name'),
     "project_id": request.env.ref('marketplace.project_product_management').id,
     "user_ids": [request.env.ref('marketplace.project_product_management').user_id.id],
