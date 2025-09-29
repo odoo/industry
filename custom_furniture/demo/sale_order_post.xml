@@ -1,8 +1,88 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo noupdate="1">
-    <function name="action_confirm" model="sale.order" eval="[[ref('sale_order_2')]]"/>
+    <function name="action_confirm" model="sale.order" eval="[[ref('sale_order_5')]]"/>
 
-    <function model="project.project" name="unlink">
-        <value model="project.project" eval="obj().search([('name', '=', 'S00001 - [TEMPLATE] Interior Design Project')]).ids"/>
+    <record id="sale_advance_payment_inv_1" model="sale.advance.payment.inv">
+        <field name="advance_payment_method" >percentage</field>
+        <field name="amount" >30</field>
+        <field name="sale_order_ids" eval="[Command.set([ref('sale_order_5')])]"/>
+    </record>
+
+    <function name="create_invoices" model="sale.advance.payment.inv" eval="[[ref('sale_advance_payment_inv_1')]]"/>
+
+    <function model="project.project" name="write">
+        <value model="sale.order.line" eval="obj().env.ref('custom_furniture.sale_order_line_19').project_id.id"/>
+        <value eval="{'stage_id': ref('project.project_project_stage_1')}"/>
     </function>
+
+    <function model="project.task" name="write">
+        <value model="project.task" search="[('sale_order_id', '=', ref('sale_order_5')), ('name', 'ilike', 'Final Invoice')]"/>
+        <value eval="{'stage_id': ref('project_task_type_18')}"/>
+    </function>
+
+     <function model="project.task" name="write">
+        <value model="project.task" search="[('sale_order_id', '=', ref('sale_order_5')), ('name', 'ilike', 'Review Customer Technical Information')]"/>
+        <value eval="{'stage_id': ref('project_task_type_21')}"/>
+    </function>
+
+     <function model="project.task" name="write">
+        <value model="project.task" search="[('sale_order_id', '=', ref('sale_order_5')), ('name', 'ilike', 'Project Configuration &amp; measure')]"/>
+        <value eval="{'stage_id': ref('project_task_type_21')}"/>
+    </function>
+
+     <function model="project.task" name="write">
+        <value model="project.task" search="[('sale_order_id', '=', ref('sale_order_5')), ('name', 'ilike', 'Bill of Material Configuration')]"/>
+        <value eval="{'stage_id': ref('project_task_type_21')}"/>
+    </function>
+
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().env.ref('custom_furniture.sale_order_line_21').task_id.id"/>
+        <value eval="{'stage_id': ref('project_task_type_21')}"/>
+    </function>
+
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().env.ref('custom_furniture.sale_order_line_20').task_id.id"/>
+        <value eval="{'stage_id': ref('project_task_type_21')}"/>
+    </function>
+
+    <function model="project.task" name="write">
+        <value model="project.task" search="[('sale_order_id', '=', ref('sale_order_5')), ('name', 'ilike', 'Manufacture Order Creation')]"/>
+        <value eval="{'stage_id': ref('project_task_type_19')}"/>
+    </function>
+
+    <record id="project_2_top_bar" model="res.users.settings.embedded.action">
+        <field name="user_setting_id" model="res.users.settings" search="[('user_id', '=', ref('base.user_admin'))]"/>
+        <field name="action_id" ref="project.act_project_project_2_project_task_all"/>
+        <field name="res_model">project.project</field>
+        <field name="res_id" model="sale.order.line" eval="obj().env.ref('custom_furniture.sale_order_line_19').project_id.id"/>
+        <field name="embedded_actions_order"
+            eval="','.join([
+                'false',
+                str(ref('hr_timesheet.project_embedded_action_timesheets')),
+                str(ref('sale_project.project_embedded_action_sales_orders')),
+                str(ref('sale_project.project_embedded_action_invoices')),
+                str(ref('project_purchase.project_embedded_action_purchase_orders')),
+                str(ref('project_stock.project_embedded_action_from_wh')),
+                str(ref('project_stock.project_embedded_action_to_wh')),
+                str(ref('project_mrp.project_embedded_action_bills_of_materials')),
+                str(ref('project_mrp.project_embedded_action_manufacturing_orders')),
+                str(ref('project.project_embedded_action_project_updates')),
+            ])"
+        />
+        <field name="embedded_actions_visibility"
+            eval="','.join([
+                'false',
+                str(ref('hr_timesheet.project_embedded_action_timesheets')),
+                str(ref('sale_project.project_embedded_action_sales_orders')),
+                str(ref('sale_project.project_embedded_action_invoices')),
+                str(ref('project_purchase.project_embedded_action_purchase_orders')),
+                str(ref('project_stock.project_embedded_action_from_wh')),
+                str(ref('project_stock.project_embedded_action_to_wh')),
+                str(ref('project_mrp.project_embedded_action_bills_of_materials')),
+                str(ref('project_mrp.project_embedded_action_manufacturing_orders')),
+                str(ref('project.project_embedded_action_project_updates')),
+            ])"
+        />
+        <field name="embedded_visibility">True</field>
+    </record>
 </odoo>
