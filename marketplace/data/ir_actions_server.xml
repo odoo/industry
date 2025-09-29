@@ -3,9 +3,9 @@
     <record id="action_create_change_request_task" model="ir.actions.server">
         <field name="code"><![CDATA[
 new_project_task = env['project.task'].sudo().create({
-    "name": "Review activity " + request.params.get('full_name'),
+    "name": request.params.get('full_name'),
     "project_id": request.env.ref('marketplace.project_product_management').id,
-    "user_ids": [request.env.ref('marketplace.project_product_management').user_id.id], #NOT THE CORRECT ONE; TO CHANGE
+    "user_ids": [request.env.ref('marketplace.project_product_management').user_id.id], #not the correct field to take: correct is [request.env.ref('marketplace.x_products_manager_field', raise_if_not_found=False)]
     "description": "<p>Request from "+request.params.get('email_from')+" / "+request.params.get('phone')+"</p><p>Company: "\
         +request.params.get('company')+"</p><p>"+request.params.get('question')+"</p>",
 })
@@ -30,12 +30,12 @@ new_product = env['product.template'].sudo().create({
     "x_vendor": request.env.user.id,
     "is_published": True,
     "route_ids": [(6, 0, [env.ref("stock_dropshipping.route_drop_shipping").id, env.ref("purchase_stock.route_warehouse0_buy").id])],
-    "seller_ids": [(0, 0, {'partner_id':request.env.user.partner_id.id})],
+    "seller_ids": [(0, 0, {'partner_id': request.env.user.partner_id.id, 'price': request.params.get('standard_price'), 'min_qty': 1.0})],
 })
 new_project_task = env['project.task'].sudo().create({
     "name": "Review activity " + request.params.get('name'),
     "project_id": request.env.ref('marketplace.project_product_management').id,
-    "user_ids": [request.env.ref('marketplace.project_product_management').user_id.id],
+    "user_ids": [request.env.ref('marketplace.project_product_management').user_id.id], #not the correct field to take (see create change request)
 })
 response = request.make_json_response({'id': new_project_task.id}, status=200)]]></field>
         <field name="model_id" ref="product.model_product_template"/>
@@ -72,6 +72,14 @@ response = request.render('marketplace.new_product_page')
         <field name="website_path">change_request</field>
         <field name="code"><![CDATA[
 response = request.render('marketplace.request_change_page')
+]]></field>
+    </record>
+    <record id="validate_purchase_order" model="ir.actions.server">
+        <field name="name">Validate purchase order</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+records.filtered(lambda p: p.picking_type_id.id in [env.ref('stock_dropshipping.route_drop_shipping').id]).button_confirm()
 ]]></field>
     </record>
 </odoo>

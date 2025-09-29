@@ -15,6 +15,7 @@
         'website_sale',
     ],
     'data': [
+        'data/ir_attachment.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
@@ -26,8 +27,10 @@
         'data/project_project.xml',
         'data/website_view.xml',
         'data/ir_actions_server.xml',
+        'data/base_automation.xml',
     ],
     'demo': [
+        'demo/payment_provider_demo.xml',
         'demo/res_config_settings.xml',
         'demo/res_partner.xml',
         'demo/res_users.xml',
