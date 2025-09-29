@@ -2,7 +2,6 @@
 <odoo noupdate="1">
     <function name="button_confirm" model="purchase.order">
         <value eval="[
-            ref('purchase_order_2'),
             ref('purchase_order_4'),
             ref('purchase_order_5'),
             ref('purchase_order_6'),
@@ -11,10 +10,24 @@
 
     <function name="button_validate" model="stock.picking">
         <value model="stock.picking" eval="(
-            obj().env.ref('custom_furniture.purchase_order_2') +
             obj().env.ref('custom_furniture.purchase_order_4') +
             obj().env.ref('custom_furniture.purchase_order_5') +
             obj().env.ref('custom_furniture.purchase_order_6')
         ).picking_ids.ids"/>
+    </function>
+
+    <!-- MO'S -->
+
+    <function name="button_mark_done" model="mrp.production">
+      <value eval="[ref('mrp_production_2'), ref('mrp_production_3')]"/>
+    </function>
+
+    <function name="button_plan" model="mrp.production">
+        <value eval="[ref('mrp_production_1')]"/>
+    </function>
+
+    <function name="write" model="mrp.workorder">
+        <function model="mrp.workorder" name="search" eval="[[('production_id', '=', ref('mrp_production_1')), ('workcenter_id', 'in', [ref('mrp_workcenter_2'), ref('mrp_workcenter_3'), ref('mrp_workcenter_4')])]]"/>
+        <value eval="{'state': 'blocked'}"/>
     </function>
 </odoo>
