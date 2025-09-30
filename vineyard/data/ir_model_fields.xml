@@ -31,18 +31,18 @@
     <field name="name">x_recipe_iteration</field>
     <field name="relation">mrp.eco</field>
   </record>
-  <record id="mrp_plm_model_mrp_eco_x_x_recipe_iteration_quality_check_count_field" model="ir.model.fields">
+  <record id="mrp_plm_model_mrp_eco_x_recipe_iteration_quality_check_count_field" model="ir.model.fields">
     <field name="compute"><![CDATA[
-for record in self: record['x_x_recipe_iteration_quality_check_count'] = self.env['quality.check'].search_count([('x_recipe_iteration', '=', record.id)])
+for record in self: record['x_recipe_iteration_quality_check_count'] = self.env['quality.check'].search_count([('x_recipe_iteration', '=', record.id)])
 ]]></field>
     <field name="ttype">integer</field>
     <field name="field_description">Recipe Iteration count</field>
     <field name="model_id" ref="mrp_plm.model_mrp_eco"/>
-    <field name="name">x_x_recipe_iteration_quality_check_count</field>
+    <field name="name">x_recipe_iteration_quality_check_count</field>
     <field name="selectable" eval="False"/>
     <field name="store" eval="False"/>
   </record>
-  <record id="mrp_model_mrp_production_x_production_id_quality_check_count_field" model="ir.model.fields">
+  <!-- <record id="mrp_model_mrp_production_x_production_id_quality_check_count_field" model="ir.model.fields">
     <field name="compute"><![CDATA[
 for record in self: record['x_production_id_quality_check_count'] = self.env['quality.check'].search_count([('production_id', '=', record.id)])
 ]]></field>
@@ -52,7 +52,35 @@ for record in self: record['x_production_id_quality_check_count'] = self.env['qu
     <field name="name">x_production_id_quality_check_count</field>
     <field name="selectable" eval="False"/>
     <field name="store" eval="False"/>
+  </record> -->
+  <!-- <record id="mrp_model_mrp_production_x_production_id_quality_check_all_pass_field" model="ir.model.fields">
+    <field name="compute"><![CDATA[
+self.x_production_id_quality_check_pass = all(
+    qc.quality_state == 'pass' 
+    for qc in self.env['quality.check'].search([('production_id', '=', self.id)])
+)
+    ]]></field>
+    <field name="ttype">boolean</field>
+    <field name="field_description">Production Order Quality Checks all passed</field>
+    <field name="model_id" ref="mrp.model_mrp_production"/>
+    <field name="name">x_production_id_quality_check_all_pass</field>
+    <field name="selectable" eval="False"/>
+    <field name="store" eval="False"/>
   </record>
+  <record id="mrp_model_mrp_production_x_production_id_quality_check_any_failed_field" model="ir.model.fields">
+    <field name="compute"><![CDATA[
+self.x_production_id_quality_check_any_failed = any(
+    qc.quality_state == 'fail'
+    for qc in self.env['quality.check'].search([('production_id', '=', self.id)])
+)
+    ]]></field>
+    <field name="ttype">boolean</field>
+    <field name="field_description">Production Order Quality Checks Any Failed</field>
+    <field name="model_id" ref="mrp.model_mrp_production"/>
+    <field name="name">x_production_id_quality_check_any_failed</field>
+    <field name="selectable" eval="False"/>
+    <field name="store" eval="False"/>
+</record> -->
   <record id="quality_model_quality_check_x_control_point_title_field" model="ir.model.fields">
     <field name="ttype">char</field>
     <field name="related">point_id.title</field>
