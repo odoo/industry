@@ -503,6 +503,7 @@ class TestEnv(IndustryCase):
         RELATIVE_DATES = [
             'Time.',
             'time.',
+            'time(',
         ]
         for record in root.xpath("//record"):
             model_name = record.get('model')
