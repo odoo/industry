@@ -257,8 +257,9 @@ for record in self:
     <record id="x_condominium_account_analytic_account_count" model="ir.model.fields">
         <field name="name">x_condominium_account_analytic_account_count</field>
         <field name="compute"><![CDATA[
-for record in self:
-    record['x_condominium_account_analytic_account_count'] = self.env['account.analytic.account'].search_count([('x_condominium', '=', record.id)])
+account_data = self.env['account.analytic.account']._read_group(domain=[('x_condominium', 'in', self.ids)], groupby=['x_condominium'], aggregates=['__count'])
+mapped_data = {partner.id: count for partner, count in account_data}
+for partner in self: partner['x_condominium_account_analytic_account_count'] = mapped_data.get(partner.id, 0)
 ]]></field>
         <field name="ttype">integer</field>
         <field name="field_description">Building Condominium count</field>
@@ -342,8 +343,9 @@ for record in self:
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="field_description">Source Sales Order count</field>
         <field name="compute"><![CDATA[
-for record in self:
-    record['x_x_source_sales_order_sale_order_count'] = self.env['sale.order'].search_count([('x_source_sales_order', '=', record.id)])
+order_data = self.env['sale.order']._read_group(domain=[('x_source_sales_order', 'in', self.ids)], groupby=['x_source_sales_order'], aggregates=['__count'])
+mapped_data = {order.id: count for order, count in order_data}
+for order in self: order['x_x_source_sales_order_sale_order_count'] = mapped_data.get(order.id, 0)
 ]]></field>
         <field name="ttype">integer</field>
         <field name="selectable" eval="False"/>
