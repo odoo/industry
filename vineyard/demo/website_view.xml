@@ -34,198 +34,6 @@
             </section>
           </div>
       </xpath>
-      <!-- <t name="Appointment: Appointment Info" t-name="appointment.appointment_info">
-        <t t-set="no_breadcrumbs" t-value="True"/>
-        <t t-call="portal.portal_layout">
-          <div id="wrap" class="h-100">
-            <t t-set="o_portal_fullwidth_alert" groups="appointment.group_appointment_manager">
-              <t t-call="appointment.appointment_edit_in_backend"/>
-            </t>
-            <div class="container-lg h-100">
-              <div t-attf-class="row #{'mt-4' if website else ''}">
-                <div t-attf-class="col-12 col-md-8 #{'p-4' if not website else ''}">
-                  <nav class="d-print-none d-flex justify-content-between mb-4" name="navbar">
-                    <t t-call="appointment.appointment_progress_bar">
-                      <t t-set="step" t-value="20"/>
-                    </t>
-                  </nav>
-                  <div class="o_appointment o_appointment_info">
-                    <div class="o_appointment_info_main o_wappointment_type_options o_not_editable" t-att-data-appointment-type-id="appointment_type.id" t-att-data-timezone="timezone">
-                      <h4 class="pb-3">Select a date &amp; time</h4>
-                      <div t-if="state in ['failed-staff-user', 'failed-resource']" class="alert alert-danger" role="alert">
-                        <p><strong>Appointment failed!</strong>
-                                            The selected timeslot is not available anymore.
-                                            Someone has booked the same time slot a few
-                                            seconds before you.
-                                        </p>
-                        <p class="mb-0">
-                                            Please, select another date.
-                                        </p>
-                      </div>
-                      <div t-if="state == 'failed-partner'" class="alert alert-danger" role="alert">
-                        <p><strong>Appointment failed!</strong>
-                                            The selected timeslot is not available.
-                                            It appears you already have another meeting with us at that date.
-                                        </p>
-                        <p class="mb-0">
-                                            Please, select another date.
-                                        </p>
-                      </div>
-                      <div t-if="state == 'cancel'" role="alert" class="o_appointment_cancelled alert alert-danger"><strong>Appointment cancelled!</strong>
-                                        You can now choose a different schedule that suits you better.
-                                    </div>
-                      <div t-if="user_forced and state != 'cancel'" role="alert" class="o_appointment_forced_staff_user_assigned alert alert-info">
-                                        We will book you with
-                                        <span class="fw-bold" t-out="user_forced.name"/>
-                                        as you are already in touch with them.
-                                    </div>
-                      <div class="clearfix"/>
-                      <t t-set="based_on_users" t-value="appointment_type.schedule_based_on == 'users'"/>
-                      <t t-set="no_users" t-value="not appointment_type.staff_user_ids if based_on_users else 1"/>
-                      <t t-set="no_resources" t-value="not appointment_type.resource_ids if not based_on_users else 1"/>
-                      <t t-set="no_slots" t-value="not appointment_type.slot_ids"/>
-                      <div t-if="(not based_on_users and no_resources) or (based_on_users and no_users) or no_slots" class="col-12 o_appointment_missing_configuration d-none">
-                        <div class="alert alert-info rounded-0 mb-3 o_not_editable" groups="appointment.group_appointment_manager">
-                          <t t-if="based_on_users">
-                            <t t-if="no_users and no_slots">
-                                                    This appointment type has no availabilities because it has no staff assigned and does not have any opening hours configured
-                                                </t>
-                            <t t-elif="no_users">
-                                                    This appointment type has no availabilities because it has no staff assigned
-                                                </t>
-                            <t t-elif="no_slots">
-                                                    This appointment type has no availabilities because it does not have any opening hours configured
-                                                </t>
-                          </t>
-                          <t t-else="">
-                            <t t-if="no_resources and no_slots">
-                                                    This appointment type has no availabilities because it has no resource assigned and does not have any opening hours configured
-                                                </t>
-                            <t t-elif="no_resources">
-                                                    This appointment type has no availabilities because it has no resource assigned
-                                                </t>
-                            <t t-elif="no_slots">
-                                                    This appointment type has no availabilities because it does not have any opening hours configured
-                                                </t>
-                          </t>
-                          <a t-attf-href="/odoo/{{main_object._name}}/{{main_object.id}}?menu_id={{backend_menu_id}}" class="d-block">
-                            <i class="oi oi-arrow-right me-2"/>
-                            <em>Configure <t t-out="appointment_type.name"/></em>
-                          </a>
-                        </div>
-                      </div>
-                      <div class="o_appointment_upcoming_appointment_alert"/>
-                      <div class="row">
-                        <div class="o_appointment_calendar col-12 col-xl-8">
-                          <t t-call="appointment.appointment_calendar"/>
-                          <div t-if="not appointment_type.hide_timezone" t-attf-class="o_appointment_timezone_selection #{'d-none' if month_first_available is False or not appointment_type.active else ''}">
-                            <form autocomplete="off">
-                              <div class="d-flex gap-2 align-items-center mt-2">
-                                <label class="small fw-normal" for="timezone">Timezone: </label>
-                                <select class="form-select form-select-sm w-50" id="timezone" name="timezone">
-                                  <t t-foreach="appointment_type._fields['appointment_tz'].selection(appointment_type)" t-as="tz">
-                                    <option t-att-value="tz[0]" t-out="tz[1]" t-att-selected="(tz[0] == timezone) or None"/>
-                                  </t>
-                                </select>
-                              </div>
-                            </form>
-                          </div>
-                        </div>
-                        <div t-attf-class="o_appointment_calendar_form o_not_editable #{'d-none' if month_first_available is False or not appointment_type.active else 'col-12 col-xl-4'}">
-                          <form id="slots_form" class="form o_appointment_appointment_info_form" autocomplete="off">
-                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                            <input type="hidden" name="active" t-att-value="appointment_type.active"/>
-                            <input type="hidden" name="appointment_type_id" t-att-value="appointment_type.id"/>
-                            <input type="hidden" name="schedule_based_on" t-att-value="appointment_type.schedule_based_on"/>
-                            <input type="hidden" name="assign_method" t-att-value="appointment_type.assign_method"/>
-                            <input type="hidden" name="resource_selected_id" t-att-value="resource_selected.id"/>
-                            <input type="hidden" name="invite_token" t-att-value="invite_token"/>
-                            <input type="hidden" name="filter_appointment_type_ids" t-att-value="filter_appointment_type_ids"/>
-                            <input type="hidden" name="filter_staff_user_ids" t-att-value="filter_staff_user_ids"/>
-                            <input type="hidden" name="filter_resource_ids" t-att-value="filter_resource_ids"/>
-                            <input type="hidden" name="hide_select_dropdown" t-att-value="hide_select_dropdown"/>
-                            <t t-if="appointment_type.assign_method == 'resource_time' and based_on_users" t-call="appointment.staff_user_select"/>
-                            <div t-if="appointment_type.assign_method == 'resource_time' and not based_on_users" name="resource_select" t-attf-class="mb-4 #{'d-none' if hide_select_dropdown else ''}">
-                              <label for="selectAppointmentResource" class="mb-2">For</label>
-                              <select class="form-select" name="resource_id" id="selectAppointmentResource">
-                                <t t-foreach="resources_possible" t-as="resource">
-                                  <option t-att-value="resource.id" t-out="resource.name" t-att-selected="resource.id == (resource_selected.id or resources_possible[0].id) and 'selected'"/>
-                                </t>
-                              </select>
-                            </div>
-                          </form>
-                          <div t-if="appointment_type.manage_capacity">
-                            <div t-if="slots and max_capacity" class="mb-4">
-                              <input type="hidden" name="max_capacity" t-att-value="max_capacity"/>
-                              <label class="mb-2 o_editable" for="resourceCapacity">Number of people</label>
-                              <select class="form-select cursor-pointer" name="resourceCapacity" id="resourceCapacity">
-                                <option value="1" t-att-selected="not asked_capacity and 'selected'" data-placeholder-option="True">-</option>
-                                <option t-foreach="range(1, max_capacity + 1)" t-as="counter" t-att-value="counter" t-att-selected="counter == asked_capacity and 'selected'">
-                                  <t t-out="counter"/>
-                                </option>
-                              </select>
-                            </div>
-                            <div class="o_appointment_no_capacity d-flex mt-2 pb-0 text-center"/>
-                          </div>
-                          <div id="slotsList" class="o_appointment_availabilities o_not_editable my-3 my-xl-0" t-att-data-appointments-count="len(available_appointments)"/>
-                          <div class="o_appointment_slot_list_loading d-flex align-items-center py-5 my-5 d-none">
-                            <i class="fa fa-2x fa-circle-o-notch fa-spin mx-auto text-o-color-2"/>
-                          </div>
-                          <div t-if="appointment_type.assign_method == 'time_resource'" class="mt-3">
-                            <div id="resourceSelection" class="d-none"/>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="o_appointment_no_slot_overall_helper col-12"/>
-                    </div>
-                    <t t-set="editor_message">DROP BUILDING BLOCKS HERE TO MAKE THEM AVAILABLE ACROSS ALL APPOINTMENTS</t>
-                    <div class="oe_structure oe_empty" t-att-data-editor-message="editor_message">
-                      <section class="s_text_block pt40 pb40 o_colored_level" data-snippet="s_text_block" data-name="Text">
-                        <div class="container s_allow_columns">
-                          <p>Step into the world of winemaking with our <strong>immersive winery tour</strong>, where tradition meets innovation. Stroll among the vines that give life to our finest blends, breathe in the aromas of ripening grapes, and learn the secrets behind each harvest.</p>
-                          <p>In our <strong>cellar</strong>, you’ll explore rows of oak barrels quietly shaping the character of our wines. From fermentation tanks to blending rooms, you’ll see every step of the journey — from grape to glass.</p>
-                          <p>Your visit ends with a <strong>guided tasting</strong> of our signature creations, including the bold <strong>Bordoo Grand Cru</strong>, the vibrant <strong>Odoomatic Spice</strong>, and the elegant <strong>Pinodoo Noir</strong>. Each sip tells a story of passion, craftsmanship, and the unique terroir that defines our vineyard.</p>
-                          <p>Whether you’re a wine enthusiast or simply curious, our tour is a feast for the senses — and a memory to savor.</p>
-                          <p><strong>Includes:</strong> Vineyard walk, cellar visit, guided tasting of 3 wines</p>
-                          <p><strong>Languages:</strong> EN / CH / FR</p>
-                        </div>
-                      </section>
-                      <section class="s_image_gallery o_spc-small o_masonry pt24 pb24 o_colored_level" data-vcss="002" data-columns="3" style="overflow: hidden;" data-snippet="s_images_wall" data-name="Images Wall">
-                        <div class="container">
-                          <div class="row s_nb_column_fixed">
-                            <div class="o_masonry_col o_snippet_not_selectable col-lg-4">
-                              <img class="img img-fluid d-block rounded" src="/web/image/website.library_image_03" data-index="0" data-name="Image" alt="" loading="lazy" data-mimetype="image/jpeg"/>
-                              <img src="/web/image/1142-763807b2/mauro-lima-VQRmSYDTDjs-unsplash.webp" alt="" data-attachment-id="1139" class="img img-fluid d-block rounded o_we_custom_image" data-format-mimetype="image/webp" data-original-id="1139" data-original-src="/web/image/1139-d3f35704/mauro-lima-VQRmSYDTDjs-unsplash.jpg" data-mimetype-before-conversion="image/jpeg" data-resize-width="690" data-mimetype="image/webp" loading="lazy"/>
-                            </div>
-                            <div class="o_masonry_col o_snippet_not_selectable col-lg-4">
-                              <img class="img img-fluid d-block rounded" src="/web/image/website.library_image_13" data-index="1" data-name="Image" alt="" loading="lazy" data-mimetype="image/jpeg"/>
-                              <img src="/web/image/1143-1b9c4c11/jennifer-yung-uSF8kGIeDMw-unsplash.webp" alt="" data-attachment-id="1141" class="img img-fluid d-block rounded o_we_custom_image" data-format-mimetype="image/webp" data-original-id="1141" data-original-src="/web/image/1141-fbc09580/jennifer-yung-uSF8kGIeDMw-unsplash.jpg" data-mimetype-before-conversion="image/jpeg" data-resize-width="690" data-mimetype="image/webp" loading="lazy"/>
-                            </div>
-                            <div class="o_masonry_col o_snippet_not_selectable col-lg-4">
-                              <img class="img img-fluid d-block rounded" src="/web/image/website.library_image_14" data-index="2" data-name="Image" alt="" loading="lazy" data-mimetype="image/jpeg"/>
-                              <img src="/web/image/1144-d8ce0b77/chelsea-pridham-Pj1JHHRqD3c-unsplash.webp" alt="" data-attachment-id="1140" class="img img-fluid d-block rounded o_we_custom_image" data-format-mimetype="image/webp" data-original-id="1140" data-original-src="/web/image/1140-0b950992/chelsea-pridham-Pj1JHHRqD3c-unsplash.jpg" data-mimetype-before-conversion="image/jpeg" data-resize-width="690" data-mimetype="image/webp" loading="lazy"/>
-                            </div>
-                          </div>
-                        </div>
-                      </section>
-                    </div>
-                  </div>
-                  <div t-attf-class="o_appointment_intro border-top pt-4 mt-4 #{'d-none' if not appointment_type.active or is_html_empty(appointment_type.message_intro) else ''}">
-                    <h5 class="mb-3">Description</h5>
-                    <div t-field="appointment_type.message_intro" placeholder="Add an intro message here..."/>
-                  </div>
-                </div>
-                <t t-call="appointment.appointment_details_column">
-                  <t t-set="isDate" t-value="True"/>
-                  <t t-set="staff_user" t-value="user_selected"/>
-                  <t t-set="resource" t-value="resource_selected"/>
-                  <t t-set="selectionPossible" t-value="appointment_type.assign_method != 'time_auto_assign' and len(users_possible or resources_possible) &gt; 1"/>
-                </t>
-              </div>
-            </div>
-          </div>
-        </t>
-      </t> -->
     </field>
     <field name="inherit_id" ref="website_appointment.appointment_info"/>
     <field name="key">vineyard.appointment_info</field>
@@ -349,7 +157,7 @@
                 </div>
               </div>
             </section>
-            <section data-snippet="s_dynamic_snippet_products" class="s_dynamic_snippet_products oe_website_sale s_dynamic s_dynamic_empty pt32 pb32 s_product_product_borderless_1 o_colored_level" data-custom-template-data="{}" data-name="Products" data-product-category-id="all" data-show-variants="true" data-number-of-records="16" data-filter-id="2" data-template-key="website_sale.dynamic_filter_template_product_product_borderless_1" data-carousel-interval="5000">
+            <section data-snippet="s_dynamic_snippet_products" class="s_dynamic_snippet_products oe_website_sale s_dynamic s_dynamic_empty pt32 pb32 s_product_product_borderless_1 o_colored_level" data-custom-template-data="{}" data-name="Products" data-product-category-id="all" data-show-variants="true" data-number-of-records="16" data-filter-id="2" data-template-key="website_sale.dynamic_filter_template_product_product_products_item" data-carousel-interval="5000">
               <div class="container">
                 <div class="row s_nb_column_fixed">
                   <section class="s_dynamic_snippet_title oe_unremovable oe_unmovable d-flex flex-column flex-md-row justify-content-between mb-lg-0 pb-3 pb-md-0 o_colored_level">
@@ -395,6 +203,19 @@
     </field>
     <field name="key">vineyard.homepage</field>
     <field name="name">Home</field>
+    <field name="type">qweb</field>
+    <field name="website_id" ref="website.default_website"/>
+  </record>
+  <record id="view_product_attribute_filters_form_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//button/b[normalize-space(text())='Tags']" position="replace">
+        <b>Taste</b>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="website_sale.product_attribute_filters_form"/>
+    <field name="key">website_sale.product_attribute_filters_form</field>
+    <field name="mode">extension</field>
+    <field name="name">replace Tags to Taste</field>
     <field name="type">qweb</field>
     <field name="website_id" ref="website.default_website"/>
   </record>
