@@ -62,6 +62,8 @@
         'demo/sale_order_post.xml',
         'demo/stock_warehouse_orderpoint.xml',
         'demo/mrp_production.xml',
+        'demo/mrp_workorder.xml',
+        'demo/stock_move.xml',
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
         'demo/purchase_order_post.xml',
