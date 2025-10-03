@@ -1,0 +1,419 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!-- Website Views -->
+    <record id="petition_list_qweb_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <t t-name="non_profit_organization_petitions.petition_list">
+                <t t-call="website.layout">
+                    <div id="wrap" class="oe_structure oe_empty">
+                        <div class="container o_website_listing_layout">
+                            <div class="oe_structure oe_new"/>
+                            <section class="s_searchbar o_colored_level o_cc pt48 pb48">
+                                <div class="row">
+                                    <div class="col-lg-8 offset-lg-2">
+                                        <div class="btn-toolbar">
+                                            <form method="get"
+                                                class="o_searchbar_form s_searchbar_input me-auto flex-grow-1">
+                                                <div role="search" class="input-group">
+                                                    <input type="search" name="search"
+                                                        class="search-query form-control oe_search_box border-0 text-bg-light"
+                                                        placeholder="Search..." t-att-value="search"
+                                                        autocomplete="off"/>
+                                                    <button type="submit" aria-label="Search"
+                                                        title="Search"
+                                                        class="btn oe_search_button btn-light">
+                                                        <i class="oi oi-search"/>
+                                                        <span t-if="search" class="oe_search_found">
+                                                            <small>(<t t-out="search_count or 0"/>
+                                                                found)</small>
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                                <input name="order" type="hidden"
+                                                    class="o_search_order_by"
+                                                    t-att-value="order_by if order_by else 'name asc'"/>
+                                            </form>
+                                            <!-- <t t-call="website_studio.listing_layout_switcher"/> -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <div
+                                t-attf-class="row mx-n2 mt8 #{'o_website_grid' if layout_mode == 'grid' else 'o_website_list'}">
+                                <t t-foreach="records" t-as="record">
+                                    <div
+                                        t-attf-class="#{'col-lg-3 col-md-4 col-sm-6 px-2 col-xs-12' if layout_mode == 'grid' else ''}">
+                                        <a
+                                            class="o_website_record text-decoration-none d-grid card w-100 mb-3"
+                                            t-att-href="record_to_url(record)">
+                                            <div class="d-flex">
+                                                <div t-if="record.x_image" t-field="record.x_image"
+                                                    t-options-widget="'image'"
+                                                    t-options-qweb_img_raw_data="True"
+                                                    t-options-class="'o_website_image h-100 w-100 rounded-3'"
+                                                    class="h-100 w-100"/>
+                                                <div t-else=""
+                                                    class="h-100 w-100 bg-light o_website_image rounded-3"/>
+                                            </div>
+                                            <div class="o_website_tags text-end me-1">
+                                                <t t-if="record.x_tag_ids" t-foreach="record.x_tag_ids"
+                                                    t-as="tag">
+                                                    <span t-field="tag.display_name"
+                                                        t-attf-class="badge o_website_tag #{'o_tag_color_'+str(tag.x_color)}"/>
+                                                </t>
+                                            </div>
+                                            <div class="card-body py-2 px-3">
+                                                <h5 class="card-title">
+                                                    <span t-field="record.x_name"/>
+                                                </h5>
+                                                <div
+                                                    class="card-text d-flex flex-column flex-grow-1 mt-1">
+                                                    <span class="mb-0"/>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </t>
+                            </div>
+                            <div class="oe_structure oe_new"/>
+                            <div t-if="pager" class="o_portal_pager d-flex justify-content-center my-4">
+                                <t t-call="portal.pager"/>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </field>
+        <field name="key">non_profit_organization.petition.list</field>
+        <field name="model">x_petition</field>
+        <field name="name">Petition</field>
+        <field name="active" eval="True"/>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+    <record id="petition_form_qweb_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <t t-name="non_profit_organization_petitions.petition_form">
+                <t t-call="website.layout">
+                    <div id="o_website_record_page wrap">
+                        <t t-set="editor_message">Drag building blocks to customize the header of
+                            single record pages.</t>
+                        <div class="oe_structure oe_empty oe_new"
+                            t-att-data-editor-message="editor_message"/>
+                        <div class="container">
+                            <ol t-if="listing" class="breadcrumb p-0 my-2">
+                                <li class="breadcrumb-item o_not_editable">
+                                    <a t-att-href="listing['href']">
+                                        <span t-out="listing['name']"/>
+                                    </a>
+                                </li>
+                                <li class="breadcrumb-item active">
+                                    <span t-field="record.x_name"/>
+                                </li>
+                            </ol>
+                            <div
+                                class="d-flex flex-row my-4 flex-wrap align-items-center justify-content-between">
+                                <div class="col-lg-12 mt-lg-12 col-sm-12">
+                                    <div class="s_progress_bar s_progress_bar_label_inline mb-2"
+                                        data-display="inline" data-vcss="001"
+                                        data-snippet="s_progress_bar" data-name="Progress Bar">
+                                        <t t-set="current_progress" t-value="record.x_progress*100"/>
+                                        <div class="s_progress_bar_wrapper d-flex gap-2">
+                                            <div class="progress" role="progressbar"
+                                                aria-label="Progress bar"
+                                                t-att-aria-valuenow="current_progress" aria-valuemin="0"
+                                                aria-valuemax="100">
+                                                <div class="progress-bar overflow-visible" t-attf-style="width: {{current_progress}}%;"
+                                                    style="min-width: 0%">
+                                                    <span class="s_progress_bar_text small"><t
+                                                            t-esc="'%.2f'%current_progress"/>%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 mt-lg-4 col-sm-12">
+                                    <h1 class="h1">
+                                        <span t-field="record.x_name"/>
+                                    </h1>
+                                    <div class="o_website_tags ">
+                                        <t t-if="record.x_tag_ids" t-foreach="record.x_tag_ids"
+                                            t-as="tag">
+                                            <span t-field="tag.display_name"
+                                                t-attf-class="badge o_website_tag #{'o_tag_color_'+str(tag.x_color)}"/>
+                                        </t>
+                                    </div>
+                                </div>
+                                <div t-if="record.x_image" t-field="record.x_image"
+                                    t-options-widget="'image'" t-options-qweb_img_raw_data="True"
+                                    t-options-class="'o_website_image h-100 w-100 rounded-3'"
+                                    class="col-lg-6 mt-md-4 col-sm-12 me-2"/>
+                                <div t-else=""
+                                    class="col-lg-6 mt-md-4 col-sm-12 me-2 bg-light o_website_image rounded-3"/>
+                                <span t-field="record.x_website_description"/>
+                            </div>
+                            <div class="oe_structure oe_empty oe_new"
+                                t-att-data-editor-message="editor_message"/>
+                            <div t-if="record.x_date_start &lt;= datetime.datetime.now() and datetime.datetime.now() &lt; record.x_date_stop">
+                                <t t-set="new_signature_values"
+                                    t-value="{
+                                        'name': request.params.get('name', ''),
+                                        'country_id': request.params.get('country_id', ''),
+                                        'email': request.params.get('email', ''),
+                                        'petition_id': record.id,
+                                        'newsletter': request.params.get('newsletter', ''),
+                                        'comments': request.params.get('comments', ''),
+                                    }"/>
+                                <span class="hidden" data-for="new_signature_form"
+                                    t-att-data-values="new_signature_values"/>
+                                <div class="o_website_html">
+                                    <section class="s_website_form pt16 pb16 o_colored_level"
+                                        data-vcss="001" data-snippet="s_website_form" data-name="Form"
+                                        id="Form" data-anchor="true">
+                                        <div class="container-fluid">
+                                            <form id="new_signature_form"
+                                                action="/website/action/new_signature/" method="post"
+                                                enctype="multipart/form-data" class="o_mark_required"
+                                                data-mark="*" data-pre-fill="true"
+                                                data-model_name="x_signature"
+                                                data-success-mode="redirect"
+                                                data-success-page="/signature-thank-you">
+                                                <div class="s_website_form_rows row s_col_no_bgcolor">
+                                                    <div data-name="Field"
+                                                        class="s_website_form_field mb-3 col-12 s_website_form_custom s_website_form_required"
+                                                        data-type="char">
+                                                        <div
+                                                            class="row s_col_no_resize s_col_no_bgcolor">
+                                                            <label
+                                                                class="col-form-label col-sm-auto s_website_form_label"
+                                                                style="width: 200px" for="omz21bc4ypc">
+                                                                <span
+                                                                    class="s_website_form_label_content">Your
+                                                                    Name</span>
+                                                                <span class="s_website_form_mark"> *</span>
+                                                            </label>
+                                                            <div class="col-sm">
+                                                                <input
+                                                                    class="form-control s_website_form_input"
+                                                                    type="text" name="name"
+                                                                    id="omz21bc4ypc" required=""/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-name="Field"
+                                                        class="s_website_form_field mb-3 col-12 s_website_form_custom s_website_form_required"
+                                                        data-type="email">
+                                                        <div
+                                                            class="row s_col_no_resize s_col_no_bgcolor">
+                                                            <label
+                                                                class="col-form-label col-sm-auto s_website_form_label"
+                                                                style="width: 200px" for="ofpexjxucp4k">
+                                                                <span
+                                                                    class="s_website_form_label_content">Your
+                                                                    Email</span>
+                                                                <span class="s_website_form_mark"> *</span>
+                                                            </label>
+                                                            <div class="col-sm">
+                                                                <input
+                                                                    class="form-control s_website_form_input"
+                                                                    type="email" name="email"
+                                                                    placeholder="" id="ofpexjxucp4k"
+                                                                    data-fill-with="undefined"
+                                                                    required=""/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-name="Field"
+                                                        class="s_website_form_field mb-3 col-12"
+                                                        data-type="integer">
+                                                        <div
+                                                            class="row s_col_no_resize s_col_no_bgcolor">
+                                                            <label
+                                                                class="col-form-label col-sm-auto s_website_form_label"
+                                                                style="width: 200px" for="oomtyt2gz2d">
+                                                                <span class="s_website_form_label_content">Your Country</span>
+                                                            </label>
+                                                            <div class="col-sm">
+                                                                <select
+                                                                    class="form-select s_website_form_input"
+                                                                    name="country_id"
+                                                                    id="oomtyt2gz2d">
+                                                                    <t t-foreach="env['res.country'].search([])" t-as="country">
+                                                                        <option t-att-value="country.id" t-out="country.name"/>
+                                                                    </t>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-name="Field"
+                                                        class="s_website_form_field mb-3 col-12 s_website_form_custom"
+                                                        data-type="text">
+                                                        <div
+                                                            class="row s_col_no_resize s_col_no_bgcolor">
+                                                            <label
+                                                                class="col-form-label col-sm-auto s_website_form_label"
+                                                                style="width: 200px" for="opcial6seyki">
+                                                                <span
+                                                                    class="s_website_form_label_content">
+                                                                    Comments</span>
+                                                            </label>
+                                                            <div class="col-sm">
+                                                                <textarea
+                                                                    class="form-control s_website_form_input"
+                                                                    name="comments" placeholder=""
+                                                                    id="opcial6seyki" rows="3"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-name="Field"
+                                                        class="s_website_form_field mb-3 col-12 s_website_form_custom"
+                                                        data-type="integer"
+                                                        t-att-style="'display: none;'">
+                                                        <div
+                                                            class="row s_col_no_resize s_col_no_bgcolor">
+                                                            <label
+                                                                class="col-form-label col-sm-auto s_website_form_label"
+                                                                style="width: 200px" for="qfqfl6seyki">
+                                                                <span
+                                                                    class="s_website_form_label_content">
+                                                                    Record</span>
+                                                            </label>
+                                                            <div class="col-sm">
+                                                                <input
+                                                                    type="number"
+                                                                    class="form-control s_website_form_input"
+                                                                    name="petition_id" placeholder=""
+                                                                    data-fill-with="petition_id"
+                                                                    t-att-readonly="1"
+                                                                    id="qfqfl6seyki"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div data-name="Field"
+                                                        class="s_website_form_field mb-3 col-12 s_website_form_custom s_website_form_required"
+                                                        data-type="boolean">
+                                                        <div
+                                                            class="row s_col_no_resize s_col_no_bgcolor">
+                                                            <label
+                                                                class="col-sm-auto s_website_form_label"
+                                                                style="width: 200px" for="oknvhj0blab">
+                                                                <span
+                                                                    class="s_website_form_label_content">Keep
+                                                                    me informed on this action</span>
+                                                            </label>
+                                                            <div class="col-sm">
+                                                                <div class="form-check">
+                                                                    <input type="checkbox" value="Yes"
+                                                                        class="s_website_form_input form-check-input"
+                                                                        name="newsletter"
+                                                                        id="oknvhj0blab"
+                                                                        data-fill-with="undefined"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        class="mb-0 py-2 col-12 s_website_form_submit text-end s_website_form_no_submit_label"
+                                                        data-name="Submit Button">
+                                                        <div style="width: 200px;"
+                                                            class="s_website_form_label"/>
+                                                        <span id="s_website_form_result"></span>
+                                                        <a href="#" role="button"
+                                                            class="btn btn-primary s_website_form_send">
+                                                            Submit</a>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                            <div t-elif="record.x_date_start > datetime.datetime.now()">
+                                <div class="d-flex flex-column">
+                                    <h5 class="s_showcase_title">
+                                        This petition will open for signatures on <t t-esc="record.x_date_start"/>.
+                                    </h5>
+                                </div>
+                            </div>
+                            <div t-else="">
+                                <div class="d-flex flex-column">
+                                    <h5 class="s_showcase_title">
+                                        This petition is closed.
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                        <t t-set="editor_message">Drag building blocks to customize the footer of
+                            single record pages.</t>
+                        <div class="oe_structure oe_empty oe_new"
+                            t-att-data-editor-message="editor_message"/>
+                    </div>
+                </t>
+            </t>
+        </field>
+        <field name="key">non_profit_organization.petition.form</field>
+        <field name="model">x_petition</field>
+        <field name="name">Petition</field>
+        <field name="active" eval="True"/>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+    <record id="signature_thanks_qweb_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <t name="Thanks (Contact us)" t-name="website.contactus_thanks">
+                <t t-call="website.layout">
+                    <div id="wrap" class="oe_structure oe_empty">
+                        <section class="s_text_block pt40 pb40 o_colored_level"
+                            data-snippet="s_text_block">
+                            <div class="container s_allow_columns">
+                                <div class="row">
+                                    <div class="col-lg-6 offset-lg-1 text-center o_colored_level">
+                                        <div class="d-inline-block mx-auto p-4">
+                                            <span
+                                                class="fa fa-inbox mb-3 rounded-circle text-bg-success fa-2x"/>
+                                            <h1 class="fw-bolder">Thank You!</h1>
+                                            <em>Your voice has joined a growing movement for justice
+                                                and human rights. Together, we’re louder, stronger,
+                                                and driving real change.</em>
+                                            <p class="lead mb-0">
+                                                <br />
+                                            </p>
+                                            <a href="/">Go to Homepage</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 offset-lg-1 o_colored_level">
+                                        <h5>My Company</h5>
+                                        <ul class="list-unstyled mb-0 ps-2">
+                                            <li>
+                                                <i class="fa fa-map-marker fa-fw me-2"/>
+                                                <span class="o_force_ltr">3575 Fake Buena Vista
+                                                    Avenue</span>
+                                            </li>
+                                            <li>
+                                                <i class="fa fa-phone fa-fw me-2"/>
+                                                <span class="o_force_ltr">+1 555-555-5556</span>
+                                            </li>
+                                            <li>
+                                                <i class="fa fa-1x fa-fw fa-envelope me-2"/>
+                                                <span>info@yourcompany.example.com</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <input t-if="website.plausible_shared_key" type="hidden"
+                        class="js_plausible_push" data-event-name="Lead Generation"
+                        data-event-params="{&quot;CTA&quot;: &quot;Contact Us&quot;}"/>
+                </t>
+            </t>
+        </field>
+        <field name="key">website.contactus_thanks</field>
+        <field name="name">Thanks (Contact us)</field>
+        <field name="active" eval="True"/>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,37 @@
+{
+    'name': 'Petitions for Nonprofit organization',
+    'version': '2.1',
+    'category': 'Config/Customization',
+    'depends': [
+        'base_industry_data',
+        'non_profit_organization',
+        'web_studio',
+    ],
+    'data': [
+        'data/ir_model.xml',
+        'data/ir_model_fields.xml',
+        'data/ir_default.xml',
+        'data/ir_actions_act_window.xml',
+        'data/ir_actions_server.xml',
+        'data/ir_ui_view.xml',
+        'data/qweb_view.xml',
+        'data/ir_ui_menu.xml',
+        'data/base_automation.xml',
+        'data/ir_model_access.xml',
+        'data/website_page.xml',
+        'data/website_controller_page.xml',
+        'data/website_menu.xml',
+        'data/x_petition_tag.xml',
+    ],
+    'demo': [
+        'demo/x_petition.xml',
+        'demo/x_signature.xml',
+    ],
+    'license': 'OPL-1',
+    'author': 'Odoo S.A.',
+    "cloc_exclude": [
+        "data/qweb_view.xml",
+    ],
+    'url': "https://www.odoo.com/trial?industry&selected_app=non_profit_organization",
+    'website': "https://www.odoo.com/industries/nonprofit-organization",
+}

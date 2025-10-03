@@ -1,11 +1,67 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<odoo noupdate="1">
-    <record id="res_config_non_profit_organization" model="res.config.settings">
-        <field name="group_mass_mailing_campaign" eval="True"/>
-        <field name="use_event_barcode" eval="True"/>
-        <field name="account_price_include">tax_included</field>
+<odoo>
+
+    <record id="x_setting_field_x_petition" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Activate petition</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="name">x_setting_x_petition</field>
+        <field name="readonly" eval="False"/>
+        <field name="store" eval="True"/>
+        <field name="compute"><![CDATA[
+self['x_setting_x_petition'] = self.env['ir.config_parameter'].sudo().get_param('non_profit_configuration.enable_petitions') or bool(self.env['ir.module.module'].search_count([('name', '=', 'non_profit_organization_petitions')], limit=1))
+]]></field>
     </record>
-    <function name="execute" model="res.config.settings">
-        <value eval="[ref('res_config_non_profit_organization')]"/>
-    </function>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.non_profit_organization</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="40"/>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside" >
+                <app string="Non Profit Organization" name="non_profit_organization">
+                    <block title="Customizations" name="custo_setting_container">
+                        <setting id="custom_petition" help="Activate the setting to drive collective action through petitions">
+                            <field name="x_setting_x_petition" readonly="0"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="x_action_activate_x_petition" model="ir.actions.server">
+        <field name="code"><![CDATA[installed = env['ir.config_parameter'].sudo().get_param('non_profit_configuration.enable_petitions')
+if not (module := env['ir.module.module'].search([('name', '=', 'non_profit_organization_petitions')], limit=1)) and not installed and record.x_setting_x_petition:
+    action_window = env['ir.module.module'].with_context({'module_name': 'non_profit_organization_petitions'}).button_immediate_install_app()
+    env['base.import.module'].with_context(action_window.get('context')).browse(action_window['res_id']).import_module()
+    env['ir.config_parameter'].sudo().set_param('non_profit_configuration.enable_petitions', 1)
+elif module and installed and not record.x_setting_x_petition:
+    module.button_immediate_uninstall()
+    env['ir.config_parameter'].sudo().set_param('non_profit_configuration.enable_petitions', 0)
+]]></field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="state">code</field>
+        <field name="name">(Un-)Install petitions customization</field>
+    </record>
+
+    <record id="x_setting_activate_x_petition" model="base.automation">
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('x_action_activate_x_petition')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Activate petition setting</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_setting_field_x_petition')])]"/>
+    </record>
+
+    <data noupdate="1">
+        <record id="res_config_non_profit_organization" model="res.config.settings">
+            <field name="group_mass_mailing_campaign" eval="True"/>
+            <field name="use_event_barcode" eval="True"/>
+            <field name="account_price_include">tax_included</field>
+        </record>
+        <function name="execute" model="res.config.settings" eval="[ref('res_config_non_profit_organization')]"/>
+    </data>
+
 </odoo>
