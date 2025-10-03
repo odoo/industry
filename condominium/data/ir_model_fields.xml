@@ -1891,4 +1891,50 @@ for rec in self:
     <field name="field_description">Account name test</field>
     <field name="model_id" ref="model_x_analytic_account_wizard_line"/>
   </record> -->
+
+  <!-- Account name test2 -->
+  <record id="field_x_analytic_account_name_id" model="ir.model.fields">
+    <field name="name">x_analytic_account_name_id</field>
+    <field name="ttype">many2one</field>
+    <field name="relation">account.analytic.account</field>
+    <field name="field_description">Account</field>
+    <field name="model_id" ref="model_x_analytic_account_wizard_line"/>
+  </record>
+  <record id="new_decimal_calendar_attending_ratio" model="ir.model.fields">
+    <field name="compute"><![CDATA[for record in self:
+    if len(record.attendee_ids) > 0 and record.x_studio_voting_key != False and record.x_studio_condominium != False :
+        x_studio_attending_ratio = 0.0
+        for attendee in record.attendee_ids:
+            if attendee.x_studio_attending or attendee.x_studio_delegating: x_studio_attending_ratio += attendee.x_studio_ratio
+        total_ratio = sum(
+            x_studio_ratio.x_ratio for x_studio_ratio in record.x_studio_voting_key.x_studio_ratio_ids
+        )
+        if total_ratio > 0:
+          record['x_studio_attending_ratio'] =  x_studio_attending_ratio / total_ratio
+        else:
+          record['x_studio_attending_ratio'] = 1]]>
+    </field>
+    <field name="ttype">float</field>
+    <field name="depends">attendee_ids,attendee_ids.x_studio_delegating, attendee_ids.x_studio_attending, attendee_ids.x_studio_ratio, x_studio_voting_key</field>
+    <field name="field_description">Attending and Delegating Ratio</field>
+    <field name="model_id" ref="calendar.model_calendar_event"/>
+    <field name="name">x_studio_attending_ratio</field>
+    <field name="readonly" eval="True"/>
+  </record>
+  <!-- <record id="new_decimal_calendar_attending_ratio_test" model="ir.model.fields">
+    <field name="compute"><![CDATA[for record in self:
+    if len(record.attendee_ids) > 0 and record.x_studio_voting_key != False and record.x_studio_condominium != False :
+        x_studio_attending_ratio = 0.0
+        for attendee in record.attendee_ids:
+            if attendee.x_studio_attending or attendee.x_studio_delegating:
+              x_studio_attending_ratio += attendee.x_studio_ratio
+        record['x_studio_attending_ratio_copy'] = str(x_studio_attending_ratio)]]>
+    </field>
+    <field name="ttype">char</field>
+    <field name="depends">attendee_ids, x_studio_voting_key</field>
+    <field name="field_description">Attending and Delegating Ratio test</field>
+    <field name="model_id" ref="calendar.model_calendar_event"/>
+    <field name="name">x_studio_attending_ratio_copy</field>
+    <field name="readonly" eval="True"/>
+  </record> -->
 </odoo>

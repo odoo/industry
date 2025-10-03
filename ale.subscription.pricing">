@@ -1,0 +1,144 @@
+[1mdiff --git a/condominium/data/documents_folder.xml b/condominium/data/documents_folder.xml[m
+[1mindex 5b3190ef8..df790d1d4 100644[m
+[1m--- a/condominium/data/documents_folder.xml[m
+[1m+++ b/condominium/data/documents_folder.xml[m
+[36m@@ -8,12 +8,10 @@[m
+   <record id="documents_document_24" model="documents.document">[m
+     <field name="name">Odoo Error - 2025-05-27 10:14:23.txt</field>[m
+     <field name="file_extension">txt</field>[m
+[31m-    <field name="res_model">documents.document</field>[m
+[31m-    <!-- <field name="res_id" ref="documents_document_24"/> -->[m
+     <field name="document_token">lQlGkhT1T72XvAea9Tm-_g</field>[m
+     <field name="access_via_link">view</field>[m
+     <field name="folder_id" ref="documents.document_support_folder"/>[m
+[31m-  </record>[m
+[32m+[m[32m</record>[m
+   <!-- <record id="documents_document_21" model="documents.document">[m
+     <field name="handler">spreadsheet</field>[m
+     <field name="spreadsheet_snapshot" type="base64" file="studio_customization/static/src/binary/documents_document/21-spreadsheet_snapshot"/>[m
+[36m@@ -121,7 +119,7 @@[m
+     <field name="document_token">qbSX6yN-TlynzB2OHlprwA</field>[m
+     <field name="access_internal">view</field>[m
+   </record>[m
+[31m-  <record id="documents_hr.document_hr_folder" model="documents.document" forcecreate="1">[m
+[32m+[m[32m  <!-- <record id="documents_hr.document_hr_folder" model="documents.document" forcecreate="1">[m
+     <field name="name">HR</field>[m
+     <field name="type">folder</field>[m
+     <field name="document_token">VuK8JAcvRaSovdJl5lHkIg</field>[m
+[36m@@ -151,7 +149,7 @@[m
+   <record id="documents.document_finance_folder" model="documents.document" forcecreate="1">[m
+     <field name="name">Finance</field>[m
+     <field name="type">folder</field>[m
+[31m-    <!-- <field name="partner_id" ref="res_partner_32"/> -->[m
+[32m+[m[32m    <field name="partner_id" ref="res_partner_32"/>[m
+     <field name="document_token">809H2snSSO2GNRSCK_Bt8A</field>[m
+     <field name="access_internal">edit</field>[m
+   </record>[m
+[36m@@ -159,5 +157,5 @@[m
+     <field name="name">Administrator</field>[m
+     <field name="type">folder</field>[m
+     <field name="document_token">gHFeBoFRTjySNYFcK7n-2Q</field>[m
+[31m-  </record>[m
+[31m-</odoo>[m
+[32m+[m[32m  </record> -->[m
+[32m+[m[32m</odoo>[m
+\ No newline at end of file[m
+[1mdiff --git a/condominium/data/ir_model_fields.xml b/condominium/data/ir_model_fields.xml[m
+[1mindex 30aae0988..10f60694f 100644[m
+[1m--- a/condominium/data/ir_model_fields.xml[m
+[1m+++ b/condominium/data/ir_model_fields.xml[m
+[36m@@ -290,7 +290,6 @@[m [mfor record in self:[m
+   <record id="partner_company_ids" model="ir.model.fields">[m
+     <field name="name">x_companies</field>[m
+     <field name="compute"><![CDATA[[m
+[31m->>>>>>> 413a26e70 (Cleanup commit -1)[m
+ for record in self:[m
+     record['x_companies'] = [(6, 0, record.x_properties_ids.x_condominium.ref_company_ids.ids)][m
+ ]]>    </field>[m
+[36m@@ -1892,4 +1891,50 @@[m [mfor rec in self:[m
+     <field name="field_description">Account name test</field>[m
+     <field name="model_id" ref="model_x_analytic_account_wizard_line"/>[m
+   </record> -->[m
+[31m-</odoo>[m
+[32m+[m
+[32m+[m[32m  <!-- Account name test2 -->[m
+[32m+[m[32m  <record id="field_x_analytic_account_name_id" model="ir.model.fields">[m
+[32m+[m[32m    <field name="name">x_analytic_account_name_id</field>[m
+[32m+[m[32m    <field name="ttype">many2one</field>[m
+[32m+[m[32m    <field name="relation">account.analytic.account</field>[m
+[32m+[m[32m    <field name="field_description">Account</field>[m
+[32m+[m[32m    <field name="model_id" ref="model_x_analytic_account_wizard_line"/>[m
+[32m+[m[32m  </record>[m
+[32m+[m[32m  <record id="new_decimal_calendar_attending_ratio" model="ir.model.fields">[m
+[32m+[m[32m    <field name="compute"><![CDATA[for record in self:[m
+[32m+[m[32m    if len(record.attendee_ids) > 0 and record.x_studio_voting_key != False and record.x_studio_condominium != False :[m
+[32m+[m[32m        x_studio_attending_ratio = 0.0[m
+[32m+[m[32m        for attendee in record.attendee_ids:[m
+[32m+[m[32m            if attendee.x_studio_attending or attendee.x_studio_delegating: x_studio_attending_ratio += attendee.x_studio_ratio[m
+[32m+[m[32m        total_ratio = sum([m
+[32m+[m[32m            x_studio_ratio.x_ratio for x_studio_ratio in record.x_studio_voting_key.x_studio_ratio_ids[m
+[32m+[m[32m        )[m
+[32m+[m[32m        if total_ratio > 0:[m
+[32m+[m[32m          record['x_studio_attending_ratio'] =  x_studio_attending_ratio / total_ratio[m
+[32m+[m[32m        else:[m
+[32m+[m[32m          record['x_studio_attending_ratio'] = 1]]>[m
+[32m+[m[32m    </field>[m
+[32m+[m[32m    <field name="ttype">float</field>[m
+[32m+[m[32m    <field name="depends">attendee_ids,attendee_ids.x_studio_delegating, attendee_ids.x_studio_attending, attendee_ids.x_studio_ratio, x_studio_voting_key</field>[m
+[32m+[m[32m    <field name="field_description">Attending and Delegating Ratio</field>[m
+[32m+[m[32m    <field name="model_id" ref="calendar.model_calendar_event"/>[m
+[32m+[m[32m    <field name="name">x_studio_attending_ratio</field>[m
+[32m+[m[32m    <field name="readonly" eval="True"/>[m
+[32m+[m[32m  </record>[m
+[32m+[m[32m  <!-- <record id="new_decimal_calendar_attending_ratio_test" model="ir.model.fields">[m
+[32m+[m[32m    <field name="compute"><![CDATA[for record in self:[m
+[32m+[m[32m    if len(record.attendee_ids) > 0 and record.x_studio_voting_key != False and record.x_studio_condominium != False :[m
+[32m+[m[32m        x_studio_attending_ratio = 0.0[m
+[32m+[m[32m        for attendee in record.attendee_ids:[m
+[32m+[m[32m            if attendee.x_studio_attending or attendee.x_studio_delegating:[m
+[32m+[m[32m              x_studio_attending_ratio += attendee.x_studio_ratio[m
+[32m+[m[32m        record['x_studio_attending_ratio_copy'] = str(x_studio_attending_ratio)]]>[m
+[32m+[m[32m    </field>[m
+[32m+[m[32m    <field name="ttype">char</field>[m
+[32m+[m[32m    <field name="depends">attendee_ids, x_studio_voting_key</field>[m
+[32m+[m[32m    <field name="field_description">Attending and Delegating Ratio test</field>[m
+[32m+[m[32m    <field name="model_id" ref="calendar.model_calendar_event"/>[m
+[32m+[m[32m    <field name="name">x_studio_attending_ratio_copy</field>[m
+[32m+[m[32m    <field name="readonly" eval="True"/>[m
+[32m+[m[32m  </record> -->[m
+[32m+[m[32m</odoo>[m
+\ No newline at end of file[m
+[1mdiff --git a/condominium/data/res_config_settings.xml b/condominium/data/res_config_settings.xml[m
+[1mindex d34726524..739453022 100644[m
+[1m--- a/condominium/data/res_config_settings.xml[m
+[1m+++ b/condominium/data/res_config_settings.xml[m
+[36m@@ -7,7 +7,9 @@[m
+         <field name="portal_confirmation_sign" eval="1"/>[m
+         <field name="module_account_payment" eval="1"/>[m
+         <field name="module_hr_timesheet" eval="1"/>[m
+[31m-        <field name="group_project_recurring_tasks" eval="1"/>[m
+[32m+[m
+[32m+[m[32m        <!-- change name in 19.0 -->[m
+[32m+[m[32m        <!-- <field name="group_project_recurring_tasks" eval="1"/> -->[m
+     </record>[m
+ [m
+     <function name="execute" model="res.config.settings">[m
+[1mdiff --git a/condominium/data/sale_subscription_pricing.xml b/condominium/data/sale_subscription_pricing.xml[m
+[1mindex 8f9170b00..e39a698db 100644[m
+[1m--- a/condominium/data/sale_subscription_pricing.xml[m
+[1m+++ b/condominium/data/sale_subscription_pricing.xml[m
+[36m@@ -1,6 +1,6 @@[m
+ <?xml version='1.0' encoding='UTF-8'?>[m
+ <odoo noupdate="1">[m
+[31m-  <record id="sale_subscription_pricing_4" model="sale.subscription.pricing">[m
+[32m+[m[32m  <!-- <record id="sale_subscription_pricing_4" model="sale.subscription.pricing">[m
+     <field name="product_template_id" ref="product_product_16_product_template"/>[m
+     <field name="plan_id" ref="sale_subscription.subscription_plan_month"/>[m
+     <field name="price">80.0</field>[m
+[36m@@ -14,5 +14,5 @@[m
+     <field name="product_template_id" ref="product_product_16_product_template"/>[m
+     <field name="plan_id" ref="sale_subscription.subscription_plan_year"/>[m
+     <field name="price">960.0</field>[m
+[31m-  </record>[m
+[32m+[m[32m  </record> -->[m
+ </odoo>[m
