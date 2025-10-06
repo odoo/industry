@@ -26,7 +26,7 @@ occupied_cells = {}
 
 project_plan, other_plans = records.env['account.analytic.plan']._get_all_plans()
 for plan in other_plans:
-    if plan.name == 'Properties':
+    if plan.name == 'Account':
         fname = plan._column_name()
 
 for line in records.x_line_ids:
@@ -48,11 +48,11 @@ for line in records.x_line_ids:
 
     if original_analytic_id in note_details:
         analytic_url = f"/odoo/analytic-items/{new_analytic_item_id.id}"
-        note_line = f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{original_analytic_name}</a>"
+        note_line = f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{original_analytic[fname].name}</a>"
         note_details[original_analytic_id].add(note_line)
     else:
         analytic_url = f"/odoo/analytic-items/{new_analytic_item_id.id}"
-        note_line = {f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{original_analytic_name}</a>"}
+        note_line = {f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{original_analytic[fname].name}</a>"}
         note_details.update({original_analytic_id: set(note_line)})
 
 for original_id, new_lines in occupied_cells.items():
@@ -96,7 +96,7 @@ for record in records:
 
     project_plan, other_plans = record.env['account.analytic.plan']._get_all_plans()
     for plan in other_plans:
-        if plan.name == 'Properties':
+        if plan.name == 'Account':
             fname = plan._column_name()
 
     for _ in range(2):
@@ -147,7 +147,7 @@ action['res_id'] = env.company.partner_id.id]]>
 action = {'type': 'ir.actions.client', 'tag': 'reload'}]]></field>
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="state">code</field>
-        <field name="name">Create Condominium</field>
+        <field name="name">Condomnium: Create Condominium</field>
     </record>
     <record id="ir_act_server_split_per_property" model="ir.actions.server">
         <field name="code"><![CDATA[
@@ -265,46 +265,47 @@ def findClosestMeterReading(date, meter_readings):
             if closest_mr.x_date < mr.x_date: closest_mr = mr
     return closest_mr
 
-if not record.x_studio_distribution_key:
-    # raise UserError("A distribution key is required to distribute costs to accounts.")
-    for aml in record.invoice_line_ids: aml['analytic_distribution'] = {}
-else:
-    analytic_distribution = {}
-    # Key distribution
-    if record.x_studio_distribution_key.x_studio_based_on == "Shares" and ((record.x_studio_period_start and record.x_studio_period_end) or (not record.x_studio_period_start and not record.x_studio_period_end)):
-        x_ratios = record.sudo().x_studio_distribution_key.x_studio_ratio_ids
-        for ratio in x_ratios.filtered(lambda l: l.x_ratio != 0):
-            for account in ratio.x_studio_property.x_studio_account_ids:
-                if record.x_studio_period_start and record.x_studio_period_end:
-                    if account.x_studio_start_date <= record.x_studio_period_end and (not account.x_studio_end_date or record.x_studio_period_start <= account.x_studio_end_date):
-                        if not account.x_studio_end_date: analytic_distribution[account.id] = (record.x_studio_period_end - max(account.x_studio_start_date, record.x_studio_period_start)).days * ratio.x_ratio
-                        else: analytic_distribution[account.id] = (account.x_studio_end_date - max(account.x_studio_start_date, record.x_studio_period_start)).days * ratio.x_ratio
-                else:
-                    if account.partner_id.id == ratio.x_owner.id: analytic_distribution[account.id] = ratio.x_ratio
-    # Meter distribution
-    if record.x_studio_distribution_key.x_studio_based_on == "Meter Readings" and record.x_studio_period_start and record.x_studio_period_end:
-        for property in env['x_property'].search([]):
-            meter_reading_ids = [item for item in property.x_studio_meter_reading_ids if item.x_meter_id.id == record.x_studio_distribution_key.x_studio_meter.id]
-            if len(meter_reading_ids) >= 2:
-                billstart = findClosestMeterReading(record.x_studio_period_start, meter_reading_ids)
-                billend = findClosestMeterReading(record.x_studio_period_end, meter_reading_ids)
-                for account in property.x_studio_account_ids:
-                    mrostart = findClosestMeterReading(account.x_studio_start_date, meter_reading_ids)
-                    if mrostart.x_date < billstart.x_date: mrostart = billstart
-                    if account.x_studio_end_date:
-                        mroend = findClosestMeterReading(account.x_studio_end_date, meter_reading_ids)
-                        if billend.x_date < mroend.x_date: mroend = billend
-                    else: mroend = billend
-                    if not (billend.x_date < mrostart.x_date or billend.x_date < mroend.x_date) and mrostart.x_date != mroend.x_date:
-                        analytic_distribution[account.id] = abs(mroend.x_quantity - mrostart.x_quantity)
-
-    # Outcome
-    total_ratio = sum(analytic_distribution.values())
-    if total_ratio:
-        for key in analytic_distribution: analytic_distribution[key] *= 100 / total_ratio
-        for aml in record.invoice_line_ids: aml['analytic_distribution'] = analytic_distribution
-    else:
+for record in records:
+    if not record.x_studio_distribution_key:
+        # raise UserError("A distribution key is required to distribute costs to accounts.")
         for aml in record.invoice_line_ids: aml['analytic_distribution'] = {}
+    else:
+        analytic_distribution = {}
+        # Key distribution
+        if record.x_studio_distribution_key.x_studio_based_on == "Shares" and ((record.x_studio_period_start and record.x_studio_period_end) or (not record.x_studio_period_start and not record.x_studio_period_end)):
+            x_ratios = record.sudo().x_studio_distribution_key.x_studio_ratio_ids
+            for ratio in x_ratios.filtered(lambda l: l.x_ratio != 0):
+                for account in ratio.x_studio_property.x_studio_account_ids:
+                    if record.x_studio_period_start and record.x_studio_period_end:
+                        if account.x_studio_start_date <= record.x_studio_period_end and (not account.x_studio_end_date or record.x_studio_period_start <= account.x_studio_end_date):
+                            if not account.x_studio_end_date: analytic_distribution[account.id] = (record.x_studio_period_end - max(account.x_studio_start_date, record.x_studio_period_start)).days * ratio.x_ratio
+                            else: analytic_distribution[account.id] = (account.x_studio_end_date - max(account.x_studio_start_date, record.x_studio_period_start)).days * ratio.x_ratio
+                    else:
+                        if account.partner_id.id == ratio.x_owner.id: analytic_distribution[account.id] = ratio.x_ratio
+        # Meter distribution
+        if record.x_studio_distribution_key.x_studio_based_on == "Meter Readings" and record.x_studio_period_start and record.x_studio_period_end:
+            for property in env['x_property'].search([]):
+                meter_reading_ids = [item for item in property.x_studio_meter_reading_ids if item.x_meter_id.id == record.x_studio_distribution_key.x_studio_meter.id]
+                if len(meter_reading_ids) >= 2:
+                    billstart = findClosestMeterReading(record.x_studio_period_start, meter_reading_ids)
+                    billend = findClosestMeterReading(record.x_studio_period_end, meter_reading_ids)
+                    for account in property.x_studio_account_ids:
+                        mrostart = findClosestMeterReading(account.x_studio_start_date, meter_reading_ids)
+                        if mrostart.x_date < billstart.x_date: mrostart = billstart
+                        if account.x_studio_end_date:
+                            mroend = findClosestMeterReading(account.x_studio_end_date, meter_reading_ids)
+                            if billend.x_date < mroend.x_date: mroend = billend
+                        else: mroend = billend
+                        if not (billend.x_date < mrostart.x_date or billend.x_date < mroend.x_date) and mrostart.x_date != mroend.x_date:
+                            analytic_distribution[account.id] = abs(mroend.x_quantity - mrostart.x_quantity)
+
+        # Outcome
+        total_ratio = sum(analytic_distribution.values())
+        if total_ratio:
+            for key in analytic_distribution: analytic_distribution[key] *= 100 / total_ratio
+            for aml in record.invoice_line_ids: aml['analytic_distribution'] = analytic_distribution
+        else:
+            for aml in record.invoice_line_ids: aml['analytic_distribution'] = {}
 
 ]]>        </field>
         <field name="model_id" ref="account.model_account_move"/>
