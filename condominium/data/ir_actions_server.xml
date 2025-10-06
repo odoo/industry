@@ -26,7 +26,7 @@ occupied_cells = {}
 
 project_plan, other_plans = records.env['account.analytic.plan']._get_all_plans()
 for plan in other_plans:
-    if plan.name == 'Properties':
+    if plan.name == 'Account':
         fname = plan._column_name()
 
 for line in records.x_line_ids:
@@ -48,11 +48,11 @@ for line in records.x_line_ids:
 
     if original_analytic_id in note_details:
         analytic_url = f"/odoo/analytic-items/{new_analytic_item_id.id}"
-        note_line = f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{original_analytic_name}</a>"
+        note_line = f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{line.x_analytic_account_name_id.name}</a>"
         note_details[original_analytic_id].add(note_line)
     else:
         analytic_url = f"/odoo/analytic-items/{new_analytic_item_id.id}"
-        note_line = {f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{original_analytic_name}</a>"}
+        note_line = {f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{line.x_analytic_account_name_id.name}</a>"}
         note_details.update({original_analytic_id: set(note_line)})
 
 for original_id, new_lines in occupied_cells.items():
@@ -85,7 +85,7 @@ for original_id, values in note_details.items():
         <field name="name">Split</field>
         <field name="model_id" ref="analytic.model_account_analytic_line"/>
         <field name="binding_model_id" ref="analytic.model_account_analytic_line"/>
-        <field name="binding_view_types">list,kanban</field>
+        <!-- <field name="binding_view_types">form</field> -->
         <field name="state">code</field>
         <field name="code"><![CDATA[analytic_account_lines = []
 amount_total = 0
@@ -96,7 +96,7 @@ for record in records:
 
     project_plan, other_plans = record.env['account.analytic.plan']._get_all_plans()
     for plan in other_plans:
-        if plan.name == 'Properties':
+        if plan.name == 'Account':
             fname = plan._column_name()
 
     for _ in range(2):
@@ -129,25 +129,39 @@ action['res_id'] = env.company.partner_id.id]]>
         </field>
     </record>
     <record id="ir_action_create_condominium" model="ir.actions.server">
-        <field name="code"><![CDATA[env['res.company'].create({
-    'partner_id': record.id,
-    'name': record.name,
-    'street': record.street,
-    'street2': record.street2,
-    'zip': record.zip,
-    'city': record.city,
-    'state_id': record.state_id.id,
-    'country_id': record.country_id.id,
-    'vat': record.vat,
-    'phone': record.phone,
-    'email': record.email,
-    'website': record.website,
-    'logo': record.image_1920,
-})
-action = {'type': 'ir.actions.client', 'tag': 'reload'}]]></field>
+        <field name="code"><![CDATA[
+if not record.country_id:
+    # Show a snackbar danger message and stop action
+    action = {
+        'type': 'ir.actions.client',
+        'tag': 'display_notification',
+        'params': {
+            'title': 'Country is required for condominium creation.',
+            'type': 'danger',
+            'sticky': False,
+        }
+    }
+else:
+    env['res.company'].create({
+        'partner_id': record.id,
+        'name': record.name,
+        'street': record.street,
+        'street2': record.street2,
+        'zip': record.zip,
+        'city': record.city,
+        'state_id': record.state_id.id,
+        'country_id': record.country_id.id,
+        'vat': record.vat,
+        'phone': record.phone,
+        'email': record.email,
+        'website': record.website,
+        'logo': record.image_1920,
+    })
+    action = {'type': 'ir.actions.client', 'tag': 'reload'}
+    ]]></field>
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="state">code</field>
-        <field name="name">Create Condominium</field>
+        <field name="name">Condomnium: Create Condominium</field>
     </record>
     <record id="ir_act_server_split_per_property" model="ir.actions.server">
         <field name="code"><![CDATA[
@@ -334,7 +348,7 @@ else:
         <field name="name">Compute Distribution Key Ratios</field>
     </record>
     <record id="execute_code_2a88e896-cf76-4255-8ab9-1c04b6739bd9" model="ir.actions.server">
-        <field name="code"><![CDATA[server_action = env['ir.actions.server'].search([('name','=','Industry: Distribute Costs')])
+        <field name="code"><![CDATA[server_action = env['ir.actions.server'].search([('name','=','Condominium: Distribute Costs')])
 if server_action: server_action.run()]]></field>
         <field name="model_id" ref="account.model_account_move"/>
         <field name="state">code</field>
@@ -342,7 +356,7 @@ if server_action: server_action.run()]]></field>
         <field name="usage">base_automation</field>
     </record>
     <record id="industry_call_distri_1dff37c7-1c90-46cd-be7e-0d935c31d7a6" model="ir.actions.server">
-        <field name="code"><![CDATA[server_action = env['ir.actions.server'].search([('name','=','Industry: Distribute Costs')])
+        <field name="code"><![CDATA[server_action = env['ir.actions.server'].search([('name','=','Condominium: Distribute Costs')])
 if server_action: server_action.run()]]></field>
         <field name="model_id" ref="account.model_account_move"/>
         <field name="state">code</field>
