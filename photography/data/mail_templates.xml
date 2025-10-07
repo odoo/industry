@@ -107,9 +107,9 @@
 
     <record id="email_calendar_reminder" model="mail.template">
         <field name="name">Photography: Order Confirmation</field>
-        <field name="model_id" ref="calendar.model_calendar_event" />
+        <field name="model_id" ref="calendar.model_calendar_attendee" />
         <field name="subject">Your Studio Session is Tomorrow!</field>
-        <field name="email_from">{{ (object.user_id.email_formatted or object.company_id.email_formatted or user.email_formatted) }}</field>
+        <field name="email_from">{{ (object.event_id.user_id.email_formatted or user.email_formatted or 'demo@example.com') }}</field>
         <field name="partner_to">{{ object.partner_id.id }}</field>
         <field name="body_html">
             <![CDATA[
@@ -172,32 +172,4 @@
         <field name="auto_delete" eval="True" />
     </record>
 
-    <record id="task_appointment_booking" model="mail.template">
-        <field name="name">Photography: Book a session</field>
-        <field name="model_id" ref="project.model_project_task" />
-        <field name="subject">Schedule your Studio Session</field>
-        <field name="email_from">{{ (object.user_id.email_formatted or object.company_id.email_formatted or user.email_formatted) }}</field>
-        <field name="partner_to">{{ object.partner_id.id }}</field>
-        <field name="body_html">
-            <![CDATA[
-                <p style="margin:0px 0 16px 0;box-sizing:border-box;">Hi <t t-out="object.partner_id.name or '''John Doe'''"/>!</p>
-                <p style="margin:0px 0 16px 0;box-sizing:border-box;">You've recently confirmed a Studio
-                    Session with us - we're super glad you chose to work with <t
-                        t-out="object.company_id.name or '''us'''">Frozen Moments</t>!</p>
-                <p style="margin:0px 0 16px 0;box-sizing:border-box;">You can book your Studio session
-                    directly via our website by following <a href="/book/studio"
-                        style="text-decoration:none;box-sizing:border-box;color:#017e84;">this link</a>
-                </p>
-                <p style="margin:0px 0 16px 0;box-sizing:border-box;">Sessions are 1h30 long, with
-                    usually 20-30min of setup and
-                    45min-1h of proper shooting (with small breaks if needed).</p>
-                <p style="margin:0px 0 16px 0;box-sizing:border-box;">If you have a scheduling issue,
-                    please contact us as soon as
-                    possible and we'll be more than happy to make adaptations!</p>
-                <p style="margin:0px 0 16px 0;box-sizing:border-box;">Kind regards,</p>
-            ]]>
-        </field>
-        <field name="lang">{{ object.partner_id.lang }}</field>
-        <field name="auto_delete" eval="True" />
-    </record>
 </odoo>
