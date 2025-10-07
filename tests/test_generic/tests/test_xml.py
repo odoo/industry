@@ -63,6 +63,7 @@ MODELS_TO_UPDATE = {
     "ir.model",
     "ir.model.access",
     "ir.model.fields",
+    "ir.model.fields.selection",
     "ir.module.module",
     "ir.ui.menu",
     "ir.ui.view",
@@ -385,11 +386,24 @@ class TestEnv(IndustryCase):
             records[record_key] |= fields
 
     def _check_fields(self, root, file_name):
+        warned_records = set()
         for record in root.xpath("//record"):
             model_name = record.get('model')
             if not model_name:
                 continue
             model = self.env.get(model_name)
+            if model_name == "ir.model.fields":
+                for ttype_element in record.xpath(".//field[@name='ttype'][text()='selection']"):
+                    record_id = record.get('id')
+                    if record_id in warned_records:
+                        continue
+                    if ttype_element.getparent().xpath(".//field[@name='selection']"):
+                        _logger.warning(
+                            "Inline selection values defined in %s. "
+                            "Remove inline 'selection' field and define values in ir.model.fields.selection.",
+                            record_id
+                        )
+                        warned_records.add(record_id)
             fields_set_in_record = {
                 field.get('name') for field in record.xpath('.//field')
                 if field.getparent().get('id', False) == record.get('id')  # nested record definitions
