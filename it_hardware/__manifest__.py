@@ -1,6 +1,6 @@
 {
     'name': 'IT Hardware & Support',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Services',
     'depends': [
         'account_followup',
@@ -10,7 +10,6 @@
         'purchase_stock',
         'sale_crm',
         'sale_purchase',
-        'web_studio',
         'website_crm',
         'website_helpdesk',
         'website_sale_comparison',
@@ -18,12 +17,8 @@
     ],
     'data': [
         'data/res_config_settings.xml',
-        'data/base_automation.xml',
-        'data/ir_actions_server.xml',
         'data/ir_attachment_pre.xml',
-        'data/ir_model_fields.xml',
         'data/stock_picking_type.xml',
-        'data/ir_ui_view.xml',
         'data/project_task_type.xml',
         'data/product_category.xml',
         'data/project_project.xml',
