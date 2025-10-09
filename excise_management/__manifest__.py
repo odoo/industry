@@ -6,6 +6,7 @@
     'depends': [
         'account_tax_python',
         'base_automation',
+        'sale_management',
         'stock',
         'web_studio',
     ],
