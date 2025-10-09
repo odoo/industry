@@ -1,19 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
     <record id="ir_actions_update_tasks" model="ir.actions.server">
-        <field name="code">
-            <![CDATA[
-ProjectTask = env['project.task']
-ProjectTag = env['project.tags']
-
+        <field name="code"><![CDATA[
 # Get references
 stage_1 = env.ref('accounting_firm.project_task_type_1')
 stage_2 = env.ref('accounting_firm.project_task_type_2')
 stage_3 = env.ref('accounting_firm.project_task_type_3')
-admin_user = env.ref('base.user_admin')
 
 today = datetime.datetime.today()
-now = datetime.datetime.now()
 
 # Month and quarter mapping
 MONTH_TAGS = {
@@ -26,7 +20,7 @@ QUARTER_STARTS = {
 }
 
 # Get all relevant tasks
-project_tasks = ProjectTask.search([
+project_tasks = env['project.task'].search([
     ('sale_line_id.order_id', 'in', [
         env.ref('accounting_firm.sale_order_1').id,
         env.ref('accounting_firm.sale_order_2').id
@@ -38,17 +32,14 @@ project_tasks = ProjectTask.search([
 month_name = today.strftime('%B').lower()
 quarter = f"q{((today.month - 1) // 3 + 1)}".lower()
 
-month_tag = ProjectTag.search([('name', 'ilike', month_name)], limit=1)
-quarter_tag = ProjectTag.search([('name', 'ilike', quarter)], limit=1)
-
-if month_tag:
+if month_tag := env['project.tags'].search([('name', 'ilike', month_name)], limit=1):
     project_tasks.filtered(lambda t: month_tag in t.tag_ids).write({'stage_id': stage_2.id})
 
-if quarter_tag:
+if quarter_tag := env['project.tags'].search([('name', 'ilike', quarter)], limit=1):
     project_tasks.filtered(lambda t: quarter_tag in t.tag_ids).write({'stage_id': stage_2.id})
 
 # Assign admin user
-project_tasks.write({'user_ids': [admin_user.id]})
+project_tasks.write({'user_ids': [env.ref('base.user_admin').id]})
 
 # Move customer onboarding tasks to stage 3
 onboarding_tasks = project_tasks.filtered(lambda t: 'customer onboarding' in (t.name or '').lower())
@@ -76,14 +67,10 @@ product_yearly = [
     env.ref('accounting_firm.product_product_3'),
     env.ref('accounting_firm.product_product_9')
 ]
-product_ubo = [
-    env.ref('accounting_firm.product_product_6')
-]
 
 # Compute next month and year
 next_month = today.month % 12 + 1
 next_month_year = today.year + (today.month == 12)
-current_year = today.year
 
 # Handle deadlines
 for task in project_tasks:
@@ -94,11 +81,8 @@ for task in project_tasks:
     month_matches = [month for name, month in MONTH_TAGS.items() if name in tag_names]
     month_num = month_matches[0] if month_matches else None
     if month_num:
-        year = current_year + (month_num < next_month or month_num == 12)
-        if month_num == 12:
-            month_num = 1
-        else:
-            month_num = month_num + 1
+        year = today.year + (month_num < next_month or month_num == 12)
+        month_num = month_num % 12 + 1
         deadline = datetime.datetime(year, month_num, 20, 23, 55)
 
     # Quarterly tag logic (without next())
@@ -106,24 +90,23 @@ for task in project_tasks:
         quarter_matches = [month for name, month in QUARTER_STARTS.items() if name in tag_names]
         start_month = quarter_matches[0] if quarter_matches else None
         if start_month:
-            year = current_year + (start_month < next_month)
+            year = today.year + (start_month < next_month)
             deadline = datetime.datetime(year, start_month, 25, 23, 55)
 
     # Yearly task logic
     if not deadline and task.sale_line_id.product_id in product_yearly:
-        deadline = datetime.datetime(current_year, 10, 20, 23, 55)
+        deadline = datetime.datetime(today.year, 10, 20, 23, 55)
         if today >= deadline:
-            deadline = deadline.replace(year=current_year + 1)
+            deadline = deadline.replace(year=today.year + 1)
 
     # UBO task logic
-    if not deadline and task.sale_line_id.product_id in product_ubo:
+    if not deadline and task.sale_line_id.product_id in [env.ref('accounting_firm.product_product_6')]:
         create_date_str = env['ir.config_parameter'].sudo().get_str('database.create_date')
         try:
             db_create_date = datetime.datetime.strptime(create_date_str, "%Y-%m-%d %H:%M:%S")
         except Exception:
-            db_create_date = now
-        deadline = db_create_date + datetime.timedelta(days=30)
-        deadline = deadline.replace(hour=23, minute=55)
+            db_create_date = datetime.datetime.now()
+        deadline = (db_create_date + datetime.timedelta(days=30)).replace(hour=23, minute=55)
 
     # Template fallback logic
     if not deadline:
@@ -135,8 +118,7 @@ for task in project_tasks:
 
     if deadline and task.name.lower() != 'customer onboarding':
         task.write({'date_deadline': deadline})
-    ]]>
-        </field>
+]]></field>
         <field name="model_id" ref="project.model_project_task" />
         <field name="state">code</field>
         <field name="name">Execute Code</field>
@@ -144,23 +126,16 @@ for task in project_tasks:
         <field name="usage">base_automation</field>
     </record>
     <record id="ir_actions_update_projects" model="ir.actions.server">
-        <field name="code">
-            <![CDATA[
-to_process = env['project.project'].search([
-    ('sale_line_id.order_id', 'in', [env.ref('accounting_firm.sale_order_1').id, env.ref('accounting_firm.sale_order_2').id]),
-])
-for record in to_process:
+        <field name="code"><![CDATA[
+for record in model.search([('sale_line_id.order_id', 'in', [env.ref('accounting_firm.sale_order_1').id, env.ref('accounting_firm.sale_order_2').id])]):
     name = record.partner_id.name if record.partner_id else env.company.name
-    record.write({
-        'name': name,
-    })
+    record.write({'name': name})
     record.documents_folder_id.write({
         'alias_name': name,
         'create_activity_type_id': env.ref('documents.mail_documents_activity_data_Inbox').id,
         'create_activity_user_id': env.ref('base.user_admin').id
     })
-        ]]>
-        </field>
+]]></field>
         <field name="model_id" ref="project.model_project_project" />
         <field name="state">code</field>
         <field name="name">Execute Code</field>

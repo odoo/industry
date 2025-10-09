@@ -1,6 +1,6 @@
 {
     'name': 'Accounting firm',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
@@ -15,12 +15,22 @@
         'sale_planning',
         'sale_timesheet_enterprise',
         'sign',
+        'web_studio',
     ],
     'data': [
         'data/ir_attachment_pre.xml',
         'data/res_config_settings.xml',
+        'data/ir_model.xml',
+        'data/ir_model_access.xml',
+        'data/ir_model_fields.xml',
+        'data/ir_default.xml',
         'data/ir_actions_server.xml',
+        'data/base_automation.xml',
+        'data/ir_cron.xml',
         'data/ir_ui_view.xml',
+        'data/ir_actions_act_window.xml',
+        'data/ir_ui_menu.xml',
+        'data/x_aml_risk_type.xml',
         'data/mail_activity_type.xml',
         'data/crm_stage.xml',
         'data/knowledge_article.xml',
@@ -40,6 +50,7 @@
         'data/sale_order_template_line.xml',
     ],
     'demo': [
+        'demo/x_mandate.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/equity_ubo.xml',
@@ -57,7 +68,6 @@
         'demo/project_task.xml',
     ],
     'cloc_exclude': [
-        'data/ir_actions_server.xml',
         'data/knowledge_article.xml',
     ],
     'images': [
