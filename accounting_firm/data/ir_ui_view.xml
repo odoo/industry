@@ -1,21 +1,216 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <!-- Res Partner views -->
     <record id="res_partner_form_customization_view" model="ir.ui.view">
-    <field name="name">res.partner.form</field>
-    <field name="inherit_id" ref="equity.equity_view_partner_form"/>
-    <field name="mode">extension</field>
-    <field name="active" eval="True"/>
-    <field name="model">res.partner</field>
-    <field name="priority">200</field>
-    <field name="type">form</field>
-    <field name="arch" type="xml">
-        <div name="button_box" position="after">
-            <header invisible="country_code != 'BE' or not vat">
-                <button string="Link CBE" type="action" name="%(parner_link_action)d" context="{'link': ['http://kbopub.economie.fgov.be/kbopub/zoeknummerform.html?nummer=']}"/>
-                <button string="Link Belgian Monitor" type="action" name="%(parner_link_action)d" context="{'link': ['https://www.ejustice.just.fgov.be/cgi_tsv/list.pl?btw=', '&amp;view_numac=']}"/>
-                <button string="Link NBB" type="action" name="%(parner_link_action)d" context="{'link': ['https://consult.cbso.nbb.be/consult-enterprise/']}"/>
-            </header>
-        </div>  
-    </field>
-  </record>
+        <field name="name">res.partner.form</field>
+        <field name="inherit_id" ref="equity.equity_view_partner_form"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="model">res.partner</field>
+        <field name="priority">200</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <div name="button_box" position="after">
+                <header invisible="country_code != 'BE' or not vat">
+                    <button string="Link CBE" type="action" name="%(parner_link_action)d" context="{'link': ['http://kbopub.economie.fgov.be/kbopub/zoeknummerform.html?nummer=']}" help="Crossroads Bank for Enterprises"/>
+                    <button string="Link Belgian Monitor" type="action" name="%(parner_link_action)d" context="{'link': ['https://www.ejustice.just.fgov.be/cgi_tsv/list.pl?btw=', '&amp;view_numac=']}"/>
+                    <button string="Link NBB" type="action" name="%(parner_link_action)d" context="{'link': ['https://consult.cbso.nbb.be/consult-enterprise/']}" help="National Bank of Belgium"/>
+                </header>
+                <header invisible="country_code != 'FR' or not vat">
+                    <button string="Link FBD" type="action" name="%(parner_link_action)d" context="{'link': ['https://annuaire-entreprises.data.gouv.fr/entreprise/']}" help="French Business Directory"/>
+                </header>
+                <header invisible="country_code != 'GB' or not vat">
+                    <button string="Link Companies House" type="action" name="%(parner_link_action)d" context="{'link': ['https://find-and-update.company-information.service.gov.uk/company/']}" help="Companies House"/>
+                </header>
+            </div>
+            <xpath expr="//page[@name='equity_ubo']" position="after">
+                <page string="ID" name="accounting_firm_id_page" invisible="is_company">
+                    <group>
+                        <group id="accounting_firm_id_page_left_group"/>
+                        <group>
+                            <field name="x_id_expiration_date" decoration-danger="x_id_expiration_date &lt; current_date"/>
+                            <field name="x_id_scan" widget="pdf_viewer"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="AML" name="accounting_firm_aml_page">
+                    <group>
+                        <group>
+                            <field name="x_relation_nature" placeholder="Accounting Management"/>
+                            <field name="x_aml_assignee_id" widget="many2one_avatar_user"/>
+                        </group>
+                        <group>
+                            <field name="x_mission_expiration_date"/>
+                            <field name="x_aml_last_update"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="x_risk_ids" nolabel="1">
+                            <list editable="bottom">
+                                <field name="x_risk_type"/>
+                                <field name="x_level"/>
+                                <field name="x_explanation" width="500"/>
+                            </list>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+            <xpath expr="//group[@id='accounting_firm_id_page_left_group']" position="inside">
+                <xpath expr="//field[@name='ubo_national_identifier']" position="move"/>
+                <xpath expr="//field[@name='ubo_birth_date']" position="move"/>
+                <xpath expr="//field[@name='ubo_birth_place']" position="move"/>
+            </xpath>
+            <xpath expr="//div[hasclass('o_address_format')]" position="after">
+                <field name="x_closing_month" invisible="not project_ids"/>
+                <field name="x_vat_declaration_recurrence" invisible="not project_ids"/>
+                <field name="x_interim_situation" invisible="not project_ids"/>
+            </xpath>
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="x_mandate_ids" widget="many2many_tags" options="{'color_field': 'x_color'}" invisible="not project_ids"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="accounting_firm_view_res_partner_search" model="ir.ui.view">
+        <field name="name">accounting.firm.view.res.partner.search</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="account_followup.customer_statements_search_view"/>
+        <field name="priority" eval="100"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='filter_in_need_of_action']" position="after">
+                <filter string="Expired IDs"
+                    name="filter_expired_ids"
+                    domain="[('x_id_expiration_date', '!=', False), ('x_id_expiration_date', '&lt;=', 'today')]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Mandate views -->
+    <record id="x_mandate_view_form" model="ir.ui.view">
+        <field name="name">Mandates</field>
+        <field name="model">x_mandate</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form string="Mandates">
+                <sheet>
+                    <group col="4">
+                        <field name="x_name"/>
+                        <field name="x_color" widget="color_picker"/>
+                        <field name="x_mandate_parent_id"/>
+                        <field name="x_active" widget="boolean_toggle"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="x_mandate_view_list" model="ir.ui.view">
+        <field name="name">Mandates</field>
+        <field name="model">x_mandate</field>
+        <field name="active" eval="True"/>
+        <field eval="6" name="priority"/>
+        <field name="arch" type="xml">
+            <list string="Mandates" editable="bottom" multi_edit="1" sample="1">
+                <field name="x_name"/>
+                <field name="x_mandate_parent_id" string="Category" domain="[('id', '!=', id)]"/>
+                <field name="x_color" widget="color_picker"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Project Project views -->
+    <record id="accounting_firm_view_project_project_form" model="ir.ui.view">
+        <field name="name">accounting.firm.view.project.project.form</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="active" eval="True"/>
+        <field name="priority" eval="100"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="x_assistant_ids" widget="many2many_avatar_user"/>
+                <field name="x_reviewer_ids" widget="many2many_avatar_user"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="accounting_firm_view_project_project_kanban" model="ir.ui.view">
+        <field name="name">accounting.firm.view.project.project.kanban</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_kanban"/>
+        <field name="priority" eval="100"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="before">
+                <field name="x_reviewer_ids" class="me-1" widget="many2many_avatar_user"/>
+                <field name="x_assistant_ids" class="me-1" widget="many2many_avatar_user"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- AML Risk views -->
+    <record id="x_aml_risk_form_view" model="ir.ui.view">
+        <field name="name">aml.risk.form.view</field>
+        <field name="model">x_aml_risk</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <h1>
+                        <field name="x_risk_type"/>
+                    </h1>
+                    <group>
+                        <field name="x_level"/>
+                        <field name="x_explanation"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Equity UBO views -->
+    <record id="equity_ubo_form_view_inherited" model="ir.ui.view">
+        <field name="name">equity.ubo.form.view.inherited</field>
+        <field name="model">equity.ubo</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="equity.view_equity_ubo_form"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//h1" position="before">
+                <header invisible="not attachment_ids or not attachment_expiration_date">
+                    <button string="Update Owner ID" type="action" name="%(server_action_update_owner_id)d"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Documents Document views-->
+    <record id="document_document_kanban_view_inherited" model="ir.ui.view">
+        <field name="name">documents.document.kanban.view.inherited</field>
+        <field name="model">documents.document</field>
+        <field name="type">kanban</field>
+        <field name="inherit_id" ref="documents.document_view_kanban"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="/kanban//field[@name='id']" position="before">
+                <header>
+                    <button name="%(server_action_update_document_partner_identity)d" string="Update Identity Document" type="action" />
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Documents Request Wizard -->
+    <record id="document_request_wizard_form_view_inherited" model="ir.ui.view">
+        <field name="name">documents.request.wizard.form.view.inherited</field>
+        <field name="model">documents.request_wizard</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="documents.documents_request_form_view"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='request_document']" position="replace">
+                <button invisible="x_has_chatter_message" name="request_document" type="object" string="Request" class="btn btn-primary" data-hotkey="q"/>
+                <button invisible="not x_has_chatter_message" name="%(server_action_request_document_with_chatter_message)d" type="action" string="Request" class="btn btn-primary" data-hotkey="q"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>
