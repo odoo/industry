@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="stock_rule_set_push_domain_server_action" model="ir.actions.server">
+    <record id="action_stock_rule_set_push_domain_on_create_or_write" model="ir.actions.server">
         <field name="name">Execute Code</field>
         <field name="model_id" ref="stock.model_stock_rule"/>
         <field name="state">code</field>
@@ -12,7 +12,7 @@ for record in records:
         record['push_domain'] = [("product_id.pos_categ_ids", "in", record.x_pos_product_category_ids.ids)]
 ]]></field>
     </record>
-    <record id="action_update_automatic_activation_on_product" model="ir.actions.server">
+    <record id="action_update_automatic_activation_on_product_on_change" model="ir.actions.server">
         <field name="code"><![CDATA[
 for route in records:
     route['x_automatic_activation_on_product'] = not route.product_selectable
@@ -21,7 +21,7 @@ for route in records:
         <field name="state">code</field>
         <field name="name">Execute Code</field>
     </record>
-    <record id="action_update_destination_location_on_picking" model="ir.actions.server">
+    <record id="action_update_destination_location_on_picking_create" model="ir.actions.server">
         <field name="code"><![CDATA[
 records.filtered('picking_type_id.x_overrule_customer_location').write({"location_dest_id": record.picking_type_id.default_location_dest_id.id})
 ]]></field>
@@ -29,7 +29,7 @@ records.filtered('picking_type_id.x_overrule_customer_location').write({"locatio
         <field name="state">code</field>
         <field name="name">Execute Code</field>
     </record>
-    <record id="make_route_on_product_create" model="ir.actions.server">
+    <record id="action_make_route_on_product_create" model="ir.actions.server">
         <field name="model_id" ref="product.model_product_template"/>
         <field name="state">object_write</field>
         <field name="update_path">route_ids</field>
@@ -38,7 +38,7 @@ records.filtered('picking_type_id.x_overrule_customer_location').write({"locatio
         <field name="name">Update Product</field>
         <field name="resource_ref" ref="stock_route_4"/>
     </record>
-    <record id="add_qty_on_product_create" model="ir.actions.server">
+    <record id="action_add_qty_on_product_create" model="ir.actions.server">
         <field name="code"><![CDATA[
 env["stock.quant"].create([{
     "product_id": variant.id,
