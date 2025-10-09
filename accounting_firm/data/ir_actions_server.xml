@@ -12,4 +12,97 @@ action = {
 }
         ]]></field>
     </record>
+    <record id="action_server_request_identity_document" model="ir.actions.server">
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="name">Request Identity Document</field>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_view_types">form</field>
+        <field name="code"><![CDATA[
+action ={
+    "type": "ir.actions.act_window",
+    "res_model": "documents.request_wizard",
+    "views": [[False, "form"]],
+    "target": "new",
+    "context": {
+        "default_folder_id": env.ref('documents.document_inbox_folder').id,
+        "default_res_id": record.id,
+        "default_res_model": env.context.get("default_res_model", False),
+        "default_name": "Identity Document - " + record.name,
+        "default_requestee_id": record.id,
+        "default_partner_id": record.id,
+        "default_activity_date_deadline_range": 7,
+        "default_activity_note": "Please provide your identity document for update.",
+        "default_x_has_chatter_message": True,
+    },
+    "name": "New Document Request",
+}
+]]></field>
+    </record>
+    <record id="server_action_update_owner_id" model="ir.actions.server">
+        <field name="model_id" ref="equity.model_equity_ubo"/>
+        <field name="state">code</field>
+        <field name="name">Update Owner ID</field>
+        <field name="code"><![CDATA[
+for ubo in records:
+    ubo.holder_id['x_id_scan'] = ubo.attachment_ids[-1].datas
+    ubo.holder_id['x_id_expiration_date'] = ubo.attachment_expiration_date
+    ubo.holder_id.message_post(
+        body="The Identity Document Scan changed for this one: ", 
+        attachment_ids=[ubo.attachment_ids[-1].id]
+    )
+action = {
+    'type': 'ir.actions.client',
+    'tag': 'display_notification',
+    'params': {
+        'message': "Identity Document updated",
+        'type': 'success',
+    },
+}
+]]></field>
+    </record>
+    <record id="server_action_request_document_with_chatter_message" model="ir.actions.server">
+        <field name="model_id" ref="documents.model_documents_request_wizard"/>
+        <field name="state">code</field>
+        <field name="name">Request Document with Chatter Message</field>
+        <field name="code"><![CDATA[
+doc = record.request_document()
+doc['x_is_identity_document_request'] = True
+record.partner_id.message_post(body="Document request has been sent")
+]]></field>
+    </record>
+    <record id="server_action_keep_scan_in_chatter" model="ir.actions.server">
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="name">Keep Scan in Chatter</field>
+        <field name="code"><![CDATA[
+for partner in records:
+    partner.message_post(
+        body="The Identity Document Scan changed for this one: ",
+        attachment_ids=[env['ir.attachment'].create({
+            'name': 'Identity Document - ' + record.name + ' - History',
+            'datas': record.x_id_scan,
+        }).id]
+    )
+]]></field>
+    </record>
+    <record id="server_action_update_document_partner_identity" model="ir.actions.server">
+        <field name="model_id" ref="documents.model_documents_document"/>
+        <field name="state">code</field>
+        <field name="name">Update Document Partner ID</field>
+        <field name="code"><![CDATA[
+for document in records:
+    document.partner_id['x_id_scan'] = document.attachment_id.datas
+    document.partner_id.message_post(
+        body="The Identity Document Scan changed for this one: ",
+        attachment_ids=[document.attachment_id.id]
+    )
+action = {
+    'view_mode': 'form',
+    'res_model': 'res.partner',
+    'res_id': document.partner_id.id,
+    'type': 'ir.actions.act_window',
+}
+]]></field>
+    </record>
 </odoo>
