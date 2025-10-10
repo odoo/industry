@@ -14,6 +14,7 @@
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
+        'data/qweb_view.xml',
         'data/ir_actions_act_window.xml',
         'data/account_tax_group.xml',
         'data/ir_actions_server.xml',
@@ -25,6 +26,9 @@
         'data/uom_uom.xml',
         'data/x_excise_category.xml',
         'data/res_config_setting.xml',
+    ],
+    'cloc_exclude': [
+        'data/qweb_view.xml',
     ],
     'license': 'OPL-1',
     'images': ['images/main.png'],
