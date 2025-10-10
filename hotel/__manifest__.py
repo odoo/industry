@@ -10,6 +10,7 @@
         'web_studio',
     ],
     'data': [
+        # arbitrary line to this module to runbot
         'data/planning_role.xml',
         'data/resource_resource.xml',
         'data/pos_config.xml',
