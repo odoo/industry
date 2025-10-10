@@ -1,5 +1,35 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+  <record id="x_city_tax_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <field name="x_slot_ids" create="false">
+          <list string="City tax" editable="bottom" multi_edit="1" class="d-flex">
+            <field name="role_id" string="Room" readonly="True" width="92px"/>
+            <field name="start_datetime" string="Slot" readonly="True" widget="daterange" options="{'end_date_field': 'end_datetime'}"/>
+            <field name="x_nights"/>
+            <field name="x_guests"/>
+            <field name="x_city_tax"/>
+          </list>
+        </field>
+        <group class="d-flex justify-content-end">
+            <field name="x_total" class="text-center"/>
+        </group>
+      </form>
+    </field>
+    <field name="mode">primary</field>
+    <field name="model">x_city_tax</field>
+    <field name="name">x_city_tax.form.booking_engine</field>
+    <field name="priority">200</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="x_city_tax_act_window" model="ir.actions.act_window">
+    <field name="view_ids" eval="[
+      Command.clear(),
+      Command.create({'view_mode': 'form', 'view_id': ref('x_city_tax_form_view')}),
+    ]"/>
+  </record>
   <record id="rental_order_view" model="ir.ui.view">
     <field name="arch" type="xml">
         <xpath expr="//button[@name='action_open_pickup']" position="attributes">
@@ -9,7 +39,7 @@
           <attribute name="string">Check Out</attribute>
         </xpath>
         <xpath expr="//field[@name='is_rental_order']" position="after">
-          <button string="City Tax" name="%(industry_add_update)d" type="action"/>
+          <button string="City Tax" type="action" name="%(x_city_tax_act_window)d"/>
         </xpath>
         <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
           <page string="Guests">
@@ -92,7 +122,7 @@
         <xpath expr="//filter[@name='my_team_shifts']" position="replace"/>
         <xpath expr="//filter[@name='my_shifts']" position="replace"/>
         <xpath expr="//filter[@name='open_shifts']" position="replace"/>
-        <xpath expr="//field[@name='employee_skill_ids']" position="replace"/>
+        <!-- <xpath expr="//field[@name='employee_skill_ids']" position="replace"/> -->
         <xpath expr="//field[@name='job_title']" position="replace"/>
         <xpath expr="//field[@name='manager_id']" position="replace"/>
         <xpath expr="//field[@name='department_id']" position="replace"/>
