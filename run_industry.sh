@@ -3,11 +3,12 @@ set -euo pipefail
 
 # Usage function
 usage() {
-  echo "Usage: ./industry/run_industry.sh -n <industry-name> [-i] [-d] [-t] [-r | -h]"
+  echo "Usage: ./industry/run_industry.sh -n <industry-name> [-i] [-d] [-t] [-p] [-r | -h]"
   echo "  -n <industry-name>   Name of the industry to run"
   echo "  -i                   Import this industry"
   echo "  -d                   Enable demo data when installing"
   echo "  -t                   Run tests for the installed industry"
+  echo "  -p                   Enable Python debugpy listening on port 5678"
   echo "  -r                   Reset the database before running but keeps the industry dependencies installed"
   echo "  -h                   Completely reset the database before running"
   exit 1
@@ -20,14 +21,16 @@ TEST=false
 RESET=false
 HARD_RESET=false
 DEMO=False
+DEBUG=false
 
 # Parse arguments
-while getopts ":n:idtrh" opt; do
+while getopts ":n:idtprh" opt; do
   case $opt in
     n)  INDUSTRY_NAME="$OPTARG";;
     i)  INSTALL=true ;;
     d)  DEMO=True ;;
     t)  TEST=true ;;
+    p)  DEBUG=true ;;
     r)  RESET=true ;;
     h)  HARD_RESET=true ;;
     *)  usage ;;
@@ -40,12 +43,17 @@ echo "Demo: $DEMO"
 echo "Test: $TEST"
 echo "Reset DB: $RESET"
 echo "Hard reset DB: $HARD_RESET"
+echo "Debug: $DEBUG"
 
 PYTHON_BIN="python3"
 ODOO_BIN="odoo/odoo-bin"
 ADDONS_PATH="industry/tests,enterprise,odoo/addons,odoo/odoo/addons,design-themes"
 TEST_TAGS="/test_generic,/test_$INDUSTRY_NAME"
 DEP_DB="dep-$INDUSTRY_NAME"
+
+if $DEBUG; then
+  PYTHON_BIN="$PYTHON_BIN -m debugpy --listen 5678"
+fi
 
 #check module exists
 if [ ! -d "industry/$INDUSTRY_NAME" ]; then
