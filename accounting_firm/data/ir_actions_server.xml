@@ -12,4 +12,40 @@ action = {
 }
         ]]></field>
     </record>
+    <record id="action_server_request_identity_document" model="ir.actions.server">
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="name">Request Identity Document</field>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_view_types">form</field>
+        <field name="code"><![CDATA[
+action ={
+    "type": "ir.actions.act_window",
+    "res_model": "documents.request_wizard",
+    "views": [[False, "form"]],
+    "target": "new",
+    "context": {
+        "default_folder_id": 2,
+        "default_res_id": record.id or False,
+        "default_res_model": env.context.get("default_res_model", False),
+        "default_name": "Identity Document",
+        "default_requestee_id": record.id,
+        "default_partner_id": record.id,
+        "default_activity_date_deadline_range": 7,
+        "default_activity_note": "Please provide your identity document for update.",
+    },
+    "name": "New Document Request",
+}
+        ]]></field>
+    </record>
+    <record id="server_action_update_owner_id" model="ir.actions.server">
+        <field name="model_id" ref="equity.model_equity_ubo"/>
+        <field name="state">code</field>
+        <field name="name">Update Owner ID</field>
+        <field name="code"><![CDATA[
+for ubo in records.filtered('attachment_ids'):
+    ubo.holder_id['x_id_scan'] = ubo.attachment_ids[-1].datas
+    ubo.holder_id['x_id_expiration_date'] = ubo.attachment_expiration_date
+        ]]></field>
+    </record>
 </odoo>

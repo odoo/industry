@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="ir_cron_request_guest_id_document" model="ir.cron">
+        <field name="name">Accounting Firm: Request Guest Identity Document</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for contact in model.search([('x_id_expiration_date', '!=', False)]):
+    if contact.x_id_expiration_date < datetime.datetime.today().date() + dateutil.relativedelta.relativedelta(days=7):
+        action_send_doc_request = env['ir.actions.server'].browse(env.ref('accounting_firm.action_server_request_identity_document').id)
+        action_send_doc_request.with_context(active_id=contact.id, active_model="res.partner").run()
+]]></field>
+    </record>
+</odoo>
