@@ -14,6 +14,7 @@
         'sale_planning',
         'sale_timesheet_enterprise',
         'sign',
+        'web_studio',
     ],
     'data': [
         'data/res_config_settings.xml',
@@ -22,6 +23,7 @@
         'data/ir_model_fields.xml',
         'data/ir_default.xml',
         'data/ir_actions_server.xml',
+        'data/ir_cron.xml',
         'data/ir_ui_view.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_ui_menu.xml',
@@ -61,7 +63,6 @@
         'demo/project_task.xml',
     ],
     'cloc_exclude': [
-        'data/ir_actions_server.xml',
         'data/knowledge_article.xml',
     ],
     'images': [
