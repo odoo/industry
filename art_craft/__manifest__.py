@@ -3,7 +3,6 @@
     'version': '1.0',
     'category': 'Retail',
     'depends': [
-        'hr_hourly_cost',
         'knowledge',
         'pos_sale',
         'product_email_template',
