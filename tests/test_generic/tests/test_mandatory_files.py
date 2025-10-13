@@ -1,15 +1,11 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from difflib import unified_diff
-import io
 import logging
 import os
 from pathlib import Path
 import re
 
-from odoo import release
-from odoo.tests import get_db_name, tagged
-from odoo.tools.translate import trans_export
+from odoo.tests import tagged
 
 from .industry_case import IndustryCase, get_industry_path
 
@@ -39,17 +35,3 @@ class FileTest(IndustryCase):
             if not re.search(module, weblate_config):
                 _logger.error("Missing module in .weblate.json")
                 continue
-            if True:  # release.version_info[3] != 'final':
-                # skip test if master
-                continue
-
-            db_name = get_db_name()
-            if db_name.endswith('imported_no_demo'):
-                return
-            with io.BytesIO() as buf:
-                trans_export(False, [module], buf, 'po', self.env)
-                new = buf.getvalue().decode("utf-8")
-            old = Path(get_industry_path() + module + '/i18n/' + module + '.pot').read_text(encoding="utf-8")
-            diff = list(unified_diff(old.split('\n'), new.split('\n')))
-            if diff_str := '\n'.join(diff[16:]):
-                _logger.warning("You forgot to export the pot file. Here is what changed:\n%s", diff_str)
