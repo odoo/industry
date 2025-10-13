@@ -51,15 +51,17 @@ class TestEnv(IndustryCase):
             if not (ref := self.env.ref(module + '.notification_knowledge', raise_if_not_found=False)):
                 _logger.warning("You forgot to define a `mail.message` with `id=notification_knowledge`.")
             notif = ref and self.env['mail.message'].browse(ref.id)
-            if notif and '/knowledge/article/' not in notif.body:
+            if notif and '/odoo/knowledge/' not in notif.body:
                 _logger.warning("The mail.message should contain a link to the knowledge article.")
+            if notif and 'Get started with' not in notif.subject:
+                _logger.warning("The mail.message subject is wrong: %s.", notif.subject)
 
             knowledge = self.env.ref(f"{module}.welcome_article", raise_if_not_found=False)
             if not knowledge:
                 _logger.warning("Missing knowledge article for the industry module.")
             if knowledge.favorite_count == 0:
                 _logger.warning("The knowledge article should be in the favorite category")
-            if notif and knowledge and '/knowledge/article/%s' % knowledge.id not in notif.body:
+            if notif and knowledge and '/odoo/knowledge/%s' % knowledge.id not in notif.body:
                 _logger.warning("The notification link should target the module-related knowledge article.")
 
     def test_cloc_exclude_view(self):
