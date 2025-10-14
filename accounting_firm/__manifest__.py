@@ -46,6 +46,7 @@
         'data/sale_order_template_line.xml',
     ],
     'demo': [
+        'demo/x_mandate.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/equity_ubo.xml',

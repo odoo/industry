@@ -33,10 +33,11 @@ action ={
         "default_partner_id": record.id,
         "default_activity_date_deadline_range": 7,
         "default_activity_note": "Please provide your identity document for update.",
+        "default_x_has_chatter_message": True,
     },
     "name": "New Document Request",
 }
-        ]]></field>
+]]></field>
     </record>
     <record id="server_action_update_owner_id" model="ir.actions.server">
         <field name="model_id" ref="equity.model_equity_ubo"/>
@@ -46,6 +47,24 @@ action ={
 for ubo in records.filtered('attachment_ids'):
     ubo.holder_id['x_id_scan'] = ubo.attachment_ids[-1].datas
     ubo.holder_id['x_id_expiration_date'] = ubo.attachment_expiration_date
-        ]]></field>
+action = {
+    'type': 'ir.actions.client',
+    'tag': 'display_notification',
+    'params': {
+        'message': "Identity Document updated",
+        'type': 'success',
+    },
+}
+]]></field>
+    </record>
+    <record id="server_action_request_document_with_chatter_message" model="ir.actions.server">
+        <field name="model_id" ref="documents.model_documents_request_wizard"/>
+        <field name="state">code</field>
+        <field name="name">Request Document with Chatter Message</field>
+        <field name="code"><![CDATA[
+doc = record.request_document()
+doc['x_is_identity_document_request'] = True
+record.partner_id.message_post(body="Document request has been sent")
+]]></field>
     </record>
 </odoo>

@@ -28,7 +28,7 @@
                     <group>
                         <group id="accounting_firm_id_page_left_group"/>
                         <group>
-                            <field name="x_id_expiration_date"/>
+                            <field name="x_id_expiration_date" decoration-danger="x_id_expiration_date &lt; current_date"/>
                             <field name="x_id_scan" widget="pdf_viewer"/>
                         </group>
                     </group>
@@ -179,6 +179,21 @@
                 <header invisible="not attachment_ids or not attachment_expiration_date">
                     <button string="Update Owner ID" type="action" name="%(server_action_update_owner_id)d"/>
                 </header>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Documents Request Wizard -->
+    <record id="document_request_wizard_form_view_inherited" model="ir.ui.view">
+        <field name="name">documents.request.wizard.form.view.inherited</field>
+        <field name="model">documents.request_wizard</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="documents.documents_request_form_view"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='request_document']" position="replace">
+                <button invisible="x_has_chatter_message" name="request_document" type="object" string="Request" class="btn btn-primary" data-hotkey="q"/>
+                <button invisible="not x_has_chatter_message" name="%(server_action_request_document_with_chatter_message)d" type="action" string="Request" class="btn btn-primary" data-hotkey="q"/>
             </xpath>
         </field>
     </record>
