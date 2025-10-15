@@ -100,15 +100,6 @@ for record in self:
         <field name="model_id" ref="stock.model_stock_lot"/>
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
-        <field name="compute"><![CDATA[
-for record in self:
-    x_maintenance = 'N/A'
-    if len(record.delivery_ids) > 0 :
-        x_maintenance = 'No Maintenance'
-    if record.x_maintenances_ids and any(maintenance.subscription_state == '3_progress' for maintenance in record.x_maintenances_ids):
-        x_maintenance = 'Maintained'
-    record['x_maintenance'] = x_maintenance
-]]></field>
     </record>
     <record id="x_maintenance_field_selection_maintained" model="ir.model.fields.selection">
         <field name="name">Maintained</field>
@@ -124,6 +115,17 @@ for record in self:
         <field name="name">N/A</field>
         <field name="field_id" ref="x_maintenance_field" />
         <field name="value">N/A</field>
+    </record>
+    <record id="x_maintenance_field" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self:
+    x_maintenance = 'N/A'
+    if len(record.delivery_ids) > 0 :
+        x_maintenance = 'No Maintenance'
+    if record.x_maintenances_ids and any(maintenance.subscription_state == '3_progress' for maintenance in record.x_maintenances_ids):
+        x_maintenance = 'Maintained'
+    record['x_maintenance'] = x_maintenance
+]]></field>
     </record>
     <record id="x_project_task_id_field" model="ir.model.fields">
         <field name="name">x_project_task_id</field>

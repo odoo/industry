@@ -298,17 +298,6 @@ for property in self:
         <field name="ttype">selection</field>
         <field name="readonly" eval="True"/>
         <field name="depends">x_property_meter_reading_ids.x_usage,x_property_meter_reading_ids.x_invoice_id</field>
-        <field name="compute">
-<![CDATA[
-for record in self:
-    meter_readings = record.x_property_meter_reading_ids.filtered(lambda l: l.x_usage > 0)
-    if not meter_readings:
-        record['x_invoice_status'] = 'no'
-    elif not meter_readings.filtered(lambda l: not l.x_invoice_id):
-        record['x_invoice_status'] = 'invoiced'
-    else:
-        record['x_invoice_status'] = 'to_invoice'
-]]></field>
     </record>
 
     <record id="field_property_invoice_status_selection_no" model="ir.model.fields.selection">
@@ -327,6 +316,20 @@ for record in self:
         <field name="name">To invoice</field>
         <field name="field_id" ref="field_property_invoice_status" />
         <field name="value">to_invoice</field>
+    </record>
+
+    <record id="field_property_invoice_status" model="ir.model.fields">
+        <field name="compute">
+<![CDATA[
+for record in self:
+    meter_readings = record.x_property_meter_reading_ids.filtered(lambda l: l.x_usage > 0)
+    if not meter_readings:
+        record['x_invoice_status'] = 'no'
+    elif not meter_readings.filtered(lambda l: not l.x_invoice_id):
+        record['x_invoice_status'] = 'invoiced'
+    else:
+        record['x_invoice_status'] = 'to_invoice'
+]]></field>
     </record>
 
     <!-- crm lead -->

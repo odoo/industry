@@ -138,26 +138,6 @@ for template in self:
         <field name="readonly" eval="True"/>
     </record>
     <record id="stock_move_fiscal_deposit_move" model="ir.model.fields">
-      <field name="compute"><![CDATA[for record in self:
-    record['x_fiscal_deposit_move'] = "none"
-    if record.location_id.usage == 'internal' and record.location_dest_id.usage == 'internal':
-        if record.location_id.warehouse_id.x_is_fiscal_deposit and record.location_dest_id.warehouse_id.x_is_fiscal_deposit:
-            record['x_fiscal_deposit_move'] = "transfer"
-        elif record.location_id.warehouse_id.x_is_fiscal_deposit:
-            record['x_fiscal_deposit_move'] = "exit"
-        elif record.location_dest_id.warehouse_id.x_is_fiscal_deposit:
-            record['x_fiscal_deposit_move'] = "entry"
-    elif record.location_id.warehouse_id.x_is_fiscal_deposit:
-        if record.picking_id.partner_id.property_account_position_id.x_is_fiscal_deposit:
-            record['x_fiscal_deposit_move'] = "exit fd"
-        else:
-            record['x_fiscal_deposit_move'] = "exit"
-    elif record.location_dest_id.warehouse_id.x_is_fiscal_deposit:
-        if record.picking_id.partner_id.property_account_position_id.x_is_fiscal_deposit:
-            record['x_fiscal_deposit_move'] = "entry fd"
-        else:
-            record['x_fiscal_deposit_move'] = "entry"
-        ]]></field>
       <field name="ttype">selection</field>
       <field name="depends">location_id,location_dest_id</field>
       <field name="field_description">Fiscal deposit move</field>
@@ -195,6 +175,28 @@ for template in self:
         <field name="field_id" ref="stock_move_fiscal_deposit_move" />
         <field name="value">transfer</field>
     </record>
+    <record id="stock_move_fiscal_deposit_move" model="ir.model.fields">
+        <field name="compute"><![CDATA[for record in self:
+    record['x_fiscal_deposit_move'] = "none"
+    if record.location_id.usage == 'internal' and record.location_dest_id.usage == 'internal':
+        if record.location_id.warehouse_id.x_is_fiscal_deposit and record.location_dest_id.warehouse_id.x_is_fiscal_deposit:
+            record['x_fiscal_deposit_move'] = "transfer"
+        elif record.location_id.warehouse_id.x_is_fiscal_deposit:
+            record['x_fiscal_deposit_move'] = "exit"
+        elif record.location_dest_id.warehouse_id.x_is_fiscal_deposit:
+            record['x_fiscal_deposit_move'] = "entry"
+    elif record.location_id.warehouse_id.x_is_fiscal_deposit:
+        if record.picking_id.partner_id.property_account_position_id.x_is_fiscal_deposit:
+            record['x_fiscal_deposit_move'] = "exit fd"
+        else:
+            record['x_fiscal_deposit_move'] = "exit"
+    elif record.location_dest_id.warehouse_id.x_is_fiscal_deposit:
+        if record.picking_id.partner_id.property_account_position_id.x_is_fiscal_deposit:
+            record['x_fiscal_deposit_move'] = "entry fd"
+        else:
+            record['x_fiscal_deposit_move'] = "entry"
+        ]]></field>
+    </record>
     <record id="stock_move_currency" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="field_description">Currency</field>
@@ -214,7 +216,7 @@ for template in self:
         record['x_excise_amount'] = amount
     ]]></field>
       <field name="ttype">monetary</field>
-      <field name="depends">quantity, product_id</field>
+      <field name="depends">quantity, product_id, x_fiscal_deposit_move</field>
       <field name="field_description">Excise amount</field>
       <field name="model_id" ref="stock.model_stock_move"/>
       <field name="name">x_excise_amount</field>
@@ -233,9 +235,9 @@ for template in self:
     <record id="stock_move_excise_quantity" model="ir.model.fields">
       <field name="compute"><![CDATA[for record in self:
     record['x_excise_quantity'] = 0
-    if 'exit' in record.x_fiscal_deposit_move:
+    if record.x_fiscal_deposit_move and 'exit' in record.x_fiscal_deposit_move:
         record['x_excise_quantity'] = -1 * record.quantity * record.product_id.x_excise_quantity
-    elif 'entry' in record.x_fiscal_deposit_move:
+    elif record.x_fiscal_deposit_move and 'entry' in record.x_fiscal_deposit_move:
         record['x_excise_quantity'] = +1 * record.quantity * record.product_id.x_excise_quantity
 ]]></field>
       <field name="ttype">float</field>
