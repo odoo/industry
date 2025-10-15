@@ -52,6 +52,8 @@
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
         'demo/ir_cron.xml',
+        'demo/esg_emission_source.xml',
+        'demo/esg_emission_factor.xml',
         'demo/account_move.xml',
         'demo/account_move_line.xml',
         'demo/account_analytic_line.xml',
