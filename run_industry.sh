@@ -36,6 +36,7 @@ echo "Demo: $DEMO"
 echo "Test: $TEST"
 echo "Reset DB: $RESET_DB"
 
+INDUSTRY_PATH="industry/"
 PYTHON_BIN="python3"
 ODOO_BIN="odoo/odoo-bin"
 ADDONS_PATH="industry/tests,enterprise,odoo/addons,odoo/odoo/addons,design-themes"
@@ -55,12 +56,10 @@ if $INSTALL; then
   cat <<EOF > "$TMP_INSTALL_PY"
 import sys
 sys.path.append('industry/')
-from utils import get_zip
-def main():
-    zip = get_zip('$INDUSTRY_NAME', env)
-    res = env['ir.module.module'].sudo()._import_zipfile(zip, force=False, with_demo=$DEMO)
-    print(res[0])
-main()
+from utils import IndustryUtils
+zip = IndustryUtils('$INDUSTRY_PATH').get_zip('$INDUSTRY_NAME')
+res = env['ir.module.module'].sudo()._import_zipfile(zip, force=False, with_demo=$DEMO)
+print("")
 env.cr.commit()
 exit()
 EOF
