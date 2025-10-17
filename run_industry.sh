@@ -3,10 +3,10 @@ set -euo pipefail
 
 # Usage function
 usage() {
-  echo "Usage: ./industry/run_industry.sh -n <industry-name> [-i] [-d] [-t] [-p] [-r | -h]"
+  echo "Usage: ./industry/run_industry.sh -n <industry-name> [-i | -d] [-t] [-p] [-r | -h]"
   echo "  -n <industry-name>   Name of the industry to run"
-  echo "  -i                   Import this industry"
-  echo "  -d                   Enable demo data when installing"
+  echo "  -i                   Import this industry without demo"
+  echo "  -d                   Import this industry with demo"
   echo "  -t                   Run tests for the installed industry"
   echo "  -p                   Enable Python debugpy listening on port 5678"
   echo "  -r                   Reset the database before running but keeps the industry dependencies installed"
@@ -37,6 +37,10 @@ while getopts ":n:idtprh" opt; do
   esac
 done
 
+if [[ $DEMO == True ]]; then
+  INSTALL=true
+fi
+
 echo "Industry: $INDUSTRY_NAME"
 echo "Install: $INSTALL"
 echo "Demo: $DEMO"
@@ -45,9 +49,10 @@ echo "Reset DB: $RESET"
 echo "Hard reset DB: $HARD_RESET"
 echo "Debug: $DEBUG"
 
+INDUSTRY_PATH="industry/"
 PYTHON_BIN="python3"
 ODOO_BIN="odoo/odoo-bin"
-ADDONS_PATH="industry/tests,enterprise,odoo/addons,odoo/odoo/addons,design-themes"
+ADDONS_PATH="$INDUSTRY_PATH/tests,enterprise,odoo/addons,odoo/odoo/addons,design-themes"
 TEST_TAGS="/test_generic,/test_$INDUSTRY_NAME"
 DEP_DB="dep-$INDUSTRY_NAME"
 
@@ -56,13 +61,13 @@ if $DEBUG; then
 fi
 
 #check module exists
-if [ ! -d "industry/$INDUSTRY_NAME" ]; then
+if [ ! -d "$INDUSTRY_PATH$INDUSTRY_NAME" ]; then
   echo "Module '$INDUSTRY_NAME' does not exist."
   exit 1
 fi
 
 #check manifest exists
-if [ ! -f "industry/$INDUSTRY_NAME/__manifest__.py" ]; then
+if [ ! -f "$INDUSTRY_PATH$INDUSTRY_NAME/__manifest__.py" ]; then
   echo "Manifest file not found."
   exit 1
 fi
@@ -81,9 +86,9 @@ if $HARD_RESET; then
   TMP_DEP_PY=$(mktemp)
   cat <<EOF > "$TMP_DEP_PY"
 import sys
-sys.path.append('industry/')
-from utils import install_internal_dependencies
-res = install_internal_dependencies('industry/$INDUSTRY_NAME', env)
+sys.path.append('$INDUSTRY_PATH')
+from utils import IndustryUtils
+IndustryUtils('$INDUSTRY_PATH').install_internal_dependencies('$INDUSTRY_NAME', env)
 print("")
 env.cr.commit()
 exit()
@@ -104,13 +109,11 @@ if $INSTALL; then
   TMP_INSTALL_PY=$(mktemp)
   cat <<EOF > "$TMP_INSTALL_PY"
 import sys
-sys.path.append('industry/')
-from utils import get_zip
-def main():
-    zip = get_zip('$INDUSTRY_NAME', env)
-    res = env['ir.module.module']._import_zipfile(zip, force=False, with_demo=$DEMO)
-    print(res[0])
-main()
+sys.path.append('$INDUSTRY_PATH')
+from utils import IndustryUtils
+zip = IndustryUtils('$INDUSTRY_PATH').get_zip('$INDUSTRY_NAME')
+env['ir.module.module']._import_zipfile(zip, force=False, with_demo=$DEMO)
+print("")
 env.cr.commit()
 exit()
 EOF
