@@ -7,6 +7,7 @@
         'accountant',
         'base_industry_data',
         'crm_enterprise',
+        'databases',
         'documents',
         'equity',
         'knowledge',
@@ -16,6 +17,7 @@
         'sign',
     ],
     'data': [
+        'data/ir_attachment_pre.xml',
         'data/res_config_settings.xml',
         'data/ir_actions_server.xml',
         'data/ir_ui_view.xml',
