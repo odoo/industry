@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="server_action_set_work_item_name" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Set Work Item name</field>
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record.write({'x_name': record.x_product_id.name})
+]]></field>
+    </record>
+    <record id="server_action_set_unit_cost_price_from_product" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Set unit cost and unit price from product</field>
+        <field name="model_id" ref="x_work_item_line_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record.write({
+    'x_unit_price': record.x_product_id.list_price,
+    'x_unit_cost': record.x_product_id.standard_price,
+})]]></field>
+    </record>
+    <record id="server_action_update_product_cost" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Update product cost</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="product.model_product_product"/>
+        <field name="update_path">x_product_id.standard_price</field>
+        <field name="update_field_id" ref="product.field_product_product__standard_price"/>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[record.x_unit_cost]]></field>
+    </record>
+    <record id="server_action_update_product_price" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Update product price</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="product.model_product_product"/>
+        <field name="update_path">x_product_id.lst_price</field>
+        <field name="update_field_id" ref="product.field_product_product__lst_price"/>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[record.x_unit_price]]></field>
+    </record>
+    <record id="server_action_set_work_item_as_template" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Set as template</field>
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record.copy(default={'x_sale_order_line_id': False, 'x_is_template': True, 'x_targeted_so': False})
+action = {
+    'type': 'ir.actions.client',
+    'tag': 'display_notification',
+    'params': {'message': record.x_name + " template saved.", 'type': 'success'},
+}
+]]></field>
+    </record>
+    <record id="server_action_create_product_for_wi" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Create new product for work item</field>
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for wi in records:
+    new_product = env['product.product'].create({
+        'name': wi.x_name,
+        'default_code': wi.x_reference,
+        'type': 'service',
+        'service_policy': "delivered_manual",
+        'list_price': wi.x_unit_price,
+        'standard_price': wi.x_unit_cost,
+        'uom_id': wi.x_unit_id.id,
+    })
+    wi.write({'x_product_id': new_product.id})
+]]></field>
+    </record>
+    <record id="server_action_create_or_modify_wi_on_sol" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Create/modify work item on sale order line</field>
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if record.x_sale_order_line_id:
+    record.x_sale_order_line_id.write({
+        'price_unit': record.x_unit_price,
+        'purchase_price': record.x_unit_cost,
+    })
+elif record.x_targeted_so:
+    env['ir.actions.server'].browse(env.ref('construction_work_items.server_action_create_product_for_wi').id).run()
+    env['sale.order.line'].create({
+        'order_id': record.x_targeted_so.id,
+        'product_id': record.x_product_id.id,
+        'price_unit': record.x_unit_price,
+        'purchase_price': record.x_unit_cost,
+        'x_line_work_item_ids': [record.id],
+    })
+]]></field>
+    </record>
+    <record id="server_action_create_associated_work_item" model="ir.actions.server">
+        <field name="name">Construction: SOL - Create associated Work Item</field>
+        <field name="model_id" ref="sale.model_sale_order_line" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for sol in records:
+    sol.product_id.x_work_item_template_id.copy({
+        'x_sale_order_line_id': record.id,
+        'x_is_template': False,
+    })
+]]></field>
+    </record>
+    <record id="server_action_open_sol_work_item" model="ir.actions.server">
+        <field name="name">Construction: SOL - Open SOL Work Item</field>
+        <field name="model_id" ref="sale.model_sale_order_line" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+action = {
+    "type": "ir.actions.act_window",
+    "res_model": "x_work_item",
+    "res_id": record.x_line_work_item_ids[:1].id,
+    "view_mode": "form",
+    "target": "new",
+}
+]]></field>
+    </record>
+    <record id="server_action_assign_x_template_work_item_id" model="ir.actions.server">
+        <field name="name">Construction: Product - Assign Template Work Item</field>
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for work_item in records.filtered(lambda w: w.x_is_template and w.x_product_id and w.x_active):
+    work_item.x_product_id.x_last_tmpl_wi_id.write({'x_active': False})
+    work_item.write({'x_active': True})
+    work_item.x_product_id['x_last_tmpl_wi_id'] = work_item.id
+]]></field>
+    </record>
+</odoo>

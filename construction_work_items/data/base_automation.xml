@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="base_automation_on_product_from_wi_line_change" model="base.automation">
+        <field name="model_id" ref="x_work_item_line_model" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_set_unit_cost_price_from_product')])]" />
+        <field name="trigger">on_change</field>
+        <field name="name">Construction: Work Item line - On product change</field>
+        <field name="on_change_field_ids"
+            eval="[(6, 0, [ref('x_product_id_field_x_work_item_line')])]" />
+    </record>
+    <record id="base_automation_on_product_from_wi_change" model="base.automation">
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_set_work_item_name')])]" />
+        <field name="trigger">on_change</field>
+        <field name="name">Construction: Work Item - On product change</field>
+        <field name="on_change_field_ids"
+            eval="[(6, 0, [ref('x_product_id_field_x_work_item')])]" />
+    </record>
+    <record id="base_automation_work_item_template_on_write" model="base.automation">
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_create_or_modify_wi_on_sol')])]" />
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[("x_is_template", "=", False)]</field>
+        <field name="name">Construction: Work Item - On save of non template</field>
+    </record>
+    <record id="base_automation_work_item_on_write_unit_cost_price_change" model="base.automation">
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_update_product_cost'), ref('server_action_update_product_price')])]" />
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Construction: Work Item - On save and unit cost/price change</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_unit_cost_field_x_work_item'), ref('x_unit_price_field_x_work_item')])]"/>
+    </record>
+    <record id="base_automation_work_item_on_write" model="base.automation">
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_assign_x_template_work_item_id')])]" />
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Construction: Work Item - On save</field>
+    </record>
+    <record id="base_automation_sol_on_write" model="base.automation">
+        <field name="model_id" ref="sale.model_sale_order_line" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_create_associated_work_item')])]" />
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Construction: SOL - On save</field>
+        <field name="filter_domain">[('x_line_work_item_ids', '=', False), ('product_id.x_work_item_template_id', '!=', False)]</field>
+    </record>
+    <record id="base_automation_wi_template_without_product_on_write" model="base.automation">
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_create_product_for_wi')])]" />
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[('x_is_template', '!=', False), ('x_product_id', '=', False)]</field>
+        <field name="name">Construction: Work Item - On save of work item template without product</field>
+    </record>
+</odoo>
