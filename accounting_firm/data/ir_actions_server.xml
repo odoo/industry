@@ -25,8 +25,8 @@ action ={
     "views": [[False, "form"]],
     "target": "new",
     "context": {
-        "default_folder_id": 2,
-        "default_res_id": record.id or False,
+        "default_folder_id": env.ref('documents.document_inbox_folder').id,
+        "default_res_id": record.id,
         "default_res_model": env.context.get("default_res_model", False),
         "default_name": "Identity Document - " + record.name,
         "default_requestee_id": record.id,
@@ -44,15 +44,12 @@ action ={
         <field name="state">code</field>
         <field name="name">Update Owner ID</field>
         <field name="code"><![CDATA[
-for ubo in records.filtered('attachment_ids'):
+for ubo in records:
     ubo.holder_id['x_id_scan'] = ubo.attachment_ids[-1].datas
     ubo.holder_id['x_id_expiration_date'] = ubo.attachment_expiration_date
     ubo.holder_id.message_post(
         body="The Identity Document Scan changed for this one: ", 
-        attachment_ids=[env['ir.attachment'].create({
-            'name': 'Identity Document - ' + ubo.holder_id.name + ' - History',
-            'datas': ubo.holder_id.x_id_scan,
-        }).id]
+        attachment_ids=[ubo.attachment_ids[-1].id]
     )
 action = {
     'type': 'ir.actions.client',
@@ -97,11 +94,8 @@ for partner in records:
 for document in records:
     document.partner_id['x_id_scan'] = document.attachment_id.datas
     document.partner_id.message_post(
-        body="The Identity Document Scan changed for this one: ", 
-        attachment_ids=[env['ir.attachment'].create({
-            'name': 'Identity Document - ' + document.partner_id.name + ' - History',
-            'datas': document.partner_id.x_id_scan,
-        }).id]
+        body="The Identity Document Scan changed for this one: ",
+        attachment_ids=[document.attachment_id.id]
     )
 action = {
     'view_mode': 'form',

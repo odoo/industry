@@ -28,6 +28,7 @@
         'data/ir_ui_view.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_ui_menu.xml',
+        'data/x_aml_risk_type.xml',
         'data/mail_activity_type.xml',
         'data/crm_stage.xml',
         'data/knowledge_article.xml',
