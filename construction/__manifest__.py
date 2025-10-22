@@ -1,19 +1,18 @@
 {
-    'name': 'Construction',
+    'name': 'Construction Builder',
+    'version': '1.1',
     'category': 'Construction',
     'depends': [
         'base_industry_data',
         'crm_enterprise',
         'documents',
-        'hr',
-        'industry_fsm',
+        'helpdesk',
         'industry_fsm_stock',
         'knowledge',
         'purchase_stock',
         'sale_crm',
         'sale_margin',
         'sale_project_forecast',
-        'sign',
     ],
     'data': [
         'data/documents_folder.xml',
