@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="x_bill_of_materials_list_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <list default_order="x_sequence asc, id desc">
+            <field name="x_sequence" widget="handle"/>
+            <field name="x_name"/>
+            <field name="x_product_product_id" optional="show"/>
+            <field name="x_unit_quantity" optional="show"/>
+            <field name="x_unit_id" optional="show"/>
+            <field name="x_unit_cost" optional="show"/>
+            <field name="x_unit_price" optional="show"/>
+            <field name="x_unit_margin" optional="show" widget="percentage"/>
+        </list>
+        </field>
+        <field name="model">x_bill_of_materials</field>
+        <field name="name">Default list view for x_bill_of_materials</field>
+        <field name="type">list</field>
+    </record>
+    <record id="x_bill_of_materials_form_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <form>
+            <!-- <header>
+                <button string="Set as Template" type="action" invisible="x_is_template or not id" name="construction_bom_set_e043ff67-0bcf-49d3-aa82-c69fd788b0e7"/>
+            </header> -->
+            <sheet string="Bill of Materials">
+                <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+                <field name="x_active" invisible="1"/>
+                <div class="oe_title">
+                    <h1>
+                        <field name="x_name" required="1" placeholder="Name..."/>
+                    </h1>
+                </div>
+                <group>
+                    <group>
+                        <field name="x_product_product_id" force_save="1" readonly="not x_is_template" invisible="x_sol_on_create" string="Product" required="x_is_template"/>
+                        <field name="x_reference"/>
+                        <label for="x_unit_quantity"/>
+                        <div class="d-flex" name="unit_quantity">
+                            <field name="x_unit_quantity" class="oe_inline" force_save="1" readonly="not x_is_template"/>
+                            <field name="x_unit_id" class="oe_inline" force_save="1" readonly="not x_product_id and not x_targeted_so" options="{'no_open': True}" placeholder="m²" required="not x_product_product_id"/>
+                        </div>
+                        <field name="x_is_template" invisible="True"/>
+                    </group>
+                    <group>
+                        <field name="x_unit_cost" force_save="1" readonly="True"/>
+                        <field name="x_unit_price" force_save="1" readonly="True"/>
+                        <field name="x_unit_margin" widget="percentage" force_save="1" readonly="True"/>
+                    </group>
+                </group>
+                <notebook>
+                    <page string="Components" name="lines">
+                        <field name="x_bill_of_materials_line_ids">
+                            <list editable="bottom" default_order="x_sequence asc, id desc" open_form_view="false">
+                                <field name="x_sequence" widget="handle"/>
+                                <field optional="show" name="x_product_product_id" string="Product"/>
+                                <field optional="show" name="x_unit_cost"/>
+                                <field optional="show" name="x_unit_price"/>
+                                <field optional="show" name="x_margin" widget="percentage" readonly="True"/>
+                                <field optional="show" name="x_quantity"/>
+                                <field optional="show" name="x_unit_id" readonly="True"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+            </sheet>
+            <!-- <chatter/> -->
+        </form>
+        </field>
+        <field name="model">x_bill_of_materials</field>
+        <field name="name">Default form view for x_bill_of_materials</field>
+        <field name="type">form</field>
+    </record>
+    <record id="x_bill_of_materials_search_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <search>
+            <field name="x_name"/>
+            <field name="x_product_product_id"/>
+            <separator/>
+            <filter string="Archived" name="archived_x_bill_of_materials" domain="[['x_active', '=', False]]"/>
+            <separator/>
+        </search>
+        </field>
+        <field name="model">x_bill_of_materials</field>
+        <field name="name">Default search view for x_bill_of_materials</field>
+        <field name="type">search</field>
+    </record>
+    
+
+
+
+    <record id="x_bill_of_materials_line_list_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <list editable="bottom" default_order="x_sequence asc, id desc">
+            <field name="x_sequence" widget="handle"/>
+            <field name="x_name"/>
+        </list>
+        </field>
+        <field name="model">x_bill_of_materials_line</field>
+        <field name="name">Default list view for x_bill_of_materials_line</field>
+        <field name="type">list</field>
+    </record>
+    <record id="x_bill_of_materials_line_form_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <form>
+            <header/>
+            <sheet string="bill_of_materials_line">
+            <div class="oe_title">
+                <h1>
+                    <field name="x_name" required="False" placeholder="Name..."/>
+                </h1>
+            </div>
+            <group>
+                <group>
+                    <field name="x_margin" widget="percentage"/>
+                </group>
+            </group>
+            </sheet>
+        </form>
+        </field>
+        <field name="model">x_bill_of_materials_line</field>
+        <field name="name">Default form view for x_bill_of_materials_line</field>
+        <field name="type">form</field>
+    </record>
+    <record id="x_bill_of_materials_line_search_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <search>
+            <field name="x_name"/>
+        </search>
+        </field>
+        <field name="model">x_bill_of_materials_line</field>
+        <field name="name">Default search view for x_bill_of_materials_line</field>
+        <field name="type">search</field>
+    </record>
+
+
+    <record id="sale_order_form_view_extension" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <data>
+            <!-- <xpath expr="/form/sheet/notebook/page[@name='order_lines']/field[@name='order_line']/list//field[@name='route_ids']" position="after">
+                <button name="959" type="action" class="btn btn-link" icon="fa-magic" width="1" invisible="not x_bom_able"/>
+            </xpath>
+            <xpath expr="/form/sheet/notebook/page[@name='order_lines']/field[@name='order_line']/list//create[@name='add_note_control']" position="after">
+                <button string="Add Work Item" name="965" type="action" class="px-4 btn-link" context="{'so_id': parent.id}"/>
+            </xpath> -->
+        </data>
+        </field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="mode">extension</field>
+        <field name="model">sale.order</field>
+        <field name="name">Construction Work Items: sale.order.form customization</field>
+        <field name="priority">1600</field>
+        <field name="type">form</field>
+    </record>
+</odoo>
