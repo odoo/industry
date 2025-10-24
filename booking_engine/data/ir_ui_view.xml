@@ -1,5 +1,47 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+  <record id="x_city_tax_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <field name="x_slot_ids">
+          <list string="City tax" editable="bottom" multi_edit="1" class="d-flex">
+            <field name="role_id" string="Room" readonly="True" width="92px"/>
+            <field name="start_datetime" string="Slot" readonly="True" widget="daterange" options="{'end_date_field': 'end_datetime'}"/>
+            <field name="x_nights"/>
+            <field name="x_guests"/>
+            <field name="x_city_tax"/>
+          </list>
+        </field>
+        <group class="d-flex justify-content-end">
+          <field name="x_total" class="text-center"/>
+        </group>
+        <footer>
+          <button string="Save" class="btn btn-primary" type="action" name="%(update_city_tax_action)d"/>
+          <button special="cancel" string="Cancel" class="btn btn-secondary"/>
+        </footer>
+      </form>
+    </field>
+    <field name="mode">primary</field>
+    <field name="model">x_city_tax</field>
+    <field name="name">x_city_tax.form.booking_engine</field>
+    <field name="priority">200</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="rental_order_view_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//button[@name='apply']" position="replace">
+        <button string="Validate" class="btn btn-primary" type="action" name="%(apply_rental_check_out)d" data-hotkey="q"/>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="sale_renting.rental_order_wizard_view_form"/>
+    <field name="mode">extension</field>
+    <field name="model">rental.order.wizard</field>
+    <field name="name">rental.order.wizard.form.booking_engine</field>
+    <field name="priority">200</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
   <record id="rental_order_view" model="ir.ui.view">
     <field name="arch" type="xml">
         <xpath expr="//button[@name='action_open_pickup']" position="attributes">
@@ -9,7 +51,7 @@
           <attribute name="string">Check Out</attribute>
         </xpath>
         <xpath expr="//field[@name='is_rental_order']" position="after">
-          <button string="City Tax" name="%(industry_add_update)d" type="action"/>
+          <button string="City Tax" type="action" name="%(open_x_city_tax_action)d"/>
         </xpath>
         <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
           <page string="Guests">
