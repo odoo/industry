@@ -1,6 +1,6 @@
 {
     'name': 'Booking Engine',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Hidden/Tools',
     'author': 'Odoo S.A.',
     'depends': [
@@ -15,6 +15,8 @@
     ],
     'data': [
         'data/res_config_settings.xml',
+        'data/ir_model.xml',
+        'data/ir_model_access.xml',
         'data/ir_model_fields.xml',
         'data/account_tax.xml',
         'data/product_template.xml',
