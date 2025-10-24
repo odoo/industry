@@ -84,8 +84,7 @@
         record['x_identity_check'] = 'na'
     elif record.x_nationality and record.x_document_type and record.x_document_number:
         record['x_identity_check'] = 'ok'
-    else:
-        record['x_identity_check'] = 'invalid'
+    else: record['x_identity_check'] = 'invalid'
 ]]></field>
   </record>
   <record id="product_model_product_template_x_is_a_room_offer_field" model="ir.model.fields">
@@ -115,8 +114,8 @@
     <field name="field_description">Order Involves Room</field>
     <field name="model_id" ref="sale.model_sale_order"/>
     <field name="name">x_order_involves_room</field>
-    <field name="compute"><![CDATA[for record in self:
-    record['x_order_involves_room'] = any(line.product_id.x_is_a_room_offer for line in record.order_line)
+    <field name="compute"><![CDATA[
+for record in self: record['x_order_involves_room'] = any(line.product_id.x_is_a_room_offer for line in record.order_line)
 ]]></field>
     <field name="depends">order_line</field>
   </record>
@@ -135,8 +134,8 @@
     <field name="depends">order_line.qty_delivered</field>
   </record>
   <record id="res_partner_x_guests_count" model="ir.model.fields">
-    <field name="compute"><![CDATA[for record in self: 
-    record['x_guests_count'] = self.env['sale.order'].search_count([('x_guests', '=', record.id)])
+    <field name="compute"><![CDATA[
+for record in self: record['x_guests_count'] = self.env['sale.order'].search_count([('x_guests', '=', record.id)])
 ]]></field>
     <field name="ttype">integer</field>
     <field name="field_description">Guests count</field>
@@ -162,9 +161,8 @@
     <field name="relation">res.partner</field>
     <field name="readonly" eval="True"/>
     <field name="depends">x_ongoing_booking.partner_id</field>
-    <field name="compute"><![CDATA[for record in self:
-    booking = record.x_ongoing_booking
-    record['x_occupant'] = booking[:1].partner_id.id
+    <field name="compute"><![CDATA[
+for record in self: record['x_occupant'] = record.x_ongoing_booking[:1].partner_id.id
 ]]></field>
   </record>
   <record id="res_partner_x_ongoing_bookings" model="ir.model.fields">
@@ -175,5 +173,64 @@
     <field name="relation_field">x_occupant</field>
     <field name="readonly" eval="True"/>
     <field name="name">x_ongoing_bookings</field>
+  </record>
+  <record id="model_planning_slot_x_nights" model="ir.model.fields">
+    <field name="ttype">integer</field>
+    <field name="field_description">Nights</field>
+    <field name="model_id" ref="planning.model_planning_slot"/>
+    <field name="depends">start_datetime, end_datetime</field>
+    <field name="name">x_nights</field>
+    <field name="compute"><![CDATA[
+for record in self: record['x_nights'] = ((record.end_datetime - record.start_datetime).total_seconds() + 86399) // 86400
+]]></field>
+  </record>
+  <record id="model_planning_slot_x_guests" model="ir.model.fields">
+    <field name="ttype">integer</field>
+    <field name="field_description">Guests</field>
+    <field name="model_id" ref="planning.model_planning_slot"/>
+    <field name="name">x_guests</field>
+  </record>
+  <record id="model_planning_slot_x_city_tax" model="ir.model.fields">
+    <field name="ttype">integer</field>
+    <field name="field_description">City tax count</field>
+    <field name="model_id" ref="planning.model_planning_slot"/>
+    <field name="depends">x_nights, x_guests</field>
+    <field name="name">x_city_tax</field>
+    <field name="compute"><![CDATA[
+for record in self: record['x_city_tax'] = record.x_nights * record.x_guests
+]]></field>
+  </record>
+  <record id="x_model_city_tax_x_sale_order_id" model="ir.model.fields">
+    <field name="ttype">many2one</field>
+    <field name="field_description">Sale order</field>
+    <field name="model_id" ref="x_model_city_tax"/>
+    <field name="relation">sale.order</field>
+    <field name="name">x_sale_order_id</field>
+    <field name="readonly" eval="True"/>
+  </record>
+  <record id="x_model_city_tax_x_slot_ids" model="ir.model.fields">
+    <field name="ttype">many2many</field>
+    <field name="field_description">Slots</field>
+    <field name="model_id" ref="x_model_city_tax"/>
+    <field name="relation">planning.slot</field>
+    <field name="depends">x_sale_order_id.order_line.planning_slot_ids</field>
+    <field name="name">x_slot_ids</field>
+    <field name="compute"><![CDATA[
+for record in self: record['x_slot_ids'] = record.x_sale_order_id.order_line.planning_slot_ids
+]]></field>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="x_model_city_tax_x_total" model="ir.model.fields">
+    <field name="ttype">integer</field>
+    <field name="field_description">Total</field>
+    <field name="model_id" ref="x_model_city_tax"/>
+    <field name="relation_field">planning_total</field>
+    <field name="name">x_total</field>
+    <field name="depends">x_slot_ids, x_slot_ids.x_city_tax</field>
+    <field name="compute"><![CDATA[
+for record in self: record['x_total'] = sum(record.x_slot_ids.mapped('x_city_tax'))
+]]></field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
   </record>
 </odoo>
