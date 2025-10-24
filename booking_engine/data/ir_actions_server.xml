@@ -1,59 +1,52 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="industry_add_update" model="ir.actions.server">
+    <record id="update_city_tax_action" model="ir.actions.server">
         <field name="name">Add/Update City Tax</field>
-        <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="usage">base_automation</field>
+        <field name="model_id" ref="x_model_city_tax"/>
         <field name="state">code</field>
-        <field name="code"><![CDATA[for record in records:
-    stay_taxes = 0
-    stay_tax_line = False
-    for so_line in record.order_line:
-        if so_line.product_id.x_is_a_room_offer:
-            if so_line.x_nights > 0: stay_taxes += so_line.x_nights
-        if so_line.product_id.x_is_stay_tax: stay_tax_line = so_line
-    if stay_taxes > 0:
-        if stay_tax_line: stay_tax_line['product_uom_qty'] = stay_taxes
-        else: # Add stay tax product
-            product = env['product.product'].search([('x_is_stay_tax', '=', True)], limit=1)
-            env['sale.order.line'].create({'order_id': record.id, 'product_id': product.id, 'product_uom_qty': stay_taxes})
+        <field name="code"><![CDATA[
+stay_tax_line = False
+sequence = 0
+for so_line in record.x_sale_order_id.order_line:
+    if so_line.product_id.x_is_stay_tax: stay_tax_line = so_line
+    sequence = max(sequence, so_line.sequence)
+if stay_tax_line: stay_tax_line.write({'product_uom_qty': record.x_total, 'qty_delivered': record.x_total, 'sequence': 1 + sequence})
+elif record.x_total > 0:
+    product = env['product.product'].search([('x_is_stay_tax', '=', True)], limit=1)
+    env['sale.order.line'].create({'order_id': record.x_sale_order_id.id, 'product_id': product.id, 'product_uom_qty': record.x_total, 'qty_delivered': record.x_total})
         ]]></field>
     </record>
-    <record id="industry_trigger_so_update_from_slot" model="ir.actions.server">
-        <field name="name">Trigger SO Update from Slot</field>
+    <record id="open_x_city_tax_action" model="ir.actions.server">
+        <field name="name">Open City Tax</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record.order_line.planning_slot_ids['x_guests'] = len(record.x_guests) // (len(record.order_line.planning_slot_ids) or 1) or 1
+action = {
+    'type': 'ir.actions.act_window',
+    'name': 'City tax',
+    'res_model': 'x_city_tax',
+    'view_mode': 'form',
+    'target': 'new',
+    'context': {'search_default_x_sale_order_id': record.id, 'default_x_sale_order_id': record.id},
+    'domain': [('x_sale_order_id', '=', record.id)],
+}   
+]]></field>
+    </record>
+    <record id="industry_fix_slot_times" model="ir.actions.server">
+        <field name="binding_model_id" ref="planning.model_planning_slot"/>
         <field name="model_id" ref="planning.model_planning_slot"/>
         <field name="usage">base_automation</field>
         <field name="state">code</field>
+        <field name="name">Fix Slot Times</field>
         <field name="code"><![CDATA[
-sale_order = record.sale_order_id
-if sale_order:
-    stay_taxes = 0
-    stay_tax_line = False
-    for so_line in sale_order.order_line:
-        if so_line.product_id.x_is_a_room_offer:
-            if so_line.x_nights > 0:
-                stay_taxes += so_line.x_nights
-        if so_line.product_id.x_is_stay_tax:
-            stay_tax_line = so_line
-    if stay_taxes > 0:
-        if stay_tax_line:
-            stay_tax_line['product_uom_qty'] = stay_taxes
-]]></field>
-    </record>
-  <record id="industry_fix_slot_times" model="ir.actions.server">
-    <field name="binding_model_id" ref="planning.model_planning_slot"/>
-    <field name="model_id" ref="planning.model_planning_slot"/>
-    <field name="usage">base_automation</field>
-    <field name="state">code</field>
-    <field name="name">Fix Slot Times</field>
-    <field name="code"><![CDATA[def ceil(x):
-    return int(x) if x == int(x) else int(x) + 1
 pickup_time = env.ref('sale_renting.recurrence_nightly').pickup_time
 return_time = env.ref('sale_renting.recurrence_nightly').return_time
-start_datetime = record.start_datetime.astimezone(tz=dateutil.tz.UTC)
-end_datetime = record.end_datetime.astimezone(tz=dateutil.tz.UTC)
 tz = env.ref('website.default_website').tz
-if record.role_id.x_is_a_room_offer:
+for record in records:
+    if not record.role_id.x_is_a_room_offer: continue
+    start_datetime = record.start_datetime.astimezone(tz=dateutil.tz.UTC)
+    end_datetime = record.end_datetime.astimezone(tz=dateutil.tz.UTC)
     if record.start_datetime and str(record.start_datetime.time()) != f"{int(pickup_time):02d}:{int(pickup_time % 1 * 60):02d}:00":
         start = timezone(tz).localize(datetime.datetime(year=start_datetime.year, month=start_datetime.month, day=start_datetime.day, hour=int(pickup_time), minute=int(pickup_time % 1 * 60), second=0))
         start_datetime = start.astimezone(tz=dateutil.tz.UTC)
@@ -66,12 +59,10 @@ if record.role_id.x_is_a_room_offer:
             end_datetime = end_datetime + datetime.timedelta(days=1)
     record['start_datetime'] = start_datetime.replace(tzinfo=None)
     record['end_datetime'] = end_datetime.replace(tzinfo=None)
-if record.sale_line_id:
+for record in records:
     nights = 0
     if record.sale_line_id.planning_slot_ids:
-        for slot in record.sale_line_id.planning_slot_ids:
-            if slot.start_datetime and slot.end_datetime:
-                nights += ceil((slot.end_datetime - slot.start_datetime).total_seconds() / (24 * 3600))
+        nights = sum(record.sale_line_id.planning_slot_ids.mapped('x_nights'))
     record.sale_line_id.update({
         'start_date': record.start_datetime,
         'return_date': record.end_datetime,
@@ -91,14 +82,24 @@ return_time = env.ref('sale_renting.recurrence_nightly').return_time
 for record in records:
     tz = env.ref('website.default_website').tz
     rental_start_date = record.rental_start_date.astimezone(tz=dateutil.tz.gettz(tz))
+    start = rental_start_date.replace(hour=int(pickup_time), minute=int(pickup_time % 1 * 60), second=0)
+    record['rental_start_date'] = start.astimezone(tz=dateutil.tz.UTC).replace(tzinfo=None)
+
     rental_return_date = record.rental_return_date.astimezone(tz=dateutil.tz.gettz(tz))
-    start = rental_start_date.replace(hour=int(pickup_time), minute=int(pickup_time % 1 * 60), second=0, microsecond=0)
-    start_datetime = start.astimezone(tz=dateutil.tz.UTC)
-    record['rental_start_date'] = start_datetime.replace(tzinfo=None)
-    end = rental_return_date.replace(hour=int(return_time), minute=int(return_time % 1 * 60), second=0, microsecond=0)
-    end_datetime = end.astimezone(tz=dateutil.tz.UTC)
-    record['rental_return_date'] = end_datetime.replace(tzinfo=None)
+    end = rental_return_date.replace(hour=int(return_time), minute=int(return_time % 1 * 60), second=0)
+    record['rental_return_date'] = end.astimezone(tz=dateutil.tz.UTC).replace(tzinfo=None)
     record.action_update_rental_prices()
+]]></field>
+    </record>
+    <record id="apply_rental_check_out" model="ir.actions.server">
+        <field name="name">Apply Rental Checkout</field>
+        <field name="model_id" ref="sale_renting.model_rental_order_wizard"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record.apply()
+if record.order_id.rental_status == "returned":
+    server_action = record.env['ir.actions.server'].browse(record.env.ref('booking_engine.open_x_city_tax_action').id)
+    action = server_action.with_context(active_id=record.order_id.id, active_model="sale.order").sudo().run()
 ]]></field>
     </record>
 </odoo>
