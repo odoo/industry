@@ -32,6 +32,14 @@ export function initializeFitnessAnalytics() {
         });
 
         window.mcAnalyticsEngine.registerProcessor('fitness_revenue_by_type', (orders) => {
+            // Define category constants for robust matching
+            const CATEGORY_TYPES = {
+                MEMBERSHIP: ['membership', 'subscription', 'plan'],
+                CLASS: ['class', 'training', 'session', 'appointment'],
+                MERCHANDISE: ['merchandise', 'apparel', 'clothing', 'gear'],
+                SUPPLEMENT: ['supplement', 'nutrition', 'protein', 'vitamin'],
+            };
+
             const revenue = {
                 memberships: 0,
                 classes: 0,
@@ -40,11 +48,19 @@ export function initializeFitnessAnalytics() {
             };
             
             orders.forEach(order => {
-                const category = order.product_category || 'other';
-                if (category.includes('membership')) revenue.memberships += order.amount_total;
-                else if (category.includes('class')) revenue.classes += order.amount_total;
-                else if (category.includes('merchandise')) revenue.merchandise += order.amount_total;
-                else if (category.includes('supplement')) revenue.supplements += order.amount_total;
+                const category = (order.product_category || '').toLowerCase();
+                
+                // Use explicit category matching
+                if (CATEGORY_TYPES.MEMBERSHIP.some(keyword => category.includes(keyword))) {
+                    revenue.memberships += order.amount_total;
+                } else if (CATEGORY_TYPES.CLASS.some(keyword => category.includes(keyword))) {
+                    revenue.classes += order.amount_total;
+                } else if (CATEGORY_TYPES.MERCHANDISE.some(keyword => category.includes(keyword))) {
+                    revenue.merchandise += order.amount_total;
+                } else if (CATEGORY_TYPES.SUPPLEMENT.some(keyword => category.includes(keyword))) {
+                    revenue.supplements += order.amount_total;
+                }
+                // Orders not matching any category are not counted
             });
             
             return revenue;
