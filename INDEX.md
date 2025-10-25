@@ -290,7 +290,7 @@ If you're new to MozinConceito, follow this learning path:
 ## 📊 Documentation Statistics
 
 - **Total Documentation Files:** 6
-- **Total Documentation Lines:** ~2,900 lines
+- **Total Documentation Lines:** 3,400+ lines
 - **Core Modules Documented:** 10
 - **Audit Checklists:** 10 (one per module)
 - **Quick Start Guides:** 10 (one per module)
