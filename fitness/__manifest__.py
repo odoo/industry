@@ -1,8 +1,9 @@
 {
     'name': 'Fitness Center',
-    'version': '1.1',
+    'version': '2.0',
     'category': 'Health and Fitness',
     'depends': [
+        'base_industry_enterprise',
         'calendar',
         'contacts',
         'hr',
@@ -71,6 +72,8 @@
     'assets': {
         'web.assets_backend': [
             'fitness/static/src/js/my_tour.js',
+            'fitness/static/src/js/fitness_enterprise.js',
+            'fitness/static/src/scss/fitness_enterprise.scss',
         ]
     },
     'author': 'Odoo S.A.',
