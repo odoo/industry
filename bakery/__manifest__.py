@@ -1,9 +1,10 @@
 {
     'name': 'Bakery',
-    'version': '1.0',
+    'version': '2.0',
     'category': 'Retail',
     'author': 'Odoo S.A.',
     'depends': [
+        'base_industry_enterprise',
         'contacts',
         'hr',
         'knowledge',
@@ -47,6 +48,8 @@
     'assets': {
         'web.assets_backend': [
             'bakery/static/src/js/my_tour.js',
+            'bakery/static/src/js/bakery_dashboard.js',
+            'bakery/static/src/scss/bakery_enterprise.scss',
         ],
     },
     'cloc_exclude': [
