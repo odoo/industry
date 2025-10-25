@@ -60,15 +60,22 @@ The server will start on http://localhost:8069 with demo data pre-loaded.
 ## Documentation
 
 ### 📚 Complete Documentation
+
+**New to MozinConceito? Start with [INDEX.md](INDEX.md) - Your complete guide to all documentation!**
+
+#### Core Documents
+- **[INDEX.md](INDEX.md)** - 📖 Complete documentation index and navigation guide
 - **[MOZIN_CONCEITO.md](MOZIN_CONCEITO.md)** - Comprehensive overview of all modules, features, and architecture
 - **[WORKFLOW.md](WORKFLOW.md)** - Detailed development, audit, and deployment workflows
 - **[QUICK_START.md](QUICK_START.md)** - Quick reference guide for getting started with each module
+- **[MODULE_MATRIX.md](MODULE_MATRIX.md)** - Feature comparison matrix and decision support
 
 ### 🚀 Getting Started
-1. Read [QUICK_START.md](QUICK_START.md) to identify which module fits your business
-2. Follow the module-specific quick start guide
-3. Use the audit checklists in [WORKFLOW.md](WORKFLOW.md) to validate your setup
-4. Refer to [MOZIN_CONCEITO.md](MOZIN_CONCEITO.md) for detailed feature documentation
+1. Read [INDEX.md](INDEX.md) to navigate the documentation effectively
+2. Use [QUICK_START.md](QUICK_START.md) to identify which module fits your business
+3. Follow the module-specific quick start guide (30-90 minutes)
+4. Use the audit checklists in [WORKFLOW.md](WORKFLOW.md) to validate your setup
+5. Refer to [MOZIN_CONCEITO.md](MOZIN_CONCEITO.md) for detailed feature documentation
 
 ## Module Selection Guide
 
