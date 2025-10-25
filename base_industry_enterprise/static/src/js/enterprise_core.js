@@ -148,7 +148,22 @@ export class AnalyticsTracker {
     }
 
     generateSessionId() {
-        return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        // Use cryptographically secure random for session IDs
+        const timestamp = Date.now();
+        let randomPart = '';
+        
+        if (window.crypto && window.crypto.getRandomValues) {
+            // Use secure random if available
+            const array = new Uint32Array(2);
+            window.crypto.getRandomValues(array);
+            randomPart = Array.from(array, dec => dec.toString(36)).join('');
+        } else {
+            // Fallback for environments without crypto.getRandomValues
+            // This is acceptable for analytics tracking (not security-critical)
+            randomPart = Math.random().toString(36).substr(2, 9);
+        }
+        
+        return `session_${timestamp}_${randomPart}`;
     }
 
     track(eventName, properties = {}) {
