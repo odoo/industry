@@ -150,6 +150,7 @@ class TestEnv(IndustryCase):
                 self._check_fields(tree, file_name)
                 self._check_change_theme_method(tree, file_name)
                 self._check_dates_are_relative(tree, file_name)
+                self._check_model_has_no_field(tree, file_name)
                 self._check_static_values_in_inputs(tree, file_name)
                 if root.split('/')[-1] == 'data':
                     self._check_view_active(tree, file_name)
@@ -460,6 +461,12 @@ class TestEnv(IndustryCase):
                     record.get('id'),
                     file_name,
                 )
+
+    def _check_model_has_no_field(self, root, file_name):
+        for record in root.xpath("//record[@model='ir.model']"):
+            active_field = record.xpath(".//field[@name='field_id']/@eval")
+            if not active_field or active_field[0] != "[Command.clear()]":
+                _logger.warning("You forgot to empty fields of ir.model record (id=%s in data/%s).", record.get('id'), file_name,)
 
     def _check_user_is_set(self, root, previous_records):
         records = previous_records
