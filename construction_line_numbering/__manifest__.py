@@ -4,14 +4,15 @@
     'category': 'Construction',
     'author': 'Odoo S.A.',
     'depends': [
+        'construction',
         'sale_management',
         'web_studio',
     ],
     'data': [
+        'data/ir_ui_view.xml',
+        'data/qweb_view.xml',
     ],
-    'demo': [
-
-    ],
+    'demo': [],
     'license': 'OPL-1',
     'cloc_exclude': [],
     'website': "https://www.odoo.com/all-industries",
