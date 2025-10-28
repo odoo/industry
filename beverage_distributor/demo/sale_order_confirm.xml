@@ -14,15 +14,39 @@
     ]]"/>
     <function name="write" model="stock.picking">
         <value model="stock.picking" eval="(
+            obj().env.ref('beverage_distributor.sale_order_21') +
+            obj().env.ref('beverage_distributor.sale_order_22') +
+            obj().env.ref('beverage_distributor.sale_order_23') +
+            obj().env.ref('beverage_distributor.sale_order_24') +
+            obj().env.ref('beverage_distributor.sale_order_25') +
+            obj().env.ref('beverage_distributor.sale_order_26') +
+            obj().env.ref('beverage_distributor.sale_order_27') +
+            obj().env.ref('beverage_distributor.sale_order_28') +
             obj().env.ref('beverage_distributor.sale_order_29') +
             obj().env.ref('beverage_distributor.sale_order_30')
         ).picking_ids.ids"/>
         <value model="stock.location" eval="{'location_id': obj().search([('warehouse_id', '=', ref('excise_management.stock_warehouse_fiscal_deposit')), ('child_ids', '=', False)], limit=1).id}"/>
     </function>
-    <function name="button_validate" model="stock.picking">
+    <function name="action_assign" model="stock.picking">
         <value model="stock.picking" eval="(
-            obj().env.ref('beverage_distributor.sale_order_29') +
+            obj().env.ref('beverage_distributor.sale_order_21') +
+            obj().env.ref('beverage_distributor.sale_order_25') +
             obj().env.ref('beverage_distributor.sale_order_30')
         ).picking_ids.ids"/>
+    </function>
+    <function name="button_validate" model="stock.picking" context="{'skip_sms': True}">
+        <value model="stock.picking" eval="(
+            obj().env.ref('beverage_distributor.sale_order_21') +
+            obj().env.ref('beverage_distributor.sale_order_25') +
+            obj().env.ref('beverage_distributor.sale_order_30')
+        ).picking_ids.ids"/>
+    </function>
+    <function name="write" model="stock.picking">
+        <value model="stock.picking" eval="(
+            obj().env.ref('beverage_distributor.sale_order_21') +
+            obj().env.ref('beverage_distributor.sale_order_25') +
+            obj().env.ref('beverage_distributor.sale_order_30')
+        ).picking_ids.ids"/>
+        <value eval="{'scheduled_date': (datetime.today().date() + relativedelta(weeks=-1)), 'date_done': (datetime.today().date() + relativedelta(weeks=-1))}" />
     </function>
 </odoo>

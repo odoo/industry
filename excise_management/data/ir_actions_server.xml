@@ -48,4 +48,50 @@ for idx, tax in enumerate(all_taxes, start=1):
         <field name="state">code</field>
         <field name="name">Sequence the taxes</field>
     </record>
+    <record id="cron_generate_excise_report" model="ir.cron">
+        <field name="name">Generate Excise Report</field>
+        <field name="model_id" ref="excise_report"/>
+        <field name="state">code</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">weeks</field>
+        <field name="active" eval="True"/>
+        <field name="nextcall" eval="(datetime.now() + timedelta(days=(0 - datetime.now().weekday()) % 7)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="code"><![CDATA[
+last_report_date = env['x_excise_report'].search([], order='x_to_date desc', limit=1).x_to_date
+from_date = last_report_date if last_report_date else datetime.date.today() - datetime.timedelta(days=7)
+if from_date < datetime.date.today():
+    res_id = env['x_excise_report'].create({'x_from_date': from_date, 'x_to_date': datetime.date.today(), 'x_reporter_id': env.company.x_reporter_id.id or env.ref('base.user_admin').id})
+    env['mail.activity'].create({'activity_type_id': env.ref('mail.mail_activity_data_todo').id, 'summary': f"Excise Report {res_id.x_name}",'res_model_id': env.ref('excise_management.excise_report').id, 'res_id': res_id.id, 'user_id': res_id.x_reporter_id.id, 'date_deadline': datetime.date.today() + datetime.timedelta(weeks=1)})
+        ]]></field>
+    </record>
+    <record id="action_excise_report_stock_moves" model="ir.actions.server">
+        <field name="model_id" ref="excise_report"/>
+        <field name="state">code</field>
+        <field name="name">Open stock moves</field>
+        <field name="code"><![CDATA[
+action = {'view_mode': 'list', 'res_model': 'stock.move', 'type': 'ir.actions.act_window', 'domain': [('id', 'in', record.x_line_ids.mapped('x_move_ids.id'))], 'view_id': env.ref('excise_management.stock_move_view_list').id, 'name': 'Excises Analysis',}
+        ]]></field>
+    </record>
+    <record id="ir_action_compute_excise_report_line" model="ir.actions.server">
+        <field name="model_id" ref="excise_report"/>
+        <field name="name">Compute excise report line</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for record in records:
+    all_moves_ids = env['stock.move']._read_group([
+        ('date', '>=', record.x_from_date),
+        ('date', '<', record.x_to_date),
+        ('x_excise_category', '!=', False), ('x_fiscal_deposit_move', 'not in', ['none', False]), ('state', '=', 'done'),
+    ],
+    groupby=['x_excise_category', 'x_fiscal_deposit_move'],
+    aggregates=['x_excise_quantity:sum', 'x_excise_amount:sum', 'id:recordset']
+    )
+    record['x_line_ids'] = [
+        (5, 0, 0), *[(0, 0, {
+            'x_excise_category_id': cat.id, 'x_excise_move_type': m_type, 'x_excise_quantity': qty, 'x_excise_amount': amt, 'x_move_ids': [(6, 0, moves.ids)],
+        })
+        for cat, m_type, qty, amt, moves in all_moves_ids ]
+    ]
+        ]]></field>
+    </record>
 </odoo>
