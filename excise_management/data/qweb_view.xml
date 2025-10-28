@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <template id="report_saleorder_custom_inherit" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//t[@t-set='display_taxes']" position="after">
+            <t t-set="display_excise_free_unit_price" t-value="any(l.x_excise_free_unit_price for l in lines_to_report)"/>
+            <t t-set="display_total_excises" t-value="any(l.x_total_excises for l in lines_to_report)"/>
+            <t t-set="display_total_deposits" t-value="any(l.x_total_deposits for l in lines_to_report)"/>
+        </xpath>
+
+        <xpath expr="//th[@name='th_taxes']" position="after">
+            <th name="th_excise_free_unit_price" t-if="display_excise_free_unit_price" class="text-end">
+                <span>Excise Free Unit Price</span>
+            </th>
+            <th name="th_total_excises" t-if="display_total_excises" class="text-end">
+                <span>Total Excises</span>
+            </th>
+            <th name="th_total_deposits" t-if="display_total_deposits" class="text-end">
+                <span>Total Deposits</span>
+            </th>
+        </xpath>
+
+        <xpath expr="//tr[@name='tr_product']/td[@name='td_product_taxes']" position="after">
+            <td name="td_excise_free_unit_price" t-if="display_excise_free_unit_price" class="text-end">
+                <span t-field="line.x_excise_free_unit_price" t-options="{'widget': 'float', 'precision': 2}" t-if="line.x_excise_free_unit_price"/>
+            </td>
+            <td name="td_display_total_excises" t-if="display_total_excises" class="text-end">
+                <span t-field="line.x_total_excises" t-options="{'widget': 'float', 'precision': 2}" t-if="line.x_total_excises"/>
+            </td>
+            <td name="td_display_total_deposits" t-if="display_total_deposits" class="text-end">
+                <span t-field="line.x_total_deposits" t-options="{'widget': 'float', 'precision': 2}" t-if="line.x_total_deposits"/>
+            </td>
+        </xpath>
+    </template>
+
+    <template id="report_invoice_document_inherit_custom" inherit_id="account.report_invoice_document">
+        <xpath expr="//t[@t-set='display_taxes']" position="after">
+            <t t-set="display_excise_free_unit_price" t-value="any(l.x_excise_free_unit_price_account_move for l in o.invoice_line_ids)"/>
+            <t t-set="display_total_excises" t-value="any(l.x_total_excises_account_move for l in o.invoice_line_ids)"/>
+            <t t-set="display_total_deposits" t-value="any(l.x_total_deposits_account_move for l in o.invoice_line_ids)"/>
+        </xpath>
+
+        <xpath expr="//th[@name='th_taxes']" position="after">
+            <th name="th_excise_free_unit_price" t-if="display_excise_free_unit_price"
+                t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                <span>Excise Free Unit Price</span>
+            </th>
+            <th name="th_total_excises" t-if="display_total_excises"
+                t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                <span>Total Excises</span>
+            </th>
+            <th name="th_total_deposits" t-if="display_total_deposits"
+                t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                <span>Total Deposits</span>
+            </th>
+        </xpath>
+
+        <xpath expr="//td[@name='td_taxes']" position="after">
+            <td name="td_excise_free_unit_price" t-if="display_excise_free_unit_price"
+                t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                <span t-out="line.x_excise_free_unit_price_account_move"
+                      id="line_x_excise_free_unit_price_account_move" t-options="{'widget': 'float', 'precision': 2}" t-if="line.x_excise_free_unit_price_account_move"/>
+            </td>
+            <td name="td_display_total_excises" t-if="display_total_excises"
+                t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                <span t-out="line.x_total_excises_account_move" id="line_x_total_excises_account_move" t-options="{'widget': 'float', 'precision': 2}" t-if="line.x_total_excises_account_move"/>
+            </td>
+            <td name="td_display_total_deposits" t-if="display_total_deposits"
+                t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                <span t-out="line.x_total_deposits_account_move" id="line_x_total_deposits_account_move" t-options="{'widget': 'float', 'precision': 2}" t-if="line.x_total_deposits_account_move"/>
+            </td>
+        </xpath>
+    </template>
+</odoo>

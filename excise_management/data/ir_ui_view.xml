@@ -124,4 +124,53 @@
             </list>
         </field>
     </record>
+    <record id="sale_order_form_view" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.excise_management</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="mode">extension</field>
+        <field name="model">sale.order</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='order_lines']//list//field[@name='tax_ids']" position="after">
+                <field optional="show" name="x_excise_free_unit_price" invisible="not x_excise_free_unit_price" column_invisible="not parent.x_has_excise_line"/>
+                <field optional="show" name="x_total_excises" invisible="not x_total_excises" column_invisible="not parent.x_has_excise_line"/>
+                <field optional="show" name="x_total_deposits" invisible="not x_total_deposits" column_invisible="not parent.x_has_deposit_line"/>
+                <field name="currency_id" column_invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="account_move_form_view" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.excise_management</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="active" eval="True"/>
+        <field name="mode">extension</field>
+        <field name="model">account.move</field>
+        <field name="priority">300</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//list[@name='journal_items']//field[@name='price_unit']" position="after">
+                <field optional="show" name="x_excise_free_unit_price_account_move" invisible="not x_excise_free_unit_price_account_move" column_invisible="not parent.x_has_excise_line"/>
+                <field optional="show" name="x_total_excises_account_move" invisible="not x_total_excises_account_move" column_invisible="not parent.x_has_excise_line"/>
+                <field optional="show" name="x_total_deposits_account_move" invisible="not x_total_deposits_account_move" column_invisible="not parent.x_has_deposit_line"/>
+                <field name="company_currency_id" column_invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="account_tax_group_form_view" model="ir.ui.view">
+        <field name="name">account.tax.group.form.inherit.excise_management</field>
+        <field name="inherit_id" ref="account.view_tax_group_form"/>
+        <field name="mode">extension</field>
+        <field name="model">account.tax.group</field>
+        <field name="priority">99</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form//field[@name='pos_receipt_label']" position="after">
+                <field name="x_is_deposit"/>
+                <field name="x_is_excise"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>

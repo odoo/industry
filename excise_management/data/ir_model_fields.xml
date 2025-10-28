@@ -257,4 +257,134 @@ for template in self:
         <field name="relation">uom.uom</field>
         <field name="readonly" eval="True"/>
     </record>
+    <record id="account_tax_group_is_deposit" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Is Deposit</field>
+        <field name="model_id" ref="account.model_account_tax_group"/>
+        <field name="name">x_is_deposit</field>
+    </record>
+    <record id="account_tax_deposit_field" model="ir.model.fields">
+        <field name="name">x_is_deposit</field>
+        <field name="field_description">Is Deposit</field>
+        <field name="model_id" ref="account.model_account_tax"/>
+        <field name="related">tax_group_id.x_is_deposit</field>
+        <field name="ttype">boolean</field>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="sale_order_line_excise_free_unit_price_field" model="ir.model.fields">
+        <field name="name">x_excise_free_unit_price</field>
+        <field name="field_description">Excise Free Unit Price</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="ttype">monetary</field>
+        <field name="depends">price_unit, product_id</field>
+        <field name="compute"><![CDATA[for record in self:
+        record['x_excise_free_unit_price'] = record.price_unit - record.product_id.x_excise_amount]]></field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="currency_field">currency_id</field>
+    </record>
+    <record id="sale_order_line_total_excises_field" model="ir.model.fields">
+        <field name="name">x_total_excises</field>
+        <field name="field_description">Excises</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="ttype">monetary</field>
+        <field name="depends">product_id, product_uom_qty, order_id.fiscal_position_id</field>
+        <field name="compute"><![CDATA[for record in self:
+        record['x_total_excises'] = record.product_id.x_excise_amount * record.product_uom_qty if not record.order_id.fiscal_position_id.x_is_fiscal_deposit else False]]></field>
+        <field name="readonly" eval="True"/>
+        <field name="currency_field">currency_id</field>
+    </record>
+    <record id="sale_order_line_total_deposits_field" model="ir.model.fields">
+        <field name="name">x_total_deposits</field>
+        <field name="field_description">Deposits</field>
+        <field name="ttype">monetary</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="depends">product_uom_qty, tax_ids</field>
+        <field name="compute"><![CDATA[for record in self:
+        deposit = sum(tax.amount for tax in record.tax_ids if tax.x_is_deposit)
+        record['x_total_deposits'] = deposit * record.product_uom_qty]]></field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="currency_field">currency_id</field>
+    </record>
+    <record id="sale_order_has_deposit_line_field" model="ir.model.fields">
+        <field name="name">x_has_deposit_line</field>
+        <field name="field_description">Has Deposit Line</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ttype">boolean</field>
+        <field name="depends">order_line.x_total_deposits</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_has_deposit_line'] = any(line.x_total_deposits for line in record.order_line)]]></field>
+        <field name="store" eval="False"/>
+    </record>
+
+    <record id="sale_order_has_excise_line_field" model="ir.model.fields">
+        <field name="name">x_has_excise_line</field>
+        <field name="field_description">Has Excise Line</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ttype">boolean</field>
+        <field name="depends">order_line.x_total_excises</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_has_excise_line'] = any(line.x_total_excises for line in record.order_line)]]></field>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="account_move_line_excise_free_unit_price_field" model="ir.model.fields">
+        <field name="name">x_excise_free_unit_price_account_move</field>
+        <field name="field_description">Excise Free Unit Price</field>
+        <field name="ttype">monetary</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="depends">price_unit, product_id</field>
+        <field name="compute"><![CDATA[for record in self:
+        record['x_excise_free_unit_price_account_move'] = record.price_unit - record.product_id.x_excise_amount]]></field>
+        <field name="readonly" eval="True"/>
+        <field name="currency_field">company_currency_id</field>
+    </record>
+    <record id="account_move_line_total_excise_field" model="ir.model.fields">
+        <field name="name">x_total_excises_account_move</field>
+        <field name="field_description">Excises</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="ttype">monetary</field>
+        <field name="depends">product_id, quantity</field>
+        <field name="compute"><![CDATA[for record in self:
+        record['x_total_excises_account_move'] = record.product_id.x_excise_amount * record.quantity if not record.sale_line_ids.order_id.fiscal_position_id.x_is_fiscal_deposit else False]]></field>
+        <field name="readonly" eval="True"/>
+        <field name="currency_field">company_currency_id</field>
+    </record>
+    <record id="account_move_line_total_deposits_field" model="ir.model.fields">
+        <field name="name">x_total_deposits_account_move</field>
+        <field name="field_description">Deposits</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="ttype">monetary</field>
+        <field name="depends">tax_ids, quantity</field>
+        <field name="compute"><![CDATA[for record in self:
+        deposit = sum(tax.amount for tax in record.tax_ids if tax.x_is_deposit)
+        record['x_total_deposits_account_move'] = deposit * record.quantity]]></field>
+        <field name="readonly" eval="True"/>
+        <field name="currency_field">company_currency_id</field>
+    </record>
+    <record id="account_move_has_deposit_line_field" model="ir.model.fields">
+        <field name="name">x_has_deposit_line</field>
+        <field name="field_description">Has Deposit Line</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="ttype">boolean</field>
+        <field name="depends">line_ids.x_total_deposits_account_move</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_has_deposit_line'] = any(line.x_total_deposits_account_move for line in record.line_ids)]]></field>
+        <field name="store" eval="False"/>
+    </record>
+
+    <record id="account_move_has_excise_line_field" model="ir.model.fields">
+        <field name="name">x_has_excise_line</field>
+        <field name="field_description">Has Excise Line</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="ttype">boolean</field>
+        <field name="depends">line_ids.x_total_excises_account_move</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_has_excise_line'] = any(line.x_total_excises_account_move for line in record.line_ids)]]></field>
+        <field name="store" eval="False"/>
+    </record>
 </odoo>
