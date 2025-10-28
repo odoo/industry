@@ -40,4 +40,22 @@ for fp in records:
         <field name="state">code</field>
         <field name="name">Add/Remove excise tax on Fiscal Position</field>
     </record>
+    <record id="cron_generate_excise_report" model="ir.cron">
+        <field name="name">Generate Excise Report</field>
+        <field name="model_id" ref="excise_report"/>
+        <field name="state">code</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">weeks</field>
+        <field name="nextcall" eval="(datetime.now() + timedelta(days=(6 - datetime.now().weekday()) % 7)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="code"><![CDATA[
+res_id = env['x_excise_report'].create({'x_from_date': datetime.date.today() - datetime.timedelta(days=7), 'x_state': 'progress', 'x_user_id': env.company.x_reporter_id.id})
+env['mail.activity'].create({'activity_type_id': env.ref('mail.mail_activity_data_todo').id, 'summary': f"Excise Report {res_id.x_name}",'res_model_id': env.ref('excise_management.excise_report').id, 'res_id': res_id.id, 'user_id': env.company.x_reporter_id.id, 'date_deadline': datetime.date.today() + datetime.timedelta(weeks=1)})
+        ]]></field>
+    </record>
+    <record id="update_excise_report_to_done" model="ir.actions.server">
+        <field name="name">Update excise report to done</field>
+        <field name="model_id" ref="excise_report"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[record['x_state'] = 'done']]></field>
+    </record>
 </odoo>
