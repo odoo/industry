@@ -387,4 +387,263 @@ for record in self:
     record['x_has_excise_line'] = any(line.x_total_excises_account_move for line in record.line_ids)]]></field>
         <field name="store" eval="False"/>
     </record>
+     <record id="stock_picking_external_id" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="field_description">External ID</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="name">x_external_id</field>
+        <field name="store" eval="True" />
+        <field name="copied" eval="False" />
+    </record>
+    <record id="stock_picking_invoice_ids" model="ir.model.fields">
+        <field name="ttype">many2many</field>
+        <field name="related">sale_id.invoice_ids</field>
+        <field name="field_description">Invoice IDs</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="name">x_invoice_ids</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="relation">account.move</field>
+    </record>
+    <record id="field_account_move_picking_ids" model="ir.model.fields">
+        <field name="name">x_picking_ids</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="field_description">Picking IDs</field>
+        <field name="ttype">many2many</field>
+        <field name="relation">stock.picking</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+for record in self: record['x_picking_ids'] = record.invoice_line_ids.sale_line_ids.mapped('order_id.picking_ids').ids
+            ]]>
+        </field>
+    </record>
+    <record id="field_account_move_x_external_ids" model="ir.model.fields">
+        <field name="compute"><![CDATA[\
+for record in self:
+    vals = [str(x) for x in record.x_picking_ids.mapped('x_external_id') if x]
+    record['x_external_ids'] = ", ".join(vals) if vals else ""
+    ]]></field>
+        <field name="ttype">char</field>
+        <field name="depends">x_picking_ids</field>
+        <field name="field_description">External IDs</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="name">x_external_ids</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
+
+    <record id="field_account_move_external_ids_count" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self: record['x_external_id_count'] = len(record.x_picking_ids)
+    ]]></field>
+        <field name="ttype">integer</field>
+        <field name="field_description">External ID count</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="name">x_external_id_count</field>
+        <field name="depends">x_picking_ids</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="reporter_id_excise_report" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Reporter ID</field>
+        <field name="model_id" ref="excise_report"/>
+        <field name="name">x_reporter_id</field>
+        <field name="relation">res.users</field>
+    </record>
+    <record id="from_date_excise_report" model="ir.model.fields">
+        <field name="ttype">date</field>
+        <field name="required" eval="True"/>
+        <field name="field_description">From Date</field>
+        <field name="model_id" ref="excise_report"/>
+        <field name="name">x_from_date</field>
+    </record>
+    <record id="to_date_excise_report" model="ir.model.fields">
+        <field name="ttype">date</field>
+        <field name="required" eval="True"/>
+        <field name="field_description">To Date</field>
+        <field name="model_id" ref="excise_report"/>
+        <field name="name">x_to_date</field>
+    </record>
+    <record id="name_excise_report" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Name</field>
+        <field name="model_id" ref="excise_report"/>
+        <field name="name">x_name</field>
+        <field name="translate">standard</field>
+        <field name="depends">x_from_date</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_name'] = f"{str(record.x_from_date.isocalendar()[0])[2:]}W{record.x_from_date.isocalendar()[1]:02d}" if record.x_from_date else "Draft"
+    ]]></field>
+    </record>
+    <record id="external_id_excise_report" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="copied" eval="False"/>
+        <field name="field_description">External ID</field>
+        <field name="model_id" ref="excise_report"/>
+        <field name="name">x_external_id</field>
+    </record>
+    <record id="document_excise_report" model="ir.model.fields">
+        <field name="ttype">binary</field>
+        <field name="copied" eval="False"/>
+        <field name="field_description">Document</field>
+        <field name="model_id" ref="excise_report"/>
+        <field name="name">x_document</field>
+    </record>
+    <record id="details_computation_excise_report" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Line Computation</field>
+        <field name="model_id" ref="excise_report"/>
+        <field name="name">x_details_computation</field>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+# Technical field only meant to trigger recomputation of lines at form opening
+# Not the cleanest, but allow for automatic update of the report without button
+for record in self:
+    if record.x_state != "done" and record.x_from_date and record.x_to_date:
+        server_action = self.env['ir.actions.server'].browse(self.env.ref('excise_management.ir_action_compute_excise_report_line')).id
+        server_action.with_context(active_ids=[record.id], active_model="x_excise_report").sudo().run()
+        record['x_details_computation'] = True
+        ]]></field>
+    </record>
+    <record id="state_excise_report" model="ir.model.fields">
+        <field name="name">x_state</field>
+        <field name="copied" eval="False"/>
+        <field name="model_id" ref="excise_report" />
+        <field name="ttype">selection</field>
+        <field name="field_description">State</field>
+    </record>
+    <record id="state_excise_report_selection_progress" model="ir.model.fields.selection">
+        <field name="name">In progress</field>
+        <field name="field_id" ref="state_excise_report" />
+        <field name="value">progress</field>
+    </record>
+    <record id="state_excise_report_selection_done" model="ir.model.fields.selection">
+        <field name="name">Done</field>
+        <field name="field_id" ref="state_excise_report" />
+        <field name="value">done</field>
+    </record>
+    <record id="excise_report_line_excise_report" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="name">x_excise_report_id</field>
+        <field name="field_description">Excise report ID</field>
+        <field name="model_id" ref="excise_report_line" />
+        <field name="relation">x_excise_report</field>
+        <field name="on_delete">cascade</field>
+    </record>
+    <record id="excise_report_line_currency_id" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">Currency</field>
+        <field name="model_id" ref="excise_report_line"/>
+        <field name="name">x_currency_id</field>
+        <field name="readonly" eval="True"/>
+        <field name="relation">res.currency</field>
+        <field name="compute"><![CDATA[
+for rec in self: rec['x_currency_id'] = self.env.company.currency_id.id
+        ]]></field>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="excise_report_line_excise_category" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="name">x_excise_category_id</field>
+        <field name="field_description">Excise Category</field>
+        <field name="model_id" ref="excise_report_line" />
+        <field name="relation">x_excise_category</field>
+    </record>
+    <record id="excise_report_line_excise_move_type" model="ir.model.fields">
+        <field name="ttype">selection</field>
+        <field name="name">x_excise_move_type</field>
+        <field name="field_description">Move Type</field>
+        <field name="model_id" ref="excise_report_line" />
+    </record>
+    <record id="excise_report_line_excise_move_type_selection_none" model="ir.model.fields.selection">
+        <field name="name">None</field>
+        <field name="field_id" ref="excise_report_line_excise_move_type" />
+        <field name="value">none</field>
+    </record>
+    <record id="excise_report_line_excise_move_type_selection_entry" model="ir.model.fields.selection">
+        <field name="name">Entry</field>
+        <field name="field_id" ref="excise_report_line_excise_move_type" />
+        <field name="value">entry</field>
+    </record>
+    <record id="excise_report_line_excise_move_type_selection_entry_fd" model="ir.model.fields.selection">
+        <field name="name">Entry from FD</field>
+        <field name="field_id" ref="excise_report_line_excise_move_type" />
+        <field name="value">entry fd</field>
+    </record>
+    <record id="excise_report_line_excise_move_type_selection_entry_exit" model="ir.model.fields.selection">
+        <field name="name">Exit</field>
+        <field name="field_id" ref="excise_report_line_excise_move_type" />
+        <field name="value">exit</field>
+    </record>
+    <record id="excise_report_line_excise_move_type_selection_exit_fd" model="ir.model.fields.selection">
+        <field name="name">Exit to FD</field>
+        <field name="field_id" ref="excise_report_line_excise_move_type" />
+        <field name="value">exit fd</field>
+    </record>
+    <record id="excise_report_line_excise_move_type_selection_transfer" model="ir.model.fields.selection">
+        <field name="name">Transfer</field>
+        <field name="field_id" ref="excise_report_line_excise_move_type" />
+        <field name="value">transfer</field>
+    </record>
+    <record id="excise_report_line_excise_quantity" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="name">x_excise_quantity</field>
+        <field name="field_description">Quantity</field>
+        <field name="model_id" ref="excise_report_line" />
+    </record>
+    <record id="excise_report_line_excise_unit" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="name">x_excise_unit</field>
+        <field name="field_description">Unit</field>
+        <field name="model_id" ref="excise_report_line" />
+        <field name="related">x_excise_category_id.x_unit_id</field>
+        <field name="relation">uom.uom</field>
+    </record>
+    <record id="excise_report_line_excise_amount" model="ir.model.fields">
+        <field name="ttype">monetary</field>
+        <field name="name">x_excise_amount</field>
+        <field name="field_description">Amount</field>
+        <field name="model_id" ref="excise_report_line" />
+        <field name="store">True</field>
+        <field name="currency_field">x_currency_id</field>
+    </record>
+    <record id="excise_report_line_move_ids" model="ir.model.fields">
+        <field name="ttype">many2many</field>
+        <field name="name">x_move_ids</field>
+        <field name="field_description">Move IDs</field>
+        <field name="model_id" ref="excise_report_line" />
+        <field name="relation">stock.move</field>
+        <field name="readonly" eval="True"/>
+        <field name="copied" eval="False"/>
+    </record>
+    <record id="excise_report_excise_report_line" model="ir.model.fields">
+        <field name="ttype">one2many</field>
+        <field name="name">x_line_ids</field>
+        <field name="field_description">Lines IDs</field>
+        <field name="model_id" ref="excise_report" />
+        <field name="relation">x_excise_report_line</field>
+        <field name="relation_field">x_excise_report_id</field>
+        <field name="store" eval="True"/>
+        <field name="copied" eval="False"/>
+    </record>
+    <record id="res_company_reporter" model="ir.model.fields">
+        <field name="name">x_reporter_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Reporter</field>
+        <field name="model_id" ref="base.model_res_company"/>
+        <field name="relation">res.users</field>
+    </record>
+    <record id="res_config_reporter" model="ir.model.fields">
+        <field name="name">x_reporter_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Reporter</field>
+        <field name="model_id" ref="base.model_res_config_settings"/>
+        <field name="relation">res.users</field>
+        <field name="related">company_id.x_reporter_id</field>
+    </record>
 </odoo>
