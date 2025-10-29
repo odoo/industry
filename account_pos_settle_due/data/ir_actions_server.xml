@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="account_pos_settle_due_settle_pos_orders" model="ir.actions.server">
+        <field name="code"><![CDATA[
+pos_orders = env['pos.order'].search([('partner_id', '=', record.partner_id.id), ('state', '=', 'paid'), ('customer_due_total', '>', 0), ('id', 'not in', record.invoice_line_ids.x_pos_order_id.ids)])
+balance_account_section_name = "Customer account balance"
+if not any(line.name == balance_account_section_name and line.display_type == 'line_section' for line in record.invoice_line_ids):
+    env['account.move.line'].create({'move_id': record.id, 'name': balance_account_section_name, 'display_type': 'line_section'})
+for order in pos_orders:
+    date = timezone('UTC').localize(order.date_order).astimezone(tz=timezone(env.user.tz or 'UTC')).strftime('%Y-%m-%d %H:%M')
+    name = f"{order.name} ({date})\n" + "\n".join(f"{line.qty} x {line.product_id.display_name}" for line in order.lines)
+    env['account.move.line'].create({'move_id': record.id, 'name': name, 'price_unit': order.customer_due_total, 'x_pos_order_id': order.id})
+]]></field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="name">Account Pos Settle Due: Settle PoS orders</field>
+    </record>
+    <record id="account_pos_settle_due_balance_customer_account" model="ir.actions.server">
+        <field name="code"><![CDATA[
+record.invoice_line_ids.filtered('x_pos_order_id').x_pos_order_id.write({'customer_due_total': 0, 'account_move': record.id})
+]]></field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="name">Account Pos Settle Due: Balance Customer Account</field>
+    </record>
+</odoo>
