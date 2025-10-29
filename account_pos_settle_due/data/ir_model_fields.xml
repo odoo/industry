@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="account_move_line_pos_order_id" model="ir.model.fields">
+        <field name="name">x_pos_order_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">PoS order</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="relation">pos.order</field>
+    </record>
+    <record id="account_move_amount_due_total" model="ir.model.fields">
+        <field name="name">x_has_total_amount_due</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">Has full amount due</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+for move in self: move['x_has_total_amount_due'] = bool(self.env['pos.order'].search_count([('partner_id', '=', move.partner_id.id), ('state', '=', 'paid'), ('customer_due_total', '>', 0), ('id', 'not in', move.invoice_line_ids.x_pos_order_id.ids)], limit=1))
+]]></field>
+    </record>
+</odoo>

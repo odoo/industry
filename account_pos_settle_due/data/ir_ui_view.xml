@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="account_pos_settle_due_res_partner_form" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <xpath expr="//notebook[1]" position="before">
+                <group>
+                    <group>
+                        <field name="pos_orders_amount_due" string="POS due amount" invisible="not pos_orders_amount_due"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="mode">extension</field>
+        <field name="model">res.partner</field>
+        <field name="name">res.partner.form.inherit.booking_online</field>
+        <field name="priority">2000</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+    </record>
+    <record id="account_pos_settle_due_account_move_form" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <header position="inside">
+                <button name="%(account_pos_settle_due_settle_pos_orders)d"
+                        string="Settle PoS Orders"
+                        type="action" class="btn-primary"
+                        invisible="state != 'draft' or not x_has_total_amount_due"/>
+            </header>
+            <xpath expr="//list[@name='journal_items']" position="attributes">
+                <attribute name="open_form_view">true</attribute>
+            </xpath>
+        </field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="mode">extension</field>
+        <field name="model">account.move</field>
+        <field name="name">account.move.form.inherit.account_pos_settle_due</field>
+        <field name="priority">300</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+    </record>
+    <record id="account_pos_settle_due_account_move_line_form" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='quantity']" position="after">
+                <field name="x_pos_order_id"/>
+            </xpath>
+        </field>
+        <field name="inherit_id" ref="account.view_move_line_form"/>
+        <field name="mode">extension</field>
+        <field name="model">account.move.line</field>
+        <field name="name">account.move.line.form.inherit.account_pos_settle_due</field>
+        <field name="priority">99</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>
