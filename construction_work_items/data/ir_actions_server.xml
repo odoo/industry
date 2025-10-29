@@ -1,0 +1,153 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="954" model="ir.actions.server">
+        <field name="name">Construction: BoM - Set BoM name and reference</field>
+        <field name="model_id" ref="x_bill_of_materials_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record.write({
+    'x_name': record.x_product_product_id.name,
+    'x_reference': record.x_product_product_id.default_code,
+    'x_unit_id': record.x_product_product_id.uom_id.id,
+})
+]]></field>
+    </record>
+    <record id="server_action_set_bom_as_template" model="ir.actions.server">
+        <field name="name">Construction: BoM - Set as template</field>
+        <field name="model_id" ref="x_bill_of_materials_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+# Archive previous template
+bom_template = env['x_bill_of_materials'].search([('x_product_product_id', '=', record.x_product_product), ("x_is_template","=",True), ('x_active','=',True)], limit=1)
+if bom_template: 
+    bom_template['x_active'] = False
+# Set new template
+record.copy({ 'x_sale_order_line_id': False, 'x_is_template': True, 'x_targeted_so': False, 'x_sol_on_create': False })
+]]></field>
+    </record>
+    <record id="server_action_set_unit_from_component" model="ir.actions.server">
+        <field name="name">Construction: BoM - Set unit from component</field>
+        <field name="model_id" ref="x_bill_of_materials_line_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if record.x_product_template_id: record['x_unit_id'] = record.x_product_template_id.uom_id
+]]></field>
+    </record>
+    <record id="server_action_set_unit_cost_price_fromm_product" model="ir.actions.server">
+        <field name="name">Construction: BoM - Set unit, unit cost and unit price from product</field>
+        <field name="model_id" ref="x_bill_of_materials_line_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record.write({
+    'x_unit_id': record.x_product_product_id.uom_id,
+    'x_unit_price': record.x_product_product_id.list_price,
+    'x_unit_cost': record.x_product_product_id.standard_price,
+})
+]]></field>
+    </record>
+    <record id="server_action_update_associated_sol" model="ir.actions.server">
+        <field name="name">Construction: BoM - Update associated SO line</field>
+        <field name="model_id" ref="x_bill_of_materials_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if record.x_sale_order_line_id:
+    record.x_sale_order_line_id.write({
+        'price_unit': record.x_unit_price,
+        'technical_price_unit': record.x_unit_price,
+        'purchase_price': record.x_unit_cost,
+    })
+else:
+    if record.x_targeted_so:
+        new_product = env['product.product'].create({
+            'name': record.x_name,
+            'default_code': record.x_reference,
+            'type': 'service',
+            'service_policy': "delivered_manual",
+            'sale_ok': True,
+            'purchase_ok': True,
+            'list_price': record.x_unit_price,
+            'standard_price': record.x_unit_cost,
+        })
+        env['sale.order.line'].create({
+            'order_id': record.x_targeted_so.id,
+            'product_id': new_product.id,
+            'product_uom_id': new_product.uom_id.id,
+            'price_unit': record.x_unit_price,
+            'technical_price_unit': record.x_unit_price,
+            'purchase_price': record.x_unit_cost,
+            'x_bill_of_materials_ids': [record.id],
+        })
+]]></field>
+    </record>
+    <record id="server_action_update_product_cost_price" model="ir.actions.server">
+        <field name="name">Construction: BoM - Update product cost and price</field>
+        <field name="model_id" ref="x_bill_of_materials_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record.x_product_product_id.write({
+    'lst_price': record.x_unit_price,
+    'standard_price': record.x_unit_cost,
+})
+]]></field>
+    </record>
+    <record id="server_action_add_custom_bom" model="ir.actions.server">
+        <field name="name">Construction: SO - Add custom BoM</field>
+        <field name="model_id" ref="sale.model_sale_order" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+action = {
+    "type": "ir.actions.act_window",
+    "res_model": "x_bill_of_materials",
+    "view_mode": "form",
+    "target": "new",
+    "context": {
+        "default_x_is_template": False,
+        "default_x_sol_on_create": True,
+        "default_x_targeted_so": env.context.get("so_id")
+    },
+}
+]]></field>
+    </record>
+    <record id="server_actoin_create_associated_bom" model="ir.actions.server">
+        <field name="name">Construction: SOL - Create associated BoM</field>
+        <!-- Changed <field name="model_id" ref="x_bill_of_materials_model" /> -->
+         <field name="model_id" ref="sale.model_sale_order_line" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if record.x_bom_able and not record.x_bill_of_materials_ids and record.product_id :
+    bom_template = env['x_bill_of_materials'].search([('x_product_product_id', '=', record.product_id), ("x_is_template","=",True), ('x_active','=',True)], limit=1)
+    bom_local = bom_template.copy({
+        'x_sale_order_line_id': record.id,
+        'x_is_template': False,
+    })
+]]></field>
+    </record>
+    <record id="server_action_open_sol_bom" model="ir.actions.server">
+        <field name="name">Construction: SOL - Open SOL BoM</field>
+        <field name="model_id" ref="sale.model_sale_order_line" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if record.x_bill_of_materials_ids:
+    # Open the local BoM
+    action = {
+        "type": "ir.actions.act_window",
+        "res_model": "x_bill_of_materials",
+        "res_id": record.x_bill_of_materials_ids.id,
+        "view_mode": "form",
+        "target": "new",
+    }
+]]></field>
+    </record>
+    <record id="server_action_scale_associated_bom" model="ir.actions.server">
+        <field name="name">Construction: SOL - Scale associated BoM</field>
+        <field name="model_id" ref="sale.model_sale_order_line" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record.x_bill_of_materials_ids.write({
+    'x_quantity': record.product_uom_qty,
+    'x_cost': record.product_uom_qty * record.x_bill_of_materials_ids.x_unit_cost,
+    'x_price': record.product_uom_qty * record.x_bill_of_materials_ids.x_unit_price,
+})
+]]></field>
+    </record>
+</odoo>
