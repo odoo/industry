@@ -57,9 +57,9 @@ class TestEnv(IndustryCase):
         c.report(True)  # show details of cloc in the logs
         for module in self.installed_modules:
             for cloc_entry in c.modules.get(module, {}):
-                message = "The view '%s' is counted in the maintenance lines. " % cloc_entry
+                message = "The record '%s' is counted in the maintenance lines. " % cloc_entry
                 message += "Please add a '__cloc_exclude__' entry in 'ir_model_data'."
-                self.assertEqual(len(cloc_entry.split(':')), 2, message)
+                self.assertIn(cloc_entry.split('/')[0], ['ir.actions.server', 'ir.model.fields'], message)
 
     def test_sale_ok_and_is_published_in_db(self):
         models = ["product.template", "product.product"]
