@@ -66,6 +66,8 @@
         'demo/stock_move.xml',
         'demo/stock_picking_post.xml',
         'demo/mrp_production.xml',
+        'demo/mrp_production_post.xml',
+        'demo/mrp_eco_stage.xml',
         'demo/mrp_eco.xml',
         'demo/ir_attachment_post.xml',
         'demo/project_tags.xml',
@@ -79,7 +81,6 @@
         'demo/website_view.xml',
         'demo/website.xml',
     ],
-    'license': 'OPL-1',
     'cloc_exclude': [
         'data/knowledge_article.xml',
         'data/ir_actions_server.xml',
@@ -88,4 +89,7 @@
     'images': [
         'images/main.png',
     ],
+    'license': 'OPL-1',
+    'url': "https://www.odoo.com/trial?industry&selected_app=vineyard",
+    'website': "https://www.odoo.com/industries/vineyard",
 }
