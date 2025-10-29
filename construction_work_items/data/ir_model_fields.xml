@@ -20,10 +20,10 @@
         <field name="field_description">Sequence</field>
         <field name="model_id" ref="x_bill_of_materials_model"/>
     </record>
-    <record id="x_product_id_field_x_bill_of_materials" model="ir.model.fields">
-        <field name="name">x_product_id</field>
+    <record id="x_product_template_id_field_x_bill_of_materials" model="ir.model.fields">
+        <field name="name">x_product_template_id</field>
         <field name="ttype">many2one</field>
-        <field name="field_description">Product</field>
+        <field name="field_description">Product Template</field>
         <field name="model_id" ref="x_bill_of_materials_model"/>
         <field name="relation">product.template</field>
     </record>
@@ -45,13 +45,6 @@
         <field name="ttype">char</field>
         <field name="field_description">Reference</field>
         <field name="model_id" ref="x_bill_of_materials_model"/>
-    </record>
-    <record id="x_currency_id_field_x_bill_of_materials" model="ir.model.fields">
-        <field name="name">x_currency_id</field>
-        <field name="ttype">many2one</field>
-        <field name="field_description">Currency</field>
-        <field name="model_id" ref="x_bill_of_materials_model"/>
-        <field name="relation">res.currency</field>
     </record>
     <record id="x_is_template_field_x_bill_of_materials" model="ir.model.fields">
         <field name="name">x_is_template</field>
@@ -79,6 +72,14 @@
         <field name="field_description">Product</field>
         <field name="model_id" ref="x_bill_of_materials_model"/>
         <field name="relation">product.product</field>
+    </record>
+    <record id="x_currency_id_field_x_bill_of_materials" model="ir.model.fields">
+        <field name="name">x_currency_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Currency</field>
+        <field name="model_id" ref="x_bill_of_materials_model"/>
+        <field name="related">x_product_product_id.currency_id</field>
+        <field name="relation">res.currency</field>
     </record>
     <record id="x_sol_on_create_field_x_bill_of_materials" model="ir.model.fields"> <!-- IS IT NECESSARY ?-->
         <field name="name">x_sol_on_create</field>
@@ -114,10 +115,10 @@
         <field name="field_description">Sequence</field>
         <field name="model_id" ref="x_bill_of_materials_line_model"/>
     </record>
-    <record id="x_product_id_field_x_bill_of_materials_line" model="ir.model.fields">
-        <field name="name">x_product_id</field>
+    <record id="x_product_template_id_field_x_bill_of_materials_line" model="ir.model.fields">
+        <field name="name">x_product_template_id</field>
         <field name="ttype">many2one</field>
-        <field name="field_description">Product</field>
+        <field name="field_description">Product Template</field>
         <field name="model_id" ref="x_bill_of_materials_line_model"/>
         <field name="relation">product.template</field>
     </record>
@@ -149,6 +150,7 @@
         <field name="ttype">many2one</field>
         <field name="field_description">Currency</field>
         <field name="model_id" ref="x_bill_of_materials_line_model"/>
+        <field name="related">x_product_product_id.currency_id</field>
         <field name="relation">res.currency</field>
     </record>
     <record id="x_unit_cost_field_x_bill_of_materials_line" model="ir.model.fields">
@@ -277,7 +279,7 @@
         <field name="model_id" ref="product.model_product_template"/>
         <field name="name">x_bill_of_materials_ids</field>
         <field name="relation">x_bill_of_materials</field>
-        <field name="relation_field">x_product_id</field>
+        <field name="relation_field">x_product_template_id</field>
     </record>
     <!-- <record id="x_bill_of_materials_ids_field_product_product" model="ir.model.fields">
         <field name="ttype">one2many</field>
@@ -289,8 +291,10 @@
     </record> -->
 
     <record id="x_bom_able_field_sale_order_line" model="ir.model.fields">
-        <field name="compute"><![CDATA[for record in self:
-        record['x_bom_able'] = 0 < len(record.product_id.x_bill_of_materials_ids) or record.x_bill_of_materials_id]]></field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_bom_able'] = 0 < len(record.product_id.x_bill_of_materials_ids) or record.x_bill_of_materials_ids
+]]></field>
         <field name="ttype">boolean</field>
         <field name="depends">product_id.x_bill_of_materials_ids</field>
         <field name="field_description">BoM-able</field>
