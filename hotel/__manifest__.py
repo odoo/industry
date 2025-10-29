@@ -1,9 +1,10 @@
 {
     'name': 'Hotel',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
+        'account_pos_settle_due',
         'base_industry_data',
         'booking_engine',
         'pos_restaurant',
