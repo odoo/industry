@@ -25,6 +25,7 @@
         'data/ir_attachment_pre.xml',
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
+        'data/report_paperformat.xml',
         'data/ir_actions_report.xml',
         'data/mail_template.xml',
         'data/ir_actions_server.xml',
@@ -99,7 +100,6 @@
     'license': 'OPL-1',
     'assets': {
         'web.assets_backend': [
-            'condominium/static/src/js/acquisition.js',
             'condominium/static/src/js/my_tour.js',
         ]
     },
@@ -108,7 +108,6 @@
         'data/ir_actions_server.xml',
         'data/qweb_view.xml',
         "data/knowledge_article.xml",
-        "static/src/js/acquisition.js",
         "static/src/js/my_tour.js",
     ],
     'images': ['images/main.png'],
