@@ -142,6 +142,7 @@ class TestEnv(IndustryCase):
                 self._check_change_theme_method(tree, file_name)
                 self._check_dates_are_relative(tree, file_name)
                 self._check_static_values_in_inputs(tree, file_name)
+                self._check_res_config_setting(tree)
                 if root.split('/')[-1] == 'data':
                     self._check_view_active(tree, file_name)
                     self._check_is_published_false(tree, file_name)
@@ -420,6 +421,10 @@ class TestEnv(IndustryCase):
                     record.get('id'),
                     file_name,
                 )
+
+    def _check_res_config_setting(self, root):
+        if root.xpath("//record[@model='res.config.settings']/field[@name='account_price_include']"):
+            _logger.warning("This setting needs extra care, see examples on how to deal with account_price_include.")
 
     def _check_user_is_set(self, root, previous_records):
         records = previous_records
