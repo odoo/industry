@@ -3,9 +3,10 @@
     <record id="res_config_settings_enable_coworking" model="res.config.settings">
         <field name="group_use_lead" eval="True"/>
         <field name="group_uom" eval="True"/>
-        <field name="account_price_include">tax_included</field>
     </record>
-    <function model="res.config.settings" name="execute">
+    <function name="write" model="res.config.settings">
         <value eval="[ref('res_config_settings_enable_coworking')]"/>
+        <value model="res.company" eval="{'account_price_include': 'tax_included'} if not obj().env.company._existing_accounting() else {}"/>
     </function>
+    <function model="res.config.settings" name="execute" eval="[ref('res_config_settings_enable_coworking')]"/>
 </odoo>
