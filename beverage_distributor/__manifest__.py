@@ -1,6 +1,6 @@
 {
     'name': 'Beverage Distributor',
-    'version': '2.1',
+    'version': '2.0',
     'category': 'Supply Chain',
     'depends': [
         'base_automation',
@@ -54,6 +54,7 @@
         'demo/crm_lead.xml',
         'demo/product_template.xml',
         'demo/product_supplierinfo.xml',
+        'demo/stock_quant.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
@@ -63,9 +64,6 @@
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
         'demo/purchase_order_confirm.xml',
-        'demo/validate_deliveries.xml',
-        'demo/validate_receipts.xml',
-        'demo/stock_quant.xml',
         'demo/mail_activity.xml',
         'demo/delivery_carrier.xml',
         'demo/payment_provider_demo_post.xml',
