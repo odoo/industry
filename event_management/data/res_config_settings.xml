@@ -6,11 +6,12 @@
         <field name="group_uom" eval="1"/>
         <field name="group_rental_stock_picking" eval="1"/>
         <field name="group_purchase_alternatives" eval="1"/>
-        <field name="account_price_include">tax_included</field>
         <field name="group_stock_multi_locations" eval="1"/>
         <field name="group_warning_purchase" eval="1"/>
     </record>
-    <function name="execute" model="res.config.settings">
+    <function name="write" model="res.config.settings">
         <value eval="[ref('res_config_account_setting_event_management')]"/>
+        <value model="res.company" eval="{'account_price_include': 'tax_included'} if not obj().env.company._existing_accounting() else {}"/>
     </function>
+    <function name="execute" model="res.config.settings" eval="[ref('res_config_account_setting_event_management')]"/>
 </odoo>

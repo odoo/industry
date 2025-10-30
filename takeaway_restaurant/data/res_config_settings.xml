@@ -2,11 +2,12 @@
 <odoo noupdate="1">
     <record id="res_config_takeaway_restaurant_settings" model="res.config.settings">
         <field name="group_product_variant" eval="True"/>
-        <field name="account_price_include">tax_included</field>
         <field name="pos_show_product_images" eval="True"/>
         <field name="pos_show_category_images" eval="True"/>
     </record>
-    <function model="res.config.settings" name="execute">
+    <function name="write" model="res.config.settings">
         <value eval="[ref('res_config_takeaway_restaurant_settings')]"/>
+        <value model="res.company" eval="{'account_price_include': 'tax_included'} if not obj().env.company._existing_accounting() else {}"/>
     </function>
+    <function model="res.config.settings" name="execute" eval="[ref('res_config_takeaway_restaurant_settings')]"/>
 </odoo>
