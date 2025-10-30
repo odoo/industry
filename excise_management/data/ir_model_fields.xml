@@ -263,6 +263,7 @@ for template in self:
         <field name="model_id" ref="stock.model_stock_picking"/>
         <field name="name">x_external_id</field>
         <field name="store" eval="True" />
+        <field name="copied" eval="False" />
     </record>
     <record id="stock_picking_invoice_ids" model="ir.model.fields">
         <field name="ttype">many2many</field>
@@ -307,13 +308,6 @@ for record in self: record['x_external_id_count'] = len(record.x_external_ids)
         <field name="depends">x_external_ids</field>
         <field name="store" eval="False"/>
     </record>
-    <record id="stock_move_excise_report" model="ir.model.fields">
-        <field name="name">x_excise_report_id</field>
-        <field name="ttype">many2one</field>
-        <field name="model_id" ref="stock.model_stock_move"/>
-        <field name="field_description">Excise Report ID</field>
-        <field name="relation">x_excise_report</field>
-    </record>
     <record id="reporter_id_excise_report" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="copied" eval="True"/>
@@ -324,10 +318,17 @@ for record in self: record['x_external_id_count'] = len(record.x_external_ids)
     </record>
     <record id="from_date_excise_report" model="ir.model.fields">
         <field name="ttype">date</field>
-        <field name="copied" eval="True"/>
+        <field name="required" eval="True"/>
         <field name="field_description">From Date</field>
         <field name="model_id" ref="excise_report"/>
         <field name="name">x_from_date</field>
+    </record>
+    <record id="to_date_excise_report" model="ir.model.fields">
+        <field name="ttype">date</field>
+        <field name="required" eval="True"/>
+        <field name="field_description">To Date</field>
+        <field name="model_id" ref="excise_report"/>
+        <field name="name">x_to_date</field>
     </record>
     <record id="name_excise_report" model="ir.model.fields">
         <field name="ttype">char</field>
@@ -343,34 +344,23 @@ for record in self:
         record['x_name'] = f"{str(record.x_from_date.isocalendar()[0])[2:]}W{record.x_from_date.isocalendar()[1]:02d}"
     ]]></field>
     </record>
-    <record id="period_excise_report" model="ir.model.fields">
-        <field name="ttype">char</field>
-        <field name="copied" eval="True"/>
-        <field name="field_description">Period</field>
-        <field name="model_id" ref="excise_report"/>
-        <field name="name">x_period</field>
-        <field name="depends">x_from_date</field>
-        <field name="compute"><![CDATA[
-for record in self:
-    if record.x_from_date:
-        record['x_period'] = f"{(record.x_from_date).strftime('%d/%m/%Y')} - {(record.x_from_date + datetime.timedelta(days=6)).strftime('%d/%m/%Y')}"
-    ]]></field>
-    </record>
     <record id="external_id_excise_report" model="ir.model.fields">
         <field name="ttype">char</field>
-        <field name="copied" eval="True"/>
+        <field name="copied" eval="False"/>
         <field name="field_description">External ID</field>
         <field name="model_id" ref="excise_report"/>
         <field name="name">x_external_id</field>
     </record>
     <record id="document_excise_report" model="ir.model.fields">
         <field name="ttype">binary</field>
+        <field name="copied" eval="False"/>
         <field name="field_description">Document</field>
         <field name="model_id" ref="excise_report"/>
         <field name="name">x_document</field>
     </record>
     <record id="state_excise_report" model="ir.model.fields">
         <field name="name">x_state</field>
+        <field name="copied" eval="False"/>
         <field name="model_id" ref="excise_report" />
         <field name="ttype">selection</field>
         <field name="field_description">State</field>
@@ -387,18 +377,17 @@ for record in self:
     </record>
     <record id="excise_report_stock_moves" model="ir.model.fields">
         <field name="name">x_stock_move_ids</field>
-        <field name="ttype">one2many</field>
+        <field name="ttype">many2many</field>
         <field name="model_id" ref="excise_report"/>
         <field name="field_description">Stock move IDs</field>
         <field name="relation">stock.move</field>
-        <field name="relation_field">x_excise_report_id</field>
-        <field name="depends">x_from_date</field>
+        <field name="depends">x_from_date, x_to_date</field>
         <field name="compute"><![CDATA[
 for record in self:
-    if record.x_from_date:
-        record['x_stock_move_ids'] = self.env['stock.move'].search([
+    if record.x_from_date and record.x_to_date:
+        record['x_stock_move_ids'] = self.env['stock.move'].sudo().search([
             ('date', '>=', record.x_from_date),
-            ('date', '<', record.x_from_date + datetime.timedelta(days=7)),
+            ('date', '<', record.x_to_date),
             ('x_excise_category', '!=', False),
             ('x_fiscal_deposit_move', 'not in', ['none', False]),
             ('state', '=', 'done'),
@@ -507,7 +496,7 @@ for record in self: record['x_move_id_count'] = len(record.x_stock_move_ids)
         <field name="depends">x_stock_move_ids</field>
         <field name="compute"><![CDATA[
 for record in self:
-    if record.x_from_date:
+    if record.x_stock_move_ids:
         results = self.env['stock.move']._read_group(domain=[
             ('id', 'in', record.x_stock_move_ids.ids),
         ],

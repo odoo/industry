@@ -46,16 +46,22 @@ for fp in records:
         <field name="state">code</field>
         <field name="interval_number">1</field>
         <field name="interval_type">weeks</field>
-        <field name="nextcall" eval="(datetime.now() + timedelta(days=(6 - datetime.now().weekday()) % 7)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="active" eval="True"/>
+        <field name="nextcall" eval="(datetime.now() + timedelta(days=(0 - datetime.now().weekday()) % 7)).strftime('%Y-%m-%d %H:%M:%S')" />
         <field name="code"><![CDATA[
-res_id = env['x_excise_report'].create({'x_from_date': datetime.date.today() - datetime.timedelta(days=7), 'x_state': 'progress', 'x_user_id': env.company.x_reporter_id.id})
-env['mail.activity'].create({'activity_type_id': env.ref('mail.mail_activity_data_todo').id, 'summary': f"Excise Report {res_id.x_name}",'res_model_id': env.ref('excise_management.excise_report').id, 'res_id': res_id.id, 'user_id': env.company.x_reporter_id.id, 'date_deadline': datetime.date.today() + datetime.timedelta(weeks=1)})
+last_report_date = env['x_excise_report'].sudo().search([], order='x_to_date desc', limit=1).x_to_date
+from_date = last_report_date if last_report_date else datetime.date.today() - datetime.timedelta(days=7)
+if from_date < datetime.date.today():
+    res_id = env['x_excise_report'].sudo().create({'x_from_date': from_date, 'x_to_date': datetime.date.today(), 'x_user_id': env.company.x_reporter_id.id})
+    env['mail.activity'].sudo().create({'activity_type_id': env.ref('mail.mail_activity_data_todo').id, 'summary': f"Excise Report {res_id.x_name}",'res_model_id': env.ref('excise_management.excise_report').id, 'res_id': res_id.id, 'user_id': env.company.x_reporter_id.id, 'date_deadline': datetime.date.today() + datetime.timedelta(weeks=1)})
         ]]></field>
     </record>
-    <record id="update_excise_report_to_done" model="ir.actions.server">
-        <field name="name">Update excise report to done</field>
+    <record id="action_excise_report_stock_moves" model="ir.actions.server">
         <field name="model_id" ref="excise_report"/>
         <field name="state">code</field>
-        <field name="code"><![CDATA[record['x_state'] = 'done']]></field>
+        <field name="name">Open stock moves</field>
+        <field name="code"><![CDATA[
+action = {'view_mode': 'list', 'res_model': 'stock.move', 'type': 'ir.actions.act_window', 'domain': [('id', 'in', record.x_stock_move_ids.ids)], 'view_id': env.ref('excise_management.stock_move_view_list').id, 'name': 'Excises Analysis',}
+        ]]></field>
     </record>
 </odoo>
