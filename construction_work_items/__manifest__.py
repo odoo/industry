@@ -25,7 +25,6 @@
         'data/x_bill_of_materials_line.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
-        'data/project_project.xml',
     ],
     'demo': [
         'demo/res_partner.xml',

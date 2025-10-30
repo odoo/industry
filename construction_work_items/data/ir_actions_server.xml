@@ -75,7 +75,7 @@ else:
             'price_unit': record.x_unit_price,
             'technical_price_unit': record.x_unit_price,
             'purchase_price': record.x_unit_cost,
-            'x_bill_of_materials_ids': [record.id],
+            'x_bom_ids': [record.id],
         })
 ]]></field>
     </record>
@@ -114,7 +114,7 @@ action = {
          <field name="model_id" ref="sale.model_sale_order_line" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
-if record.x_bom_able and not record.x_bill_of_materials_ids and record.product_id :
+if record.x_bom_able and not record.x_bom_ids and record.product_id :
     bom_template = env['x_bill_of_materials'].search([('x_product_product_id', '=', record.product_id), ("x_is_template","=",True), ('x_active','=',True)], limit=1)
     bom_local = bom_template.copy({
         'x_sale_order_line_id': record.id,
@@ -127,12 +127,12 @@ if record.x_bom_able and not record.x_bill_of_materials_ids and record.product_i
         <field name="model_id" ref="sale.model_sale_order_line" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
-if record.x_bill_of_materials_ids:
+if record.x_bom_ids:
     # Open the local BoM
     action = {
         "type": "ir.actions.act_window",
         "res_model": "x_bill_of_materials",
-        "res_id": record.x_bill_of_materials_ids.id,
+        "res_id": record.x_bom_ids.id,
         "view_mode": "form",
         "target": "new",
     }
@@ -143,11 +143,22 @@ if record.x_bill_of_materials_ids:
         <field name="model_id" ref="sale.model_sale_order_line" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
-record.x_bill_of_materials_ids.write({
+record.x_bom_ids.write({
     'x_quantity': record.product_uom_qty,
-    'x_cost': record.product_uom_qty * record.x_bill_of_materials_ids.x_unit_cost,
-    'x_price': record.product_uom_qty * record.x_bill_of_materials_ids.x_unit_price,
+    'x_cost': record.product_uom_qty * record.x_bom_ids.x_unit_cost,
+    'x_price': record.product_uom_qty * record.x_bom_ids.x_unit_price,
 })
+]]></field>
+    </record>
+    <record id="server_action_archive_product_related_work_item" model="ir.actions.server">
+        <field name="name">Construction: SOL - Archive product related work item</field>
+        <field name="model_id" ref="x_bill_of_materials_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for bom in records:
+    #if related_boms := env['x_bill_of_materials'].search([('id', '!=', bom.id), ('x_product_product_id', '=', bom.x_product_product_id.id), ('x_is_template', '!=', False), ('x_active', '!=', False)]):
+    if related_boms := bom.x_product_product_id.x_bom_ids.filtered(lambda b: b.id != bom.id and b.x_is_template and b.x_active):
+        related_boms.write({'x_active': False})
 ]]></field>
     </record>
 </odoo>
