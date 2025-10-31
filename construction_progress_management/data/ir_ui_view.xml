@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="sale_order_list_view" model="ir.ui.view">
+        <field name="name">Construction list view for Sale Order Lines</field>
+        <field name="inherit_id" ref="sale.view_order_line_tree"/>
+        <field name="mode">extension</field>
+        <field name="model">sale.order.line</field>
+        <field name="priority">1000</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="/list" position="replace">
+                <list default_order="order_id desc,sequence" editable="bottom" expand="True" decoration-info="display_type" decoration-it="display_type == 'line_note'" decoration-bf="display_type == 'line_section'">
+                    <header>
+                        <button class="btn btn-primary" name="%(action_sol_update_qty_delivered)d" type="action" string="Update Delivery"/>
+                    </header>
+                    <field name="order_id"                                              widget="many2one"     readonly="True"/>
+                    <field name="name"                                                                        readonly="True"/>
+                    <field name="product_uom_qty"                                       string="Qty"          readonly="True"                                                                                                              invisible="display_type"/>
+                    <field name="product_uom_id" groups="uom.group_uom"                 widget="many2one_uom" readonly="True"                                                                                                              invisible="display_type"/>
+                    <field name="x_delivered_progress"                                  widget="progressbar"  readonly="True"                                                                                                              invisible="x_delivered_progress == 0"/>
+                    <field name="x_quantity_increment"                    width="130px"                       readonly="display_type or not (is_service and x_service_policy == 'delivered_manual')"                                       invisible="(not display_type and not (is_service and x_service_policy == 'delivered_manual')) or display_type == 'line_note'"/>
+                    <button name="%(action_sol_update_section_progress)d" width="110px" string="Apply to section" type="action"                                                                                                            invisible="not display_type or display_type == 'line_note'"/>
+                    <field name="x_progress_increment"                    width="130px" widget="percentage"   readonly="display_type == 'line_note' or (not display_type and not (is_service and x_service_policy == 'delivered_manual'))" invisible="(not display_type and not (is_service and x_service_policy == 'delivered_manual')) or display_type == 'line_note'"/>
+                    <field name="x_current_progress"                                    widget="progressbar"  readonly="True"                                                                                                              invisible="(not display_type and not (is_service and x_service_policy == 'delivered_manual')) or x_current_progress == 0"/>
+                </list>
+            </xpath>
+        </field>
+    </record>
+    <record id="sale_order_filter" model="ir.ui.view">
+        <field name="name">Construction list view search filters for Sale Order Lines</field>
+        <field name="inherit_id" ref="sale.view_sales_order_line_filter"/>
+        <field name="mode">extension</field>
+        <field name="model">sale.order.line</field>
+        <field name="priority">1000</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="/search" position="replace">
+                <search string="Search Sales Order">
+                <filter string="Not Started"
+                    name="not_started"
+                    domain="[('x_delivered_progress', '=', 0), ('display_type', '=', False)]"
+                    help="Sales Order Lines that have not been started yet (0% progress)"/>
+                <filter string="In Progress"
+                    name="in_progress"
+                    domain="[('x_delivered_progress', '&gt;', 0), ('display_type', '=', False), ('x_delivered_progress', '&lt;', 100)]"
+                    help="Sales Order Lines that between 0 and 100% progress"/>
+                <filter string="Fully Invoiced"
+                    name="fully_invoiced"
+                    domain="[('x_delivered_progress', '&gt;=', 100), ('display_type', '=', False)]"
+                    help="Sales Order Lines that are at 100% progress"/>
+                <filter string="Structure"
+                    name="structure"
+                    domain="[('display_type', '!=', False)]"
+                    help="The structure Sale Order Lines"/>
+                <field name="order_id"/>
+                <field name="product_id"/>
+                <group>
+                    <filter string="Product" name="product" context="{'group_by':'product_id'}"/>
+                    <filter string="Order" name="order" context="{'group_by':'order_id'}"/>
+                </group>
+            </search>
+            </xpath>
+        </field>
+    </record>
+</odoo>

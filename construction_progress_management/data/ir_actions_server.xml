@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="action_sol_update_progress_increment_on_change" model="ir.actions.server">
+        <field name="code"><![CDATA[
+record['x_progress_increment'] = record.x_quantity_increment / record.product_uom_qty if record.product_uom_qty > 0 else False
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Construction - Update Progress Increment on Quantity Increment change</field>
+    </record>
+    <record id="action_sol_update_quantity_increment_on_change" model="ir.actions.server">
+        <field name="code"><![CDATA[
+record['x_quantity_increment'] = record.x_progress_increment * record.product_uom_qty
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Construction - Update Quantity Increment on Progress Increment change</field>
+    </record>
+    <record id="action_sol_update_section_progress" model="ir.actions.server">
+        <field name="code"><![CDATA[
+lines = record.order_id.order_line.sorted(key=lambda sol: sol.sequence)
+i = [sol.sequence for sol in lines].index(record.sequence) + 1
+while (i < len(lines) and
+      ((record.display_type == 'line_section' and lines[i].display_type != 'line_section')
+      or (record.display_type == 'line_subsection' and (lines[i].display_type not in ['line_subsection', 'line_section'])))):
+    if lines[i].is_service and lines[i].x_service_policy == 'delivered_manual':
+        if record.x_progress_increment * lines[i].product_uom_qty + lines[i].qty_delivered > lines[i].product_uom_qty:  
+            increment = lines[i].product_uom_qty - lines[i].qty_delivered
+        else:
+            increment = lines[i].product_uom_qty * record.x_progress_increment
+        percentage = increment / lines[i].product_uom_qty
+        lines[i]['x_quantity_increment'], lines[i]['x_progress_increment'] = increment, percentage
+    i += 1
+record['x_progress_increment'] = 0
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Construction - Update Quantity Increment on section button click</field>
+    </record>
+    <record id="action_sol_update_qty_delivered" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for sol in records:
+    sol['qty_delivered'], sol['x_quantity_increment'], sol['x_progress_increment'] = sol.qty_delivered + sol.x_quantity_increment, 0, 0
+action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'message': "Delivered quantities updated.", 'type': 'success', 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'}}}
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Construction - Update Quantity Delivered</field>
+    </record>
+    <record id="action_initialize_sales_order_line_sequence_on_sales_order_create" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="update_path">sequence</field>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="sale.model_sale_order"/>
+        <field name="evaluation_type">equation</field>
+        <field name="name">Construction - Initialize Sales Order Line Sequence on Sales Order create</field>
+        <field name="update_field_id" ref="sale.field_sale_order_line__sequence"/>
+        <field name="usage">base_automation</field>
+        <field name="value"><![CDATA[list(record.order_id.order_line._ids).index(record.id)]]></field>
+    </record>
+</odoo>
