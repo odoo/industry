@@ -9,7 +9,6 @@ registry.category("web_tour.tours").add("condominium_knowledge_tour", {
         {
             trigger: '.o_app[data-menu-xmlid="knowledge.knowledge_menu_root"]',
             content: _t("Get on track and explore our recommendations for your Odoo usage here!"),
-            position: "bottom",
             run: "click",
         },
     ],
