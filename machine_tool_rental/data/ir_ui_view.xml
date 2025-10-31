@@ -1,0 +1,305 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="x_run_time_meter_form_view" model="ir.ui.view">
+    <field name="name">x_run_time_meter.form.view.machine_tool_rental</field>
+    <field name="model">x_run_time_meter</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Run-Time Meter">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <group name="main_details">
+            <group name="left_column">
+              <field name="x_product_id"/>
+              <field name="x_serial_id" domain="[('product_id', '=', x_product_id)]"/>
+            </group>
+            <group name="right_column">
+              <field name="x_date" options="{'warn_future':true}"/>
+              <field name="x_run_time" options="{'digits':[2,1]}" string="Run-Time (h)"/>
+              <field name="x_run_time_increment_h"/>
+            </group>
+          </group>
+          <group>
+            <field name="x_notes" placeholder="Type down your notes here..." nolabel="1" colspan="2"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+  <record id="x_run_time_meter_search_view" model="ir.ui.view">
+    <field name="name">x_run_time_meter.search.view.machine_tool_rental</field>
+    <field name="model">x_run_time_meter</field>
+    <field name="active" eval="True"/>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_serial_id"/>
+        <field name="x_product_id"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_run_time_meter" domain="[['x_active', '=', False]]"/>
+        <separator/>
+        <group name="group_by"/>
+        <filter name="group_by_date" string="Date" context="{'group_by': 'x_date'}"/>
+      </search>
+    </field>
+  </record>
+  <record id="x_run_time_meter_list_custom" model="ir.ui.view">
+    <field name="name">x_run_time_meter.list.view.machine_tool_rental</field>
+    <field name="model">x_run_time_meter</field>
+    <field name="active" eval="True"/>
+    <field name="priority">99</field>
+    <field name="arch" type="xml">
+      <list default_order="x_date desc">
+        <field name="x_date" optional="show"/>
+        <field name="x_product_id" optional="show"/>
+        <field name="x_serial_id" optional="show"/>
+        <field name="x_run_time_increment_h" optional="show"/>
+        <field name="x_run_time" optional="show"/>
+      </list>
+    </field>
+  </record>
+  <record id="x_run_time_meter_graph_view" model="ir.ui.view">
+    <field name="name">x_run_time_meter.graph.view.machine_tool_rental</field>
+    <field name="model">x_run_time_meter</field>
+    <field name="active" eval="True"/>
+    <field name="priority">99</field>
+    <field name="arch" type="xml">
+      <graph string="Run Time Meter" type="line" stacked="False">
+        <field name="x_date" type="col"/>
+        <field name="x_serial_id" type="col"/>
+        <field name="x_run_time_increment_h" type="measure"/>
+      </graph>
+    </field>
+  </record>
+  <record id="stock_production_lot_form_custom" model="ir.ui.view">
+    <field name="name">stock.production.lot.form.view.machine_tool_rental</field>
+    <field name="inherit_id" ref="stock.view_production_lot_form"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.lot</field>
+    <field name="active" eval="True"/>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <xpath expr="//div[@name='button_box']" position="inside">
+        <button class="oe_stat_button" icon="fa-clock-o" type="action" name="%(run_time_meters_serial_act_window)d">
+          <field widget="statinfo" name="x_x_serial_x_run_time_meter_count" string="Run-Time"/>
+        </button>
+        <button class="oe_stat_button" icon="fa-rotate-right" type="action" name="%(project_maintenance_act_window)d">
+          <field widget="statinfo" name="x_x_serial_project_task_count" string="Maintenance"/>
+        </button>
+      </xpath>
+      <xpath expr="//field[@name='location_id']" position="after">
+        <field name="x_run_time_meter_h" options="{'digits':[2,1]}"/>
+      </xpath>
+      <xpath expr="//field[@name='name']" position="after">
+        <widget name="web_ribbon" title="Available" invisible="x_status != 'available'"/>
+        <widget name="web_ribbon" title="Out" invisible="x_status != 'out'" bg_color="text-bg-danger"/>
+        <widget name="web_ribbon" title="Reception" invisible="x_status != 'reception'" bg_color="text-bg-warning"/>
+        <widget name="web_ribbon" title="Maintenance" invisible="x_status != 'maintenance'" bg_color="text-bg-warning"/>
+      </xpath>
+    </field>
+  </record>
+  <record id="stock_production_lot_list_custom" model="ir.ui.view">
+    <field name="name">stock.production.lot.list.view.machine_tool_rental</field>
+    <field name="inherit_id" ref="stock.view_production_lot_tree"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.lot</field>
+    <field name="active" eval="True"/>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='activity_ids']" position="replace"/>
+      <xpath expr="//field[@name='create_date']" position="replace">
+        <field name="x_run_time_meter_h" optional="show"/>
+        <field name="location_id" optional="show"/>
+        <field name="x_status" optional="show" widget="badge" decoration-success="x_status == 'available'" decoration-danger="x_status == 'out'" decoration-warning="x_status in ['reception', 'maintenance']"/>
+      </xpath>
+      <xpath expr="//field[@name='ref']" position="replace"/>
+    </field>
+  </record>
+  <record id="rental_order_kanban_custom" model="ir.ui.view">
+    <field name="name">rental.order.kanban.view.machine_tool_rental</field>
+    <field name="inherit_id" ref="sale_renting.rental_order_view_kanban"/>
+    <field name="model">sale.order</field>
+    <field name="mode">extension</field>
+    <field name="priority">160</field>
+    <field name="type">kanban</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <xpath expr="//kanban[1]" position="attributes">
+        <attribute name="default_group_by">rental_status</attribute>
+      </xpath>
+    </field>
+  </record>
+  <record id="product_template_product_form_custom" model="ir.ui.view">
+    <field name="name">product.template.product.form.view.machine_tool_rental</field>
+    <field name="inherit_id" ref="product.product_template_only_form_view"/>
+    <field name="mode">extension</field>
+    <field name="model">product.template</field>
+    <field name="active" eval="True"/>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <xpath expr="//div[@name='button_box']" position="inside">
+        <button class="oe_stat_button" icon="fa-gears" type="action" name="%(product_recurring_maintenance_rules_act_window)d">
+          <field widget="statinfo" name="x_recurring_maintenance_rules_count" string="Recurring Maintenance Rules"/>
+        </button>
+      </xpath>
+    </field>
+  </record>
+  <record id="project_task_form_custom" model="ir.ui.view">
+    <field name="name">project.task.form.view.machine_tool_rental</field>
+    <field name="inherit_id" ref="project.view_task_form2"/>
+    <field name="mode">extension</field>
+    <field name="model">project.task</field>
+    <field name="active" eval="True"/>
+    <field name="priority">9990</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='under_warranty']" position="after">
+        <field name="x_maintenance"/>
+        <field name="x_recurring_maintenance_rule_id"
+               invisible="x_maintenance != 'recurrent'"
+               required="x_maintenance == 'recurrent'"
+               options="{'no_open':true}"
+        />
+        <label for="x_serial_id"/>
+        <div class="d-flex" name="serial">
+          <field class="oe_inline" name="x_serial_id"/>
+          <field name="x_product_id"/>
+        </div>
+      </xpath>
+    </field>
+  </record>
+  <record id="x_recurring_maintenance_rules_search_view" model="ir.ui.view">
+    <field name="name">x_recurring_maintenance_rules.search.view.machine_tool_rental</field>
+    <field name="model">x_recurring_maintenance_rules</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <search>
+        <filter string="Archived" name="archived_x_recurring_maintenance_rules" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+  </record>
+  <record id="x_recurring_maintenance_rules_list_view" model="ir.ui.view">
+    <field name="name">x_recurring_maintenance_rules.list.view.machine_tool_rental</field>
+    <field name="model">x_recurring_maintenance_rules</field>
+    <field name="active" eval="True"/>
+    <field name="priority">99</field>
+    <field name="arch" type="xml">
+      <list editable="bottom">
+        <field name="x_run_time_increment_h" optional="show"/>
+        <field name="x_product_id" optional="show"/>
+      </list>
+    </field>
+  </record>
+  <record id="stock_location_route_form_custom" model="ir.ui.view">
+    <field name="name">stock.location.route.form.view.machine_tool_rental</field>
+    <field name="inherit_id" ref="stock.stock_location_route_form_view"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.route</field>
+    <field name="priority">160</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='rule_ids']//field[@name='sequence']" position="after">
+        <field name="name" optional="show"/>
+      </xpath>
+    </field>
+  </record>
+  <record id="stock_rule_list_custom" model="ir.ui.view">
+    <field name="name">stock.rule.list.view.machine_tool_rental</field>
+    <field name="inherit_id" ref="stock.view_stock_rule_tree"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.rule</field>
+    <field name="active" eval="True"/>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='action']" position="before">
+        <xpath expr="//field[@name='name']" position="move"/>
+      </xpath>
+      <xpath expr="//field[@name='name']" position="attributes">
+        <attribute name="optional">show</attribute>
+      </xpath>
+    </field>
+  </record>
+  <record id="stock_picking_form_custom" model="ir.ui.view">
+    <field name="name">stock.picking.form.view.machine_tool_rental</field>
+    <field name="inherit_id" ref="stock.view_picking_form"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.picking</field>
+    <field name="active" eval="True"/>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <xpath expr="//button[@name='action_cancel']" position="after">
+        <button string="Record Run-Time"
+                type="action"
+                name="%(record_run_time_meter)d"
+        />
+      </xpath>
+      <xpath expr="//field[@name='lot_ids']" position="attributes">
+        <attribute name="optional">show</attribute>
+      </xpath>
+    </field>
+  </record>
+  <record id="stock_storage_category_form_custom_view" model="ir.ui.view">
+    <field name="name">stock.storage.category.form.view.machine_tool_rental</field>
+    <field name="inherit_id" ref="stock.stock_storage_category_form"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.storage.category</field>
+    <field name="active" eval="True"/>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='max_weight']/.." position="after">
+        <field name="x_serial_status"/>
+      </xpath>
+    </field>
+  </record>
+  <record id="res_partner_form_view_custom" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//button[@name='sale.act_res_partner_2_sale_order']" position="after">
+        <button class="oe_stat_button" icon="fa-envelope" type="action" name="%(to_invoice_act_window)d">
+          <div class="o_form_field o_stat_info">
+            <span class="o_stat_value">
+              <field name="x_amount_to_invoice" widget='monetary'/>
+            </span>
+            <span class="o_stat_text">To Invoice</span>
+          </div>
+        </button>
+      </xpath>
+      <xpath expr="//div[@name='warning_tax']" position="before">
+        <header>
+          <button string="Consolidated Down payment" type="action" name="%(consolidated_down_payment_server_action)d"/>
+        </header>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="mode">extension</field>
+    <field name="model">res.partner</field>
+    <field name="active" eval="True"/>
+    <field name="name">res.partner.form.view.machine_tool_rental</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="rental_order_form_view_custom" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='rental_start_date']" position="attributes">
+        <attribute name="readonly">invoice_count != 0</attribute>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="sale_renting.rental_order_form_view"/>
+    <field name="mode">extension</field>
+    <field name="model">sale.order</field>
+    <field name="name">rental.order.form.view.machine_tool_rental</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+</odoo>

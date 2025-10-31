@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <function model="stock.warehouse" name="write">
+        <value eval="[ref('stock.warehouse0')]"/>
+        <value eval="{'reception_steps': 'two_steps'}"/>
+    </function>
+    <function model="stock.rule" name="write">
+        <value model="stock.rule" eval="obj().search([('location_dest_id', '=', ref('stock.stock_location_company')), ('route_id', '=', ref('sale_stock_renting.route_rental'))], limit=1).id"/>
+        <value eval="{'name': 'Rental Return'}"/>
+    </function>
+    <record id="stock_rule_9" model="stock.rule">
+        <field name="name">Rental Return Check - Heavy</field>
+        <field name="action">push</field>
+        <field name="location_dest_id" ref="stock.stock_location_stock"/>
+        <field name="location_src_id" ref="stock.stock_location_company"/>
+        <field name="procure_method">make_to_order</field>
+        <field name="delay">2</field>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="picking_type_id" search="[('sequence_code', '=', 'STOR')]"/>
+        <field name="route_id" model="stock.rule" eval="obj().search([('action', '=', 'push')]).route_id"/>
+        <field name="push_domain" eval="[('product_id.categ_id', '=', ref('product_category_7'))]"/>
+    </record>
+    <record id="stock_rule_10" model="stock.rule">
+        <field name="name">Rental Return Check - Light</field>
+        <field name="action">push</field>
+        <field name="location_dest_id" ref="stock.stock_location_stock"/>
+        <field name="location_src_id" ref="stock.stock_location_company"/>
+        <field name="picking_type_id" search="[('sequence_code', '=', 'STOR')]"/>
+        <field name="route_id" model="stock.rule" eval="obj().env.ref('machine_tool_rental.stock_rule_9').route_id"/>
+        <field name="procure_method">make_to_order</field>
+        <field name="delay">1</field>
+        <field name="warehouse_id" ref="stock.warehouse0"/>
+        <field name="push_domain" eval="[('product_id.categ_id', '=', ref('product_category_6'))]"/>
+    </record>
+</odoo>
