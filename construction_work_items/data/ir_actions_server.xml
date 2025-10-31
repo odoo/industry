@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="954" model="ir.actions.server">
+    <record id="server_action_set_bom_name_and_ref" model="ir.actions.server">
         <field name="name">Construction: BoM - Set BoM name and reference</field>
         <field name="model_id" ref="x_bill_of_materials_model" />
         <field name="state">code</field>
@@ -18,11 +18,11 @@ record.write({
         <field name="state">code</field>
         <field name="code"><![CDATA[
 # Archive previous template
-bom_template = env['x_bill_of_materials'].search([('x_product_product_id', '=', record.x_product_product), ("x_is_template","=",True), ('x_active','=',True)], limit=1)
+bom_template = env['x_bill_of_materials'].search([('x_product_product_id', '=', record.x_product_product_id), ("x_is_template","=",True), ('x_active','=',True)], limit=1)
 if bom_template: 
     bom_template['x_active'] = False
 # Set new template
-record.copy({ 'x_sale_order_line_id': False, 'x_is_template': True, 'x_targeted_so': False, 'x_sol_on_create': False })
+record.copy({ 'x_sale_order_line_id': False, 'x_is_template': True, 'x_targeted_so': False})
 ]]></field>
     </record>
     <record id="server_action_set_unit_from_component" model="ir.actions.server">
@@ -30,7 +30,7 @@ record.copy({ 'x_sale_order_line_id': False, 'x_is_template': True, 'x_targeted_
         <field name="model_id" ref="x_bill_of_materials_line_model" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
-if record.x_product_template_id: record['x_unit_id'] = record.x_product_template_id.uom_id
+if record.x_product_product_id: record['x_unit_id'] = record.x_product_product_id.uom_id
 ]]></field>
     </record>
     <record id="server_action_set_unit_cost_price_fromm_product" model="ir.actions.server">
@@ -102,7 +102,6 @@ action = {
     "target": "new",
     "context": {
         "default_x_is_template": False,
-        "default_x_sol_on_create": True,
         "default_x_targeted_so": env.context.get("so_id")
     },
 }
@@ -145,20 +144,21 @@ if record.x_bom_ids:
         <field name="code"><![CDATA[
 record.x_bom_ids.write({
     'x_quantity': record.product_uom_qty,
-    'x_cost': record.product_uom_qty * record.x_bom_ids.x_unit_cost,
-    'x_price': record.product_uom_qty * record.x_bom_ids.x_unit_price,
 })
 ]]></field>
     </record>
-    <record id="server_action_archive_product_related_work_item" model="ir.actions.server">
-        <field name="name">Construction: SOL - Archive product related work item</field>
+
+    <record id="server_action_assign_x_template_bom_id" model="ir.actions.server">
+        <field name="name">Construction: Product - Assign Template BOM</field>
         <field name="model_id" ref="x_bill_of_materials_model" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
 for bom in records:
-    #if related_boms := env['x_bill_of_materials'].search([('id', '!=', bom.id), ('x_product_product_id', '=', bom.x_product_product_id.id), ('x_is_template', '!=', False), ('x_active', '!=', False)]):
-    if related_boms := bom.x_product_product_id.x_bom_ids.filtered(lambda b: b.id != bom.id and b.x_is_template and b.x_active):
-        related_boms.write({'x_active': False})
+    if bom.x_is_template and bom.x_product_product_id and bom.x_active:
+        if bom.x_product_product_id.x_tmpl_bom_id:
+            bom.x_product_product_id.x_tmpl_bom_id.write({'x_active': False})
+        bom.write({'x_active': True})
+        bom.x_product_product_id['x_tmpl_bom_id'] = bom.id
 ]]></field>
     </record>
 </odoo>
