@@ -71,6 +71,19 @@ registry.category("web_tour.tours").add("Condominium_Acquisition", {
         run: "click"
     },
     {
+        trigger: ".o_field_widget[name='country_id'] .o-autocomplete--input",
+        content: "Open the country dropdown",
+        run: "click"
+    },
+    {
+        trigger: ".dropdown-item.ui-menu-item-wrapper:contains('Search more')",
+        run: "click"
+    },
+    {
+        trigger: ".o_data_cell[name='name']:contains('Belgium')",
+        run: "click"
+    },
+    {
         trigger: ".o_statusbar_buttons > button:contains('Create Condominium')",
         content: "Convert it as condominium",
         expectUnloadPage: true,
