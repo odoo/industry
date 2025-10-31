@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="server_action_set_bom_name_and_ref" model="ir.actions.server">
-        <field name="name">Construction: BoM - Set BoM name and reference</field>
-        <field name="model_id" ref="x_bill_of_materials_model" />
+    <record id="server_action_set_work_item_name_and_ref" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Set Work Item name and reference</field>
+        <field name="model_id" ref="x_work_item_model" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
 record.write({
@@ -12,30 +12,30 @@ record.write({
 })
 ]]></field>
     </record>
-    <record id="server_action_set_bom_as_template" model="ir.actions.server">
-        <field name="name">Construction: BoM - Set as template</field>
-        <field name="model_id" ref="x_bill_of_materials_model" />
+    <record id="server_action_set_work_item_as_template" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Set as template</field>
+        <field name="model_id" ref="x_work_item_model" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
 # Archive previous template
-bom_template = env['x_bill_of_materials'].search([('x_product_product_id', '=', record.x_product_product_id), ("x_is_template","=",True), ('x_active','=',True)], limit=1)
-if bom_template: 
-    bom_template['x_active'] = False
+work_item_template = env['x_work_item'].search([('x_product_product_id', '=', record.x_product_product_id), ("x_is_template","=",True), ('x_active','=',True)], limit=1)
+if work_item_template: 
+    work_item_template['x_active'] = False
 # Set new template
 record.copy({ 'x_sale_order_line_id': False, 'x_is_template': True, 'x_targeted_so': False})
 ]]></field>
     </record>
     <record id="server_action_set_unit_from_component" model="ir.actions.server">
-        <field name="name">Construction: BoM - Set unit from component</field>
-        <field name="model_id" ref="x_bill_of_materials_line_model" />
+        <field name="name">Construction: Work Item - Set unit from component</field>
+        <field name="model_id" ref="x_work_item_line_model" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
 if record.x_product_product_id: record['x_unit_id'] = record.x_product_product_id.uom_id
 ]]></field>
     </record>
     <record id="server_action_set_unit_cost_price_fromm_product" model="ir.actions.server">
-        <field name="name">Construction: BoM - Set unit, unit cost and unit price from product</field>
-        <field name="model_id" ref="x_bill_of_materials_line_model" />
+        <field name="name">Construction: Work Item - Set unit, unit cost and unit price from product</field>
+        <field name="model_id" ref="x_work_item_line_model" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
 record.write({
@@ -46,8 +46,8 @@ record.write({
 ]]></field>
     </record>
     <record id="server_action_update_associated_sol" model="ir.actions.server">
-        <field name="name">Construction: BoM - Update associated SO line</field>
-        <field name="model_id" ref="x_bill_of_materials_model" />
+        <field name="name">Construction: Work Item - Update associated SO line</field>
+        <field name="model_id" ref="x_work_item_model" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
 if record.x_sale_order_line_id:
@@ -75,13 +75,13 @@ else:
             'price_unit': record.x_unit_price,
             'technical_price_unit': record.x_unit_price,
             'purchase_price': record.x_unit_cost,
-            'x_bom_ids': [record.id],
+            'x_work_item_ids': [record.id],
         })
 ]]></field>
     </record>
     <record id="server_action_update_product_cost_price" model="ir.actions.server">
-        <field name="name">Construction: BoM - Update product cost and price</field>
-        <field name="model_id" ref="x_bill_of_materials_model" />
+        <field name="name">Construction: Work Item - Update product cost and price</field>
+        <field name="model_id" ref="x_work_item_model" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
 record.x_product_product_id.write({
@@ -90,14 +90,14 @@ record.x_product_product_id.write({
 })
 ]]></field>
     </record>
-    <record id="server_action_add_custom_bom" model="ir.actions.server">
-        <field name="name">Construction: SO - Add custom BoM</field>
+    <record id="server_action_add_custom_work_item" model="ir.actions.server">
+        <field name="name">Construction: SO - Add custom Work Item</field>
         <field name="model_id" ref="sale.model_sale_order" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
 action = {
     "type": "ir.actions.act_window",
-    "res_model": "x_bill_of_materials",
+    "res_model": "x_work_item",
     "view_mode": "form",
     "target": "new",
     "context": {
@@ -107,58 +107,58 @@ action = {
 }
 ]]></field>
     </record>
-    <record id="server_actoin_create_associated_bom" model="ir.actions.server">
-        <field name="name">Construction: SOL - Create associated BoM</field>
-        <!-- Changed <field name="model_id" ref="x_bill_of_materials_model" /> -->
+    <record id="server_actoin_create_associated_work_item" model="ir.actions.server">
+        <field name="name">Construction: SOL - Create associated Work Item</field>
+        <!-- Changed <field name="model_id" ref="x_work_item_model" /> -->
          <field name="model_id" ref="sale.model_sale_order_line" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
-if record.x_bom_able and not record.x_bom_ids and record.product_id :
-    bom_template = env['x_bill_of_materials'].search([('x_product_product_id', '=', record.product_id), ("x_is_template","=",True), ('x_active','=',True)], limit=1)
-    bom_local = bom_template.copy({
+if record.x_work_item_able and not record.x_work_item_ids and record.product_id :
+    work_item_template = env['x_work_item'].search([('x_product_product_id', '=', record.product_id), ("x_is_template","=",True), ('x_active','=',True)], limit=1)
+    work_item_local = work_item_template.copy({
         'x_sale_order_line_id': record.id,
         'x_is_template': False,
     })
 ]]></field>
     </record>
-    <record id="server_action_open_sol_bom" model="ir.actions.server">
-        <field name="name">Construction: SOL - Open SOL BoM</field>
+    <record id="server_action_open_sol_work_item" model="ir.actions.server">
+        <field name="name">Construction: SOL - Open SOL Work Item</field>
         <field name="model_id" ref="sale.model_sale_order_line" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
-if record.x_bom_ids:
-    # Open the local BoM
+if record.x_work_item_ids:
+    # Open the local work item
     action = {
         "type": "ir.actions.act_window",
-        "res_model": "x_bill_of_materials",
-        "res_id": record.x_bom_ids.id,
+        "res_model": "x_work_item",
+        "res_id": record.x_work_item_ids.id,
         "view_mode": "form",
         "target": "new",
     }
 ]]></field>
     </record>
-    <record id="server_action_scale_associated_bom" model="ir.actions.server">
-        <field name="name">Construction: SOL - Scale associated BoM</field>
+    <record id="server_action_scale_associated_work_item" model="ir.actions.server">
+        <field name="name">Construction: SOL - Scale associated Work Item</field>
         <field name="model_id" ref="sale.model_sale_order_line" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
-record.x_bom_ids.write({
+record.x_work_item_ids.write({
     'x_quantity': record.product_uom_qty,
 })
 ]]></field>
     </record>
 
-    <record id="server_action_assign_x_template_bom_id" model="ir.actions.server">
-        <field name="name">Construction: Product - Assign Template BOM</field>
-        <field name="model_id" ref="x_bill_of_materials_model" />
+    <record id="server_action_assign_x_template_work_item_id" model="ir.actions.server">
+        <field name="name">Construction: Product - Assign Template Work Item</field>
+        <field name="model_id" ref="x_work_item_model" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
-for bom in records:
-    if bom.x_is_template and bom.x_product_product_id and bom.x_active:
-        if bom.x_product_product_id.x_tmpl_bom_id:
-            bom.x_product_product_id.x_tmpl_bom_id.write({'x_active': False})
-        bom.write({'x_active': True})
-        bom.x_product_product_id['x_tmpl_bom_id'] = bom.id
+for work_item in records:
+    if work_item.x_is_template and work_item.x_product_product_id and work_item.x_active:
+        if work_item.x_product_product_id.x_tmpl_work_item_id:
+            work_item.x_product_product_id.x_tmpl_work_item_id.write({'x_active': False})
+        work_item.write({'x_active': True})
+        work_item.x_product_product_id['x_tmpl_work_item_id'] = work_item.id
 ]]></field>
     </record>
 </odoo>
