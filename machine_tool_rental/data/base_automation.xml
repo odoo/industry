@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="on_run_time_edit" model="base.automation">
+    <field name="model_id" ref="x_run_time_meter_model"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('compute_run_time_increment')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="name">On Run-Time edit</field>
+    <field name="trigger_field_ids" eval="[(6, 0, [ref('x_run_time_meter_model_x_date_field'), ref('x_run_time_meter_model_x_run_time_field'), ref('x_run_time_meter_model_x_serial_field')])]"/>
+  </record>
+  <record id="set_task_run_time_meter" model="base.automation">
+    <field name="model_id" ref="project.model_project_task"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('run_time_meter_when_done')])]"/>
+    <field name="trigger">on_state_set</field>
+    <field name="trg_selection_field_id" ref="project.selection__project_task__state__1_done"/>
+    <field name="filter_domain">[('state', '=', '1_done')]</field>
+    <field name="filter_pre_domain">[('state', '!=', '1_done')]</field>
+    <field name="name">Set task run time meter when done</field>
+    <field name="trigger_field_ids" eval="[(6, 0, [ref('project.field_project_task__state')])]"/>
+  </record>
+  <record id="create_task_on_maintenance_move" model="base.automation">
+    <field name="model_id" ref="stock.model_stock_move"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('create_corrective_task')])]"/>
+    <field name="trigger">on_state_set</field>
+    <field name="trg_selection_field_id" ref="stock.selection__stock_move__state__done"/>
+    <field name="filter_domain" eval="[('state', '=', 'done'), ('location_dest_id', '=', ref('stock_location_18'))]"/>
+    <field name="filter_pre_domain" eval="[('location_id', '=', ref('stock.stock_location_company'))]"/>
+    <field name="name">Create task on maintenance move</field>
+    <field name="trigger_field_ids" eval="[(6, 0, [ref('stock.field_stock_move__state')])]"/>
+  </record>
+</odoo>
