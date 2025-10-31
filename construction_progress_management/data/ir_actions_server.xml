@@ -24,8 +24,12 @@ while (i < len(lines) and
       ((record.display_type == 'line_section' and lines[i].display_type != 'line_section')
       or (record.display_type == 'line_subsection' and (lines[i].display_type not in ['line_subsection', 'line_section'])))):
     if lines[i].is_service and lines[i].x_service_policy == 'delivered_manual':
-        new_inc = lines[i].product_uom_qty * (record.x_progress_increment if record.x_progress_increment + lines[i].x_current_progress < 100 else 100 - lines[i].x_current_progress)
-        lines[i]['x_quantity_increment'], lines[i]['x_progress_increment'] = new_inc, new_inc / lines[i].product_uom_qty if lines[i].product_uom_qty > 0 else False
+        if record.x_progress_increment * lines[i].product_uom_qty + lines[i].qty_delivered > lines[i].product_uom_qty:  
+            increment = lines[i].product_uom_qty - lines[i].qty_delivered
+        else:
+            increment = lines[i].product_uom_qty * record.x_progress_increment
+        percentage = increment / lines[i].product_uom_qty
+        lines[i]['x_quantity_increment'], lines[i]['x_progress_increment'] = increment, percentage
     i += 1
 record['x_progress_increment'] = 0
 ]]></field>
