@@ -1,9 +1,10 @@
 {
     'name': 'Construction Line Numbering',
     'version': '1.0',
-    'category': 'Construction',
+    'category': 'Hidden/Tools',
     'author': 'Odoo S.A.',
     'depends': [
+        'base_industry_data',
         'construction',
         'sale_management',
         'web_studio',

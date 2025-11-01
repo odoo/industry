@@ -1,11 +1,12 @@
 {
     'name': 'Construction Work Items',
     'version': '1.0',
-    'category': 'Construction',
+    'category': 'Hidden/Tools',
     'author': 'Odoo S.A.',
     'depends': [
-        'sale_management',
+        'base_industry_data',
         'construction',
+        'sale_management',
         'web_studio',
     ],
     'data': [
