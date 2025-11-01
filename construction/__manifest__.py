@@ -61,11 +61,13 @@
         'demo/planning_recurrency.xml',
         'demo/planning_slot.xml',
         'demo/sale_order_spreadsheet.xml',
+        'demo/res_config_settings.xml',
     ],
     'license': 'OPL-1',
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        "data/res_config_settings.xml",
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=construction",
