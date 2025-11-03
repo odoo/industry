@@ -121,13 +121,16 @@
         <xpath expr="//field[@name='product_id']" position="replace">
           <field name="date" type="col"/>
         </xpath>
-        <xpath expr="//graph[1]" position="attributes">
+        <!-- <xpath expr="//graph[1]" position="attributes">
           <attribute name="order">asc</attribute>
           <attribute name="stacked">0</attribute>
           <attribute name="type">line</attribute>
-        </xpath>
+        </xpath> -->
         <xpath expr="//field[@name='location_dest_id'][not(ancestor::field)]" position="replace">
           <field name="location_id" type="col"/>
+        </xpath>
+        <xpath expr="//field[@name='product_uom_qty']" position="replace">
+          <field name="product_qty" type="measure"/>
         </xpath>
       </data>
     </field>
@@ -186,6 +189,9 @@
         <xpath expr="//filter[@name='inventory']" position="replace"/>
         <xpath expr="//filter[@name='outgoing']" position="replace"/>
         <xpath expr="//filter[@name='incoming']" position="replace"/>
+        <xpath expr="//filter[@name='groupby_date']" position="after">
+          <filter string="Scheduled Date" name="groupby_date_year" domain="[]" context="{'group_by': 'date:year'}"/>
+        </xpath>
         <xpath expr="//field[@name='partner_id']" position="replace"/>
         <xpath expr="//field[@name='location_dest_id']" position="replace"/>
         <xpath expr="//field[@name='origin']" position="replace"/>
@@ -249,14 +255,6 @@
             <field widget="statinfo" name="x_recipe_iteration_quality_check_count" string="Tests"/>
           </button>
         </xpath>
-        <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
-          <page string="Tests" name="studio_page_5oo_1j2h7skmn">
-            <group name="studio_group_5oo">
-              <group name="studio_group_5oo_left"/>
-              <group name="studio_group_5oo_right"/>
-            </group>
-          </page>
-        </xpath>
       </data>
     </field>
     <field name="inherit_id" ref="mrp_plm.mrp_eco_view_form"/>
@@ -267,7 +265,7 @@
     <field name="active" eval="True"/>
     <field name="type">form</field>
   </record>
-  <record id="quality_point_view_tree_inherit" model="ir.ui.view">
+  <record id="quality_point_view_tree" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
         <xpath expr="//field[@name='product_category_ids']" position="attributes">
@@ -279,7 +277,7 @@
     <field name="mode">extension</field>
     <field name="model">quality.point</field>
     <field name="name">quality.point.view.list</field>
-    <field name="priority">160</field>
+    <!-- <field name="priority">160</field> -->
     <field name="active" eval="True"/>
     <field name="type">list</field>
   </record>
