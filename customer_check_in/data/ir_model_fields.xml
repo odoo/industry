@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+    <!-- Event event fields -->
     <record id="x_recurring_access_field_event_event" model="ir.model.fields">
         <field name="name">x_recurring_access</field>
         <field name="ttype">boolean</field>
@@ -8,5 +9,123 @@
         <field name="help">Enables the system to track multiple entries.
             When enabled, the ticket type can be configured for either unlimited access until an expiry date, or a fixed number of available entrances.
         </field>
+    </record>
+
+    <!-- <record id="event.field_event_event__date_end" model="ir.model.fields">
+        <field name="required" eval="False"/>
+    </record> -->
+
+    <!-- Event ticket fields -->
+    <record id="x_allowed_entries_field_event_event_ticket" model="ir.model.fields">
+        <field name="name">x_allowed_entries</field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Allowed Entries</field>
+        <field name="model_id" ref="event.model_event_event_ticket"/>
+    </record>
+
+    <!-- x_attendance fields -->
+    <record id="x_event_registration_id_field_x_attendance" model="ir.model.fields">
+        <field name="name">x_event_registration_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Event Registration</field>
+        <field name="model_id" ref="x_attendance_model"/>
+        <field name="relation">event.registration</field>
+    </record>
+    <record id="x_attendance_date_field_x_attendance" model="ir.model.fields">
+        <field name="name">x_attendance_date</field>
+        <field name="ttype">datetime</field>
+        <field name="field_description">Attendance Date</field>
+        <field name="model_id" ref="x_attendance_model"/>
+    </record>
+    <record id="x_date_attendance_date_field_x_attendance" model="ir.model.fields">
+        <field name="name">x_date_attendance_date</field>
+        <field name="ttype">date</field>
+        <field name="field_description">Date Attendance Date</field>
+        <field name="model_id" ref="x_attendance_model"/>
+        <field name="depends">x_attendance_date</field>
+        <field name="compute"><![CDATA[
+for record in self: 
+    if record.x_attendance_date: record['x_date_attendance_date'] = record.x_attendance_date.date() 
+    else: record['x_attendance_date'] = False
+]]></field>
+    </record>
+    <record id="x_event_id_field_x_attendance" model="ir.model.fields">
+        <field name="name">x_event_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Related Event</field>
+        <field name="model_id" ref="x_attendance_model"/>
+        <field name="related">x_event_registration_id.event_id</field>
+        <field name="relation">event.event</field>
+    </record>
+    <record id="x_address_id_field_x_attendance" model="ir.model.fields">
+        <field name="name">x_address_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Venue</field>
+        <field name="model_id" ref="x_attendance_model"/>
+        <field name="related">x_event_registration_id.event_id.address_id</field>
+        <field name="relation">res.partner</field>
+    </record>
+    <record id="x_responsible_id_field_x_attendance" model="ir.model.fields">
+        <field name="name">x_responsible_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Responsible</field>
+        <field name="model_id" ref="x_attendance_model"/>
+        <field name="related">x_event_registration_id.event_id.user_id</field>
+        <field name="relation">res.users</field>
+    </record>
+    <record id="x_company_name_field_x_attendance" model="ir.model.fields">
+        <field name="name">x_company_name</field>
+        <field name="ttype">char</field>
+        <field name="field_description">Company</field>
+        <field name="model_id" ref="x_attendance_model"/>
+        <field name="related">x_event_registration_id.company_name</field>
+    </record>
+
+    <record id="x_attendances_registered_today_ids_field_event_event" model="ir.model.fields">
+        <field name="name">x_attendances_registered_today_ids</field>
+        <field name="ttype">one2many</field>
+        <field name="field_description">Attendances Registered Today</field>
+        <field name="model_id" ref="event.model_event_event"/>
+        <field name="relation">x_attendance</field>
+        <field name="relation_field">x_event_id</field>
+        <field name="domain" eval="[('x_date_attendance_date', '=', 'today')]"/>
+    </record>
+    <record id="x_attendances_registered_today_amount_field_event_event" model="ir.model.fields">
+        <field name="name">x_attendances_registered_today_amount</field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Attendances Registered Today Amount</field>
+        <field name="model_id" ref="event.model_event_event"/>
+        <field name="depends">x_attendances_registered_today_ids</field>
+        <field name="compute"><![CDATA[
+for record in self: record['x_attendances_registered_today_amount'] = len(record.x_attendances_registered_today_ids)
+]]></field>
+    </record>
+
+    <!-- Event registration fields -->
+    <record id="x_attendances_ids_field_event_registration" model="ir.model.fields"> <!-- Add automatically when registration scanned -->
+        <field name="name">x_attendances_ids</field>
+        <field name="ttype">one2many</field>
+        <field name="field_description">Attendances</field>
+        <field name="model_id" ref="event.model_event_registration"/>
+        <field name="relation">x_attendance</field>
+        <field name="relation_field">x_event_registration_id</field>
+    </record>
+    <record id="x_remaining_entries_field_event_registration" model="ir.model.fields">
+        <field name="name">x_remaining_entries</field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Remaining Entries</field>
+        <field name="model_id" ref="event.model_event_registration"/>
+        <field name="depends">x_attendances_ids,event_ticket_id</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_remaining_entries'] = record.event_ticket_id.x_allowed_entries - len(record.x_attendances_ids)
+]]></field>
+    </record>
+    <record id="x_registration_valid_until_field_event_registration" model="ir.model.fields">
+        <field name="name">x_registration_valid_until</field>
+        <field name="ttype">datetime</field>
+        <field name="field_description">Valid until</field>
+        <field name="model_id" ref="event.model_event_registration"/>
+        <field name="related">event_id.date_end</field>
     </record>
 </odoo>

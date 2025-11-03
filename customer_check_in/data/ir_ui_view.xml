@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+    <!-- Event event extension views -->
     <record id="event_event_form_view_extended" model="ir.ui.view">
         <field name="name">Event event form view extended customer check in</field>
         <field name="inherit_id" ref="website_event.event_event_view_form"/>
@@ -15,9 +16,211 @@
             <xpath expr="//field[@name='stage_id']" position="attributes">
                 <attribute name="invisible">x_recurring_access</attribute>
             </xpath>
-            <xpath expr="//sheet/group/group" position="inside">
-                <field name="x_recurring_access"/>
+        </field>
+    </record>
+
+    <record id="event_event_form_view_extended_website_event_exhibitor" model="ir.ui.view">
+        <field name="name">Event event form view extended website_event_exhibitor customer check in</field>
+        <field name="inherit_id" ref="website_event_exhibitor.event_event_view_form"/>
+        <field name="mode">extension</field>
+        <field name="model">event.event</field>
+        <field name="priority">8</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@icon='fa-black-tie']" position="attributes">
+                <attribute name="invisible">true</attribute>
             </xpath>
+        </field>
+    </record>
+    <record id="event_event_form_view_extended_website_event_track" model="ir.ui.view">
+        <field name="name">Event event form view extended website_event_track customer check in</field>
+        <field name="inherit_id" ref="website_event_track_gantt.event_event_view_form"/>
+        <field name="mode">extension</field>
+        <field name="model">event.event</field>
+        <field name="priority">165</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']/button[@icon='fa-microphone']" position="attributes">
+                <attribute name="invisible">true</attribute>
+            </xpath>
+        </field>
+    </record>
+    <record id="event_event_form_view_extended_event_booth" model="ir.ui.view">
+        <field name="name">Event event form view extended event_booth customer check in</field>
+        <field name="inherit_id" ref="event_booth.event_event_view_form"/>
+        <field name="mode">extension</field>
+        <field name="model">event.event</field>
+        <field name="priority">5</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@icon='fa-university']" position="attributes">
+                <attribute name="invisible">true</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Event event primary views -->
+    <record id="event_event_form_view_stations" model="ir.ui.view">
+        <field name="name">Event event form view Stations customer check in</field>
+        <field name="inherit_id" ref="event_event_form_view_extended"/>
+        <field name="mode">primary</field>
+        <field name="model">event.event</field>
+        <field name="priority">170</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//label[@for='name']" position="attributes">
+                <attribute name="string">Station Name</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="event_event_kanban_view_stations" model="ir.ui.view">
+        <field name="name">Event event kanban view Stations customer check in</field>
+        <field name="model">event.event</field>
+        <field name="priority">160</field>
+        <field name="type">kanban</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <kanban>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex gap-1 align-items-baseline ms-2">
+                            <!-- <field name="is_favorite" widget="boolean_favorite" nolabel="1"/> -->
+                            <field name="name" class="fw-bold fs-4 mb16"/>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <button class="btn btn-primary ms-2" name="%(action_url_open_registration_desk)d" type="action">Open Registration Desk</button>
+                            </div>
+                            <div class="col-6">
+                                <a t-if="record.x_attendances_registered_today_amount.raw_value > 0" name="%(action_window_redirect_attendances_filtered_view)d" type="action" class="d-block">
+                                <field name="x_attendances_registered_today_amount"/> registered today</a>
+                            </div>
+                        </div>
+                        <footer>
+                            <!-- <field name="latest_check_in" class="ms-2 fs-6"/> -->
+                            <field class="ms-auto me-2" name="user_id" widget="many2one_avatar_user"/>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <record id="event_event_list_view_stations" model="ir.ui.view">
+        <field name="name">Event event list view Stations customer check in</field>
+        <field name="inherit_id" ref="website_event.event_event_view_list"/>
+        <field name="mode">primary</field>
+        <field name="model">event.event</field>
+        <field name="priority">160</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="string">Station</attribute>
+            </xpath>
+            <xpath expr="//field[@name='seats_taken']" position="replace"></xpath>
+            <xpath expr="//field[@name='seats_used']" position="replace"></xpath>
+            <xpath expr="//field[@name='seats_max']" position="replace"></xpath>
+            <xpath expr="//field[@name='seats_reserved']" position="replace"></xpath>
+            <xpath expr="//field[@name='stage_id']" position="replace"></xpath>
+        </field>
+    </record>
+    <record id="event_event_search_view_stations" model="ir.ui.view">
+        <field name="name">Station search view</field>
+        <field name="model">event.event</field>
+        <field name="active" eval="True"/>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter string="Open" name="open_filter_event_event_station" domain="['|', ('date_end', '>=', 'today'), ('date_end', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_window_stations_view" model="ir.actions.act_window">
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('event_event_kanban_view_stations')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('event_event_list_view_stations')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('event_event_form_view_stations')}),
+        ]"/>
+    </record>
+
+    <!-- Event Ticket Views -->
+    <record id="event_event_ticket_list_view_from_event_extended" model="ir.ui.view">
+        <field name="name">Event event tickets list form view extended customer check in</field>
+        <field name="inherit_id" ref="event.event_event_ticket_view_tree_from_event"/>
+        <field name="mode">extension</field>
+        <field name="model">event.event.ticket</field>
+        <field name="priority">160</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='start_sale_datetime']" position="before">
+                <field name="x_allowed_entries" column_invisible="not parent.x_recurring_access" placeholder="Unlimited if empty"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Event Registration Views -->
+    <record id="event_event_form_view_extension" model="ir.ui.view">
+        <field name="name">Event registration form view extension customer check in</field>
+        <field name="inherit_id" ref="event_product.event_registration_ticket_view_form"/>
+        <field name="mode">extension</field>
+        <field name="model">event.registration</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='transaction']" position="inside">
+                <field name="x_remaining_entries"/>
+                <field name="x_registration_valid_until"/>
+            </xpath>
+            <xpath expr="//page[@name='questions']" position="after">
+                <page string="Attendances" name="attendances">
+                    <field name="x_attendances_ids" widget="one2many">
+                        <list editable="bottom">
+                            <field name="x_attendance_date"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- x_attendance views -->
+    <record id="x_attendance_list_view" model="ir.ui.view">
+        <field name="name">Attendances list view</field>
+        <field name="model">x_attendance</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list string="Attendances">
+                <field name="x_event_id"/>
+                <field name="x_address_id"/>
+                <field name="x_responsible_id"/>
+                <field name="x_company_name"/>
+                <field name="x_attendance_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="x_attendance_search_view" model="ir.ui.view">
+        <field name="name">Attendances search view</field>
+        <field name="model">x_attendance</field>
+        <field name="active" eval="True"/>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="x_event_id"/>
+                <field name="x_attendance_date"/>
+                <separator/>
+                <filter string="Today" name="date_today_filter_x_attendance" domain="[('x_date_attendance_date', '=', 'today')]"/>
+                <separator/>
+            </search>
         </field>
     </record>
 </odoo>
