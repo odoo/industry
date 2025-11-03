@@ -56,7 +56,7 @@
         'demo/product_supplierinfo.xml',
         'demo/website_view.xml',
         'demo/website_page.xml',
-        'demo/website_theme_apply.xml',
+        # 'demo/website_theme_apply.xml',
         'demo/website.xml',
     ],
     'license': 'OPL-1',
