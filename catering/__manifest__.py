@@ -19,6 +19,7 @@
     ],
     'data': [
         'data/res_config_settings.xml',
+        'data/crm_stage.xml',
         'data/ir_attachment_pre.xml',
         'data/mail_template.xml',
         'data/knowledge_cover.xml',
@@ -40,8 +41,9 @@
         'demo/crm_lead.xml',
         'demo/hr_department.xml',
         'demo/sale_order.xml',
-        'demo/project_project.xml',
         'demo/sale_order_line.xml',
+        'demo/sale_order_confirm.xml',
+        'demo/project_project.xml',
         'demo/project_task.xml',
         'demo/calendar_event.xml',
         'demo/purchase_order.xml',
