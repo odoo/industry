@@ -4,6 +4,7 @@
         <field name="code"><![CDATA[
 if (quant := record.x_quantity_by_deposit_product) == 1 and record.x_unit_sale_product.id:
     raise UserError("Unit sale product should be undefined if this product can not be sold in a smaller unit.")
+if quant <= 0 and record.x_unit_sale_product: raise UserError("The auto-BOM should contain a positive amount of units.")
 if record.x_unit_sale_product:
     existing_bom = env['mrp.bom'].search([('product_tmpl_id', '=',record.x_unit_sale_product.id)], limit=1)
     reordering_rule = env['stock.warehouse.orderpoint'].search_count([('product_id', '=', record.x_unit_sale_product.product_variant_id.id)], limit=1)
@@ -66,6 +67,23 @@ for product in records:
     <record id="action_make_deposit_storable_delivery_invoice" model="ir.actions.server">
         <field name="code"><![CDATA[
 record.write({'invoice_policy':'delivery', 'type': 'consu', 'is_storable': True})
+]]></field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="state">code</field>
+        <field name="name">Execute Code</field>
+    </record>
+    <record id="deposit_taxes_server_action" model="ir.actions.server">
+        <field name="code"><![CDATA[
+all_taxes = env['account.tax'].search([('name', 'like', 'DEP %'), ('amount', 'in', records.mapped('x_deposit_amount'))])
+deposit_tax_group = env['account.tax.group'].search([('x_is_deposit', '=', True)], limit=1)
+for product in records:
+    product.write({'taxes_id': [Command.unlink(tax) for tax in product.taxes_id.filtered('x_is_deposit').ids], 'supplier_taxes_id': [Command.unlink(tax) for tax in product.supplier_taxes_id.filtered('x_is_deposit').ids]})
+    if (taxes := all_taxes.filtered(lambda t: not float_compare(t.amount, product.x_deposit_amount, precision_digits=4))):
+        product.write({'taxes_id': [Command.link(taxes.filtered(lambda t: t.type_tax_use == 'sale')[:1].id)],
+                       'supplier_taxes_id': [Command.link(taxes.filtered(lambda t: t.type_tax_use == 'purchase')[:1].id)]})
+    elif product.x_deposit_amount:
+        values = {'name': 'DEP ' + str(product.x_deposit_amount), 'amount': product.x_deposit_amount, 'amount_type': 'fixed', 'tax_group_id': deposit_tax_group.id}
+        product.write({'taxes_id': [Command.create(values | {'type_tax_use': 'sale'})], 'supplier_taxes_id': [Command.create(values | {'type_tax_use': 'purchase'})]})
 ]]></field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="state">code</field>
