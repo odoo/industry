@@ -30,6 +30,7 @@
         'data/pos_config.xml',
     ],
     'demo': [
+        'demo/res_users.xml',
         'demo/res_company.xml',
         'demo/delivery_carrier.xml',
         'demo/ir_attachment.xml',

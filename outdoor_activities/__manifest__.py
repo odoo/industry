@@ -26,6 +26,7 @@
         'data/mail_message.xml',
     ],
     'demo': [
+        'demo/res_users.xml',
         'demo/res_partner.xml',
         'demo/appointment_type.xml',
         'demo/website_theme_apply.xml',

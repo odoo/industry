@@ -5,3 +5,4 @@ from . import test_industry_requirements
 from . import test_mandatory_files
 from . import test_manifest
 from . import test_xml
+from . import test_industry_mail_behavior

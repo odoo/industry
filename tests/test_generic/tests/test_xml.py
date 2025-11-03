@@ -92,6 +92,18 @@ ESCAPE_STUDIO_TEST = [
     'construction',
 ]
 
+CONTEXT_MODELS = [
+    'helpdesk.ticket',
+    'hr.applicant',
+    'calendar.event',
+]
+
+REQUIRED_CONTEXT_LIST = [
+    'mail_auto_subscribe_no_notify',
+    'mail_notrack',
+    'no_mail_to_attendees',
+]
+
 
 @tagged('post_install', '-at_install')
 class TestEnv(IndustryCase):
@@ -152,6 +164,7 @@ class TestEnv(IndustryCase):
                 self._check_dates_are_relative(tree, file_name)
                 self._check_static_values_in_inputs(tree, file_name)
                 self._check_res_config_setting(tree)
+                self._check_context_to_stop_mail_sending(tree, file_name)
                 if root.split('/')[-1] == 'data':
                     self._check_view_active(tree, file_name)
                     self._check_is_published_false(tree, file_name)
@@ -571,3 +584,22 @@ class TestEnv(IndustryCase):
                     file_name,
                     line,
                 )
+
+    def _check_context_to_stop_mail_sending(self, root, file_name):
+        for record in root.xpath("//record"):
+            model_name = record.get('model')
+            if model_name in CONTEXT_MODELS:
+                record_context = record.get('context')
+                if not record_context:
+                    _logger.warning(
+                        "Context should be used in file '%s' for model '%s' to prevent mail pollution.",
+                        file_name,
+                        model_name
+                    )
+                else:
+                    if not any(con in record_context for con in REQUIRED_CONTEXT_LIST):
+                        _logger.warning(
+                            "Context should be used in file '%s' for model '%s' to prevent mail pollution.",
+                            file_name,
+                            model_name
+                        )
