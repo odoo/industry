@@ -3,11 +3,27 @@
     <function name="button_choose_theme" model="ir.module.module" eval="[ref('base.module_theme_orchid', raise_if_not_found=False) or ref('base.module_theme_default')]"/>
     <function model="ir.ui.view" name="write">
         <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('website.default_website').id).viewref('website.homepage').id"/>
-        <value model="ir.ui.view" eval="{'arch': obj().env.ref('tattoo_shop.homepage').arch}"/>
+        <value model="ir.ui.view" eval="{'arch': obj().env.ref('tattoo_shop.homepage').arch.replace(
+            '/appointment/*flash_tattoo_appointment*', '/appointment/%s' % str(obj().env.ref('tattoo_shop.appointment_type_1').id)).replace(
+            '/appointment/*piercing_appointment*', '/appointment/%s' % str(obj().env.ref('tattoo_shop.appointment_type_2').id))
+        }"/>
     </function>
     <function model="ir.ui.view" name="write">
-        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('website.default_website').id).viewref('website.contactus').id" />
-        <value model="ir.ui.view" eval="{'arch': obj().env.ref('tattoo_shop.contact_us').arch}" />
+        <value model="ir.ui.view" eval="obj().env.ref('tattoo_shop.ir_ui_view_2930').id"/>
+        <value model="ir.ui.view" eval="{'arch': obj().env.ref('tattoo_shop.ir_ui_view_2930').arch.replace(
+            '/appointment/*book_session*', '/appointment/%s' % str(obj().env.ref('tattoo_shop.appointment_type_1').id))
+        }"/>
+    </function>
+    <function model="ir.ui.view" name="write">
+        <value model="ir.ui.view" eval="obj().env.ref('tattoo_shop.contact_us').id"/>
+        <value model="ir.ui.view" eval="{'arch': obj().env.ref('tattoo_shop.contact_us').arch.replace(
+            'value=&quot;*tattoo_tag*&quot;', 'value=&quot;%s&quot;' % str(obj().env.ref('tattoo_shop.crm_tag_1').id)).replace(
+            'value=&quot;*tattoo_removal_tag*&quot;', 'value=&quot;%s&quot;' % str(obj().env.ref('tattoo_shop.crm_tag_2').id)).replace(
+            'value=&quot;*piercing_tag*&quot;', 'value=&quot;%s&quot;' % str(obj().env.ref('tattoo_shop.crm_tag_3').id)).replace(
+            'value=&quot;*general_question_tag*&quot;', 'value=&quot;%s&quot;' % str(obj().env.ref('tattoo_shop.crm_tag_4').id)).replace(
+            'value=&quot;*explorative_work_tag*&quot;', 'value=&quot;%s&quot;' % str(obj().env.ref('tattoo_shop.crm_tag_5').id)).replace(
+            'value=&quot;*other_tag*&quot;', 'value=&quot;%s&quot;' % str(obj().env.ref('sales_team.categ_oppor8').id))
+        }"/>
     </function>
     <function model="website.assets" name="make_scss_customization">
         <value eval="'/website/static/src/scss/options/colors/user_color_palette.scss'"/>
