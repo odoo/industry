@@ -77,7 +77,7 @@ registry.category("web_tour.tours").add("Condominium_Acquisition", {
         run: "click"
     },
     {
-        trigger: ".o_switch_company_menu > button",
+        trigger: ".o_switch_company_menu",
         content: "The condominium is created as a new company where you will be able to manage it",
         tooltipPosition: "bottom",
         run: "click"
