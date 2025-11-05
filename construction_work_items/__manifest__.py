@@ -36,7 +36,6 @@
         'demo/sale_order_line.xml',
         'demo/project_task.xml',
         'demo/x_work_item.xml',
-        'demo/sale_order_confirm.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [],

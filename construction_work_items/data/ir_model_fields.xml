@@ -62,10 +62,11 @@
     <record id="x_product_id_field_x_work_item" model="ir.model.fields">
         <field name="name">x_product_id</field>
         <field name="ttype">many2one</field>
-        <field name="domain">[('type','=','service')]</field>
+        <field name="domain">[('type', '=', 'service')]</field>
         <field name="field_description">Product</field>
         <field name="model_id" ref="x_work_item_model"/>
         <field name="relation">product.product</field>
+        <field name="copied" eval="True"/>
     </record>
     <record id="x_currency_id_field_x_work_item" model="ir.model.fields">
         <field name="name">x_currency_id</field>
@@ -169,6 +170,7 @@
         <field name="model_id" ref="x_work_item_model"/>
         <field name="relation">x_work_item_line</field>
         <field name="relation_field">x_work_item_id</field>
+        <field name="copied" eval="True"/>
     </record>
     <record id="x_unit_cost_field_x_work_item" model="ir.model.fields">
         <field name="name">x_unit_cost</field>
@@ -264,26 +266,36 @@
         <field name="relation_field">x_product_id</field>
     </record>
 
-    <record id="x_work_item_able_field_sale_order_line" model="ir.model.fields">
-        <field name="compute"><![CDATA[
-for record in self:
-    record['x_work_item_able'] = 0 < len(record.product_id.x_work_item_ids) or record.x_work_item_ids
-]]></field>
-        <field name="ttype">boolean</field>
-        <field name="depends">product_id.x_work_item_ids</field>
-        <field name="field_description">Work Item-able</field>
-        <field name="model_id" ref="sale.model_sale_order_line"/>
-        <field name="name">x_work_item_able</field>
-        <field name="readonly" eval="True"/>
-        <field name="selectable" eval="False"/>
-        <field name="store" eval="False"/>
-    </record>
-
-    <record id="x_tmpl_work_item_id_field_product_template" model="ir.model.fields">
+    <record id="x_last_tmpl_wi_id_field_product_template" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="field_description">Template Work Item</field>
         <field name="model_id" ref="product.model_product_template"/>
-        <field name="name">x_tmpl_work_item_id</field>
+        <field name="name">x_last_tmpl_wi_id</field>
         <field name="relation">x_work_item</field>
+    </record>
+    <record id="x_work_item_template_id_field_product_product" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self:
+    template = self.env['x_work_item'].search([('x_is_template', '=', True), ('x_product_id', '=', record.id),('x_active', '=', True)])
+    record['x_work_item_template_id'] = template.id if template else False
+]]></field>
+        <field name="ttype">many2one</field>
+        <field name="depends">x_work_item_ids</field>
+        <field name="field_description">Work Item Template</field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="name">x_work_item_template_id</field>
+        <field name="readonly" eval="True"/>
+        <field name="relation">x_work_item</field>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="x_product_wi_template_id_field_x_work_item" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="related">x_product_id.x_work_item_template_id</field>
+        <field name="field_description">Product Work Item Template</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="name">x_product_wi_template_id</field>
+        <field name="readonly" eval="True"/>
+        <field name="relation">x_work_item</field>
+        <field name="store" eval="False"/>
     </record>
 </odoo>

@@ -55,9 +55,7 @@ record.x_product_id.write({'default_code': record.x_reference})
         <field name="model_id" ref="x_work_item_model" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
-if work_item_template := env['x_work_item'].search([('x_product_id', '=', record.x_product_id.id), ("x_is_template","=",True), ('x_active','=',True)], limit=1): 
-    work_item_template['x_active'] = False
-record.copy({'x_sale_order_line_id': False, 'x_is_template': True, 'x_targeted_so': False})
+record.copy(default={'x_sale_order_line_id': False, 'x_is_template': True, 'x_targeted_so': False})
 ]]></field>
     </record>
     <record id="server_action_update_associated_sol" model="ir.actions.server">
@@ -87,6 +85,7 @@ elif record.x_targeted_so:
         'purchase_price': record.x_unit_cost,
         'x_work_item_ids': [record.id],
     })
+    record.write({'x_product_id': new_product.id})
 ]]></field>
     </record>
     <record id="server_action_create_associated_work_item" model="ir.actions.server">
@@ -94,12 +93,11 @@ elif record.x_targeted_so:
         <field name="model_id" ref="sale.model_sale_order_line" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
-if record.x_work_item_able and not record.x_work_item_ids and record.product_id :
-    work_item_template = env['x_work_item'].search([('x_product_id', '=', record.product_id.id), ('x_is_template', '=', True), ('x_active', '=', True)], limit=1)
-    record['x_work_item_ids'] = [work_item_template.copy({
+if not record.x_work_item_ids and record.product_id and record.product_id.x_work_item_template_id:
+    record.product_id.x_work_item_template_id.copy({
         'x_sale_order_line_id': record.id,
         'x_is_template': False,
-    }).id]
+    })
 ]]></field>
     </record>
     <record id="server_action_open_sol_work_item" model="ir.actions.server">
@@ -117,16 +115,17 @@ if record.x_work_item_ids:
     }
 ]]></field>
     </record>
+
     <record id="server_action_assign_x_template_work_item_id" model="ir.actions.server">
         <field name="name">Construction: Product - Assign Template Work Item</field>
         <field name="model_id" ref="x_work_item_model" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
 for work_item in records.filtered('x_is_template').filtered('x_product_id').filtered('x_active'):
-    if template := work_item.x_product_id.x_tmpl_work_item_id:
+    if template := work_item.x_product_id.x_last_tmpl_wi_id:
         template.write({'x_active': False})
     work_item.write({'x_active': True})
-    work_item.x_product_id['x_tmpl_work_item_id'] = work_item.id
+    work_item.x_product_id['x_last_tmpl_wi_id'] = work_item.id
 ]]></field>
     </record>
 </odoo>
