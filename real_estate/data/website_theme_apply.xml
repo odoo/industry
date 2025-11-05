@@ -16,9 +16,9 @@
             <value eval="{'name': 'Free estimate'}"/>
         </function>
     </data>
-    
+
     <function model="ir.ui.view" name="write">
-        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('website.default_website').id).viewref('website.contactus').id"/>
-        <value model="ir.ui.view" eval="{'arch': obj().env.ref('real_estate.contactus').arch}"/>
+        <value model="ir.ui.view" eval="obj().env.ref('real_estate.contactus').id"/>
+        <value model="ir.ui.view" eval="{'arch': obj().env.ref('real_estate.contactus').arch.replace( 'value=&quot;*salesteam*&quot;', 'value=&quot;%s&quot;' % str( (team := obj().env.ref('sales_team.team_sales_department', raise_if_not_found=False) or obj().env['crm.team'].search([], limit=1) ) and team.id or 0))}"/>
     </function>
 </odoo>
