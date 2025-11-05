@@ -5,7 +5,7 @@
         <list default_order="x_sequence asc, id desc">
             <field name="x_sequence" widget="handle"/>
             <field name="x_name"/>
-            <field name="x_product_product_id" optional="show"/>
+            <field name="x_product_id" optional="show"/>
             <field name="x_unit_quantity" optional="show"/>
             <field name="x_unit_id" optional="show"/>
             <field name="x_unit_cost" optional="show" widget="monetary"/>
@@ -24,7 +24,7 @@
             <header>
                 <button string="Set as Template" type="action" invisible="x_is_template or not id" name="%(server_action_set_work_item_as_template)d"/>
             </header>
-            <div class="alert alert-info" role="alert" style="height: 40px; margin-bottom:0px;" invisible="id or not x_is_template or not x_product_product_id or not x_product_product_id.x_tmpl_work_item_id">
+            <div class="alert alert-info" role="alert" style="height: 40px; margin-bottom:0px;" invisible="id or not x_is_template or not x_product_id or not x_product_id.x_tmpl_work_item_id">
                 Saving this Work Item will archive the current one for this product.
             </div>
             <sheet string="Work Item">
@@ -37,12 +37,12 @@
                 </div>
                 <group>
                     <group>
-                        <field name="x_product_product_id" force_save="1" readonly="not x_is_template" invisible="x_targeted_so" string="Product" required="x_is_template"/>
-                        <field name="x_reference"/>
+                        <field name="x_product_id" force_save="1" readonly="not x_is_template" invisible="x_targeted_so" string="Product" required="x_is_template"/>
+                        <field name="x_reference" readonly="id and not x_is_template"/>
                         <label for="x_unit_quantity"/>
                         <div class="d-flex" name="unit_quantity">
                             <field name="x_unit_quantity" class="oe_inline" force_save="1" readonly="not x_is_template"/>
-                            <field name="x_unit_id" class="oe_inline" force_save="1" readonly="x_product_product_id and not x_targeted_so" options="{'no_open': True}" placeholder="m²" required="not x_product_product_id"/>
+                            <field name="x_unit_id" class="oe_inline" force_save="1" readonly="x_product_id and not x_targeted_so" options="{'no_open': True}" placeholder="m²" required="not x_product_id"/>
                         </div>
                         <field name="x_is_template" invisible="True"/>
                     </group>
@@ -57,7 +57,7 @@
                         <field name="x_work_item_line_ids">
                             <list editable="bottom" default_order="x_sequence asc, id desc" open_form_view="false">
                                 <field name="x_sequence" widget="handle"/>
-                                <field optional="show" name="x_product_product_id" string="Product"/>
+                                <field optional="show" name="x_product_id" string="Product"/>
                                 <field optional="show" name="x_unit_cost" widget="monetary"/>
                                 <field optional="show" name="x_unit_price" widget="monetary"/>
                                 <field optional="show" name="x_margin" widget="percentage" readonly="True"/>
@@ -80,7 +80,8 @@
         <field name="arch" type="xml">
         <search>
             <field name="x_name"/>
-            <field name="x_product_product_id"/>
+            <field name="x_product_id"/>
+            <field name="x_reference"/>
             <separator/>
             <filter string="Archived" name="archived_x_work_item" domain="[['x_active', '=', False]]"/>
             <separator/>
@@ -91,9 +92,6 @@
         <field name="type">search</field>
         <field name="active" eval="True"/>
     </record>
-    
-
-
 
     <record id="x_work_item_line_list_view" model="ir.ui.view">
         <field name="arch" type="xml">
@@ -147,7 +145,7 @@
         <field name="arch" type="xml">
         <data>
             <xpath expr="//field[@name='order_line']/list//field[@name='route_ids']" position="after">
-                <button name="%(server_action_open_sol_work_item)d" type="action" class="btn btn-link" icon="fa-magic" width="1" invisible="not x_work_item_able"/>
+                <button name="%(server_action_open_sol_work_item)d" type="action" class="btn btn-link" icon="fa-magic" width="1" invisible="not x_work_item_able" string=" "/>
             </xpath>
             <xpath expr="//create[@name='add_note_control']" position="after">
                 <button string="Add Work Item" name="%(server_action_add_custom_work_item)d" type="action" class="px-4 btn-link" context="{'so_id': parent.id}"/>
