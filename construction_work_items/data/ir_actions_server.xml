@@ -6,9 +6,9 @@
         <field name="state">code</field>
         <field name="code"><![CDATA[
 record.write({
-    'x_name': record.x_product_product_id.name,
-    'x_reference': record.x_product_product_id.default_code,
-    'x_unit_id': record.x_product_product_id.uom_id.id,
+    'x_name': record.x_product_id.name,
+    'x_reference': record.x_product_id.default_code,
+    'x_unit_id': record.x_product_id.uom_id.id,
 })
 ]]></field>
     </record>
@@ -18,7 +18,7 @@ record.write({
         <field name="state">code</field>
         <field name="code"><![CDATA[
 # Archive previous template
-work_item_template = env['x_work_item'].search([('x_product_product_id', '=', record.x_product_product_id), ("x_is_template","=",True), ('x_active','=',True)], limit=1)
+work_item_template = env['x_work_item'].search([('x_product_id', '=', record.x_product_id.id), ("x_is_template","=",True), ('x_active','=',True)], limit=1)
 if work_item_template: 
     work_item_template['x_active'] = False
 # Set new template
@@ -30,7 +30,7 @@ record.copy({ 'x_sale_order_line_id': False, 'x_is_template': True, 'x_targeted_
         <field name="model_id" ref="x_work_item_line_model" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
-if record.x_product_product_id: record['x_unit_id'] = record.x_product_product_id.uom_id
+if record.x_product_id: record['x_unit_id'] = record.x_product_id.uom_id
 ]]></field>
     </record>
     <record id="server_action_set_unit_cost_price_fromm_product" model="ir.actions.server">
@@ -39,9 +39,9 @@ if record.x_product_product_id: record['x_unit_id'] = record.x_product_product_i
         <field name="state">code</field>
         <field name="code"><![CDATA[
 record.write({
-    'x_unit_id': record.x_product_product_id.uom_id,
-    'x_unit_price': record.x_product_product_id.list_price,
-    'x_unit_cost': record.x_product_product_id.standard_price,
+    'x_unit_id': record.x_product_id.uom_id,
+    'x_unit_price': record.x_product_id.list_price,
+    'x_unit_cost': record.x_product_id.standard_price,
 })
 ]]></field>
     </record>
@@ -67,6 +67,7 @@ else:
             'purchase_ok': True,
             'list_price': record.x_unit_price,
             'standard_price': record.x_unit_cost,
+            'uom_id': record.x_unit_id.id,
         })
         env['sale.order.line'].create({
             'order_id': record.x_targeted_so.id,
@@ -84,7 +85,7 @@ else:
         <field name="model_id" ref="x_work_item_model" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
-record.x_product_product_id.write({
+record.x_product_id.write({
     'lst_price': record.x_unit_price,
     'standard_price': record.x_unit_cost,
 })
@@ -114,7 +115,7 @@ action = {
         <field name="state">code</field>
         <field name="code"><![CDATA[
 if record.x_work_item_able and not record.x_work_item_ids and record.product_id :
-    work_item_template = env['x_work_item'].search([('x_product_product_id', '=', record.product_id), ("x_is_template","=",True), ('x_active','=',True)], limit=1)
+    work_item_template = env['x_work_item'].search([('x_product_id', '=', record.product_id.id), ("x_is_template","=",True), ('x_active','=',True)], limit=1)
     work_item_local = work_item_template.copy({
         'x_sale_order_line_id': record.id,
         'x_is_template': False,
@@ -154,11 +155,19 @@ record.x_work_item_ids.write({
         <field name="state">code</field>
         <field name="code"><![CDATA[
 for work_item in records:
-    if work_item.x_is_template and work_item.x_product_product_id and work_item.x_active:
-        if work_item.x_product_product_id.x_tmpl_work_item_id:
-            work_item.x_product_product_id.x_tmpl_work_item_id.write({'x_active': False})
+    if work_item.x_is_template and work_item.x_product_id and work_item.x_active:
+        if work_item.x_product_id.x_tmpl_work_item_id:
+            work_item.x_product_id.x_tmpl_work_item_id.write({'x_active': False})
         work_item.write({'x_active': True})
-        work_item.x_product_product_id['x_tmpl_work_item_id'] = work_item.id
+        work_item.x_product_id['x_tmpl_work_item_id'] = work_item.id
+]]></field>
+    </record>
+    <record id="server_action_actualize_reference" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Actualize product reference</field>
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record.x_product_id.write({'default_code': record.x_reference})
 ]]></field>
     </record>
 </odoo>
