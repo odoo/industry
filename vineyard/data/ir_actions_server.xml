@@ -54,4 +54,54 @@ picking.button_validate()
     <field name="name">Check Harvest Is From Harvest Location</field>
     <field name="usage">base_automation</field>
   </record>
+  <record id="industry_create_lot_on_validation_server_action" model="ir.actions.server">
+    <field name="code"><![CDATA[
+for picking in records:
+    for ml in picking.move_line_ids:
+        product = ml.product_id
+
+        if not product or product.tracking != 'lot':
+            continue
+
+        if not ml.lot_id:
+            serial = env['ir.sequence'].next_by_code('auto.lot.serial')
+            lot = env['stock.lot'].create({
+                'name': serial,
+                'product_id': product.id,
+                'company_id': picking.company_id.id,
+            })
+            ml.write({'lot_id': lot.id})
+    ]]></field>
+    <!-- <field name="code"><![CDATA[
+generated_serial = env['ir.sequence'].next_by_code('auto.lot.serial')
+prefix = generated_serial.split('-')[0] + '-'
+existing_lots = set(
+    env['stock.lot'].search([
+        ('name', 'like', prefix + '%')
+    ]).mapped('name')
+)
+
+for picking in records:
+    for ml in picking.move_line_ids:
+        product = ml.product_id
+        if not product or product.tracking != 'lot':
+            continue
+
+        if not ml.lot_id:
+            serial = generated_serial
+            while serial in existing_lots:
+                serial = env['ir.sequence'].next_by_code('auto.lot.serial')
+
+            lot = env['stock.lot'].create({
+                'name': serial,
+                'product_id': product.id,
+                'company_id': picking.company_id.id,
+            })
+            ml.write({'lot_id': lot.id})
+    ]]></field> -->
+    <field name="model_id" ref="stock.model_stock_picking"/>
+    <field name="state">code</field>
+    <field name="name">Action for Assign Serial</field>
+    <field name="usage">base_automation</field>
+  </record>
 </odoo>
