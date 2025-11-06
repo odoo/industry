@@ -1,6 +1,6 @@
 {
     'name': 'Environmental Agency',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
@@ -8,6 +8,7 @@
         'base_industry_data',
         'crm_enterprise',
         'documents_project',
+        'esg',
         'knowledge',
         'sale_timesheet_enterprise',
         'spreadsheet_sale_management',
@@ -32,6 +33,7 @@
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
         'data/document_document.xml',
+        'data/hr_job.xml',
     ],
     'demo': [
         'demo/ir_attachment_post.xml',
@@ -49,7 +51,13 @@
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
+        'demo/ir_cron.xml',
+        'demo/esg_emission_source.xml',
+        'demo/esg_emission_factor.xml',
+        'demo/account_move.xml',
+        'demo/account_move_line.xml',
         'demo/account_analytic_line.xml',
+        'demo/account_move_post.xml',
         'demo/website.xml',
     ],
     'license': 'OPL-1',
