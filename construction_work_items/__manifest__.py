@@ -26,6 +26,7 @@
         'data/x_work_item_line.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
+        'data/ir_attachment.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
