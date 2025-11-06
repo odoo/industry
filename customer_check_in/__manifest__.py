@@ -20,7 +20,6 @@
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
         'data/ir_actions_act_window.xml',
-        'data/ir_actions_act_url.xml',
         'data/ir_ui_view.xml',
         'data/ir_ui_menu.xml',
     ],

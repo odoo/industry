@@ -85,16 +85,31 @@
         <field name="type">kanban</field>
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
-            <kanban>
+            <kanban action="%(action_window_redirect_attendances_filtered_view)d" type="action">
                 <templates>
+                    <t t-name="menu">
+                        <div class="container">
+                            <div class="row">
+                                <div name="card_menu_view" class="col-6">
+                                    <div role="menuitem">
+                                        <a class="dropdown-item" role="menuitem" type="open">Configuration</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
                     <t t-name="card">
                         <div class="d-flex gap-1 align-items-baseline ms-2">
-                            <!-- <field name="is_favorite" widget="boolean_favorite" nolabel="1"/> -->
                             <field name="name" class="fw-bold fs-4 mb16"/>
                         </div>
                         <div class="row">
                             <div class="col-6">
-                                <button class="btn btn-primary ms-2" name="%(action_url_open_registration_desk)d" type="action">Open Registration Desk</button>
+                                <button name="%(event.event_barcode_action_main_view)d"
+                                    type="action"
+                                    class="btn btn-primary ms-2"
+                                    context="{'default_event_id': id}">
+                                    Open Desk
+                                </button>
                             </div>
                             <div class="col-6">
                                 <a t-if="record.x_attendances_registered_today_amount.raw_value > 0" name="%(action_window_redirect_attendances_filtered_view)d" type="action" class="d-block">
@@ -102,7 +117,6 @@
                             </div>
                         </div>
                         <footer>
-                            <!-- <field name="latest_check_in" class="ms-2 fs-6"/> -->
                             <field class="ms-auto me-2" name="user_id" widget="many2one_avatar_user"/>
                         </footer>
                     </t>
@@ -177,11 +191,11 @@
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <xpath expr="//group[@name='transaction']" position="inside">
-                <field name="x_remaining_entries"/>
-                <field name="x_registration_valid_until"/>
+                <field name="x_remaining_entries" invisible="not x_is_station"/>
+                <field name="x_registration_valid_until" invisible="not x_is_station"/>
             </xpath>
             <xpath expr="//page[@name='questions']" position="after">
-                <page string="Attendances" name="attendances">
+                <page string="Attendances" name="attendances" invisible="not x_is_station">
                     <field name="x_attendances_ids" widget="one2many">
                         <list editable="bottom">
                             <field name="x_attendance_date"/>
