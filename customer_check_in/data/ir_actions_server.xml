@@ -7,7 +7,7 @@ record.action_set_done()
 ]]></field>
         <field name="model_id" ref="event.model_event_registration"/>
         <field name="state">code</field>
-        <field name="name">Execute Code</field>
+        <field name="name">Check in: Set registration as done</field>
     </record>
     <record id="action_plan_event_end_date_far_away" model="ir.actions.server">
         <field name="code"><![CDATA[
@@ -22,6 +22,30 @@ for record in records:
 ]]></field>
         <field name="model_id" ref="event.model_event_event"/>
         <field name="state">code</field>
-        <field name="name">Execute Code</field>
+        <field name="name">Check in: Plan event before the end date</field>
+    </record>
+    <record id="action_server_use_registration_with_recurring_access" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for record in records:
+    if record.x_registration_valid_until and r.x_registration_valid_until > datetime.datetime.now():
+        env['x_attendance'].create({
+            'x_event_registration_id': record.id,
+            'x_attendance_date': datetime.datetime.today(),
+        })
+        if record.x_remaining_entries > 0:
+            record.write({'date_closed': False, 'state': 'open'})
+]]></field>
+        <field name="model_id" ref="event.model_event_registration"/>
+        <field name="state">code</field>
+        <field name="name">Check in: Use registration with recurring access</field>
+    </record>
+    <record id="action_server_link_registration_to_so" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for record in records.filtered('sale_order_id.end_date'):
+    record['x_registration_valid_until'] = record.sale_order_id.end_date
+]]></field>
+        <field name="model_id" ref="event.model_event_registration"/>
+        <field name="state">code</field>
+        <field name="name">Check in: Link registration to SO</field>
     </record>
 </odoo>

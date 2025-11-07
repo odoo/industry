@@ -7,6 +7,7 @@
         'event_booth',
         'event_sale',
         'knowledge',
+        'sale_subscription',
         'website_event',
         'website_event_exhibitor',
         'website_event_track_gantt',

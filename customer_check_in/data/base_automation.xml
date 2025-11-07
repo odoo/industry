@@ -8,12 +8,38 @@
         <field name="filter_domain">[('id', '!=', False), ('x_remaining_entries', '&lt;=', 0), ('state', 'in', ['open'])]</field>
         <field name="trigger">on_change</field>
     </record>
-    <!-- Comment le faire tourner également si la date limite est dépassée ?-->
+    <record id="base_automation_on_event_registration_with_so_create" model="base.automation">
+        <field name="name">On Registration With SO Create</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_server_link_registration_to_so')])]"/>
+        <field name="model_id" ref="event.model_event_registration"/>
+        <field name="filter_domain">[('sale_order_id', '!=', False), ('x_is_station', '!=', False)]</field>
+        <field name="trigger">on_create</field>
+    </record>
+    <record id="base_automation_on_registration_date_passed" model="base.automation">
+        <field name="name">On Registration Date Passed</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_set_registration_done')])]"/>
+        <field name="model_id" ref="event.model_event_registration"/>
+        <field name="filter_domain">[('x_is_station', '!=', False)]</field>
+        <field name="trigger">on_time</field>
+        <field name="trg_date_id" ref="x_registration_valid_until_field_event_registration"/>
+        <field name="trg_date_range">1</field>
+        <field name="trg_date_range_type">minutes</field>
+        <field name="trg_date_range_mode">after</field>
+    </record>
     <record id="base_automation_on_recurring_access_event_created" model="base.automation">
         <field name="name">On Recurring Access Event Created</field>
         <field name="model_id" ref="event.model_event_event"/>
         <field name="action_server_ids" eval="[(6, 0, [ref('action_plan_event_end_date_far_away')])]"/>
         <field name="filter_domain">[('x_recurring_access', '!=', False)]</field>
         <field name="trigger">on_create</field>
+    </record>
+    <record id="base_automation_on_registration_state_done" model="base.automation">
+        <field name="name">On Registration State Done</field>
+        <field name="model_id" ref="event.model_event_registration"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_server_use_registration_with_recurring_access')])]"/>
+        <field name="filter_domain">[('x_is_station', '!=', False), ('state', '=', 'done')]</field>
+        <field name="trigger">on_state_set</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('event.field_event_registration__state')])]"/>
+        <field name="trg_selection_field_id" ref="event.selection__event_registration__state__done"/>
     </record>
 </odoo>
