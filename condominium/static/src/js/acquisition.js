@@ -47,6 +47,15 @@ registry.category("web_tour.tours").add("Condominium_Acquisition", {
         run: "click"
     },
     {
+        trigger: ".o_field_widget[name='plan_id'] .o-autocomplete--input",
+        content: "Select the right quotation template",
+        run: "click"
+    },
+    {
+        trigger: ".o-autocomplete--dropdown-item:nth-child(2) > a",
+        run: "click"
+    },
+    {
         trigger: ".o_statusbar_buttons > button[name='action_confirm']",
         content: "If the quote is accepted, confirm it",
         run: "click"
