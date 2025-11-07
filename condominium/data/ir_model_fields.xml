@@ -271,7 +271,7 @@ for record in self:
   <record id="x_properties_ids" model="ir.model.fields">
     <field name="ttype">one2many</field>
     <field name="name">x_properties_ids</field>
-    <field name="field_description">Properties</field>
+    <field name="field_description">Properties_test</field>
     <field name="model_id" ref="base.model_res_partner"/>
     <field name="relation">account.analytic.account</field>
     <field name="relation_field">partner_id</field>
@@ -356,7 +356,7 @@ for record in self:
     <field name="field_description">Source Sales Order count</field>
     <field name="compute"><![CDATA[
 for record in self:
-    record['x_x_source_sales_order_sale_order_count'] = self.env['sale.order'].search_count([('x_source_sales_order', '=', record.id)])
+    record['x_x_source_sales_order_sale_order_count'] = self.env['sale.order'].search_count([('x_source_sales_order', 'in', record.ids)])
 ]]>    </field>
     <field name="ttype">integer</field>
     <field name="selectable" eval="False"/>
@@ -444,16 +444,6 @@ for record in self:
     <field name="model_id" ref="ratios_model" />
     <field name="name">x_ratio</field>
   </record>
-
-  <!-- not found -->
-  <!-- <record id="x_distribution_key_field" model="ir.model.fields">
-    <field name="name">x_distribution_key</field>
-    <field name="ttype">many2one</field>
-    <field name="copied" eval="True" />
-    <field name="field_description">X Distribution Key</field>
-    <field name="model_id" ref="account.model_account_move" />
-    <field name="relation">product.pricelist</field>
-  </record> -->
   <record id="field_meter_reading_meter_id" model="ir.model.fields">
     <field name="name">x_meter_id</field>
     <field name="field_description">Meter</field>
@@ -912,7 +902,7 @@ for record in self:
   </record>
   <record id="field_partner_current_owner_x_property_count" model="ir.model.fields">
     <field name="compute"><![CDATA[
-for record in self: record['x_x_studio_current_owner_x_property_count'] = self.env['x_property'].search_count([('x_studio_current_owner', '=', record.id)])
+for record in self: record['x_x_studio_current_owner_x_property_count'] = self.env['x_property'].search_count([('x_studio_current_owner', 'in', record.ids)])
 ]]>    </field>
     <field name="ttype">integer</field>
     <field name="field_description">Current Owner count</field>
@@ -963,7 +953,7 @@ for record in self:
   </record>
   <record id="field_partner_condominium_x_property_count" model="ir.model.fields">
     <field name="compute"><![CDATA[
-for record in self: record['x_x_studio_condominium_x_property_count'] = self.env['x_property'].search_count([('x_studio_condominium', '=', record.id)])
+for record in self: record['x_x_studio_condominium_x_property_count'] = self.env['x_property'].search_count([('x_studio_condominium', 'in', record.ids)])
 ]]>    </field>
     <field name="ttype">integer</field>
     <field name="field_description">Condominium count</field>
@@ -1106,7 +1096,21 @@ for record in self: record['x_x_studio_condominium_x_property_count'] = self.env
     <field name="field_description">Vote</field>
     <field name="model_id" ref="calendar_event_line__20e26dba-3310-4f10-858a-5459180a2ced"/>
     <field name="name">x_studio_vote</field>
-    <field name="selection">[('Abstention', 'Abstention'), ('Against', 'Against'), ('In Favor', 'In Favor')]</field>
+  </record>
+  <record id="x_studio_vote_abstention" model="ir.model.fields.selection">
+      <field name="field_id" ref="new_selection_calend_vote"/>
+      <field name="value">Abstention</field>
+      <field name="name">Abstention</field>
+  </record>
+  <record id="x_studio_vote_against" model="ir.model.fields.selection">
+      <field name="field_id" ref="new_selection_calend_vote"/>
+      <field name="value">Against</field>
+      <field name="name">Against</field>
+  </record>
+  <record id="x_studio_vote_in_favor" model="ir.model.fields.selection">
+      <field name="field_id" ref="new_selection_calend_vote"/>
+      <field name="value">In Favor</field>
+      <field name="name">In Favor</field>
   </record>
   <record id="calendar_sequence_field_sequence" model="ir.model.fields">
     <field name="ttype">integer</field>
@@ -1325,8 +1329,17 @@ for record in self: record['x_x_studio_condominium_x_property_count'] = self.env
     <field name="name">x_studio_outcome</field>
     <field name="readonly" eval="True"/>
     <field name="selectable" eval="False"/>
-    <field name="selection">[('Approved', 'Approved'), ('Rejected', 'Rejected')]</field>
     <field name="store" eval="False"/>
+  </record>
+  <record id="x_studio_outcome_approved" model="ir.model.fields.selection">
+      <field name="field_id" ref="new_selection_calend_outcome"/>
+      <field name="value">Approved</field>
+      <field name="name">Approved</field>
+  </record>
+  <record id="x_studio_outcome_rejected" model="ir.model.fields.selection">
+      <field name="field_id" ref="new_selection_calend_outcome"/>
+      <field name="value">Rejected</field>
+      <field name="name">Rejected</field>
   </record>
   <record id="new_integer_calendar_attending_owners" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self: record['x_studio_attending_owners'] = len([a for a in record.attendee_ids if a.x_studio_attending or a.x_studio_delegating])]]></field>
@@ -1391,14 +1404,6 @@ for record in self: record['x_x_studio_condominium_x_property_count'] = self.env
     <field name="model_id" ref="period_f8169273-7f99-4a0f-9efe-77709295f0d2"/>
     <field name="name">x_studio_end_date</field>
   </record>
-  <!-- <record id="field_account_move_meter" model="ir.model.fields">
-    <field name="ttype">many2one</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Meter</field>
-    <field name="model_id" ref="account.model_account_move"/>
-    <field name="name">x_studio_meter</field>
-    <field name="relation">x_meters</field>
-  </record> -->
   <record id="field_account_move_period" model="ir.model.fields">
     <field name="ttype">many2one</field>
     <field name="copied" eval="True"/>
@@ -1461,7 +1466,16 @@ for record in self: record['x_x_studio_condominium_x_property_count'] = self.env
     <field name="field_description">Based on</field>
     <field name="model_id" ref="distribution_key_ebf70cee-4475-4921-a5f1-85e747bc5842"/>
     <field name="name">x_studio_based_on</field>
-    <field name="selection">[('Shares', 'Shares'), ('Meter Readings', 'Meter Readings')]</field>
+  </record>
+  <record id="x_studio_based_on_shares" model="ir.model.fields.selection">
+      <field name="field_id" ref="field_distribution_key_base_on"/>
+      <field name="value">Shares</field>
+      <field name="name">Shares</field>
+  </record>
+  <record id="x_studio_based_on_meter_readings" model="ir.model.fields.selection">
+      <field name="field_id" ref="field_distribution_key_base_on"/>
+      <field name="value">Meter Readings</field>
+      <field name="name">Meter Readings</field>
   </record>
   <record id="field_distribution_key_base_meter" model="ir.model.fields">
     <field name="ttype">many2one</field>
@@ -1572,7 +1586,16 @@ for record in self: record['x_x_studio_condominium_x_property_count'] = self.env
     <field name="field_description">Roof Type</field>
     <field name="model_id" ref="base.model_res_partner"/>
     <field name="name">x_studio_roof_type_1</field>
-    <field name="selection">[('Flat', 'Flat'), ('Angled', 'Angled')]</field>
+  </record>
+  <record id="x_studio_roof_type_flat" model="ir.model.fields.selection">
+    <field name="field_id" ref="roof_type_partner_field"/>
+    <field name="value">Flat</field>
+    <field name="name">Flat</field>
+  </record>
+  <record id="x_studio_roof_type_angled" model="ir.model.fields.selection">
+    <field name="field_id" ref="roof_type_partner_field"/>
+    <field name="value">Angled</field>
+    <field name="name">Angled</field>
   </record>
   <record id="floor_partner_field" model="ir.model.fields">
     <field name="ttype">integer</field>
@@ -1595,8 +1618,17 @@ for record in self: record['x_x_studio_condominium_x_property_count'] = self.env
     <field name="model_id" ref="account.model_account_move"/>
     <field name="name">x_studio_based_on</field>
     <field name="readonly" eval="True"/>
-    <field name="selection">[('Shares', 'Shares'), ('Meter Readings', 'Meter Readings')]</field>
     <field name="store" eval="False"/>
+  </record>
+  <record id="x_studio_based_on_shares_move" model="ir.model.fields.selection">
+      <field name="field_id" ref="base_on_account_move_field"/>
+      <field name="value">Shares</field>
+      <field name="name">Shares</field>
+  </record>
+  <record id="x_studio_based_on_meter_readings_move" model="ir.model.fields.selection">
+      <field name="field_id" ref="base_on_account_move_field"/>
+      <field name="value">Meter Readings</field>
+      <field name="name">Meter Readings</field>
   </record>
   <record id="company_account_analytic_plan_field" model="ir.model.fields">
     <field name="ttype">many2one</field>
@@ -1690,14 +1722,6 @@ for record in self: record['x_x_studio_condominium_x_property_count'] = self.env
     <field name="name">x_calendar_event_line_a1bce_id</field>
     <field name="relation">x_calendar_event_line_a1bce</field>
   </record>
-  <!-- <record id="new_lines_calendar_field" model="ir.model.fields">
-    <field name="ttype">one2many</field>
-    <field name="field_description">New Lines</field>
-    <field name="model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
-    <field name="name">x_studio_one2many_field_8eh_1is91bfcb</field>
-    <field name="relation">x_calendar_event_line_a1bce_line_ea528</field>
-    <field name="relation_field">x_calendar_event_line_a1bce_id</field>
-  </record> -->
   <record id="sequence_calendar_ev_7ae84ab3-77e0-4f06-bc10-442a614919c3" model="ir.model.fields">
     <field name="ttype">integer</field>
     <field name="copied" eval="True"/>
