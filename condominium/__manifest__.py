@@ -51,6 +51,7 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
+        'demo/res_users.xml',
         'demo/res_partner.xml',
         'demo/res_company.xml',
         'demo/x_buildings.xml',
