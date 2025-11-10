@@ -80,23 +80,14 @@ if record.x_sale_order_line_id:
         'purchase_price': record.x_unit_cost,
     })
 elif record.x_targeted_so:
-    new_product = env['product.product'].create({
-        'name': record.x_name,
-        'default_code': record.x_reference,
-        'type': 'service',
-        'service_policy': "delivered_manual",
-        'list_price': record.x_unit_price,
-        'standard_price': record.x_unit_cost,
-        'uom_id': record.x_unit_id.id,
-    })
+    env['ir.actions.server'].browse(env.ref('construction_work_items.server_action_create_product_for_wi').id).run()
     env['sale.order.line'].create({
         'order_id': record.x_targeted_so.id,
-        'product_id': new_product.id,
+        'product_id': record.x_product_id.id,
         'price_unit': record.x_unit_price,
         'purchase_price': record.x_unit_cost,
         'x_line_work_item_ids': [record.id],
     })
-    record.write({'x_product_id': new_product.id})
 ]]></field>
     </record>
     <record id="server_action_create_associated_work_item" model="ir.actions.server">
