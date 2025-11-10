@@ -14,6 +14,7 @@ if record.x_unit_sale_product:
         'type': 'normal',
         'x_parent_product': record.id,
         'x_auto_production': True,
+        'company_id': False,
         'bom_line_ids': [(5, 0), (0, 0, {'product_id': record.product_variant_id.id, 'product_qty': 1})],
     }
     if record.x_deposit_product:
@@ -27,13 +28,17 @@ if record.x_unit_sale_product:
         uom_id = env['uom.uom'].search([('relative_factor', '=', quant), ('relative_uom_id', '=', record.x_unit_sale_product.uom_id.id)], limit=1)
         if not uom_id:
             uom_id = env['uom.uom'].create({'relative_factor': quant, 'relative_uom_id': record.x_unit_sale_product.uom_id.id, 'name': f"Pack of {quant} x {record.x_unit_sale_product.uom_id.name}"})
-        env['stock.warehouse.orderpoint'].create({
-            'product_id': record.x_unit_sale_product.product_variant_id.id,
-            'x_parent_product': record.id,
-            'replenishment_uom_id': uom_id.id,
-            'route_id': env.ref('mrp.route_warehouse0_manufacture').id,
-            'location_id': env.ref('stock.stock_location_stock').id,
-        })
+        orderpoints_to_create = []
+        for wh in env['stock.warehouse'].search([('lot_stock_id', '!=', False)]):
+            orderpoints_to_create.append({
+                'product_id': record.x_unit_sale_product.product_variant_id.id,
+                'x_parent_product': record.id,
+                'replenishment_uom_id': uom_id.id,
+                'company_id': wh.company_id.id,
+                'route_id': env.ref('mrp.route_warehouse0_manufacture').id,
+                'location_id': wh.lot_stock_id.id,
+            })
+        env['stock.warehouse.orderpoint'].create(orderpoints_to_create)
 else:
     existing_bom = env['mrp.bom'].search([('x_parent_product', '=',record.id)], limit=1)
     reordering_rule = env['stock.warehouse.orderpoint'].search([('x_parent_product', '=', record.id)], limit=1)
