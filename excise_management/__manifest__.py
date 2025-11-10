@@ -27,6 +27,9 @@
         'data/x_excise_category.xml',
         'data/res_config_setting.xml',
     ],
+    'demo': [
+        'demo/res_users.xml',
+    ],
     'cloc_exclude': [
         'data/qweb_view.xml',
     ],
