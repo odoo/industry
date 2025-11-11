@@ -124,7 +124,7 @@ action['res_id'] = wizard.id]]>
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-action = env['ir.actions.act_window']._for_xml_id('condominium.condo_act_window')
+action = env['ir.actions.act_window']._for_xml_id('condominium.condominium_act_window')
 action['res_id'] = env.company.partner_id.id]]>
         </field>
     </record>
@@ -198,7 +198,7 @@ for mr in mrs:
         <field name="state">code</field>
         <field name="name">Condominium: Compute Meter Reading Consumption</field>
     </record>
-    <record id="industry_update_curr_9c379c6b-889a-4235-af2e-df6e3dcfaa6d" model="ir.actions.server">
+    <record id="action_update_property_current_owner" model="ir.actions.server">
         <field name="code"><![CDATA[for line in record.x_property_id.x_studio_owner_ids:
     if line.x_studio_end_date == False: record['x_property_id']['x_studio_current_owner'] = line.x_studio_owner
     account = env['account.analytic.account'].search([('x_studio_property','=',record.x_property_id.id),('partner_id','=',line.x_studio_owner.id)])
@@ -209,7 +209,7 @@ for mr in mrs:
         <field name="name">Condominium: Update Property Current Owner</field>
         <field name="usage">base_automation</field>
     </record>
-    <record id="industry_archive_rel_1116b329-ad32-4a7f-b31c-59702e264ec1" model="ir.actions.server">
+    <record id="action_archive_related_accounts" model="ir.actions.server">
         <field name="code"><![CDATA[for owner in record.x_studio_owner_ids:
     if owner.x_studio_account: owner['x_studio_account']['active'] = False
 
@@ -219,7 +219,7 @@ for mr in mrs:
         <field name="name">Condominium: Archive related accounts</field>
         <field name="usage">base_automation</field>
     </record>
-    <record id="industry_populate_vo_154b8787-f5ce-4bea-931b-a6edbc80a723" model="ir.actions.server">
+    <record id="action_populate_voters" model="ir.actions.server">
         <field name="binding_model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
         <field name="code"><![CDATA[record['x_studio_attendee_vote_ids'].unlink()
 voters = []
@@ -227,14 +227,13 @@ for attendee in record.x_calendar_event_id.attendee_ids:
     if (attendee.x_studio_attending or attendee.x_studio_delegating) and attendee.partner_id.id not in list(map(lambda voter: voter.x_studio_attendee.id, record.x_studio_attendee_vote_ids)): voters.append({ 'x_studio_attendee': attendee.partner_id.id, })
 record['x_studio_attendee_vote_ids'] = env['x_calendar_event_line_a1bce_line_a3f04'].create(voters).ids
 
-
 ]]>        </field>
         <field name="model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
         <field name="state">code</field>
         <field name="name">Condominium: Populate Voters</field>
         <field name="usage">base_automation</field>
     </record>
-    <record id="industry_set_votes_a_73342a03-85fc-4775-afd2-800be099d3aa" model="ir.actions.server">
+    <record id="action_set_votes_as_all_against" model="ir.actions.server">
         <field name="binding_model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
         <field name="code"><![CDATA[for attendee_vote in record.x_studio_attendee_vote_ids: attendee_vote['x_studio_vote'] = "Against"
 
@@ -243,7 +242,7 @@ record['x_studio_attendee_vote_ids'] = env['x_calendar_event_line_a1bce_line_a3f
         <field name="state">code</field>
         <field name="name">Condominium: Set Votes as All Against</field>
     </record>
-    <record id="industry_set_votes_a_d3b6fd79-aef3-4619-9279-4ec49d90559d" model="ir.actions.server">
+    <record id="action_set_votes_as_all_favor" model="ir.actions.server">
         <field name="binding_model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
         <field name="code"><![CDATA[for attendee_vote in record.x_studio_attendee_vote_ids: attendee_vote['x_studio_vote'] = "In Favor"
 
@@ -252,14 +251,14 @@ record['x_studio_attendee_vote_ids'] = env['x_calendar_event_line_a1bce_line_a3f
         <field name="state">code</field>
         <field name="name">Condominium: Set Votes as All In Favor</field>
     </record>
-    <record id="industry_send_genera_2c1dc29b-783e-4233-89c4-0ad81f20c6eb" model="ir.actions.server">
+    <record id="action_send_general_meeting_report" model="ir.actions.server">
         <field name="binding_model_id" ref="calendar.model_calendar_event"/>
         <field name="model_id" ref="calendar.model_calendar_event"/>
         <field name="state">mail_post</field>
         <field name="template_id" ref="mail_template_51"/>
         <field name="name">Condominium: Send General Meeting Report</field>
     </record>
-    <record id="industry_send_genera_636204d5-33e7-437e-99cb-fbc897d72c0e" model="ir.actions.server">
+    <record id="action_send_general_meeting_agenda" model="ir.actions.server">
         <field name="binding_model_id" ref="calendar.model_calendar_event"/>
         <field name="model_id" ref="calendar.model_calendar_event"/>
         <field name="template_id" ref="mail_template_52"/>
@@ -325,7 +324,7 @@ else:
         <field name="state">code</field>
         <field name="name">Condominium: Distribute Costs</field>
     </record>
-    <record id="industry_populate_di_1bcb08fe-f6dc-4ea0-9ffc-d4607055470e" model="ir.actions.server">
+    <record id="action_populate_distribution_key" model="ir.actions.server">
         <field name="binding_model_id" ref="distribution_key_ebf70cee-4475-4921-a5f1-85e747bc5842"/>
         <field name="code"><![CDATA[for distribution_key in records:
     properties = env['x_property'].search([('x_studio_company_id', 'in', record.x_studio_company_id.id)])
@@ -338,7 +337,7 @@ else:
         <field name="state">code</field>
         <field name="name">Condominium: Populate Distribution Key</field>
     </record>
-    <record id="industry_compute_dis_a81d25a4-1a4e-4e6d-94d2-cd9ed915b36f" model="ir.actions.server">
+    <record id="action_compute_distribution_key_ratios" model="ir.actions.server">
         <field name="binding_model_id" ref="distribution_key_ebf70cee-4475-4921-a5f1-85e747bc5842"/>
         <field name="code"><![CDATA[for distribution_key in records:
     total_distribution = sum(distribution_key.x_studio_ratio_ids.mapped('x_area'))
@@ -347,7 +346,7 @@ else:
         <field name="state">code</field>
         <field name="name">Compute Distribution Key Ratios</field>
     </record>
-    <record id="execute_code_2a88e896-cf76-4255-8ab9-1c04b6739bd9" model="ir.actions.server">
+    <record id="action_call_distribute_costs_on_update" model="ir.actions.server">
         <field name="code"><![CDATA[server_action = env['ir.actions.server'].search([('name','=','Condominium: Distribute Costs')])
 if server_action: server_action.run()]]></field>
         <field name="model_id" ref="account.model_account_move"/>
@@ -355,7 +354,7 @@ if server_action: server_action.run()]]></field>
         <field name="name">Condominium: Call Distribute Costs on UI update</field>
         <field name="usage">base_automation</field>
     </record>
-    <record id="industry_call_distri_1dff37c7-1c90-46cd-be7e-0d935c31d7a6" model="ir.actions.server">
+    <record id="action_call_distribute_costs_on_save" model="ir.actions.server">
         <field name="code"><![CDATA[server_action = env['ir.actions.server'].search([('name','=','Condominium: Distribute Costs')])
 if server_action: server_action.run()]]></field>
         <field name="model_id" ref="account.model_account_move"/>
@@ -363,7 +362,7 @@ if server_action: server_action.run()]]></field>
         <field name="name">Condominium: Call Distribute Costs on save</field>
         <field name="usage">base_automation</field>
     </record>
-    <record id="industry_create_task_47e0cf69-8b12-4e53-b7d5-794639319f20" model="ir.actions.server">
+    <record id="action_create_task_from_motion" model="ir.actions.server">
         <field name="binding_model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
         <field name="code"><![CDATA[customer_id = record.x_calendar_event_id.x_studio_condominium.partner_id.id
 action = { 'type': 'ir.actions.act_window', 'name': 'Create Task', 'res_model': 'project.task', 'view_mode': 'form', 'view_type': 'form', 'target': 'new', 'context': { 'default_project_id': env['project.project'].search([('partner_id', '=', customer_id)]).id, 'default_name': record.x_name, 'default_user_ids': [env.user.id], 'default_partner_id': customer_id } }]]></field>
