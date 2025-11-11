@@ -47,9 +47,6 @@
       </data>
     </field>
   </record>
-
-
-
   <record id="sale_order_form_custom" model="ir.ui.view">
     <field name="name">sale.order.form.condominium</field>
     <field name="model">sale.order</field>
@@ -180,7 +177,7 @@
       </form>
     </field>
   </record>
-  <record id="analytic_account_custom_kanban_view" model="ir.ui.view">
+  <record id="analytic_account_kanban_view" model="ir.ui.view">
     <field name="name">account.analytic.account.kanban.condominium</field>
     <field name="mode">primary</field>
     <field name="active" eval="True"/>
@@ -302,10 +299,14 @@
             <group>
               <field name="x_property" options='{"create_name_field": "x_name", "no_create": true}'/>
               <field name="x_pricelist" options='{"no_create": true}'/>
+              <field name="x_company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+              <field name="x_building"/>
+              <field name="x_studio_property"/>
             </group>
             <group>
+              <field name="x_type"/>
+              <field name="x_area"/>
               <field name="x_ratio"/>
-              <field name="x_company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
             </group>
           </group>
         </sheet>
@@ -362,7 +363,7 @@
         </header>
       </xpath>
       <xpath expr="//button[@name='action_open_employees']" position="after">
-        <button class="oe_stat_button" icon="fa-home" type="action" name="%(properties_bcdebf3d-1009-4ec1-b263-329f31ab8376)d" invisible="not x_x_studio_condominium_x_property_count">
+        <button class="oe_stat_button" icon="fa-home" type="action" name="%(condominium_x_property_count_contact_smart_button)d" invisible="not x_x_studio_condominium_x_property_count">
           <field widget="statinfo" name="x_x_studio_condominium_x_property_count" string="Properties" />
         </button>
       </xpath>
@@ -416,7 +417,6 @@
       </field>
     </field>
   </record>
-
   <record id="sale_order_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
@@ -450,6 +450,9 @@
       <list>
         <field name="x_studio_sequence" widget="handle"/>
         <field name="x_name"/>
+        <field name="x_studio_type" optional="show"/>
+        <field name="x_studio_building" optional="show"/>
+        <field name="x_studio_current_owner" optional="show"/>
       </list>
     </field>
     <field name="model">x_property</field>
@@ -470,9 +473,80 @@
             </h1>
           </div>
           <group name="studio_group_d40dcf">
-            <group name="studio_group_d40dcf_left"/>
-            <group name="studio_group_d40dcf_right"/>
+            <group name="studio_group_d40dcf_left">
+              <field name="x_studio_type" options="{'create_name_field': 'x_name'}"/>
+              <field name="x_studio_building" options="{'create_name_field': 'x_name'}"/>
+              <field name="x_studio_floor"/>
+              <field name="x_studio_area"/>
+            </group>
+            <group name="studio_group_d40dcf_right">
+              <field name="x_studio_tags" widget="many2many_tags"/>
+              <field name="x_studio_parent" options="{'create_name_field': 'x_name'}" domain="[('x_studio_company_id', 'in', allowed_company_ids)]"/>
+              <field name="x_studio_current_owner" force_save="1" readonly="True"/>
+              <field name="x_studio_company_id" string="Company"/>
+              <field name="x_studio_condominium" force_save="1" readonly="True"/>
+            </group>
           </group>
+          <notebook name="studio_notebook_tl_1ipjs3dc0">
+            <page string="Meter Readings" name="studio_page_tl">
+              <field name="x_studio_meter_reading_ids">
+                <list string="Meter Reading" editable="bottom" default_order="x_date desc">
+                  <field name="x_meter_id" optional="show"/>
+                  <field name="x_date" optional="show"/>
+                  <field name="x_quantity" optional="show"/>
+                  <field name="x_usage" optional="show"/>
+                  <field name="x_description" optional="show"/>
+                  <field name="x_image" optional="show"/>
+                </list>
+                <form>
+                  <sheet string="Meter Reading" name="studio_sheet_bf045e">
+                    <group name="studio_group_8ffe76">
+                      <group name="studio_group_dfe9dd">
+                        <field name="x_meter_id"/>
+                        <field name="x_quantity"/>
+                        <field name="x_description"/>
+                        <field name="x_account_analytic_account_id"/>
+                      </group>
+                      <group name="studio_group_fa1b35">
+                        <field name="x_date"/>
+                        <field name="x_usage"/>
+                        <field name="x_image"/>
+                        <field name="x_studio_property"/>
+                      </group>
+                    </group>
+                    <group name="studio_group_3a155c">
+                      <separator/>
+                    </group>
+                  </sheet>
+                </form>
+              </field>
+            </page>
+            <page string="Owners" name="studio_page_7sn_1ipjs3r3u">
+              <field name="x_studio_owner_ids">
+                <list editable="top">
+                  <field name="x_studio_sequence" widget="handle"/>
+                  <field optional="show" name="x_studio_start_date" required="True"/>
+                  <field optional="show" name="x_studio_end_date"/>
+                  <field optional="show" name="x_studio_owner" required="True" widget="many2one_avatar_user"/>
+                  <field optional="show" name="x_studio_co_owners" widget="many2many_tags_avatar"/>
+                  <field optional="show" name="x_studio_account" options="{&quot;no_create&quot;:true}" readonly="True" widget="many2one_tax_tags" column_invisible="True"/>
+                </list>
+              </field>
+            </page>
+            <page string="Tenants" name="studio_page_s9_1ipjs4bi6">
+              <field name="x_studio_tenant_ids">
+                <list editable="top">
+                  <field name="x_studio_sequence" widget="handle"/>
+                  <field optional="show" name="x_studio_start_date" required="True"/>
+                  <field optional="show" name="x_studio_end_date"/>
+                  <field optional="show" name="x_studio_tenant" column_invisible="False" invisible="False" required="True" widget="many2one_avatar_user"/>
+                </list>
+              </field>
+            </page>
+            <page string="Accounts" name="studio_page_1j7_1ipmch0he" invisible="True">
+              <field name="x_studio_account_ids"/>
+            </page>
+          </notebook>
         </sheet>
         <chatter/>
       </form>
@@ -496,7 +570,7 @@
     <field name="name">x_property.search.condominium</field>
     <field name="type">search</field>
   </record>
-  <record id="x_property_form_inherit" model="ir.ui.view">
+  <!-- <record id="x_property_form_inherit" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
         <xpath expr="//group[@name='studio_group_d40dcf_left']" position="inside">
@@ -583,8 +657,8 @@
     <field name="priority">99</field>
     <field name="active" eval="True"/>
     <field name="type">form</field>
-  </record>
-  <record id="default_list_view_fo_c3d34cb8-7465-4ebe-8ccc-c68a749b70bc" model="ir.ui.view">
+  </record> -->
+  <record id="x_property_line_meter_reading_list_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <list>
         <field name="x_studio_sequence" widget="handle"/>
@@ -596,7 +670,7 @@
     <field name="name">x_property_line_meter_reading.list.condominium</field>
     <field name="type">list</field>
   </record>
-  <record id="default_form_view_fo_03e007bf-17ad-467e-a8bc-0592b17b66e9" model="ir.ui.view">
+  <record id="x_property_line_meter_reading_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <form>
         <header/>
@@ -618,7 +692,7 @@
     <field name="name">x_property_line_meter_reading.form.condominium</field>
     <field name="type">form</field>
   </record>
-  <record id="default_search_view__94e22e19-e077-4fc5-92ba-4efebdc632a5" model="ir.ui.view">
+  <record id="x_property_line_meter_reading_search_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <search>
         <field name="x_name"/>
@@ -629,7 +703,7 @@
     <field name="name">x_property_line_meter_reading.search.condominium</field>
     <field name="type">search</field>
   </record>
-  <record id="default_list_view_fo_740c1f1f-3907-4d9f-8893-914c9999112d" model="ir.ui.view">
+  <record id="x_property_line_owner_list_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <list>
         <field name="x_studio_sequence" widget="handle"/>
@@ -641,7 +715,7 @@
     <field name="name">x_property_line_owner.list.condominium</field>
     <field name="type">list</field>
   </record>
-  <record id="default_form_view_fo_2b5eeda3-5376-4a55-b09e-374c51a9beee" model="ir.ui.view">
+  <record id="x_property_line_owner_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <form>
         <header/>
@@ -663,7 +737,7 @@
     <field name="name">x_property_line_owner.form.condominium</field>
     <field name="type">form</field>
   </record>
-  <record id="default_search_view__91023503-6711-4055-b066-caa4747ed3cb" model="ir.ui.view">
+  <record id="x_property_line_owner_search_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <search>
         <field name="x_name"/>
@@ -674,7 +748,7 @@
     <field name="name">x_property_line_owner.search.condominium</field>
     <field name="type">search</field>
   </record>
-  <record id="default_list_view_fo_1bb21a71-b146-4433-be29-97eda95ccf38" model="ir.ui.view">
+  <record id="x_property_line_tenant_list_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <list>
         <field name="x_studio_sequence" widget="handle"/>
@@ -686,7 +760,7 @@
     <field name="name">x_property_line_tenant.list.condominium</field>
     <field name="type">list</field>
   </record>
-  <record id="default_form_view_fo_0b08689e-c8d2-4504-a86e-ca64ceb1bace" model="ir.ui.view">
+  <record id="x_property_line_tenant_form" model="ir.ui.view">
     <field name="arch" type="xml">
       <form>
         <header/>
@@ -708,7 +782,7 @@
     <field name="name">x_property_line_tenant.form.condominium</field>
     <field name="type">form</field>
   </record>
-  <record id="default_search_view__1dc4fe31-7cfb-4181-a5a0-dad054233076" model="ir.ui.view">
+  <record id="x_property_line_tenant_search_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <search>
         <field name="x_name"/>
@@ -719,8 +793,6 @@
     <field name="name">x_property_line_tenant.search.condominium</field>
     <field name="type">search</field>
   </record>
-
-
   <record id="x_property_kanban_view" model="ir.ui.view">
     <field name="name">x_property.kanban.condominium</field>
     <field name="mode">primary</field>
@@ -787,7 +859,7 @@
     <field name="type">search</field>
   </record>
 
-  <record id="odoo_studio_account__94def992-2f7b-4ea1-baf0-56202860d0f3" model="ir.ui.view">
+  <record id="view_account_analytic_line_form_inherit" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
         <xpath expr="//form[1]/field[@name='company_id']" position="before">
@@ -811,7 +883,7 @@
     <field name="priority">160</field>
     <field name="type">form</field>
   </record>
-  <record id="odoo_studio_default__45aaa2bc-76b2-473c-9045-3dcade7e8c43" model="ir.ui.view">
+  <!-- <record id="odoo_studio_default__45aaa2bc-76b2-473c-9045-3dcade7e8c43" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
         <xpath expr="//field[@name='x_name']" position="after">
@@ -828,7 +900,9 @@
     <field name="name">x_property.list.condominium</field>
     <field name="priority">99</field>
     <field name="type">list</field>
-  </record>
+  </record> -->
+
+  <!-- rename this  -->
   <record id="odoo_studio_ir_defau_af5d1d9e-409e-439a-a72e-6ffba7305c85" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
@@ -861,7 +935,7 @@
     <field name="priority">99</field>
     <field name="type">form</field>
   </record>
-  <record id="odoo_studio_default__a1b9cefe-461c-43ab-b1fc-adf02b9efd7a" model="ir.ui.view">
+  <!-- <record id="odoo_studio_default__a1b9cefe-461c-43ab-b1fc-adf02b9efd7a" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
         <xpath expr="//field[@name='x_pricelist']" position="before"/>
@@ -883,8 +957,8 @@
     <field name="name">x_ratios.form.condominium</field>
     <field name="priority">99</field>
     <field name="type">form</field>
-  </record>
-  <record id="default_list_view_fo_b0d7ca6f-f54d-44d8-a970-4242da2ec66a" model="ir.ui.view">
+  </record> -->
+  <record id="x_calendar_event_line_a7dc0_list_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <list>
         <field name="x_studio_sequence" widget="handle"/>
@@ -896,7 +970,7 @@
     <field name="active" eval="True"/>
     <field name="type">list</field>
   </record>
-  <record id="default_form_view_fo_e5f54a81-938a-498c-bf3f-51a54b4433eb" model="ir.ui.view">
+  <record id="x_calendar_event_line_a7dc0_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <form>
         <header/>
@@ -918,7 +992,7 @@
     <field name="name">x_calendar_event_line_a7dc0.form.condominium</field>
     <field name="type">form</field>
   </record>
-  <record id="default_search_view__d8b3a0f1-5b2b-4a94-803d-232311e97956" model="ir.ui.view">
+  <record id="x_calendar_event_line_a7dc0_search_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <search>
         <field name="x_name"/>
@@ -929,7 +1003,7 @@
     <field name="name">x_calendar_event_line_a7dc0.search.condominium</field>
     <field name="type">search</field>
   </record>
-  <record id="default_list_view_fo_849446f0-1ecd-498c-b1c6-085e920df214" model="ir.ui.view">
+  <record id="x_calendar_event_line_a1bce_list_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <list>
         <field name="x_studio_sequence" widget="handle"/>
@@ -941,19 +1015,54 @@
     <field name="name">x_calendar_event_line_a1bce.list.condominium</field>
     <field name="type">list</field>
   </record>
-  <record id="default_form_view_fo_7c12ffe2-d680-4f0a-9c3f-7b49fcbbc1d8" model="ir.ui.view">
+  <record id="x_calendar_event_line_a1bce_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <form>
-        <header/>
+        <header>
+          <button string="Reset Votes" name="%(action_populate_voters)d" type="action"/>
+          <button string="Plan Task" name="%(action_create_task_from_motion)d" type="action"/>
+        </header>
         <sheet string="calendar_event_line">
           <div class="oe_title">
             <h1>
-              <field name="x_name" required="1" placeholder="Name..."/>
+              <field name="x_name" required="1" placeholder="Motion..."/>
             </h1>
           </div>
           <group name="studio_group_a3daf6">
-            <group name="studio_group_a3daf6_left"/>
-            <group name="studio_group_a3daf6_right"/>
+            <group name="studio_group_a3daf6_left">
+              <field name="x_studio_notes"/>
+              <widget name="web_ribbon" title="Approved" invisible="x_studio_outcome != 'Approved'"/>
+              <widget name="web_ribbon" title="Rejected" invisible="x_studio_outcome != 'Rejected'" bg_color="text-bg-danger"/>
+            </group>
+            <group name="studio_group_a3daf6_right">
+              <field name="x_studio_vote_criteria" options="{'create_name_field': 'x_name'}" string="Motion Criteria" required="x_studio_abstention &lt; 1"/>
+              <field name="x_studio_in_favor" force_save="1" readonly="True" widget="percentage"/>
+              <field name="x_studio_against" widget="percentage" force_save="1" readonly="True"/>
+              <field name="x_studio_abstention" widget="percentage"/>
+              <button name="%(action_set_votes_as_all_against)d" string="All Against" type="action"/>
+              <button name="%(action_set_votes_as_all_favor)d" string="All In Favor" type="action"/>
+              <field name="x_studio_attendee_vote_ids" nolabel="1" colspan="2">
+                <list editable="bottom" open_form_view="false" delete="false" duplicate="false" create="false">
+                  <field name="x_studio_sequence" widget="handle"/>
+                  <field optional="show" name="x_studio_attendee" readonly="True"/>
+                  <field optional="show" name="x_studio_vote" widget="radio" options="{&quot;horizontal&quot;:true}"/>
+                </list>
+                <form>
+                  <header/>
+                  <sheet string="calendar_event_line_a1bce_line" name="studio_sheet_119cb2">
+                    <div class="oe_title" name="studio_div_11ac83">
+                      <h1>
+                        <field name="x_name" required="1" placeholder="Name..."/>
+                      </h1>
+                    </div>
+                    <group name="studio_group_37cb0f">
+                      <group name="studio_group_37cb0f_left"/>
+                      <group name="studio_group_37cb0f_right"/>
+                    </group>
+                  </sheet>
+                </form>
+              </field>
+            </group>
           </group>
         </sheet>
       </form>
@@ -963,7 +1072,7 @@
     <field name="name">x_calendar_event_line_a1bce.form.condominium</field>
     <field name="type">form</field>
   </record>
-  <record id="default_search_view__812edcb2-7225-4e8d-8ef1-135ca3a428dc" model="ir.ui.view">
+  <record id="x_calendar_event_line_a1bce_search_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <search>
         <field name="x_name"/>
@@ -974,7 +1083,7 @@
     <field name="name">x_calendar_event_line_a1bce.search.condominium</field>
     <field name="type">search</field>
   </record>
-  <record id="odoo_studio_default__b7acc772-442e-4a84-9c08-9014040515ff" model="ir.ui.view">
+  <!-- <record id="odoo_studio_default__b7acc772-442e-4a84-9c08-9014040515ff" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
         <xpath expr="//form[1]/header[1]" position="inside">
@@ -1020,15 +1129,15 @@
         </xpath>
       </data>
     </field>
-    <field name="inherit_id" ref="default_form_view_fo_7c12ffe2-d680-4f0a-9c3f-7b49fcbbc1d8"/>
+    <field name="inherit_id" ref="x_calendar_event_line_a1bce_form_view"/>
     <field name="mode">extension</field>
     <field name="active" eval="True"/>
     <field name="model">x_calendar_event_line_a1bce</field>
     <field name="name">x_calendar_event_line_a1bce.form.condominium</field>
     <field name="priority">99</field>
     <field name="type">form</field>
-  </record>
-  <record id="default_list_view_fo_9812d1c5-3bc4-4326-8b69-7cab7d792402" model="ir.ui.view">
+  </record> -->
+  <record id="x_calendar_event_line_a1bce_line_a3f04_list_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <list>
         <field name="x_studio_sequence" widget="handle"/>
@@ -1040,7 +1149,7 @@
     <field name="name">x_calendar_event_line_a1bce_line_a3f04.list.condominium</field>
     <field name="type">list</field>
   </record>
-  <record id="default_form_view_fo_e3d11bbd-2479-422f-b24a-abb0272d8fe0" model="ir.ui.view">
+  <record id="x_calendar_event_line_a1bce_line_a3f04_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <form>
         <header/>
@@ -1062,7 +1171,7 @@
     <field name="name">x_calendar_event_line_a1bce_line_a3f04.form.condominium</field>
     <field name="type">form</field>
   </record>
-  <record id="default_search_view__56f54935-ee97-4288-a279-c6cd4066580c" model="ir.ui.view">
+  <record id="x_calendar_event_line_a1bce_line_a3f04_search_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <search>
         <field name="x_name"/>
@@ -1073,7 +1182,7 @@
     <field name="name">x_calendar_event_line_a1bce_line_a3f04.search.condominium</field>
     <field name="type">search</field>
   </record>
-  <record id="default_list_view_fo_19cae0fc-7e40-4cf0-9e81-d77c4242f567" model="ir.ui.view">
+  <record id="x_calendar_event_line_920fe_list_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <list>
         <field name="x_studio_sequence" widget="handle"/>
@@ -1085,7 +1194,7 @@
     <field name="name">x_calendar_event_line_920fe.list.condominium</field>
     <field name="type">list</field>
   </record>
-  <record id="default_form_view_fo_8193d201-031a-49ba-8f15-48f3813b6c37" model="ir.ui.view">
+  <record id="x_calendar_event_line_920fe_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <form>
         <header/>
@@ -1107,7 +1216,7 @@
     <field name="name">x_calendar_event_line_920fe.form.condominium</field>
     <field name="type">form</field>
   </record>
-  <record id="default_search_view__72251a69-bdeb-4f88-966f-863bac3391b3" model="ir.ui.view">
+  <record id="x_calendar_event_line_920fe_search_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <search>
         <field name="x_name"/>
@@ -1118,11 +1227,12 @@
     <field name="name">x_calendar_event_line_920fe.search.condominium</field>
     <field name="type">search</field>
   </record>
-  <record id="default_list_view_fo_6964e352-ba17-43ba-beee-a927fa62197b" model="ir.ui.view">
+  <record id="x_vote_criteria_list_view" model="ir.ui.view">
     <field name="arch" type="xml">
-      <list>
+      <list editable="bottom">
         <field name="x_studio_sequence" widget="handle"/>
         <field name="x_name"/>
+        <field name="x_studio_acceptation_threshold" optional="show" widget="percentage"/>
       </list>
     </field>
     <field name="model">x_vote_criteria</field>
@@ -1130,7 +1240,7 @@
     <field name="name">x_vote_criteria.list.condominium</field>
     <field name="type">list</field>
   </record>
-  <record id="default_form_view_fo_c690517f-b466-458c-811b-9b7274b4be8e" model="ir.ui.view">
+  <record id="x_vote_criteria_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <form>
         <header/>
@@ -1143,7 +1253,9 @@
             </h1>
           </div>
           <group name="studio_group_42f7a7">
-            <group name="studio_group_42f7a7_left"/>
+            <group name="studio_group_42f7a7_left">
+              <field name="x_studio_acceptation_threshold" widget="percentage" force_save="0" readonly="False" invisible="False" required="True"/>
+            </group>
             <group name="studio_group_42f7a7_right"/>
           </group>
         </sheet>
@@ -1155,7 +1267,7 @@
     <field name="name">x_vote_criteria.form.condominium</field>
     <field name="type">form</field>
   </record>
-  <record id="default_search_view__cd591762-dc10-459f-847f-2ac67ee981e1" model="ir.ui.view">
+  <record id="x_vote_criteria_search_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <search>
         <field name="x_name"/>
@@ -1169,7 +1281,7 @@
     <field name="name">x_vote_criteria.search.condominium</field>
     <field name="type">search</field>
   </record>
-  <record id="odoo_studio_default__0fa0af68-25d6-4bc8-9ab9-62543d5d14c2" model="ir.ui.view">
+  <!-- <record id="odoo_studio_default__0fa0af68-25d6-4bc8-9ab9-62543d5d14c2" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
         <xpath expr="//group[@name='studio_group_42f7a7_left']" position="inside">
@@ -1177,15 +1289,15 @@
         </xpath>
       </data>
     </field>
-    <field name="inherit_id" ref="default_form_view_fo_c690517f-b466-458c-811b-9b7274b4be8e"/>
+    <field name="inherit_id" ref="x_vote_criteria_form_view"/>
     <field name="mode">extension</field>
     <field name="active" eval="True"/>
     <field name="model">x_vote_criteria</field>
     <field name="name">x_vote_criteria.form.condominium</field>
     <field name="priority">99</field>
     <field name="type">form</field>
-  </record>
-  <record id="odoo_studio_default__1ca52e38-15d9-412f-8e1a-70c0ec4bdf08" model="ir.ui.view">
+  </record> -->
+  <!-- <record id="odoo_studio_default__1ca52e38-15d9-412f-8e1a-70c0ec4bdf08" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
         <xpath expr="//list[1]" position="attributes">
@@ -1196,15 +1308,15 @@
         </xpath>
       </data>
     </field>
-    <field name="inherit_id" ref="default_list_view_fo_6964e352-ba17-43ba-beee-a927fa62197b"/>
+    <field name="inherit_id" ref="x_vote_criteria_list_view"/>
     <field name="mode">extension</field>
     <field name="model">x_vote_criteria</field>
     <field name="name">x_vote_criteria.list.condominium</field>
     <field name="priority">99</field>
     <field name="active" eval="True"/>
     <field name="type">list</field>
-  </record>
-  <record id="odoo_studio_calendar_7789adc7-207d-47e7-858a-b821e51de589" model="ir.ui.view">
+  </record> -->
+  <record id="view_calendar_event_form_inherit" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
         <xpath expr="//header" position="inside">
@@ -1330,7 +1442,7 @@
     <field name="priority">160</field>
     <field name="type">form</field>
   </record>
-  <record id="odoo_studio_account__a25da466-f9b9-425a-9919-a46cfe5e49e1" model="ir.ui.view">
+  <record id="account_report_line_form_inherit" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
         <xpath expr="//field[@name='user_groupby']" position="after">
@@ -1346,7 +1458,7 @@
     <field name="priority">99</field>
     <field name="type">form</field>
   </record>
-  <record id="odoo_studio_account__485a4437-0359-4b73-bb01-ede38aa91f99" model="ir.ui.view">
+  <record id="view_move_line_tree_inherit" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
         <xpath expr="//field[@name='move_name']" position="after">
@@ -1362,11 +1474,13 @@
     <field name="priority">160</field>
     <field name="type">list</field>
   </record>
-  <record id="default_list_view_fo_62ecbeef-9397-4032-9b25-469b8c8e9c4d" model="ir.ui.view">
+  <record id="x_period_list_view" model="ir.ui.view">
     <field name="arch" type="xml">
-      <list>
+      <list editable="bottom" default_order="x_studio_start_date desc">
         <field name="x_studio_sequence" widget="handle"/>
-        <field name="x_name"/>
+        <field name="x_studio_start_date" optional="show"/>
+        <field name="x_studio_end_date" optional="show"/>
+        <field name="x_name" string="Name"/>
       </list>
     </field>
     <field name="model">x_period</field>
@@ -1374,7 +1488,7 @@
     <field name="name">x_period.list.condominium</field>
     <field name="type">list</field>
   </record>
-  <record id="default_form_view_fo_2a9e3eda-a4d3-4c9d-8be4-804e42cfa6ed" model="ir.ui.view">
+  <record id="x_period_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <form>
         <header/>
@@ -1435,7 +1549,7 @@
         </xpath>
       </data>
     </field>
-    <field name="inherit_id" ref="default_form_view_fo_2a9e3eda-a4d3-4c9d-8be4-804e42cfa6ed"/>
+    <field name="inherit_id" ref="x_period_form_view"/>
     <field name="mode">extension</field>
     <field name="model">x_period</field>
     <field name="active" eval="True"/>
@@ -1443,7 +1557,7 @@
     <field name="priority">99</field>
     <field name="type">form</field>
   </record>
-  <record id="odoo_studio_default__e4f59ec5-2713-4033-b7b0-e3b0e85a33b6" model="ir.ui.view">
+  <!-- <record id="odoo_studio_default__e4f59ec5-2713-4033-b7b0-e3b0e85a33b6" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
         <xpath expr="//list[1]" position="attributes">
@@ -1459,15 +1573,14 @@
         </xpath>
       </data>
     </field>
-    <field name="inherit_id" ref="default_list_view_fo_62ecbeef-9397-4032-9b25-469b8c8e9c4d"/>
+    <field name="inherit_id" ref="x_period_list_view"/>
     <field name="mode">extension</field>
     <field name="model">x_period</field>
     <field name="active" eval="True"/>
     <field name="name">x_period.list.condominium</field>
     <field name="priority">99</field>
     <field name="type">list</field>
-  </record>
-
+  </record> -->
   <record id="odoo_studio_condomin_b037142b-7612-4095-85cf-016fbc14b18e" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
@@ -1554,7 +1667,8 @@
       <list>
         <field name="x_studio_sequence" widget="handle"/>
         <field name="x_name"/>
-        <field name="x_studio_company_id" groups="base.group_multi_company"/>
+        <field name="x_studio_based_on" optional="show"/>
+        <field name="x_studio_meter" optional="show"/>
       </list>
     </field>
     <field name="model">x_distribution_key</field>
@@ -1565,7 +1679,10 @@
   <record id="default_form_view_fo_05ed18e5-7ade-46ff-bb7f-7020e9812caf" model="ir.ui.view">
     <field name="arch" type="xml">
       <form>
-        <header/>
+        <header>
+          <button string="Populate" name="%(action_populate_distribution_key)d" type="action" class="btn-primary" invisible="x_studio_based_on != &quot;Shares&quot;"/>
+          <button string="Compute Ratios" name="%(action_compute_distribution_key_ratios)d" type="action" invisible="x_studio_based_on != &quot;Shares&quot;"/>
+        </header>
         <sheet string="Distribution Key">
           <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
           <field name="x_active" invisible="1"/>
@@ -1576,9 +1693,24 @@
           </div>
           <group name="studio_group_ad492f">
             <group name="studio_group_ad492f_left">
+              <field name="x_studio_based_on" required="True"/>
+              <field name="x_studio_meter" options="{'create_name_field': 'x_name'}" invisible="x_studio_based_on != &quot;Meter Readings&quot;" force_save="0" readonly="False" required="x_studio_based_on == &quot;Meter Readings&quot;"/>
+            </group>
+            <group name="studio_group_ad492f_right">
               <field name="x_studio_company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
             </group>
-            <group name="studio_group_ad492f_right"/>
+            <field name="x_studio_ratio_ids" invisible="x_studio_based_on != &quot;Shares&quot;">
+              <list editable="bottom">
+                <field name="x_sequence" widget="handle"/>
+                <field name="x_studio_property" optional="show"/>
+                <field name="x_owner" strinng="Current Owner" optional="show"/>
+                <field name="x_building" optional="show"/>
+                <field name="x_type" optional="show"/>
+                <field name="x_floor" optional="show"/>
+                <field name="x_area" sum="Sum of Area" optional="show"/>
+                <field name="x_ratio" sum="Sum of Ratio" optional="show" options="{'digits':[6,2]}"/>
+              </list>
+            </field>
           </group>
         </sheet>
         <chatter/>
@@ -1603,7 +1735,7 @@
     <field name="name">x_distribution_key.search.condominium</field>
     <field name="type">search</field>
   </record>
-  <record id="odoo_studio_default__214161ff-2fbf-4a5e-8e17-44ccb8a2dbb7" model="ir.ui.view">
+  <!-- <record id="odoo_studio_default__214161ff-2fbf-4a5e-8e17-44ccb8a2dbb7" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
         <xpath expr="//form[1]/header[1]" position="inside">
@@ -1640,8 +1772,8 @@
     <field name="name">x_distribution_key.form.condominium</field>
     <field name="priority">99</field>
     <field name="type">form</field>
-  </record>
-  <record id="odoo_studio_default__d0c79897-97c1-474f-9a96-6087c436ab49" model="ir.ui.view">
+  </record> -->
+  <!-- <record id="odoo_studio_default__d0c79897-97c1-474f-9a96-6087c436ab49" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
         <xpath expr="//field[@name='x_studio_company_id']" position="replace">
@@ -1657,7 +1789,7 @@
     <field name="name">x_distribution_key.list.condominium</field>
     <field name="priority">99</field>
     <field name="type">list</field>
-  </record>
+  </record> -->
   <record id="default_list_view_fo_40ba5f92-72b6-40df-8826-0a2c1798c399" model="ir.ui.view">
     <field name="arch" type="xml">
       <list>
@@ -1819,7 +1951,7 @@
     <field name="priority">16000</field>
     <field name="type">form</field>
   </record>
-  <record id="default_list_view_fo_e16d1ddd-cdbf-49c5-8d89-7f05a10655d1" model="ir.ui.view">
+  <record id="x_calendar_event_line_a1bce_line_cce2e_list_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <list>
         <field name="x_studio_sequence" widget="handle"/>
@@ -1831,7 +1963,7 @@
     <field name="name">x_calendar_event_line_a1bce_line_cce2e.list.condominium</field>
     <field name="type">list</field>
   </record>
-  <record id="default_form_view_fo_ec0961c8-0c6f-4dfc-9990-e0da07c8d2b1" model="ir.ui.view">
+  <record id="x_calendar_event_line_a1bce_line_cce2e_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <form>
         <header/>
@@ -1853,7 +1985,7 @@
     <field name="name">x_calendar_event_line_a1bce_line_cce2e.form.condominium</field>
     <field name="type">form</field>
   </record>
-  <record id="default_search_view__c3de3ea9-ac05-4c09-8ecd-d5fde1f4ae8d" model="ir.ui.view">
+  <record id="x_calendar_event_line_a1bce_line_cce2e_search_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <search>
         <field name="x_name"/>
@@ -1864,7 +1996,7 @@
     <field name="name">x_calendar_event_line_a1bce_line_cce2e.search.condominium</field>
     <field name="type">search</field>
   </record>
-  <record id="default_list_view_fo_50bae836-54d8-4289-80e2-30937a6e7fb3" model="ir.ui.view">
+  <record id="x_calendar_event_line_a1bce_line_ea528_list_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <list>
         <field name="x_studio_sequence" widget="handle"/>
@@ -1876,7 +2008,7 @@
     <field name="name">x_calendar_event_line_a1bce_line_ea528.list.condominium</field>
     <field name="type">list</field>
   </record>
-  <record id="default_form_view_fo_8b7cb702-3ec0-443d-b8b5-600e1075afb1" model="ir.ui.view">
+  <record id="x_calendar_event_line_a1bce_line_ea528_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <form>
         <header/>
@@ -1898,7 +2030,7 @@
     <field name="name">x_calendar_event_line_a1bce_line_ea528.form.condominium</field>
     <field name="type">form</field>
   </record>
-  <record id="default_search_view__2a284cf6-111e-43ac-b394-4b2221079610" model="ir.ui.view">
+  <record id="x_calendar_event_line_a1bce_line_ea528_search_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <search>
         <field name="x_name"/>
@@ -1909,7 +2041,7 @@
     <field name="name">x_calendar_event_line_a1bce_line_ea528.search.condominium</field>
     <field name="type">search</field>
   </record>
-  <record id="default_list_view_fo_1672de8b-f784-43f6-9294-def1fa093b35" model="ir.ui.view">
+  <record id="x_calendar_event_line_a1bce_line_e3675_list_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <list>
         <field name="x_studio_sequence" widget="handle"/>
@@ -1921,7 +2053,7 @@
     <field name="name">x_calendar_event_line_a1bce_line_e3675.list.condominium</field>
     <field name="type">list</field>
   </record>
-  <record id="default_form_view_fo_0c42c9f9-7810-488b-89b8-1d053d16ffb2" model="ir.ui.view">
+  <record id="x_calendar_event_line_a1bce_line_e3675_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <form>
         <header/>
@@ -1943,7 +2075,7 @@
     <field name="name">x_calendar_event_line_a1bce_line_e3675.form.condominium</field>
     <field name="type">form</field>
   </record>
-  <record id="default_search_view__e2578b5d-b369-4b77-8498-322d24c9447f" model="ir.ui.view">
+  <record id="x_calendar_event_line_a1bce_line_e3675_search_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <search>
         <field name="x_name"/>
@@ -1954,7 +2086,7 @@
     <field name="name">x_calendar_event_line_a1bce_line_e3675.search.condominium</field>
     <field name="type">search</field>
   </record>
-  <record id="default_list_view_fo_6ce727c5-101e-454f-a44f-a94bc0bcefdd" model="ir.ui.view">
+  <record id="x_calendar_event_line_a1bce_line_89b1c_list_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <list>
         <field name="x_studio_sequence" widget="handle"/>
@@ -1966,7 +2098,7 @@
     <field name="name">x_calendar_event_line_a1bce_line_89b1c.list.condominium</field>
     <field name="type">list</field>
   </record>
-  <record id="default_form_view_fo_8a51bbc5-cd87-4a3e-8f56-aaf7f9ea5b3d" model="ir.ui.view">
+  <record id="x_calendar_event_line_a1bce_line_89b1c_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <form>
         <header/>
