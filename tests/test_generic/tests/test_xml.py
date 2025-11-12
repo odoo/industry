@@ -60,6 +60,7 @@ MODELS_TO_UPDATE = {
     "ir.actions.report",
     "ir.actions.server",
     "ir.cron",
+    "ir.embedded.actions",
     "ir.model",
     "ir.model.access",
     "ir.model.fields",
