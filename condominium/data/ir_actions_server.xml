@@ -174,7 +174,7 @@ for owner in env['res.partner'].search([('x_companies', 'in', record.company_id.
     for sol in record.order_line: # The lines are re-created using the distribution key and the analytic account corresponding to the property is set
         for distribution in distributions:
             if distribution['x_owner'].id == owner.id:
-                new_so_lines.append((0, 0, { 'order_id': record.id, 'product_id': sol.product_id.id, 'name': sol.name #+ '\n' + distribution.x_studio_property.x_name
+                new_so_lines.append((0, 0, { 'order_id': record.id, 'product_id': sol.product_id.id, 'name': sol.name #+ '\n' + distribution.x_property.x_name
                 , 'product_uom_qty': sol.product_uom_qty, 'product_uom_id': sol.product_uom_id.id,
                     'price_unit': sol.price_unit * distribution['x_ratio'] / total_distribution, 'tax_ids': sol.tax_ids, 'discount': sol.discount, 'analytic_distribution': {distribution.x_account.id: 100} }))
     new_so.write({'order_line': new_so_lines})
@@ -185,7 +185,7 @@ record['state'] = 'cancel'
         <field name="name">Condominium: Split SO per Owner</field>
     </record>
     <record id="action_server_set_usage_meter_reading" model="ir.actions.server">
-        <field name="code"><![CDATA[mrs = env['x_meter_reading'].search([('id', 'in', record.x_studio_property.x_meter_reading_ids.ids), ('x_meter_id', '=', record.x_meter_id.id)], order='x_date')
+        <field name="code"><![CDATA[mrs = env['x_meter_reading'].search([('id', 'in', record.x_property.x_meter_reading_ids.ids), ('x_meter_id', '=', record.x_meter_id.id)], order='x_date')
 previous_mr = False
 for mr in mrs:
     mr['x_usage'] = mr['x_quantity'] - previous_mr['x_quantity'] if previous_mr else 0
@@ -199,8 +199,8 @@ for mr in mrs:
     <record id="action_update_property_current_owner" model="ir.actions.server">
         <field name="code"><![CDATA[for line in record.x_property_id.x_owner_ids:
     if line.x_end_date == False: record['x_property_id']['x_current_owner'] = line.x_owner
-    account = env['account.analytic.account'].search([('x_studio_property','=',record.x_property_id.id),('partner_id','=',line.x_owner.id)])
-    if not account and line.x_owner.id: line['x_account'] = env['account.analytic.account'].create({ 'name': str(record.x_property_id.x_name) + " - " + str(line.x_owner.name), 'x_studio_property': record.x_property_id.id, 'partner_id': line.x_owner.id, 'x_owner_line': line.id}).id
+    account = env['account.analytic.account'].search([('x_property','=',record.x_property_id.id),('partner_id','=',line.x_owner.id)])
+    if not account and line.x_owner.id: line['x_account'] = env['account.analytic.account'].create({ 'name': str(record.x_property_id.x_name) + " - " + str(line.x_owner.name), 'x_property': record.x_property_id.id, 'partner_id': line.x_owner.id, 'x_owner_line': line.id}).id
 ]]>        </field>
         <field name="model_id" ref="model_x_property_line_owner"/>
         <field name="state">code</field>
@@ -329,7 +329,7 @@ else:
     if properties:
         total_distribution = sum(properties.mapped('x_area'))
         for property in properties:
-            if property.id not in distribution_key.x_ratio_ids.mapped('x_studio_property').ids: distribution_key.write({'x_ratio_ids': [(0, 0, {'x_distribution_key': distribution_key.id, 'x_studio_property': property.id, 'x_ratio': property.x_area / total_distribution * 100, })]})
+            if property.id not in distribution_key.x_ratio_ids.mapped('x_property').ids: distribution_key.write({'x_ratio_ids': [(0, 0, {'x_distribution_key': distribution_key.id, 'x_property': property.id, 'x_ratio': property.x_area / total_distribution * 100, })]})
 ]]>        </field>
         <field name="model_id" ref="model_x_distribution_key"/>
         <field name="state">code</field>
