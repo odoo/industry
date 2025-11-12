@@ -13,8 +13,9 @@
         'data/ir_ui_view.xml',
         'data/qweb_view.xml',
     ],
-    'demo': [],
     'license': 'OPL-1',
-    'cloc_exclude': [],
+    'cloc_exclude': [
+        'data/qweb_view.xml',
+    ],
     'website': "https://www.odoo.com/all-industries",
 }
