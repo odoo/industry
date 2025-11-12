@@ -23,6 +23,8 @@
         'data/ir_actions_act_window.xml',
         'data/ir_ui_view.xml',
         'data/ir_ui_menu.xml',
+        'data/mail_template.xml',
+        'data/qweb_view.xml',
     ],
     'demo': [
 
@@ -30,7 +32,7 @@
     'license': 'OPL-1',
     'author': 'Odoo S.A.',
     "cloc_exclude": [
-
+        'data/qweb_view.xml',
     ],
     'images': [],
 }
