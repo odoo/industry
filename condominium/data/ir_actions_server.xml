@@ -218,34 +218,34 @@ for mr in mrs:
         <field name="usage">base_automation</field>
     </record>
     <record id="action_populate_voters" model="ir.actions.server">
-        <field name="binding_model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
+        <field name="binding_model_id" ref="model_x_calendar_event_line_motion"/>
         <field name="code"><![CDATA[record['x_attendee_vote_ids'].unlink()
 voters = []
 for attendee in record.x_calendar_event_id.attendee_ids:
     if (attendee.x_attending or attendee.x_delegating) and attendee.partner_id.id not in list(map(lambda voter: voter.x_attendee.id, record.x_attendee_vote_ids)): voters.append({ 'x_attendee': attendee.partner_id.id, })
-record['x_attendee_vote_ids'] = env['x_calendar_event_line_a1bce_line_a3f04'].create(voters).ids
+record['x_attendee_vote_ids'] = env['x_calendar_event_line_motion_line_vote'].create(voters).ids
 
 ]]>        </field>
-        <field name="model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
+        <field name="model_id" ref="model_x_calendar_event_line_motion"/>
         <field name="state">code</field>
         <field name="name">Condominium: Populate Voters</field>
         <field name="usage">base_automation</field>
     </record>
     <record id="action_set_votes_as_all_against" model="ir.actions.server">
-        <field name="binding_model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
+        <field name="binding_model_id" ref="model_x_calendar_event_line_motion"/>
         <field name="code"><![CDATA[for attendee_vote in record.x_attendee_vote_ids: attendee_vote['x_vote'] = "Against"
 
 ]]>        </field>
-        <field name="model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
+        <field name="model_id" ref="model_x_calendar_event_line_motion"/>
         <field name="state">code</field>
         <field name="name">Condominium: Set Votes as All Against</field>
     </record>
     <record id="action_set_votes_as_all_favor" model="ir.actions.server">
-        <field name="binding_model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
+        <field name="binding_model_id" ref="model_x_calendar_event_line_motion"/>
         <field name="code"><![CDATA[for attendee_vote in record.x_attendee_vote_ids: attendee_vote['x_vote'] = "In Favor"
 
 ]]>        </field>
-        <field name="model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
+        <field name="model_id" ref="model_x_calendar_event_line_motion"/>
         <field name="state">code</field>
         <field name="name">Condominium: Set Votes as All In Favor</field>
     </record>
@@ -253,13 +253,13 @@ record['x_attendee_vote_ids'] = env['x_calendar_event_line_a1bce_line_a3f04'].cr
         <field name="binding_model_id" ref="calendar.model_calendar_event"/>
         <field name="model_id" ref="calendar.model_calendar_event"/>
         <field name="state">mail_post</field>
-        <field name="template_id" ref="mail_template_51"/>
+        <field name="template_id" ref="mail_template_3"/>
         <field name="name">Condominium: Send General Meeting Report</field>
     </record>
     <record id="action_send_general_meeting_agenda" model="ir.actions.server">
         <field name="binding_model_id" ref="calendar.model_calendar_event"/>
         <field name="model_id" ref="calendar.model_calendar_event"/>
-        <field name="template_id" ref="mail_template_52"/>
+        <field name="template_id" ref="mail_template_2"/>
         <field name="state">mail_post</field>
         <field name="name">Condominium: Send General Meeting Agenda</field>
     </record>
@@ -285,7 +285,7 @@ else:
     if record.x_distribution_key.x_based_on == "Shares" and ((record.x_period_start and record.x_period_end) or (not record.x_period_start and not record.x_period_end)):
         x_ratios = record.sudo().x_distribution_key.x_ratio_ids
         for ratio in x_ratios.filtered(lambda l: l.x_ratio != 0):
-            for account in ratio.x_studio_property.x_account_ids:
+            for account in ratio.x_property_ratios.x_account_ids:
                 if record.x_period_start and record.x_period_end:
                     if account.x_start_date <= record.x_period_end and (not account.x_end_date or record.x_period_start <= account.x_end_date):
                         if not account.x_end_date: analytic_distribution[account.id] = (record.x_period_end - max(account.x_start_date, record.x_period_start)).days * ratio.x_ratio
@@ -361,10 +361,10 @@ if server_action: server_action.run()]]></field>
         <field name="usage">base_automation</field>
     </record>
     <record id="action_create_task_from_motion" model="ir.actions.server">
-        <field name="binding_model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
+        <field name="binding_model_id" ref="model_x_calendar_event_line_motion"/>
         <field name="code"><![CDATA[customer_id = record.x_calendar_event_id.x_condominium.partner_id.id
 action = { 'type': 'ir.actions.act_window', 'name': 'Create Task', 'res_model': 'project.task', 'view_mode': 'form', 'view_type': 'form', 'target': 'new', 'context': { 'default_project_id': env['project.project'].search([('partner_id', '=', customer_id)]).id, 'default_name': record.x_name, 'default_user_ids': [env.user.id], 'default_partner_id': customer_id } }]]></field>
-        <field name="model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
+        <field name="model_id" ref="model_x_calendar_event_line_motion"/>
         <field name="state">code</field>
         <field name="name">Condominium: Create Task from Motion</field>
     </record>
