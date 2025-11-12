@@ -163,7 +163,7 @@ else:
     </record>
     <record id="ir_act_server_split_per_property" model="ir.actions.server">
         <field name="code"><![CDATA[
-    distributions = record.x_studio_distribution_key.x_studio_ratio_ids
+    distributions = record.x_distribution_key.x_ratio_ids
 total_distribution = sum(distributions.mapped('x_ratio'))
 if total_distribution == 0: raise UserError("Cannot split the Sales Orders because there is not distribution key total is null.")
 for owner in env['res.partner'].search([('x_companies', 'in', record.company_id.id)]):  # One SO per owner
@@ -176,7 +176,7 @@ for owner in env['res.partner'].search([('x_companies', 'in', record.company_id.
             if distribution['x_owner'].id == owner.id:
                 new_so_lines.append((0, 0, { 'order_id': record.id, 'product_id': sol.product_id.id, 'name': sol.name #+ '\n' + distribution.x_studio_property.x_name
                 , 'product_uom_qty': sol.product_uom_qty, 'product_uom_id': sol.product_uom_id.id,
-                    'price_unit': sol.price_unit * distribution['x_ratio'] / total_distribution, 'tax_ids': sol.tax_ids, 'discount': sol.discount, 'analytic_distribution': {distribution.x_studio_account.id: 100} }))
+                    'price_unit': sol.price_unit * distribution['x_ratio'] / total_distribution, 'tax_ids': sol.tax_ids, 'discount': sol.discount, 'analytic_distribution': {distribution.x_account.id: 100} }))
     new_so.write({'order_line': new_so_lines})
 record['state'] = 'cancel'
 ]]>        </field>
@@ -185,7 +185,7 @@ record['state'] = 'cancel'
         <field name="name">Condominium: Split SO per Owner</field>
     </record>
     <record id="action_server_set_usage_meter_reading" model="ir.actions.server">
-        <field name="code"><![CDATA[mrs = env['x_meter_reading'].search([('id', 'in', record.x_studio_property.x_studio_meter_reading_ids.ids), ('x_meter_id', '=', record.x_meter_id.id)], order='x_date')
+        <field name="code"><![CDATA[mrs = env['x_meter_reading'].search([('id', 'in', record.x_studio_property.x_meter_reading_ids.ids), ('x_meter_id', '=', record.x_meter_id.id)], order='x_date')
 previous_mr = False
 for mr in mrs:
     mr['x_usage'] = mr['x_quantity'] - previous_mr['x_quantity'] if previous_mr else 0
@@ -197,33 +197,33 @@ for mr in mrs:
         <field name="name">Condominium: Compute Meter Reading Consumption</field>
     </record>
     <record id="action_update_property_current_owner" model="ir.actions.server">
-        <field name="code"><![CDATA[for line in record.x_property_id.x_studio_owner_ids:
-    if line.x_studio_end_date == False: record['x_property_id']['x_studio_current_owner'] = line.x_studio_owner
-    account = env['account.analytic.account'].search([('x_studio_property','=',record.x_property_id.id),('partner_id','=',line.x_studio_owner.id)])
-    if not account and line.x_studio_owner.id: line['x_studio_account'] = env['account.analytic.account'].create({ 'name': str(record.x_property_id.x_name) + " - " + str(line.x_studio_owner.name), 'x_studio_property': record.x_property_id.id, 'partner_id': line.x_studio_owner.id, 'x_studio_owner_line': line.id}).id
+        <field name="code"><![CDATA[for line in record.x_property_id.x_owner_ids:
+    if line.x_end_date == False: record['x_property_id']['x_current_owner'] = line.x_owner
+    account = env['account.analytic.account'].search([('x_studio_property','=',record.x_property_id.id),('partner_id','=',line.x_owner.id)])
+    if not account and line.x_owner.id: line['x_account'] = env['account.analytic.account'].create({ 'name': str(record.x_property_id.x_name) + " - " + str(line.x_owner.name), 'x_studio_property': record.x_property_id.id, 'partner_id': line.x_owner.id, 'x_owner_line': line.id}).id
 ]]>        </field>
-        <field name="model_id" ref="property_line_58f38056-6793-42e3-8f7a-f3db6e3da145"/>
+        <field name="model_id" ref="model_x_property_line_owner"/>
         <field name="state">code</field>
         <field name="name">Condominium: Update Property Current Owner</field>
         <field name="usage">base_automation</field>
     </record>
     <record id="action_archive_related_accounts" model="ir.actions.server">
-        <field name="code"><![CDATA[for owner in record.x_studio_owner_ids:
-    if owner.x_studio_account: owner['x_studio_account']['active'] = False
+        <field name="code"><![CDATA[for owner in record.x_owner_ids:
+    if owner.x_account: owner['x_account']['active'] = False
 
 ]]>        </field>
-        <field name="model_id" ref="property_9abd67e7-492e-4fac-9aef-812e565e196e"/>
+        <field name="model_id" ref="model_x_property"/>
         <field name="state">code</field>
         <field name="name">Condominium: Archive related accounts</field>
         <field name="usage">base_automation</field>
     </record>
     <record id="action_populate_voters" model="ir.actions.server">
         <field name="binding_model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
-        <field name="code"><![CDATA[record['x_studio_attendee_vote_ids'].unlink()
+        <field name="code"><![CDATA[record['x_attendee_vote_ids'].unlink()
 voters = []
 for attendee in record.x_calendar_event_id.attendee_ids:
-    if (attendee.x_studio_attending or attendee.x_studio_delegating) and attendee.partner_id.id not in list(map(lambda voter: voter.x_studio_attendee.id, record.x_studio_attendee_vote_ids)): voters.append({ 'x_studio_attendee': attendee.partner_id.id, })
-record['x_studio_attendee_vote_ids'] = env['x_calendar_event_line_a1bce_line_a3f04'].create(voters).ids
+    if (attendee.x_attending or attendee.x_delegating) and attendee.partner_id.id not in list(map(lambda voter: voter.x_attendee.id, record.x_attendee_vote_ids)): voters.append({ 'x_attendee': attendee.partner_id.id, })
+record['x_attendee_vote_ids'] = env['x_calendar_event_line_a1bce_line_a3f04'].create(voters).ids
 
 ]]>        </field>
         <field name="model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
@@ -233,7 +233,7 @@ record['x_studio_attendee_vote_ids'] = env['x_calendar_event_line_a1bce_line_a3f
     </record>
     <record id="action_set_votes_as_all_against" model="ir.actions.server">
         <field name="binding_model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
-        <field name="code"><![CDATA[for attendee_vote in record.x_studio_attendee_vote_ids: attendee_vote['x_studio_vote'] = "Against"
+        <field name="code"><![CDATA[for attendee_vote in record.x_attendee_vote_ids: attendee_vote['x_vote'] = "Against"
 
 ]]>        </field>
         <field name="model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
@@ -242,7 +242,7 @@ record['x_studio_attendee_vote_ids'] = env['x_calendar_event_line_a1bce_line_a3f
     </record>
     <record id="action_set_votes_as_all_favor" model="ir.actions.server">
         <field name="binding_model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
-        <field name="code"><![CDATA[for attendee_vote in record.x_studio_attendee_vote_ids: attendee_vote['x_studio_vote'] = "In Favor"
+        <field name="code"><![CDATA[for attendee_vote in record.x_attendee_vote_ids: attendee_vote['x_vote'] = "In Favor"
 
 ]]>        </field>
         <field name="model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
@@ -276,34 +276,34 @@ def findClosestMeterReading(date, meter_readings):
             if closest_mr.x_date < mr.x_date: closest_mr = mr
     return closest_mr
 
-if not record.x_studio_distribution_key:
+if not record.x_distribution_key:
     # raise UserError("A distribution key is required to distribute costs to accounts.")
     for aml in record.invoice_line_ids: aml['analytic_distribution'] = {}
 else:
     analytic_distribution = {}
     # Key distribution
-    if record.x_studio_distribution_key.x_studio_based_on == "Shares" and ((record.x_studio_period_start and record.x_studio_period_end) or (not record.x_studio_period_start and not record.x_studio_period_end)):
-        x_ratios = record.sudo().x_studio_distribution_key.x_studio_ratio_ids
+    if record.x_distribution_key.x_based_on == "Shares" and ((record.x_period_start and record.x_period_end) or (not record.x_period_start and not record.x_period_end)):
+        x_ratios = record.sudo().x_distribution_key.x_ratio_ids
         for ratio in x_ratios.filtered(lambda l: l.x_ratio != 0):
-            for account in ratio.x_studio_property.x_studio_account_ids:
-                if record.x_studio_period_start and record.x_studio_period_end:
-                    if account.x_studio_start_date <= record.x_studio_period_end and (not account.x_studio_end_date or record.x_studio_period_start <= account.x_studio_end_date):
-                        if not account.x_studio_end_date: analytic_distribution[account.id] = (record.x_studio_period_end - max(account.x_studio_start_date, record.x_studio_period_start)).days * ratio.x_ratio
-                        else: analytic_distribution[account.id] = (account.x_studio_end_date - max(account.x_studio_start_date, record.x_studio_period_start)).days * ratio.x_ratio
+            for account in ratio.x_studio_property.x_account_ids:
+                if record.x_period_start and record.x_period_end:
+                    if account.x_start_date <= record.x_period_end and (not account.x_end_date or record.x_period_start <= account.x_end_date):
+                        if not account.x_end_date: analytic_distribution[account.id] = (record.x_period_end - max(account.x_start_date, record.x_period_start)).days * ratio.x_ratio
+                        else: analytic_distribution[account.id] = (account.x_end_date - max(account.x_start_date, record.x_period_start)).days * ratio.x_ratio
                 else:
                     if account.partner_id.id == ratio.x_owner.id: analytic_distribution[account.id] = ratio.x_ratio
     # Meter distribution
-    if record.x_studio_distribution_key.x_studio_based_on == "Meter Readings" and record.x_studio_period_start and record.x_studio_period_end:
+    if record.x_distribution_key.x_based_on == "Meter Readings" and record.x_period_start and record.x_period_end:
         for property in env['x_property'].search([]):
-            meter_reading_ids = [item for item in property.x_studio_meter_reading_ids if item.x_meter_id.id == record.x_studio_distribution_key.x_studio_meter.id]
+            meter_reading_ids = [item for item in property.x_meter_reading_ids if item.x_meter_id.id == record.x_distribution_key.x_meter.id]
             if len(meter_reading_ids) >= 2:
-                billstart = findClosestMeterReading(record.x_studio_period_start, meter_reading_ids)
-                billend = findClosestMeterReading(record.x_studio_period_end, meter_reading_ids)
-                for account in property.x_studio_account_ids:
-                    mrostart = findClosestMeterReading(account.x_studio_start_date, meter_reading_ids)
+                billstart = findClosestMeterReading(record.x_period_start, meter_reading_ids)
+                billend = findClosestMeterReading(record.x_period_end, meter_reading_ids)
+                for account in property.x_account_ids:
+                    mrostart = findClosestMeterReading(account.x_start_date, meter_reading_ids)
                     if mrostart.x_date < billstart.x_date: mrostart = billstart
-                    if account.x_studio_end_date:
-                        mroend = findClosestMeterReading(account.x_studio_end_date, meter_reading_ids)
+                    if account.x_end_date:
+                        mroend = findClosestMeterReading(account.x_end_date, meter_reading_ids)
                         if billend.x_date < mroend.x_date: mroend = billend
                     else: mroend = billend
                     if not (billend.x_date < mrostart.x_date or billend.x_date < mroend.x_date) and mrostart.x_date != mroend.x_date:
@@ -323,24 +323,24 @@ else:
         <field name="name">Condominium: Distribute Costs</field>
     </record>
     <record id="action_populate_distribution_key" model="ir.actions.server">
-        <field name="binding_model_id" ref="distribution_key_ebf70cee-4475-4921-a5f1-85e747bc5842"/>
+        <field name="binding_model_id" ref="model_x_distribution_key"/>
         <field name="code"><![CDATA[for distribution_key in records:
-    properties = env['x_property'].search([('x_studio_company_id', 'in', record.x_studio_company_id.id)])
+    properties = env['x_property'].search([('x_company_id', 'in', record.x_company_id.id)])
     if properties:
-        total_distribution = sum(properties.mapped('x_studio_area'))
+        total_distribution = sum(properties.mapped('x_area'))
         for property in properties:
-            if property.id not in distribution_key.x_studio_ratio_ids.mapped('x_studio_property').ids: distribution_key.write({'x_studio_ratio_ids': [(0, 0, {'x_distribution_key': distribution_key.id, 'x_studio_property': property.id, 'x_ratio': property.x_studio_area / total_distribution * 100, })]})
+            if property.id not in distribution_key.x_ratio_ids.mapped('x_studio_property').ids: distribution_key.write({'x_ratio_ids': [(0, 0, {'x_distribution_key': distribution_key.id, 'x_studio_property': property.id, 'x_ratio': property.x_area / total_distribution * 100, })]})
 ]]>        </field>
-        <field name="model_id" ref="distribution_key_ebf70cee-4475-4921-a5f1-85e747bc5842"/>
+        <field name="model_id" ref="model_x_distribution_key"/>
         <field name="state">code</field>
         <field name="name">Condominium: Populate Distribution Key</field>
     </record>
     <record id="action_compute_distribution_key_ratios" model="ir.actions.server">
-        <field name="binding_model_id" ref="distribution_key_ebf70cee-4475-4921-a5f1-85e747bc5842"/>
+        <field name="binding_model_id" ref="model_x_distribution_key"/>
         <field name="code"><![CDATA[for distribution_key in records:
-    total_distribution = sum(distribution_key.x_studio_ratio_ids.mapped('x_area'))
-    for ratio in distribution_key.x_studio_ratio_ids: ratio['x_ratio'] = ratio.x_area / total_distribution * 100]]></field>
-        <field name="model_id" ref="distribution_key_ebf70cee-4475-4921-a5f1-85e747bc5842"/>
+    total_distribution = sum(distribution_key.x_ratio_ids.mapped('x_area'))
+    for ratio in distribution_key.x_ratio_ids: ratio['x_ratio'] = ratio.x_area / total_distribution * 100]]></field>
+        <field name="model_id" ref="model_x_distribution_key"/>
         <field name="state">code</field>
         <field name="name">Compute Distribution Key Ratios</field>
     </record>
@@ -362,7 +362,7 @@ if server_action: server_action.run()]]></field>
     </record>
     <record id="action_create_task_from_motion" model="ir.actions.server">
         <field name="binding_model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
-        <field name="code"><![CDATA[customer_id = record.x_calendar_event_id.x_studio_condominium.partner_id.id
+        <field name="code"><![CDATA[customer_id = record.x_calendar_event_id.x_condominium.partner_id.id
 action = { 'type': 'ir.actions.act_window', 'name': 'Create Task', 'res_model': 'project.task', 'view_mode': 'form', 'view_type': 'form', 'target': 'new', 'context': { 'default_project_id': env['project.project'].search([('partner_id', '=', customer_id)]).id, 'default_name': record.x_name, 'default_user_ids': [env.user.id], 'default_partner_id': customer_id } }]]></field>
         <field name="model_id" ref="calendar_event_line_c0871dc9-8843-41a1-8c07-bbfd5c053508"/>
         <field name="state">code</field>
