@@ -1,107 +1,21 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-  <record id="industry_harvest_and_transfer_server_action" model="ir.actions.server">
-    <field name="code"><![CDATA[dest_location = env['stock.location'].search([('complete_name', '=', 'WH/Stock')], limit=1)
-if not dest_location:
-    raise UserError("Destination location not found (WH/Stock).")
-    
-# Confirm harvest 
-record.action_confirm()
-
-# Match inputs and set as done
-record['qty_producing'] = record.product_qty
-record.action_generate_serial()
-record.button_mark_done()
-
-# Create a picking
-picking = env['stock.picking'].create({
-    'picking_type_id': env.ref('stock.picking_type_internal').id,
-    'location_id': record.location_dest_id.id,
-    'location_dest_id': dest_location.id,
-    'origin': record.name,
-    'move_type': 'direct',
-})
-
-# Add stock moves for the finished products
-for move in record.move_finished_ids.filtered(lambda m: m.product_id.type == 'product'):
-    env['stock.move'].create({
-        'name': move.product_id.display_name,
-        'product_id': move.product_id.id,
-        'product_uom_qty': move.quantity_done,
-        'product_uom': move.product_uom.id,
-        'location_id': record.location_dest_id.id,
-        'location_dest_id': dest_location.id,
-        'picking_id': picking.id,
-    })
-
-# Confirm, assign and validate the picking
-picking.action_confirm()
-picking.action_assign()
-picking.button_validate()
-
-
-]]></field>
-    <field name="model_id" ref="mrp.model_mrp_production"/>
-    <field name="state">code</field>
-    <field name="name">Harvest and transfer</field>
-    <field name="usage">base_automation</field>
-  </record>
   <record id="industry_check_harvest_is_from_harvest_location_server_action" model="ir.actions.server">
-    <field name="code"><![CDATA[if record.picking_type_id.x_is_harvest and not record.location_id.x_harvest_location:
-    raise UserError ("Source location shall be eligible for harvest.")]]></field>
-    <field name="model_id" ref="stock.model_stock_picking"/>
-    <field name="state">code</field>
     <field name="name">Check Harvest Is From Harvest Location</field>
-    <field name="usage">base_automation</field>
-  </record>
-  <record id="industry_create_lot_on_validation_server_action" model="ir.actions.server">
-    <field name="code"><![CDATA[
-for picking in records:
-    for ml in picking.move_line_ids:
-        product = ml.product_id
-
-        if not product or product.tracking != 'lot':
-            continue
-
-        if not ml.lot_id:
-            serial = env['ir.sequence'].next_by_code('auto.lot.serial')
-            lot = env['stock.lot'].create({
-                'name': serial,
-                'product_id': product.id,
-                'company_id': picking.company_id.id,
-            })
-            ml.write({'lot_id': lot.id})
-    ]]></field>
-    <!-- <field name="code"><![CDATA[
-generated_serial = env['ir.sequence'].next_by_code('auto.lot.serial')
-prefix = generated_serial.split('-')[0] + '-'
-existing_lots = set(
-    env['stock.lot'].search([
-        ('name', 'like', prefix + '%')
-    ]).mapped('name')
-)
-
-for picking in records:
-    for ml in picking.move_line_ids:
-        product = ml.product_id
-        if not product or product.tracking != 'lot':
-            continue
-
-        if not ml.lot_id:
-            serial = generated_serial
-            while serial in existing_lots:
-                serial = env['ir.sequence'].next_by_code('auto.lot.serial')
-
-            lot = env['stock.lot'].create({
-                'name': serial,
-                'product_id': product.id,
-                'company_id': picking.company_id.id,
-            })
-            ml.write({'lot_id': lot.id})
-    ]]></field> -->
     <field name="model_id" ref="stock.model_stock_picking"/>
-    <field name="state">code</field>
-    <field name="name">Action for Assign Serial</field>
     <field name="usage">base_automation</field>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[if record.picking_type_id.x_is_harvest and not record.location_id.x_is_harvest:
+  raise UserError ("Source location shall be eligible for harvest.")
+for picking in records:
+  for ml in picking.move_line_ids.filtered(lambda line: line.product_id and line.product_id.tracking == 'lot' and not line.lot_id):
+    serial = env['ir.sequence'].next_by_code('auto.lot.serial')
+    lot = env['stock.lot'].create({
+        'name': serial,
+        'product_id': ml.product_id.id,
+        'company_id': picking.company_id.id,
+    })
+    ml.write({'lot_id': lot.id})
+    ]]></field>
   </record>
 </odoo>

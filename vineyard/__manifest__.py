@@ -11,7 +11,6 @@
         'excise_management',
         'hr_sign',
         'industry_fsm_sale_report',
-        'industry_fsm_stock',
         'knowledge',
         'mrp_plm',
         'pos_enterprise',
@@ -19,7 +18,6 @@
         'project_purchase',
         'quality_mrp',
         'sale_planning',
-        'web_studio',
         'website_appointment_sale_project',
     ],
     'data': [
