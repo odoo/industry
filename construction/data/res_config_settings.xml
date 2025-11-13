@@ -1,7 +1,24 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <function name="button_immediate_install" model="ir.module.module" eval="[ref('base.module_web_studio', raise_if_not_found=False)]"/>
-    <record id="x_setting_field_line_numbering" model="ir.model.fields">
+    <!-- <function name="button_immediate_install" model="ir.module.module" eval="[ref('base.module_web_studio', raise_if_not_found=False)]"/> -->
+    <record id="config_parameter_enable_progress_management" model="ir.config_parameter">
+        <field name="key">construction_configuration.enable_progress_management</field>
+        <field name="value">0</field>
+    </record>
+
+    <record id="x_setting_field_progress_management" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Progress Management</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="name">x_setting_progress_management</field>
+        <field name="readonly" eval="False"/>
+        <field name="store" eval="True"/>
+        <field name="compute"><![CDATA[
+self['x_setting_progress_management'] = self.env['ir.config_parameter'].sudo().get_param('construction_configuration.enable_progress_management', '0') != '0' or bool(self.env['ir.module.module'].search_count([('name', '=', 'construction_progress_management')], limit=1))
+]]></field>
+    </record>
+
+    <!-- <record id="x_setting_field_line_numbering" model="ir.model.fields">
         <field name="ttype">boolean</field>
         <field name="field_description">Line Numbering</field>
         <field name="model_id" ref="base_setup.model_res_config_settings"/>
@@ -23,7 +40,7 @@ self['x_setting_line_numbering'] = self.env['ir.config_parameter'].sudo().get_pa
         <field name="compute"><![CDATA[
 self['x_setting_work_items'] = self.env['ir.config_parameter'].sudo().get_param('construction_configuration.enable_work_items') or bool(self.env['ir.module.module'].search_count([('name', '=', 'construction_work_items')], limit=1))
 ]]></field>
-    </record>
+    </record> -->
 
     <record id="res_config_settings_view_form" model="ir.ui.view">
         <field name="name">res.config.settings.view.form.inherit.construction</field>
@@ -32,30 +49,62 @@ self['x_setting_work_items'] = self.env['ir.config_parameter'].sudo().get_param(
         <field name="active" eval="True"/>
         <field name="inherit_id" ref="sale.res_config_settings_view_form" />
         <field name="arch" type="xml">
-            <xpath expr="//form" position="inside" >
+            <xpath expr="//form" position="inside">
                 <app string="Construction" name="construction">
                     <block title="Quotations &amp; Orders" name="quotations_setting_container">
-                        <setting id="construction_custom_line_numbering" help="Display line number in sale orders and invoices for more clarity with your customers">
+                        <setting id="construction_custom_progress_management" help="">
+                            <field name="x_setting_progress_management" readonly="0"/>
+                        </setting>
+                        <!-- <setting id="construction_custom_line_numbering" help="Display line number in sale orders and invoices for more clarity with your customers">
                             <field name="x_setting_line_numbering" readonly="0"/>
                         </setting>
                         <setting id="construction_custom_work_items" help="Adjust work item pricing and secure your margin straight from quotations based on components.">
                             <field name="x_setting_work_items" readonly="0"/>
-                        </setting>
+                        </setting> -->
                     </block>
                 </app>
             </xpath>
             <xpath expr="//block[@name='quotation_order_setting_container']" position="inside">
-                <setting id="sales_custom_line_numbering" help="Display line number in sale orders and invoices for more clarity with your customers">
+                <setting id="sales_custom_progress_management" help="">
+                    <field name="x_setting_progress_management" readonly="0"/>
+                </setting>
+                <!-- <setting id="sales_custom_line_numbering" help="Display line number in sale orders and invoices for more clarity with your customers">
                     <field name="x_setting_line_numbering" readonly="0"/>
-                </setting>
-                <setting id="sales_custom_work_items" help="Adjust work item pricing and secure your margin straight from quotations based on components.">
+                </setting> -->
+                <!-- <setting id="sales_custom_work_items" help="Adjust work item pricing and secure your margin straight from quotations based on components.">
                     <field name="x_setting_work_items" readonly="0"/>
-                </setting>
+                </setting> -->
             </xpath>
         </field>
     </record>
 
-    <record id="x_action_activate_line_numbering" model="ir.actions.server">
+    <record id="x_action_set_enable_progress_management" model="ir.actions.server">
+        <field name="code"><![CDATA[
+setting_set = env['ir.config_parameter'].sudo().get_param('construction_configuration.enable_progress_management', '0') != '0'
+if not (module := env['ir.module.module'].search([('name', '=', 'construction_progress_management')], limit=1)) and not setting_set and record.x_setting_progress_management:
+    env['ir.config_parameter'].sudo().set_param('construction_configuration.enable_progress_management', '1')
+    record['module_industry_fsm_report'] = True
+elif module and setting_set and not record.x_setting_progress_management:
+    env['ir.config_parameter'].sudo().set_param('construction_configuration.enable_progress_management', '0')
+]]></field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="state">code</field>
+        <field name="name">Set progress management parameter</field>
+    </record>
+    <record id="x_action_activate_progress_management" model="ir.actions.server">
+        <field name="code"><![CDATA[
+setting_set = env['ir.config_parameter'].sudo().get_param('construction_configuration.enable_progress_management', '0') != '0'
+if not (module := env['ir.module.module'].search([('name', '=', 'construction_progress_management')], limit=1)) and setting_set:
+    action_window = env['ir.module.module'].with_context({'module_name': 'construction_progress_management', 'data_module': True}).button_immediate_install_app()
+    env['base.import.module'].with_context(action_window.get('context')).browse(action_window['res_id']).import_module()
+elif module and not setting_set:
+    module.button_immediate_uninstall()
+]]></field>
+        <field name="model_id" ref="base.model_ir_config_parameter"/>
+        <field name="state">code</field>
+        <field name="name">(Un-)Install Progress Management</field>
+    </record>
+    <!-- <record id="x_action_activate_line_numbering" model="ir.actions.server">
         <field name="code"><![CDATA[installed = env['ir.config_parameter'].sudo().get_param('construction_configuration.enable_line_numbering')
 if not (module := env['ir.module.module'].search([('name', '=', 'construction_line_numbering')], limit=1)) and not installed and record.x_setting_line_numbering:
     action_window = env['ir.module.module'].with_context({'module_name': 'construction_line_numbering'}).button_immediate_install_app()
@@ -82,10 +131,24 @@ elif module and installed and not record.x_setting_work_items:
         <field name="model_id" ref="base_setup.model_res_config_settings"/>
         <field name="state">code</field>
         <field name="name">(Un-)Install Work Items</field>
-    </record>
+    </record> -->
 
     <function name="button_immediate_install" model="ir.module.module" eval="[ref('base.module_web_studio', raise_if_not_found=False)]"/>
-    <record id="x_setting_activate_line_numbering" model="base.automation">
+    <record id="x_setting_activate_progress_management" model="base.automation">
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('x_action_set_enable_progress_management')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Activate progress management setting</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_setting_field_progress_management')])]"/>
+    </record>
+    <record id="x_setting_set_enable_progress_management" model="base.automation">
+        <field name="model_id" ref="base.model_ir_config_parameter"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('x_action_activate_progress_management')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Install progress management module</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('base.field_ir_config_parameter__value')])]"/>
+    </record>
+    <!-- <record id="x_setting_activate_line_numbering" model="base.automation">
         <field name="model_id" ref="base_setup.model_res_config_settings"/>
         <field name="action_server_ids" eval="[(6, 0, [ref('x_action_activate_line_numbering')])]"/>
         <field name="trigger">on_create_or_write</field>
@@ -98,8 +161,31 @@ elif module and installed and not record.x_setting_work_items:
         <field name="trigger">on_create_or_write</field>
         <field name="name">Activate Work Items setting</field>
         <field name="trigger_field_ids" eval="[(6, 0, [ref('x_setting_field_work_items')])]"/>
-    </record>
+    </record> -->
     <function name="button_immediate_uninstall" model="ir.module.module" eval="[ref('base.module_web_studio', raise_if_not_found=False)]"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <data noupdate="1">
         <record id="res_config_construction" model="res.config.settings">
