@@ -11,6 +11,9 @@
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
     ],
+    'demo': [
+        'demo/sale_order_post.xml',
+    ],
     'license': 'OPL-1',
     'author': 'Odoo S.A.',
 }
