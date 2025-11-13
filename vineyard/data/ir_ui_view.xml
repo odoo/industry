@@ -4,7 +4,7 @@
     <field name="arch" type="xml">
       <data>
         <xpath expr="//field[@name='replenish_location']" position="after">
-          <field name="x_harvest_location"/>
+          <field name="x_is_harvest"/>
         </xpath>
       </data>
     </field>
@@ -69,7 +69,7 @@
     <field name="arch" type="xml">
       <data>
         <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/field[@name='picking_type_id']" position="after">
-          <field name="location_id" hidden="not x_is_harvest" domain="[(&quot;x_harvest_location&quot;, &quot;!=&quot;, False)]"/>
+          <field name="location_id" hidden="not x_is_harvest" domain="[(&quot;x_is_harvest&quot;, &quot;!=&quot;, False)]"/>
         </xpath>
       </data>
     </field>
@@ -97,11 +97,6 @@
         <xpath expr="//field[@name='user_id']" position="after">
           <xpath expr="//field[@name='state']" position="move"/>
         </xpath>
-        <!-- <xpath expr="//field[@name='scheduled_date']" position="attributes">
-          <attribute name="invisible"/>
-          <attribute name="readonly"/>
-          <attribute name="widget"/>
-        </xpath> -->
         <xpath expr="//field[@name='date_done']" position="attributes">
           <attribute name="optional">show</attribute>
         </xpath>
@@ -121,11 +116,6 @@
         <xpath expr="//field[@name='product_id']" position="replace">
           <field name="date" type="col"/>
         </xpath>
-        <!-- <xpath expr="//graph[1]" position="attributes">
-          <attribute name="order">asc</attribute>
-          <attribute name="stacked">0</attribute>
-          <attribute name="type">line</attribute>
-        </xpath> -->
         <xpath expr="//field[@name='location_dest_id'][not(ancestor::field)]" position="replace">
           <field name="location_id" type="col"/>
         </xpath>
@@ -163,22 +153,6 @@
     <field name="active" eval="True"/>
     <field name="type">list</field>
   </record>
-  <!-- <record id="mrp_bom_tree_view_inherit" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <data>
-        <xpath expr="//list[1]" position="attributes">
-          <attribute name="default_order">code asc</attribute>
-        </xpath>
-      </data>
-    </field>
-    <field name="inherit_id" ref="mrp.mrp_bom_tree_view"/>
-    <field name="mode">extension</field>
-    <field name="model">mrp.bom</field>
-    <field name="name">mrp.bom.list</field>
-    <field name="priority">99</field>
-    <field name="active" eval="True"/>
-    <field name="type">list</field>
-  </record> -->
   <record id="stock_move_search_view_inherit" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
@@ -390,7 +364,7 @@
       <xpath expr="//filter[@name='in_location']" position="replace">
         <filter name="in_location"
             string="Internal"
-            domain="['|', ('usage', '=', 'internal'), ('x_harvest_location', '!=', False)]"
+            domain="['|', ('usage', '=', 'internal'), ('x_is_harvest', '!=', False)]"
             help="Internal Locations"/>
       </xpath>
     </field>
