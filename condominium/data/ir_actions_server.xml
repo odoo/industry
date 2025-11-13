@@ -78,7 +78,7 @@ for original_id, values in note_details.items():
         </p>
         """
     new_analytic_item.browse(original_id).write({"x_notes": note_html.strip(), "amount": 0.0,})
-            ]]></field>
+            ]]>        </field>
     </record>
     <record id="split_analytic_item_action" model="ir.actions.server">
         <field name="name">Split</field>
@@ -156,14 +156,13 @@ else:
         'logo': record.image_1920,
     })
     action = {'type': 'ir.actions.client', 'tag': 'reload'}
-    ]]></field>
+    ]]>        </field>
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="state">code</field>
         <field name="name">Condomnium: Create Condominium</field>
     </record>
     <record id="ir_act_server_split_per_property" model="ir.actions.server">
-        <field name="code"><![CDATA[
-    distributions = record.x_distribution_key.x_ratio_ids
+        <field name="code"><![CDATA[distributions = record.x_distribution_key.x_ratio_ids
 total_distribution = sum(distributions.mapped('x_ratio'))
 if total_distribution == 0: raise UserError("Cannot split the Sales Orders because there is not distribution key total is null.")
 for owner in env['res.partner'].search([('x_companies', 'in', record.company_id.id)]):  # One SO per owner
@@ -190,7 +189,6 @@ previous_mr = False
 for mr in mrs:
     mr['x_usage'] = mr['x_quantity'] - previous_mr['x_quantity'] if previous_mr else 0
     previous_mr = mr
-
         ]]>        </field>
         <field name="model_id" ref="model_meter_reading"/>
         <field name="state">code</field>
@@ -198,7 +196,7 @@ for mr in mrs:
     </record>
     <record id="action_update_property_current_owner" model="ir.actions.server">
         <field name="code"><![CDATA[for line in record.x_property_id.x_owner_ids:
-    if line.x_end_date == False: record['x_property_id']['x_current_owner'] = line.x_owner
+    if not line.x_end_date: record['x_property_id']['x_current_owner'] = line.x_owner
     account = env['account.analytic.account'].search([('x_property','=',record.x_property_id.id),('partner_id','=',line.x_owner.id)])
     if not account and line.x_owner.id: line['x_account'] = env['account.analytic.account'].create({ 'name': str(record.x_property_id.x_name) + " - " + str(line.x_owner.name), 'x_property': record.x_property_id.id, 'partner_id': line.x_owner.id, 'x_owner_line': line.id}).id
 ]]>        </field>
@@ -210,7 +208,6 @@ for mr in mrs:
     <record id="action_archive_related_accounts" model="ir.actions.server">
         <field name="code"><![CDATA[for owner in record.x_owner_ids:
     if owner.x_account: owner['x_account']['active'] = False
-
 ]]>        </field>
         <field name="model_id" ref="model_x_property"/>
         <field name="state">code</field>
@@ -223,8 +220,7 @@ for mr in mrs:
 voters = []
 for attendee in record.x_calendar_event_id.attendee_ids:
     if (attendee.x_attending or attendee.x_delegating) and attendee.partner_id.id not in list(map(lambda voter: voter.x_attendee.id, record.x_attendee_vote_ids)): voters.append({ 'x_attendee': attendee.partner_id.id, })
-record['x_attendee_vote_ids'] = env['x_calendar_event_line_motion_line_vote'].create(voters).ids
-
+if voters: record['x_attendee_vote_ids'] = env['x_calendar_event_line_motion_line_vote'].create(voters).ids
 ]]>        </field>
         <field name="model_id" ref="model_x_calendar_event_line_motion"/>
         <field name="state">code</field>
@@ -234,7 +230,6 @@ record['x_attendee_vote_ids'] = env['x_calendar_event_line_motion_line_vote'].cr
     <record id="action_set_votes_as_all_against" model="ir.actions.server">
         <field name="binding_model_id" ref="model_x_calendar_event_line_motion"/>
         <field name="code"><![CDATA[for attendee_vote in record.x_attendee_vote_ids: attendee_vote['x_vote'] = "Against"
-
 ]]>        </field>
         <field name="model_id" ref="model_x_calendar_event_line_motion"/>
         <field name="state">code</field>
@@ -243,7 +238,6 @@ record['x_attendee_vote_ids'] = env['x_calendar_event_line_motion_line_vote'].cr
     <record id="action_set_votes_as_all_favor" model="ir.actions.server">
         <field name="binding_model_id" ref="model_x_calendar_event_line_motion"/>
         <field name="code"><![CDATA[for attendee_vote in record.x_attendee_vote_ids: attendee_vote['x_vote'] = "In Favor"
-
 ]]>        </field>
         <field name="model_id" ref="model_x_calendar_event_line_motion"/>
         <field name="state">code</field>
