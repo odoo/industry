@@ -1,20 +1,20 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-  <record id="stock_model_stock_location_x_harvest_location_field" model="ir.model.fields">
+  <record id="stock_location_is_harvest" model="ir.model.fields">
     <field name="ttype">boolean</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Harvest Location</field>
     <field name="model_id" ref="stock.model_stock_location"/>
-    <field name="name">x_harvest_location</field>
-    </record>
-  <record id="stock_model_stock_picking_type_x_is_harvest_field" model="ir.model.fields">
+    <field name="name">x_is_harvest</field>
+  </record>
+  <record id="stock_picking_type_is_harvest" model="ir.model.fields">
     <field name="ttype">boolean</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Is Harvest</field>
     <field name="model_id" ref="stock.model_stock_picking_type"/>
     <field name="name">x_is_harvest</field>
-    </record>
-  <record id="stock_model_stock_picking_x_is_harvest_field" model="ir.model.fields">
+  </record>
+  <record id="stock_picking_is_harvest" model="ir.model.fields">
     <field name="ttype">boolean</field>
     <field name="related">picking_type_id.x_is_harvest</field>
     <field name="field_description">Is Harvest</field>
@@ -23,7 +23,7 @@
     <field name="readonly" eval="True"/>
     <field name="store" eval="False"/>
   </record>
-  <record id="quality_model_quality_check_x_recipe_iteration_field" model="ir.model.fields">
+  <record id="quality_check_recipe_iteration" model="ir.model.fields">
     <field name="ttype">many2one</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Recipe Iteration</field>
@@ -31,18 +31,20 @@
     <field name="name">x_recipe_iteration</field>
     <field name="relation">mrp.eco</field>
   </record>
-  <record id="mrp_plm_model_mrp_eco_x_recipe_iteration_quality_check_count_field" model="ir.model.fields">
-    <field name="compute"><![CDATA[
-for record in self: record['x_recipe_iteration_quality_check_count'] = self.env['quality.check'].search_count([('x_recipe_iteration', '=', record.id)])
-]]></field>
+  <record id="mrp_eco_recipe_iteration_quality_check_count" model="ir.model.fields">
     <field name="ttype">integer</field>
     <field name="field_description">Recipe Iteration count</field>
     <field name="model_id" ref="mrp_plm.model_mrp_eco"/>
     <field name="name">x_recipe_iteration_quality_check_count</field>
     <field name="selectable" eval="False"/>
     <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[
+check_data = self.env['quality.check']._read_group(domain=[('x_recipe_iteration', 'in', self.ids)], groupby=['x_recipe_iteration'], aggregates=['__count'])
+mapped_data = {eco.id: count for eco, count in check_data}
+for eco in self: eco['x_recipe_iteration_quality_check_count'] = mapped_data.get(eco.id, 0)
+    ]]></field>
   </record>
-  <record id="quality_model_quality_check_x_control_point_title_field" model="ir.model.fields">
+  <record id="quality_check_control_point_title" model="ir.model.fields">
     <field name="ttype">char</field>
     <field name="related">point_id.title</field>
     <field name="field_description">Control Point Title</field>
@@ -51,14 +53,14 @@ for record in self: record['x_recipe_iteration_quality_check_count'] = self.env[
     <field name="readonly" eval="True"/>
     <field name="store" eval="False"/>
   </record>
-  <record id="x_project_task_worksheet_template_1_ir_model_fields_7" model="ir.model.fields" forcecreate="1">
+  <record id="project_task_worksheet_template_1_ir_model_1_comments" model="ir.model.fields" forcecreate="1">
     <field name="ttype">html</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Comments</field>
     <field name="model_id" ref="x_project_task_worksheet_template_1_ir_model_1"/>
     <field name="name">x_comments</field>
-    </record>
-  <record id="x_project_task_worksheet_template_1_ir_model_fields_9" model="ir.model.fields" forcecreate="1">
+  </record>
+  <record id="project_task_worksheet_template_1_ir_model_1_project_task_id" model="ir.model.fields" forcecreate="1">
     <field name="ttype">many2one</field>
     <field name="copied" eval="True"/>
     <field name="field_description">Task</field>
@@ -68,11 +70,11 @@ for record in self: record['x_recipe_iteration_quality_check_count'] = self.env[
     <field name="relation">project.task</field>
     <field name="required" eval="True"/>
   </record>
-  <record id="x_project_task_worksheet_template_1_ir_model_fields_8" model="ir.model.fields" forcecreate="1">
+  <record id="project_task_worksheet_template_1_ir_model_1_name" model="ir.model.fields" forcecreate="1">
     <field name="ttype">char</field>
     <field name="related">x_project_task_id.name</field>
     <field name="field_description">Name</field>
     <field name="model_id" ref="x_project_task_worksheet_template_1_ir_model_1"/>
     <field name="name">x_name</field>
-    </record>
+  </record>
 </odoo>
