@@ -14,7 +14,6 @@
         'project_sms',
         'sale_crm',
         'sale_purchase',
-        'stock_landed_costs',
         'web_studio',
         'website_crm',
         'website_helpdesk_knowledge',
