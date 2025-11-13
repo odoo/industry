@@ -4,6 +4,7 @@
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
+        # 
         'appointment_crm',
         'base_automation',
         'base_industry_data',
