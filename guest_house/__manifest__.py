@@ -1,11 +1,12 @@
 {
     'name': 'Guest House',
-    'version': '1.4',
+    'version': '1.5',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
         'base_industry_data',
         'booking_engine',
+        'web_studio',
     ],
     'data': [
         'data/product_template.xml',
@@ -16,8 +17,10 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/ir_ui_menu.xml',
+        'data/ir_ui_view.xml',
         'data/product_pricing.xml',
         'data/website_view.xml',
+        'data/res_config_settings.xml',
     ],
     'demo': [
         'demo/hr_employee.xml',
@@ -27,6 +30,7 @@
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
+        'demo/planning_slot_post.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
         'demo/website.xml',
