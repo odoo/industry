@@ -1,19 +1,202 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<odoo noupdate="1">
-    <record model="res.config.settings" id="res_config_settings_enable">
-        <field name="group_discount_per_so_line" eval="1"/>
-        <field name="group_product_pricelist" eval="1"/>
-        <field name="portal_confirmation_pay" eval="1"/>
-        <field name="group_product_variant" eval="1"/>
-        <field name="show_line_subtotals_tax_selection">tax_included</field>
-        <field name="add_to_cart_action">go_to_cart</field>
-        <field name="automatic_invoice" eval="1"/>
-        <field name="group_uom" eval="1"/>
-        <field name="tz" model="res.config.settings" eval="obj().env.context.get('tz') or 'Europe/Brussels'"/>
+<odoo>
+    <data noupdate="1">
+        <record model="res.config.settings" id="res_config_settings_enable">
+            <field name="group_discount_per_so_line" eval="1"/>
+            <field name="group_product_pricelist" eval="1"/>
+            <field name="portal_confirmation_pay" eval="1"/>
+            <field name="group_product_variant" eval="1"/>
+            <field name="show_line_subtotals_tax_selection">tax_included</field>
+            <field name="add_to_cart_action">go_to_cart</field>
+            <field name="automatic_invoice" eval="1"/>
+            <field name="group_uom" eval="1"/>
+            <field name="tz" model="res.config.settings" eval="obj().env.context.get('tz') or 'Europe/Brussels'"/>
+        </record>
+        <function name="write" model="res.config.settings">
+            <value eval="[ref('res_config_settings_enable')]"/>
+            <value model="res.company" eval="{'account_price_include': 'tax_included'} if not obj().env.company._existing_accounting() else {}"/>
+        </function>
+        <function model="res.config.settings" name="execute" eval="[ref('res_config_settings_enable')]"/>
+    </data>
+
+    <!-- House Keeping -->
+    <!-- Module setting -->
+    <record id="x_setting_field_house_keeping" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">House Keeping</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="name">x_module_house_keeping</field>
+        <field name="store" eval="True"/>
+        <field name="compute"><![CDATA[
+self['x_module_house_keeping'] = self.env.user.has_group('booking_engine.group_house_keeping')
+]]></field>
     </record>
-    <function name="write" model="res.config.settings">
-        <value eval="[ref('res_config_settings_enable')]"/>
-        <value model="res.company" eval="{'account_price_include': 'tax_included'} if not obj().env.company._existing_accounting() else {}"/>
+    <record id="x_action_activate_house_keeping" model="ir.actions.server">
+        <field name="code"><![CDATA[
+env.ref('base.group_user')._apply_group(env.ref('booking_engine.group_house_keeping'))
+for to_unarchive in [
+    'automation_on_check_in',
+    'automation_on_check_out',
+    'automation_on_task_stage_clean',
+    'automation_on_task_stage_ready',
+    'automation_on_task_stage_modified',
+    'ir_cron_room_update',
+]:
+    env.ref(f'booking_engine.{to_unarchive}')['active'] = True
+for cloc_entry in [
+    'x_ongoing_task_id_field_resource_resource',
+    'x_is_in_stage_clean_field_resource_resource',
+    'x_cleaning_color_field_project_task',
+    'x_occupancy_color_field_resource_resource',
+    'server_action_set_resources_occupied',
+    'server_action_set_resources_vacant',
+    'server_action_set_task_ready_if_no_approvers',
+    'server_action_check_has_right_to_approve_tasks',
+    'server_action_update_rooms',
+]:
+    if (cloc_entry_id := env.ref(f'__cloc_exclude__.booking_engine_{cloc_entry}', raise_if_not_found=False)):
+        entry_model = 'ir.actions.server' if cloc_entry.startswith('server_action') else 'ir.model.fields'
+        env['ir.model.data'].search([
+            ('name', '=', f'booking_engine_{cloc_entry}'),
+            ('model', '=', entry_model),
+            ('module', '=', '__cloc_exclude__'),
+            ('res_id', '=', cloc_entry_id.id),
+        ], limit=1).unlink()
+]]></field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="state">code</field>
+        <field name="name">Install House Keeping</field>
+    </record>
+    <record id="x_action_deactivate_house_keeping" model="ir.actions.server">
+        <field name="code"><![CDATA[
+env.ref('base.group_user')._remove_group(env.ref('booking_engine.group_house_keeping'))
+for to_archive in [
+    'automation_on_check_in',
+    'automation_on_check_out',
+    'automation_on_task_stage_clean',
+    'automation_on_task_stage_ready',
+    'automation_on_task_stage_modified',
+    'ir_cron_room_update',
+]:
+    env.ref(f'booking_engine.{to_archive}')['active'] = False
+for cloc_entry in [
+    'x_ongoing_task_id_field_resource_resource',
+    'x_is_in_stage_clean_field_resource_resource',
+    'x_cleaning_color_field_project_task',
+    'x_occupancy_color_field_resource_resource',
+    'server_action_set_resources_occupied',
+    'server_action_set_resources_vacant',
+    'server_action_set_task_ready_if_no_approvers',
+    'server_action_check_has_right_to_approve_tasks',
+    'server_action_update_rooms',
+]:
+    cloc_exclude_id = f'booking_engine_{cloc_entry}'
+    entry_model = 'ir.actions.server' if cloc_entry.startswith('server_action') else 'ir.model.fields'
+    if (cloc_entry_id := env.ref(f'booking_engine.{cloc_entry}', raise_if_not_found=False)) and not env.ref(f'__cloc_exclude__.{cloc_exclude_id}', raise_if_not_found=False):
+        env['ir.model.data'].create({
+            'name': cloc_exclude_id,
+            'model': entry_model,
+            'module': '__cloc_exclude__',
+            'res_id': cloc_entry_id.id,
+        })
+]]></field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="state">code</field>
+        <field name="name">Uninstall House Keeping</field>
+    </record>
+
+    <record id="base_automation_on_house_keeping_setting_set" model="base.automation">
+        <field name="name">Activate House Keeping</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('x_action_activate_house_keeping')])]"/>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="on_change_field_ids" eval="[(6, 0, [ref('x_setting_field_house_keeping')])]"/>
+        <field name="filter_domain">[('x_module_house_keeping', '=', True)]</field>
+        <field name="trigger">on_create_or_write</field>
+    </record>
+    <record id="base_automation_on_house_keeping_setting_unset" model="base.automation">
+        <field name="name">Deactivate House Keeping</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('x_action_deactivate_house_keeping')])]"/>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="on_change_field_ids" eval="[(6, 0, [ref('x_setting_field_house_keeping')])]"/>
+        <field name="filter_domain">[('x_module_house_keeping', '=', False)]</field>
+        <field name="trigger">on_create_or_write</field>
+    </record>
+
+    <!-- Approvers Settings-->
+    <record id="x_setting_field_approvers" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Approvers</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="name">x_setting_approvers</field>
+        <field name="store" eval="True"/>
+        <field name="compute"><![CDATA[
+self['x_setting_approvers'] = self.env['ir.config_parameter'].get_bool('booking_engine.x_approvers_setting', False)
+]]></field>
+    </record>
+    <record id="x_setting_field_approver_users_ids" model="ir.model.fields">
+        <field name="ttype">many2many</field>
+        <field name="relation">res.users</field>
+        <field name="field_description">Users</field>
+        <field name="model_id" ref="base.model_res_company"/>
+        <field name="name">x_setting_approver_users_ids</field>
+    </record>
+    <record id="x_setting_related_field_approver_users_ids" model="ir.model.fields">
+        <field name="ttype">many2many</field>
+        <field name="relation">res.users</field>
+        <field name="store" eval="False"/>
+        <field name="related">company_id.x_setting_approver_users_ids</field>
+        <field name="field_description">Users</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="name">x_setting_related_approver_users_ids</field>
+    </record>
+
+    <record id="server_action_set_x_setting_approvers" model="ir.actions.server">
+        <field name="name">HouseKeeping: Set approvers setting</field>
+        <field name="code"><![CDATA[
+env['ir.config_parameter'].set_bool('booking_engine.x_approvers_setting', (True if record.x_setting_approvers else False))
+]]></field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="state">code</field>
+    </record>
+    <record id="automation_on_x_setting_approvers_set" model="base.automation">
+        <field name="name">HouseKeeping: On approvers setting set</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_set_x_setting_approvers')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_setting_field_approvers')])]"/>
+    </record>
+
+    <record id="res_config_settings_form_view_inherited" model="ir.ui.view">
+        <field name="name">res.config.settings.form.view.inherited.booking.engine</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="40"/>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Accomodation" name="accomodation">
+                    <block title="House Keeping" name="house_keeping_config_block">
+                        <setting id="booking_engine_house_keeping_setting" help="Access cleanness state and manage tasks.">
+                            <field name="x_module_house_keeping"/>
+                            <div class="row mt-2" invisible="not x_module_house_keeping">
+                                <field name="x_setting_approvers" class="col flex-grow-0 ml16 mr0 pe-2"/>
+                                <div class="col ps-0">
+                                    <label for="x_setting_approvers"/>
+                                    <div class="text-muted">Approval process to accept house keeping tasks.</div>
+                                    <div class="mt16" invisible="not x_setting_approvers">
+                                        <label for="x_setting_related_approver_users_ids" class="o_light_label mr16"/>
+                                        <field name="x_setting_related_approver_users_ids" class="oe_inline" widget="many2many_tags"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <function name="run" model="ir.actions.server" context="{'active_model': 'res.config.settings', 'active_id': ref('res_config_settings_enable')}">
+        <value eval="[ref('x_action_activate_house_keeping')]"/>
     </function>
-    <function model="res.config.settings" name="execute" eval="[ref('res_config_settings_enable')]"/>
 </odoo>
