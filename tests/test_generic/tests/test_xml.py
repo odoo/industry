@@ -93,6 +93,22 @@ ESCAPE_STUDIO_TEST = [
     'construction',
 ]
 
+SKIP_CONTEXT_DICT_FOR_DEMO = {
+    'crm.lead': 'mail_auto_subscribe_no_notify',
+    'event.event': 'mail_auto_subscribe_no_notify',
+    'hr.job': 'mail_auto_subscribe_no_notify',
+    'mailing.mailing': 'mail_auto_subscribe_no_notify',
+    'project.project': 'mail_auto_subscribe_no_notify',
+    'project.task': 'mail_auto_subscribe_no_notify',
+    'stock.picking': 'skip_sms',
+}
+CONTEXT_MODELS_DICT = {
+    'calendar.event': 'no_mail_to_attendees',
+    'helpdesk.ticket': 'mail_notrack',
+    'hr.applicant': 'mail_notrack',
+    **SKIP_CONTEXT_DICT_FOR_DEMO
+}
+
 
 @tagged('post_install', '-at_install')
 class TestEnv(IndustryCase):
@@ -153,6 +169,7 @@ class TestEnv(IndustryCase):
                 self._check_dates_are_relative(tree, file_name)
                 self._check_static_values_in_inputs(tree, file_name)
                 self._check_res_config_setting(tree)
+                self._check_context_to_stop_mail_sending(tree, file_name, module)
                 if root.split('/')[-1] == 'data':
                     self._check_view_active(tree, file_name)
                     self._check_is_published_false(tree, file_name)
@@ -571,4 +588,30 @@ class TestEnv(IndustryCase):
                     href,
                     file_name,
                     line,
+                )
+
+    def _check_context_to_stop_mail_sending(self, root, file_name, module):
+        for record in root.xpath("//record"):
+            model_name = record.get('model')
+            if not model_name or model_name not in CONTEXT_MODELS_DICT:
+                continue
+            record_context = record.get('context') or ''
+            expected_context = CONTEXT_MODELS_DICT.get(model_name)
+            if model_name in SKIP_CONTEXT_DICT_FOR_DEMO:
+                record_xml_id = record.get('id') if "." in record.get('id') else module + '.' + record.get('id')
+                recordset = self.env.ref(record_xml_id) if record_xml_id else False
+                if recordset:
+                    user = getattr(recordset, 'user_id', False)
+                    if not user or user.notification_type == 'inbox':
+                        continue
+
+            context_dict = literal_eval(record_context) if record_context else {}
+            if expected_context not in context_dict:
+                _logger.warning(
+                    "Context should be used in file '%s' for model '%s' to prevent mail pollution. "
+                    "Expected context: '%s'. Found context: %s",
+                    file_name,
+                    model_name,
+                    expected_context,
+                    record_context or 'None'
                 )
