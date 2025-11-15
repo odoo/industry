@@ -8,7 +8,8 @@
         <field name="model_id" ref="x_stock_history_model"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-for sq in env['stock.quant'].search([('location_id.usage', '=', 'internal'), ('inventory_quantity_auto_apply', '&gt;', 0.0)]):
+for sq in env['stock.quant'].search([('location_id.usage', '=', 'internal')]):
+    if sq.inventory_quantity_auto_apply <= 0.0: continue
     sh = env['x_stock_history'].create({
         'x_date': datetime.datetime.today().date(),
         'x_history_owner_id': sq.product_tmpl_id.x_owner_id.id,
