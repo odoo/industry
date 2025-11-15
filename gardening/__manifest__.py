@@ -1,6 +1,5 @@
 {
     'name': 'Gardening',
-    'version': '1.0',
     'category': 'Construction',
     'depends': [
         'industry_fsm_sale_report',

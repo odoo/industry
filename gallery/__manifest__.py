@@ -1,6 +1,5 @@
 {
     'name': 'Gallery',
-    'version': '1.0',
     'category': 'Retail',
     'depends': [
         'base_industry_data',

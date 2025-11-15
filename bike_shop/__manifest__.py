@@ -1,6 +1,5 @@
 {
     'name': 'Bike Shop',
-    'version': '1.0',
     'category': 'Retail',
     'author': 'Odoo S.A.',
     'depends': [

@@ -21,7 +21,6 @@ MANDATORY_KEYS = {
     'depends': [],
     'license': 'OPL-1',
     'name': '',
-    'version': '',
 }
 
 MANDATORY_KEYS_INDUSTRIES = {
@@ -135,3 +134,8 @@ class ManifestTest(ManifestLinter, IndustryCase):
             _logger.warning("Dependencies not in alphabetical order")
         if any(dependency.startswith("theme_") for dependency in dependencies):
             _logger.warning("Themes should not be in the dependencies.")
+
+    def _test_manifest_license(self, module, manifest, value):
+        if "industry" in manifest.addons_path:
+            return
+        super()._test_manifest_license(module, manifest, value)

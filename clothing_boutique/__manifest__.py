@@ -1,6 +1,5 @@
 {
     'name': 'Clothing Store',
-    'version': '1.0',
     'category': 'Retail',
     'depends': [
         'knowledge',

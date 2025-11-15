@@ -1,6 +1,5 @@
 {
     'name': 'Construction Progress Management',
-    'version': '1.0',
     'category': 'Hidden/Tools',
     'depends': [
         'base_industry_data',

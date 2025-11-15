@@ -1,6 +1,5 @@
 {
     'name': 'Cleaning Services',
-    'version': '1.0',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [

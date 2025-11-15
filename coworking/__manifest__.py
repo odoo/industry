@@ -1,6 +1,5 @@
 {
     'name': 'Coworking',
-    'version': '1.0',
     'category': 'Service',
     'author': 'Odoo S.A.',
     'depends': [

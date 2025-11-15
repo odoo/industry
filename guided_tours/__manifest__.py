@@ -1,6 +1,5 @@
 {
     'name': 'Guided Tours',
-    'version': '1.0',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [

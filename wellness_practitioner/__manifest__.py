@@ -1,6 +1,5 @@
 {
     'name': 'Wellness Practitioner',
-    'version': '1.0',
     'category': 'Health and Fitness',
     'depends': [
         'appointment_account_payment',
