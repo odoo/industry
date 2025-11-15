@@ -1,6 +1,5 @@
 {
     'name': 'Machine & Tools Rental',
-    'version': '1.0',
     'category': 'Construction',
     'author': 'Odoo S.A.',
     'depends': [

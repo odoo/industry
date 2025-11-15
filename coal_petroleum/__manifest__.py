@@ -1,6 +1,5 @@
 {
     'name': 'Fossil Fuel Trading',
-    'version': '1.0',
     'category': 'Supply Chain',
     'depends': [
         'account_asset',

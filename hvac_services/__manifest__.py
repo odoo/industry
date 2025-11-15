@@ -1,6 +1,5 @@
 {
     'name': 'HVAC Services',
-    'version': '1.0',
     'category': 'Services',
     'depends': [
         'appointment_account_payment',

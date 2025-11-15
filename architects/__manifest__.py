@@ -1,6 +1,5 @@
 {
     'name': 'Architecture Firm',
-    'version': '1.0',
     'category': 'Services',
     'depends': [
         'account_followup',

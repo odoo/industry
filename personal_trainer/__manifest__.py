@@ -1,6 +1,5 @@
 {
     'name': 'Personal Trainer',
-    'version': '1.0',
     'category': 'Health and Fitness',
     'depends': [
         'appointment_hr',
