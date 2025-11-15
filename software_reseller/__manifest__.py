@@ -1,6 +1,5 @@
 {
     'name': 'Software Reseller',
-    'version': '1.0',
     'category': 'Services',
     'depends': [
         'knowledge',

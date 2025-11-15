@@ -1,6 +1,5 @@
 {
     'name': 'Photography',
-    'version': '1.0',
     'category': 'Services',
     'depends': [
         'crm',

@@ -1,6 +1,5 @@
 {
     'name': 'Sports Club',
-    'version': '1.0',
     'category': 'Health and Fitness',
     'depends': [
         'appointment_crm',

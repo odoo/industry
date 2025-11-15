@@ -1,6 +1,5 @@
 {
     'name': 'Arts & Crafts Store',
-    'version': '1.0',
     'category': 'Retail',
     'depends': [
         'knowledge',

@@ -1,6 +1,5 @@
 {
     'name': 'Billboard Rental',
-    'version': '1.0',
     'category': 'Services',
     'depends': [
         'hr',

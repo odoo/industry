@@ -1,6 +1,5 @@
 {
     'name': 'Surveying & Mapping',
-    'version': '1.0',
     'category': 'Services',
     'depends': [
         'base_automation',

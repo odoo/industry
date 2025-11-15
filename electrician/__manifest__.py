@@ -1,6 +1,5 @@
 {
     'name': 'Electricians',
-    'version': '1.0',
     'category': 'Services',
     'depends': [
         'appointment',

@@ -1,6 +1,5 @@
 {
     'name': 'Toy Store',
-    'version': '1.0',
     'category': 'Retail',
     'depends': [
         'hr',

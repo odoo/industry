@@ -1,6 +1,5 @@
 {
     'name': 'Fast Food',
-    'version': '1.0',
     'category': 'Hospitality',
     'depends': [
         'account_followup',

@@ -1,6 +1,5 @@
 {
     'name': 'Bike Leasing',
-    'version': '1.0',
     'category': 'Services',
     'depends': [
         'base_automation',

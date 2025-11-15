@@ -1,6 +1,5 @@
 {
     'name': 'Construction',
-    'version': '1.0',
     'category': 'Construction',
     'depends': [
         'base_industry_data',

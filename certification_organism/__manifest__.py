@@ -1,6 +1,5 @@
 {
     'name': 'Audit & Certification',
-    'version': '1.0',
     'category': 'Services',
     'depends': [
         'crm',
