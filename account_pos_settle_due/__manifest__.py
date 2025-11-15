@@ -1,6 +1,5 @@
 {
     'name': 'Account - Point of Sale Settle Due',
-    'version': '1.0',
     'category': 'Point of Sale',
     'author': 'Odoo S.A.',
     'depends': [

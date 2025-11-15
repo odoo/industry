@@ -1,6 +1,5 @@
 {
     'name': 'Pharmacy',
-    'version': '1.0',
     'category': 'Health and Fitness',
     'depends': [
         'calendar',

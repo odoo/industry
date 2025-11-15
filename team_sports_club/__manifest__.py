@@ -1,6 +1,5 @@
 {
     'name': 'Team Sports Club',
-    'version': '1.0',
     'category': 'Health & Fitness',
     'author': 'Odoo S.A.',
     'depends': [

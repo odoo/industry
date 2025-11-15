@@ -21,7 +21,6 @@ MANDATORY_KEYS = {
     'depends': [],
     'license': 'OPL-1',
     'name': '',
-    'version': '',
 }
 
 MANDATORY_KEYS_INDUSTRIES = {
@@ -53,6 +52,9 @@ class ManifestTest(ManifestLinter, IndustryCase):
         fake_Manifest = Manifest(path=get_industry_path() + 'test/test_generic', manifest_content=manifest_data)
         self._test_manifest_keys(fake_Manifest)
         self._test_manifest_values(fake_Manifest)
+        version = manifest_data.get("version")
+        if version is not None:
+            self.assertNotEqual(version, "1.0", "Don't define default version value in the manifest.")
         self.assertNotIn('description', manifest_data, "Module description should be defined in /static/description/index.html, not in the manifest.")
         mandatory_keys = MANDATORY_KEYS.copy()
         if (is_industry := module in self.installed_industries):
@@ -135,3 +137,8 @@ class ManifestTest(ManifestLinter, IndustryCase):
             _logger.warning("Dependencies not in alphabetical order")
         if any(dependency.startswith("theme_") for dependency in dependencies):
             _logger.warning("Themes should not be in the dependencies.")
+
+    def _test_manifest_license(self, module, manifest, value):
+        if "industry" in manifest.addons_path:
+            return
+        super()._test_manifest_license(module, manifest, value)

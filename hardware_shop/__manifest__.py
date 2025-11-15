@@ -1,6 +1,5 @@
 {
     'name': 'Hardware Store',
-    'version': '1.0',
     'category': 'Retail',
     'depends': [
         'barcodes',

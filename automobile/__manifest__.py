@@ -1,6 +1,5 @@
 {
     'name': 'Automobile Spare Parts',
-    'version': '1.0',
     'category': 'Retail',
     'depends': [
         'account_check_printing',
