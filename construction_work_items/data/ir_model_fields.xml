@@ -20,12 +20,6 @@
         <field name="field_description">Sequence</field>
         <field name="model_id" ref="x_work_item_model"/>
     </record>
-    <record id="x_quantity_field_x_work_item" model="ir.model.fields">
-        <field name="name">x_quantity</field>
-        <field name="ttype">float</field>
-        <field name="field_description">Quantity</field>
-        <field name="model_id" ref="x_work_item_model"/>
-    </record>
     <record id="x_is_template_field_x_work_item" model="ir.model.fields">
         <field name="name">x_is_template</field>
         <field name="ttype">boolean</field>
@@ -38,7 +32,6 @@
         <field name="field_description">Sale Order Line</field>
         <field name="model_id" ref="x_work_item_model"/>
         <field name="relation">sale.order.line</field>
-        <field name="on_delete">cascade</field>
     </record>
     <record id="x_product_id_field_x_work_item" model="ir.model.fields">
         <field name="name">x_product_id</field>
@@ -56,6 +49,7 @@
         <field name="model_id" ref="x_work_item_model"/>
         <field name="relation">uom.uom</field>
         <field name="related">x_product_id.uom_id</field>
+        <field name="store" eval="False"/>
     </record>
     <record id="x_reference_field_x_work_item" model="ir.model.fields">
         <field name="name">x_reference</field>
@@ -63,6 +57,7 @@
         <field name="field_description">Reference</field>
         <field name="model_id" ref="x_work_item_model"/>
         <field name="related">x_product_id.default_code</field>
+        <field name="store" eval="False"/>
     </record>
     <record id="x_currency_id_field_x_work_item" model="ir.model.fields">
         <field name="name">x_currency_id</field>
@@ -71,6 +66,8 @@
         <field name="model_id" ref="x_work_item_model"/>
         <field name="related">x_product_id.currency_id</field>
         <field name="relation">res.currency</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
     </record>
     <record id="x_targeted_so_field_x_work_item" model="ir.model.fields">
         <field name="name">x_targeted_so</field>
@@ -93,6 +90,8 @@
         <field name="field_description">Work Item</field>
         <field name="model_id" ref="x_work_item_line_model"/>
         <field name="relation">x_work_item</field>
+        <field name="required" eval="True"/>
+        <field name="on_delete">restrict</field>
     </record>
     <record id="x_sequence_field_x_work_item_line" model="ir.model.fields">
         <field name="name">x_sequence</field>
@@ -130,6 +129,8 @@
         <field name="model_id" ref="x_work_item_line_model"/>
         <field name="related">x_product_id.currency_id</field>
         <field name="relation">res.currency</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
     </record>
     <record id="x_unit_cost_field_x_work_item_line" model="ir.model.fields">
         <field name="name">x_unit_cost</field>
@@ -147,9 +148,9 @@
     </record>
     <record id="x_margin_field_x_work_item_line" model="ir.model.fields">
         <field name="name">x_margin</field>
-        <field name="compute"><![CDATA[for record in self:
-        if record.x_unit_price > 0 : record['x_margin'] = (record.x_unit_price - record.x_unit_cost) / record.x_unit_price
-        else: record['x_margin'] = False]]></field>
+        <field name="compute"><![CDATA[
+for record in self: record['x_margin'] = (record.x_unit_price - record.x_unit_cost) / record.x_unit_price if record.x_unit_price > 0 else False
+]]></field>
         <field name="ttype">float</field>
         <field name="depends">x_unit_price, x_unit_cost</field>
         <field name="field_description">Margin</field>
@@ -162,7 +163,7 @@
     <record id="x_work_item_line_ids_field_x_work_item" model="ir.model.fields">
         <field name="name">x_work_item_line_ids</field>
         <field name="ttype">one2many</field>
-        <field name="field_description">New Lines</field>
+        <field name="field_description">Work Item Lines</field>
         <field name="model_id" ref="x_work_item_model"/>
         <field name="relation">x_work_item_line</field>
         <field name="relation_field">x_work_item_id</field>
@@ -170,41 +171,38 @@
     </record>
     <record id="x_unit_cost_field_x_work_item" model="ir.model.fields">
         <field name="name">x_unit_cost</field>
-        <field name="compute"><![CDATA[for record in self:
-        total = 0
-        for line in record.x_work_item_line_ids:
-            total += line.x_unit_cost * line.x_quantity
-        record['x_unit_cost'] = total / record.x_quantity]]></field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_unit_cost'] = sum(line.x_unit_cost * line.x_quantity for line in record.x_work_item_line_ids)
+]]></field>
         <field name="ttype">monetary</field>
-        <field name="depends">x_work_item_line_ids, x_quantity</field>
+        <field name="depends">x_work_item_line_ids</field>
         <field name="field_description">Unit Cost</field>
         <field name="model_id" ref="x_work_item_model"/>
         <field name="readonly" eval="True"/>
         <field name="selectable" eval="False"/>
-        <field name="store" eval="False"/>
         <field name="currency_field">x_currency_id</field>
     </record>
     <record id="x_unit_price_field_x_work_item" model="ir.model.fields">
         <field name="name">x_unit_price</field>
-        <field name="compute"><![CDATA[for record in self:
-        total = 0
-        for line in record.x_work_item_line_ids:
-            total += line.x_unit_price * line.x_quantity
-        record['x_unit_price'] = total / record.x_quantity]]></field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_unit_price'] = sum(line.x_unit_price * line.x_quantity for line in record.x_work_item_line_ids)
+]]></field>
         <field name="ttype">monetary</field>
-        <field name="depends">x_work_item_line_ids, x_quantity</field>
+        <field name="depends">x_work_item_line_ids</field>
         <field name="field_description">Unit Price</field>
         <field name="model_id" ref="x_work_item_model"/>
         <field name="readonly" eval="True"/>
         <field name="selectable" eval="False"/>
-        <field name="store" eval="False"/>
         <field name="currency_field">x_currency_id</field>
     </record>
     <record id="x_unit_margin_field_x_work_item" model="ir.model.fields">
         <field name="name">x_unit_margin</field>
-        <field name="compute"><![CDATA[for record in self:
-        if record.x_unit_price > 0 : record['x_unit_margin'] = (record.x_unit_price - record.x_unit_cost) / record.x_unit_price
-        else: record['x_unit_margin'] = False]]></field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_unit_margin'] = (record.x_unit_price - record.x_unit_cost) / record.x_unit_price if record.x_unit_price > 0 else False
+]]></field>
         <field name="ttype">float</field>
         <field name="depends">x_unit_price,x_unit_cost</field>
         <field name="field_description">Unit Margin</field>
@@ -237,12 +235,6 @@
         <field name="name">x_work_item_product_line</field>
         <field name="relation">sale.order.line</field>
     </record>
-    <record id="x_is_work_item_line_field_sale_order_line" model="ir.model.fields">
-        <field name="ttype">boolean</field>
-        <field name="field_description">Is Work Item Line</field>
-        <field name="model_id" ref="sale.model_sale_order_line"/>
-        <field name="name">x_is_work_item_line</field>
-    </record>
 
     <!-- Product fields -->
     <record id="x_product_work_item_ids_field_product_product" model="ir.model.fields">
@@ -264,11 +256,9 @@
     <record id="x_work_item_template_id_field_product_product" model="ir.model.fields">
         <field name="compute"><![CDATA[
 for record in self:
-    template = self.env['x_work_item'].search([('x_is_template', '=', True), ('x_product_id', '=', record.id),('x_active', '=', True)])
-    record['x_work_item_template_id'] = template.id if template else False
+    record['x_work_item_template_id'] = self.env['x_work_item'].search([('x_is_template', '=', True), ('x_product_id', '=', record.id),('x_active', '=', True)], limit=1).id
 ]]></field>
         <field name="ttype">many2one</field>
-        <field name="depends">x_product_work_item_ids</field>
         <field name="field_description">Work Item Template</field>
         <field name="model_id" ref="product.model_product_product"/>
         <field name="name">x_work_item_template_id</field>

@@ -6,7 +6,6 @@
     'depends': [
         'base_industry_data',
         'construction',
-        'sale_management',
         'web_studio',
     ],
     'data': [
@@ -30,7 +29,6 @@
     ],
     'demo': [
         'demo/res_partner.xml',
-        'demo/account_analytic_account.xml',
         'demo/project_project.xml',
         'demo/product_supplierinfo.xml',
         'demo/sale_order.xml',
@@ -38,6 +36,5 @@
         'demo/project_task.xml',
     ],
     'license': 'OPL-1',
-    'cloc_exclude': [],
     'website': "https://www.odoo.com/all-industries",
 }

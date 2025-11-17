@@ -9,7 +9,7 @@ record.write({'x_name': record.x_product_id.name})
 ]]></field>
     </record>
     <record id="server_action_set_unit_cost_price_from_product" model="ir.actions.server">
-        <field name="name">Construction: Work Item - Set unit, unit cost and unit price from product</field>
+        <field name="name">Construction: Work Item - Set unit cost and unit price from product</field>
         <field name="model_id" ref="x_work_item_line_model" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
@@ -18,23 +18,25 @@ record.write({
     'x_unit_cost': record.x_product_id.standard_price,
 })]]></field>
     </record>
-    <record id="server_action_update_product_cost_price" model="ir.actions.server">
-        <field name="name">Construction: Work Item - Update product cost and price</field>
-        <field name="model_id" ref="x_work_item_model" />
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-record.x_product_id.write({
-    'lst_price': record.x_unit_price,
-    'standard_price': record.x_unit_cost,
-})]]></field>
+    <record id="server_action_update_product_cost" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Update product cost</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="product.model_product_product"/>
+        <field name="update_path">x_product_id.standard_price</field>
+        <field name="update_field_id" ref="product.field_product_product__standard_price"/>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[record.x_unit_cost]]></field>
     </record>
-    <record id="server_action_scale_associated_work_item" model="ir.actions.server">
-        <field name="name">Construction: SOL - Scale associated Work Item</field>
-        <field name="model_id" ref="sale.model_sale_order_line" />
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-record.x_line_work_item_ids.write({'x_quantity': record.product_uom_qty})
-]]></field>
+    <record id="server_action_update_product_price" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Update product price</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="product.model_product_product"/>
+        <field name="update_path">x_product_id.lst_price</field>
+        <field name="update_field_id" ref="product.field_product_product__lst_price"/>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[record.x_unit_price]]></field>
     </record>
     <record id="server_action_set_work_item_as_template" model="ir.actions.server">
         <field name="name">Construction: Work Item - Set as template</field>
@@ -64,7 +66,7 @@ for wi in records:
         'standard_price': wi.x_unit_cost,
         'uom_id': wi.x_unit_id.id,
     })
-    record.write({'x_product_id': new_product.id})
+    wi.write({'x_product_id': new_product.id})
 ]]></field>
     </record>
     <record id="server_action_create_or_modify_wi_on_sol" model="ir.actions.server">
@@ -93,8 +95,8 @@ elif record.x_targeted_so:
         <field name="model_id" ref="sale.model_sale_order_line" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
-if not record.x_line_work_item_ids and record.product_id and record.product_id.x_work_item_template_id:
-    record.product_id.x_work_item_template_id.copy({
+for sol in records:
+    sol.product_id.x_work_item_template_id.copy({
         'x_sale_order_line_id': record.id,
         'x_is_template': False,
     })
@@ -105,14 +107,13 @@ if not record.x_line_work_item_ids and record.product_id and record.product_id.x
         <field name="model_id" ref="sale.model_sale_order_line" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
-if record.x_line_work_item_ids:
-    action = {
-        "type": "ir.actions.act_window",
-        "res_model": "x_work_item",
-        "res_id": record.x_line_work_item_ids.id,
-        "view_mode": "form",
-        "target": "new",
-    }
+action = {
+    "type": "ir.actions.act_window",
+    "res_model": "x_work_item",
+    "res_id": record.x_line_work_item_ids[0].id,
+    "view_mode": "form",
+    "target": "new",
+}
 ]]></field>
     </record>
     <record id="server_action_assign_x_template_work_item_id" model="ir.actions.server">
@@ -120,9 +121,8 @@ if record.x_line_work_item_ids:
         <field name="model_id" ref="x_work_item_model" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
-for work_item in records.filtered('x_is_template').filtered('x_product_id').filtered('x_active'):
-    if template := work_item.x_product_id.x_last_tmpl_wi_id:
-        template.write({'x_active': False})
+for work_item in records.filtered(lambda w: w.x_is_template and w.x_product_id and w.x_active):
+    work_item.x_product_id.x_last_tmpl_wi_id.write({'x_active': False})
     work_item.write({'x_active': True})
     work_item.x_product_id['x_last_tmpl_wi_id'] = work_item.id
 ]]></field>

@@ -56,17 +56,6 @@ self['x_setting_work_items'] = self.env['ir.config_parameter'].sudo().get_param(
                     </block>
                 </app>
             </xpath>
-            <xpath expr="//block[@name='quotation_order_setting_container']" position="inside">
-                <setting id="sales_custom_show_line_numbering" help="Display line number in sale orders and invoices for more clarity with your customers">
-                    <field name="x_setting_show_line_numbering" readonly="0"/>
-                </setting>
-                <setting id="sales_custom_work_items" help="Adjust work item pricing and secure your margin straight from quotations based on components.">
-                    <field name="x_setting_work_items" readonly="0"/>
-                </setting>
-                <setting id="sales_custom_progress_management" help="Handle progress delivery at project level and delegate work progress statement approval prior billing.">
-                    <field name="x_setting_progress_management" readonly="0"/>
-                </setting>
-            </xpath>
         </field>
     </record>
 
@@ -78,10 +67,10 @@ if not (module := env['ir.module.module'].search([('name', '=', 'construction_pr
     env['ir.config_parameter'].sudo().set_param('construction_configuration.enable_progress_management', '1')
     record['module_industry_fsm_report'] = True
 elif module and setting_set and not record.x_setting_progress_management:
-    module.button_immediate_uninstall()
     line_numbering_module = env['ir.module.module'].search([('name', '=', 'construction_line_numbering')], limit=1)
-    if line_numbering_module and not env['ir.module.module'].search_count([('dependencies_id.name', '=', 'construction_line_numbering')]):
-        line_numbering_module.button_immediate_uninstall()
+    if line_numbering_module and not env['ir.module.module'].search_count([('dependencies_id.name', '=', 'construction_line_numbering')], limit=1):
+        (module + line_numbering_module).button_immediate_uninstall()
+    else: module.button_immediate_uninstall()
     env['ir.config_parameter'].sudo().set_param('construction_configuration.enable_progress_management', '0')
 ]]></field>
         <field name="model_id" ref="base_setup.model_res_config_settings"/>
@@ -94,12 +83,12 @@ if not (module := env['ir.module.module'].search([('name', '=', 'construction_li
     action_window = env['ir.module.module'].with_context({'module_name': 'construction_line_numbering', 'data_module': True}).button_immediate_install_app()
     env['base.import.module'].with_context(action_window.get('context')).browse(action_window['res_id']).import_module()
     env['ir.config_parameter'].sudo().set_param('construction_configuration.enable_show_line_numbering', '1')
-    #May have the need to set other settings so potential bridge modules don't try to uninstall themselves
+    record['module_industry_fsm_report'] = True
 elif module and setting_set and not record.x_setting_show_line_numbering:
-    module.button_immediate_uninstall()
     line_numbering_module = env['ir.module.module'].search([('name', '=', 'construction_line_numbering')], limit=1)
-    if line_numbering_module and not env['ir.module.module'].search_count([('dependencies_id.name', '=', 'construction_line_numbering')]):
-        line_numbering_module.button_immediate_uninstall()
+    if line_numbering_module and not env['ir.module.module'].search_count([('dependencies_id.name', '=', 'construction_line_numbering')], limit=1):
+        (module + line_numbering_module).button_immediate_uninstall()
+    else: module.button_immediate_uninstall()
     env['ir.config_parameter'].sudo().set_param('construction_configuration.enable_show_line_numbering', '0')
 ]]></field>
         <field name="model_id" ref="base_setup.model_res_config_settings"/>
@@ -112,7 +101,7 @@ if not (module := env['ir.module.module'].search([('name', '=', 'construction_wo
     action_window = env['ir.module.module'].with_context({'module_name': 'construction_work_items', 'data_module': True}).button_immediate_install_app()
     env['base.import.module'].with_context(action_window.get('context')).browse(action_window['res_id']).import_module()
     env['ir.config_parameter'].sudo().set_param('construction_configuration.enable_work_items', '1')
-    #May have the need to set other settings so potential bridge modules don't try to uninstall themselves
+    record['module_industry_fsm_report'] = True
 elif module and setting_set and not record.x_setting_work_items:
     module.button_immediate_uninstall()
     env['ir.config_parameter'].sudo().set_param('construction_configuration.enable_work_items', '0')
@@ -122,7 +111,6 @@ elif module and setting_set and not record.x_setting_work_items:
         <field name="name">(Un-)Install Work Items</field>
     </record>
 
-    <function name="button_immediate_install" model="ir.module.module" eval="[ref('base.module_web_studio', raise_if_not_found=False)]"/>
     <record id="x_setting_activate_progress_management" model="base.automation">
         <field name="model_id" ref="base_setup.model_res_config_settings"/>
         <field name="action_server_ids" eval="[(6, 0, [ref('x_action_set_enable_progress_management')])]"/>
@@ -144,7 +132,6 @@ elif module and setting_set and not record.x_setting_work_items:
         <field name="name">Activate Work Items setting</field>
         <field name="trigger_field_ids" eval="[(6, 0, [ref('x_setting_field_work_items')])]"/>
     </record>
-    <function name="button_immediate_uninstall" model="ir.module.module" eval="[ref('base.module_web_studio', raise_if_not_found=False)]"/>
 
 
 
