@@ -17,6 +17,7 @@
         <field name="ttype">integer</field>
         <field name="field_description">Allowed Entries</field>
         <field name="model_id" ref="event.model_event_event_ticket"/>
+        <field name="help">Number of entries allowed with this ticket. Let 0 to allow for unlimited access.</field>
     </record>
 
     <!-- x_attendance fields -->
@@ -106,6 +107,17 @@ for record in self: record['x_attendances_registered_today_amount'] = len(record
         <field name="relation">x_attendance</field>
         <field name="relation_field">x_event_registration_id</field>
     </record>
+    <record id="x_has_unlimited_entries_field_event_registration" model="ir.model.fields">
+        <field name="name">x_has_unlimited_entries</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">Has Unlimited Entries</field>
+        <field name="model_id" ref="event.model_event_registration"/>
+        <field name="depends">event_ticket_id</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_has_unlimited_entries'] = (record.event_ticket_id.x_allowed_entries <= 0)
+]]></field>
+    </record>
     <record id="x_remaining_entries_field_event_registration" model="ir.model.fields">
         <field name="name">x_remaining_entries</field>
         <field name="ttype">integer</field>
@@ -114,7 +126,10 @@ for record in self: record['x_attendances_registered_today_amount'] = len(record
         <field name="depends">x_attendances_ids,event_ticket_id</field>
         <field name="compute"><![CDATA[
 for record in self:
-    record['x_remaining_entries'] = record.event_ticket_id.x_allowed_entries - len(record.x_attendances_ids)
+    if not record.x_has_unlimited_entries:
+        record['x_remaining_entries'] = record.event_ticket_id.x_allowed_entries - len(record.x_attendances_ids)
+    else:
+        record['x_remaining_entries'] = False
 ]]></field>
     </record>
     <record id="x_registration_valid_until_field_event_registration" model="ir.model.fields">
