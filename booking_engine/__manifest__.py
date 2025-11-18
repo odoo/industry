@@ -7,6 +7,7 @@
         'base_automation',
         'contacts',
         'knowledge',
+        'planning_hr_skills',
         'sale_project',
         'sale_renting_planning',
         'web_studio',
