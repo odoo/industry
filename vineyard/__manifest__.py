@@ -4,8 +4,8 @@
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
-        'crm',
         'base_industry_data',
+        'crm',
         'excise_management',
         'industry_fsm_sale_report',
         'knowledge',
@@ -14,6 +14,7 @@
         'product_expiry',
         'purchase',
         'quality_mrp',
+        'web_studio',
         'website_appointment_sale_project',
     ],
     'data': [
