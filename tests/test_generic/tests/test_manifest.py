@@ -33,7 +33,7 @@ MANDATORY_KEYS_INDUSTRIES = {
 }
 
 
-@tagged('post_install', '-at_install')
+@tagged('-post_install', 'at_install')
 class ManifestTest(ManifestLinter, IndustryCase):
 
     def _load_manifest(self, module):
