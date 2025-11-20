@@ -57,7 +57,7 @@
         'demo/payment_provider_demo_post.xml',
         'demo/website.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'furniture_store/static/src/js/my_tour.js',

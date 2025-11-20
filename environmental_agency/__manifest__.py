@@ -52,7 +52,7 @@
         'demo/account_analytic_line.xml',
         'demo/website.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'cloc_exclude': [
         'data/knowledge_article.xml',
         'demo/website_view.xml',

@@ -83,7 +83,7 @@
         'demo/x_project_task_worksheet.xml',
         'demo/website.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'solar_installation/static/src/js/my_tour.js',
