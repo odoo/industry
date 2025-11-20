@@ -48,7 +48,7 @@
         'demo/planning_slot.xml',
         'demo/timesheet.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'software_reseller/static/src/js/my_tour.js',

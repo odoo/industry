@@ -11,6 +11,6 @@
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'author': 'Odoo S.A.',
 }

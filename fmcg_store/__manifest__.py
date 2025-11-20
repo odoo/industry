@@ -58,7 +58,7 @@
         'demo/pos_order_line.xml',
         'demo/pos_confirm.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'fmcg_store/static/src/js/my_tour.js',

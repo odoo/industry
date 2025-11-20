@@ -46,7 +46,7 @@
         'demo/sale_order_confirm.xml',
         'demo/function_pickup.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'hardware_shop/static/src/js/my_tour.js',

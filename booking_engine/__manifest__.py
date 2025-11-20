@@ -39,7 +39,7 @@
         'demo/website_menu.xml',
         'demo/payment_provider_demo.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'cloc_exclude': [
         'data/website_view.xml',
     ],

@@ -56,7 +56,7 @@
         'demo/sale_order_post.xml',
         'demo/x_project_task_worksheet_template.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",

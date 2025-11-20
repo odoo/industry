@@ -53,7 +53,7 @@
         "data/knowledge_article.xml",
     ],
     'images': ['images/main.png'],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'url': "https://www.odoo.com/trial?industry&selected_app=wedding_planner",
     'website': "https://www.odoo.com/all-industries",
 }

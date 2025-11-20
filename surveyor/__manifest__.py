@@ -48,7 +48,7 @@
         'demo/website_ir_attachment.xml',
         'demo/website.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'surveyor/static/src/js/my_tour.js',

@@ -40,7 +40,7 @@
     'cloc_exclude': [
         'data/knowledge_article.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=thrift_store",
