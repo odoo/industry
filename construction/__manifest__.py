@@ -63,7 +63,7 @@ focusing on accurate quoting, efficient planning, seamless execution, and excell
         'demo/planning_recurrency.xml',
         'demo/planning_slot.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }

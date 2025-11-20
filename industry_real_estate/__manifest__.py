@@ -69,7 +69,7 @@ Manage your properties, create and manage rental contracts, and streamline your 
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }

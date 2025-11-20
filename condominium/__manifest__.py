@@ -60,7 +60,7 @@ Moreover, the business is legally regulated in lots of countries under different
         'demo/helpdesk_team.xml',
         'demo/helpdesk_ticket.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }

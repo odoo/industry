@@ -90,7 +90,7 @@ ensuring the efficient installation of solar panels and associated equipment.
         'demo/ir_attachment_post.xml',
         'demo/x_project_task_worksheet.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }
