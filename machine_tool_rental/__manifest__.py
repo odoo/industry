@@ -49,7 +49,7 @@
         'demo/stock_picking.xml',
         'demo/quality_check.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'cloc_exclude': [
         'data/knowledge_article.xml',
     ],

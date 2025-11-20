@@ -15,5 +15,5 @@
     'demo': [
         'demo/res_users.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
 }

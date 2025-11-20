@@ -33,6 +33,6 @@
     'cloc_exclude': [
         'data/qweb_view.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'images': ['images/main.png'],
 }

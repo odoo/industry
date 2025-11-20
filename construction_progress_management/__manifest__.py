@@ -29,6 +29,6 @@
         "static/src/widgets/apply_to_section_widget.xml",
         "static/src/widgets/apply_to_section_widget.js",
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'author': 'Odoo S.A.',
 }

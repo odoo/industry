@@ -58,7 +58,7 @@
         'demo/delivery_confirm.xml',
         'demo/website.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'hair_salon/static/src/js/my_tour.js',

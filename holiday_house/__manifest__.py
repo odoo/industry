@@ -34,7 +34,7 @@
         'demo/website_theme_apply.xml',
         'demo/website.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'cloc_exclude': [
         'data/knowledge_article.xml',
         'data/web_views.xml',
