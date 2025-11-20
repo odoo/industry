@@ -54,7 +54,7 @@
         'demo/purchase_order_line.xml',
         'demo/purchase_order_confirm.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",

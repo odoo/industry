@@ -55,7 +55,7 @@
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'automobile/static/src/js/my_tour.js',

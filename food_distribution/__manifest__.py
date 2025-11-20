@@ -53,7 +53,7 @@
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'cloc_exclude': [
         'data/knowledge_article.xml',
     ],

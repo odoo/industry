@@ -62,7 +62,7 @@
         'demo/planning_slot.xml',
         'demo/sale_order_spreadsheet.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
