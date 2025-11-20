@@ -69,6 +69,7 @@
         'demo/payment_provider_demo_post.xml',
         'demo/website.xml',
     ],
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'eyewear_shop/static/src/js/my_tour.js',
@@ -81,5 +82,4 @@
         "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
-    'license': 'OPL-1',
 }

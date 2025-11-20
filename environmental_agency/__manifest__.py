@@ -52,7 +52,7 @@
         'demo/account_analytic_line.xml',
         'demo/website.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'environmental_agency/static/src/js/my_tour.js',

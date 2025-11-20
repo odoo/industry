@@ -72,7 +72,7 @@
         'demo/payment_provider_demo.xml',
         'demo/website.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
             'web.assets_backend': [
                 'wine_merchant/static/src/js/my_tour.js',

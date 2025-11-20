@@ -52,5 +52,5 @@
         "static/src/js/my_tour.js",
     ],
     'images': ['images/main.png'],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
 }

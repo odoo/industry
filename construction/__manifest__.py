@@ -57,7 +57,7 @@
         'demo/planning_recurrency.xml',
         'demo/planning_slot.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'construction/static/src/js/my_tour.js',

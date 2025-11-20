@@ -76,7 +76,7 @@
         'demo/website_theme_apply.xml',
         'demo/website.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'florist/static/src/js/my_tour.js'

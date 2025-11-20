@@ -44,7 +44,7 @@
         'demo/sale_order_post.xml',
         'demo/documents_document.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'industry_lawyer/static/src/js/my_tour.js',
