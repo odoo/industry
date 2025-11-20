@@ -60,7 +60,7 @@
         'demo/payment_provider_demo_post.xml',
         'demo/website.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     'images': ['images/main.png'],
     'assets': {

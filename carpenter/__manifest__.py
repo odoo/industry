@@ -50,7 +50,7 @@
         'demo/purchase_order_post.xml',
         'demo/sale_order_spreadsheet.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'cloc_exclude': [
         'data/knowledge_article.xml',
     ],

@@ -1,11 +1,12 @@
 {
     'name': 'Industry base',
     'author': 'Odoo S.A.',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Hidden/Tools',
     'depends': [
         'base',
         'digest',
+        'knowledge',
     ],
     'data': [
         'data/knowledge_tour.xml',
@@ -17,7 +18,7 @@
         'demo/res_partner.xml',
         'demo/res_partner_category.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'base_industry_data/static/src/js/my_tour.js',

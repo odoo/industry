@@ -51,7 +51,7 @@
         'demo/x_control_charging_station.xml',
         'demo/website.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'certification_organism/static/src/js/my_tour.js',

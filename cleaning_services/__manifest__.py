@@ -46,7 +46,7 @@
         "data/knowledge_article.xml",
     ],
     'images': ['images/main.png'],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'url': "https://www.odoo.com/trial?industry&selected_app=cleaning_services",
     'website': "https://www.odoo.com/industries/cleaning-services",
 }

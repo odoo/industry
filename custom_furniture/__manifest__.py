@@ -81,7 +81,7 @@
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=custom_furniture",
     'website': "https://www.odoo.com/industries/custom-furniture-production",

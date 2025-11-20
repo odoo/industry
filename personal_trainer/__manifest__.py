@@ -36,7 +36,7 @@
         'demo/sale_order_confirm.xml',
         'demo/account_analytic_line.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'personal_trainer/static/src/js/my_tour.js',
