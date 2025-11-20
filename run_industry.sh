@@ -56,10 +56,6 @@ ADDONS_PATH="$INDUSTRY_PATH/tests,enterprise,odoo/addons,odoo/odoo/addons,design
 TEST_TAGS="/test_generic,/test_$INDUSTRY_NAME"
 DEP_DB="dep-$INDUSTRY_NAME"
 
-if $DEBUG; then
-  PYTHON_BIN="$PYTHON_BIN -m debugpy --listen 5678"
-fi
-
 #check module exists
 if [ ! -d "$INDUSTRY_PATH$INDUSTRY_NAME" ]; then
   echo "Module '$INDUSTRY_NAME' does not exist."
@@ -75,6 +71,10 @@ fi
 #try to init the db to check if it exists
 if $PYTHON_BIN $ODOO_BIN db init $DEP_DB >/dev/null 2>&1; then
   HARD_RESET=true
+fi
+
+if $DEBUG; then
+  PYTHON_BIN="$PYTHON_BIN -m debugpy --listen 5678"
 fi
 
 # reset the dependency db
