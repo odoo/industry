@@ -81,7 +81,7 @@
         "static/src/js/my_tour.js",
         "demo/website_view.xml",
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }

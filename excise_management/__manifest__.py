@@ -25,6 +25,6 @@
         'data/x_excise_category.xml',
         'data/res_config_setting.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'images': ['images/main.png'],
 }
