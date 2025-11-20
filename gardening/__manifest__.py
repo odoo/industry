@@ -44,7 +44,7 @@
         'demo/sale_order_confirm.xml',
         'demo/timesheet.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'gardening/static/src/js/my_tour.js',

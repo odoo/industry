@@ -87,7 +87,7 @@
         "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'url': "https://www.odoo.com/trial?industry&selected_app=real_estate",
     'website': "https://www.odoo.com/industries/real-estate-agency",
 }

@@ -64,7 +64,7 @@
         "static/src/js/my_tour.js",
         "demo/website_view.xml",
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=toy_store",

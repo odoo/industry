@@ -19,7 +19,7 @@ MANDATORY_KEYS = {
     'category': '',
     'data': [],
     'depends': [],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'name': '',
 }
 
@@ -63,6 +63,8 @@ class ManifestTest(ManifestLinter, IndustryCase):
             expected_type = type(expected_value)
             self.assertIsInstance(value, expected_type, f"Wrong type for '{key}', expected {expected_type}")
             if expected_value:
+                if key == 'license' and not any(mod in manifest_data.get('depends', []) for mod in ['base_industry_data', 'knowledge', 'web_studio']):
+                    expected_value = 'LGPL-3'
                 self.assertEqual(value, expected_value, f"Wrong {key} '{value}' in manifest, it should be {expected_value}")
             if key in ['data', 'demo']:
                 self.assertTrue(all(val.startswith(f'{key}/') for val in value), f"Files must be in '{key}/' directory")
