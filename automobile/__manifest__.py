@@ -59,7 +59,7 @@ Maintenance and accessorises etc.
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }

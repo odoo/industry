@@ -58,7 +58,7 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
         'demo/pos_order_line.xml',
         'demo/pos_confirm.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     'images': ['images/main.png'],
 }
