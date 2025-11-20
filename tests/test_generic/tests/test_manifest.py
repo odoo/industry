@@ -17,7 +17,7 @@ MANDATORY_KEYS = {
     'category': '',
     'data': [],
     'depends': [],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'name': '',
     'version': '',
 }

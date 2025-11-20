@@ -61,7 +61,7 @@
         'demo/helpdesk_team.xml',
         'demo/helpdesk_ticket.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'condominium/static/src/js/my_tour.js',

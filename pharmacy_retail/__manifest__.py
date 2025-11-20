@@ -66,7 +66,7 @@
         'demo/pos_payment_method.xml',
         'demo/pos_config.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'pharmacy_retail/static/src/js/my_tour.js',

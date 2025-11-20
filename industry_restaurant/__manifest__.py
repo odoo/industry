@@ -55,7 +55,7 @@
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'industry_restaurant/static/src/js/my_tour.js',
