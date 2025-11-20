@@ -38,7 +38,7 @@
         'demo/pos_order_line.xml',
         'demo/website.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'bowling/static/src/js/my_tour.js',

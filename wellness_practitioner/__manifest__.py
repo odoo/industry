@@ -36,5 +36,5 @@
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
 }

@@ -97,5 +97,5 @@
         "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
 }
