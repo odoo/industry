@@ -61,7 +61,7 @@
         'demo/pos_orders.xml',
         'demo/pos_order_lines.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'assets': {
         'web.assets_backend': [
             'industry_restaurant/static/src/js/my_tour.js',
