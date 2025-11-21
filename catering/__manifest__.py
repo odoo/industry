@@ -1,12 +1,11 @@
 {
     'name': 'Catering',
-    'version': '1.0',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
         'base_industry_data',
         'crm_enterprise',
-        'hr_skills',
+        'hr',
         'knowledge',
         'planning',
         'project_forecast',
@@ -14,7 +13,6 @@
         'sale_management',
         'sale_timesheet',
         'stock_dropshipping',
-        'survey',
         'website',
     ],
     'data': [
@@ -38,7 +36,6 @@
     'demo': [
         'demo/crm_tag.xml',
         'demo/res_partner.xml',
-        'demo/account_analytic_account.xml',
         'demo/crm_lead.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
@@ -57,11 +54,10 @@
         'demo/ir_attachment_post.xml',
         'demo/product_supplierinfo.xml',
         'demo/website_view.xml',
-        'demo/website_page.xml',
         'demo/website_theme_apply.xml',
         'demo/website.xml',
     ],
-    'license': 'OPL-1',
+    'license': 'OEEL-1',
     'cloc_exclude': [
         'data/knowledge_article.xml',
         'demo/website_view.xml',
