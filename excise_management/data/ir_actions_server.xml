@@ -48,4 +48,97 @@ for idx, tax in enumerate(all_taxes, start=1):
         <field name="state">code</field>
         <field name="name">Sequence the taxes</field>
     </record>
+    <record id="cron_generate_excise_report" model="ir.cron">
+        <field name="name">Generate Excise Report</field>
+        <field name="model_id" ref="excise_report"/>
+        <field name="state">code</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">weeks</field>
+        <field name="active" eval="True"/>
+        <field name="nextcall" eval="(datetime.now() + timedelta(days=(0 - datetime.now().weekday()) % 7)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="code"><![CDATA[
+last_report_date = env['x_excise_report'].search([], order='x_to_date desc', limit=1).x_to_date
+from_date = last_report_date if last_report_date else datetime.date.today() - datetime.timedelta(days=7)
+if from_date < datetime.date.today():
+    res_id = env['x_excise_report'].create({'x_from_date': from_date, 'x_to_date': datetime.date.today(), 'x_reporter_id': env.company.x_reporter_id.id or env.ref('base.user_admin').id})
+    env['mail.activity'].create({'activity_type_id': env.ref('mail.mail_activity_data_todo').id, 'summary': f"Excise Report {res_id.x_name}",'res_model_id': env.ref('excise_management.excise_report').id, 'res_id': res_id.id, 'user_id': res_id.x_reporter_id.id, 'date_deadline': datetime.date.today() + datetime.timedelta(weeks=1)})
+        ]]></field>
+    </record>
+    <record id="action_excise_report_stock_moves" model="ir.actions.server">
+        <field name="model_id" ref="excise_report"/>
+        <field name="state">code</field>
+        <field name="name">Open stock moves</field>
+        <field name="code"><![CDATA[
+action = {'view_mode': 'list', 'res_model': 'stock.move', 'type': 'ir.actions.act_window', 'domain': [('id', 'in', record.x_line_ids.mapped('x_move_ids.id'))], 'view_id': env.ref('excise_management.stock_move_view_list').id, 'name': 'Excises Analysis',}
+        ]]></field>
+    </record>
+    <record id="ir_action_create_excise_report_line" model="ir.actions.server">
+        <field name="code"><![CDATA[
+all_moves_ids = env['stock.move'].search([
+    ('date', '>=', min(records.mapped('x_from_date'), default=datetime.datetime.today())),
+    ('date', '<', max(records.mapped('x_to_date'), default=datetime.datetime.today())),
+    ('x_excise_category', '!=', False),
+    ('x_fiscal_deposit_move', 'not in', ['none', False]),
+    ('state', '=', 'done'),
+])
+for record in records:
+    grouped_data = {}
+    for move in all_moves_ids:
+        if move.date.date() < record.x_from_date or move.date.date() >= record.x_to_date: continue
+        key = (move.x_excise_category.id, move.x_fiscal_deposit_move)
+        if key not in grouped_data: grouped_data[key] = {'qty': 0.0, 'amount': 0.0, 'line_move_ids': []}
+        grouped_data[key]['qty'] += move.x_excise_quantity
+        grouped_data[key]['amount'] += move.x_excise_amount
+        grouped_data[key]['line_move_ids'].append(move.id)
+    lines = env['x_excise_report_line'].create([{
+        'x_excise_category_id': key[0],
+        'x_excise_move_type': key[1],
+        'x_excise_quantity': values['qty'],
+        'x_excise_amount': values['amount'],
+        'x_excise_report_id': record.id,
+        'x_move_ids': [(6, 0, values['line_move_ids'])]
+    } for key, values in grouped_data.items()])
+    record['x_line_ids'] = [(6, 0, lines.ids)] if bool(lines) else [(5, 0, 0)]
+        ]]></field>
+        <field name="model_id" ref="excise_report"/>
+        <field name="state">code</field>
+        <field name="name">Action to Create Excise Report Line</field>
+        <field name="usage">base_automation</field>
+    </record>
+    <record id="ir_action_update_excise_report_line_onupdate_stock_move" model="ir.actions.server">
+        <field name="code"><![CDATA[
+if record['state'] == 'done' and record['x_excise_category'] and record['x_fiscal_deposit_move'] and record['x_fiscal_deposit_move'] != 'none':
+    all_report_ids = env['x_excise_report'].search([])
+    old_report_ids = all_report_ids.filtered(lambda report: report.x_from_date > record['date'].date() or report.x_to_date <= record['date'].date())
+    for report_id in old_report_ids:
+        line_ids = report_id.x_line_ids.filtered(lambda l: l.x_excise_category_id == record['x_excise_category'] and l.x_excise_move_type == record['x_fiscal_deposit_move'] and record.id in l.x_move_ids.ids)
+        for line_id in line_ids:
+            line_id['x_excise_quantity'] -= record['x_excise_quantity'] or 0.0
+            line_id['x_excise_amount'] -= record['x_excise_amount'] or 0.0
+            line_id['x_move_ids'] = [(3, record.id)]
+            if not line_id['x_move_ids']:
+                line_id.unlink()
+    new_report_ids = all_report_ids - old_report_ids
+    for report_id in new_report_ids:
+        line_ids = report_id.x_line_ids.filtered(lambda l: l.x_excise_category_id == record['x_excise_category'] and l.x_excise_move_type == record['x_fiscal_deposit_move'])
+        for line_id in line_ids:
+            if record.id not in line_id.x_move_ids.ids:
+                line_id['x_excise_quantity'] += record['x_excise_quantity'] or 0.0
+                line_id['x_excise_amount'] += record['x_excise_amount'] or 0.0
+                line_id['x_move_ids'] = [(4, record.id)]
+        if not line_ids:
+            env['x_excise_report_line'].create([{
+                'x_excise_category_id': record['x_excise_category'].id,
+                'x_excise_move_type': record['x_fiscal_deposit_move'],
+                'x_excise_quantity': record['x_excise_quantity'],
+                'x_excise_amount': record['x_excise_amount'],
+                'x_excise_report_id': report_id.id,
+                'x_move_ids': [(6, 0, [record.id])]
+            }])
+        ]]></field>
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="state">code</field>
+        <field name="name">Action to Update Excise line</field>
+        <field name="usage">base_automation</field>
+    </record>
 </odoo>
