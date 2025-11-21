@@ -44,6 +44,7 @@
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
         'demo/stock_picking.xml',
+        'demo/stock_move.xml',
         'demo/project_project.xml',
         'demo/project_task.xml',
         'demo/calendar_event.xml',
