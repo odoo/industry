@@ -12,71 +12,76 @@ records.action_confirm()
     <record id="confirm_analytic_account_item_split_action" model="ir.actions.server">
         <field name="name">Confirm Account Analytic Line</field>
         <field name="state">code</field>
-        <field name="model_id" ref="model_analytic_account_wizard"/>
-        <field name="binding_model_id" ref="model_analytic_account_wizard"/>
+        <field name="model_id" ref="model_x_split_analytic_items_wizard"/>
+        <field name="binding_model_id" ref="model_x_split_analytic_items_wizard"/>
         <field name="code"><![CDATA[
-total_share = sum(line.x_share for line in records.x_line_ids)
+total_share = sum(records.x_line_ids.mapped('x_share'))
 
 if round(total_share) != 100: raise UserError("The Share sum shall equal 100% to confirm the split.")
 
-new_analytic_item = env['account.analytic.line']
 note_details = {}
-occupied_cells = {}
-
-project_plan, other_plans = records.env['account.analytic.plan']._get_all_plans()
-for plan in other_plans:
-    if plan.name == 'Account':
-        fname = plan._column_name()
+split_account_analytic_lines = {}
+account_plan_column_name = records.env.ref('condominium.condominium_analytic_plan_1')._column_name()
 
 for line in records.x_line_ids:
-    original_analytic = line.x_analytic_line_id or original_analytic
-    analytic_id = line.x_analytic_account_name_id
-    original_analytic_name = original_analytic.name
-    original_analytic_id = original_analytic.id
+    original_analytic_line = line.x_analytic_line_id
+    original_analytic_line_name = original_analytic_line.name
+    original_analytic_line_id = original_analytic_line.id
+    analytic_id = line.x_analytic_account_id
 
-    if original_analytic:
-        new_analytic_item_id = original_analytic.copy({
-            fname: analytic_id.id or '',
+    if original_analytic_line:
+        new_split_analytic_line_id = original_analytic_line.copy({
+            account_plan_column_name: analytic_id.id,
             "amount": line.x_amount
         })
 
-    if original_analytic_id in occupied_cells:
-        occupied_cells[original_analytic_id].update(new_analytic_item_id)
+    if original_analytic_line_id in split_account_analytic_lines:
+        split_account_analytic_lines[original_analytic_line_id].update(new_split_analytic_line_id)
     else:
-        occupied_cells.update({original_analytic_id: set(new_analytic_item_id)})
+        split_account_analytic_lines.update({original_analytic_line_id: set(new_split_analytic_line_id)})
 
-    if original_analytic_id in note_details:
-        analytic_url = f"/odoo/analytic-items/{new_analytic_item_id.id}"
-        note_line = f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{line.x_analytic_account_name_id.name}</a>"
-        note_details[original_analytic_id].add(note_line)
+    if original_analytic_line_id in note_details:
+        analytic_url = f"/odoo/analytic-items/{new_split_analytic_line_id.id}"
+        note_line = f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{analytic_id.name}</a>"
+        note_details[original_analytic_line_id].add(note_line)
     else:
-        analytic_url = f"/odoo/analytic-items/{new_analytic_item_id.id}"
-        note_line = {f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{line.x_analytic_account_name_id.name}</a>"}
-        note_details.update({original_analytic_id: set(note_line)})
+        analytic_url = f"/odoo/analytic-items/{new_split_analytic_line_id.id}"
+        note_line = {f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{analytic_id.name}</a>"}
+        note_details.update({original_analytic_line_id: set(note_line)})
 
-for original_id, new_lines in occupied_cells.items():
-    for new_analytic_line in list(new_lines):
-        for Aid, values in note_details.items():
-            if original_id == Aid:
-                note_html = f"""
-                    <i>{datetime.date.today().strftime("%d %B %Y")}</i><br/>
-                    <p><b>Analytic item coming from a split</b><br/>
-                    {'<br/>'.join(list(values))}<br/>
-                    See <a href='/odoo/analytic-items/{original_id}' target='_blank'> original analytic item</a>
-                    </p>
-                    """
-                new_analytic_line.write({"x_notes": note_html.strip()})
+today_date_display = datetime.date.today().strftime("%d %B %Y")
+for original_analytic_id, new_account_analytic_lines in split_account_analytic_lines.items():
+    notes = note_details.get(original_analytic_id)
+    if not notes:
+        continue
 
-for original_id, values in note_details.items():
-    original_item = new_analytic_item.browse(original_id)
+    # Make sure notes are strings and build in HTML
+    note_items = [str(line).strip() for line in notes if line]
+
     note_html = f"""
-        <i>{datetime.date.today().strftime("%d %B %Y")}</i><br/>
+        <i>{today_date_display}</i><br/>
+        <p><b>Analytic item coming from a split</b><br/>
+        {'<br/>'.join(note_items)}<br/>
+        See <a href='/odoo/analytic-items/{original_analytic_id}' target='_blank'> original analytic item</a>
+        </p>
+        """
+
+    for new_account_analytic_line in new_account_analytic_lines:
+        new_account_analytic_line.write({"x_notes": note_html})
+
+# notes add for original analytic item
+for original_analytic_id, note_lines in note_details.items():
+    original_item = env['account.analytic.line'].browse(original_analytic_id)
+    note_html = f"""
+        <i>{today_date_display}</i><br/>
         <p><b>Analytic item splited</b><br/>
-        {'<br/>'.join(list(values))}<br/>
+        {'<br/>'.join(list(note_lines))}<br/>
         Original amount: {original_item.amount}
         </p>
         """
-    new_analytic_item.browse(original_id).write({"x_notes": note_html.strip(), "amount": 0.0,})
+
+    # write the note and zero the amount in original analytic account line
+    original_item.write({"x_notes": note_html.strip(), "amount": 0.0,})
             ]]>        </field>
     </record>
     <record id="split_analytic_item_action" model="ir.actions.server">
@@ -84,35 +89,38 @@ for original_id, values in note_details.items():
         <field name="model_id" ref="analytic.model_account_analytic_line"/>
         <field name="binding_model_id" ref="analytic.model_account_analytic_line"/>
         <field name="state">code</field>
-        <field name="code"><![CDATA[analytic_account_lines = []
+        <field name="code"><![CDATA[split_line_vals = []
 amount_total = 0
 
-for record in records:
-    amount_total += record.amount
-    split_amount = record.amount / 2
+for analytic_line in records:
+    amount_total += analytic_line.amount
+    analytic_amount_split = analytic_line.amount / 2
+    account_plan_column_name = analytic_line.env.ref('condominium.condominium_analytic_plan_1')._column_name()
 
-    project_plan, other_plans = record.env['account.analytic.plan']._get_all_plans()
-    for plan in other_plans:
-        if plan.name == 'Account':
-            fname = plan._column_name()
+    # add two split lines
+    plan_id = analytic_line[account_plan_column_name].id if analytic_line[account_plan_column_name] else False
+    split_line_vals.extend([
+        (0, 0, {
+            'x_analytic_line_id': analytic_line.id,
+            'x_amount': analytic_amount_split,
+            'x_analytic_account_id': plan_id,
+        }),
+        (0, 0, {
+            'x_analytic_line_id': analytic_line.id,
+            'x_amount': analytic_amount_split,
+            'x_analytic_account_id': plan_id,
+        }),
+    ])
 
-    for _ in range(2):
-        analytic_account_lines.append((0, 0, {
-            "x_analytic_line_id": record.id,
-            "x_amount": split_amount,
-            "x_analytic_account_name_id": record[fname].id if record[fname] else False
-        }))
+if amount_total == 0: raise UserError("Total amount is zero. Cannot split analytic items.")
 
-if amount_total == 0:
-    raise UserError("Total amount is zero. Cannot split analytic items.")
-
-wizard = env['x_analytic_account_wizard'].create({
-    "x_line_ids": analytic_account_lines,
+split_analytic_items_wizard = env['x_split_analytic_items_wizard'].create({
+    "x_line_ids": split_line_vals,
     "x_total": amount_total
 })
 
 action = env['ir.actions.act_window']._for_xml_id('condominium.split_act_window')
-action['res_id'] = wizard.id]]>
+action['res_id'] = split_analytic_items_wizard.id]]>
         </field>
     </record>
     <record id="action_view_company_partner" model="ir.actions.server">
@@ -160,20 +168,20 @@ else:
         <field name="name">Condomnium: Create Condominium</field>
     </record>
     <record id="ir_act_server_split_per_property" model="ir.actions.server">
-        <field name="code"><![CDATA[distributions = record.x_distribution_key.x_ratio_ids
+        <field name="code"><![CDATA[# Get distribution ratios
+distributions = record.x_distribution_key.x_ratio_ids
 total_distribution = sum(distributions.mapped('x_ratio'))
-if total_distribution == 0: raise UserError("Cannot split the Sales Orders because there is not distribution key total is null.")
+if total_distribution == 0: raise UserError("Cannot split the Sales Orders because there is is no distribution key and total is null.")
 for owner in env['res.partner'].search([('x_companies', 'in', record.company_id.id)]):  # One SO per owner
-    new_so = record.copy(); new_so_lines = [];
+    new_so = record.copy({'order_line': False}); new_so_lines = [];
     new_so['x_source_sales_order'] = record.id
     new_so['partner_id'] = owner.id
-    new_so.order_line.unlink() # Remove the lines that were copied from the source SO
     for sol in record.order_line: # The lines are re-created using the distribution key and the analytic account corresponding to the property is set
         for distribution in distributions:
-            if distribution['x_owner'].id == owner.id:
+            if distribution.x_owner.id == owner.id:
                 new_so_lines.append((0, 0, { 'order_id': record.id, 'product_id': sol.product_id.id, 'name': sol.name #+ '\n' + distribution.x_property.x_name
                 , 'product_uom_qty': sol.product_uom_qty, 'product_uom_id': sol.product_uom_id.id,
-                    'price_unit': sol.price_unit * distribution['x_ratio'] / total_distribution, 'tax_ids': sol.tax_ids, 'discount': sol.discount, 'analytic_distribution': {distribution.x_account.id: 100} }))
+                    'price_unit': sol.price_unit * distribution.x_ratio / total_distribution, 'tax_ids': sol.tax_ids, 'discount': sol.discount, 'analytic_distribution': {distribution.x_account.id: 100} }))
     new_so.write({'order_line': new_so_lines})
 record['state'] = 'cancel'
 ]]>        </field>
@@ -185,7 +193,7 @@ record['state'] = 'cancel'
         <field name="code"><![CDATA[mrs = env['x_meter_reading'].search([('id', 'in', record.x_property.x_meter_reading_ids.ids), ('x_meter_id', '=', record.x_meter_id.id)], order='x_date')
 previous_mr = False
 for mr in mrs:
-    mr['x_usage'] = mr['x_quantity'] - previous_mr['x_quantity'] if previous_mr else 0
+    mr['x_usage'] = mr.x_quantity - previous_mr.x_quantity if previous_mr else 0
     previous_mr = mr
         ]]>        </field>
         <field name="model_id" ref="model_meter_reading"/>
@@ -193,10 +201,14 @@ for mr in mrs:
         <field name="name">Condominium: Compute Meter Reading Consumption</field>
     </record>
     <record id="action_update_property_current_owner" model="ir.actions.server">
-        <field name="code"><![CDATA[for line in record.x_property_id.x_owner_ids:
-    if not line.x_end_date: record['x_property_id']['x_current_owner'] = line.x_owner
-    account = env['account.analytic.account'].search([('x_property','=',record.x_property_id.id),('partner_id','=',line.x_owner.id)])
-    if not account and line.x_owner.id: line['x_account'] = env['account.analytic.account'].create({ 'name': str(record.x_property_id.x_name) + " - " + str(line.x_owner.name), 'x_property': record.x_property_id.id, 'partner_id': line.x_owner.id, 'x_owner_line': line.id}).id
+        <field name="code"><![CDATA[property_id = record.x_property_id
+analytic_account = env['account.analytic.account']
+for line in property_id.x_owner_ids:
+    x_owner_line = line.x_owner
+    x_owner_line_id = x_owner_line.id
+    if not line.x_end_date: property_id['x_current_owner'] = x_owner_line
+    account = analytic_account.search([('x_property', '=', property_id.id), ('partner_id', '=', x_owner_line_id)])
+    if not account and x_owner_line_id: line['x_account'] = analytic_account.create({'name': f"{property_id.x_name} - {x_owner_line.name}", 'x_property': property_id.id, 'partner_id': x_owner_line_id, 'x_owner_line': line.id}).id
 ]]>        </field>
         <field name="model_id" ref="model_x_property_line_owner"/>
         <field name="state">code</field>
@@ -204,8 +216,10 @@ for mr in mrs:
         <field name="usage">base_automation</field>
     </record>
     <record id="action_archive_related_accounts" model="ir.actions.server">
-        <field name="code"><![CDATA[for owner in record.x_owner_ids:
-    if owner.x_account: owner['x_account']['active'] = False
+        <field name="code"><![CDATA[
+for owner in record.x_owner_ids:
+    owner_account = owner.x_account
+    if owner_account: owner_account['active'] = False
 ]]>        </field>
         <field name="model_id" ref="model_x_property"/>
         <field name="state">code</field>
@@ -214,10 +228,11 @@ for mr in mrs:
     </record>
     <record id="action_populate_voters" model="ir.actions.server">
         <field name="binding_model_id" ref="model_x_calendar_event_line_motion"/>
-        <field name="code"><![CDATA[record['x_attendee_vote_ids'].unlink()
+        <field name="code"><![CDATA[record.x_attendee_vote_ids.unlink()
 voters = []
 for attendee in record.x_calendar_event_id.attendee_ids:
-    if (attendee.x_attending or attendee.x_delegating) and attendee.partner_id.id not in list(map(lambda voter: voter.x_attendee.id, record.x_attendee_vote_ids)): voters.append({ 'x_attendee': attendee.partner_id.id, })
+    attendee_partner_id = attendee.partner_id.id
+    if (attendee.x_attending or attendee.x_delegating) and attendee_partner_id not in list(map(lambda voter: voter.x_attendee.id, record.x_attendee_vote_ids)): voters.append({ 'x_attendee': attendee_partner_id, })
 if voters: record['x_attendee_vote_ids'] = env['x_calendar_event_line_motion_line_vote'].create(voters).ids
 ]]>        </field>
         <field name="model_id" ref="model_x_calendar_event_line_motion"/>
@@ -269,13 +284,18 @@ def findClosestMeterReading(date, meter_readings):
     return closest_mr
 
 if not record.x_distribution_key:
-    # raise UserError("A distribution key is required to distribute costs to accounts.")
-    for aml in record.invoice_line_ids: aml['analytic_distribution'] = {}
+    if record.invoice_line_ids:
+        record.invoice_line_ids.write({'analytic_distribution': {}})
 else:
     analytic_distribution = {}
-    # Key distribution
-    if record.x_distribution_key.x_based_on == "Shares" and ((record.x_period_start and record.x_period_end) or (not record.x_period_start and not record.x_period_end)):
+
+    # periods_valid: True when both start and end are set OR both are unset
+    periods_valid = bool(record.x_period_start) == bool(record.x_period_end)
+
+    if record.x_distribution_key.x_based_on == "Shares" and periods_valid:
         x_ratios = record.sudo().x_distribution_key.x_ratio_ids
+
+        # start from here
         for ratio in x_ratios.filtered(lambda l: l.x_ratio != 0):
             for account in ratio.x_property_ratios.x_account_ids:
                 if record.x_period_start and record.x_period_end:
