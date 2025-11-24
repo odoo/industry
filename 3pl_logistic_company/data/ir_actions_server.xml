@@ -38,4 +38,28 @@ for pick in records:
         <field name="state">code</field>
         <field name="name">Execute Code</field>
     </record>
+    <record id="server_action_account_move_create_next" model="ir.actions.server">
+        <field name="code"><![CDATA[
+new_invoice = record.copy()
+date_from_sale_subscription_plan = dateutil.relativedelta.relativedelta()
+match record.x_invoice_period_id.billing_period_unit:
+    case 'week':
+        date_from_sale_subscription_plan = dateutil.relativedelta.relativedelta(weeks=record.x_invoice_period_id.billing_period_value)
+    case 'month':
+        date_from_sale_subscription_plan = dateutil.relativedelta.relativedelta(months=record.x_invoice_period_id.billing_period_value)
+    case 'year':
+        date_from_sale_subscription_plan = dateutil.relativedelta.relativedelta(years=record.x_invoice_period_id.billing_period_value)
+new_invoice['invoice_date'] = record.invoice_date + date_from_sale_subscription_plan
+new_invoice.invoice_line_ids.write({'quantity': 0})
+action = {
+    'view_mode': 'form',
+    'res_model': 'account.move',
+    'res_id': new_invoice.id,
+    'type': 'ir.actions.act_window',
+}
+]]></field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="name">3PL Logistic Company: Invoice - create next action</field>
+    </record>
 </odoo>
