@@ -11,6 +11,7 @@
     <field name="arch" type="xml">
       <data>
         <xpath expr="//field[@name='code']" position="replace"/>
+        <xpath expr="//form//label[@for='name']" position="replace"/>
         <xpath expr="//field[@name='name']" position="attributes">
           <attribute name="placeholder">e.g. Apartment A0</attribute>
         </xpath>
@@ -19,10 +20,9 @@
             <field string="Vendor Bills" name="vendor_bill_count" widget="statinfo"/>
           </button>
         </xpath>
-        <xpath expr="//form[1]/sheet[1]/div[not(@name)][1]/label[1]" position="replace"/>
         <xpath expr="//button[@name='action_view_projects']" position="replace"/>
         <xpath expr="//field[@name='active']" position="after">
-          <xpath expr="//form[1]/sheet[1]/group[@name='main']/group[2]/field[@name='company_id']" position="move"/>
+          <xpath expr="//group[@name='main']/group[2]/field[@name='company_id']" position="move"/>
           <field name="x_condominium"/>
         </xpath>
         <xpath expr="//field[@name='currency_id']" position="replace">
@@ -38,7 +38,7 @@
         <xpath expr="//field[@name='plan_id']" position="attributes">
           <attribute name="invisible">True</attribute>
         </xpath>
-        <xpath expr="//form[1]/sheet[1]/group[@name='main']/group[1]/field[@name='company_id']" position="attributes">
+        <xpath expr="//group[@name='main']/group/field[@name='company_id']" position="attributes">
           <attribute name="force_save">1</attribute>
           <attribute name="groups">base.group_no_one</attribute>
           <attribute name="readonly">True</attribute>
@@ -56,7 +56,7 @@
     <field name="type">form</field>
     <field name="arch" type="xml">
       <xpath expr="//header" position="inside">
-        <button name="%(ir_act_server_split_per_property)d" string="Split per Owner" type="action" invisible="not x_company_partner_id or state != 'draft'"/>
+        <button name="%(ir_act_server_split_so_per_owner)d" string="Split per Owner" type="action" invisible="not x_company_partner_id or state != 'draft'"/>
       </xpath>
       <xpath expr="//button[@name='action_sale_order_log']" position="after">
         <button name="%(sale_order_button_action)d" class="oe_stat_button" icon="fa-dollar" type="action" invisible="x_source_sales_order_sale_order_count == 0">
@@ -336,7 +336,7 @@
     <field name="priority">99</field>
     <field name="type">list</field>
     <field name="arch" type="xml">
-      <xpath expr="//list[1]/field[@name='name']" position="attributes">
+      <xpath expr="//field[@name='name']" position="attributes">
         <attribute name="string">Distribution Key</attribute>
       </xpath>
       <xpath expr="//field[@name='country_group_ids']" position="attributes">
@@ -369,7 +369,7 @@
       <xpath expr="//field[@name='property_product_pricelist']" position="after">
         <field name="x_condominium_properties" widget="many2many_tags" force_save="1" readonly="True" />
       </xpath>
-      <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+      <xpath expr="//sheet/notebook" position="inside">
         <page string="Vendors" invisible="not ref_company_ids">
           <field name="x_vendors">
             <list string="Contacts" sample="1" multi_edit="1" editable="bottom">
@@ -422,16 +422,16 @@
         <xpath expr="//field[@name='sale_order_template_id']" position="after">
           <field name="x_distribution_key" options="{'create_name_field': 'x_name'}"/>
         </xpath>
-        <xpath expr="//form[1]/sheet[1]/group[@name='sale_header']/group[@name='order_details']/label[not(@name)][1]" position="attributes">
+        <xpath expr="//label[@for='pricelist_id']" position="attributes">
           <attribute name="string">Pricelist</attribute>
         </xpath>
-        <xpath expr="//form[1]/sheet[1]/group[@name='sale_header']/group[@name='order_details']/div[not(@name)][3]/field[@name='pricelist_id']" position="attributes">
+        <xpath expr="//field[@name='pricelist_id']" position="attributes">
           <attribute name="placeholder"/>
         </xpath>
         <xpath expr="//group[@name='sale_header']" position="after">
           <group name="sale_header_group"/>
         </xpath>
-        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='order_lines']/field[@name='order_line']/list[1]" position="attributes">
+        <xpath expr="//page[@name='order_lines']/field[@name='order_line']/list" position="attributes">
           <attribute name="open_form_view">true</attribute>
         </xpath>
       </data>
@@ -727,7 +727,7 @@
   <record id="analytic_account_custom_list_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
-        <xpath expr="//list[1]/field[@name='company_id'][2]" position="replace"/>
+        <xpath expr="//field[@name='company_id' and @groups='base.group_multi_company']" position="replace"/>
         <xpath expr="//field[@name='plan_id']" position="replace"/>
         <xpath expr="//field[@name='code']" position="replace">
           <field name="x_start_date" optional="show"/>
@@ -770,12 +770,12 @@
   <record id="view_account_analytic_line_form_inherit" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
-        <xpath expr="//form[1]/field[@name='company_id']" position="before">
+        <xpath expr="//field[@name='company_id']" position="before">
           <header>
             <button string="Split" name="%(split_analytic_item_action)d" type="action" class="btn-primary"/>
           </header>
         </xpath>
-        <xpath expr="//form[1]/sheet[1]/group[1]/group[@name='analytic_item']/field[@name='company_id']" position="after">
+        <xpath expr="//group[@name='analytic_item']/field[@name='company_id']" position="after">
           <field name="x_notes"/>
         </xpath>
         <xpath expr="//field[@name='product_id']" position="after">
@@ -1006,24 +1006,15 @@
         <xpath expr="//page[@name='page_invitations']" position="attributes">
           <attribute name="groups"/>
         </xpath>
-        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/list[1]/field[@name='partner_id']" position="attributes">
+        <xpath expr="//field[@name='attendee_ids']" position="attributes">
           <attribute name="readonly">True</attribute>
         </xpath>
-        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/list[1]/field[@name='email']" position="attributes">
-          <attribute name="readonly">True</attribute>
-        </xpath>
-        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/list[1]/field[@name='phone']" position="attributes">
-          <attribute name="readonly">True</attribute>
-        </xpath>
-        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/list[1]/field[@name='state']" position="attributes">
-          <attribute name="readonly">True</attribute>
-        </xpath>
-        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/list[1]/button[@name='do_decline']" position="after">
+        <xpath expr="//field[@name='attendee_ids']/list/button[@name='do_decline']" position="after">
           <field name="x_attending" invisible="not x_condominium"/>
           <field optional="show" name="x_delegating" invisible="not x_condominium"/>
           <field name="x_ratio" optional="show"/>
         </xpath>
-        <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='page_invitations']/field[@name='attendee_ids']/kanban[1]" position="after">
+        <xpath expr="//field[@name='attendee_ids']/kanban" position="after">
           <form>
             <sheet string="Calendar Attendee Information" name="calendar_attendee_information_sheet">
               <group name="calendar_attendee_information_group">
@@ -1056,7 +1047,7 @@
             </sheet>
           </form>
         </xpath>
-        <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+        <xpath expr="//form/sheet/notebook" position="inside">
           <page string="Motions" name="motions_page" invisible="not x_condominium">
             <group name="motions_group_main">
               <group name="motions_group_left">
@@ -1216,14 +1207,14 @@
   <record id="view_invoice_tree_inherit" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
-        <xpath expr="//list[1]" position="attributes">
+        <xpath expr="//list" position="attributes">
           <attribute name="create">false</attribute>
           <attribute name="default_order">invoice_date desc</attribute>
           <attribute name="delete">false</attribute>
           <attribute name="multi_edit">true</attribute>
           <attribute name="open_form_view">true</attribute>
         </xpath>
-        <xpath expr="//list[1]/field[@name='name']" position="attributes">
+        <xpath expr="//list/field[@name='name']" position="attributes">
           <attribute name="readonly">True</attribute>
         </xpath>
         <xpath expr="//field[@name='name']" position="after">
@@ -1237,7 +1228,7 @@
           <attribute name="string">Total</attribute>
         </xpath>
         <xpath expr="//field[@name='invoice_partner_display_name']" position="after">
-          <xpath expr="//list[1]/field[@name='amount_total_in_currency_signed']" position="move"/>
+          <xpath expr="//list/field[@name='amount_total_in_currency_signed']" position="move"/>
           <field name="x_distribution_key" optional="show"/>
           <field name="x_period_start" optional="show"/>
           <field name="x_period_end" optional="show"/>
@@ -1273,7 +1264,7 @@
         <xpath expr="//filter[@name='not_sent']" position="replace"/>
         <xpath expr="//field[@name='line_ids']" position="replace"/>
         <xpath expr="//field[@name='next_payment_date']" position="replace"/>
-        <xpath expr="//search[1]/field[@name='date']" position="replace"/>
+        <xpath expr="//search/field[@name='date']" position="replace"/>
         <xpath expr="//field[@name='invoice_user_id']" position="replace"/>
         <xpath expr="//field[@name='journal_group_id']" position="replace"/>
         <xpath expr="//field[@name='journal_id']" position="replace"/>
@@ -1284,6 +1275,8 @@
           <filter domain="[('x_distribution_key', '=', False)]" name="undistributed" help="Without distribution"/>
           <separator/>
         </xpath>
+        <xpath expr="//filter[@name='draft']" position="replace"/>
+        <xpath expr="//filter[@name='partner']" position="replace"/>
       </data>
     </field>
     <field name="inherit_id" ref="account.view_account_invoice_filter"/>
@@ -1470,7 +1463,6 @@
       </form>
     </field>
   </record>
-
   <record id="properties_act_window_account" model="ir.actions.act_window">
     <field name="view_ids" eval="[
         (5, 0, 0),
