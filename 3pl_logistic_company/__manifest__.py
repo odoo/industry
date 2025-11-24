@@ -54,6 +54,7 @@
         'demo/quality_point.xml',
         'demo/stock_location.xml',
         'demo/res_partner.xml',
+        'demo/res_users.xml',
         'demo/product_template.xml',
         'demo/qweb_view.xml',
         'demo/mrp_bom.xml',
