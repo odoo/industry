@@ -43,8 +43,6 @@
         'data/knowledge_article.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
-        'data/event_event.xml',
-        'data/event_event_ticket.xml',
     ],
     'demo': [
         'demo/product_template.xml',
@@ -59,6 +57,7 @@
         'demo/hr_expense.xml',
         'demo/hr_expense_action.xml',
         'demo/event_event.xml',
+        'demo/event_event_ticket.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
         'demo/sale_order_confirm.xml',
