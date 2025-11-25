@@ -26,8 +26,6 @@
         'data/product_pricelist_item.xml',
         'data/appointment_type.xml',
         'data/ir_attachment_post.xml',
-        'data/event_event.xml',
-        'data/event_event_ticket.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
@@ -40,6 +38,7 @@
     'demo': [
         'demo/appointment_type.xml',
         'demo/event_event.xml',
+        'demo/event_event_ticket.xml',
         'demo/product_product.xml',
         'demo/hr_department.xml',
         'demo/res_partner.xml',
