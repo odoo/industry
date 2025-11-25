@@ -16,30 +16,24 @@ records.action_confirm()
         <field name="binding_model_id" ref="model_x_split_analytic_items_wizard"/>
         <field name="code"><![CDATA[
 total_share = sum(records.x_line_ids.mapped('x_share'))
-
 if round(total_share) != 100: raise UserError("The Share sum shall equal 100% to confirm the split.")
-
 note_details = {}
 split_account_analytic_lines = {}
 account_plan_column_name = records.env.ref('condominium.condominium_analytic_plan_1')._column_name()
-
 for line in records.x_line_ids:
     original_analytic_line = line.x_analytic_line_id
     original_analytic_line_name = original_analytic_line.name
     original_analytic_line_id = original_analytic_line.id
     analytic_id = line.x_analytic_account_id
-
     if original_analytic_line:
         new_split_analytic_line_id = original_analytic_line.copy({
             account_plan_column_name: analytic_id.id,
             "amount": line.x_amount
         })
-
     if original_analytic_line_id in split_account_analytic_lines:
         split_account_analytic_lines[original_analytic_line_id].update(new_split_analytic_line_id)
     else:
         split_account_analytic_lines.update({original_analytic_line_id: set(new_split_analytic_line_id)})
-
     if original_analytic_line_id in note_details:
         analytic_url = f"/odoo/analytic-items/{new_split_analytic_line_id.id}"
         note_line = f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{analytic_id.name}</a>"
@@ -48,16 +42,12 @@ for line in records.x_line_ids:
         analytic_url = f"/odoo/analytic-items/{new_split_analytic_line_id.id}"
         note_line = {f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{analytic_id.name}</a>"}
         note_details.update({original_analytic_line_id: set(note_line)})
-
 today_date_display = datetime.date.today().strftime("%d %B %Y")
 for original_analytic_id, new_account_analytic_lines in split_account_analytic_lines.items():
     notes = note_details.get(original_analytic_id)
-    if not notes:
-        continue
-
+    if not notes: continue
     # Make sure notes are strings and build in HTML
     note_items = [str(line).strip() for line in notes if line]
-
     note_html = f"""
         <i>{today_date_display}</i><br/>
         <p><b>Analytic item coming from a split</b><br/>
@@ -65,10 +55,8 @@ for original_analytic_id, new_account_analytic_lines in split_account_analytic_l
         See <a href='/odoo/analytic-items/{original_analytic_id}' target='_blank'> original analytic item</a>
         </p>
         """
-
     for new_account_analytic_line in new_account_analytic_lines:
         new_account_analytic_line.write({"x_notes": note_html})
-
 # notes add for original analytic item
 for original_analytic_id, note_lines in note_details.items():
     original_item = env['account.analytic.line'].browse(original_analytic_id)
@@ -94,7 +82,6 @@ for analytic_line in records:
     amount_total += analytic_line.amount
     analytic_amount_split = analytic_line.amount / 2
     account_plan_column_name = analytic_line.env.ref('condominium.condominium_analytic_plan_1')._column_name()
-
     # add two split lines
     plan_id = analytic_line[account_plan_column_name].id if analytic_line[account_plan_column_name] else False
     split_line_vals.extend([
@@ -109,14 +96,8 @@ for analytic_line in records:
             'x_analytic_account_id': plan_id,
         }),
     ])
-
 if amount_total == 0: raise UserError("Total amount is zero. Cannot split analytic items.")
-
-split_analytic_items_wizard = env['x_split_analytic_items_wizard'].create({
-    "x_line_ids": split_line_vals,
-    "x_total": amount_total
-})
-
+split_analytic_items_wizard = env['x_split_analytic_items_wizard'].create({"x_line_ids": split_line_vals, "x_total": amount_total})
 action = env['ir.actions.act_window']._for_xml_id('condominium.split_act_window')
 action['res_id'] = split_analytic_items_wizard.id]]>
         </field>
@@ -203,7 +184,7 @@ for line in property_id.x_owner_ids:
     owner = line.x_owner
     owner_id = owner.id
     if not line.x_end_date: property_id.write({'x_current_owner': owner_id})
-    if owner: account = analytic_account.search([('x_property', '=', property_id.id), ('partner_id', '=', owner_id)], limit=1)
+    account = analytic_account.search([('x_property', '=', property_id.id), ('partner_id', '=', owner_id)], limit=1)
     if not account and owner_id:
         line['x_account'] = analytic_account.create({'name': f"{property_id.x_name} - {owner.name}", 'x_property': property_id.id, 'partner_id': owner_id, 'x_owner_line': line.id}).id
 ]]>        </field>
@@ -285,15 +266,11 @@ if not record.x_distribution_key:
         record.invoice_line_ids.write({'analytic_distribution': {}})
 else:
     analytic_distribution = {}
-
-    # periods_valid: True when both start and end are set OR both are unset
     period_start = record.x_period_start
     period_end = record.x_period_end
     periods_valid = bool(period_start) == bool(period_end)
-
     if record.x_distribution_key.x_based_on == "Shares" and periods_valid:
-        x_ratios = record.sudo().x_distribution_key.x_ratio_ids
-
+        x_ratios = record.x_distribution_key.x_ratio_ids
         for ratio in x_ratios.filtered(lambda l: l.x_ratio != 0):
             for account in ratio.x_property_ratios.x_account_ids:
                 account_start_date = account.x_start_date
@@ -327,7 +304,6 @@ else:
                     else: mroend = billend
                     if not (billend_date < mrostart_date or billend_date < mroend.x_date) and mrostart_date != mroend.x_date:
                         analytic_distribution[account.id] = abs(mroend.x_quantity - mrostart.x_quantity)
-
     # Outcome
     total_ratio = sum(analytic_distribution.values())
     if total_ratio:
