@@ -24,8 +24,6 @@
         'data/resource_calendar.xml',
         'data/ir_attachment.xml',
         'data/ir_model_fields.xml',
-        'data/event_tag_category.xml',
-        'data/event_tag.xml',
         'data/res_config_settings.xml',
         'data/product_category.xml',
         'data/pos_category.xml',
@@ -52,6 +50,8 @@
     'demo': [
         'demo/ir_attachment_post.xml',
         'demo/res_config_settings.xml',
+        'demo/event_tag_category.xml',
+        'demo/event_tag.xml',
         'demo/event_event.xml',
         'demo/event_event_ticket.xml',
         'demo/event_slot.xml',

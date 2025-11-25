@@ -35,7 +35,6 @@
         'data/product_pricelist_item.xml',
         'data/crm_tag.xml',
         'data/hr_job.xml',
-        'data/event_event.xml',
         'data/helpdesk_team.xml',
         'data/mailing_mailing.xml',
         'data/mail_message.xml',

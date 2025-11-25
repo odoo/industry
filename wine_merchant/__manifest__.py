@@ -27,8 +27,6 @@
         'data/product_template_attribute_line.xml',
         'data/product_product.xml',
         'data/ir_attachment.xml',
-        'data/event_event.xml',
-        'data/event_event_ticket.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/pos_payment_method.xml',
@@ -43,6 +41,7 @@
     'demo': [
         'demo/loyalty_program.xml',
         'demo/event_event.xml',
+        'demo/event_event_ticket.xml',
         'demo/product_template.xml',
         'demo/loyalty_rule.xml',
         'demo/website_view.xml',
