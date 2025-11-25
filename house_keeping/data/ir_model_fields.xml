@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!-- Project.project fields -->
+    <record id="x_is_house_keeping_project_field_project_project" model="ir.model.fields">
+        <field name="name">x_is_house_keeping_project</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">House Keeping Project</field>
+        <field name="help"><![CDATA[When set, the tasks from this project are used for house keeping management in the accommodation app.]]></field>
+        <field name="model_id" ref="project.model_project_project"/>
+    </record>
+
+    <!-- project.task fields -->
+    <record id="x_resource_field_resource_resource" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">Resource</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="name">x_resource</field>
+        <field name="relation">resource.resource</field>
+    </record>
+    <record id="x_task_employee_field_project_task" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">Employee</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="name">x_task_employee</field>
+        <field name="relation">hr.employee</field>
+    </record>
+    <record id="x_cleaning_field_project_task" model="ir.model.fields">
+        <field name="ttype">selection</field>
+        <field name="field_description">Cleaning</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="name">x_cleaning</field>
+        <field name="selection">[('Stayover', 'Stayover'), ('Checkout', 'Checkout')]</field>
+    </record>
+    
+    <!-- planning.role fields -->
+    <record id="x_overstay_clean_field_planning_role" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="field_description">Overstay Clean</field>
+        <field name="help"><![CDATA[Credits assigned to the overstay cleaning tasks to balance toad by employee.]]></field>
+        <field name="model_id" ref="planning.model_planning_role"/>
+        <field name="name">x_overstay_clean</field>
+    </record>
+    <record id="x_checkout_clean_field_planning_role" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="field_description">Checkout Clean</field>
+        <field name="help"><![CDATA[Credits assigned to the checkout cleaning tasks to balance toad by employee.]]></field>
+        <field name="model_id" ref="planning.model_planning_role"/>
+        <field name="name">x_checkout_clean</field>
+    </record>
+
+    <!-- resource.resource fields -->
+    <record id="x_occupancy_field_resource_resource" model="ir.model.fields">
+        <field name="ttype">selection</field>
+        <field name="field_description">Occupancy</field>
+        <field name="model_id" ref="resource.model_resource_resource"/>
+        <field name="name">x_occupancy</field>
+        <field name="selection">[('Vacant', 'Vacant'), ('Occupied', 'Occupied'), ('Stayover', 'Stayover'), ('Due Out', 'Due Out')]</field>
+    </record>
+    <record id="x_tasks_field_project_task" model="ir.model.fields">
+        <field name="ttype">one2many</field>
+        <field name="field_description">Tasks</field>
+        <field name="model_id" ref="resource.model_resource_resource"/>
+        <field name="name">x_tasks</field>
+        <field name="relation">project.task</field>
+        <field name="relation_field">x_resource</field>
+    </record>
+    <record id="x_house_keeping_stage_field_resource_resource" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">House Keeping Stage</field>
+        <field name="model_id" ref="resource.model_resource_resource"/>
+        <field name="name">x_house_keeping_stage</field>
+        <field name="relation">project.task.type</field>
+    </record>
+    <record id="x_ongoing_task_field_resource_resource" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_ongoing_task'] = False
+    for task in record.x_tasks:
+        if not task.is_closed : record['x_ongoing_task'] = task.id]]></field>
+        <field name="ttype">many2one</field>
+        <field name="depends">x_tasks, x_tasks.stage_id</field>
+        <field name="field_description">Ongoing Task</field>
+        <field name="model_id" ref="resource.model_resource_resource"/>
+        <field name="name">x_ongoing_task</field>
+        <field name="readonly" eval="True"/>
+        <field name="relation">project.task</field>
+    </record>
+    <record id="x_resource_employee_field_resource_resource" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="related">x_ongoing_task.x_task_employee</field>
+        <field name="field_description">Employee</field>
+        <field name="model_id" ref="resource.model_resource_resource"/>
+        <field name="name">x_resource_employee</field>
+        <field name="readonly" eval="True"/>
+        <field name="relation">hr.employee</field>
+        <field name="store" eval="False"/>
+    </record>
+
+    <record id="x_related_field_4i4_1j8nlcue4_field_project_task" model="ir.model.fields">
+        <field name="ttype">selection</field>
+        <field name="related">x_resource.x_occupancy</field>
+        <field name="field_description">Occupancy</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="name">x_related_field_4i4_1j8nlcue4</field>
+        <field name="readonly" eval="True"/>
+        <field name="selection">[('Vacant', 'Vacant'), ('Stayover', 'Stayover'), ('Due Out', 'Due Out'), ('Out of Order', 'Out of Order')]</field>
+        <field name="store" eval="False"/>
+    </record>
+</odoo>

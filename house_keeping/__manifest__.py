@@ -5,11 +5,21 @@
     'author': 'Odoo S.A.',
     'depends': [
         'booking_engine',
+        'web_studio',
     ],
     'data': [
+        'data/ir_model_fields.xml',
+        'data/project_task_type.xml',
+        'data/project_project.xml',
+        'data/ir_actions_server.xml',
+        'data/base_automation.xml',
+        'data/ir_actions_act_window.xml',
+        'data/ir_ui_view.xml',
         'data/ir_ui_menu.xml',
     ],
     'demo': [
+        'demo/res_partner.xml',
+        'demo/planning_slot.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [
