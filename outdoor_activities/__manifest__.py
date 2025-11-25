@@ -17,7 +17,6 @@
         'data/crm_stages.xml',
         'data/crm_tags.xml',
         'data/product_product.xml',
-        'data/event_event.xml',
         'data/appointment_resource.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favourite.xml',

@@ -29,7 +29,6 @@
         'data/ir_actions_act_window.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
-        'data/event.event.xml',
         'data/mail_template.xml',
         'data/ir_ui_menu.xml',
         'data/knowledge_cover.xml',
