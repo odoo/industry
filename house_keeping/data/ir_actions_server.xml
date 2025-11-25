@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="server_action_set_resources_occupied" model="ir.actions.server">
+        <field name="name">HouseKeeping: Set resources as occupied</field>
+        <field name="code"><![CDATA[
+for line in record.order_line:
+    for slot in line.planning_slot_ids:
+        if slot.resource_id.role_ids.x_is_room_offer: slot['resource_id']['x_occupancy'] = 'Occupied']]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+    </record>
+    <record id="server_action_set_resources_vacant" model="ir.actions.server">
+        <field name="name">HouseKeeping: Set resources as vacant</field>
+        <field name="code"><![CDATA[
+for line in record.order_line:
+    for slot in line.planning_slot_ids:
+        if slot.resource_id.role_ids.x_is_room_offer: slot['resource_id']['x_occupancy'] = 'Vacant']]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+    </record>
+    <record id="server_action_set_task_to_done" model="ir.actions.server">
+        <field name="name">HouseKeeping: Set task to done</field>
+        <field name="code"><![CDATA[
+# ASSUMING THIS IS A SETTING
+setting_house_keeping_approver = True
+if record.stage_id == env.ref('project_task_type_18'): # Ready
+    record['state'] = '1_done'
+if record.stage_id == env.ref('project_task_type_17'): # Clean
+    if not setting_house_keeping_approver: 
+        record['stage_id'] = env.ref('project_task_type_18') # Ready since no need for approver
+        record['state'] = '1_done'
+record["state"] = '1_done']]></field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="update_path">state</field>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="project.model_project_task"/>
+        <field name="selection_value" ref="project.selection__project_task__state__1_done"/>
+        <field name="update_field_id" ref="project.field_project_task__state"/>
+        <field name="value"><![CDATA[1_done]]></field>
+    </record>
+    <record id="server_action_check_auto_approve_readiness" model="ir.actions.server">
+        <field name="name">HouseKeeping: Check if auto-approve readiness</field>
+        <field name="code"><![CDATA[# ASSUMED THIS IS THE SETTING
+setting_house_keeping_approver = True
+if not setting_house_keeping_approver: record['stage'] = env.ref('project_task_type_18') # Ready]]></field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+    </record>
+    <record id="server_action_update_task_cleaning_state" model="ir.actions.server">
+        <field name="name">HouseKeeping: Update task cleaning state</field>
+        <field name="code"><![CDATA[record["x_resource"]["x_house_keeping_stage"] = record.stage_id.id]]></field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+    </record>
+</odoo>
