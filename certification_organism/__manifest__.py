@@ -36,6 +36,7 @@
         'data/website_view.xml',
         'data/website_page.xml',
         'data/website_menu.xml',
+        'data/website_theme_apply.xml',
         'data/knowledge_tour.xml',
     ],
     'demo': [
