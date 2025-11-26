@@ -28,10 +28,10 @@
             </xpath>
         </field>
     </record>
-    <record id="product_template_form_custom" model="ir.ui.view">
-        <field name="name">product.template.product.form customization</field>
+    <record id="product_template_form_deposit" model="ir.ui.view">
+        <field name="name">product.template.product.form.inherit.deposit_management</field>
         <field name="model">product.template</field>
-        <field name="inherit_id" ref="excise_management.product_template_view_form"/>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="mode">extension</field>
         <field name="active" eval="True"/>
         <field name="priority">200</field>
@@ -42,9 +42,9 @@
                     invisible="x_is_a_deposit"
                     placeholder="Beer Crate &amp; Bottles 24x33cl"
                     options="{'no_quick_create': True}"
-                    context="{'default_categ_id': x_deposit_categ_id}"/>
+                    context="{'default_categ_id': x_deposit_categ_id, 'default_list_price': 0}"/>
             </group>
-            <group name="excise" position="after">
+            <xpath expr="//group[@name='group_standard_price']/.." position="inside">
                 <group name="autobom" string="Auto-BOM" invisible="x_is_a_deposit">
                     <label for="x_quantity_by_deposit_product"/>
                     <div class="d-flex" name="deposit">
@@ -55,9 +55,13 @@
                     <field name="x_deposit_product" invisible="not x_unit_sale_product"
                         placeholder="Beer Crate 24x33cl"/>
                 </group>
-            </group>
+            </xpath>
             <field name="categ_id" position="after">
-                <field name="x_deposit_amount" invisible="not x_is_a_deposit" required="x_is_a_deposit"/>
+                <label for="x_deposit_amount" invisible="not x_is_a_deposit"/>
+                <div class="d-flex" name="deposit_amount" invisible="not x_is_a_deposit">
+                    <field name="x_currency_symbol_deposit" class="oe_inline" force_save="1"/>
+                    <field name="x_deposit_amount" required="x_is_a_deposit" class="oe_inline"/>
+                </div>
             </field>
         </field>
     </record>
@@ -73,7 +77,7 @@
         </field>
     </record>
     <record id="product_template_search_inherit" model="ir.ui.view">
-        <field name="name">product.template.search.inherit.micro_brewery</field>
+        <field name="name">product.template.search.inherit.beverage_distributor</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_search_view"/>
         <field name="active" eval="True"/>
@@ -81,6 +85,50 @@
             <filter name="combo" position="after">
                 <filter string="Deposit" name="deposit" domain="[('x_is_a_deposit', '=', 'True')]"/>
             </filter>
+        </field>
+    </record>
+    <record id="sale_order_form_view" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.deposit_management</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="mode">extension</field>
+        <field name="model">sale.order</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='order_lines']//list//field[@name='tax_ids']" position="after">
+                <field name="x_total_deposits" optional="show" invisible="not x_total_deposits" column_invisible="not parent.x_has_deposit_line"/>
+                <field name="currency_id" column_invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="account_move_form_view" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.deposit_management</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="active" eval="True"/>
+        <field name="mode">extension</field>
+        <field name="model">account.move</field>
+        <field name="priority">300</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//list[@name='journal_items']//field[@name='price_unit']" position="after">
+                <field name="x_total_deposits_account_move" optional="show" invisible="not x_total_deposits_account_move" column_invisible="not parent.x_has_deposit_line"/>
+                <field name="company_currency_id" column_invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="account_tax_group_form_view" model="ir.ui.view">
+        <field name="name">account.tax.group.form.inherit.deposit_management</field>
+        <field name="inherit_id" ref="account.view_tax_group_form"/>
+        <field name="mode">extension</field>
+        <field name="model">account.tax.group</field>
+        <field name="priority">99</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form//field[@name='pos_receipt_label']" position="after">
+                <field name="x_is_deposit"/>
+            </xpath>
         </field>
     </record>
 </odoo>
