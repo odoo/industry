@@ -13,13 +13,16 @@
         'data/project_project.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
+        'data/ir_cron.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_ui_view.xml',
         'data/ir_ui_menu.xml',
+        'data/res_config_settings.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
         'demo/planning_slot.xml',
+        'demo/planning_slot_post.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [
