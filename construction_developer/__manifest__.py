@@ -1,6 +1,5 @@
 {
     'name': 'Construction Developer',
-    'version': '1.0',
     'category': 'Construction',
     'depends': [
         'base_industry_data',
@@ -33,10 +32,12 @@
         'web.assets_backend': [
             'construction_developer/static/src/widgets/apply_to_section_widget.js',
             'construction_developer/static/src/widgets/apply_to_section_widget.xml',
+            'construction_developer/static/src/scss/sale_order.scss',
         ],
     },
     'cloc_exclude': [
         'data/qweb_view.xml',
+        'static/src/scss/sale_order.scss',
         'static/src/widgets/apply_to_section_widget.js',
         'static/src/widgets/apply_to_section_widget.xml',
     ],
