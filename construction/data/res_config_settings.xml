@@ -1,23 +1,69 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<odoo noupdate="1">
-    <record id="res_config_account_setting" model="res.config.settings">
-        <field name="group_project_stages" eval="1"/>
-        <field name="group_discount_per_so_line" eval="1"/>
-        <field name="group_product_pricelist" eval="1"/>
-        <field name="group_warning_sale" eval="1"/>
-        <field name="group_warning_purchase" eval="1"/>
-        <field name="invoiced_timesheet" eval="'approved'"/> 
-        <field name="group_warning_stock" eval="1"/> 
-        <field name="group_stock_reception_report" eval="1"/> 
-        <field name="group_sale_delivery_address" eval="1"/>
-        <field name="documents_product_settings" eval="1"/>
-        <field name="documents_hr_settings" eval="1"/>
-        <field name="group_analytic_accounting" eval="1"/>
-        <field name="group_uom" eval="1"/>
-        <field name="group_sale_order_template" eval="1"/>
+<odoo>
+    <record id="x_setting_field_full_width_sol" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Full width order lines</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="name">x_setting_full_width_sol</field>
+        <field name="readonly" eval="False"/>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+self['x_setting_full_width_sol'] = bool(self.env['ir.module.module'].search_count([('name', '=', 'construction_full_width_sol')], limit=1))
+]]></field>
     </record>
 
-    <function name="execute" model="res.config.settings">
-        <value eval="[ref('res_config_account_setting')]"/>
-    </function>
+    <record id="x_action_activate_full_width_sol" model="ir.actions.server">
+        <field name="code"><![CDATA[
+if not (module := env['ir.module.module'].search([('name', '=', 'construction_full_width_sol')], limit=1)):
+    action_window = env['ir.module.module'].with_context({'module_name': 'construction_full_width_sol'}).button_immediate_install_app()
+    env['base.import.module'].with_context(action_window.get('context')).browse(action_window['res_id']).import_module()
+elif module:
+    module.button_immediate_uninstall()
+action = {'type': 'ir.actions.client', 'tag': 'reload'}
+]]></field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="state">code</field>
+        <field name="name">(Un-)Install Full width order lines</field>
+    </record>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.construction</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="40"/>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="sale.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Construction" name="construction">
+                    <block title="Quotations &amp; Orders" name="quotations_setting_container">
+                        <setting id="construction_custom_full_width_sol" help="Scales the sale order lines to full width to maximize visibility of data in sale orders.">
+                            <field name="x_setting_full_width_sol" readonly="1"/>
+                            <button invisible="x_setting_full_width_sol" name="%(x_action_activate_full_width_sol)d" string="Install" class="btn-primary" type="action"/>
+                            <button invisible="not x_setting_full_width_sol" name="%(x_action_activate_full_width_sol)d" string="Uninstall" class="btn-primary" type="action"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <data noupdate="1">
+        <record id="res_config_construction" model="res.config.settings">
+            <field name="group_project_stages" eval="1"/>
+            <field name="group_discount_per_so_line" eval="1"/>
+            <field name="group_product_pricelist" eval="1"/>
+            <field name="group_warning_sale" eval="1"/>
+            <field name="group_warning_purchase" eval="1"/>
+            <field name="invoiced_timesheet" eval="'approved'"/> 
+            <field name="group_warning_stock" eval="1"/> 
+            <field name="group_stock_reception_report" eval="1"/> 
+            <field name="group_sale_delivery_address" eval="1"/>
+            <field name="documents_product_settings" eval="1"/>
+            <field name="documents_hr_settings" eval="1"/>
+            <field name="group_analytic_accounting" eval="1"/>
+            <field name="group_uom" eval="1"/>
+            <field name="group_sale_order_template" eval="1"/>
+        </record>
+        <function name="execute" model="res.config.settings" eval="[ref('res_config_construction')]"/>
+    </data>
 </odoo>
