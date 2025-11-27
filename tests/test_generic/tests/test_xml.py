@@ -170,6 +170,7 @@ class TestEnv(IndustryCase):
                 self._check_static_values_in_inputs(tree, file_name)
                 self._check_res_config_setting(tree)
                 self._check_context_to_stop_mail_sending(tree, file_name, module)
+                self._check_text_based_xpath(tree, file_name)
                 if root.split('/')[-1] == 'data':
                     self._check_view_active(tree, file_name)
                     self._check_is_published_false(tree, file_name)
@@ -614,4 +615,16 @@ class TestEnv(IndustryCase):
                     model_name,
                     expected_context,
                     record_context or 'None'
+                )
+
+    def _check_text_based_xpath(self, root, file_name):
+        TEXT_XPATH_PATTERN = re.compile(r"text\(")
+        for xpath_node in root.xpath("//xpath[@expr]"):
+            expr = xpath_node.get("expr")
+            if TEXT_XPATH_PATTERN.search(expr):
+                _logger.warning(
+                    "Text-dependent xpath detected in %s: expr='%s'."
+                    " Avoid using text-based conditions and use class/name/id attributes instead.",
+                    file_name,
+                    expr,
                 )
