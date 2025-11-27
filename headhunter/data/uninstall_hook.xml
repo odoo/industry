@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="uninstall_hook_base_automation" model="base.automation">
+        <field name="model_id" ref="base.model_ir_module_module"/>
+        <field name="trigger">on_state_set</field>
+        <field name="trg_selection_field_id" ref="base.selection__ir_module_module__state__to_remove"/>
+        <field name="filter_domain">[('state', '=', 'to remove')]</field>
+        <field name="name">Talent Acquisition: Uninstall Hook</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('base.field_ir_module_module__state')])]"/>
+        <field name="filter_pre_domain" eval="[('id', '=', ref('base.module_headhunter'))]"/>
+    </record>
+        <record id="uninstall_hook_action_server" model="ir.actions.server">
+        <field name="code"><![CDATA[
+if hr_recruitment_action_hr_job_applications := env.ref('hr_recruitment.action_hr_job_applications', raise_if_not_found=False):
+    hr_recruitment_action_hr_job_applications['context'] = {'search_default_job_id': [active_id], 'search_default_applicants': 1, 'default_job_id': active_id, 'dialog_size':'medium', 'allow_search_matching_applicants': 1}
+
+if hr_recruitment_crm_case_categ0_act_job := env.ref('hr_recruitment.crm_case_categ0_act_job', raise_if_not_found=False):
+    hr_recruitment_crm_case_categ0_act_job['context'] = {'search_default_applicants': 1}
+    ]]></field>
+        <field name="model_id" ref="base.model_ir_module_module"/>
+        <field name="base_automation_id" ref="uninstall_hook_base_automation"/>
+        <field name="state">code</field>
+        <field name="name">Talent Acquisition: Uninstall Hook</field>
+        <field name="usage">base_automation</field>
+    </record>
+</odoo>
