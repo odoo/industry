@@ -12,6 +12,9 @@
                 <xpath expr="//field[@name='create_date']" position="after">
                     <field name="x_opportunities" optional="show" />
                 </xpath>
+                <xpath expr="//field[@name='availability']" position="before">
+                    <field name="x_available" optional="hide" />
+                </xpath>
             </data>
         </field>
     </record>
@@ -46,6 +49,18 @@
                 <xpath expr="//field[@name='job_id']" position="before">
                     <field name="x_opportunities" widget="many2many_tags"/>
                 </xpath>
+                <xpath expr="//field[@name='linkedin_profile']" position="after">
+                    <field name="x_is_shared_cv" widget="many2many_binary"/>
+                </xpath>
+                <xpath expr="//field[@name='priority']" position="before">
+                    <field name="employee_id"/>
+                </xpath>
+                <xpath expr="//field[@name='type_id']" position="after">
+                    <field name="x_available"/>
+                </xpath>
+                <xpath expr="//field[@name='availability']" position="attributes">
+                    <attribute name="invisible">not x_available</attribute>
+                </xpath>
             </data>
         </field>
     </record>
@@ -67,6 +82,50 @@
                     <filter name="group_by_opportunities" string="Opportunities" context="{'group_by': 'x_opportunities'}" />
                 </xpath>
             </data>
+        </field>
+    </record>
+    <record id="hr_kanban_view_applicant_inherit_view" model="ir.ui.view">
+        <field name="name">hr.applicants.kanban.inherit.view</field>
+        <field name="model">hr.applicant</field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="hr_recruitment.hr_kanban_view_applicant"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="inside">
+                <field name="x_available"/>
+                <field name="availability"/>
+            </xpath>
+            <xpath expr="//t[@t-name='card']/field[@name='partner_name']" position="after">
+                <t t-if="record.x_available.raw_value === false">
+                    <div class="text-muted small mt-1">
+                        <span class="text-danger fw-bold">Unavailable</span>
+                    </div>
+                </t>
+                <t t-elif="record.availability.raw_value">
+                    <div class="text-muted small mt-1">
+                        <field class="text-warning fw-bold" name="availability"/>
+                    </div>
+                </t>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_hr_job_form_inherit_view" model="ir.ui.view">
+        <field name="name">hr.job.form.inherit.view</field>
+        <field name="model">hr.job</field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="hr.view_hr_job_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="x_status_bar" widget="statusbar" options="{'clickable': '1'}"/>
+            </xpath>
+            <xpath expr="//group[@id='job_skills']/field[@name='current_job_skill_ids']" position="after">
+                <field name="x_recruitment_type"/>
+                <field name="x_customer" invisible="x_recruitment_type != &quot;External&quot;"/>
+                <field name="x_hiring_team_contact" widget="many2many_tags_email"/>
+            </xpath>
+            <xpath expr="//page[@name='recruitment_page']/group/group[@name='hiring_process']/div" position="after">
+                <field name="x_opportunity"/>
+                <field name="x_quotation_sales_order"/>
+            </xpath>
         </field>
     </record>
 </odoo>
