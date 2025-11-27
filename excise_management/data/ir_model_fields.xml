@@ -405,28 +405,43 @@ for record in self:
         <field name="store" eval="False"/>
         <field name="relation">account.move</field>
     </record>
-    <record id="field_account_move_external_ids" model="ir.model.fields">
-        <field name="name">x_external_ids</field>
+    <record id="field_account_move_picking_ids" model="ir.model.fields">
+        <field name="name">x_picking_ids</field>
         <field name="model_id" ref="account.model_account_move"/>
-        <field name="field_description">External IDs</field>
+        <field name="field_description">Picking IDs</field>
         <field name="ttype">many2many</field>
         <field name="relation">stock.picking</field>
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
         <field name="compute"><![CDATA[
-for record in self: record['x_external_ids'] = record.invoice_line_ids.sale_line_ids.mapped('order_id.picking_ids').ids
+for record in self: record['x_picking_ids'] = record.invoice_line_ids.sale_line_ids.mapped('order_id.picking_ids').ids
             ]]>
         </field>
     </record>
+    <record id="field_account_move_x_external_ids" model="ir.model.fields">
+        <field name="compute"><![CDATA[\
+for record in self:
+    vals = [str(x) for x in record.x_picking_ids.mapped('x_external_id') if x]
+    record['x_external_ids'] = ", ".join(vals) if vals else ""
+    ]]></field>
+        <field name="ttype">char</field>
+        <field name="depends">x_picking_ids</field>
+        <field name="field_description">External IDs</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="name">x_external_ids</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
+
     <record id="field_account_move_external_ids_count" model="ir.model.fields">
         <field name="compute"><![CDATA[
-for record in self: record['x_external_id_count'] = len(record.x_external_ids)
+for record in self: record['x_external_id_count'] = len(record.x_picking_ids)
     ]]></field>
         <field name="ttype">integer</field>
         <field name="field_description">External ID count</field>
         <field name="model_id" ref="account.model_account_move"/>
         <field name="name">x_external_id_count</field>
-        <field name="depends">x_external_ids</field>
+        <field name="depends">x_picking_ids</field>
         <field name="store" eval="False"/>
         <field name="readonly" eval="True"/>
     </record>
@@ -478,6 +493,20 @@ for record in self:
         <field name="field_description">Document</field>
         <field name="model_id" ref="excise_report"/>
         <field name="name">x_document</field>
+    </record>
+    <record id="details_computation_excise_report" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Line Computation</field>
+        <field name="model_id" ref="excise_report"/>
+        <field name="name">x_details_computation</field>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+for record in self:
+    if record.x_state != "done" and record.x_from_date and record.x_to_date:
+        server_action = self.env['ir.actions.server'].browse(self.env.ref('excise_management.ir_action_compute_excise_report_line')).id
+        server_action.with_context(active_ids=[record.id], active_model="x_excise_report").sudo().run()
+        record['x_details_computation'] = True
+        ]]></field>
     </record>
     <record id="state_excise_report" model="ir.model.fields">
         <field name="name">x_state</field>
@@ -599,18 +628,6 @@ for rec in self: rec['x_currency_id'] = self.env.company.currency_id.id
         <field name="relation_field">x_excise_report_id</field>
         <field name="store" eval="True"/>
         <field name="copied" eval="False"/>
-    </record>
-    <record id="excise_report_stock_moves_count" model="ir.model.fields">
-        <field name="compute"><![CDATA[
-for record in self: record['x_move_id_count'] = len(record.x_line_ids.mapped('x_move_ids'))
-    ]]></field>
-        <field name="ttype">integer</field>
-        <field name="field_description">Stock move ID count</field>
-        <field name="model_id" ref="excise_report"/>
-        <field name="name">x_move_id_count</field>
-        <field name="depends">x_line_ids, x_line_ids.x_move_ids</field>
-        <field name="store" eval="False"/>
-        <field name="readonly" eval="True"/>
     </record>
     <record id="res_company_reporter" model="ir.model.fields">
         <field name="name">x_reporter_id</field>

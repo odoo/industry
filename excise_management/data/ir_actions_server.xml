@@ -72,73 +72,26 @@ if from_date < datetime.date.today():
 action = {'view_mode': 'list', 'res_model': 'stock.move', 'type': 'ir.actions.act_window', 'domain': [('id', 'in', record.x_line_ids.mapped('x_move_ids.id'))], 'view_id': env.ref('excise_management.stock_move_view_list').id, 'name': 'Excises Analysis',}
         ]]></field>
     </record>
-    <record id="ir_action_create_excise_report_line" model="ir.actions.server">
-        <field name="code"><![CDATA[
-all_moves_ids = env['stock.move'].search([
-    ('date', '>=', min(records.mapped('x_from_date'), default=datetime.datetime.today())),
-    ('date', '<', max(records.mapped('x_to_date'), default=datetime.datetime.today())),
-    ('x_excise_category', '!=', False),
-    ('x_fiscal_deposit_move', 'not in', ['none', False]),
-    ('state', '=', 'done'),
-])
-for record in records:
-    grouped_data = {}
-    for move in all_moves_ids:
-        if move.date.date() < record.x_from_date or move.date.date() >= record.x_to_date: continue
-        key = (move.x_excise_category.id, move.x_fiscal_deposit_move)
-        if key not in grouped_data: grouped_data[key] = {'qty': 0.0, 'amount': 0.0, 'line_move_ids': []}
-        grouped_data[key]['qty'] += move.x_excise_quantity
-        grouped_data[key]['amount'] += move.x_excise_amount
-        grouped_data[key]['line_move_ids'].append(move.id)
-    lines = env['x_excise_report_line'].create([{
-        'x_excise_category_id': key[0],
-        'x_excise_move_type': key[1],
-        'x_excise_quantity': values['qty'],
-        'x_excise_amount': values['amount'],
-        'x_excise_report_id': record.id,
-        'x_move_ids': [(6, 0, values['line_move_ids'])]
-    } for key, values in grouped_data.items()])
-    record['x_line_ids'] = [(6, 0, lines.ids)] if bool(lines) else [(5, 0, 0)]
-        ]]></field>
+    <record id="ir_action_compute_excise_report_line" model="ir.actions.server">
         <field name="model_id" ref="excise_report"/>
+        <field name="name">Compute excise report line</field>
         <field name="state">code</field>
-        <field name="name">Action to Create Excise Report Line</field>
-        <field name="usage">base_automation</field>
-    </record>
-    <record id="ir_action_update_excise_report_line_onupdate_stock_move" model="ir.actions.server">
         <field name="code"><![CDATA[
-if record['state'] == 'done' and record['x_excise_category'] and record['x_fiscal_deposit_move'] and record['x_fiscal_deposit_move'] != 'none':
-    all_report_ids = env['x_excise_report'].search([])
-    old_report_ids = all_report_ids.filtered(lambda report: report.x_from_date > record['date'].date() or report.x_to_date <= record['date'].date())
-    for report_id in old_report_ids:
-        line_ids = report_id.x_line_ids.filtered(lambda l: l.x_excise_category_id == record['x_excise_category'] and l.x_excise_move_type == record['x_fiscal_deposit_move'] and record.id in l.x_move_ids.ids)
-        for line_id in line_ids:
-            line_id['x_excise_quantity'] -= record['x_excise_quantity'] or 0.0
-            line_id['x_excise_amount'] -= record['x_excise_amount'] or 0.0
-            line_id['x_move_ids'] = [(3, record.id)]
-            if not line_id['x_move_ids']:
-                line_id.unlink()
-    new_report_ids = all_report_ids - old_report_ids
-    for report_id in new_report_ids:
-        line_ids = report_id.x_line_ids.filtered(lambda l: l.x_excise_category_id == record['x_excise_category'] and l.x_excise_move_type == record['x_fiscal_deposit_move'])
-        for line_id in line_ids:
-            if record.id not in line_id.x_move_ids.ids:
-                line_id['x_excise_quantity'] += record['x_excise_quantity'] or 0.0
-                line_id['x_excise_amount'] += record['x_excise_amount'] or 0.0
-                line_id['x_move_ids'] = [(4, record.id)]
-        if not line_ids:
-            env['x_excise_report_line'].create([{
-                'x_excise_category_id': record['x_excise_category'].id,
-                'x_excise_move_type': record['x_fiscal_deposit_move'],
-                'x_excise_quantity': record['x_excise_quantity'],
-                'x_excise_amount': record['x_excise_amount'],
-                'x_excise_report_id': report_id.id,
-                'x_move_ids': [(6, 0, [record.id])]
-            }])
+for record in records:
+    all_moves_ids = env['stock.move']._read_group([
+        ('date', '>=', record.x_from_date),
+        ('date', '<', record.x_to_date),
+        ('x_excise_category', '!=', False), ('x_fiscal_deposit_move', 'not in', ['none', False]), ('state', '=', 'done'),
+    ],
+    groupby=['x_excise_category', 'x_fiscal_deposit_move'],
+    aggregates=['x_excise_quantity:sum', 'x_excise_amount:sum', 'id:recordset']
+    )
+    lines = env['x_excise_report_line'].create([{
+        'x_excise_category_id': move[0].id, 'x_excise_move_type': move[1], 'x_excise_quantity': move[2],
+        'x_excise_amount': move[3], 'x_excise_report_id': record.id, 'x_move_ids': [(6, 0, move[4].ids)]
+        } for move in all_moves_ids
+    ]).ids
+    record['x_line_ids'] = [(6, 0, lines)]
         ]]></field>
-        <field name="model_id" ref="stock.model_stock_move"/>
-        <field name="state">code</field>
-        <field name="name">Action to Update Excise line</field>
-        <field name="usage">base_automation</field>
     </record>
 </odoo>
