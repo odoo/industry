@@ -46,7 +46,6 @@
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
-        # 'demo/project_task.xml',
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
         'demo/planning_slot.xml',
