@@ -489,39 +489,39 @@ class TestEnv(IndustryCase):
 
     def _check_static_values_in_inputs(self, root, file_name):
         ALLOWED_INPUTS = {"resourceCapacity"}
-        for tag in root.xpath("//input[@value] | //option[@value]"):
-            value = tag.get("value")
-            if not (value and value.isdigit()):
+        for record in root.xpath("//record"):
+            if record.get('model') != 'ir.ui.view':
                 continue
-            if tag.get("t-att-value"):
-                continue
-            name = tag.get("name")
-            if name in ALLOWED_INPUTS:
-                continue
-
-            line = getattr(tag, "sourceline", "?")
-            _logger.warning(
-                "Static value '%s' found in <%s name='%s'> in %s (line %s). "
-                "Please use t-att-value=\"request.env.ref('module.record').id\" instead.",
-                value,
-                tag.tag,
-                name or tag.get("id") or "",
-                file_name,
-                line,
-            )
-
-        for tag in root.xpath("//a[@href]"):
-            href = tag.get("href")
-            if tag.get("t-att-href") or tag.get("t-attf-href"):
-                continue
-            if href and (href.startswith(("tel:", "mailto:", "javascript:", "#", "http://", "https://"))):
-                continue
-            if href and re.search(r"-\d+$", href):
+            for tag in root.xpath("//input[@value] | //option[@value] | //input[@t-att-value] | //option[@t-att-value]"):
+                value = tag.get("value") or tag.get("t-att-value")
+                if not value or not (value.isdigit() or "request.env.ref" in value):
+                    continue
+                name = tag.get("name")
+                if name in ALLOWED_INPUTS:
+                    continue
                 line = getattr(tag, "sourceline", "?")
                 _logger.warning(
-                    "Static record link '%s' found in <a> in %s (line %s). "
-                    "Please use t-att-href=\"request.env.ref('module.record').website_url\" instead.",
-                    href,
+                    "Static or env-ref value '%s' found in <%s name='%s'> in %s (line %s). "
+                    "Avoid using static numbers or request.env.ref in value.",
+                    value,
+                    tag.tag,
+                    name or tag.get("id") or "",
                     file_name,
                     line,
                 )
+
+            for tag in root.xpath("//a[@href] | //a[@t-att-href]"):
+                href = tag.get("href") or tag.get("t-att-href")
+                if not href:
+                    continue
+                if href.startswith(("tel:", "mailto:", "javascript:", "#", "http://", "https://")):
+                    continue
+                if re.search(r"-\d+$", href) or "request.env.ref" in href:
+                    line = getattr(tag, "sourceline", "?")
+                    _logger.warning(
+                        "Static or env-ref record link '%s' found in <a> in %s (line %s). "
+                        "Avoid static ID or request.env.ref in href attribute.",
+                        href,
+                        file_name,
+                        line,
+                    )
