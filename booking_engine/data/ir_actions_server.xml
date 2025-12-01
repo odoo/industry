@@ -16,21 +16,11 @@ elif record.x_total > 0:
     env['sale.order.line'].create({'order_id': record.x_sale_order_id.id, 'product_id': product.id, 'product_uom_qty': record.x_total, 'qty_delivered': record.x_total})
         ]]></field>
     </record>
-    <record id="open_x_city_tax_action" model="ir.actions.server">
-        <field name="name">Open City Tax</field>
-        <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-record.order_line.planning_slot_ids['x_guests'] = len(record.x_guests) // (len(record.order_line.planning_slot_ids) or 1) or 1
-action = {
-    'type': 'ir.actions.act_window',
-    'name': 'City tax',
-    'res_model': 'x_city_tax',
-    'view_mode': 'form',
-    'target': 'new',
-    'context': {'search_default_x_sale_order_id': record.id, 'default_x_sale_order_id': record.id, 'default_x_slot_ids': record.order_line.planning_slot_ids.ids},
-}   
-]]></field>
+    <record id="open_x_city_tax_action" model="ir.actions.act_window">
+        <field name="name">City Tax</field>
+        <field name="res_model">x_city_tax</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
     </record>
     <record id="industry_fix_slot_times" model="ir.actions.server">
         <field name="binding_model_id" ref="planning.model_planning_slot"/>
@@ -99,8 +89,8 @@ for record in records:
         <field name="code"><![CDATA[
 record.apply()
 if record.order_id.rental_status == "returned":
-    server_action = record.env['ir.actions.server'].browse(record.env.ref('booking_engine.open_x_city_tax_action').id)
-    action = server_action.with_context(active_id=record.order_id.id, active_model="sale.order").sudo().run()
+    action = record.env['ir.actions.act_window']._for_xml_id('booking_engine.open_x_city_tax_action')
+    action['context'] = {'search_default_x_sale_order_id': record.order_id.id, 'default_x_sale_order_id': record.order_id.id}
 ]]></field>
     </record>
 </odoo>
