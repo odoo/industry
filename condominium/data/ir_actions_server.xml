@@ -148,17 +148,15 @@ else:
     </record>
     <record id="ir_act_server_split_so_per_owner" model="ir.actions.server">
         <field name="code"><![CDATA[# Get distribution ratios
-distributions = record.x_distribution_key.x_ratio_ids
-total_distribution = sum(distributions.mapped('x_ratio'))
-if total_distribution == 0: raise UserError("Cannot split the Sales Orders because there is is no distribution key and total is null.")
-for owner in env['res.partner'].search([('x_companies', 'in', record.company_id.id)]):  # One SO per owner
+distribution_ratio_lines = record.x_distribution_key.x_ratio_ids
+total_ratio = sum(distribution_ratio_lines.mapped('x_ratio'))
+if total_ratio == 0: raise UserError("Cannot split the Sales Orders because there is is no distribution key and total is null.")
+for owner in env['res.partner'].search([('x_companies', '=', record.company_id.id)]):  # One SO per owner
     new_so = record.copy({'order_line': False, 'x_source_sales_order': record.id, 'partner_id': owner.id}); new_so_lines = [];
     for sol in record.order_line: # The lines are re-created using the distribution key and the analytic account corresponding to the property is set
-        for distribution in distributions:
-            if distribution.x_owner.id == owner.id:
-                new_so_lines.append((0, 0, { 'order_id': record.id, 'product_id': sol.product_id.id, 'name': sol.name #+ '\n' + distribution.x_property.x_name
-                , 'product_uom_qty': sol.product_uom_qty, 'product_uom_id': sol.product_uom_id.id,
-                    'price_unit': sol.price_unit * distribution.x_ratio / total_distribution, 'tax_ids': sol.tax_ids, 'discount': sol.discount, 'analytic_distribution': {distribution.x_account.id: 100} }))
+        for distribution_ratio_line in distribution_ratio_lines:
+            if distribution_ratio_line.x_owner.id == owner.id:
+                new_so_lines.append((0, 0, {'order_id': record.id, 'product_id': sol.product_id.id, 'name': sol.name, 'product_uom_qty': sol.product_uom_qty, 'product_uom_id': sol.product_uom_id.id, 'price_unit': sol.price_unit * distribution_ratio_line.x_ratio / total_ratio, 'tax_ids': sol.tax_ids, 'discount': sol.discount, 'analytic_distribution': {distribution_ratio_line.x_account.id: 100} }))
     new_so.write({'order_line': new_so_lines})
 record.write({'state': 'cancel'})
 ]]>        </field>
@@ -181,12 +179,11 @@ for mr in mrs:
         <field name="code"><![CDATA[property_id = record.x_property_id
 analytic_account = env['account.analytic.account']
 for line in property_id.x_owner_ids:
-    owner = line.x_owner
-    owner_id = owner.id
-    if not line.x_end_date: property_id.write({'x_current_owner': owner_id})
-    account = analytic_account.search([('x_property', '=', property_id.id), ('partner_id', '=', owner_id)], limit=1)
+    owner_id = line.x_owner
+    if not line.x_end_date: property_id.write({'x_current_owner': owner_id.id})
+    account = analytic_account.search([('x_property', '=', property_id.id), ('partner_id', '=', owner_id.id)], limit=1)
     if not account and owner_id:
-        line['x_account'] = analytic_account.create({'name': f"{property_id.x_name} - {owner.name}", 'x_property': property_id.id, 'partner_id': owner_id, 'x_owner_line': line.id}).id
+        line['x_account'] = analytic_account.create({'name': f"{property_id.x_name} - {owner_id.name}", 'x_property': property_id.id, 'partner_id': owner_id.id, 'x_owner_line': line.id}).id
 ]]>        </field>
         <field name="model_id" ref="model_x_property_line_owner"/>
         <field name="state">code</field>

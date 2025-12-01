@@ -233,8 +233,13 @@
   <record id="x_parent_account_analytic_account_count" model="ir.model.fields">
     <field name="name">x_parent_account_analytic_account_count</field>
     <field name="compute"><![CDATA[
-for record in self:
-    record['x_parent_account_analytic_account_count'] = self.env['account.analytic.account'].search_count([('x_parent', '=', record.id)])
+groups = self.env['account.analytic.account']._read_group(
+    [('x_parent', 'in', self.ids)],
+    ['x_parent'],
+    ['__count']
+)
+parent_child_counts = {parent.id: count for parent, count in groups}
+for record in self: record['x_parent_account_analytic_account_count'] = parent_child_counts.get(record.id, 0)
 ]]>    </field>
     <field name="ttype">integer</field>
     <field name="field_description">Parent count</field>
@@ -245,8 +250,13 @@ for record in self:
   <record id="x_building_account_analytic_account_count_field" model="ir.model.fields">
     <field name="name">x_building_account_analytic_account_count</field>
     <field name="compute"><![CDATA[
-for record in self:
-    record['x_building_account_analytic_account_count'] = self.env['account.analytic.account'].search_count([('x_building', '=', record.id)])
+groups = self.env['account.analytic.account']._read_group(
+    [('x_building', 'in', self.ids)],
+    ['x_building'],
+    ['__count']
+)
+building_counts = {building.id: count for building, count in groups}
+for record in self: record['x_building_account_analytic_account_count'] = building_counts.get(record.id, 0)
 ]]>    </field>
     <field name="ttype">integer</field>
     <field name="field_description">Building count</field>
@@ -257,8 +267,13 @@ for record in self:
   <record id="x_condominium_account_analytic_account_count_field" model="ir.model.fields">
     <field name="name">x_condominium_account_analytic_account_count</field>
     <field name="compute"><![CDATA[
-for record in self:
-    record['x_condominium_account_analytic_account_count'] = self.env['account.analytic.account'].search_count([('partner_id', '=', record.id)])
+groups = self.env['account.analytic.account']._read_group(
+    [('partner_id', 'in', self.ids)],
+    ['partner_id'],
+    ['__count']
+)
+analytic_account_counts = {partner.id: count for partner, count in groups}
+for record in self: record['x_condominium_account_analytic_account_count'] = analytic_account_counts.get(record.id, 0)
 ]]>    </field>
     <field name="ttype">integer</field>
     <field name="field_description">Building Condominium count</field>
@@ -352,9 +367,13 @@ for record in self:
     <field name="name">x_source_sales_order_sale_order_count</field>
     <field name="model_id" ref="sale.model_sale_order"/>
     <field name="field_description">Source Sales Order count</field>
-    <field name="compute"><![CDATA[
-for record in self:
-    record['x_source_sales_order_sale_order_count'] = self.env['sale.order'].search_count([('x_source_sales_order', 'in', record.ids)])
+    <field name="compute"><![CDATA[groups = self.env['sale.order']._read_group(
+    [('x_source_sales_order', 'in', self.ids)],
+    ['x_source_sales_order'],
+    ['__count']
+)
+sale_order_counts = {source_so.id: count for source_so, count in groups}
+for record in self: record['x_source_sales_order_sale_order_count'] = sale_order_counts.get(record.id, 0)
 ]]>    </field>
     <field name="ttype">integer</field>
     <field name="selectable" eval="False"/>
@@ -858,8 +877,8 @@ for record in self:
   </record>
   <record id="field_ratios_account" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self:
-    accounts = self.env['account.analytic.account'].search([('partner_id','=',record.x_owner),('x_property','=',record.x_property),('x_end_date','=',False)])
-    record['x_account'] = accounts.id]]></field>
+    account = self.env['account.analytic.account'].search([('partner_id', '=', record.x_owner), ('x_property', '=', record.x_property), ('x_end_date', '=', False)], limit=1))
+    record['x_account'] = account.id]]></field>
     <field name="ttype">many2one</field>
     <field name="depends">x_property_ratios, x_owner</field>
     <field name="field_description">Account</field>
@@ -896,7 +915,13 @@ for record in self:
   </record>
   <record id="field_partner_current_owner_x_property_count" model="ir.model.fields">
     <field name="compute"><![CDATA[
-for record in self: record['x_x_current_owner_x_property_count'] = self.env['x_property'].search_count([('x_current_owner', 'in', record.ids)])
+groups = self.env['x_property']._read_group(
+    [('x_current_owner', 'in', self.ids)],
+    ['x_current_owner'],
+    ['__count']
+)
+owner_property_counts = {owner.id: count for owner, count in groups}
+for record in self: record['x_x_current_owner_x_property_count'] = owner_property_counts.get(record.id, 0)
 ]]>    </field>
     <field name="ttype">integer</field>
     <field name="field_description">Current Owner count</field>
@@ -945,7 +970,13 @@ for record in self:
   </record>
   <record id="field_partner_condominium_x_property_count" model="ir.model.fields">
     <field name="compute"><![CDATA[
-for record in self: record['x_x_condominium_x_property_count'] = self.env['x_property'].search_count([('x_condominium', 'in', record.ids)])
+groups = self.env['x_property']._read_group(
+    [('x_condominium', 'in', self.ids)],
+    ['x_condominium'],
+    ['__count']
+)
+condo_counts = {condo.id: count for condo, count in groups}
+for record in self: record['x_x_condominium_x_property_count'] = condo_counts.get(record.id, 0)
 ]]>    </field>
     <field name="ttype">integer</field>
     <field name="field_description">Condominium count</field>
@@ -1090,11 +1121,11 @@ for record in self: record['x_x_condominium_x_property_count'] = self.env['x_pro
   </record>
   <record id="new_decimal_calendar_ratio" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self:
-    x_ratio = 0
-    if record.event_id.x_voting_key:
-        for property in record.event_id.x_voting_key.x_ratio_ids:
-            if property.x_owner.id == record.partner_id.id: x_ratio += property.x_ratio
-    record['x_ratio'] = x_ratio]]></field>
+  voting_key = record.event_id.x_voting_key
+  if voting_key:
+    record['x_ratio'] = sum(line.x_ratio for line in voting_key.x_ratio_ids if line.x_owner.id == record.partner_id.id)
+  else:
+    record['x_ratio'] = 0]]></field>
     <field name="ttype">float</field>
     <field name="depends">event_id.x_voting_key</field>
     <field name="field_description">Ratio</field>
@@ -1258,7 +1289,7 @@ for record in self: record['x_x_condominium_x_property_count'] = self.env['x_pro
   </record>
   <record id="new_selection_calend_outcome" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self:
-    if (record.x_in_favor == 0 and record.x_against == 0) or not record.x_vote_criteria : record['x_outcome'] = False
+    if (record.x_in_favor == 0 and record.x_against == 0) or not record.x_vote_criteria: record['x_outcome'] = False
     else: 
         if record.x_in_favor >= record.x_vote_criteria.x_acceptation_threshold: record['x_outcome'] = 'Approved'
         else: record['x_outcome'] = 'Rejected'
@@ -1443,12 +1474,8 @@ for record in self: record['x_x_condominium_x_property_count'] = self.env['x_pro
   </record>
   <record id="x_is_distributed_field" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self:
-    is_distributed = False
-    for invoice_line in record.invoice_line_ids:
-        if invoice_line.analytic_distribution != False: 
-            is_distributed = True
-            break
-    record['x_is_distributed'] = is_distributed]]></field>
+    record['x_is_distributed'] = any(bool(line.analytic_distribution) for line in record.invoice_line_ids
+    )]]></field>
     <field name="ttype">boolean</field>
     <field name="depends">invoice_line_ids, x_distribution_key, x_period_start, x_period_end</field>
     <field name="field_description">Is distributed</field>
@@ -1532,7 +1559,7 @@ for record in self: record['x_x_condominium_x_property_count'] = self.env['x_pro
   </record>
   <record id="is_a_unit_field" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self:
-    record['x_is_a_unit'] = record.parent_id != False]]></field>
+    record['x_is_a_unit'] = bool(record.parent_id)]]></field>
     <field name="ttype">boolean</field>
     <field name="depends">parent_id</field>
     <field name="field_description">Is a unit</field>
