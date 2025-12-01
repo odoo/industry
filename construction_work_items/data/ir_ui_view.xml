@@ -1,0 +1,157 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="x_work_item_list_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <list>
+            <field name="x_sequence" widget="handle"/>
+            <field name="x_name"/>
+            <field name="x_product_id" optional="show"/>
+            <field name="x_unit_id" optional="show"/>
+            <field name="x_unit_cost" optional="show" widget="monetary"/>
+            <field name="x_unit_price" optional="show" widget="monetary"/>
+            <field name="x_unit_margin" optional="show" widget="percentage"/>
+        </list>
+        </field>
+        <field name="model">x_work_item</field>
+        <field name="name">x_work_item.list.default.construction_work_item</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+    </record>
+    <record id="x_work_item_form_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <form>
+            <header>
+                <button string="Set as Template" type="action" invisible="x_is_template or not id" name="%(server_action_set_work_item_as_template)d" title="Sets the current work item as new template (archives the current template if any)."/>
+            </header>
+            <div class="alert alert-info" role="alert" style="height: 40px; margin-bottom:0px;" invisible="not x_is_template or x_product_wi_template_id == False  or x_product_wi_template_id == id">
+                Saving this Work Item will archive the current one for this product.
+            </div>
+            <sheet string="Work Item">
+                <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+                <div class="oe_title">
+                    <h1>
+                        <field name="x_name" required="1" placeholder="Name..."/>
+                    </h1>
+                </div>
+                <group>
+                    <group>
+                        <field name="x_product_id" force_save="1" readonly="not x_is_template" invisible="x_targeted_so" string="Product"/>
+                        <field name="x_reference" readonly="id and not x_is_template"/>
+                        <label for="x_unit_id"/>
+                        <div class="d-flex" name="unit_quantity">
+                            <field name="x_unit_id" class="oe_inline" string="Unit" force_save="1" readonly="x_product_id and not x_targeted_so" options="{'no_open': True}" placeholder="m²" required="not x_product_id"/>
+                        </div>
+                    </group>
+                    <group>
+                        <field name="x_unit_cost" widget="monetary" force_save="1" readonly="True"/>
+                        <field name="x_unit_price" widget="monetary" force_save="1" readonly="True"/>
+                        <field name="x_unit_margin" widget="percentage" force_save="1" readonly="True"/>
+                    </group>
+                </group>
+                <notebook>
+                    <page string="Components" name="lines">
+                        <field name="x_work_item_line_ids">
+                            <list editable="bottom" open_form_view="false">
+                                <field name="x_sequence" widget="handle"/>
+                                <field optional="show" name="x_product_id" string="Product"/>
+                                <field optional="show" name="x_unit_cost" widget="monetary"/>
+                                <field optional="show" name="x_unit_price" widget="monetary"/>
+                                <field optional="show" name="x_margin" widget="percentage" readonly="True"/>
+                                <field optional="show" name="x_quantity"/>
+                                <field optional="show" name="x_unit_id" readonly="True"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+            </sheet>
+            <chatter/>
+        </form>
+        </field>
+        <field name="model">x_work_item</field>
+        <field name="name">x_work_item.form.default.construction_work_item</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+    </record>
+    <record id="x_work_item_search_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <search>
+            <field name="x_name"/>
+            <field name="x_product_id"/>
+            <field name="x_reference"/>
+            <separator/>
+            <filter string="Archived" name="archived_x_work_item" domain="[['x_active', '=', False]]"/>
+            <separator/>
+        </search>
+        </field>
+        <field name="model">x_work_item</field>
+        <field name="name">x_work_item.search.default.construction_work_item</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="x_work_item_line_list_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <list editable="bottom">
+            <field name="x_sequence" widget="handle"/>
+            <field name="x_name"/>
+        </list>
+        </field>
+        <field name="model">x_work_item_line</field>
+        <field name="name">x_work_item_line.list.default.construction_work_item</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+    </record>
+    <record id="x_work_item_line_form_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <form>
+            <header/>
+            <sheet string="work_item_line">
+            <div class="oe_title">
+                <h1>
+                    <field name="x_name" required="False" placeholder="Name..."/>
+                </h1>
+            </div>
+            <group>
+                <group>
+                    <field name="x_margin" widget="percentage"/>
+                </group>
+            </group>
+            </sheet>
+        </form>
+        </field>
+        <field name="model">x_work_item_line</field>
+        <field name="name">x_work_item_line.form.default.construction_work_item</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+    </record>
+    <record id="x_work_item_line_search_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <search>
+            <field name="x_name"/>
+        </search>
+        </field>
+        <field name="model">x_work_item_line</field>
+        <field name="name">x_work_item_line.search.default.construction_work_item</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+    </record>
+
+
+    <record id="sale_order_form_view_extension" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/list//field[@name='route_ids']" position="after">
+                <button name="%(server_action_open_sol_work_item)d" type="action" class="btn btn-link" icon="fa-magic" width="1" invisible="not x_line_work_item_ids" string=" "/>
+            </xpath>
+            <xpath expr="//create[@name='add_note_control']" position="after">
+                <button string="Add Work Item" name="%(action_window_add_work_item)d" type="action" class="px-4 btn-link" context="{'so_id': parent.id}"/>
+            </xpath>
+        </field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="mode">extension</field>
+        <field name="model">sale.order</field>
+        <field name="name">sale.order.form.inherit.construction_work_item</field>
+        <field name="priority">1600</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>
