@@ -13,6 +13,7 @@
         'purchase',
     ],
     'data': [
+        'data/hr_employee.xml',
         'data/res_config_settings.xml',
         'data/product_category.xml',
         'data/product_pricelist.xml',

@@ -45,6 +45,7 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
+        'demo/hr_employee.xml',
         'demo/res_users.xml',
         'demo/res_partner.xml',
         'demo/appointment_type.xml',

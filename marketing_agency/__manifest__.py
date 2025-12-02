@@ -42,10 +42,10 @@
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
         'data/crm_tag.xml',
-        'data/hr_department.xml',
         'data/install_apps.xml',
     ],
     'demo': [
+        'demo/hr_department.xml',
         'demo/crm_team.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
