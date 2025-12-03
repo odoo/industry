@@ -25,10 +25,10 @@
         <field name="relation">hr.employee</field>
     </record>
     <record id="x_cleaning_field_project_task" model="ir.model.fields">
+        <field name="name">x_cleaning</field>
         <field name="ttype">selection</field>
         <field name="field_description">Cleaning</field>
         <field name="model_id" ref="project.model_project_task" />
-        <field name="name">x_cleaning</field>
     </record>
     <record id="x_cleaning_field_selection_stayover" model="ir.model.fields.selection">
         <field name="name">Stayover</field>
@@ -39,19 +39,6 @@
         <field name="name">Checkout</field>
         <field name="field_id" ref="x_cleaning_field_project_task" />
         <field name="value">checkout</field>
-    </record>
-
-    <record id="x_cleaning_color_field_project_task" model="ir.model.fields">
-        <field name="ttype">integer</field>
-        <field name="field_description">Cleaning Color</field>
-        <field name="model_id" ref="project.model_project_task" />
-        <field name="name">x_cleaning_color</field>
-        <!-- <field name="store" eval="False"/> -->
-        <field name="depends">x_cleaning</field>
-        <field name="compute"><![CDATA[
-for record in self:
-    record['x_cleaning_color'] = 1 if record.x_cleaning == 'checkout' else 3        
-]]></field>
     </record>
 
     <!-- resource.resource fields -->
@@ -81,17 +68,6 @@ for record in self:
         <field name="field_id" ref="x_occupancy_field_resource_resource" />
         <field name="value">due_out</field>
     </record>
-    <record id="x_occupancy_color_field_project_task" model="ir.model.fields">
-        <field name="ttype">integer</field>
-        <field name="field_description">Occupancy Color</field>
-        <field name="model_id" ref="resource.model_resource_resource" />
-        <field name="name">x_occupancy_color</field>
-        <field name="depends">x_occupancy</field>
-        <field name="compute"><![CDATA[
-for record in self:
-    record['x_occupancy_color'] = 0 if record.x_occupancy == 'due_out' else 8
-]]></field>
-    </record>
 
     <record id="x_tasks_field_project_task" model="ir.model.fields">
         <field name="name">x_tasks</field>
@@ -101,26 +77,38 @@ for record in self:
         <field name="relation">project.task</field>
         <field name="relation_field">x_resource</field>
     </record>
-    <record id="x_house_keeping_stage_field_resource_resource" model="ir.model.fields">
-        <field name="name">x_house_keeping_stage</field>
-        <field name="ttype">many2one</field>
-        <field name="field_description">House Keeping Stage</field>
-        <field name="model_id" ref="resource.model_resource_resource" />
-        <field name="relation">project.task.type</field>
-    </record>
     <record id="x_ongoing_task_field_resource_resource" model="ir.model.fields">
         <field name="name">x_ongoing_task</field>
         <field name="compute"><![CDATA[
 for record in self:
     record['x_ongoing_task'] = False
     for task in record.x_tasks:
-        if not task.is_closed : record['x_ongoing_task'] = task.id]]></field>
+        if not task.is_closed : record['x_ongoing_task'] = task.id
+]]></field>
         <field name="ttype">many2one</field>
         <field name="depends">x_tasks, x_tasks.stage_id</field>
         <field name="field_description">Ongoing Task</field>
         <field name="model_id" ref="resource.model_resource_resource" />
         <field name="readonly" eval="True" />
         <field name="relation">project.task</field>
+    </record>
+    <record id="x_house_keeping_stage_field_resource_resource" model="ir.model.fields">
+        <field name="name">x_house_keeping_stage</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">House Keeping Stage</field>
+        <field name="model_id" ref="resource.model_resource_resource" />
+        <field name="relation">project.task.type</field>
+        <field name="related">x_ongoing_task.stage_id</field>
+    </record>
+    <record id="x_is_in_stage_clean_field_resource_resource" model="ir.model.fields">
+        <field name="name">x_is_in_stage_clean</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">Is In House Keeping Stage Clean</field>
+        <field name="model_id" ref="resource.model_resource_resource" />
+        <field name="depends">x_house_keeping_stage</field>
+        <field name="compute"><![CDATA[
+for record in self: record['x_is_in_stage_clean'] = record.x_house_keeping_stage.id == record.env.ref('house_keeping.project_task_type_17').id
+]]></field>
     </record>
     <record id="x_resource_employee_field_resource_resource" model="ir.model.fields">
         <field name="name">x_resource_employee</field>
@@ -132,14 +120,6 @@ for record in self:
         <field name="relation">hr.employee</field>
         <field name="store" eval="False" />
     </record>
-    <record id="x_task_stage_color_field_project_task" model="ir.model.fields">
-        <field name="ttype">integer</field>
-        <field name="field_description">Task Stage Color</field>
-        <field name="model_id" ref="resource.model_resource_resource" />
-        <field name="name">x_task_stage_color</field>
-        <!-- <field name="store" eval="False"/> -->
-        <field name="related">x_ongoing_task.stage_id_color</field>
-    </record>
 
     <record id="x_task_occupancy_field_project_task" model="ir.model.fields">
         <field name="name">x_task_occupancy</field>
@@ -150,12 +130,51 @@ for record in self:
         <field name="readonly" eval="True" />
         <field name="store" eval="False" />
     </record>
+
+    <!-- Colors for fields -->
+    <record id="x_cleaning_color_field_project_task" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="field_description">Cleaning Color</field>
+        <field name="model_id" ref="project.model_project_task" />
+        <field name="name">x_cleaning_color</field>
+        <field name="store" eval="False"/>
+        <field name="depends">x_cleaning</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_cleaning_color'] = 1 if record.x_cleaning == 'checkout' else 3        
+]]></field>
+    </record>
+    <record id="x_occupancy_color_field_resource_resource" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="field_description">Occupancy Color</field>
+        <field name="model_id" ref="resource.model_resource_resource" />
+        <field name="name">x_occupancy_color</field>
+        <field name="depends">x_occupancy</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_occupancy_color'] = 13 if record.x_occupancy == 'due_out' else 8
+]]></field>
+    </record>
+    <record id="x_booking_board_color_field_planning_role" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="field_description">Role Color on Board of Booking</field>
+        <field name="model_id" ref="planning.model_planning_role" />
+        <field name="name">x_booking_board_color</field>
+    </record>
+    <record id="x_task_stage_color_field_project_task" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="field_description">Task Stage Color</field>
+        <field name="model_id" ref="resource.model_resource_resource" />
+        <field name="name">x_task_stage_color</field>
+        <field name="store" eval="False"/>
+        <field name="related">x_ongoing_task.stage_id_color</field>
+    </record>
     <record id="x_task_occupancy_color_field_project_task" model="ir.model.fields">
         <field name="ttype">integer</field>
         <field name="field_description">Occupancy Color</field>
         <field name="model_id" ref="project.model_project_task" />
         <field name="name">x_task_occupancy_color</field>
-        <!-- <field name="store" eval="False"/> -->
+        <field name="store" eval="False"/>
         <field name="related">x_resource.x_occupancy_color</field>
     </record>
 </odoo>

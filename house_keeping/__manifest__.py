@@ -8,8 +8,9 @@
         'web_studio',
     ],
     'data': [
-        'data/ir_model_fields.xml',
         'data/project_task_type.xml',
+        'data/ir_model_fields.xml',
+        'data/ir_default.xml',
         'data/project_project.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
@@ -20,8 +21,6 @@
         'data/res_config_settings.xml',
     ],
     'demo': [
-        'demo/res_partner.xml',
-        'demo/planning_slot.xml',
         'demo/planning_slot_post.xml',
     ],
     'license': 'OPL-1',
