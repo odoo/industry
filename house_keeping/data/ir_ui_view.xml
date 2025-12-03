@@ -53,9 +53,11 @@
                         <div class="d-flex align-items-baseline mb-2">
                             <div>
                                 <field name="name" class="fw-bold fs-5 ms-1"/>
-                                <field t-if="record.role_ids.raw_value.length &gt; 0" name="role_ids" widget="many2many_tags" options="{'color_field': 'color'}" class="ms-1"/>
+                                <field t-if="record.role_ids.raw_value.length &gt; 0" name="role_ids" widget="many2many_tags" options="{'color_field': 'x_booking_board_color'}" class="ms-1"/>
+                                <field name="x_occupancy_color" invisible="True"/>
                                 <field name="x_occupancy" display="full" widget="badge" options="{'color_field':'x_occupancy_color'}"/>
                             </div>
+                            <field name="x_task_stage_color" invisible="True"/>
                             <field name="x_house_keeping_stage" display="full" widget="badge" options="{'color_field':'x_task_stage_color'}" class="ms-auto"/>
                         </div>
                         <footer class="align-items-end">
@@ -81,8 +83,7 @@
             <xpath expr="//filter[@name='material']" position="replace">
                 <filter string="Ongoing Cleaning" name="filter_ongoing_cleaning" domain="[('x_ongoing_task', '!=', False)]"/>
                 <separator/>
-                <!-- <filter string="To Check" name="filter_to_check" domain="[('x_house_keeping_stage', 'in', [ref('project_task_type_17')])]"/> -->
-                 <!-- active_id ?-->
+                <filter string="To Check" name="filter_to_check" domain="[('x_is_in_stage_clean', '!=', False)]"/>
             </xpath>
             <xpath expr="//filter[@name='user']" position="replace"/>
             <xpath expr="//filter[@name='type']" position="replace"/>
@@ -114,12 +115,17 @@
     <!-- project.task views -->
     <record id="project_task_form_view_primary" model="ir.ui.view">
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='stage_id']" position="attributes">
+                <attribute name="options">{'clickable': '1', 'fold_field': 'auto_validation_state'}</attribute>
+            </xpath>
             <xpath expr="/form/sheet/group/group/field[@name='user_ids']" position="replace">
                 <field name="x_task_employee" widget="many2one_avatar_employee"/>
                 <field name="x_resource"/>
                 <field name="x_task_occupancy"/>
                 <field name="x_cleaning" widget="selection" options="{}"/>
             </xpath>
+            <xpath expr="//field[@widget='project_task_state_selection']" position="replace"/>
+            <xpath expr="//field[@widget='project_task_state_selection']" position="replace"/>
         </field>
         <field name="inherit_id" ref="project.view_task_form2"/>
         <field name="mode">primary</field>
@@ -129,25 +135,6 @@
         <field name="type">form</field>
         <field name="active" eval="True"/>
     </record>
-    <!-- <record id="project_task_kanban_view_extension" model="ir.ui.view">
-        <field name="arch" type="xml">
-            <xpath expr="//kanban" position="attributes">
-                <attribute name="default_group_by">stage_id</attribute>
-            </xpath>
-            <xpath expr="/kanban/templates/t[@t-name='card']/main/div" position="after">
-                <field name="x_task_occupancy" display="full" widget="badge"/>
-                <field name="x_cleaning" display="full" widget="badge"/>
-            </xpath>
-            <xpath expr="/kanban//field[@name='project_id']" position="replace"/>
-        </field>
-        <field name="inherit_id" ref="project.view_task_kanban"/>
-        <field name="mode">extension</field>
-        <field name="model">project.task</field>
-        <field name="name">House Keeping - Project Task kanban view extension</field>
-        <field name="priority">160</field>
-        <field name="type">kanban</field>
-        <field name="active" eval="True"/>
-    </record> -->
     <record id="project_task_list_view_extension" model="ir.ui.view">
         <field name="arch" type="xml">
             <xpath expr="/list//field[@name='sequence']" position="before">
@@ -159,10 +146,15 @@
                 <xpath expr="/list//field[@name='priority']" position="move"/>
             </xpath>
             <xpath expr="/list//field[@name='name']" position="after">
+                <field name="x_task_occupancy_color" column_invisible="True"/>
+                <field name="x_cleaning_color" column_invisible="True"/>
                 <field name="x_task_occupancy" optional="show" widget="badge" options="{'color_field': 'x_task_occupancy_color'}"/>
                 <field name="x_cleaning" optional="show" widget="badge" options="{'color_field': 'x_cleaning_color'}"/>
                 <xpath expr="/list//field[@name='stage_id']" position="move"/>
                 <field name="x_task_employee" optional="show" widget="many2one_avatar_employee"/>
+            </xpath>
+            <xpath expr="/list//field[@name='stage_id']" position="attributes">
+                <attribute name="options">{'color_field': 'stage_id_color'}</attribute>
             </xpath>
             <xpath expr="/list//field[@name='user_ids']" position="replace"/>
             <xpath expr="/list//field[@name='activity_ids']" position="replace"/>
