@@ -66,6 +66,7 @@
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        "data/res_config_settings.xml",
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=construction",
