@@ -1,0 +1,161 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="view_partner_form_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.industry_lawyer</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="priority">17</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_type']" position="before">
+                <div class="d-flex align-items-center">
+                    <field name="x_is_group_of_people" class="m-0 p-0"/>
+                    <label for="x_is_group_of_people" class="m-0">Is Group Of People</label>
+                </div>
+            </xpath>
+            <xpath expr="//page[@name='internal_notes']" position="before">
+                <page name='claimants' string="Claimants" invisible="not x_is_group_of_people">
+                    <field name="x_claimants_line_ids">
+                        <list editable="bottom">
+                            <field name="x_claimants" widget="many2one"/>
+                            <field name="x_share"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <record id="sale_order_form_custom" model="ir.ui.view">
+        <field name="name">sale.order.form.industry_lawyer</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="%(ir_act_server_split_per_property)d" string="Split Invoice" type="action" invisible="not invoice_count"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="email_compose_message_wizard_form_custom" model="ir.ui.view">
+        <field name="name">mail.compose.message.form.industry_lawyer</field>
+        <field name="model">mail.compose.message</field>
+        <field name="inherit_id" ref="mail.email_compose_message_wizard_form"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="priority">16</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='subject']" position="before">
+                <field name="x_approval" invisible="context.get('default_model') != 'sale.order'"/>
+            </xpath>
+            <xpath expr="//footer/button[@name='action_send_mail']" position="after">
+                <button string="Submit for Approval" class="btn-primary" name="%(action_submit_for_approval)d" invisible="context.get('default_model') != 'sale.order'"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_approval_config_settings" model="ir.ui.view">
+        <field name="name">res.config.settings.form.industry_lawyer</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Approval Settings" string="Approvals" name="approvals_settings" logo="/industry_lawyer/static/description/icon.png" groups="base.group_system">
+                    <block title="Approval Settings">
+                        <setting id="approvals_settings" string="Approval Required" help="Choose whether email approval is optional or mandatory before sending">
+                            <field name="x_approval_required" class="o_light_label" widget="radio"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_mail_list_custom" model="ir.ui.view">
+        <field name="name">mail.mail.list.industry_lawyer</field>
+        <field name="model">mail.mail</field>
+        <field name="inherit_id" ref="mail.view_mail_tree"/>
+        <field name="mode">primary</field>
+        <field name="active" eval="True"/>
+        <field name="priority">160</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='send']" position="attributes">
+                <attribute name="string">Approve and Send </attribute>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_mail_form_custom" model="ir.ui.view">
+        <field name="name">mail.mail.form.industry_lawyer</field>
+        <field name="model">mail.mail</field>
+        <field name="inherit_id" ref="mail.view_mail_form"/>
+        <field name="mode">primary</field>
+        <field name="active" eval="True"/>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="replace">
+               <field name="x_approval_state" widget="statusbar" statusbar_visible="pending,sent,cancelled"/>
+            </xpath>
+            <xpath expr="//label[@for='subject']/parent::div[1]" position="replace">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="d-flex w-100">
+                        <field name="subject" options="{'line_breaks': False}" widget="text" class="o_task_name text-truncate w-md-75 w-100 pe-2" placeholder="Subject"/>
+                    </h1>
+                    <!-- <div class="d-flex justify-content-end o_state_container" invisible="not active or is_template or has_project_template">
+                        <field name="approval_state" widget="project_task_state_selection" class="o_task_state_widget"/>
+                    </div> -->
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='author_id']/parent::div[1]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//group" position="replace">
+                <group>
+                    <group>
+                        <field name="email_from"/>
+                        <field name="email_to"/>
+                        <field name="email_cc"/>
+                        <!--<field name="recipient_ids" widget="many2many_tags" domain="[('active', '=', True)]"/>-->
+                    </group>
+                    <group>
+                        <field name="scheduled_date" placeholder="YYYY-MM-DD HH:MM:SS"/>
+                        <field name="date" readonly="1"/>
+                    </group>
+                </group>
+            </xpath>
+            <xpath expr="//page[@name='advanced']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='failure_reason']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='unrestricted_attachment_ids']" position="inside">
+                <list>
+                    <field name="name" editable="bottom"/>
+                    <field name="create_date"/>
+                </list>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="approval_config_settings_action" model="ir.actions.act_window">
+      <field name="view_id" ref="view_approval_config_settings"/>
+      <field name="context">{'module' : 'approvals_settings', 'bin_size': False}</field>
+    </record>
+
+    <record id="approval_email_action" model="ir.actions.act_window">
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_mail_list_custom')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_mail_form_custom')}),
+        ]"/>
+    </record>
+</odoo>

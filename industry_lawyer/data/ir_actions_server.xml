@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="ir_act_server_split_per_property" model="ir.actions.server">
+        <field name="code"><![CDATA[
+claimants_lines = record.partner_id.x_claimants_line_ids
+for claimant_line in claimants_lines:   # One invoice per claimant
+    for invoice in record.invoice_ids:
+        new_invoice = invoice.copy({'partner_id': claimant_line.x_claimants_id.id})
+        for orig_line, new_line in zip(invoice.invoice_line_ids, new_invoice.invoice_line_ids):
+            if orig_line.product_id:
+                new_line.write({'price_unit': new_line.price_unit / len(claimants_lines) if new_line.price_unit else 0.0})
+        invoice.write({'state': 'cancel'})
+]]>        </field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Industry Lawyer: Split SO per Claimant</field>
+    </record>
+
+    <record id="action_update_additional_contacts" model="ir.actions.server">
+        <field name="code"><![CDATA[
+record['partner_ids'] = [(4, pid) for pid in set(record.partner_ids.mapped('x_claimants_line_ids.x_claimants').ids)]
+        ]]></field>
+        <field name="model_id" ref="mail.model_mail_compose_message"/>
+        <field name="state">code</field>
+        <field name="name">Update Additional Contacts in Mail Compose</field>
+    </record>
+
+    <record id="action_submit_for_approval" model="ir.actions.server">
+        <field name="code"><![CDATA[
+            raise UserError(records)
+        ]]></field>
+        <field name="model_id" ref="mail.model_mail_compose_message"/>
+        <field name="state">code</field>
+        <field name="name">Submit For Approval</field>
+    </record>
+</odoo>
