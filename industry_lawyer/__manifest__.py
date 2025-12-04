@@ -9,15 +9,24 @@
         'hr_expense',
         'hr_timesheet',
         'knowledge',
+        'mail',
         'project_enterprise',
         'sale_management',
         'sale_timesheet_enterprise',
         'sign',
         'website',
+        'web_studio',
     ],
     'data': [
         'data/res_config_settings.xml',
+        'data/ir_model.xml',
+        'data/ir_model_access.xml',
+        'data/ir_model_fields.xml',
         'data/ir_default.xml',
+        'data/ir_actions_act_window.xml',
+        'data/ir_actions_server.xml',
+        'data/ir_ui_menu.xml',
+        'data/ir_ui_view.xml',
         'data/project_task_type.xml',
         'data/project_tags.xml',
         'data/project_project_stage.xml',
@@ -66,6 +75,7 @@
     'assets': {
         'web.assets_backend': [
             'industry_lawyer/static/src/js/my_tour.js',
+            'industry_lawyer/static/src/xml/composer.xml',
         ]
     },
     'author': 'Odoo S.A.',
