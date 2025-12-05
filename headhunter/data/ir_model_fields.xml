@@ -64,6 +64,7 @@
         <field name="field_description">Pipeline status bar</field>
         <field name="model_id" ref="hr.model_hr_job"/>
         <field name="ttype">selection</field>
+        <field name="tracking">1</field>
     </record>
     <record id="x_status_bar_draft_value" model="ir.model.fields.selection">
         <field name="name">Draft</field>
@@ -110,5 +111,79 @@
         <field name="ttype">many2many</field>
         <field name="relation">res.partner</field>
         <field name="relation_table">x_hr_job_res_partner_rel</field>
+        <field name="tracking">1</field>
+        <field name="depends">x_customer, x_recruitment_type</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    if record.x_recruitment_type == 'Internal':
+        record['x_customer'] = False
+        record['x_hiring_team_contact'] = False
+    else:
+        record['x_hiring_team_contact'] = record.x_customer | record.x_customer.child_ids
+]]></field>
+    </record>
+    <record id="x_customer_children_ids_field" model="ir.model.fields">
+        <field name="name">x_customer_children_ids</field>
+        <field name="field_description">New Many2Many</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="depends">x_customer, x_customer.child_ids</field>
+        <field name="ttype">many2many</field>
+        <field name="compute"><![CDATA[for record in self:
+        if record.x_customer:
+            record['x_customer_children_ids'] = record.x_customer | record.x_customer.child_ids
+        else:
+            record['x_customer_children_ids'] = False]]></field>
+        <field name="relation">res.partner</field>
+        <field name="relation_table">x_hr_job_res_partner_rel_1</field>
+        <field name="on_delete" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="x_job_position_field" model="ir.model.fields">
+        <field name="name">x_job_position</field>
+        <field name="field_description">Job Position</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">hr.job</field>
+    </record>
+    <record id="x_invoices_job_position_field" model="ir.model.fields">
+        <field name="name">x_invoices</field>
+        <field name="field_description">Invoices</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="ttype">one2many</field>
+        <field name="relation">account.move</field>
+        <field name="relation_field">x_job_position</field>
+    </record>
+    <record id="x_invoice_count_field" model="ir.model.fields">
+        <field name="name">x_invoice_count</field>
+        <field name="field_description">Invoice Count</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="ttype">integer</field>
+        <field name="depends">x_invoices</field>
+        <field name="compute"><![CDATA[
+for record in self: record['x_invoice_count'] = len(record.x_invoices)
+]]></field>
+    </record>
+    <record id="x_job_id_field" model="ir.model.fields">
+        <field name="name">x_job_id</field>
+        <field name="field_description">Job Position</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">hr.job</field>
+    </record>
+    <record id="x_has_portal_access_field" model="ir.model.fields">
+        <field name="name">x_has_portal_access</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">Has Portal Access</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="depends">x_hiring_team_contact.user_ids</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+for job in self:
+    job['x_has_portal_access'] = any(
+        not partner.user_ids or not partner.user_ids[0]._is_portal()
+        for partner in job.x_hiring_team_contact
+    )
+]]></field>
     </record>
 </odoo>
