@@ -43,7 +43,7 @@ pickup_time = env.ref('sale_renting.recurrence_nightly').pickup_time
 return_time = env.ref('sale_renting.recurrence_nightly').return_time
 tz = env.ref('website.default_website').tz
 for record in records:
-    if not record.role_id.x_is_a_room_offer: continue
+    if not record.role_id.x_is_a_stay_offer: continue
     start_datetime = record.start_datetime.astimezone(tz=dateutil.tz.UTC)
     end_datetime = record.end_datetime.astimezone(tz=dateutil.tz.UTC)
     if record.start_datetime and str(record.start_datetime.time()) != f"{int(pickup_time):02d}:{int(pickup_time % 1 * 60):02d}:00":
@@ -59,8 +59,7 @@ for record in records:
     record['start_datetime'] = start_datetime.replace(tzinfo=None)
     record['end_datetime'] = end_datetime.replace(tzinfo=None)
 for record in records:
-    if not record.sale_line_id:
-        continue
+    if not record.sale_line_id: continue
     nights = 0
     if record.sale_line_id.planning_slot_ids:
         nights = sum(record.sale_line_id.planning_slot_ids.mapped('x_nights'))
@@ -102,5 +101,24 @@ if record.order_id.rental_status == "returned":
     server_action = record.env['ir.actions.server'].browse(record.env.ref('booking_engine.open_x_city_tax_action').id)
     action = server_action.with_context(active_id=record.order_id.id, active_model="sale.order").sudo().run()
 ]]></field>
+    </record>
+    <record id="industry_create_roles" model="ir.actions.server">
+        <field name="name">Plan Services</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code">
+for record in records:
+    env['planning.role'].create({'name': record.name, 'sync_shift_rental': True, 'x_is_a_stay_offer': True, 'product_ids': [record.id]})
+        </field>
+    </record>
+    <record id="industry_delete_roles" model="ir.actions.server">
+        <field name="name">Plan Services</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code">
+if records: records.planning_role_id.unlink()
+        </field>
     </record>
 </odoo>
