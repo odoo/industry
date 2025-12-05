@@ -59,4 +59,102 @@ for record in records:
     )
     ]]></field>
     </record>
+    <record id="ir_actions_server_view_sales_order" model="ir.actions.server">
+        <field name="name">View Sales Order</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="hr.model_hr_job"/>
+        <field name="code"><![CDATA[
+    action = {
+        'view_mode': 'form',
+        'res_model': 'sale.order',
+        'res_id': record.x_quotation_sales_order.id,
+        'type': 'ir.actions.act_window',
+    }
+    ]]></field>
+    </record>
+    <record id="ir_actions_server_view_opportunity" model="ir.actions.server">
+        <field name="name">View Opportunity</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="hr.model_hr_job"/>
+        <field name="code"><![CDATA[
+    action = {
+        'view_mode': 'form',
+        'res_model': 'crm.lead',
+        'res_id': record.x_opportunity.id,
+        'type': 'ir.actions.act_window',
+    }
+    ]]></field>
+    </record>
+    <record id="ir_actions_server_view_invoices" model="ir.actions.server">
+        <field name="name">View Invoices</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="hr.model_hr_job"/>
+        <field name="code"><![CDATA[
+invoices = record.x_invoices
+action = {
+    'res_model': 'account.move',
+    'type': 'ir.actions.act_window',
+}
+if len(invoices) == 1:
+    action.update({
+        'view_mode': 'form',
+        'res_id': invoices.id,
+    })
+elif invoices:
+    action.update({
+        'view_mode': 'list,form',
+        'domain': [('id', 'in', invoices.ids)],
+    })
+action
+    ]]></field>
+    </record>
+    <record id="ir_actions_server_706" model="ir.actions.server">
+        <field name="name">Execute Code</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="base_automation_id" ref="status_update_base_automation"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for record in records:
+    if record['x_status_bar'] == 'done':
+        record['website_published'] = False
+    if record['website_published'] and record['x_status_bar'] == 'draft':
+        raise UserError("You cannot publish a Draft Job Position. Please set status to Open before publishing.")
+    if record['x_status_bar'] == 'draft' and record.all_application_count > 0:
+        raise UserError("You cannot set this job position back to Draft because applications already exist.")]]></field>
+    </record>
+    <record id="ir_actions_server_create_sale_order_from_job" model="ir.actions.server">
+        <field name="name">Create sale order</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="hr.model_hr_job"/>
+        <field name="code"><![CDATA[
+action = {
+    'view_mode': 'form',
+    'type': 'ir.actions.act_window',
+    'res_model': 'sale.order',
+    'context': {
+        'default_x_job_id': record.id,
+    }
+}]]></field>
+    </record>
+    <record id="ir_actions_server_link_to_job" model="ir.actions.server">
+        <field name="name">Execute Code</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="base_automation_id" ref="base_automation_sale_linked_to_job_position"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[record.x_job_id.write({'x_quotation_sales_order': record.id})]]></field>
+    </record>
+    <record id="ir_actions_server_check_portal_access" model="ir.actions.server">
+        <field name="name">Check Portal Access</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="hr.model_hr_job"/>
+        <field name="code"><![CDATA[
+partner_ids = record.x_hiring_team_contact.ids if record.x_hiring_team_contact else []
+action = env['portal.wizard'].with_context(default_partner_ids=partner_ids).action_open_wizard()
+    ]]></field>
+    </record>
 </odoo>
