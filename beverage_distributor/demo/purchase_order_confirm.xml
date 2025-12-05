@@ -14,11 +14,23 @@
         ).picking_ids.ids"/>
         <value model="stock.location" eval="{'location_dest_id': obj().search([('display_name', '=', 'FD/Stock')]).id}"/>
     </function>
-
-    <function name="button_validate" model="stock.picking">
+    <function name="button_validate" model="stock.picking" context="{'skip_sms': True}">
         <value model="stock.picking" eval="(
             obj().env.ref('beverage_distributor.purchase_order_4') +
+            obj().env.ref('beverage_distributor.purchase_order_5') +
+            obj().env.ref('beverage_distributor.purchase_order_6') +
             obj().env.ref('beverage_distributor.purchase_order_7')
         ).picking_ids.ids"/>
     </function>
+    <function name="write" model="stock.picking">
+        <value model="stock.picking" eval="(
+            obj().env.ref('beverage_distributor.purchase_order_4')
+        ).picking_ids.ids"/>
+        <value eval="{'scheduled_date': (datetime.today().date() + relativedelta(weeks=-1)), 'date_done': (datetime.today().date() + relativedelta(weeks=-1))}" />
+    </function>
+    <record id="excise_report_1" model="x_excise_report">
+        <field name="x_reporter_id" ref="base.user_admin"/>
+        <field name="x_from_date" eval="(datetime.today() - timedelta(weeks=1))"/>
+        <field name="x_to_date" eval="(datetime.today())"/>
+    </record>
 </odoo>
