@@ -6,7 +6,7 @@
     <field name="view_mode">list,form</field>
     <field name="domain">[("x_is_harvest", "!=", False)]</field>
     <field name="context" eval="{
-      'default_picking_type_id': ref('vineyard.stock_picking_type_27'),
+      'default_picking_type_id': ref('stock_picking_type_27'),
       'default_x_is_harvest': True
     }" />
   </record>
@@ -24,12 +24,10 @@
           'graph_stacked': False,
           'graph_cumulated': False
     }</field>
-    <field name="domain">["&amp;", ("location_id.x_is_harvest", "!=", False), ("picking_id.x_is_harvest", "!=", False),("state", "=", "done")]</field>
-  </record>
-  <record id="quality_check_tests_action_window" model="ir.actions.act_window">
-    <field name="context">{}</field>
-    <field name="domain">[('x_recipe_iteration', '=', active_id)]</field>
-    <field name="name">Tests</field>
-    <field name="res_model">quality.check</field>
+    <field name="view_ids" eval="[
+        (5, 0, 0),
+        (0, 0, {'view_mode': 'graph', 'view_id': ref('stock_move_graph_view_inherit')}),
+    ]"/>
+    <field name="domain">[("location_id.x_is_harvest", "!=", False), ("picking_id.x_is_harvest", "!=", False),("state", "=", "done")]</field>
   </record>
 </odoo>

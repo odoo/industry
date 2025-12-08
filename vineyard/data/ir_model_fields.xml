@@ -44,6 +44,18 @@ mapped_data = {eco.id: count for eco, count in check_data}
 for eco in self: eco['x_recipe_iteration_quality_check_count'] = mapped_data.get(eco.id, 0)
     ]]></field>
   </record>
+  <record id="mrp_eco_is_stage_discarded" model="ir.model.fields">
+    <field name="ttype">boolean</field>
+    <field name="field_description">Is Stage Discarded</field>
+    <field name="model_id" ref="mrp_plm.model_mrp_eco"/>
+    <field name="name">x_is_stage_discarded</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="True"/>
+    <field name="depends">stage_id</field>
+    <field name="compute"><![CDATA[
+for eco in self: eco['x_is_stage_discarded'] = eco.stage_id == self.env.ref('vineyard.mrp_eco_stage_9')
+    ]]></field>
+  </record>
   <record id="quality_check_control_point_title" model="ir.model.fields">
     <field name="ttype">char</field>
     <field name="related">point_id.title</field>
@@ -52,29 +64,5 @@ for eco in self: eco['x_recipe_iteration_quality_check_count'] = mapped_data.get
     <field name="name">x_control_point_title</field>
     <field name="readonly" eval="True"/>
     <field name="store" eval="False"/>
-  </record>
-  <record id="project_task_worksheet_template_1_ir_model_1_comments" model="ir.model.fields" forcecreate="1">
-    <field name="ttype">html</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Comments</field>
-    <field name="model_id" ref="x_project_task_worksheet_template_1_ir_model_1"/>
-    <field name="name">x_comments</field>
-  </record>
-  <record id="project_task_worksheet_template_1_ir_model_1_project_task_id" model="ir.model.fields" forcecreate="1">
-    <field name="ttype">many2one</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Task</field>
-    <field name="model_id" ref="x_project_task_worksheet_template_1_ir_model_1"/>
-    <field name="name">x_project_task_id</field>
-    <field name="on_delete">cascade</field>
-    <field name="relation">project.task</field>
-    <field name="required" eval="True"/>
-  </record>
-  <record id="project_task_worksheet_template_1_ir_model_1_name" model="ir.model.fields" forcecreate="1">
-    <field name="ttype">char</field>
-    <field name="related">x_project_task_id.name</field>
-    <field name="field_description">Name</field>
-    <field name="model_id" ref="x_project_task_worksheet_template_1_ir_model_1"/>
-    <field name="name">x_name</field>
   </record>
 </odoo>

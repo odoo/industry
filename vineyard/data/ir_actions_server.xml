@@ -8,7 +8,8 @@
     <field name="code"><![CDATA[if record.picking_type_id.x_is_harvest and not record.location_id.x_is_harvest:
   raise UserError ("Source location shall be eligible for harvest.")
 for picking in records:
-  for ml in picking.move_line_ids.filtered(lambda line: line.product_id and line.product_id.tracking == 'lot' and not line.lot_id):
+  for ml in picking.move_line_ids:
+    if ml.product_id.tracking != 'lot' or ml.lot_id: continue
     serial = env['ir.sequence'].next_by_code('auto.lot.serial')
     lot = env['stock.lot'].create({
         'name': serial,
