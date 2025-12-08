@@ -1,6 +1,6 @@
 {
     'name': 'Booking Engine',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Hidden/Tools',
     'author': 'Odoo S.A.',
     'depends': [
@@ -14,17 +14,22 @@
         'website_sale_renting',
     ],
     'data': [
+        'data/res_groups.xml',
+        'data/project_task_type.xml',
         'data/res_config_settings.xml',
         'data/ir_model.xml',
         'data/ir_model_access.xml',
         'data/ir_model_fields.xml',
+        'data/ir_default.xml',
+        'data/project_project.xml',
         'data/account_tax.xml',
         'data/product_template.xml',
         'data/sale_temporal_recurrence.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
-        'data/ir_ui_view.xml',
+        'data/ir_cron.xml',
         'data/ir_actions_act_window.xml',
+        'data/ir_ui_view.xml',
         'data/ir_ui_menu.xml',
         'data/website_view.xml',
         'data/website_menu.xml',
@@ -36,6 +41,7 @@
     'demo': [
         'demo/website_menu.xml',
         'demo/payment_provider_demo.xml',
+        'demo/planning_slot_post.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [
