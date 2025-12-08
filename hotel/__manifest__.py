@@ -24,6 +24,7 @@
         'data/mail_message.xml',
         'data/views.xml',
         'data/product_pricing.xml',
+        'data/res_config_settings.xml',
     ],
     'demo': [
         'demo/hr_employee.xml',

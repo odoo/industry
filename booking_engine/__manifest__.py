@@ -17,7 +17,6 @@
     'data': [
         'data/res_groups.xml',
         'data/project_task_type.xml',
-        'data/res_config_settings.xml',
         'data/ir_model.xml',
         'data/ir_model_access.xml',
         'data/ir_model_fields.xml',
@@ -38,6 +37,7 @@
         'data/product_category.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
+        'data/res_config_settings.xml',
     ],
     'demo': [
         'demo/res_users.xml',

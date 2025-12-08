@@ -20,6 +20,7 @@
         'data/ir_ui_menu.xml',
         'data/product_pricing.xml',
         'data/website_view.xml',
+        'data/res_config_settings.xml',
     ],
     'demo': [
         'demo/hr_employee.xml',
