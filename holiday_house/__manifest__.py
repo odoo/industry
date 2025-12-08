@@ -22,6 +22,7 @@
         'data/views.xml',
         'data/web_views.xml',
         'data/product_pricing.xml',
+        'data/res_config_settings.xml',
     ],
     'demo': [
         'demo/product_template_post.xml',
