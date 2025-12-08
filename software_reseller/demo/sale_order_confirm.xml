@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo noupdate="1">
-
     <function model="sale.order" name="write">
         <value eval="[ref('sale_order_4')]" />
         <value eval="{'date_order': DateTime.today() - relativedelta(years=1)}" />
@@ -14,6 +13,7 @@
     <function model="sale.order" name="action_confirm">
         <value eval="[
             ref('sale_order_1'),
+            ref('sale_order_2'),
             ref('sale_order_3'),
             ref('sale_order_4'),
         ]"/>
@@ -31,25 +31,14 @@
         <value model="project.task" eval="obj().env.ref('software_reseller.sale_order_line_8').task_id.ids"/>
         <value eval="{'date_deadline': (DateTime.today() + relativedelta(months=6)).strftime('%Y-%m-%d %H:%M'), 'sale_order_id': ref('sale_order_3'), 'stage_id': ref('project_task_type_2')}"/>
     </function>
-
-    <record id="project_project_2" model="project.project">
-        <field name="name">Odoo Licenses</field>
-        <field name="task_properties_definition" eval="[
-            {'name': 'number_of_users', 'type': 'integer', 'string': 'Number of Users', 'default': 8},
-            {'name': 'hosted_on', 'type': 'selection', 'string': 'Hosted On', 'default': False, 'selection': [['on_premise', 'On Premise'], ['odoo_sh', 'Odoo.sh'], ['odoo_online', 'Odoo Online']], 'default': 'on_premise'},
-            {'name': 'license_key', 'type': 'char', 'string': 'License Key', 'default': 'BB9kL3pQ7xU2mH5cV8nR5KZ2'},
-            {'name': 'version', 'type': 'selection', 'string': 'Odoo Version', 'default': False, 'selection': [['odoo_14', 'Odoo 14'], ['odoo_15', 'Odoo 15'], ['odoo_16', 'Odoo 16'], ['odoo_17', 'Odoo 17']], 'default': 'odoo_16'},
-        ]" />
-    </record>
-
-    <function model="sale.order" name="action_confirm">
-        <value eval="[
-            ref('sale_order_2'),
-        ]"/>
-    </function>
-
     <function model="project.task" name="write">
         <value model="project.task" eval="obj().env.ref('software_reseller.sale_order_line_7').task_id.ids"/>
-        <value eval="{'date_deadline': (DateTime.today() + relativedelta(years=1)).strftime('%Y-%m-%d %H:%M'), 'sale_order_id': ref('sale_order_2')}"/>
+        <value eval="{'date_deadline': (DateTime.today() + relativedelta(years=1)).strftime('%Y-%m-%d %H:%M'), 'sale_order_id': ref('sale_order_2'),
+        'task_properties': {
+            'number_of_users': 8,
+            'hosted_on': 'on_premise',
+            'license_key': 'BB9kL3pQ7xU2mH5cV8nR5KZ2',
+            'version': 'odoo_16'}
+        }"/>
     </function>
 </odoo>

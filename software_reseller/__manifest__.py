@@ -1,8 +1,9 @@
 {
     'name': 'Software Reseller',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Services',
     'depends': [
+        'base_industry_data',
         'contacts',
         'knowledge',
         'project',
@@ -35,7 +36,6 @@
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
-        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/res_users.xml',
