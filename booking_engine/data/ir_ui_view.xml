@@ -467,4 +467,272 @@
     <field name="type">form</field>
     <field name="active" eval="True"/>
   </record>
+
+  <record id="booking_engine_rooms_schedule_action" model="ir.actions.act_window">
+    <field name="search_view_id" ref="planning_search_view"/>
+    <field name="view_ids" eval="[
+      (5, 0, 0),
+      (0, 0, {'view_mode': 'gantt', 'view_id': ref('booking_engine_planning_gantt_view')}),
+      (0, 0, {'view_mode': 'form', 'view_id': ref('booking_engine_schedule_form')}),
+      (0, 0, {'view_mode': 'list', 'view_id': ref('booking_engine_planning_list_view')}),
+      
+    ]"/>
+  </record>
+  <record id="booking_engine_rooms_order_action" model="ir.actions.act_window">
+    <field name="search_view_id" ref="booking_engine_order_search"/>
+    <field name="view_ids" eval="[
+      (5, 0, 0),
+      (0, 0, {'view_mode': 'kanban', 'view_id': ref('booking_engine_orders_kanban')}),
+      (0, 0, {'view_mode': 'list', 'view_id': ref('sale_renting.rental_order_view_tree')}),
+      (0, 0, {'view_mode': 'form', 'view_id': ref('sale_renting.rental_order_primary_form_view')}),
+    ]"/>
+  </record>
+  <record id="booking_engine_rooms_offers_action" model="ir.actions.act_window">
+    <field name="search_view_id" ref="booking_engine_offers_search"/>
+    <field name="view_ids" eval="[  
+      (5, 0, 0),
+      (0, 0, {'view_mode': 'kanban', 'view_id': ref('booking_engine_offers_kanban')}),
+      (0, 0, {'view_mode': 'list', 'view_id': ref('booking_engine_offers_list')}),
+    ]"/>
+  </record>
+  <record id="booking_engine_rooms_roles_action" model="ir.actions.act_window">
+    <field name="search_view_id" ref="booking_engine_planning_role_view_search"/>
+    <field name="view_ids" eval="[
+      (5, 0, 0),
+      (0, 0, {'view_mode': 'list', 'view_id': ref('planning.planning_role_view_tree')}),
+    ]"/>
+  </record>
+  <record id="booking_engine_rooms_resources_action" model="ir.actions.act_window">
+    <field name="search_view_id" ref="booking_engine_planning_resource_view_search"/>
+    <field name="view_ids" eval="[
+      (5, 0, 0),
+      (0, 0, {'view_mode': 'list', 'view_id': ref('planning.resource_resource_tree_view_inherit')}),
+      (0, 0, {'view_mode': 'form', 'view_id': ref('planning.resource_resource_form_view_inherit')}),
+    ]"/>
+  </record>
+
+  <!-- House Keeping -->
+    <!-- project.project video -->
+    <record id="project_project_form_view_extension" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='settings']/group[2]" position="after">
+                <group>
+                    <group string="House Keeping">
+                        <field name="x_is_house_keeping_project" groups="booking_engine.group_house_keeping"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="mode">extension</field>
+        <field name="model">project.project</field>
+        <field name="name">House Keeping - Project Project form view extension</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- resource.resource views -->
+    <record id="resource_resource_form_view_extension" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <xpath expr="/form/sheet/group" position="after">
+                <group>
+                    <group string="House Keeping" groups="booking_engine.group_house_keeping">
+                        <field name="x_occupancy" options="{}"/>
+                        <field name="x_house_keeping_stage" domain="[('project_ids.x_is_house_keeping_project', '!=', False)]"/>
+                        <field name="x_ongoing_task"/>
+                        <field name="x_resource_employee" widget="many2one_avatar_employee"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+        <field name="inherit_id" ref="resource.resource_resource_form"/>
+        <field name="mode">extension</field>
+        <field name="model">resource.resource</field>
+        <field name="name">House Keeping - Resource Resource form view extension</field>
+        <field name="priority">700</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+    </record>
+    <record id="resource_resource_kanban_view_primary" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <kanban sample="1">
+                <templates>
+                    <t t-name="menu">
+                        <field name="color" widget="kanban_color_picker"/>
+                    </t>
+                    <t t-name="card">
+                        <div class="d-flex align-items-baseline mb-2">
+                            <div>
+                                <field name="name" class="fw-bold fs-5 ms-1"/>
+                                <field t-if="record.role_ids.raw_value.length &gt; 0" name="role_ids" widget="many2many_tags" options="{'color_field': 'x_booking_board_color'}" class="ms-1"/>
+                                <field name="x_occupancy_color" invisible="True"/>
+                                <field name="x_occupancy" display="full" widget="badge" options="{'color_field':'x_occupancy_color'}"/>
+                            </div>
+                            <field name="x_task_stage_color" invisible="True"/>
+                            <field name="x_house_keeping_stage" display="full" widget="badge" options="{'color_field':'x_task_stage_color'}" class="ms-auto"/>
+                        </div>
+                        <footer class="align-items-end">
+                            <a t-if="record.x_ongoing_task" name="%(action_window_redirect_related_task)d" type="action" class="d-block ms-auto">
+                                <field name="x_ongoing_task" display="full"/>
+                            </a>
+                            <field name="x_resource_employee" display="full" widget="many2one_avatar_employee" class="ms-auto"/>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+        <field name="mode">primary</field>
+        <field name="model">resource.resource</field>
+        <field name="name">House Keeping - Resource Resource kanban view primary</field>
+        <field name="priority">99</field>
+        <field name="type">kanban</field>
+        <field name="active" eval="True"/>
+    </record>
+    <record id="resource_resource_search_view_primary" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='human']" position="replace"/>
+            <xpath expr="//filter[@name='material']" position="replace">
+                <filter string="Ongoing Cleaning" name="filter_ongoing_cleaning" domain="[('x_ongoing_task', '!=', False)]"/>
+                <separator/>
+                <filter string="To Check" name="filter_to_check" domain="[('x_is_in_stage_clean', '!=', False)]"/>
+            </xpath>
+            <xpath expr="//filter[@name='user']" position="replace"/>
+            <xpath expr="//filter[@name='type']" position="replace"/>
+            <xpath expr="//filter[@name='company']" position="replace"/>
+            <xpath expr="//filter[@name='working_period']" position="replace">
+                <filter string="Occupancy" name="occupancy" domain="[]" context="{'group_by':'x_occupancy'}"/>
+                <filter string="Stage" name="stage" domain="[]" context="{'group_by':'x_house_keeping_stage'}"/>
+                <filter string="Employee" name="employee" domain="[]" context="{'group_by':'x_resource_employee'}"/>
+            </xpath>
+        </field>
+        <field name="inherit_id" ref="resource.view_resource_resource_search"/>
+        <field name="mode">primary</field>
+        <field name="model">resource.resource</field>
+        <field name="name">House Keeping - Resource Resource search view primary</field>
+        <field name="priority">99</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="act_window_board" model="ir.actions.act_window">
+        <field name="search_view_id" ref="resource_resource_search_view_primary"/>
+        <field name="view_ids" eval="[
+            (6, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('booking_engine.resource_resource_kanban_view_primary')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('booking_engine.resource_resource_form_view_extension')}),
+        ]"/>
+    </record>
+
+    <!-- project.task views -->
+    <record id="project_task_form_view_primary" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='stage_id']" position="attributes">
+                <attribute name="options">{'clickable': '1', 'fold_field': 'auto_validation_state'}</attribute>
+            </xpath>
+            <xpath expr="/form/sheet/group/group/field[@name='user_ids']" position="replace">
+                <field name="x_task_employee" widget="many2one_avatar_employee"/>
+                <field name="x_resource"/>
+                <field name="x_task_occupancy"/>
+                <field name="x_cleaning" widget="selection" options="{}"/>
+            </xpath>
+            <xpath expr="//field[@widget='project_task_state_selection']" position="replace"/>
+            <xpath expr="//field[@widget='project_task_state_selection']" position="replace"/>
+        </field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="mode">primary</field>
+        <field name="model">project.task</field>
+        <field name="name">House Keeping - Project Task form view extension</field>
+        <field name="priority">1000</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+    </record>
+    <record id="project_task_list_view_extension" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <xpath expr="/list//field[@name='sequence']" position="before">
+                <header>
+                    <button string="Assign Employee" type="action" class="btn-primary"/>
+                </header>
+            </xpath>
+            <xpath expr="/list//field[@name='id']" position="after">
+                <xpath expr="/list//field[@name='priority']" position="move"/>
+            </xpath>
+            <xpath expr="/list//field[@name='name']" position="after">
+                <field name="x_task_occupancy_color" column_invisible="True"/>
+                <field name="x_cleaning_color" column_invisible="True"/>
+                <field name="x_task_occupancy" optional="show" widget="badge" options="{'color_field': 'x_task_occupancy_color'}"/>
+                <field name="x_cleaning" optional="show" widget="badge" options="{'color_field': 'x_cleaning_color'}"/>
+                <xpath expr="/list//field[@name='stage_id']" position="move"/>
+                <field name="x_task_employee" optional="show" widget="many2one_avatar_employee"/>
+            </xpath>
+            <xpath expr="/list//field[@name='stage_id']" position="attributes">
+                <attribute name="options">{'color_field': 'stage_id_color'}</attribute>
+            </xpath>
+            <xpath expr="/list//field[@name='user_ids']" position="replace"/>
+            <xpath expr="/list//field[@name='activity_ids']" position="replace"/>
+            <xpath expr="/list//field[@name='tag_ids']" position="replace"/>
+            <xpath expr="/list//field[@name='state']" position="replace"/>
+            <xpath expr="/list//field[@name='stage_id']" position="attributes">
+                <attribute name="widget">badge</attribute>
+            </xpath>
+            <xpath expr="/list//field[@name='project_id']" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="/list//field[@name='date_deadline']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+        </field>
+        <field name="inherit_id" ref="project.view_task_tree2"/>
+        <field name="mode">primary</field>
+        <field name="model">project.task</field>
+        <field name="name">House Keeping - Project Task list view extension</field>
+        <field name="priority">160</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+    </record>
+    <record id="project_task_search_view_primary" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='my_tasks']" position="attributes">
+                <attribute name="domain">[('x_task_employee', '=', uid)]</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='unassigned']" position="attributes">
+                <attribute name="domain">[('x_task_employee', '=', False)]</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='private_tasks']" position="replace"/>
+            <xpath expr="//filter[@name='favorite_projects']" position="replace"/>
+            <xpath expr="//filter[@name='creation_date_filter']" position="replace"/>
+            <xpath expr="//filter[@name='filter_rotting']" position="replace"/>
+            <xpath expr="//filter[@name='closed_on']" position="replace"/>
+            <xpath expr="//filter[@name='message_needaction']" position="replace"/>
+            <xpath expr="//filter[@name='templates']" position="replace"/>
+            <xpath expr="//filter[@name='user']" position="replace">
+                <filter string="Employee" name="filter_x_task_employee" context="{'group_by': 'x_task_employee'}"/>
+                <filter string="Occupancy" name="filter_x_task_occupancy" context="{'group_by': 'x_task_occupancy'}"/>
+            </xpath>
+            <xpath expr="//filter[@name='project']" position="replace"/>
+        </field>
+        <field name="inherit_id" ref="project.view_task_search_form"/>
+        <field name="mode">primary</field>
+        <field name="model">project.task</field>
+        <field name="name">House Keeping - Project Task search view primary</field>
+        <field name="priority">99</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="act_window_house_keeping_project_tasks" model="ir.actions.act_window">
+        <field name="search_view_id" ref="project_task_search_view_primary"/>
+        <field name="view_ids" eval="[
+            (6, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('booking_engine.project_task_list_view_extension')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('booking_engine.project_task_form_view_primary')}),
+        ]"/>
+    </record>
+    <record id="action_window_redirect_related_task" model="ir.actions.act_window">
+        <field name="view_ids" eval="[
+            (6, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('booking_engine.project_task_list_view_extension')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('booking_engine.project_task_form_view_primary')}),
+        ]"/>
+    </record>
 </odoo>
