@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="action_x_remark_generate_x_reference_on_create" model="ir.actions.server">
+        <field name="model_id" ref="model_x_remark"/>
+        <field name="state">code</field>
+        <field name="name">Construction - Remarks: Generate Remark Reference on Create</field>
+        <field name="code"><![CDATA[
+for record in records:
+    # project already has remarks
+    if (project := record.x_project_id) and (remarks := project.x_remark_ids) and (last_refs := remarks.filtered(lambda r: r.x_reference).sorted('create_date desc')): 
+        pid, rid = last_refs[0].x_reference.split('-')
+    # project has no remarks but has SO
+    elif project and (so := project.sale_order_id):
+        pid, rid = so.name[1:], 0
+    # no SO but made from SO
+    elif project and (soid := project.name.split('-')[0].strip()).startswith('S') and soid[1:].isnumeric():
+        pid, rid = soid[1:], 0
+    # no project or project with no SO (e.g. field service) and 00000-remarks already exist
+    elif (last_ref := env['x_remark'].search([('x_reference', 'like', '00000-')], order='x_reference desc', limit=1).x_reference):
+        pid, rid = last_ref.split('-')
+    # no project or project with no SO and no 00000-remarks
+    else:
+        pid, rid = '00000', 0
+    record['x_reference'] = f"{pid}-{int(rid) + 1:05d}"
+]]></field>
+    </record>
+</odoo>
