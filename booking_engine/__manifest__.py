@@ -41,7 +41,6 @@
     'demo': [
         'demo/website_menu.xml',
         'demo/payment_provider_demo.xml',
-        'demo/planning_slot_post.xml',
     ],
     'license': 'OPL-1',
     'cloc_exclude': [

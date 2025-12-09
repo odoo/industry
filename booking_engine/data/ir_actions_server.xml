@@ -166,21 +166,26 @@ if env['ir.config_parameter'].get_param('booking_engine.x_approvers_setting', '0
         <field name="code"><![CDATA[
 project = env['project.project'].search([('x_is_house_keeping_project', '=', True)], limit=1)
 newtasks = []
-for slot in env['planning.slot'].search([('start_datetime','<',datetime.datetime.now()),('end_datetime','>',datetime.datetime.now())]):
+last_midnight = datetime.datetime.today().replace(hour=0, minute=1)
+for slot in env['planning.slot'].search([('start_datetime', '<', last_midnight),('end_datetime', '>', last_midnight)]):
     if any(slot.resource_id.role_ids.mapped('x_is_a_room_offer')):
         cleaning_state = ''
-        if slot.end_datetime < datetime.datetime.now() + datetime.timedelta(hours=24):
-            slot.resource_id['x_occupancy'] = 'due_out'
+        if slot.end_datetime < last_midnight + datetime.timedelta(hours=24):
+            if not slot.role_id.x_has_checkout_cleaning:
+                continue
+            slot.resource_id.write({'x_occupancy': 'due_out', 'x_house_keeping_stage': 'checkout'})
             cleaning_state = 'checkout'
         else:
-            slot.resource_id['x_occupancy'] = 'stayover'
+            if not slot.role_id.x_has_stayover_cleaning:
+                continue
+            slot.resource_id.write({'x_occupancy': 'stayover', 'x_house_keeping_stage': 'stayover'})
             cleaning_state = 'stayover'
         newtasks.append({
             'name': "HK " + slot.resource_id.name,
             'project_id': project.id,
             'partner_id': slot.sale_line_id.order_id.partner_id.id,
             'description': "Automatically generated house keeping task.",
-            'date_deadline': (datetime.datetime.now() + datetime.timedelta(hours=24)),
+            'date_deadline': (last_midnight + datetime.timedelta(hours=24)),
             'x_resource': slot.resource_id.id,
             'x_cleaning': cleaning_state,
         })
