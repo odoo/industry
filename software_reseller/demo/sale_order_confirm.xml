@@ -1,62 +1,44 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo noupdate="1">
-    <function model="sale.order" name="action_confirm" eval="[[
-        ref('sale_order_1'),
-        ref('sale_order_2'),
-        ref('sale_order_3'),
-        ref('sale_order_4'),
-        ref('sale_order_5'),
-        ref('sale_order_6'),
-        ref('sale_order_8')]]"/>
-    <record id="sale_advance_payment_inv_1" model="sale.advance.payment.inv">
-        <field name="advance_payment_method" >delivered</field>
-        <field name="sale_order_ids" eval="[Command.set([ref('sale_order_6')])]"/>
-    </record>
-
-    <function model="sale.advance.payment.inv" name="create_invoices"
-            eval="[ref('sale_advance_payment_inv_1')]"/>
-
-    <function model="project.task" name="write">
-        <value model="project.task" eval="obj().env.ref('software_reseller.sale_order_line_15').task_id.ids"/>
-        <value eval="{'user_ids': [Command.set([ref('base.user_admin')])]}"/>
+    <function model="sale.order" name="write">
+        <value eval="[ref('sale_order_4')]" />
+        <value eval="{'date_order': DateTime.today() - relativedelta(years=1)}" />
     </function>
-    <function model="project.task" name="write">
-        <value model="project.task" eval="
-            (
-                obj().env.ref('software_reseller.sale_order_line_19') +
-                obj().env.ref('software_reseller.sale_order_line_3') +
-                obj().env.ref('software_reseller.sale_order_line_17')
-            ).task_id.ids"/>
-        <value eval="{'stage_id': ref('project_task_type_22')}"/>
+    <function model="sale.order" name="write">
+        <value eval="[ref('sale_order_3')]" />
+        <value eval="{'date_order': DateTime.today() - relativedelta(months=6)}"/>
+    </function>
+
+    <!-- Action confirm -->
+    <function model="sale.order" name="action_confirm">
+        <value eval="[
+            ref('sale_order_1'),
+            ref('sale_order_2'),
+            ref('sale_order_3'),
+            ref('sale_order_4'),
+        ]"/>
     </function>
 
     <function model="project.task" name="write">
-        <value model="project.task" eval="
-            (
-                obj().env.ref('software_reseller.sale_order_line_11') +
-                obj().env.ref('software_reseller.sale_order_line_5') +
-                obj().env.ref('software_reseller.sale_order_line_9')
-            ).task_id.ids"/>
-        <value eval="{'stage_id': ref('project_task_type_23')}"/>
+        <value model="project.task" eval="obj().env.ref('software_reseller.sale_order_line_1').task_id.ids"/>
+        <value eval="{'date_deadline': (DateTime.today() + relativedelta(years=1)).strftime('%Y-%m-%d %H:%M'), 'sale_order_id': ref('sale_order_1')}"/>
     </function>
-
     <function model="project.task" name="write">
-        <value model="project.task" eval="
-            (
-                obj().env.ref('software_reseller.sale_order_line_15') +
-                obj().env.ref('software_reseller.sale_order_line_1')
-            ).task_id.ids"/>
-        <value eval="{'stage_id': ref('project_task_type_2')}"/>
+        <value model="project.task" eval="obj().env.ref('software_reseller.sale_order_line_9').task_id.ids"/>
+        <value eval="{'date_deadline': DateTime.today(), 'sale_order_id': ref('sale_order_4'), 'stage_id': ref('project_task_type_2'), 'state': '02_changes_requested'}"/>
     </function>
-
     <function model="project.task" name="write">
-        <value model="project.task" eval="
-            (
-                obj().env.ref('software_reseller.sale_order_line_18') +
-                obj().env.ref('software_reseller.sale_order_line_11') +
-                obj().env.ref('software_reseller.sale_order_line_17')
-            ).task_id.ids"/>
-        <value eval="{'state': '03_approved'}"/>
+        <value model="project.task" eval="obj().env.ref('software_reseller.sale_order_line_8').task_id.ids"/>
+        <value eval="{'date_deadline': (DateTime.today() + relativedelta(months=6)).strftime('%Y-%m-%d %H:%M'), 'sale_order_id': ref('sale_order_3'), 'stage_id': ref('project_task_type_2')}"/>
     </function>
-
+    <function model="project.task" name="write">
+        <value model="project.task" eval="obj().env.ref('software_reseller.sale_order_line_7').task_id.ids"/>
+        <value eval="{'date_deadline': (DateTime.today() + relativedelta(years=1)).strftime('%Y-%m-%d %H:%M'), 'sale_order_id': ref('sale_order_2'),
+        'task_properties': {
+            'number_of_users': 8,
+            'hosted_on': 'on_premise',
+            'license_key': 'BB9kL3pQ7xU2mH5cV8nR5KZ2',
+            'version': 'odoo_16'}
+        }"/>
+    </function>
 </odoo>
