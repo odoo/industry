@@ -24,8 +24,7 @@
         <field name="field_description">House Keeping</field>
         <field name="model_id" ref="base_setup.model_res_config_settings"/>
         <field name="name">x_module_house_keeping</field>
-        <field name="readonly" eval="True"/>
-        <field name="store" eval="False"/>
+        <field name="store" eval="True"/>
         <field name="compute"><![CDATA[
 self['x_module_house_keeping'] = self.env.user.has_group('booking_engine.group_house_keeping')
 ]]></field>
@@ -103,7 +102,24 @@ for cloc_entry in [
         <field name="state">code</field>
         <field name="name">(Un-)Install Work Items</field>
         <field name="name">Uninstall Work Items</field>
-    </record>    
+    </record>
+
+    <record id="base_automation_on_house_keeping_setting_set" model="base.automation">
+        <field name="name">Activate House Keeping</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('x_action_activate_house_keeping')])]"/>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="on_change_field_ids" eval="[(6, 0, [ref('x_setting_field_house_keeping')])]"/>
+        <field name="filter_domain">[('x_module_house_keeping', '=', True)]</field>
+        <field name="trigger">on_create_or_write</field>
+    </record>
+    <record id="base_automation_on_house_keeping_setting_unset" model="base.automation">
+        <field name="name">Deactivate House Keeping</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('x_action_deactivate_house_keeping')])]"/>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="on_change_field_ids" eval="[(6, 0, [ref('x_setting_field_house_keeping')])]"/>
+        <field name="filter_domain">[('x_module_house_keeping', '=', False)]</field>
+        <field name="trigger">on_create_or_write</field>
+    </record>
 
     <!-- Approvers Settings-->
     <record id="x_setting_field_approvers" model="ir.model.fields">
@@ -173,16 +189,16 @@ env['ir.config_parameter'].set_param('house_keeping.x_approver_users_ids_setting
                     <block title="House Keeping" name="house_keeping_config_block">
                         <setting id="booking_engine_house_keeping_setting" help="Access cleanness state and manage tasks.">
                             <field name="x_module_house_keeping"/>
-                            <button invisible="x_module_house_keeping" name="%(x_action_activate_house_keeping)d" string="Install" class="btn-secondary" type="action"/>
-                            <button invisible="not x_module_house_keeping" name="%(x_action_deactivate_house_keeping)d" string="Uninstall" class="btn-secondary" type="action"/>
-                            <div class="mt16" invisible="not x_module_house_keeping">
-                                <setting id="approvers_setting_house_keeping" help="Approval process to accept house keeping tasks." documentation="/" title="By default, the house keeping tasks are automatically accepted as Ready when set to Clean by employees. When set, the tasks wait for approvers to set their state to Ready as a task completion confirmation.">
-                                    <field name="x_setting_approvers"/>
+                            <div class="row mt-2" invisible="not x_module_house_keeping">
+                                <field name="x_setting_approvers" class="col flex-grow-0 ml16 mr0 pe-2"/>
+                                <div class="col ps-0">
+                                    <label for="x_setting_approvers"/>
+                                    <div class="text-muted">Approval process to accept house keeping tasks.</div>
                                     <div class="mt16" invisible="not x_module_house_keeping or not x_setting_approvers">
                                         <label for="x_setting_approver_users_ids" class="o_light_label mr16"/>
                                         <field name="x_setting_approver_users_ids" class="oe_inline" widget="many2many_tags"/>
                                     </div>
-                                </setting>
+                                </div>
                             </div>
                         </setting>
                     </block>

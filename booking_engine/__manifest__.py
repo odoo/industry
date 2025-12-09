@@ -43,7 +43,6 @@
         'demo/res_users.xml',
         'demo/website_menu.xml',
         'demo/payment_provider_demo.xml',
-        'demo/planning_slot_post.xml',
     ],
     'license': 'OEEL-1',
     'cloc_exclude': [

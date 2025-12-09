@@ -172,6 +172,8 @@
         <xpath expr="//field[@name='default_code']" position="after">
           <field name="x_is_a_room_offer"/>
           <field name="x_is_stay_tax" string="Is City Tax"/>
+          <field name="x_related_has_stayover_cleaning" groups="booking_engine.group_house_keeping" invisible="not x_planning_is_a_room_offer"/>
+          <field name="x_related_has_checkout_cleaning" groups="booking_engine.group_house_keeping" invisible="not x_planning_is_a_room_offer"/>
         </xpath>
     </field>
     <field name="inherit_id" ref="product.product_template_only_form_view"/>
@@ -214,6 +216,14 @@
     <field name="arch" type="xml">
         <xpath expr="//field[@name='sync_shift_rental']" position="after">
           <field name="x_is_a_room_offer" invisible="not sync_shift_rental"/>
+        </xpath>
+        <xpath expr="/form/sheet/group" position="after">
+          <group string="House Keeping" groups="booking_engine.group_house_keeping">
+            <group>
+              <field name="x_has_stayover_cleaning"/>
+              <field name="x_has_checkout_cleaning"/>
+            </group>
+          </group>
         </xpath>
     </field>
     <field name="inherit_id" ref="planning.planning_role_view_form"/>
@@ -636,8 +646,6 @@
                 <field name="x_task_occupancy"/>
                 <field name="x_cleaning" widget="selection" options="{}"/>
             </xpath>
-            <xpath expr="//field[@widget='project_task_state_selection']" position="replace"/>
-            <xpath expr="//field[@widget='project_task_state_selection']" position="replace"/>
         </field>
         <field name="inherit_id" ref="project.view_task_form2"/>
         <field name="mode">primary</field>
