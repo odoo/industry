@@ -52,15 +52,9 @@
         'demo/planning_slot.xml',
     ],
     'license': 'OEEL-1',
-    'assets': {
-        'web.assets_backend': [
-            'software_reseller/static/src/js/my_tour.js',
-        ]
-    },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
-        "static/src/js/my_tour.js",
     ],
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=software_reseller",
