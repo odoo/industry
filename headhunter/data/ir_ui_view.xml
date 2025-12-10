@@ -81,6 +81,9 @@
                 <xpath expr="//filter[@name='responsible']" position="after">
                     <filter name="group_by_opportunities" string="Opportunities" context="{'group_by': 'x_opportunities'}" />
                 </xpath>
+                <xpath expr="//filter[@name='applicants']" position="after">
+                    <filter string="Job Positions" name="job_positions" domain="[('job_id.x_status_bar', 'not in', ['draft', 'done'])]"/>
+                </xpath>
             </data>
         </field>
     </record>
@@ -136,6 +139,36 @@
                 <field name="x_quotation_sales_order"/>
                 <field name="x_invoices" widget="many2many_tags"/>
             </xpath>
+            <xpath expr="//page[@name='trackers_page']" position="after">
+                <page string="Client Description" name="client_description_page" groups="hr.group_hr_user">
+                    <field name="x_client_description" options="{'collaborative': true}" placeholder="e.g. Summarize the position in one or two lines..."/>
+                </page>
+                <page string="Job Description" name="job_description_page_custom" groups="hr.group_hr_user">
+                    <field name="x_job_description" options="{'collaborative': true}" placeholder="e.g. Summarize the position in one or two lines..."/>
+                </page>
+                <page string="Applicant Description" name="applicant_description_page" groups="hr.group_hr_user">
+                    <field name="x_applicant_description" options="{'collaborative': true}" placeholder="e.g. Summarize the position in one or two lines..."/>
+                </page>
+                <page string="Offer Description" name="offer_description_page" groups="hr.group_hr_user">
+                    <field name="x_offer_description" options="{'collaborative': true}" placeholder="e.g. Summarize the position in one or two lines..."/>
+                </page>
+            </xpath>
+            <xpath expr="//sheet/notebook" position="inside">
+                <page string="Similar Job Position" name="similar_job_page">
+                    <field name="x_similar_job_ids" mode="list" context="{'default_department_id': department_id, 'default_x_recruitment_type': x_recruitment_type, 'default_company_id': company_id}">
+                        <list>
+                            <field name="name"/>
+                            <field name="department_id"/>
+                            <field name="x_recruitment_type"/>
+                            <field name="x_matching_percentage" widget="progressbar"/>
+                            <field name="x_matching_skills" widget="many2many_tags"/>
+                            <field name="x_missing_skills" widget="many2many_tags"/>
+                            <field name="x_customer" column_invisible="parent.x_recruitment_type == 'Internal'"/>
+                            <field name="company_id" column_invisible="parent.x_recruitment_type == 'External'"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
         </field>
     </record>
     <record id="hr_job_survey_inherit_view" model="ir.ui.view">
@@ -146,6 +179,27 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']/button[@name='%(hr_recruitment.action_hr_job_applications)d']" position="attributes">
                 <attribute name="invisible">x_status_bar == 'draft'</attribute>
+            </xpath>
+        </field>
+    </record>
+    <record id="hr_job_list_view_inherit" model="ir.ui.view">
+        <field name="name">hr.job.list.inherit.view</field>
+        <field name="inherit_id" ref="hr.view_hr_job_tree"/>
+        <field name="model">hr.job</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='department_id']" position="after">
+                <field name="x_matching_percentage" optional="show" widget="progressbar"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="hr_recruitment_stage_form_inherit_headhunter" model="ir.ui.view">
+        <field name="name">hr.recruitment.stage.form.inherit.headhunter</field>
+        <field name="model">hr.recruitment.stage</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_recruitment_stage_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='template_id']" position="before">
+                <field name="x_send_cv"/>
             </xpath>
         </field>
     </record>
