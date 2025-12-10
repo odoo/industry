@@ -279,6 +279,9 @@
         <xpath expr="//field[@name='standard_price']" position="attributes">
           <attribute name="optional">hide</attribute>
         </xpath>
+        <xpath expr="//field[@name='uom_id']" position="after">
+          <field name="company_id" groups="base.group_multi_company"/>
+        </xpath>
     </field>
     <field name="inherit_id" ref="product.product_template_tree_view"/>
     <field name="mode">primary</field>
@@ -286,23 +289,6 @@
     <field name="name">product.template.list.inherit.booking_engine</field>
     <field name="priority">160</field>
     <field name="type">list</field>
-    <field name="active" eval="True"/>
-  </record>
-  <record id="booking_engine_offers_kanban" model="ir.ui.view">
-    <field name="arch" type="xml">
-        <xpath expr="//field[@name='list_price']" position="replace">
-          <field name="display_price" display="full"/>
-        </xpath>
-        <xpath expr="//field[@name='product_properties']" position="after">
-          <field name="planning_role_id" display="full" widget="badge"/>
-        </xpath>
-    </field>
-    <field name="inherit_id" ref="product.product_template_kanban_view"/>
-    <field name="mode">primary</field>
-    <field name="model">product.template</field>
-    <field name="name">product.template.kanban.inherit.booking_engine</field>
-    <field name="priority">160</field>
-    <field name="type">kanban</field>
     <field name="active" eval="True"/>
   </record>
   <record id="booking_engine_planning_role_view_search" model="ir.ui.view">
@@ -391,6 +377,7 @@
         <xpath expr="//gantt[1]" position="attributes">
           <attribute name="default_group_by">resource_id</attribute>
           <attribute name="default_range">month</attribute>
+          <attribute name="sample">0</attribute>
           <attribute name="precision">{"day":"hour:full","week":"day:half","month":"day:half","year":"day:full"}</attribute>
         </xpath>
         <xpath expr="/gantt" position="attributes">
@@ -428,6 +415,9 @@
         <xpath expr="//field[@name='tz']" position="after">
           <field name="x_occupant_ids" widget="many2many_tags"/>
         </xpath>
+        <xpath expr="//field[@name='calendar_id']" position="attributes">
+          <attribute name="domain">[('company_id', 'in', (False, company_id))]</attribute>
+        </xpath>
     </field>
     <field name="inherit_id" ref="planning.resource_resource_form_view_inherit"/>
     <field name="mode">extension</field>
@@ -441,6 +431,12 @@
     <field name="arch" type="xml">
         <xpath expr="//field[@name='default_role_id']" position="after">
           <field name="x_occupant_ids" optional="show" widget="many2many_tags"/>
+        </xpath>
+        <xpath expr="//field[@name='color']" position="after">
+          <field name="company_id" groups="base.group_multi_company"/>
+        </xpath>
+        <xpath expr="//field[@name='calendar_id']" position="attributes">
+          <attribute name="domain">[('company_id', 'in', (False, company_id))]</attribute>
         </xpath>
     </field>
     <field name="inherit_id" ref="planning.resource_resource_tree_view_inherit"/>
