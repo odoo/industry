@@ -103,4 +103,93 @@ if record.order_id.rental_status == "returned":
     action = server_action.with_context(active_id=record.order_id.id, active_model="sale.order").sudo().run()
 ]]></field>
     </record>
+
+    <!-- House Keeping -->
+    <record id="server_action_set_resources_occupied" model="ir.actions.server">
+        <field name="name">HouseKeeping: Set resources as occupied</field>
+        <field name="code"><![CDATA[
+if record.order_line.planning_slot_ids:
+    #for slot in record.order_line.planning_slot_ids.filtered(lambda s: s.resource_id.role_ids and any(s.resource_id.role_ids.x_is_a_room_offer)):
+        #slot.resource_id['x_occupancy'] = 'Occupied'
+    pass]]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+    </record>
+    <record id="server_action_set_resources_vacant" model="ir.actions.server">
+        <field name="name">HouseKeeping: Set resources as vacant</field>
+        <field name="code"><![CDATA[
+if record.order_line.planning_slot_ids:
+    #for slot in record.order_line.planning_slot_ids.filtered(lambda s: s.resource_id.role_ids and any(s.resource_id.role_ids.x_is_a_room_offer)):
+        #slot.resource_id['x_occupancy'] = 'Vacant'
+    pass]]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+    </record>
+
+    <record id="server_action_set_task_ready_if_no_approvers" model="ir.actions.server">
+        <field name="name">HouseKeeping: Set task ready if no approvers required after cleaning</field>
+        <field name="code"><![CDATA[
+if env['ir.config_parameter'].get_param('house_keeping.x_approvers_setting', '0') == '0': 
+    record.write({'stage_id': env.ref('booking_engine.project_task_type_18').id, 'state': '1_done'})
+]]></field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+    </record>
+
+    <record id="server_action_check_has_right_to_approve_tasks" model="ir.actions.server">
+        <field name="name">HouseKeeping: Has right to approve tasks</field>
+        <field name="code"><![CDATA[
+authorized_users = env['ir.config_parameter'].get_param('house_keeping.x_approver_users_ids_setting', 'a')
+if env['ir.config_parameter'].get_param('booking_engine.x_approvers_setting', '0') != '0' and (authorized_users == 'a' or (authorized_users != 'a' and env.user.id not in [int(u) for u in authorized_users.split(',')])):
+    raise UserError("You can't set a task as ready, as you are not one of the approvers.")
+]]></field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+    </record>
+
+    <record id="server_action_update_task_cleaning_state" model="ir.actions.server">
+        <field name="name">HouseKeeping: Update task cleaning state</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="resource.model_resource_resource"/>
+        <field name="update_path">x_resource.x_house_keeping_stage</field>
+        <field name="update_field_id" ref="x_house_keeping_stage_field_resource_resource"/>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[record.stage_id.id]]></field>
+    </record>
+
+    <record id="server_action_update_rooms" model="ir.actions.server">
+        <field name="name">Housekeeping: Update rooms server action</field>
+        <field name="model_id" ref="resource.model_resource_resource"/>
+        <field name="state">code</field>
+        <field name="usage">ir_cron</field>
+        <field name="code"><![CDATA[
+project = env['project.project'].search([('x_is_house_keeping_project', '=', True)], limit=1)
+newtasks = []
+last_midnight = datetime.datetime.today().replace(hour=0, minute=1)
+for slot in env['planning.slot'].search([('start_datetime', '<', last_midnight),('end_datetime', '>', last_midnight)]):
+    if any(slot.resource_id.role_ids.mapped('x_is_a_room_offer')):
+        cleaning_state = ''
+        if slot.end_datetime < last_midnight + datetime.timedelta(hours=24):
+            if not slot.role_id.x_has_checkout_cleaning:
+                continue
+            slot.resource_id.write({'x_occupancy': 'due_out', 'x_house_keeping_stage': 'checkout'})
+            cleaning_state = 'checkout'
+        else:
+            if not slot.role_id.x_has_stayover_cleaning:
+                continue
+            slot.resource_id.write({'x_occupancy': 'stayover', 'x_house_keeping_stage': 'stayover'})
+            cleaning_state = 'stayover'
+        newtasks.append({
+            'name': "HK " + slot.resource_id.name,
+            'project_id': project.id,
+            'partner_id': slot.sale_line_id.order_id.partner_id.id,
+            'description': "Automatically generated house keeping task.",
+            'date_deadline': (last_midnight + datetime.timedelta(hours=24)),
+            'x_resource': slot.resource_id.id,
+            'x_cleaning': cleaning_state,
+        })
+env['project.task'].create(newtasks)
+]]></field>
+    </record>
 </odoo>

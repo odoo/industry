@@ -20,6 +20,7 @@
         'data/ir_ui_menu.xml',
         'data/product_pricing.xml',
         'data/website_view.xml',
+        'data/res_config_settings.xml',
     ],
     'demo': [
         'demo/hr_employee.xml',
@@ -29,6 +30,7 @@
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
+        'demo/planning_slot_post.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
         'demo/website.xml',
