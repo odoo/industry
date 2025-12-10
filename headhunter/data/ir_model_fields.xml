@@ -186,4 +186,141 @@ for job in self:
     )
 ]]></field>
     </record>
+    <record id="x_client_description_field" model="ir.model.fields">
+        <field name="name">x_client_description</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="field_description">Client Description</field>
+        <field name="ttype">html</field>
+        <field name="translate">html_translate</field>
+    </record>
+    <record id="x_job_description_field" model="ir.model.fields">
+        <field name="name">x_job_description</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="field_description">Job Description</field>
+        <field name="ttype">html</field>
+        <field name="translate">html_translate</field>
+    </record>
+    <record id="x_applicant_description_field" model="ir.model.fields">
+        <field name="name">x_applicant_description</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="field_description">Applicant Description</field>
+        <field name="ttype">html</field>
+        <field name="translate">html_translate</field>
+    </record>
+    <record id="x_offer_description_field" model="ir.model.fields">
+        <field name="name">x_offer_description</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="field_description">Offer Description</field>
+        <field name="ttype">html</field>
+        <field name="translate">html_translate</field>
+    </record>
+    <record id="x_similar_job_ids_field" model="ir.model.fields">
+        <field name="name">x_similar_job_ids</field>
+        <field name="field_description">Similar Job Positions</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="ttype">many2many</field>
+        <field name="relation">hr.job</field>
+        <field name="relation_table">x_hr_job_hr_job_rel</field>
+    </record>
+    <record id="x_matching_percentage_field" model="ir.model.fields">
+        <field name="name">x_matching_percentage</field>
+        <field name="field_description">Matching %</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="ttype">float</field>
+        <field name="depends">current_job_skill_ids,current_job_skill_ids.skill_id,x_similar_job_ids,x_similar_job_ids.current_job_skill_ids,x_similar_job_ids.current_job_skill_ids.skill_id</field>
+        <field name="compute"><![CDATA[
+for job in self:
+    if not job.current_job_skill_ids or not job.x_similar_job_ids:
+        job['x_matching_percentage'] = 0.0
+        continue
+
+    best_match = 0.0
+    job_skill_ids = job.current_job_skill_ids.mapped("skill_id")
+
+    for similar in job.x_similar_job_ids:
+        similar_skill_ids = similar.current_job_skill_ids.mapped("skill_id")
+        overlap = job_skill_ids & similar_skill_ids
+        similar_total = len(similar_skill_ids)
+
+        match_percentage = (len(overlap) / similar_total * 100) if similar_total else 0.0
+        best_match = max(best_match, match_percentage)
+
+    job['x_matching_percentage'] = best_match
+]]></field>
+    </record>
+    <record id="x_matching_skills_field" model="ir.model.fields">
+        <field name="name">x_matching_skills</field>
+        <field name="field_description">Matching Skills</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="ttype">many2many</field>
+        <field name="relation">hr.skill</field>
+        <field name="depends">current_job_skill_ids,current_job_skill_ids.skill_id,x_similar_job_ids,x_similar_job_ids.current_job_skill_ids,x_similar_job_ids.current_job_skill_ids.skill_id</field>
+        <field name="compute"><![CDATA[
+for job in self:
+    job_skill_ids = job.current_job_skill_ids.mapped("skill_id")
+    similar_jobs = job.x_similar_job_ids | self.search([('x_similar_job_ids', 'in', job.id)])
+
+    if not job_skill_ids or not similar_jobs:
+        job['x_matching_skills'] = [(6, 0, [])]
+        continue
+
+    best_match = 0.0
+    best_overlap = job.env['hr.skill'].browse([])
+
+    for similar in similar_jobs:
+        similar_skill_ids = similar.current_job_skill_ids.mapped("skill_id")
+        if not similar_skill_ids:
+            continue
+
+        overlap = job_skill_ids & similar_skill_ids
+        match_percentage = (len(overlap) / len(similar_skill_ids)) * 100
+
+        if match_percentage > best_match:
+            best_match = match_percentage
+            best_overlap = overlap
+
+    job['x_matching_skills'] = [(6, 0, best_overlap.ids)]
+]]></field>
+    </record>
+    <record id="x_missing_skills_field" model="ir.model.fields">
+        <field name="name">x_missing_skills</field>
+        <field name="field_description">Missing Skills</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="ttype">many2many</field>
+        <field name="relation">hr.skill</field>
+        <field name="depends">current_job_skill_ids,current_job_skill_ids.skill_id,x_similar_job_ids,x_similar_job_ids.current_job_skill_ids,x_similar_job_ids.current_job_skill_ids.skill_id</field>
+        <field name="compute"><![CDATA[
+for job in self:
+    job_skill_ids = job.current_job_skill_ids.mapped("skill_id")
+    similar_jobs = job.x_similar_job_ids | self.search([('x_similar_job_ids', 'in', job.id)])
+
+    if not job_skill_ids or not similar_jobs:
+        job['x_missing_skills'] = [(6, 0, [])]
+        continue
+
+    best_match = 0.0
+    best_missing = job.env['hr.skill'].browse([])
+
+    for similar in similar_jobs:
+        similar_skill_ids = similar.current_job_skill_ids.mapped("skill_id")
+        if not similar_skill_ids:
+            continue
+
+        overlap = job_skill_ids & similar_skill_ids
+        missing = similar_skill_ids - job_skill_ids
+        match_percentage = (len(overlap) / len(similar_skill_ids)) * 100
+
+        if match_percentage > best_match:
+            best_match = match_percentage
+            best_missing = missing
+
+    job['x_missing_skills'] = [(6, 0, best_missing.ids)]
+]]></field>
+    </record>
+    <record id="x_send_cv_field" model="ir.model.fields">
+        <field name="name">x_send_cv</field>
+        <field name="field_description">Send CV</field>
+        <field name="model_id" ref="hr_recruitment.model_hr_recruitment_stage"/>
+        <field name="ttype">boolean</field>
+    </record>
 </odoo>
