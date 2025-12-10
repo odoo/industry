@@ -1,23 +1,133 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<odoo noupdate="1">
-    <record id="res_config_account_setting" model="res.config.settings">
-        <field name="group_project_stages" eval="1"/>
-        <field name="group_discount_per_so_line" eval="1"/>
-        <field name="group_product_pricelist" eval="1"/>
-        <field name="group_warning_sale" eval="1"/>
-        <field name="group_warning_purchase" eval="1"/>
-        <field name="invoiced_timesheet" eval="'approved'"/> 
-        <field name="group_warning_stock" eval="1"/> 
-        <field name="group_stock_reception_report" eval="1"/> 
-        <field name="group_sale_delivery_address" eval="1"/>
-        <field name="documents_product_settings" eval="1"/>
-        <field name="documents_hr_settings" eval="1"/>
-        <field name="group_analytic_accounting" eval="1"/>
-        <field name="group_uom" eval="1"/>
-        <field name="group_sale_order_template" eval="1"/>
+<odoo>
+    <record id="x_setting_field_progress_management" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Progress Management</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="name">x_module_construction_progress_management</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+self['x_module_construction_progress_management'] = bool(self.env['ir.module.module'].search_count([('name', '=', 'construction_progress_management')], limit=1))
+]]></field>
+    </record>
+    <record id="x_setting_field_show_line_numbering" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Show Line Numbering</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="name">x_module_construction_show_line_numbering</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+self['x_module_construction_show_line_numbering'] = bool(self.env['ir.module.module'].search_count([('name', '=', 'construction_show_line_numbering')], limit=1))
+]]></field>
+    </record>
+    <record id="x_setting_field_work_items" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Work Items</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="name">x_module_construction_work_items</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+self['x_module_construction_work_items'] = bool(self.env['ir.module.module'].search_count([('name', '=', 'construction_work_items')], limit=1))
+]]></field>
     </record>
 
-    <function name="execute" model="res.config.settings">
-        <value eval="[ref('res_config_account_setting')]"/>
-    </function>
+    <record id="x_action_activate_progress_management" model="ir.actions.server">
+        <field name="code"><![CDATA[
+if not (module := env['ir.module.module'].search([('name', '=', 'construction_progress_management')], limit=1)):
+    action_window = env['ir.module.module'].with_context({'module_name': 'construction_progress_management'}).button_immediate_install_app()
+    env['base.import.module'].with_context(action_window.get('context')).browse(action_window['res_id']).import_module()
+elif module:
+    line_numbering_module = env['ir.module.module'].search([('name', '=', 'construction_line_numbering')], limit=1)
+    if line_numbering_module and not env['ir.module.module'].search_count([('dependencies_id.name', '=', 'construction_line_numbering')], limit=1):
+        (module + line_numbering_module).button_immediate_uninstall()
+    else: module.button_immediate_uninstall()
+action = {'type': 'ir.actions.client', 'tag': 'reload'}
+]]></field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="state">code</field>
+        <field name="name">(Un-)Install Progress Management</field>
+    </record>
+    <record id="x_action_activate_show_line_numbering" model="ir.actions.server">
+        <field name="code"><![CDATA[
+if not (module := env['ir.module.module'].search([('name', '=', 'construction_show_line_numbering')], limit=1)):
+    action_window = env['ir.module.module'].with_context({'module_name': 'construction_show_line_numbering', 'data_module': True}).button_immediate_install_app()
+    env['base.import.module'].with_context(action_window.get('context')).browse(action_window['res_id']).import_module()
+elif module:
+    line_numbering_module = env['ir.module.module'].search([('name', '=', 'construction_line_numbering')], limit=1)
+    if line_numbering_module and not env['ir.module.module'].search_count([('dependencies_id.name', '=', 'construction_line_numbering')], limit=1):
+        (module + line_numbering_module).button_immediate_uninstall()
+    else: module.button_immediate_uninstall()
+action = {'type': 'ir.actions.client', 'tag': 'reload'}
+]]></field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="state">code</field>
+        <field name="name">(Un-)Install Line Numbering</field>
+    </record>
+    <record id="x_action_activate_work_items" model="ir.actions.server">
+        <field name="code"><![CDATA[
+if not (module := env['ir.module.module'].search([('name', '=', 'construction_work_items')], limit=1)):
+    action_window = env['ir.module.module'].with_context({'module_name': 'construction_work_items', 'data_module': True}).button_immediate_install_app()
+    env['base.import.module'].with_context(action_window.get('context')).browse(action_window['res_id']).import_module()
+elif module:
+    module.button_immediate_uninstall()
+action = {'type': 'ir.actions.client', 'tag': 'reload'}
+]]></field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="state">code</field>
+        <field name="name">(Un-)Install Work Items</field>
+    </record>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.construction</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="40"/>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="sale.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Construction" name="construction">
+                    <block title="Quotations &amp; Orders" name="quotations_setting_container">
+                        <setting id="construction_custom_show_line_numbering" help="Display line number in sale orders and invoices for more clarity with your customers">
+                            <field name="x_module_construction_show_line_numbering"/>
+                            <button invisible="x_module_construction_show_line_numbering" name="%(x_action_activate_show_line_numbering)d" string="Install" class="btn-secondary" type="action"/>
+                            <button invisible="not x_module_construction_show_line_numbering" name="%(x_action_activate_show_line_numbering)d" string="Uninstall" class="btn-secondary" type="action"/>
+                        </setting>
+                        <setting id="construction_custom_work_items" help="Adjust work item pricing and secure your margin straight from quotations based on components.">
+                            <field name="x_module_construction_work_items"/>
+                            <button invisible="x_module_construction_work_items" name="%(x_action_activate_work_items)d" string="Install" class="btn-secondary" type="action"/>
+                            <button invisible="not x_module_construction_work_items" name="%(x_action_activate_work_items)d" string="Uninstall" class="btn-secondary" type="action"/>
+                        </setting>
+                        <setting id="construction_custom_progress_management" help="Handle progress delivery at project level and delegate work progress statement approval prior billing.">
+                            <field name="x_module_construction_progress_management"/>
+                            <button invisible="x_module_construction_progress_management" name="%(x_action_activate_progress_management)d" string="Install" class="btn-secondary" type="action"/>
+                            <button invisible="not x_module_construction_progress_management" name="%(x_action_activate_progress_management)d" string="Uninstall" class="btn-secondary" type="action"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <data noupdate="1">
+        <record id="res_config_construction" model="res.config.settings">
+            <field name="group_project_stages" eval="1"/>
+            <field name="group_discount_per_so_line" eval="1"/>
+            <field name="group_product_pricelist" eval="1"/>
+            <field name="group_warning_sale" eval="1"/>
+            <field name="group_warning_purchase" eval="1"/>
+            <field name="invoiced_timesheet" eval="'approved'"/> 
+            <field name="group_warning_stock" eval="1"/> 
+            <field name="group_stock_reception_report" eval="1"/> 
+            <field name="group_sale_delivery_address" eval="1"/>
+            <field name="documents_product_settings" eval="1"/>
+            <field name="documents_hr_settings" eval="1"/>
+            <field name="group_analytic_accounting" eval="1"/>
+            <field name="group_uom" eval="1"/>
+            <field name="group_sale_order_template" eval="1"/>
+        </record>
+        <function name="execute" model="res.config.settings" eval="[ref('res_config_construction')]"/>
+    </data>
 </odoo>

@@ -32,4 +32,6 @@
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'url': "https://www.odoo.com/trial?industry&selected_app=construction",
+    'website': "https://www.odoo.com/industries/construction",
 }
