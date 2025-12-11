@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="stock_location_is_harvest" model="ir.model.fields">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Harvest Location</field>
+    <field name="model_id" ref="stock.model_stock_location"/>
+    <field name="name">x_is_harvest</field>
+  </record>
+  <record id="stock_picking_type_is_harvest" model="ir.model.fields">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Is Harvest</field>
+    <field name="model_id" ref="stock.model_stock_picking_type"/>
+    <field name="name">x_is_harvest</field>
+  </record>
+  <record id="stock_picking_is_harvest" model="ir.model.fields">
+    <field name="ttype">boolean</field>
+    <field name="related">picking_type_id.x_is_harvest</field>
+    <field name="field_description">Is Harvest</field>
+    <field name="model_id" ref="stock.model_stock_picking"/>
+    <field name="name">x_is_harvest</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="quality_check_recipe_iteration" model="ir.model.fields">
+    <field name="ttype">many2one</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Recipe Iteration</field>
+    <field name="model_id" ref="quality.model_quality_check"/>
+    <field name="name">x_recipe_iteration</field>
+    <field name="relation">mrp.eco</field>
+  </record>
+  <record id="mrp_eco_recipe_iteration_quality_check_count" model="ir.model.fields">
+    <field name="ttype">integer</field>
+    <field name="field_description">Recipe Iteration count</field>
+    <field name="model_id" ref="mrp_plm.model_mrp_eco"/>
+    <field name="name">x_recipe_iteration_quality_check_count</field>
+    <field name="selectable" eval="False"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[
+check_data = self.env['quality.check']._read_group(domain=[('x_recipe_iteration', 'in', self.ids)], groupby=['x_recipe_iteration'], aggregates=['__count'])
+mapped_data = {eco.id: count for eco, count in check_data}
+for eco in self: eco['x_recipe_iteration_quality_check_count'] = mapped_data.get(eco.id, 0)
+    ]]></field>
+  </record>
+  <record id="mrp_eco_is_stage_discarded" model="ir.model.fields">
+    <field name="ttype">boolean</field>
+    <field name="field_description">Is Stage Discarded</field>
+    <field name="model_id" ref="mrp_plm.model_mrp_eco"/>
+    <field name="name">x_is_stage_discarded</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="True"/>
+    <field name="depends">stage_id</field>
+    <field name="compute"><![CDATA[
+for eco in self: eco['x_is_stage_discarded'] = eco.stage_id == self.env.ref('vineyard.mrp_eco_stage_9')
+    ]]></field>
+  </record>
+  <record id="quality_check_control_point_title" model="ir.model.fields">
+    <field name="ttype">char</field>
+    <field name="related">point_id.title</field>
+    <field name="field_description">Control Point Title</field>
+    <field name="model_id" ref="quality.model_quality_check"/>
+    <field name="name">x_control_point_title</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+  </record>
+</odoo>

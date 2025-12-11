@@ -1,0 +1,306 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="stock_location_form_view_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='replenish_location']" position="after">
+        <field name="x_is_harvest"/>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="stock.view_location_form"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.location</field>
+    <field name="name">stock.location.form</field>
+    <field name="priority">160</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+  </record>
+  <record id="product_template_kanban_view_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//kanban[1]" position="attributes">
+        <attribute name="default_group_by">categ_id</attribute>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="product.product_template_kanban_view"/>
+    <field name="mode">extension</field>
+    <field name="model">product.template</field>
+    <field name="name">Product.template.product.kanban</field>
+    <field name="priority">160</field>
+    <field name="active" eval="True"/>
+    <field name="type">kanban</field>
+  </record>
+  <record id="stock_picking_type_form_view_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='barcode']" position="after">
+        <field name="x_is_harvest"/>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="stock.view_picking_type_form"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.picking.type</field>
+    <field name="name">Operation Types</field>
+    <field name="priority">160</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+  </record>
+  <record id="stock_quant_tree_editable_view_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//list[1]" position="attributes">
+        <attribute name="editable"/>
+        <attribute name="open_form_view">true</attribute>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="stock.view_stock_quant_tree_editable"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.quant</field>
+    <field name="name">stock.quant.list.editable</field>
+    <field name="priority">160</field>
+    <field name="active" eval="True"/>
+    <field name="type">list</field>
+  </record>
+  <record id="stock_picking_form_view_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='picking_type_id']" position="after">
+        <field name="location_id" invisible="not x_is_harvest" domain="[('x_is_harvest', '!=', False)]"/>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="stock.view_picking_form"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.picking</field>
+    <field name="name">stock.picking.form</field>
+    <field name="priority">160</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+  </record>
+  <record id="stock_vpicktree_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='origin']" position="replace"/>
+      <xpath expr="//field[@name='partner_id']" position="replace"/>
+      <xpath expr="//field[@name='location_dest_id']" position="replace"/>
+      <xpath expr="//list[1]" position="attributes">
+        <attribute name="default_order">date_done desc</attribute>
+      </xpath>
+      <xpath expr="//list[1]/field[@name='name']" position="after">
+        <xpath expr="//field[@name='scheduled_date']" position="move"/>
+        <xpath expr="//field[@name='date_done']" position="move"/>
+      </xpath>
+      <xpath expr="//field[@name='user_id']" position="after">
+        <xpath expr="//field[@name='state']" position="move"/>
+      </xpath>
+      <xpath expr="//field[@name='date_done']" position="attributes">
+        <attribute name="optional">show</attribute>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="stock.vpicktree"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.picking</field>
+    <field name="name">stock.picking.list.inherit.vineyard</field>
+    <field name="priority">160</field>
+    <field name="active" eval="True"/>
+    <field name="type">list</field>
+  </record>
+  <record id="stock_move_graph_view_inherit" model="ir.ui.view">
+    <field name="name">stock.move.graph</field>
+    <field name="model">stock.move</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <graph string="Stock Moves Analysis" sample="1">
+        <field name="date" type="col"/>
+        <field name="location_id" type="col"/>
+        <field name="product_qty" type="measure"/>
+      </graph>
+    </field>
+  </record>
+  <record id="stock_move_tree_receipt_picking_view_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='state']" position="replace"/>
+      <xpath expr="//field[@name='product_uom_qty']" position="replace">
+        <field name="quantity" optional="show"/>
+      </xpath>
+      <xpath expr="//field[@name='origin']" position="replace">
+        <field name="date" optional="show"/>
+        <field name="location_id" optional="show"/>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="stock.view_move_tree_receipt_picking"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.move</field>
+    <field name="name">stock.move.tree2</field>
+    <field name="priority">99</field>
+    <field name="active" eval="True"/>
+    <field name="type">list</field>
+  </record>
+  <record id="stock_move_search_view_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//filter[@name='groupby_create_date']" position="replace"/>
+      <xpath expr="//filter[@name='status']" position="replace"/>
+      <xpath expr="//filter[@name='groupby_dest_location_id']" position="replace"/>
+      <xpath expr="//filter[@name='groupby_picking_type_id']" position="replace"/>
+      <xpath expr="//filter[@name='inventory']" position="replace"/>
+      <xpath expr="//filter[@name='outgoing']" position="replace"/>
+      <xpath expr="//filter[@name='incoming']" position="replace"/>
+      <xpath expr="//filter[@name='groupby_date']" position="after">
+        <filter string="Scheduled Date" name="groupby_date_year" domain="[]" context="{'group_by': 'date:year'}" invisible="True"/>
+      </xpath>
+      <xpath expr="//field[@name='partner_id']" position="replace"/>
+      <xpath expr="//field[@name='location_dest_id']" position="replace"/>
+      <xpath expr="//field[@name='origin']" position="replace"/>
+      <xpath expr="//field[@name='reference']" position="replace"/>
+    </field>
+    <field name="inherit_id" ref="stock.view_move_search"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.move</field>
+    <field name="name">stock.move.search</field>
+    <field name="priority">99</field>
+    <field name="active" eval="True"/>
+    <field name="type">search</field>
+  </record>
+  <record id="stock_move_pivot_view_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='date']" position="after">
+        <field name="quantity" type="measure"/>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="stock.view_move_pivot"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.move</field>
+    <field name="name">stock.move.pivot</field>
+    <field name="priority">99</field>
+    <field name="active" eval="True"/>
+    <field name="type">pivot</field>
+  </record>
+  <record id="stock_picking_internal_search_view_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//filter[@name='backorder']" position="replace"/>
+      <xpath expr="//filter[@name='my_transfers']" position="replace"/>
+      <xpath expr="//field[@name='activity_type_id']" position="replace"/>
+      <xpath expr="//field[@name='activity_user_id']" position="replace"/>
+      <xpath expr="//field[@name='picking_type_id']" position="replace"/>
+      <xpath expr="//field[@name='partner_id']" position="replace"/>
+      <xpath expr="//search[1]/field[@name='name']" position="before">
+        <field name="location_id" string="Parcel"/>
+      </xpath>
+      <xpath expr="//filter[@name='status']" position="before">
+        <filter name="group_by_location" string="Parcels" context="{'group_by': 'location_id'}"/>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.picking</field>
+    <field name="name">stock.picking.internal.search</field>
+    <field name="priority">160</field>
+    <field name="active" eval="True"/>
+    <field name="type">search</field>
+  </record>
+  <record id="quality_check_tests_action_window" model="ir.actions.act_window">
+    <field name="context">{}</field>
+    <field name="domain">[('x_recipe_iteration', '=', active_id)]</field>
+    <field name="name">Tests</field>
+    <field name="res_model">quality.check</field>
+  </record>
+  <record id="mrp_eco_view_form_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//button[@name='open_new_bom']" position="after">
+        <button class="oe_stat_button" icon="fa-eyedropper" type="action" name="%(quality_check_tests_action_window)d">
+          <field widget="statinfo" name="x_recipe_iteration_quality_check_count" string="Tests"/>
+        </button>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="mrp_plm.mrp_eco_view_form"/>
+    <field name="mode">extension</field>
+    <field name="model">mrp.eco</field>
+    <field name="name">mrp.eco.view.form</field>
+    <field name="priority">160</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+  </record>
+  <record id="quality_point_view_tree" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='product_category_ids']" position="attributes">
+        <attribute name="optional">show</attribute>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="quality.quality_point_view_tree"/>
+    <field name="mode">extension</field>
+    <field name="model">quality.point</field>
+    <field name="name">quality.point.view.list</field>
+    <field name="priority">160</field>
+    <field name="active" eval="True"/>
+    <field name="type">list</field>
+  </record>
+  <record id="quality_check_view_form_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='lot_ids']" position="after">
+        <field name="x_recipe_iteration" domain="[('x_is_stage_discarded', '=', False)]"/>
+      </xpath>
+      <xpath expr="//field[@name='production_id']" position="after">
+        <label for="point_id"/>
+        <div class="d-flex" name="point_id_div">
+          <xpath expr="//field[@name='point_id']" position="move"/>
+          <field name="x_control_point_title"/>
+        </div>
+      </xpath>
+      <xpath expr="//field[@name='point_id']" position="attributes">
+        <attribute name="class">oe_inline</attribute>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="quality_control.quality_check_view_form"/>
+    <field name="mode">extension</field>
+    <field name="model">quality.check</field>
+    <field name="name">quality.check.view.form</field>
+    <field name="priority">160</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+  </record>
+  <record id="quality_check_view_tree_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='name']" position="after">
+        <field name="x_control_point_title" optional="show"/>
+      </xpath>
+      <xpath expr="//field[@name='title']" position="attributes">
+        <attribute name="optional">hide</attribute>
+      </xpath>
+      <xpath expr="//field[@name='lot_ids']" position="attributes">
+        <attribute name="optional">hide</attribute>
+      </xpath>
+      <xpath expr="//field[@name='finished_lot_ids']" position="attributes">
+        <attribute name="optional">show</attribute>
+      </xpath>
+      <xpath expr="//field[@name='control_date']" position="before">
+        <field name="x_recipe_iteration" optional="show"/>
+      </xpath>
+      <xpath expr="//field[@name='user_id']" position="attributes">
+        <attribute name="optional">hide</attribute>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="quality_control.quality_check_view_tree"/>
+    <field name="mode">extension</field>
+    <field name="model">quality.check</field>
+    <field name="name">quality.check.view.list</field>
+    <field name="priority">160</field>
+    <field name="active" eval="True"/>
+    <field name="type">list</field>
+  </record>
+  <record id="view_location_search_inherit" model="ir.ui.view">
+    <field name="name">stock.location.search.inherit</field>
+    <field name="model">stock.location</field>
+    <field name="inherit_id" ref="stock.view_location_search"/>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <xpath expr="//filter[@name='in_location']" position="replace">
+        <filter name="in_location"
+            string="Internal"
+            domain="['|', ('usage', '=', 'internal'), ('x_is_harvest', '!=', False)]"
+            help="Internal Locations"/>
+      </xpath>
+    </field>
+  </record>
+  <record id="quality_check_view_search_inherit" model="ir.ui.view">
+    <field name="name">quality.check.view.search.inherit</field>
+    <field name="model">quality.check</field>
+    <field name="inherit_id" ref="quality_mrp_workorder.quality_check_view_search_inherit_mrp_workorder"/>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <xpath expr="//filter[@name='quality_checks']" position="replace"/>
+    </field>
+  </record>
+</odoo>
