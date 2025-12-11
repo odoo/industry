@@ -30,6 +30,9 @@
   </record>
   <record id="rental_order_view_inherit" model="ir.ui.view">
     <field name="arch" type="xml">
+      <xpath expr="//list//field[@name='product_id']" position="after">
+        <field name="x_resource_id" readonly="1"/>
+      </xpath>
       <xpath expr="//button[@name='apply']" position="replace">
         <button string="Validate" class="btn btn-primary" type="action" name="%(apply_rental_check_out)d" data-hotkey="q"/>
       </xpath>
@@ -51,25 +54,20 @@
           <attribute name="string">Check Out</attribute>
         </xpath>
         <xpath expr="//field[@name='is_rental_order']" position="after">
-          <button string="City Tax" type="action" name="%(open_x_city_tax_action)d"/>
+          <button string="City Tax" type="action" name="%(open_x_city_tax_action)d" context="{'search_default_x_sale_order_id': id, 'default_x_sale_order_id': id}"/>
         </xpath>
+        <xpath expr="/form/sheet/notebook/page[@name='order_lines']/field[@name='order_line']/list//field[@name='planning_slot_ids']" position="replace"/>
         <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
           <page string="Guests">
-            <field name="x_guests">
-              <list string="Contacts" sample="1" multi_edit="1">
-                <field name="avatar_128" widget="image" options="{'size': [24, 24], 'img_class': 'o_avatar rounded'}" width="30" nolabel="1"/>
-                <field name="complete_name" string="Name"/>
-                <field name="email" optional="show"/>
-                <field name="phone" class="o_force_ltr" optional="show"/>
-                <field name="x_nationality" optional="show"/>
-                <field name="x_identity_check" optional="show" widget="badge" decoration-success="x_identity_check == 'ok'" decoration-warning="x_identity_check == 'na'" decoration-danger="x_identity_check == 'invalid'"/>
-                <field name="application_statistics" widget="contact_statistics" nolabel="1" optional="show" width="270"/>
+            <field name="x_guest_line_ids">
+              <list default_order="x_sequence asc,id desc" editable="bottom">
+                <field name="x_sequence" widget="handle"/>
+                <field optional="show" name="x_guest_partner_id" widget="res_partner_many2one" required="1"/>
+                <field optional="show" name="x_guest_identity_check" widget="badge" readonly="True" decoration-success="x_guest_identity_check == 'ok'" decoration-warning="x_guest_identity_check == 'na'" decoration-danger="x_guest_identity_check == 'invalid'"/>
+                <field optional="show" name="x_room_resource_id" domain="[('default_role_id.x_is_a_room_offer', '!=', False), ('id', 'in', x_sol_resource_ids)]" options="{'no_create': True, 'no_create_edit': True}"/>
               </list>
             </field>
           </page>
-        </xpath>
-        <xpath expr="//field[@name='product_template_id']" position="after">
-          <field name="planning_slot_ids" optional="hide" widget="many2many_tags"/>
         </xpath>
     </field>
     <field name="inherit_id" ref="sale_renting.rental_order_primary_form_view"/>
@@ -156,7 +154,9 @@
   <record id="sale_order_view" model="ir.ui.view">
     <field name="arch" type="xml">
         <xpath expr="//field[@name='product_template_id']" position="after">
-          <field name="x_nights" optional="show"/>
+          <field name="x_total_guests" optional="hide"/>
+          <field name="x_nights" optional="hide"/>
+          <field name="x_resource_id" optional="hide"/>
         </xpath>
     </field>
     <field name="inherit_id" ref="sale.view_order_form"/>
@@ -426,7 +426,7 @@
   <record id="booking_engine_resource_form" model="ir.ui.view">
     <field name="arch" type="xml">
         <xpath expr="//field[@name='tz']" position="after">
-          <field name="x_occupant"/>
+          <field name="x_occupant_ids" widget="many2many_tags"/>
         </xpath>
     </field>
     <field name="inherit_id" ref="planning.resource_resource_form_view_inherit"/>
@@ -440,7 +440,7 @@
   <record id="booking_engine_resource_list" model="ir.ui.view">
     <field name="arch" type="xml">
         <xpath expr="//field[@name='default_role_id']" position="after">
-          <field name="x_occupant" optional="show"/>
+          <field name="x_occupant_ids" optional="show" widget="many2many_tags"/>
         </xpath>
     </field>
     <field name="inherit_id" ref="planning.resource_resource_tree_view_inherit"/>
@@ -449,6 +449,26 @@
     <field name="name">resource.resource.list.inherit.booking_engine</field>
     <field name="priority">99</field>
     <field name="type">list</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="booking_engine_product_attribute_view_form" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="/form//field[@name='create_variant']" position="after">
+        <field name="x_captures_guests" help="When set, enables to capture the number of guests per attribute value."/>
+      </xpath>
+      <xpath expr="/form/sheet/notebook/page[@name='attribute_values']/field[@name='value_ids']/list//field[@name='default_extra_price']" position="after">
+        <field optional="show" name="x_adults" column_invisible="not parent.x_captures_guests"/>
+        <field optional="show" name="x_children" column_invisible="not parent.x_captures_guests"/>
+      </xpath>
+      <xpath expr="/form/sheet/notebook/page[@name='attribute_values']/field[@name='value_ids']/list" position="attributes">
+        <attribute name="open_form_view">true</attribute>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="product.product_attribute_view_form"/>
+    <field name="mode">extension</field>
+    <field name="model">product.attribute</field>
+    <field name="name">product.attribute.view.form.inherit.booking.engine</field>
+    <field name="type">form</field>
     <field name="active" eval="True"/>
   </record>
 </odoo>
