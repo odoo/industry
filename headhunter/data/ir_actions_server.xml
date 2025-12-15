@@ -167,4 +167,31 @@ if not record.x_is_shared_cv:
     raise UserError("No CV set on this Talent/applicant.")
     ]]></field>
     </record>
+    <record id="ir_actions_server_712" model="ir.actions.server">
+        <field name="code"><![CDATA[
+if not (record.x_status_bar == 'open' and record.active and record.is_published):
+    for job in record.x_similar_job_ids:
+        if record.id in job.x_similar_job_ids.ids:
+            job['x_similar_job_ids'] = [(3, record.id)]
+else:
+    for job in record.x_similar_job_ids:
+        if record.id not in job.x_similar_job_ids.ids:
+            job['x_similar_job_ids'] = [(4, record.id)]]]></field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="base_automation_id" ref="base_automation_sync_as_per_status"/>
+        <field name="state">code</field>
+        <field name="name">Execute Code</field>
+  </record>
+  <record id="ir_actions_server_713" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for similar in record.x_similar_job_ids:
+    if similar.x_status_bar == 'open' and similar.active and similar.is_published:
+        if record.id not in similar.x_similar_job_ids.ids:
+            similar['x_similar_job_ids'] = [(4, record.id)]]]></field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="base_automation_id" ref="base_automation_job_add"/>
+        <field name="state">code</field>
+        <field name="name">Execute Code</field>
+        <field name="usage">base_automation</field>
+  </record>
 </odoo>
