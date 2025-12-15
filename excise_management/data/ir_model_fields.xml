@@ -40,6 +40,21 @@
         <field name="required" eval="True"/>
         <field name="on_delete">restrict</field>
     </record>
+    <record id="currency_id_excise_category" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">Currency</field>
+        <field name="model_id" ref="excise_category"/>
+        <field name="name">x_currency_id</field>
+        <field name="relation">res.currency</field>
+    </record>
+    <record id="packaging_tax_excise_category" model="ir.model.fields">
+        <field name="ttype">monetary</field>
+        <field name="name">x_packaging_tax</field>
+        <field name="field_description">Packaging tax</field>
+        <field name="model_id" ref="excise_category" />
+        <field name="currency_field">x_currency_id</field>
+        <field name="help">Packaging tax per product packaging units for reporting purpose.</field>
+    </record>
     <record id="sales_tax_excise_category" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="field_description">Excise Sales Tax</field>
@@ -107,6 +122,22 @@ for template in self:
         <field name="model_id" ref="product.model_product_template"/>
         <field name="name">x_excise_description</field>
         <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="product_template_excise_packaging_units" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="field_description">Packaging units</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="name">x_packaging_units</field>
+    </record>
+    <record id="product_template_x_excise_packaging_tax" model="ir.model.fields">
+        <field name="ttype">monetary</field>
+        <field name="related">x_excise_category.x_packaging_tax</field>
+        <field name="field_description">Excise packaging tax</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="name">x_excise_packaging_tax</field>
+        <field name="readonly" eval="True"/>
+        <field name="currency_field">currency_id</field>
         <field name="store" eval="False"/>
     </record>
     <record id="stock_warehouse_is_fiscal_deposit" model="ir.model.fields">
@@ -208,7 +239,7 @@ for template in self:
     </record>
     <record id="stock_move_excise_amount" model="ir.model.fields">
       <field name="compute"><![CDATA[for record in self:
-    amount = record.quantity * record.x_currency_id._convert(record.product_id.x_excise_amount, record.product_id.currency_id)
+    amount = record.quantity * record.product_id.x_excise_amount
     record['x_excise_amount'] = 0
     if record.x_fiscal_deposit_move == "exit":
         record['x_excise_amount'] = -amount
@@ -247,6 +278,34 @@ for template in self:
       <field name="name">x_excise_quantity</field>
       <field name="readonly" eval="True"/>
     </record>
+    <record id="stock_move_excise_packaging_units" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_packaging_units'] = 0
+    if record.x_fiscal_deposit_move and 'exit' in record.x_fiscal_deposit_move:
+        record['x_packaging_units'] = -1 * record.quantity * record.product_id.x_packaging_units
+    elif record.x_fiscal_deposit_move and 'entry' in record.x_fiscal_deposit_move:
+        record['x_packaging_units'] = +1 * record.quantity * record.product_id.x_packaging_units
+        ]]></field>
+        <field name="ttype">integer</field>
+        <field name="depends">quantity, product_id, x_fiscal_deposit_move</field>
+        <field name="field_description">Packaging Units</field>
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="name">x_packaging_units</field>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="stock_move_excise_packaging_amount" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self:    record['x_packaging_amount'] = record.x_packaging_units * record.product_id.x_excise_packaging_tax
+        ]]></field>
+        <field name="ttype">monetary</field>
+        <field name="depends">x_packaging_units</field>
+        <field name="field_description">Packaging Amount</field>
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="name">x_packaging_amount</field>
+        <field name="currency_field">x_currency_id</field>
+        <field name="readonly" eval="True"></field>
+    </record>
     <record id="stock_move_excise_amount_unit" model="ir.model.fields">
         <field name="related">x_excise_category.x_unit_id</field>
         <field name="ttype">many2one</field>
@@ -274,9 +333,9 @@ for template in self:
         <field name="field_description">Excises</field>
         <field name="model_id" ref="sale.model_sale_order_line"/>
         <field name="ttype">monetary</field>
-        <field name="depends">product_id, product_uom_qty, order_id.fiscal_position_id</field>
+        <field name="depends">product_id, product_uom_qty, order_id.fiscal_position_id, product_uom_id</field>
         <field name="compute"><![CDATA[for record in self:
-        record['x_total_excises'] = record.product_id.x_excise_amount * record.product_uom_qty if not record.order_id.fiscal_position_id.x_is_fiscal_deposit else False]]></field>
+        record['x_total_excises'] = record.product_uom_id._compute_quantity(record.product_uom_qty, record.product_id.uom_id) * (record.product_id.x_excise_amount + record.product_id.x_packaging_units * record.product_id.x_excise_packaging_tax) if not record.order_id.fiscal_position_id.x_is_fiscal_deposit else False]]></field>
         <field name="readonly" eval="True"/>
         <field name="currency_field">currency_id</field>
     </record>
@@ -308,9 +367,9 @@ for record in self:
         <field name="field_description">Excises</field>
         <field name="model_id" ref="account.model_account_move_line"/>
         <field name="ttype">monetary</field>
-        <field name="depends">product_id, quantity</field>
+        <field name="depends">product_id, quantity, product_uom_id</field>
         <field name="compute"><![CDATA[for record in self:
-        record['x_total_excises_account_move'] = record.product_id.x_excise_amount * record.quantity if not record.sale_line_ids.order_id.fiscal_position_id.x_is_fiscal_deposit else False]]></field>
+        record['x_total_excises_account_move'] = record.product_uom_id._compute_quantity(record.quantity, record.product_id.uom_id) * (record.product_id.x_excise_amount + record.product_id.x_packaging_units * record.product_id.x_excise_packaging_tax) if not record.sale_line_ids.order_id.fiscal_position_id.x_is_fiscal_deposit else False]]></field>
         <field name="readonly" eval="True"/>
         <field name="currency_field">company_currency_id</field>
     </record>
@@ -474,6 +533,15 @@ for record in self:
         <field name="relation">x_excise_report</field>
         <field name="on_delete">cascade</field>
     </record>
+    <record id="excise_report_line_move_ids" model="ir.model.fields">
+        <field name="ttype">many2many</field>
+        <field name="name">x_move_ids</field>
+        <field name="field_description">Move IDs</field>
+        <field name="model_id" ref="excise_report_line" />
+        <field name="relation">stock.move</field>
+        <field name="readonly" eval="True"/>
+        <field name="copied" eval="False"/>
+    </record>
     <record id="excise_report_line_currency_id" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="field_description">Currency</field>
@@ -481,10 +549,7 @@ for record in self:
         <field name="name">x_currency_id</field>
         <field name="readonly" eval="True"/>
         <field name="relation">res.currency</field>
-        <field name="compute"><![CDATA[
-for rec in self: rec['x_currency_id'] = self.env.company.currency_id.id
-        ]]></field>
-        <field name="store" eval="False"/>
+        <field name="related">x_move_ids.product_id.currency_id</field>
     </record>
     <record id="excise_report_line_excise_category" model="ir.model.fields">
         <field name="ttype">many2one</field>
@@ -535,6 +600,19 @@ for rec in self: rec['x_currency_id'] = self.env.company.currency_id.id
         <field name="field_description">Quantity</field>
         <field name="model_id" ref="excise_report_line" />
     </record>
+    <record id="excise_report_line_excise_packaging_units" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="name">x_excise_packaging_units</field>
+        <field name="field_description">Packaging Units</field>
+        <field name="model_id" ref="excise_report_line" />
+    </record>
+    <record id="excise_report_line_excise_packaging_amount" model="ir.model.fields">
+        <field name="ttype">monetary</field>
+        <field name="name">x_excise_packaging_amount</field>
+        <field name="field_description">Packaging Amount</field>
+        <field name="model_id" ref="excise_report_line" />
+        <field name="currency_field">x_currency_id</field>
+    </record>
     <record id="excise_report_line_excise_unit" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="name">x_excise_unit</field>
@@ -546,19 +624,10 @@ for rec in self: rec['x_currency_id'] = self.env.company.currency_id.id
     <record id="excise_report_line_excise_amount" model="ir.model.fields">
         <field name="ttype">monetary</field>
         <field name="name">x_excise_amount</field>
-        <field name="field_description">Amount</field>
+        <field name="field_description">Excise Amount</field>
         <field name="model_id" ref="excise_report_line" />
         <field name="store">True</field>
         <field name="currency_field">x_currency_id</field>
-    </record>
-    <record id="excise_report_line_move_ids" model="ir.model.fields">
-        <field name="ttype">many2many</field>
-        <field name="name">x_move_ids</field>
-        <field name="field_description">Move IDs</field>
-        <field name="model_id" ref="excise_report_line" />
-        <field name="relation">stock.move</field>
-        <field name="readonly" eval="True"/>
-        <field name="copied" eval="False"/>
     </record>
     <record id="excise_report_excise_report_line" model="ir.model.fields">
         <field name="ttype">one2many</field>
