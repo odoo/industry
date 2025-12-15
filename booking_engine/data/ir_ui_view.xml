@@ -215,10 +215,10 @@
   <record id="planning_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
         <xpath expr="//field[@name='sync_shift_rental']" position="after">
-          <field name="x_is_a_room_offer" invisible="not sync_shift_rental"/>
+          <field name="x_is_a_room_offer" invisible="not sync_shift_rental" groups="booking_engine.group_house_keeping"/>
         </xpath>
         <xpath expr="/form/sheet/group" position="after">
-          <group string="House Keeping" groups="booking_engine.group_house_keeping">
+          <group string="House Keeping" groups="booking_engine.group_house_keeping" invisible="not x_is_a_room_offer">
             <group>
               <field name="x_has_stayover_cleaning"/>
               <field name="x_has_checkout_cleaning"/>
@@ -550,8 +550,8 @@
                     <group string="House Keeping" groups="booking_engine.group_house_keeping">
                         <field name="x_occupancy" options="{}"/>
                         <field name="x_house_keeping_stage" domain="[('project_ids.x_is_house_keeping_project', '!=', False)]"/>
-                        <field name="x_ongoing_task"/>
-                        <field name="x_resource_employee" widget="many2one_avatar_employee"/>
+                        <field name="x_ongoing_task" placeholder="None"/>
+                        <field name="x_resource_employee" widget="many2one_avatar_employee" placeholder="None"/>
                     </group>
                 </group>
             </xpath>
@@ -566,24 +566,32 @@
     </record>
     <record id="resource_resource_kanban_view_primary" model="ir.ui.view">
         <field name="arch" type="xml">
-            <kanban sample="1">
+            <kanban sample="1" highlight_color="x_task_stage_color">
                 <templates>
                     <t t-name="menu">
                         <field name="color" widget="kanban_color_picker"/>
                     </t>
                     <t t-name="card">
-                        <div class="d-flex align-items-baseline mb-2">
-                            <div>
-                                <field name="name" class="fw-bold fs-5 ms-1"/>
-                                <field t-if="record.role_ids.raw_value.length &gt; 0" name="role_ids" widget="many2many_tags" options="{'color_field': 'x_booking_board_color'}" class="ms-1"/>
-                                <field name="x_occupancy_color" invisible="True"/>
-                                <field name="x_occupancy" display="full" widget="badge" options="{'color_field':'x_occupancy_color'}"/>
+                        <div class="d-flex flex-column">
+                            <div class="d-flex align-items-center  justify-content-between w-100 gap-1">
+                                <field name="name" class="fw-bold"/>
+                                <div>
+                                    <field name="x_task_stage_color" invisible="True"/>
+                                    <field name="x_house_keeping_stage" display="full" widget="badge" options="{'color_field':'x_task_stage_color'}" class=""/>
+                                </div>
                             </div>
-                            <field name="x_task_stage_color" invisible="True"/>
-                            <field name="x_house_keeping_stage" display="full" widget="badge" options="{'color_field':'x_task_stage_color'}" class="ms-auto"/>
+                            <div class="d-flex align-items-center justify-content-between w-100">
+                                <div  class="d-flex align-items-center gap-1">
+                                    <div class="align-items-center">
+                                        <field name="x_occupancy_color" invisible="True"/>
+                                        <field name="x_occupancy" display="full" widget="badge" options="{'color_field':'x_occupancy_color'}"/>
+                                    </div>
+                                    <field name="role_ids" widget="many2many_tags"/>
+                                </div>
+                            </div>
                         </div>
                         <footer class="align-items-end">
-                            <a t-if="record.x_ongoing_task" name="%(action_window_redirect_related_task)d" type="action" class="d-block ms-auto">
+                            <a t-if="record.x_ongoing_task" name="%(action_window_redirect_related_task)d" type="action" class="d-flex align-items-center gap-1">
                                 <field name="x_ongoing_task" display="full"/>
                             </a>
                             <field name="x_resource_employee" display="full" widget="many2one_avatar_employee" class="ms-auto"/>
