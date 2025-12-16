@@ -61,8 +61,6 @@
         'demo/payment_provider_demo_post.xml',
         'demo/payment_provider.xml',
         'demo/payment_method.xml',
-        'demo/pos_payment_method.xml',
-        'demo/pos_config.xml',
     ],
     'license': 'OEEL-1',
     'assets': {
