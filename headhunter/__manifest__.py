@@ -20,10 +20,13 @@
         'website_hr_recruitment',
     ],
     'data': [
+        'data/ir_model.xml',
+        'data/ir_model_access.xml',
         'data/ir_model_fields.xml',
         'data/base_automation.xml',
         'data/mail_template.xml',
         'data/ir_actions_act_window.xml',
+        'data/ir_ui_menu.xml',
         'data/ir_actions_server.xml',
         'data/hr_recruitment_stage.xml',
         'data/ir_default.xml',

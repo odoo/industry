@@ -109,6 +109,10 @@
                     </div>
                 </t>
             </xpath>
+            <xpath expr="//field[@name='rotting_days']" position="after">
+                <button name="%(ir_actions_server_for_email_pop_up)d" string="Send CV" type="action" class="btn btn-outline-primary btn-sm" invisible="x_is_cv_sent"/>
+                <button name="%(ir_actions_server_for_email_pop_up)d" string="CV Sent" type="action" class="btn btn-outline-success btn-sm" invisible="not x_is_cv_sent"/>
+            </xpath>
         </field>
     </record>
     <record id="view_hr_job_form_inherit_view" model="ir.ui.view">
@@ -193,14 +197,54 @@
             </xpath>
         </field>
     </record>
-    <record id="hr_recruitment_stage_form_inherit_headhunter" model="ir.ui.view">
-        <field name="name">hr.recruitment.stage.form.inherit.headhunter</field>
-        <field name="model">hr.recruitment.stage</field>
-        <field name="inherit_id" ref="hr_recruitment.hr_recruitment_stage_form"/>
+    <!-- cv sent views -->
+    <record id="view_cv_sent_applicant_list" model="ir.ui.view">
+        <field name="name">cv.sent.applicant.list</field>
+        <field name="model">x_cv_sent_application</field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='template_id']" position="before">
-                <field name="x_send_cv"/>
-            </xpath>
+            <list string="CV Sent Applicants">
+                <field name="x_applicant_id"/>
+                <field name="x_job_id"/>
+                <field name="x_cv" widget="many2many_binary"/>
+                <field name="x_availability"/>
+                <field name="x_cv_sent_date"/>
+                <field name="x_is_published"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_cv_sent_applicant_form" model="ir.ui.view">
+        <field name="name">cv.sent.applicant.form</field>
+        <field name="model">x_cv_sent_application</field>
+        <field name="arch" type="xml">
+            <form string="CV Sent Applicant">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="x_applicant_id"/>
+                            <field name="x_job_id" readonly="1"/>
+                            <field name="x_cv" widget="many2many_binary"/>
+                        </group>
+                        <group>
+                            <field name="x_availability"/>
+                            <field name="x_cv_sent_date"/>
+                            <field name="x_is_published"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_cv_sent_applicant_search" model="ir.ui.view">
+        <field name="name">cv.sent.applicant.search</field>
+        <field name="model">x_cv_sent_application</field>
+        <field name="arch" type="xml">
+            <search string="Search CV Sent Applicants">
+                <field name="x_applicant_id"/>
+                <field name="x_job_id"/>
+                <group>
+                    <filter name="group_by_job" string="Job Position" context="{'group_by':'x_job_id'}"/>
+                </group>
+            </search>
         </field>
     </record>
 </odoo>
