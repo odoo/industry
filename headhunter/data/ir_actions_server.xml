@@ -157,16 +157,6 @@ partner_ids = record.x_hiring_team_contact.ids if record.x_hiring_team_contact e
 action = env['portal.wizard'].with_context(default_partner_ids=partner_ids).action_open_wizard()
     ]]></field>
     </record>
-    <record id="ir_actions_server_stage_update_for_cv" model="ir.actions.server">
-        <field name="name">Execute Code</field>
-        <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
-        <field name="base_automation_id" ref="base_automation_to_check_cv_is_attached"/>
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-if not record.x_is_shared_cv:
-    raise UserError("No CV set on this Talent/applicant.")
-    ]]></field>
-    </record>
     <record id="ir_actions_server_712" model="ir.actions.server">
         <field name="code"><![CDATA[
 if not (record.x_status_bar == 'open' and record.active and record.is_published):
@@ -192,6 +182,51 @@ for similar in record.x_similar_job_ids:
         <field name="base_automation_id" ref="base_automation_job_add"/>
         <field name="state">code</field>
         <field name="name">Execute Code</field>
-        <field name="usage">base_automation</field>
   </record>
+  <!-- mail pop up server action -->
+    <record id="ir_actions_server_for_email_pop_up" model="ir.actions.server">
+        <field name="binding_model_id" ref="hr_recruitment.model_hr_applicant"/>
+        <field name="code"><![CDATA[
+compose_form = env.ref('mail.email_compose_message_wizard_form')
+ctx = {
+    'default_model': 'hr.applicant',
+    'default_res_ids': [record.id],
+    'default_template_id': record.stage_id.template_id.id,
+    'default_composition_mode': 'comment',
+    'default_attachment_ids': [(6, 0, record.x_is_shared_cv.ids)],
+    'force_email': True,
+    'x_from_cv_send': True,
+}
+action =  {
+    'type': 'ir.actions.act_window',
+    'res_model': 'mail.compose.message',
+    'view_mode': 'form',
+    'views': [(compose_form.id, 'form')],
+    'target': 'new',
+    'context': ctx,
+}]]></field>
+        <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
+        <field name="state">code</field>
+        <field name="name">To open email pop up</field>
+    </record>
+    <record id="ir_actions_server_718" model="ir.actions.server">
+        <field name="code"><![CDATA[applicant = env['hr.applicant'].browse(record.res_id)
+if env.context.get('x_from_cv_send'):
+    sent_date = datetime.date.today()
+    env['x_cv_sent_application'].create({
+        'x_applicant_id': applicant.id,
+        'x_job_id': applicant.job_id.id,
+        'x_cv': [(6, 0, record.attachment_ids.ids)],
+        'x_availability': applicant.availability,
+        'x_cv_sent_date': sent_date,
+        'x_is_published': True,
+        })
+    applicant['x_is_cv_sent'] = True,
+    applicant['x_published'] = True,
+        ]]></field>
+        <field name="model_id" ref="mail.model_mail_message"/>
+        <field name="state">code</field>
+        <field name="name">Execute Code</field>
+        <field name="base_automation_id" ref="base_automation_to_send_mail"/>
+    </record>
 </odoo>
