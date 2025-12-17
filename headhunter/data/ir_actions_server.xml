@@ -213,6 +213,9 @@ action =  {
         <field name="code"><![CDATA[applicant = env['hr.applicant'].browse(record.res_id)
 if env.context.get('x_from_cv_send'):
     sent_date = datetime.date.today()
+    attachments = applicant.x_is_shared_cv
+    for attachment in attachments:
+        attachment.write({'public': True})
     env['x_cv_sent_application'].create({
         'x_applicant_id': applicant.id,
         'x_job_id': applicant.job_id.id,
@@ -228,5 +231,15 @@ if env.context.get('x_from_cv_send'):
         <field name="state">code</field>
         <field name="name">Execute Code</field>
         <field name="base_automation_id" ref="base_automation_to_send_mail"/>
+    </record>
+    <record id="cv_sent_applicants_route" model="ir.actions.server">
+        <field name="name">Route displaying CV Sent Applicants</field>
+        <field name="model_id" ref="x_cv_sent_application_model"/>
+        <field name="state">code</field>
+        <field name="website_published">True</field>
+        <field name="website_path">cv_sent_applicants</field>
+        <field name="code"><![CDATA[
+response = request.render('headhunter.portal_cv_sent_applicants')
+]]></field>
     </record>
 </odoo>
