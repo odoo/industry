@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+    <template id="portal_my_home_cv_sent_applicants" name="CV Sent Applicants" inherit_id="portal.portal_my_home">
+        <div id="portal_common_category" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/web/image/headhunter.ir_attachment_3'" />
+                <t t-set="title">Applicants</t>
+                <t t-set="text">Follow CVs and availability from applicants for each job position</t>
+                <t t-set="url" t-value="'/website/action/cv_sent_applicants'" />
+                <t t-set="config_card" t-value="True" />
+            </t>
+        </div>
+    </template>
+    <template id="portal_cv_sent_applicants" name="CV Sent Applicants">
+        <t t-call="portal.portal_layout">
+            <t t-set="logged_user" t-value="request.env.user"/>
+            <t t-set="partner_ids" t-value="[logged_user.partner_id.id, logged_user.partner_id.parent_id.id]"/>
+            <t t-set="user_applicants" t-value="
+                request.env['x_cv_sent_application'].sudo().search([
+                    ('x_is_published', '=', True),
+                    ('x_job_id.x_customer', 'in', partner_ids)
+                ])
+            "/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Applicants</t>
+            </t>
+
+            <div t-if="not user_applicants" class="alert alert-info">
+                There are currently no published applicants for your account.
+            </div>
+
+            <t t-else="">
+                <t t-call="portal.portal_table">
+                    <thead>
+                        <tr>
+                            <th>Applicant</th>
+                            <th>Job Position</th>
+                            <th>Availability</th>
+                            <th>CV Sent Date</th>
+                            <th>CV</th>
+                        </tr>
+                    </thead>
+                    <t t-foreach="user_applicants" t-as="app">
+                        <tr>
+                            <td><t t-out="app.x_applicant_id.partner_name"/></td>
+                            <td><t t-out="app.x_job_id.name"/></td>
+                            <td><t t-out="app.x_availability"/></td>
+                            <td><t t-out="app.x_cv_sent_date"/></td>
+                            <td>
+                                <t t-if="app.x_cv">
+                                    <a t-att-href="'/web/content/%s?filename=%s&amp;download=false' % (app.x_cv.id, app.x_cv.name)" target="_blank">
+                                        <i class="fa fa-file-pdf-o me-1"/>
+                                        <t t-out="app.x_cv.name or 'View CV'"/>
+                                    </a>
+                                </t>
+                            </td>
+                        </tr>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
