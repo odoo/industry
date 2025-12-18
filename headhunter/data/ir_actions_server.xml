@@ -188,6 +188,7 @@ for similar in record.x_similar_job_ids:
         <field name="binding_model_id" ref="hr_recruitment.model_hr_applicant"/>
         <field name="code"><![CDATA[
 compose_form = env.ref('mail.email_compose_message_wizard_form')
+job_partner = record.job_id.x_customer
 ctx = {
     'default_model': 'hr.applicant',
     'default_res_ids': [record.id],
@@ -197,6 +198,8 @@ ctx = {
     'force_email': True,
     'x_from_cv_send': True,
 }
+if job_partner:
+    ctx['default_partner_ids'] = [(6, 0, [job_partner.id])]
 action =  {
     'type': 'ir.actions.act_window',
     'res_model': 'mail.compose.message',
