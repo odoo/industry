@@ -76,6 +76,9 @@
         'web.assets_backend': [
             'industry_lawyer/static/src/js/my_tour.js',
             'industry_lawyer/static/src/xml/composer.xml',
+            'industry_lawyer/static/src/js/approval_state_selection.js',
+            'industry_lawyer/static/src/xml/approval_state_selection.xml',
+            'industry_lawyer/static/src/scss/approval_state_selection.scss',
         ]
     },
     'author': 'Odoo S.A.',

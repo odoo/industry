@@ -87,6 +87,9 @@
         <field name="priority">160</field>
         <field name="type">list</field>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="replace">
+               <field name="x_approval_status" widget="badge" decoration-muted="x_approval_status in ('sent', 'cancelled')" decoration-info="state=='pending'" decoration-danger="state=='cancelled'"/>
+            </xpath>
             <xpath expr="//button[@name='send']" position="attributes">
                 <attribute name="string">Approve and Send </attribute>
             </xpath>
@@ -102,16 +105,16 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='state']" position="replace">
-               <field name="x_approval_state" widget="statusbar" statusbar_visible="pending,sent,cancelled"/>
+               <field name="x_approval_status" widget="statusbar" statusbar_visible="pending,sent,cancelled"/>
             </xpath>
             <xpath expr="//label[@for='subject']/parent::div[1]" position="replace">
                 <div class="d-flex justify-content-between align-items-center">
                     <h1 class="d-flex w-100">
                         <field name="subject" options="{'line_breaks': False}" widget="text" class="o_task_name text-truncate w-md-75 w-100 pe-2" placeholder="Subject"/>
                     </h1>
-                    <!-- <div class="d-flex justify-content-end o_state_container" invisible="not active or is_template or has_project_template">
-                        <field name="approval_state" widget="project_task_state_selection" class="o_task_state_widget"/>
-                    </div> -->
+                    <div class="d-flex justify-content-end o_state_container">
+                        <field name="x_approval_state" widget="approval_state_selection" class="o_task_state_widget"/>
+                    </div>
                 </div>
             </xpath>
             <xpath expr="//field[@name='author_id']/parent::div[1]" position="attributes">
@@ -123,7 +126,6 @@
                         <field name="email_from"/>
                         <field name="email_to"/>
                         <field name="email_cc"/>
-                        <!--<field name="recipient_ids" widget="many2many_tags" domain="[('active', '=', True)]"/>-->
                     </group>
                     <group>
                         <field name="scheduled_date" placeholder="YYYY-MM-DD HH:MM:SS"/>
@@ -145,6 +147,42 @@
             </xpath>
         </field>
     </record>
+    <!-- <record id="view_res_group_form_custom" model="ir.ui.view">
+        <field name="inherit_id" ref="base.view_groups_form"/>
+        <field name="mode">extension</field>
+        <field name="model">res.groups</field>
+        <field name="name">res.groups.form.inherit</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//group/group" position="inside">
+                <field name="x_approval_group"/>
+            </xpath>
+            <xpath expr="//field[@name='privilege_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='share']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='api_key_duration']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='menus']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='views']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='access_rights']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='record_rules']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='notes']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record> -->
 
     <record id="approval_config_settings_action" model="ir.actions.act_window">
       <field name="view_id" ref="view_approval_config_settings"/>
