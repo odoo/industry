@@ -159,17 +159,10 @@ newtasks = []
 last_midnight = datetime.datetime.today().replace(hour=0, minute=0)
 for slot in env['planning.slot'].search([('start_datetime', '<', last_midnight),('end_datetime', '>', last_midnight)]):
     if any(slot.resource_id.role_ids.mapped('x_is_a_room_offer')):
-        cleaning_state = ''
-        if slot.end_datetime < last_midnight + datetime.timedelta(hours=24):
-            if not slot.role_id.x_has_checkout_cleaning:
-                continue
-            slot.resource_id.write({'x_occupancy': 'due_out', 'x_house_keeping_stage': 'checkout'})
-            cleaning_state = 'checkout'
-        else:
-            if not slot.role_id.x_has_stayover_cleaning:
-                continue
-            slot.resource_id.write({'x_occupancy': 'stayover', 'x_house_keeping_stage': 'stayover'})
-            cleaning_state = 'stayover'
+        end_today = slot.end_datetime < last_midnight + datetime.timedelta(hours=24)
+        if (end_today and not slot.role_id.x_has_checkout_cleaning) or (not end_today and not slot.role_id.x_has_stayover_cleaning):
+            continue
+        slot.resource_id.write({'x_occupancy': 'due_out' if end_today else 'stayover'})
         newtasks.append({
             'name': "HK " + slot.resource_id.name,
             'project_id': project.id,
@@ -177,7 +170,8 @@ for slot in env['planning.slot'].search([('start_datetime', '<', last_midnight),
             'description': "Automatically generated house keeping task.",
             'date_deadline': (last_midnight + datetime.timedelta(hours=24)),
             'x_resource': slot.resource_id.id,
-            'x_cleaning': cleaning_state,
+            'x_cleaning': 'checkout' if end_today else 'stayover',
+            'user_ids': [(5,0)],
         })
 env['project.task'].create(newtasks)
 ]]></field>

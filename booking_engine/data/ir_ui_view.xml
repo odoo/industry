@@ -170,7 +170,7 @@
   <record id="product_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
         <xpath expr="//field[@name='default_code']" position="after">
-          <field name="x_is_a_room_offer"/>
+          <field name="x_planning_is_a_room_offer" readonly="True"/>
           <field name="x_is_stay_tax" string="Is City Tax"/>
           <field name="x_related_has_stayover_cleaning" groups="booking_engine.group_house_keeping" invisible="not x_planning_is_a_room_offer"/>
           <field name="x_related_has_checkout_cleaning" groups="booking_engine.group_house_keeping" invisible="not x_planning_is_a_room_offer"/>
@@ -501,7 +501,7 @@
     <field name="search_view_id" ref="booking_engine_offers_search"/>
     <field name="view_ids" eval="[  
       (5, 0, 0),
-      (0, 0, {'view_mode': 'kanban', 'view_id': ref('booking_engine_offers_kanban')}),
+      (0, 0, {'view_mode': 'kanban', 'view_id': ref('product.product_template_kanban_view')}),
       (0, 0, {'view_mode': 'list', 'view_id': ref('booking_engine_offers_list')}),
     ]"/>
   </record>
@@ -550,7 +550,7 @@
                     <group string="House Keeping" groups="booking_engine.group_house_keeping">
                         <field name="x_occupancy" options="{}"/>
                         <field name="x_house_keeping_stage" domain="[('project_ids.x_is_house_keeping_project', '!=', False)]"/>
-                        <field name="x_ongoing_task" placeholder="None"/>
+                        <field name="x_ongoing_task" context="{'form_view_ref': 'booking_engine.project_task_form_view_primary'}"/>
                         <field name="x_resource_employee" widget="many2one_avatar_employee" placeholder="None"/>
                     </group>
                 </group>
@@ -568,9 +568,6 @@
         <field name="arch" type="xml">
             <kanban sample="1" highlight_color="x_task_stage_color">
                 <templates>
-                    <t t-name="menu">
-                        <field name="color" widget="kanban_color_picker"/>
-                    </t>
                     <t t-name="card">
                         <div class="d-flex flex-column">
                             <div class="d-flex align-items-center  justify-content-between w-100 gap-1">
@@ -588,13 +585,16 @@
                                     </div>
                                     <field name="role_ids" widget="many2many_tags"/>
                                 </div>
+                                <div t-if="record.x_ongoing_task" class="ms-auto">
+                                    <a t-if="record.x_ongoing_task" name="%(action_window_redirect_related_task)d" type="action">
+                                        <field name="x_ongoing_task" display="full"/>
+                                    </a>
+                                </div>
+                                <field name="x_resource_employee" display="full" widget="many2one_avatar_employee" class="ms-auto"/>
                             </div>
                         </div>
                         <footer class="align-items-end">
-                            <a t-if="record.x_ongoing_task" name="%(action_window_redirect_related_task)d" type="action" class="d-flex align-items-center gap-1">
-                                <field name="x_ongoing_task" display="full"/>
-                            </a>
-                            <field name="x_resource_employee" display="full" widget="many2one_avatar_employee" class="ms-auto"/>
+                            
                         </footer>
                     </t>
                 </templates>
