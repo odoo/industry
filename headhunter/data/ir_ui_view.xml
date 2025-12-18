@@ -15,6 +15,10 @@
                 <xpath expr="//field[@name='availability']" position="before">
                     <field name="x_available" optional="hide" />
                 </xpath>
+                <xpath expr="//list" position="inside">
+                    <button name="%(ir_actions_server_for_email_pop_up)d" string="Send CV" type="action" class="btn btn-outline-primary btn-sm" invisible="x_is_cv_sent"/>
+                    <button name="%(ir_actions_server_for_email_pop_up)d" string="CV Sent" type="action" class="btn btn-outline-success btn-sm" invisible="not x_is_cv_sent"/>
+                </xpath>
             </data>
         </field>
     </record>
@@ -58,8 +62,15 @@
                 <xpath expr="//field[@name='type_id']" position="after">
                     <field name="x_available"/>
                 </xpath>
+                <xpath expr="//field[@name='department_id']" position="after">
+                    <field name="x_published"/>
+                </xpath>
                 <xpath expr="//field[@name='availability']" position="attributes">
                     <attribute name="invisible">not x_available</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_job_add_applicants']" position="after">
+                    <button name="%(ir_actions_server_for_email_pop_up)d" string="Send CV" type="action" class="btn btn-outline-primary" invisible="x_is_cv_sent"/>
+                    <button name="%(ir_actions_server_for_email_pop_up)d" string="CV Sent" type="action" class="btn btn-outline-success" invisible="not x_is_cv_sent"/>
                 </xpath>
             </data>
         </field>
@@ -203,7 +214,7 @@
         <field name="model">x_cv_sent_application</field>
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
-            <list string="CV Sent Applicants">
+            <list string="CV Sent Applicants" create="0" editable="bottom">
                 <field name="x_applicant_id"/>
                 <field name="x_job_id"/>
                 <field name="x_cv" widget="many2many_binary"/>
