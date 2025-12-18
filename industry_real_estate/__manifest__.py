@@ -1,6 +1,6 @@
 {
     'name': 'Estate Management',
-    'version': '1.0',
+    'version': '19.0.1.0.1',
     'category': 'Services',
     'depends': [
         'base_automation',
