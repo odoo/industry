@@ -257,4 +257,32 @@ for applicant in records:
     applicant.x_cv_sent_ids.write({'x_is_published': False})
 ]]></field>
     </record>
+    <record id="ir_actions_server_view_job_positions" model="ir.actions.server">
+        <field name="name">View Job Positions</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="crm.model_crm_lead"/>
+        <field name="code"><![CDATA[
+for lead in records:
+    jobs = lead.x_job_positions.filtered(lambda job: job.active)
+
+    action = {
+        'res_model': 'hr.job',
+        'type': 'ir.actions.act_window',
+    }
+
+    if len(jobs) == 1:
+        action.update({
+            'view_mode': 'form',
+            'res_id': jobs.id,
+        })
+    elif jobs:
+        action.update({
+            'view_mode': 'list,form',
+            'domain': [('id', 'in', jobs.ids)],
+        })
+
+    action_result = action
+    ]]></field>
+    </record>
 </odoo>
