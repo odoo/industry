@@ -1051,7 +1051,7 @@ for record in self: record['x_x_condominium_x_property_count'] = condo_counts.ge
   </record>
   <record id="new_lines_calendar_attendee_vote" model="ir.model.fields">
     <field name="ttype">one2many</field>
-    <field name="field_description">Attendee Vote ids</field>
+    <field name="field_description">Attendee Vote Line</field>
     <field name="model_id" ref="model_x_calendar_event_line_motion"/>
     <field name="name">x_attendee_vote_ids</field>
     <field name="relation">x_calendar_event_line_motion_line_vote</field>
@@ -1098,10 +1098,8 @@ for record in self: record['x_x_condominium_x_property_count'] = condo_counts.ge
   <record id="new_decimal_calendar_ratio" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self:
   voting_key = record.event_id.x_voting_key
-  if voting_key:
-    record['x_ratio'] = sum(line.x_ratio for line in voting_key.x_ratio_ids if line.x_owner.id == record.partner_id.id)
-  else:
-    record['x_ratio'] = 0]]></field>
+  record['x_ratio'] = sum(voting_key.x_ratio_ids.filtered(lambda l: l.x_owner == record.partner_id).mapped('x_ratio')) if voting_key else 0.0
+    ]]></field>
     <field name="ttype">float</field>
     <field name="depends">event_id.x_voting_key</field>
     <field name="field_description">Ratio</field>
@@ -1153,7 +1151,6 @@ for record in self: record['x_x_condominium_x_property_count'] = condo_counts.ge
     <field name="field_description">Distribution Key</field>
     <field name="relation">x_distribution_key</field>
   </record>
-
   <record id="new_distribution_key_field" model="ir.model.fields">
     <field name="ttype">one2many</field>
     <field name="field_description">Ratio ids</field>
@@ -1211,12 +1208,14 @@ for record in self: record['x_x_condominium_x_property_count'] = condo_counts.ge
   </record>
   <record id="new_decimal_calendar_in_favor" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self:
-    if record.x_calendar_event_id.x_attending_ratio > 0 and record.x_calendar_event_id.x_voting_key != False:
+    event = record.x_calendar_event_id
+    voting_key = event.x_voting_key
+    if event.x_attending_ratio > 0 and voting_key:
         x_in_favor = 0
         for attendee_vote in record.x_attendee_vote_ids:
-            for attendee in record.x_calendar_event_id.attendee_ids:
+            for attendee in event.attendee_ids:
                 if attendee.partner_id.id == attendee_vote.x_attendee.id and attendee_vote.x_vote == 'In Favor': x_in_favor += attendee.x_ratio
-        record['x_in_favor'] = x_in_favor / sum([x_ratio.x_ratio for x_ratio in record.x_calendar_event_id.x_voting_key.x_ratio_ids]) / record.x_calendar_event_id.x_attending_ratio
+        record['x_in_favor'] = x_in_favor / sum([x_ratio.x_ratio for x_ratio in voting_key.x_ratio_ids]) / event.x_attending_ratio
     else: record['x_in_favor'] = 0]]></field>
     <field name="ttype">float</field>
     <field name="depends">x_attendee_vote_ids</field>
@@ -1229,12 +1228,14 @@ for record in self: record['x_x_condominium_x_property_count'] = condo_counts.ge
   </record>
   <record id="new_decimal_calendar_against" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self:
-    if record.x_calendar_event_id.x_attending_ratio > 0 and record.x_calendar_event_id.x_voting_key != False:
+    event = record.x_calendar_event_id
+    voting_key = event.x_voting_key
+    if event.x_attending_ratio > 0 and voting_key:
         x_against = 0
         for attendee_vote in record.x_attendee_vote_ids:
-            for attendee in record.x_calendar_event_id.attendee_ids:
+            for attendee in event.attendee_ids:
                 if attendee.partner_id.id == attendee_vote.x_attendee.id and attendee_vote.x_vote == 'Against': x_against += attendee.x_ratio
-        record['x_against'] = x_against / sum([x_ratio.x_ratio for x_ratio in record.x_calendar_event_id.x_voting_key.x_ratio_ids]) / record.x_calendar_event_id.x_attending_ratio
+        record['x_against'] = x_against / sum([x_ratio.x_ratio for x_ratio in voting_key.x_ratio_ids]) / event.x_attending_ratio
     else: record['x_against'] = 0]]></field>
     <field name="ttype">float</field>
     <field name="depends">x_attendee_vote_ids</field>
@@ -1247,12 +1248,14 @@ for record in self: record['x_x_condominium_x_property_count'] = condo_counts.ge
   </record>
   <record id="new_decimal_calendar_abstention" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self:
-    if record.x_calendar_event_id.x_attending_ratio > 0 and record.x_calendar_event_id.x_voting_key != False:
+    event = record.x_calendar_event_id
+    voting_key = event.x_voting_key
+    if event.x_attending_ratio > 0 and voting_key:
         x_abstention = 0
         for attendee_vote in record.x_attendee_vote_ids:
-            for attendee in record.x_calendar_event_id.attendee_ids:
+            for attendee in event.attendee_ids:
                 if attendee.partner_id.id == attendee_vote.x_attendee.id and attendee_vote.x_vote == 'Abstention': x_abstention += attendee.x_ratio
-        record['x_abstention'] = x_abstention / sum([x_ratio.x_ratio for x_ratio in record.x_calendar_event_id.x_voting_key.x_ratio_ids]) / record.x_calendar_event_id.x_attending_ratio
+        record['x_abstention'] = x_abstention / sum([x_ratio.x_ratio for x_ratio in voting_key.x_ratio_ids]) / event.x_attending_ratio
     else: record['x_abstention'] = 0]]></field>
     <field name="ttype">float</field>
     <field name="depends">x_attendee_vote_ids</field>
@@ -1265,10 +1268,11 @@ for record in self: record['x_x_condominium_x_property_count'] = condo_counts.ge
   </record>
   <record id="new_selection_calend_outcome" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self:
-    if (record.x_in_favor == 0 and record.x_against == 0) or not record.x_vote_criteria: record['x_outcome'] = False
-    else: 
-        if record.x_in_favor >= record.x_vote_criteria.x_acceptation_threshold: record['x_outcome'] = 'Approved'
-        else: record['x_outcome'] = 'Rejected'
+    criteria = record.x_vote_criteria
+    if not criteria or (record.x_in_favor == 0 and record.x_against == 0):
+        record['x_outcome'] = False
+    else:
+        record['x_outcome'] = 'Approved' if record.x_in_favor >= criteria.x_acceptation_threshold else 'Rejected'
     ]]>    </field>
     <field name="ttype">selection</field>
     <field name="depends">x_in_favor, x_against, x_abstention, x_vote_criteria</field>
@@ -1622,8 +1626,7 @@ for line in self:
   </record>
   <record id="field_x_share_total" model="ir.model.fields">
     <field name="name">x_share_total</field>
-    <field name="compute"><![CDATA[
-for record in self:
+    <field name="compute"><![CDATA[for record in self:
     record['x_share_total'] =  sum(line.x_share for line in record.x_line_ids)
       ]]>    </field>
     <field name="ttype">float</field>
@@ -1654,19 +1657,17 @@ for record in self:
     <field name="model_id" ref="model_x_account_analytic_split_line"/>
   </record>
   <record id="new_decimal_calendar_attending_ratio" model="ir.model.fields">
-    <field name="compute"><![CDATA[for record in self:
-    if len(record.attendee_ids) > 0 and record.x_voting_key != False and record.x_condominium != False :
-        x_attending_ratio = 0.0
-        for attendee in record.attendee_ids:
-            if attendee.x_attending or attendee.x_delegating: x_attending_ratio += attendee.x_ratio
-        total_ratio = sum(
-            x_ratio.x_ratio for x_ratio in record.x_voting_key.x_ratio_ids
-        )
-        if total_ratio > 0:
-          record['x_attending_ratio'] =  x_attending_ratio / total_ratio
-        else:
-          record['x_attending_ratio'] = 1]]>
-    </field>
+    <field name="compute"><![CDATA[
+for record in self:
+    voting_key = record.x_voting_key
+    attendees = record.attendee_ids
+    if not (attendees and voting_key and record.x_condominium):
+        record['x_attending_ratio'] = 0.0
+        continue
+    attending_ratio = sum(attendees.filtered(lambda a: a.x_attending or a.x_delegating).mapped('x_ratio'))
+    total_ratio = sum(voting_key.x_ratio_ids.mapped('x_ratio'))
+    record['x_attending_ratio'] = (attending_ratio / total_ratio if total_ratio > 0 else 1.0)
+]]></field>
     <field name="ttype">float</field>
     <field name="depends">attendee_ids,attendee_ids.x_delegating, attendee_ids.x_attending, attendee_ids.x_ratio, x_voting_key</field>
     <field name="field_description">Attending and Delegating Ratio</field>
