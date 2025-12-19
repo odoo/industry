@@ -392,12 +392,24 @@ for job in self:
     <record id="x_job_position_count_field" model="ir.model.fields">
         <field name="name">x_job_position_count</field>
         <field name="field_description">Job Position Count</field>
-        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="model_id" ref="crm.model_crm_lead"/>
         <field name="ttype">integer</field>
         <field name="depends">x_job_positions.active</field>
         <field name="compute"><![CDATA[
 for lead in self:
     lead['x_job_position_count'] = len(lead.x_job_positions.filtered(lambda job: job.active))
+]]></field>
+    </record>
+    <record id="x_cv_sent_count_field" model="ir.model.fields">
+        <field name="name">x_cv_sent_count</field>
+        <field name="field_description">CV Sent Count</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="ttype">integer</field>
+        <field name="depends">x_job_positions,x_job_positions.application_ids.x_is_cv_sent</field>
+        <field name="compute"><![CDATA[
+for lead in self:
+    applicants = self.env['hr.applicant'].search([ ('job_id', 'in', lead.x_job_positions.ids), ('x_is_cv_sent', '=', True) ])
+    lead['x_cv_sent_count'] = len(applicants)
 ]]></field>
     </record>
 </odoo>
