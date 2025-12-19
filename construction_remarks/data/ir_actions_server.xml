@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="action_x_remark_generate_x_reference_on_create" model="ir.actions.server">
-        <field name="model_id" ref="model_x_remark"/>
+    <record model="ir.actions.server" id="action_x_remark_generate_x_reference_on_create">
+        <field name="model_id" ref="project.model_project_task"/>
         <field name="state">code</field>
         <field name="name">Construction - Remarks: Generate Remark Reference on Create</field>
         <field name="code"><![CDATA[
 for record in records:
     # project already has remarks
-    if (project := record.x_project_id) and (remarks := project.x_remark_ids) and (last_refs := remarks.filtered(lambda r: r.x_reference).sorted('create_date desc')): 
+    if (project := record.project_id) and (remarks := project.x_remark_ids) and (last_refs := remarks.filtered(lambda r: r.x_reference).sorted('create_date desc')): 
         pid, rid = last_refs[0].x_reference.split('-')
     # project has no remarks but has SO
     elif project and (so := project.sale_order_id):
@@ -15,13 +15,32 @@ for record in records:
     # no SO but made from SO
     elif project and (soid := project.name.split('-')[0].strip()).startswith('S') and soid[1:].isnumeric():
         pid, rid = soid[1:], 0
-    # no project or project with no SO (e.g. field service) and 00000-remarks already exist
-    elif (last_ref := env['x_remark'].search([('x_reference', 'like', '00000-')], order='x_reference desc', limit=1).x_reference):
-        pid, rid = last_ref.split('-')
-    # no project or project with no SO and no 00000-remarks
+    # should not be possible because project has to exist for a Remark
     else:
         pid, rid = '00000', 0
     record['x_reference'] = f"{pid}-{int(rid) + 1:05d}"
+]]></field>
+    </record>
+    <record model="ir.actions.server" id="action_x_remark_write_project_stage_on_create_or_write">
+        <field name="name">Write Task Stage</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[ 
+for record in records: 
+    if record.x_is_remark: record['stage_id'] = record.x_stage_id
+]]></field>
+    </record>
+    <!-- 
+    Use a server action to open an act_window be able to make the context use both 
+    ref() (only available in eval="") and active_id (only available in >{}<)
+    -->
+    <record model="ir.actions.server" id="action_project_x_remark_list_view">
+        <field name="name">Open Remarks</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+ctx = { 'form_view_ref': 'construction_remarks.view_x_remark_form', 'search_default_open_remarks': 1, 'default_project_id': record.id if record else env.context.get('active_id'), 'default_x_is_remark': True, 'default_x_stage_id': env.ref('construction_remarks.project_remark_type_1').id}
+action = {'type': 'ir.actions.act_window', 'name': 'Remarks', 'res_model': 'project.task', 'view_mode': 'list,form', 'context': ctx, 'domain': [('x_is_remark', '=', True), ('stage_id.x_is_remark_stage', '=', True)]}
 ]]></field>
     </record>
 </odoo>
