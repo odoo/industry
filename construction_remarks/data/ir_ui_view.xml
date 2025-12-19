@@ -1,46 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_x_remark_form" model="ir.ui.view">
-        <field name="name">construction.remarks.x_remark.view.form</field>
-        <field name="model">x_remark</field>
+<!-- remark -->
+    <record model="ir.ui.view" id="view_x_remark_form">
+        <field name="name">construction.remarks.project.task.form</field>
+        <field name="model">project.task</field>
         <field name="type">form</field>
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <form>
-                <header/>
-                <sheet string="Remarks">
+                <header>
+                    <field name="x_stage_id" domain="[('x_is_remark_stage', '=', True)]" widget="rotting_statusbar_duration" options="{'clickable': '1', 'fold_field': 'fold'}" invisible="not project_id and not x_stage_id"/>
+                </header>
+                <sheet>
                     <div class="d-flex justify-content-between align-items-center">
                         <h1 class="d-flex w-100">
-                            <field name="x_name" options="{'line_breaks': False}" widget="text" class="o_task_name text-truncate w-md-75 w-100 pe-2" placeholder="Remark Title..."/>
+                            <field name="name" options="{'line_breaks': False}" widget="text" class="o_task_name text-truncate w-md-75 w-100 pe-2" placeholder="Remark Title..."/>
                         </h1>
-                        <div class="d-flex justify-content-end align-items-center px-1">
-                            <field name="x_priority" class="h3 pe-2" widget="priority_switch"/>
+                        <div class="d-flex justify-content-end align-items-center px-1" invisible="not active or is_template or has_project_template">
+                            <field name="priority" class="h3 pe-2" widget="priority_switch"/>
                         </div>
-                        <div class="d-flex justify-content-end o_state_container">
-                            <field name="x_state" widget="project_remark_state_selection" class="o_task_state_widget" />
+                        <div class="d-flex justify-content-end o_state_container" invisible="not active or is_template or has_project_template">
+                            <field name="state" widget="project_task_state_selection" class="o_task_state_widget" />
                         </div>
                     </div>
                     <group>
+                        <field name="x_is_remark" invisible="1"/>
+                        <field name="x_stage_id" invisible="1"/>
                         <group>
                             <field name="x_date" widget="date"/>
-                            <field name="x_project_id"/>
-                            <field name="x_event_id" readonly="True" invisible="x_update_id or not (x_update_id and x_event_id)"/>
-                            <field name="x_update_id" readonly="True" invisible="x_event_id or not (x_update_id and x_event_id)"/>
+                            <field name="project_id" required="True"/>
+                            <field name="x_event_id" readonly="True" invisible="x_update_id or not (x_update_id or x_event_id)"/>
+                            <field name="x_update_id" readonly="True" invisible="x_event_id or not (x_update_id or x_event_id)"/>
                             <field name="x_reference" readonly="True"/>
-                            <field name="x_description" type="html" options="{'collaborative': false, 'resizable': false}" placeholder="Add details about this remark..."/>
                         </group>
                         <group>
                             <field name="x_location"/>
                             <field name="x_remark_category_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
-                            <field name="x_due_date" decoration-danger="x_due_date and x_due_date &lt; current_date" decoration-bf="x_due_date and x_due_date &lt; current_date"/>
-                            <field name="x_partner_id"/>
+                            <field name="date_deadline" decoration-danger="date_deadline and date_deadline &lt; current_date" decoration-bf="date_deadline and date_deadline &lt; current_date"/>
+                            <field name="x_owner_id" string="Owner"/>
                         </group>
                         <group colspan="2" name="product_template_images" string="Remark Media">
                             <field
                                 colspan="2"
                                 name="x_remark_image_ids"
                                 class="o_website_sale_image_list"
-                                context="{'default_x_remark_id': id, 'default_name': x_name}"
+                                context="{'default_x_remark_id': id, 'default_name': name}"
                                 mode="kanban"
                                 add-label="Add Media"
                                 nolabel="1"
@@ -50,58 +54,81 @@
                         </group>
                     </group>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>
-
-    <record id="view_x_remark_list" model="ir.ui.view">
+    <record model="ir.ui.view" id="view_x_remark_list">
         <field name="name">construction.remarks.x_remark.view.list</field>
-        <field name="model">x_remark</field>
+        <field name="model">project.task</field>
         <field name="type">list</field>
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
-            <list default_order="x_priority DESC,x_date">
+            <list default_order="priority DESC,x_date">
                 <field name="x_reference"/>
-                <field name="x_date"/>
-                <field name="x_priority" widget="priority" options="{'is_toggle_mode': false}"/>
+                <field name="priority" widget="priority" options="{'is_toggle_mode': false}"/>
                 <field name="x_remark_category_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
-                <field name="x_name"/>
-                <field name="x_partner_id"/>
-                <field name="x_due_date" widget="remaining_days"/>
-                <field name="x_state" widget="project_remark_state_selection" class="o_task_state_widget"/>
+                <field name="name"/>
+                <field name="x_owner_id"/>
+                <field name="date_deadline" widget="remaining_days"/>
+                <field name="x_stage_id"/>
+                <field name="state" widget="project_task_state_selection" class="o_task_state_widget"/>
             </list>
         </field>
     </record>
-
-    <record id="view_x_remark_search" model="ir.ui.view">
+    <record model="ir.ui.view" id="view_x_remark_list_one2many">
+        <field name="name">construction.remarks.x_remark.view.list.one2many</field>
+        <field name="model">project.task</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list>
+                <!-- column_invisible fields required for the modal to save them -->
+                <field name="project_id" column_invisible="1"/>
+                <field name="x_is_remark" column_invisible="1"/>
+                <field name="x_event_id" column_invisible="1"/>
+                <field name="stage_id" column_invisible="1"/>
+                <field name="x_reference"/>
+                <field name="priority" widget="priority" options="{'is_toggle_mode': false}"/>
+                <field name="x_remark_category_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+                <field name="name"/>
+                <field name="x_owner_id"/>
+                <field name="date_deadline" widget="remaining_days"/>
+                <field name="state" widget="project_task_state_selection" class="o_task_state_widget"/>
+            </list>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="view_x_remark_search">
         <field name="name">construction.remarks.x_remark.view.search</field>
-        <field name="model">x_remark</field>
+        <field name="model">project.task</field>
+        <field name="type">search</field>
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <search string="Remark">
-                <field string="Name &amp; Description" name="x_name" filter_domain="['|', ('x_name', 'like', self), ('x_description', 'like', self)]"/>
-                <field string="Owner" name="x_partner_id" filter_domain="['|', ('x_partner_id.name', 'like', self), ('x_partner_id.user_ids.name', 'like', self)]"/>
+                <field string="Name &amp; Description" name="name" filter_domain="['|', ('name', 'like', self), ('description', 'like', self)]"/>
+                <field string="Owner" name="x_owner_id" filter_domain="['|', ('x_owner_id.name', 'like', self), x_owner_id.user_ids.name', 'like', self)]"/>
                 <field string="Category" name="x_remark_category_ids" filter_domain="[('x_remark_category_ids.x_name', 'like', self)]"/>
                 <separator/>
-                <filter string="My Remarks" name="my_remarks" domain="[('x_partner_id.user_ids', '=', uid)]"/>
-                <filter string="Unassigned" name="unassigned" domain="[('x_partner_id', '=', False)]"/>
+                <filter string="My Remarks" name="my_remarks" domain="[('x_owner_id.user_ids', '=', uid)]"/>
+                <filter string="Unassigned" name="unassigned" domain="[('x_owner_id', '=', False)]"/>
                 <separator/>
-                <filter string="Overdue" name="overdue" domain="[('x_due_date', '&lt;', 'today')]"/>
+                <filter string="Overdue" name="overdue" domain="[('date_deadline', '&lt;', 'today')]"/>
                 <separator/>
-                <filter string="Open" name="open_remarks" domain="[('x_state', 'in', ['01_in_progress','02_changes_requested', '03_approved'])]"/>
-                <filter string="Closed" name="closed_remarks" domain="[('x_state', 'in', ['1_done','1_canceled'])]"/>
+                <filter string="Open" name="open_remarks" domain="[('state', 'in', ['01_in_progress','02_changes_requested', '03_approved'])]"/>
+                <filter string="Closed" name="closed_remarks" domain="[('state', 'in', ['1_done','1_canceled'])]"/>
                 <group>
-                    <filter string="Owner" name="x_partner_id" context="{'group_by': 'x_partner_id'}" />
-                    <filter string="Priority" name="x_priority" context="{'group_by': 'x_priority'}"/>
+                    <filter string="Owner" name="x_owner_id" context="{'group_by': 'x_owner_id'}" />
+                    <filter string="Priority" name="priority" context="{'group_by': 'priority'}"/>
                     <filter string="Category" name="x_remark_category_ids" context="{'group_by': 'x_remark_category_ids'}"/>
-                    <filter string="State" name="x_state" context="{'group_by': 'x_state'}"/>
-                    <filter string="Project" name="x_project_id" context="{'group_by': 'x_project_id'}"/>
+                    <filter string="State" name="state" context="{'group_by': 'state'}"/>
+                    <filter string="Stage" name="x_stage_id" context="{'group_by': 'x_stage_id'}"/>
+                    <filter string="Project" name="project_id" context="{'group_by': 'project_id'}"/>
                 </group>
             </search>
         </field>
     </record>
-
-    <record id="view_x_remark_category_form" model="ir.ui.view">
+<!-- remark category -->
+    <record model="ir.ui.view" id="view_x_remark_category_form">
         <field name="name">construction.remarks.x_remark_category.view.form</field>
         <field name="model">x_remark_category</field>
         <field name="type">form</field>
@@ -122,8 +149,7 @@
             </form>
         </field>
     </record>
-
-    <record id="view_x_remark_category_list" model="ir.ui.view">
+    <record model="ir.ui.view" id="view_x_remark_category_list">
         <field name="name">construction.remarks.x_remark_category.view.list</field>
         <field name="model">x_remark_category</field>
         <field name="type">list</field>
@@ -134,10 +160,8 @@
             </list>
         </field>
     </record>
-
-
-    <!-- This view should only be used from the product o2m because the required field product_tmpl_id has to be automatically set. -->
-    <record id="view_x_remark_image_form" model="ir.ui.view">
+<!-- remark image -->
+    <record model="ir.ui.view" id="view_x_remark_image_form">
         <field name="name">construction.remarks.x_remark_image.view.form</field>
         <field name="model">x_remark_image</field>
         <field name="active" eval="True"/>
@@ -173,8 +197,7 @@
             </form>
         </field>
     </record>
-
-    <record id="view_x_remark_image_form_kanban" model="ir.ui.view">
+    <record model="ir.ui.view" id="view_x_remark_image_form_kanban">
         <field name="name">construction.remarks.x_remark_image.view.kanban</field>
         <field name="model">x_remark_image</field>
         <field name="active" eval="True"/>
@@ -216,8 +239,53 @@
             </kanban>
         </field>
     </record>
-
-    <record id="view_calendar_event_form_inherit" model="ir.ui.view">
+<!-- remark stage -->
+    <record model="ir.ui.view" id="view_task_type_tree_inherited">
+        <field name="name">project.type.list.inherited</field>
+        <field name="model">project.task.type</field>
+        <field name="mode">extension</field>
+        <field name="inherit_id" ref="project.task_type_tree_inherited"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="x_is_remark_stage" column_invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+<!-- hiding remarks in existing task views -->
+    <record model="ir.ui.view" id="view_task_form2">
+        <field name="name">project.task.form.inherited</field>
+        <field name="model">project.task</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="(//field[@name='stage_id'])[1]" position="attributes">
+                <attribute name="domain">[('x_is_remark_stage', '=', False), ('project_ids', 'in', project_id)]</attribute>
+            </xpath>
+            <xpath expr="(//field[@name='stage_id'])[2]" position="attributes">
+                <attribute name="domain">[('x_is_remark_stage', '=', False), ('project_ids', 'in', project_id)]</attribute>
+            </xpath>
+            <xpath expr="(//field[@name='stage_id'])[3]" position="attributes">
+                <attribute name="domain">[('x_is_remark_stage', '=', False), ('project_ids', 'in', project_id)]</attribute>
+            </xpath>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="project_task_in_project_view_kanban_inherited">
+        <field name="name">project.task.in.project.kanban.inherited</field>
+        <field name="model">project.task</field>
+        <field name="mode">extension</field>
+        <field name="inherit_id" ref="project_enterprise.view_task_kanban_inherited"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="inside">
+                <field name="x_is_remark" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+<!-- new notebook pages in existing models -->
+    <record model="ir.ui.view" id="view_calendar_event_form_inherit">
         <field name="name">calendar.event.form.inherit</field>
         <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
         <field name="model">calendar.event</field>
@@ -230,18 +298,19 @@
                     <group class="mb-0">
                         <field name="x_project_id" class="mb-0"/>
                     </group>
-                    <div class="g-col-sm-2">
-                        <div class="o_horizontal_separator mt-2 mb-1 text-uppercase fw-bolder small">
-                            Remarks
-                        </div>
-                    </div>
-                    <field name="x_remark_ids" widget="one2many" nolabel="1" context="{'default_x_project_id': x_project_id}"/>
+                    <field name="x_remark_ids" readonly="not x_project_id" nolabel="1" context="{
+                        'default_project_id': x_project_id,
+                        'default_x_event_id': id,
+                        'default_x_is_remark': True,
+                        'default_stage_id': %(project_remark_type_1)d,
+                        'form_view_ref': 'construction_remarks.view_x_remark_form', 
+                        'list_view_ref': 'construction_remarks.view_x_remark_list_one2many',
+                    }"/>
                 </page>
             </xpath>
         </field>
     </record>
-
-    <record id="project_update_view_form_inherit" model="ir.ui.view">
+    <record model="ir.ui.view" id="project_update_view_form_inherit">
         <field name="name">project.update.view.form.inherit</field>
         <field name="inherit_id" ref="project.project_update_view_form"/>
         <field name="model">project.update</field>
@@ -251,7 +320,14 @@
         <field name="arch" type="xml">
             <xpath expr="//page[@name='description']" position="after">
                 <page name="remarks" string="Remarks">
-                    <field name="x_remark_ids" widget="one2many" nolabel="1" context="{'default_x_project_id': project_id}"/>
+                    <field name="x_remark_ids" nolabel="1" context="{
+                        'default_project_id': project_id,
+                        'default_x_update_id': id,
+                        'default_x_is_remark': True,
+                        'default_stage_id': %(project_remark_type_1)d,
+                        'form_view_ref': 'construction_remarks.view_x_remark_form', 
+                        'list_view_ref': 'construction_remarks.view_x_remark_list_one2many',
+                    }"/>
                 </page>
             </xpath>
         </field>

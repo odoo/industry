@@ -1,30 +1,58 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+<!-- remark -->
+    <record model="ir.actions.act_window" id="action_x_remark_form_view">
+        <field name="name">Remarks</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">form</field>
+        <field name="search_view_id" ref="view_x_remark_search"/>
+        <field name="view_id" ref="view_x_remark_form"/>
+        <field name="context" eval="{
+            'default_x_is_remark': True,
+            'default_x_stage_id': ref('construction_remarks.project_remark_type_1'),
+        }"/>
+    </record>
     <record model="ir.actions.act_window" id="menu_action_project_x_remark_list_view">
         <field name="name">Remarks</field>
-        <field name="res_model">x_remark</field>
+        <field name="res_model">project.task</field>
         <field name="view_id" ref="view_x_remark_list"/>
-        <field name="view_mode">list,form</field>
-        <field name="context">{'search_default_open_remarks': 1}</field>
+        <field name="view_mode">list,form,search</field>
+        <field name="search_view_id" ref="view_x_remark_search"/>
+        <field name="domain">[('x_is_remark', '=', True)]</field>
+        <field name="context" eval="{
+            'form_view_ref': 'construction_remarks.view_x_remark_form',
+            'search_default_open_remarks': 1,
+            'default_x_is_remark': True,
+            'default_x_stage_id': ref('construction_remarks.project_remark_type_1'),
+        }"/>
     </record>
+<!-- remark category -->
     <record model="ir.actions.act_window" id="menu_action_x_remark_category_list_view">
         <field name="name">Remark Categories</field>
         <field name="res_model">x_remark_category</field>
         <field name="view_id" ref="view_x_remark_category_list"/>
-        <field name="view_mode">list,form</field>
-        <field name="context">{'search_default_open_remarks': 1}</field>
+        <field name="view_mode">list,form,search</field>
     </record>
-    <record model="ir.actions.act_window" id="action_project_x_remark_list_view">
-        <field name="name">Remarks</field>
-        <field name="res_model">x_remark</field>
-        <field name="view_id" ref="view_x_remark_list"/>
+<!-- remark stage -->
+    <record model="ir.actions.act_window" id="menu_action_x_remark_stage_list_view">
+        <field name="name">Remark Stages</field>
+        <field name="res_model">project.task.type</field>
+        <field name="view_id" ref="view_task_type_tree_inherited"/>
         <field name="view_mode">list,form</field>
-        <field name="domain">[('x_project_id','=', active_id)]</field>
-        <field name="context">{'search_default_open_remarks': 1, 'default_x_project_id': active_id}</field>
+        <field name="domain">[('x_is_remark_stage', '=', True)]</field>
+        <field name="context">{'default_x_is_remark_stage': 1}</field>
     </record>
-    <record model="ir.actions.act_window" id="action_x_remark_form_view">
-        <field name="name">Remarks</field>
-        <field name="res_model">x_remark</field>
-        <field name="view_mode">form</field>
+    <!-- filter out remark stages from the project stages view -->
+    <record model="ir.actions.act_window" id="project.open_task_type_form" forcecreate="0">
+        <field name="domain">[('user_id', '=', False), ('x_is_remark_stage', '=', False)]</field>
+    </record>
+<!-- task -->
+    <!-- filter out remarks from project tasks view -->
+    <record model="ir.actions.act_window" id="project.action_view_all_task" forcecreate="0">
+        <field name="domain">[('has_template_ancestor', '=', False), ('x_is_remark', '=', False)]</field>
+    </record>
+    <!-- filter out remarks from project tasks report -->
+    <record model="ir.actions.act_window" id="project.action_project_task_user_tree" forcecreate="0">
+        <field name="domain">[('has_template_ancestor', '=', False), ('stage_id.x_is_remark_stage', '=', False)]</field>
     </record>
 </odoo>
