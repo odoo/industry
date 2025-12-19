@@ -20,8 +20,10 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/views.xml',
+        'data/ir_ui_view.xml',
         'data/web_views.xml',
         'data/product_pricing.xml',
+        'data/res_config_settings.xml',
     ],
     'demo': [
         'demo/product_template_post.xml',
@@ -30,6 +32,7 @@
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
+        'demo/planning_slot_post.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
         'demo/website.xml',
