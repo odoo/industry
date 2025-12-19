@@ -12,6 +12,7 @@
         'data/ir_model.xml',
         'data/ir_model_access.xml',
         'data/ir_model_fields.xml',
+        'data/project_task_type.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
         'data/ir_default.xml',
@@ -23,13 +24,11 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'construction_remarks/static/src/widgets/project_remark_x2many_media_viewer.js',
-            'construction_remarks/static/src/widgets/project_remark_state_selection.js',
+            'construction_remarks/static/src/js/kanban_controller.js',
         ],
     },
     'cloc_exclude': [
-        "static/src/widgets/project_remark_x2many_media_viewer.js",
-        "static/src/widgets/project_remark_state_selection.js",
+        "static/src/js/kanban_controller.js",
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
