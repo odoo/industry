@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="action_convert_generate_mo" model="ir.actions.server">
+        <field name="name">Convert Product → Generate MO</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+wizard = records[0]
+move = wizard.x_move_id
+
+move_line = env['stock.move.line'].create({
+    'move_id': move.id,
+    'product_id': wizard.x_product_id.id,
+    'location_id': wizard.x_quant_id.location_id.id,
+    'lot_id': wizard.x_quant_id.lot_id.id,
+    'quantity': wizard.x_quantity,
+})
+
+move_raw_ids = env['stock.move'].create({
+    'product_id': wizard.x_product_id.id,
+    'product_uom_qty': wizard.x_quantity,
+    'product_uom': wizard.x_product_id.uom_id.id,
+    'location_id': move.location_id.id,
+    'location_dest_id': move.location_dest_id.id,
+    'move_line_ids': [(4, move_line.id)],
+})
+
+# Create MO
+mo = env['mrp.production'].create({
+    'product_id': wizard.x_product_attribute_value.id,
+    'product_qty': wizard.x_quantity,
+    'product_uom_id': wizard.x_product_attribute_value.uom_id.id,
+    'location_src_id': move.location_id.id,
+    'location_dest_id': move.location_dest_id.id,
+    'origin': move.reference or move.picking_id.name,
+    'user_id': env.user.id,
+    'move_raw_ids': [(6, 0, move_raw_ids.ids)],
+})
+
+if wizard.x_keep_lot_sn:
+    lot_name = wizard.x_quant_id.lot_id.name
+else:
+    if wizard.x_new_lot_sn_id:
+        lot_name = wizard.x_new_lot_sn_id
+if lot_name:
+    lot = env['stock.lot'].create({
+        'name': lot_name,
+        'product_id': wizard.x_product_attribute_value.id,
+    })
+    mo.write({'lot_producing_ids': [(6,0,lot.ids)]})
+    
+mo.action_confirm()
+        ]]></field>
+    </record>
+
+</odoo>
