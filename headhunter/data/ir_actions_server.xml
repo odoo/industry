@@ -345,4 +345,31 @@ action = {
     }
 }]]></field>
     </record>
+    <record id="ir_actions_server_view_job_position_from_partner" model="ir.actions.server">
+        <field name="name">View Job Position from partner</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="code"><![CDATA[
+domain = [('x_customer', '=', record.id), ('x_status_bar', '!=', 'done'), ('active', '=', True)]
+jobs = record.x_partner_job_ids.filtered(lambda j: j.x_status_bar != 'done' and j.active)
+action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Job Positions',
+    'res_model': 'hr.job',
+    'view_mode': 'list,form',
+    'domain': domain,
+}
+if len(jobs) == 1:
+    action.update({
+        'view_mode': 'form',
+        'res_id': jobs.id,
+    })
+elif len(jobs) > 1:
+    action.update({
+        'domain': [('id', 'in', jobs.ids)],
+    })
+action_result = action
+]]></field>
+    </record>
 </odoo>
