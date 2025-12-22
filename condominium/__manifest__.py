@@ -70,7 +70,6 @@
         'demo/x_meter_reading.xml',
         'demo/x_property_line_tenant.xml',
         'demo/x_property_line_meter_reading.xml',
-        'demo/account_analytic_line.xml',
         'demo/hr_employee.xml',
         'demo/account_move.xml',
         'demo/account_move_line.xml',
