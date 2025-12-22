@@ -27,17 +27,17 @@
                         <field name="x_is_remark" invisible="1"/>
                         <field name="x_stage_id" invisible="1"/>
                         <group>
-                            <field name="x_date" widget="date"/>
                             <field name="project_id" required="True"/>
+                            <field name="x_reference" readonly="True" invisible="not id"/>
                             <field name="x_event_id" readonly="True" invisible="x_update_id or not (x_update_id or x_event_id)"/>
                             <field name="x_update_id" readonly="True" invisible="x_event_id or not (x_update_id or x_event_id)"/>
-                            <field name="x_reference" readonly="True"/>
+                            <field name="x_owner_id" string="Owner"/>
                         </group>
                         <group>
+                            <field name="x_date" widget="date"/>
+                            <field name="date_deadline" decoration-danger="date_deadline and date_deadline &lt; current_date" decoration-bf="date_deadline and date_deadline &lt; current_date"/>
                             <field name="x_location"/>
                             <field name="x_remark_category_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
-                            <field name="date_deadline" decoration-danger="date_deadline and date_deadline &lt; current_date" decoration-bf="date_deadline and date_deadline &lt; current_date"/>
-                            <field name="x_owner_id" string="Owner"/>
                         </group>
                         <group colspan="2" name="product_template_images" string="Remark Media">
                             <field
@@ -87,8 +87,8 @@
                 <field name="project_id" column_invisible="1"/>
                 <field name="x_is_remark" column_invisible="1"/>
                 <field name="x_event_id" column_invisible="1"/>
-                <field name="stage_id" column_invisible="1"/>
-                <field name="x_reference"/>
+                <field name="x_stage_id" column_invisible="1"/>
+                <field name="x_reference" invisible="not id"/>
                 <field name="priority" widget="priority" options="{'is_toggle_mode': false}"/>
                 <field name="x_remark_category_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
                 <field name="name"/>
@@ -103,28 +103,51 @@
         <field name="model">project.task</field>
         <field name="type">search</field>
         <field name="active" eval="True"/>
+        <field name="inherit_id" ref="project.view_task_search_form"/>
+        <field name="mode">primary</field>
         <field name="arch" type="xml">
-            <search string="Remark">
+            <xpath expr="//search" position="attributes">
+                <attribute name="string">Remark</attribute>
+            </xpath>
+        <!-- search bar fields -->
+            <xpath expr="//field[@name='name']" position="replace">
                 <field string="Name &amp; Description" name="name" filter_domain="['|', ('name', 'like', self), ('description', 'like', self)]"/>
-                <field string="Owner" name="x_owner_id" filter_domain="['|', ('x_owner_id.name', 'like', self), x_owner_id.user_ids.name', 'like', self)]"/>
+            </xpath>
+            <xpath expr="//field[@name='tag_ids']" position="replace">
                 <field string="Category" name="x_remark_category_ids" filter_domain="[('x_remark_category_ids.x_name', 'like', self)]"/>
-                <separator/>
+            </xpath>
+            <xpath expr="//field[@name='user_ids']" position="replace">
+                <field string="Owner" name="x_owner_id" filter_domain="['|', ('x_owner_id.name', 'like', self), x_owner_id.user_ids.name', 'like', self)]"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="replace"/>
+            <xpath expr="//field[@name='sale_order_id']" position="replace"/>
+            <xpath expr="//field[@name='worksheet_template_id']" position="replace"/>
+            <xpath expr="//field[@name='user_skill_ids']" position="replace"/>
+            <xpath expr="//field[@name='activity_user_id']" position="replace"/>
+            <xpath expr="//field[@name='activity_type_id']" position="replace"/>
+        <!-- filters -->
+            <xpath expr="//filter[@name='my_tasks']" position="replace">
                 <filter string="My Remarks" name="my_remarks" domain="[('x_owner_id.user_ids', '=', uid)]"/>
-                <filter string="Unassigned" name="unassigned" domain="[('x_owner_id', '=', False)]"/>
-                <separator/>
-                <filter string="Overdue" name="overdue" domain="[('date_deadline', '&lt;', 'today')]"/>
-                <separator/>
-                <filter string="Open" name="open_remarks" domain="[('state', 'in', ['01_in_progress','02_changes_requested', '03_approved'])]"/>
-                <filter string="Closed" name="closed_remarks" domain="[('state', 'in', ['1_done','1_canceled'])]"/>
-                <group>
-                    <filter string="Owner" name="x_owner_id" context="{'group_by': 'x_owner_id'}" />
-                    <filter string="Priority" name="priority" context="{'group_by': 'priority'}"/>
-                    <filter string="Category" name="x_remark_category_ids" context="{'group_by': 'x_remark_category_ids'}"/>
-                    <filter string="State" name="state" context="{'group_by': 'state'}"/>
-                    <filter string="Stage" name="x_stage_id" context="{'group_by': 'x_stage_id'}"/>
-                    <filter string="Project" name="project_id" context="{'group_by': 'project_id'}"/>
-                </group>
-            </search>
+            </xpath>
+            <xpath expr="//filter[@name='unassigned']" position="attributes">
+                <attribute name="domain">[('x_owner_id', '=', False)]</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='private_tasks']" position="replace"/>
+            <xpath expr="//filter[@name='favorite_projects']" position="replace"/>
+            <xpath expr="//filter[@name='blocking']" position="replace"/>
+            <xpath expr="//filter[@name='templates']" position="replace"/>
+        <!-- group by -->
+            <xpath expr="//filter[@name='tags']" position="replace">
+                <filter string="Category" name="x_remark_category_ids" context="{'group_by': 'x_remark_category_ids'}"/>
+            </xpath>
+            <xpath expr="//filter[@name='stage']" position="attributes">
+                <attribute name="context">{'group_by': 'x_stage_id', 'x_stage_id_domain': [('x_stage_id.x_is_remark_stage', '=', True)]}</attribute>
+                <attribute name="domain">[('x_stage_id.x_is_remark_stage', '=', True)]</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='groupby_worksheet_template']" position="replace"/>
+            <xpath expr="//filter[@name='user']" position="replace">
+                <filter string="Owner" name="x_owner_id" context="{'group_by': 'x_owner_id'}" />
+            </xpath>
         </field>
     </record>
 <!-- remark category -->
@@ -302,7 +325,7 @@
                         'default_project_id': x_project_id,
                         'default_x_event_id': id,
                         'default_x_is_remark': True,
-                        'default_stage_id': %(project_remark_type_1)d,
+                        'default_x_stage_id': %(project_remark_type_1)d,
                         'form_view_ref': 'construction_remarks.view_x_remark_form', 
                         'list_view_ref': 'construction_remarks.view_x_remark_list_one2many',
                     }"/>
@@ -324,7 +347,7 @@
                         'default_project_id': project_id,
                         'default_x_update_id': id,
                         'default_x_is_remark': True,
-                        'default_stage_id': %(project_remark_type_1)d,
+                        'default_x_stage_id': %(project_remark_type_1)d,
                         'form_view_ref': 'construction_remarks.view_x_remark_form', 
                         'list_view_ref': 'construction_remarks.view_x_remark_list_one2many',
                     }"/>
