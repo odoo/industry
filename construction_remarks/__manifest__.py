@@ -25,10 +25,12 @@
     'assets': {
         'web.assets_backend': [
             'construction_remarks/static/src/js/kanban_controller.js',
+            'construction_remarks/static/src/js/relational_model.js',
         ],
     },
     'cloc_exclude': [
         "static/src/js/kanban_controller.js",
+        "static/src/js/relational_model.js",
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
