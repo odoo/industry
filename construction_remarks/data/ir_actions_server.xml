@@ -1,5 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+    <!-- 
+    server action and not compute because otherwise compute generates the same ID if
+    creating multiple remarks from a one2many list since they are not saved yet so
+    we cannot access the previous reference, resulting in duplicates
+    -->
     <record model="ir.actions.server" id="action_x_remark_generate_x_reference_on_create">
         <field name="model_id" ref="project.model_project_task"/>
         <field name="state">code</field>
@@ -39,7 +44,7 @@ for record in records:
         <field name="model_id" ref="project.model_project_task"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-ctx = { 'form_view_ref': 'construction_remarks.view_x_remark_form', 'search_default_open_remarks': 1, 'default_project_id': record.id if record else env.context.get('active_id'), 'default_x_is_remark': True, 'default_x_stage_id': env.ref('construction_remarks.project_remark_type_1').id}
+ctx = { 'search_view_ref': 'construction_remarks.view_x_remark_search', 'list_view_ref': 'construction_remarks.view_x_remark_list', 'form_view_ref': 'construction_remarks.view_x_remark_form', 'search_default_open_remarks': 1, 'default_project_id': record.id if record else env.context.get('active_id'), 'default_x_is_remark': True, 'default_x_stage_id': env.ref('construction_remarks.project_remark_type_1').id}
 action = {'type': 'ir.actions.act_window', 'name': 'Remarks', 'res_model': 'project.task', 'view_mode': 'list,form', 'context': ctx, 'domain': [('x_is_remark', '=', True), ('stage_id.x_is_remark_stage', '=', True)]}
 ]]></field>
     </record>
