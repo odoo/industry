@@ -13,6 +13,7 @@
         'hr_skills',
         'knowledge',
         'sale_crm',
+        'sale_management',
         'sign',
         'web_studio',
         'website_appointment',
