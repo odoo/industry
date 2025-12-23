@@ -54,9 +54,27 @@ for record in records:
             "res_model_id": env.ref("hr_recruitment.model_hr_applicant").id,
             "res_id": record.pool_applicant_id.id if record.pool_applicant_id else record.id,
             "user_id": record.user_id.id if record.user_id else record.create_uid.id,
-            "date_deadline": datetime.date.today(),
         }
     )
+    job = record.job_id
+    if job:
+        sales_order = job.x_quotation_sales_order
+        if sales_order:
+            env['mail.activity'].create({
+                'res_model_id': env['ir.model'].sudo().search([('model', '=', 'sale.order')], limit=1).id,
+                'res_id': sales_order.id,
+                'activity_type_id': env.ref('mail.mail_activity_data_todo').id,
+                'summary': "One hire has been processed.",
+                'user_id': sales_order.user_id.id,
+            })
+        else:
+            env['mail.activity'].create({
+                'res_model_id': env['ir.model'].sudo().search([('model', '=', 'hr.job')], limit=1).id,
+                'res_id': job.id,
+                'activity_type_id': env.ref('mail.mail_activity_data_todo').id,
+                'summary': "Invoice completed without a sales order?",
+                'user_id': job.user_id.id,
+            })
     ]]></field>
     </record>
     <record id="ir_actions_server_view_sales_order" model="ir.actions.server">
