@@ -372,4 +372,16 @@ elif len(jobs) > 1:
 action_result = action
 ]]></field>
     </record>
+    <!-- Scope 4 point 1 -->
+    <record id="ir_actions_server_fill_jobs_from_opportunity" model="ir.actions.server">
+        <field name="name">Execute Code</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="base_automation_id" ref="base_automation_to_prefill_jobs_from_opportunity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if record.opportunity_id:
+    jobs = record.opportunity_id.x_job_positions.filtered(lambda j: not j.x_quotation_sales_order)
+    jobs.write({'x_quotation_sales_order': record.id})
+        ]]></field>
+    </record>
 </odoo>
