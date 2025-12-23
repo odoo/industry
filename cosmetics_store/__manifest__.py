@@ -55,7 +55,6 @@
         'demo/ir_attachment_post.xml',
         'demo/sale_order_line.xml',
         'demo/website_view.xml',
-        'demo/website_page.xml',
         'demo/loyalty_rule.xml',
         'demo/hr_employee.xml',
         'demo/sale_order_confirm.xml',
