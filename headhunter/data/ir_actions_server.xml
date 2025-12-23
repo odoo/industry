@@ -116,16 +116,8 @@ action = {
     'res_model': 'account.move',
     'type': 'ir.actions.act_window',
 }
-if len(invoices) == 1:
-    action.update({
-        'view_mode': 'form',
-        'res_id': invoices.id,
-    })
-elif invoices:
-    action.update({
-        'view_mode': 'list,form',
-        'domain': [('id', 'in', invoices.ids)],
-    })
+if invoices:
+    action.update({'view_mode': 'form', 'res_id':invoices.id} if len(invoices) == 1 else {'view_mode': 'list,form', 'domain': [('id', 'in', invoices.ids)]})
 action
     ]]></field>
     </record>
@@ -142,21 +134,6 @@ for record in records:
         raise UserError("You cannot publish a Draft Job Position. Please set status to Open before publishing.")
     if record['x_status_bar'] == 'draft' and record.all_application_count > 0:
         raise UserError("You cannot set this job position back to Draft because applications already exist.")]]></field>
-    </record>
-    <record id="ir_actions_server_create_sale_order_from_job" model="ir.actions.server">
-        <field name="name">Create sale order</field>
-        <field name="model_id" ref="hr.model_hr_job"/>
-        <field name="state">code</field>
-        <field name="binding_model_id" ref="hr.model_hr_job"/>
-        <field name="code"><![CDATA[
-action = {
-    'view_mode': 'form',
-    'type': 'ir.actions.act_window',
-    'res_model': 'sale.order',
-    'context': {
-        'default_x_job_id': record.id,
-    }
-}]]></field>
     </record>
     <record id="ir_actions_server_link_to_job" model="ir.actions.server">
         <field name="name">Execute Code</field>
@@ -177,14 +154,12 @@ action = env['portal.wizard'].with_context(default_partner_ids=partner_ids).acti
     </record>
     <record id="ir_actions_server_712" model="ir.actions.server">
         <field name="code"><![CDATA[
-if not (record.x_status_bar == 'open' and record.active and record.is_published):
-    for job in record.x_similar_job_ids:
-        if record.id in job.x_similar_job_ids.ids:
-            job['x_similar_job_ids'] = [(3, record.id)]
-else:
-    for job in record.x_similar_job_ids:
-        if record.id not in job.x_similar_job_ids.ids:
-            job['x_similar_job_ids'] = [(4, record.id)]]]></field>
+record_to_update = record.x_status_bar == 'open' and record.active and record.is_published
+for j in record.x_similar_job_ids:
+    if record_to_update and record.id not in j.x_similar_job_ids.ids:
+        j['x_similar_job_ids'] = [(4, record.id)]
+    elif not record_to_update and record.id in j.x_similar_job_ids.ids:
+        j['x_similar_job_ids'] = [(3, record.id)]]]></field>
         <field name="model_id" ref="hr.model_hr_job"/>
         <field name="base_automation_id" ref="base_automation_sync_as_per_status"/>
         <field name="state">code</field>
@@ -192,10 +167,8 @@ else:
   </record>
   <record id="ir_actions_server_713" model="ir.actions.server">
         <field name="code"><![CDATA[
-for similar in record.x_similar_job_ids:
-    if similar.x_status_bar == 'open' and similar.active and similar.is_published:
-        if record.id not in similar.x_similar_job_ids.ids:
-            similar['x_similar_job_ids'] = [(4, record.id)]]]></field>
+for similar in record.x_similar_job_ids.filtered(lambda j: j.x_status_bar == 'open' and j.active and j.is_published and record not in j.x_similar_job_ids):
+    similar['x_similar_job_ids'] = [(4, record.id)]]]></field>
         <field name="model_id" ref="hr.model_hr_job"/>
         <field name="base_automation_id" ref="base_automation_job_add"/>
         <field name="state">code</field>
@@ -205,8 +178,6 @@ for similar in record.x_similar_job_ids:
     <record id="ir_actions_server_for_email_pop_up" model="ir.actions.server">
         <field name="binding_model_id" ref="hr_recruitment.model_hr_applicant"/>
         <field name="code"><![CDATA[
-compose_form = env.ref('mail.email_compose_message_wizard_form')
-job_partner = record.job_id.x_customer
 ctx = {
     'default_model': 'hr.applicant',
     'default_res_ids': [record.id],
@@ -216,13 +187,13 @@ ctx = {
     'force_email': True,
     'x_from_cv_send': True,
 }
-if job_partner:
-    ctx['default_partner_ids'] = [(6, 0, [job_partner.id])]
+if record.job_id.x_customer:
+    ctx['default_partner_ids'] = [(6, 0, [record.job_id.x_customer.id])]
 action =  {
     'type': 'ir.actions.act_window',
     'res_model': 'mail.compose.message',
     'view_mode': 'form',
-    'views': [(compose_form.id, 'form')],
+    'views': [(env.ref('mail.email_compose_message_wizard_form').id, 'form')],
     'target': 'new',
     'context': ctx,
 }]]></field>
@@ -281,26 +252,14 @@ for applicant in records:
         <field name="state">code</field>
         <field name="binding_model_id" ref="crm.model_crm_lead"/>
         <field name="code"><![CDATA[
-for lead in records:
-    jobs = lead.x_job_positions.filtered(lambda job: job.active)
-
-    action = {
-        'res_model': 'hr.job',
-        'type': 'ir.actions.act_window',
-    }
-
-    if len(jobs) == 1:
-        action.update({
-            'view_mode': 'form',
-            'res_id': jobs.id,
-        })
-    elif jobs:
-        action.update({
-            'view_mode': 'list,form',
-            'domain': [('id', 'in', jobs.ids)],
-        })
-
-    action_result = action
+jobs = records.mapped('x_job_positions').filtered(lambda job: job.active)
+action = {
+    'res_model': 'hr.job',
+    'type': 'ir.actions.act_window',
+}
+if jobs:
+    action.update({'view_mode': 'form', 'res_id': jobs.id} if len(jobs) == 1 else {'view_mode': 'list,form', 'domain': [('id', 'in', jobs.ids)]})
+action
     ]]></field>
     </record>
     <record id="ir_actions_server_view_applicants" model="ir.actions.server">
@@ -309,26 +268,14 @@ for lead in records:
         <field name="state">code</field>
         <field name="binding_model_id" ref="crm.model_crm_lead"/>
         <field name="code"><![CDATA[
-for lead in records:
-    applicants = env['hr.applicant'].search([('x_opportunities', '=', lead.id)])
-
-    action = {
-        'res_model': 'hr.applicant',
-        'type': 'ir.actions.act_window',
-    }
-
-    if len(applicants) == 1:
-        action.update({
-            'view_mode': 'form',
-            'res_id': applicants.id,
-        })
-    elif applicants:
-        action.update({
-            'view_mode': 'list,form',
-            'domain': [('id', 'in', applicants.ids)],
-        })
-
-    action_result = action
+applicants = env['hr.applicant'].search([('x_opportunities', 'in', records.ids)])
+action = {
+    'res_model': 'hr.applicant',
+    'type': 'ir.actions.act_window',
+}
+if applicants:
+    action.update({'view_mode': 'form', 'res_id': applicants.id} if len(applicants) == 1 else {'view_mode': 'list,form', 'domain': [('id', 'in', applicants.ids)]})
+action
     ]]></field>
     </record>
     <record id="ir_actions_server_view_sent_cvs" model="ir.actions.server">
@@ -378,16 +325,9 @@ action = {
     'view_mode': 'list,form',
     'domain': domain,
 }
-if len(jobs) == 1:
-    action.update({
-        'view_mode': 'form',
-        'res_id': jobs.id,
-    })
-elif len(jobs) > 1:
-    action.update({
-        'domain': [('id', 'in', jobs.ids)],
-    })
-action_result = action
+if jobs:
+    action.update({'view_mode': 'form', 'res_id': jobs.id} if len(jobs) == 1 else {'view_mode': 'list,form', 'domain': [('id', 'in', jobs.ids)]})
+action
 ]]></field>
     </record>
     <!-- Scope 4 point 1 -->
