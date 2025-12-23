@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="action_initialize_sales_order_line_sequence_on_sales_order_create" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="name">Construction: Initialize Sales Order Line Sequence on Sales Order create</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+sequences = record.order_line.mapped('sequence')
+if len(sequences) != len(set(sequences)):  # not all different: create order
+    new_sols = []
+    for sol_i, sol in enumerate(record.order_line):
+        previous_same_sequences = sum(seq == sequences[sol_i] for seq in sequences[:sol_i + 1])
+        # Handle duplicates by adding fractional offsets which will be used to order the list
+        new_sols.append((sol.id, sol.sequence + (previous_same_sequences / sequences.count(sol.sequence))))
+    seqs = {sid: i for (i, (sid, _)) in enumerate(sorted(new_sols, key=lambda soltup: soltup[1]))}         # Associate each sid with its sequence (order) when sorted
+else:  # all different: use existing order
+    seqs = {sol.id: i for (i, sol) in enumerate(sorted(record.order_line, key=lambda sol: sol.sequence))}  # Associate each sid with its sequence (order) when sorted
+for sol in record.order_line: sol['sequence'] = seqs[sol.id] + 1
+]]></field>
+    </record>
+    <record id="action_sol_update_progress_increment_on_change" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Construction: Update Progress Increment on Quantity Increment change</field>
+        <field name="code"><![CDATA[
+record['x_progress_increment'] = record.x_quantity_increment / record.product_uom_qty if record.product_uom_qty > 0 else False
+]]></field>
+    </record>
+    <record id="action_sol_update_quantity_increment_on_change" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Construction: Update Quantity Increment on Progress Increment change</field>
+        <field name="code"><![CDATA[
+record['x_quantity_increment'] = record.x_progress_increment * record.product_uom_qty
+]]></field>
+    </record>
+    <record id="action_sol_update_section_progress" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Construction: Update Quantity Increment on section button click</field>
+        <field name="code"><![CDATA[
+lines = record.order_id.order_line.sorted(key=lambda sol: sol.sequence)
+i = [sol.sequence for sol in lines].index(record.sequence) + 1
+while (i < len(lines) and
+      ((record.display_type == 'line_section' and lines[i].display_type != 'line_section')
+      or (record.display_type == 'line_subsection' and (lines[i].display_type not in ['line_subsection', 'line_section'])))):
+    if lines[i].x_is_deliverable:
+        increment = min(lines[i].product_uom_qty - lines[i].qty_delivered, lines[i].product_uom_qty * record.x_progress_increment)  # ensures the total doesn't exceed lines[i].product_uom_qty
+        percentage = increment / lines[i].product_uom_qty if lines[i].product_uom_qty else False
+        lines[i]['x_quantity_increment'], lines[i]['x_progress_increment'] = increment, percentage
+    i += 1
+record['x_progress_increment'] = 0
+action = {'type': 'ir.actions.client', 'tag': 'soft_reload'}
+]]></field>
+    </record>
+    <record id="action_sol_update_qty_delivered" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for sol in records: sol.write({'qty_delivered': sol.qty_delivered + sol.x_quantity_increment, 'x_quantity_increment': 0, 'x_progress_increment': 0})
+action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'message': "Delivered quantities updated.", 'type': 'success', 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'}}}
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Construction: Update Quantity Delivered</field>
+    </record>
+</odoo>

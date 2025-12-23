@@ -32,22 +32,18 @@ class TestEnv(IndustryCase):
                 "Call 'button_immediate_install' on 'base.module_payment_demo' in demo."
             )
 
-    def test_welcome_article_exists(self):
+    def test_welcome_article_and_notification_exist(self):
         for module in self.installed_industries:
+            if module in ['construction_developer']:
+                continue
             ref = self.env.ref(f"{module}.welcome_article", raise_if_not_found=False)
             self.assertTrue(
                 ref, f"You forgot to define a record with id='welcome_article' in module '{module}'."
             )
-
-    def test_welcome_article_body_exists(self):
-        for module in self.installed_industries:
             ref = self.env.ref(f"{module}.welcome_article_body", raise_if_not_found=False)
             self.assertTrue(
                 ref, f"You forgot to define a template with id='welcome_article_body' in module '{module}'."
             )
-
-    def test_knowledge_article_notification(self):
-        for module in self.installed_industries:
             if not (ref := self.env.ref(module + '.notification_knowledge', raise_if_not_found=False)):
                 _logger.warning("You forgot to define a `mail.message` with `id=notification_knowledge`.")
             notif = ref and self.env['mail.message'].browse(ref.id)

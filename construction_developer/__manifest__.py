@@ -1,0 +1,40 @@
+{
+    'name': 'Construction Developer',
+    'version': '1.0',
+    'category': 'Construction',
+    'depends': [
+        'base_industry_data',
+        'construction',
+        'web_studio',
+    ],
+    'data': [
+        'data/ir_model_fields.xml',
+        'data/ir_actions_server.xml',
+        'data/ir_ui_view.xml',
+        'data/ir_actions_act_window.xml',
+        'data/ir_embedded_actions.xml',
+        'data/project_project.xml',
+        'data/base_automation.xml',
+        'data/qweb_view.xml',
+    ],
+    'demo': [
+        'demo/project_project.xml',
+        'demo/sale_order_post.xml',
+    ],
+    'assets': {
+        'web.assets_backend': [
+            'construction_developer/static/src/widgets/apply_to_section_widget.js',
+            'construction_developer/static/src/widgets/apply_to_section_widget.xml',
+        ],
+    },
+    'cloc_exclude': [
+        'data/qweb_view.xml',
+        'static/src/widgets/apply_to_section_widget.js',
+        'static/src/widgets/apply_to_section_widget.xml',
+    ],
+    'images': ['images/main.png'],
+    'license': 'OEEL-1',
+    'author': 'Odoo S.A.',
+    'url': "https://www.odoo.com/trial?industry&selected_app=construction_developer",
+    'website': "https://www.odoo.com/all-industries",
+}
