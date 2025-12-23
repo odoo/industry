@@ -14,30 +14,18 @@
         <field name="store">False</field>
         <field name="compute"><![CDATA[
 for move in self:
-    visible = False
-
-    # 1. product must be storable
-    if not move.is_storable:
-        move['x_show_convert_visible'] = False
-        continue
-
-    # 2. skip incoming or dropship
-    if move.picking_type_id.code in ('incoming', 'dropship'):
-        move['x_show_convert_visible'] = False
-        continue
-
-    # 3. picking state must be allowed
-    if move.picking_id.state not in ('waiting', 'confirmed', 'assigned', 'done'):
-        move['x_show_convert_visible'] = False
-        continue
-
-    # 4. check product attributes
-    attributes = move.product_id.product_template_attribute_value_ids.mapped('attribute_id')
-
-    if any(attr.x_is_convert_attribute for attr in attributes):
-        visible = True
-
-    move['x_show_convert_visible'] = visible
+    move['x_show_convert_visible'] = (
+        move.is_storable
+        and move.picking_type_id.code not in ('incoming', 'dropship')
+        and move.picking_id.state in ('waiting', 'confirmed', 'assigned', 'done')
+        and (
+            not move.product_id.product_template_attribute_value_ids
+            or any(
+                attr.x_is_convert_attribute
+                for attr in move.product_id.product_template_attribute_value_ids.mapped('attribute_id')
+            )
+        )
+    )
         ]]></field>
     </record>
     <record id="field_stock_move_first_quant_quantity" model="ir.model.fields">
@@ -74,12 +62,6 @@ for move in self:
         <field name="ttype">many2one</field>
         <field name="relation">stock.move</field>
     </record>
-    <record id="field_convert_product_wizard_location_id" model="ir.model.fields">
-    <field name="name">x_location_id</field>
-    <field name="model_id" ref="x_model_convert_product_wizard"/>
-    <field name="ttype">many2one</field>
-    <field name="relation">stock.location</field>
-</record>
     <record id="x_field_convert_product_wizard_product_id" model="ir.model.fields">
         <field name="name">x_product_id</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
@@ -117,12 +99,12 @@ for wizard in self:
         <field name="ttype">boolean</field>
     </record>
     <record id="field_convert_product_wizard_new_lot_id" model="ir.model.fields">
-        <field name="name">x_new_lot_sn_id</field>
+        <field name="name">x_new_lot_sn</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
         <field name="ttype">char</field>
     </record>
     <record id="field_convert_product_wizard_grade_id" model="ir.model.fields">
-        <field name="name">x_product_attribute_value</field>
+        <field name="name">x_product_convert_into</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
         <field name="ttype">many2one</field>
         <field name="relation">product.product</field>
@@ -141,7 +123,6 @@ for wizard in self:
         <field name="model_id" ref="x_model_convert_product_wizard"/>
         <field name="ttype">many2many</field>
         <field name="relation">stock.quant</field>
-        <!-- <field name="store">False</field> -->
         <field name="depends">x_move_id</field>
         <field name="compute"><![CDATA[
 for wizard in self:
@@ -155,7 +136,7 @@ for wizard in self:
     wizard['x_allowed_quant_id'] = [(6, 0, quant_ids)]
         ]]></field>
     </record>
-    <record id="field_convert_product_wizard_convert_attribute" model="ir.model.fields">
+    <!-- <record id="field_convert_product_wizard_convert_attribute" model="ir.model.fields">
         <field name="name">x_convert_attribute_id</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
         <field name="ttype">many2one</field>
@@ -169,6 +150,18 @@ for wizard in self:
     )[:1].attribute_id
     wizard['x_convert_attribute_id'] = attribute
         ]]></field>
+    </record> -->
+
+    <record id="field_convert_product_wizard_source_tmpl_id" model="ir.model.fields">
+        <field name="name">x_source_product_tmpl_id</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="ttype">integer</field>
+        <field name="store" eval="False"/>
+        <field name="depends">x_product_id</field>
+        <field name="compute"><![CDATA[
+for wizard in self:
+    wizard['x_source_product_tmpl_id'] = wizard.x_product_id.product_tmpl_id.id
+        ]]></field>
     </record>
     <record id="x_allowed_product_ids_field" model="ir.model.fields">
         <field name="name">x_allowed_product_ids</field>
@@ -177,7 +170,7 @@ for wizard in self:
         <field name="ttype">many2many</field>
         <field name="relation">product.product</field>
         <field name="store">False</field>
-        <field name="depends">x_product_id, x_keep_lot_sn, x_new_lot_sn_id</field>
+        <field name="depends">x_product_id, x_keep_lot_sn, x_new_lot_sn</field>
         <field name="compute"><![CDATA[
 for wizard in self:
     allowed = wizard.env['product.product']
@@ -207,16 +200,16 @@ for wizard in self:
             continue
 
         if any(val.product_attribute_value_id in
-            tgt_ptavs.mapped('product_attribute_value_id')
-            for val in src_convert):
+                tgt_ptavs.mapped('product_attribute_value_id')
+                for val in src_convert):
             continue
 
         # 3. tracking rules
-        if wizard.x_keep_lot_sn or wizard.x_new_lot_sn_id:
+        if wizard.x_keep_lot_sn or wizard.x_new_lot_sn:
             if product.tracking != source.tracking:
                 continue
         else:
-            if product.tracking != 'quantity' and product.is_storable:
+            if product.tracking in ('lot', 'serial'):
                 continue
 
         allowed |= product
