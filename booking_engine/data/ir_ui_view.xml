@@ -522,7 +522,7 @@
   </record>
 
   <!-- House Keeping -->
-    <!-- project.project video -->
+    <!-- project.project views -->
     <record id="project_project_form_view_extension" model="ir.ui.view">
         <field name="arch" type="xml">
             <xpath expr="//page[@name='settings']/group[2]" position="after">
@@ -549,9 +549,9 @@
                 <group>
                     <group string="House Keeping" groups="booking_engine.group_house_keeping">
                         <field name="x_occupancy" options="{}"/>
-                        <field name="x_house_keeping_stage" domain="[('project_ids.x_is_house_keeping_project', '!=', False)]"/>
-                        <field name="x_ongoing_task" context="{'form_view_ref': 'booking_engine.project_task_form_view_primary'}"/>
-                        <field name="x_resource_employee" widget="many2one_avatar_employee" placeholder="None"/>
+                        <field name="x_house_keeping_stage_id" domain="[('project_ids.x_is_house_keeping_project', '!=', False)]"/>
+                        <field name="x_ongoing_task_id" context="{'form_view_ref': 'booking_engine.project_task_form_view_primary'}"/>
+                        <field name="x_resource_employee_id" widget="many2one_avatar_employee" placeholder="None"/>
                     </group>
                 </group>
             </xpath>
@@ -574,7 +574,7 @@
                                 <field name="name" class="fw-bold"/>
                                 <div>
                                     <field name="x_task_stage_color" invisible="True"/>
-                                    <field name="x_house_keeping_stage" display="full" widget="badge" options="{'color_field':'x_task_stage_color'}" class=""/>
+                                    <field name="x_house_keeping_stage_id" display="full" widget="badge" options="{'color_field':'x_task_stage_color'}" class=""/>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center justify-content-between w-100">
@@ -585,12 +585,12 @@
                                     </div>
                                     <field name="role_ids" widget="many2many_tags"/>
                                 </div>
-                                <div t-if="record.x_ongoing_task" class="ms-auto">
-                                    <a t-if="record.x_ongoing_task" name="%(action_window_redirect_related_task)d" type="action">
-                                        <field name="x_ongoing_task" display="full"/>
+                                <div t-if="record.x_ongoing_task_id" class="ms-auto">
+                                    <a t-if="record.x_ongoing_task_id" name="%(action_window_redirect_related_task)d" type="action">
+                                        <field name="x_ongoing_task_id" display="full"/>
                                     </a>
                                 </div>
-                                <field name="x_resource_employee" display="full" widget="many2one_avatar_employee" class="ms-auto"/>
+                                <field name="x_resource_employee_id" display="full" widget="many2one_avatar_employee" class="ms-auto"/>
                             </div>
                         </div>
                         <footer class="align-items-end">
@@ -611,7 +611,7 @@
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='human']" position="replace"/>
             <xpath expr="//filter[@name='material']" position="replace">
-                <filter string="Ongoing Cleaning" name="filter_ongoing_cleaning" domain="[('x_ongoing_task', '!=', False)]"/>
+                <filter string="Ongoing Cleaning" name="filter_ongoing_cleaning" domain="[('x_ongoing_task_id', '!=', False)]"/>
                 <separator/>
                 <filter string="To Check" name="filter_to_check" domain="[('x_is_in_stage_clean', '!=', False)]"/>
             </xpath>
@@ -620,8 +620,8 @@
             <xpath expr="//filter[@name='company']" position="replace"/>
             <xpath expr="//filter[@name='working_period']" position="replace">
                 <filter string="Occupancy" name="occupancy" domain="[]" context="{'group_by':'x_occupancy'}"/>
-                <filter string="Stage" name="stage" domain="[]" context="{'group_by':'x_house_keeping_stage'}"/>
-                <filter string="Employee" name="employee" domain="[]" context="{'group_by':'x_resource_employee'}"/>
+                <filter string="Stage" name="stage" domain="[]" context="{'group_by':'x_house_keeping_stage_id'}"/>
+                <filter string="Employee" name="employee" domain="[]" context="{'group_by':'x_resource_employee_id'}"/>
             </xpath>
         </field>
         <field name="inherit_id" ref="resource.view_resource_resource_search"/>
@@ -649,8 +649,8 @@
                 <attribute name="options">{'clickable': '1', 'fold_field': 'auto_validation_state'}</attribute>
             </xpath>
             <xpath expr="/form/sheet/group/group/field[@name='user_ids']" position="replace">
-                <field name="x_task_employee" widget="many2one_avatar_employee"/>
-                <field name="x_resource"/>
+                <field name="x_employee_id" widget="many2one_avatar_employee"/>
+                <field name="x_resource_id"/>
                 <field name="x_task_occupancy"/>
                 <field name="x_cleaning" widget="selection" options="{}"/>
             </xpath>
@@ -679,7 +679,7 @@
                 <field name="x_task_occupancy" optional="show" widget="badge" options="{'color_field': 'x_task_occupancy_color'}"/>
                 <field name="x_cleaning" optional="show" widget="badge" options="{'color_field': 'x_cleaning_color'}"/>
                 <xpath expr="/list//field[@name='stage_id']" position="move"/>
-                <field name="x_task_employee" optional="show" widget="many2one_avatar_employee"/>
+                <field name="x_employee_id" optional="show" widget="many2one_avatar_employee"/>
             </xpath>
             <xpath expr="/list//field[@name='stage_id']" position="attributes">
                 <attribute name="options">{'color_field': 'stage_id_color'}</attribute>
@@ -709,10 +709,10 @@
     <record id="project_task_search_view_primary" model="ir.ui.view">
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='my_tasks']" position="attributes">
-                <attribute name="domain">[('x_task_employee', '=', uid)]</attribute>
+                <attribute name="domain">[('x_employee_id', '=', uid)]</attribute>
             </xpath>
             <xpath expr="//filter[@name='unassigned']" position="attributes">
-                <attribute name="domain">[('x_task_employee', '=', False)]</attribute>
+                <attribute name="domain">[('x_employee_id', '=', False)]</attribute>
             </xpath>
             <xpath expr="//filter[@name='private_tasks']" position="replace"/>
             <xpath expr="//filter[@name='favorite_projects']" position="replace"/>
@@ -722,7 +722,7 @@
             <xpath expr="//filter[@name='message_needaction']" position="replace"/>
             <xpath expr="//filter[@name='templates']" position="replace"/>
             <xpath expr="//filter[@name='user']" position="replace">
-                <filter string="Employee" name="filter_x_task_employee" context="{'group_by': 'x_task_employee'}"/>
+                <filter string="Employee" name="filter_x_employee_id" context="{'group_by': 'x_employee_id'}"/>
                 <filter string="Occupancy" name="filter_x_task_occupancy" context="{'group_by': 'x_task_occupancy'}"/>
             </xpath>
             <xpath expr="//filter[@name='project']" position="replace"/>

@@ -98,9 +98,9 @@ if record.order_id.rental_status == "returned":
     <record id="server_action_set_resources_occupied" model="ir.actions.server">
         <field name="name">HouseKeeping: Set resources as occupied</field>
         <field name="code"><![CDATA[
-if record.order_line.planning_slot_ids:
-    #for slot in record.order_line.planning_slot_ids.filtered(lambda s: s.resource_id.role_ids and any(s.resource_id.role_ids.x_is_a_room_offer)):
-        #slot.resource_id['x_occupancy'] = 'Occupied'
+if slots := record.order_line.planning_slot_ids:
+    for slot in slots.filtered(lambda s: s.resource_id.role_ids and any(s.resource_id.role_ids.mapped('x_is_a_room_offer'))):
+        slot.resource_id['x_occupancy'] = 'occupied'
     pass]]></field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
@@ -108,9 +108,9 @@ if record.order_line.planning_slot_ids:
     <record id="server_action_set_resources_vacant" model="ir.actions.server">
         <field name="name">HouseKeeping: Set resources as vacant</field>
         <field name="code"><![CDATA[
-if record.order_line.planning_slot_ids:
-    #for slot in record.order_line.planning_slot_ids.filtered(lambda s: s.resource_id.role_ids and any(s.resource_id.role_ids.x_is_a_room_offer)):
-        #slot.resource_id['x_occupancy'] = 'Vacant'
+if slots := record.order_line.planning_slot_ids:
+    for slot in slots.filtered(lambda s: s.resource_id.role_ids and any(s.resource_id.role_ids.mapped('x_is_a_room_offer'))):
+        slot.resource_id['x_occupancy'] = 'vacant'
     pass]]></field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
@@ -119,7 +119,7 @@ if record.order_line.planning_slot_ids:
     <record id="server_action_set_task_ready_if_no_approvers" model="ir.actions.server">
         <field name="name">HouseKeeping: Set task ready if no approvers required after cleaning</field>
         <field name="code"><![CDATA[
-if env['ir.config_parameter'].get_param('house_keeping.x_approvers_setting', '0') == '0': 
+if env['ir.config_parameter'].get_param('booking_engine.x_approvers_setting', '0') == '0': 
     record.write({'stage_id': env.ref('booking_engine.project_task_type_18').id, 'state': '1_done'})
 ]]></field>
         <field name="model_id" ref="project.model_project_task"/>
@@ -129,8 +129,7 @@ if env['ir.config_parameter'].get_param('house_keeping.x_approvers_setting', '0'
     <record id="server_action_check_has_right_to_approve_tasks" model="ir.actions.server">
         <field name="name">HouseKeeping: Has right to approve tasks</field>
         <field name="code"><![CDATA[
-authorized_users = env['ir.config_parameter'].get_param('house_keeping.x_approver_users_ids_setting', 'a')
-if env['ir.config_parameter'].get_param('booking_engine.x_approvers_setting', '0') != '0' and (authorized_users == 'a' or (authorized_users != 'a' and env.user.id not in [int(u) for u in authorized_users.split(',')])):
+if env['ir.config_parameter'].get_param('booking_engine.x_approvers_setting', '0') != '0' and env.user.id not in env.company.x_setting_approver_users_ids.ids:
     raise UserError("You can't set a task as ready, as you are not one of the approvers.")
 ]]></field>
         <field name="model_id" ref="project.model_project_task"/>
@@ -142,8 +141,8 @@ if env['ir.config_parameter'].get_param('booking_engine.x_approvers_setting', '0
         <field name="model_id" ref="project.model_project_task"/>
         <field name="state">object_write</field>
         <field name="crud_model_id" ref="resource.model_resource_resource"/>
-        <field name="update_path">x_resource.x_house_keeping_stage</field>
-        <field name="update_field_id" ref="x_house_keeping_stage_field_resource_resource"/>
+        <field name="update_path">x_resource_id.x_house_keeping_stage_id</field>
+        <field name="update_field_id" ref="x_house_keeping_stage_id_field_resource_resource"/>
         <field name="evaluation_type">equation</field>
         <field name="value"><![CDATA[record.stage_id.id]]></field>
     </record>
@@ -169,7 +168,7 @@ for slot in env['planning.slot'].search([('start_datetime', '<', last_midnight),
             'partner_id': slot.sale_line_id.order_id.partner_id.id,
             'description': "Automatically generated house keeping task.",
             'date_deadline': (last_midnight + datetime.timedelta(hours=24)),
-            'x_resource': slot.resource_id.id,
+            'x_resource_id': slot.resource_id.id,
             'x_cleaning': 'checkout' if end_today else 'stayover',
             'user_ids': [(5,0)],
         })

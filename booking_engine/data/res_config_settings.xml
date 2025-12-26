@@ -42,7 +42,7 @@ for to_unarchive in [
 ]:
     env.ref(f'booking_engine.{to_unarchive}')['active'] = True
 for cloc_entry in [
-    'x_ongoing_task_field_resource_resource',
+    'x_ongoing_task_id_field_resource_resource',
     'x_is_in_stage_clean_field_resource_resource',
     'x_cleaning_color_field_project_task',
     'x_occupancy_color_field_resource_resource',
@@ -63,7 +63,7 @@ for cloc_entry in [
 ]]></field>
         <field name="model_id" ref="base_setup.model_res_config_settings"/>
         <field name="state">code</field>
-        <field name="name">Install Work Items</field>
+        <field name="name">Install House Keeping</field>
     </record>
     <record id="x_action_deactivate_house_keeping" model="ir.actions.server">
         <field name="code"><![CDATA[
@@ -78,7 +78,7 @@ for to_archive in [
 ]:
     env.ref(f'booking_engine.{to_archive}')['active'] = False
 for cloc_entry in [
-    'x_ongoing_task_field_resource_resource',
+    'x_ongoing_task_id_field_resource_resource',
     'x_is_in_stage_clean_field_resource_resource',
     'x_cleaning_color_field_project_task',
     'x_occupancy_color_field_resource_resource',
@@ -100,8 +100,7 @@ for cloc_entry in [
 ]]></field>
         <field name="model_id" ref="base_setup.model_res_config_settings"/>
         <field name="state">code</field>
-        <field name="name">(Un-)Install Work Items</field>
-        <field name="name">Uninstall Work Items</field>
+        <field name="name">Uninstall House Keeping</field>
     </record>
 
     <record id="base_automation_on_house_keeping_setting_set" model="base.automation">
@@ -129,35 +128,29 @@ for cloc_entry in [
         <field name="name">x_setting_approvers</field>
         <field name="store" eval="True"/>
         <field name="compute"><![CDATA[
-self['x_setting_approvers'] = self.env['ir.config_parameter'].get_param('house_keeping.x_approvers_setting', '0') == '1'
+self['x_setting_approvers'] = self.env['ir.config_parameter'].get_param('booking_engine.x_approvers_setting', '0') == '1'
 ]]></field>
     </record>
     <record id="x_setting_field_approver_users_ids" model="ir.model.fields">
         <field name="ttype">many2many</field>
         <field name="relation">res.users</field>
         <field name="field_description">Users</field>
-        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="model_id" ref="base.model_res_company"/>
         <field name="name">x_setting_approver_users_ids</field>
-        <field name="store" eval="True"/>
-        <field name="compute"><![CDATA[
-param = self.env['ir.config_parameter'].get_param('house_keeping.x_approver_users_ids_setting', 'a')
-self['x_setting_approver_users_ids'] = [(6, 0, [int(u) for u in param.split(',')])] if param != 'a' else [(5, 0)]
-]]></field>
+    </record>
+    <record id="x_setting_related_field_approver_users_ids" model="ir.model.fields">
+        <field name="ttype">many2many</field>
+        <field name="relation">res.users</field>
+        <field name="related">company_id.x_setting_approver_users_ids</field>
+        <field name="field_description">Users</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="name">x_setting_related_approver_users_ids</field>
     </record>
 
     <record id="server_action_set_x_setting_approvers" model="ir.actions.server">
         <field name="name">HouseKeeping: Set approvers setting</field>
         <field name="code"><![CDATA[
-env['ir.config_parameter'].set_param('house_keeping.x_approvers_setting', ('1' if record.x_setting_approvers else '0'))
-]]></field>
-        <field name="model_id" ref="base_setup.model_res_config_settings"/>
-        <field name="state">code</field>
-    </record>
-    <record id="server_action_set_x_setting_approver_users_ids" model="ir.actions.server">
-        <field name="name">HouseKeeping: Set approver users setting</field>
-        <field name="code"><![CDATA[
-approvers_ids_formated = ','.join(str(u.id) for u in record.x_setting_approver_users_ids) if (record.x_setting_approver_users_ids and record.x_setting_approvers) else 'a'
-env['ir.config_parameter'].set_param('house_keeping.x_approver_users_ids_setting', approvers_ids_formated)
+env['ir.config_parameter'].set_param('booking_engine.x_approvers_setting', ('1' if record.x_setting_approvers else '0'))
 ]]></field>
         <field name="model_id" ref="base_setup.model_res_config_settings"/>
         <field name="state">code</field>
@@ -168,13 +161,6 @@ env['ir.config_parameter'].set_param('house_keeping.x_approver_users_ids_setting
         <field name="action_server_ids" eval="[(6, 0, [ref('server_action_set_x_setting_approvers')])]"/>
         <field name="trigger">on_create_or_write</field>
         <field name="trigger_field_ids" eval="[(6, 0, [ref('x_setting_field_approvers')])]"/>
-    </record>
-    <record id="automation_on_x_setting_approver_users_ids_set" model="base.automation">
-        <field name="name">HouseKeeping: On approver users setting set</field>
-        <field name="model_id" ref="base_setup.model_res_config_settings"/>
-        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_set_x_setting_approver_users_ids')])]"/>
-        <field name="trigger">on_create_or_write</field>
-        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_setting_field_approver_users_ids')])]"/>
     </record>
 
     <record id="res_config_settings_form_view_inherited" model="ir.ui.view">
@@ -195,8 +181,8 @@ env['ir.config_parameter'].set_param('house_keeping.x_approver_users_ids_setting
                                     <label for="x_setting_approvers"/>
                                     <div class="text-muted">Approval process to accept house keeping tasks.</div>
                                     <div class="mt16" invisible="not x_module_house_keeping or not x_setting_approvers">
-                                        <label for="x_setting_approver_users_ids" class="o_light_label mr16"/>
-                                        <field name="x_setting_approver_users_ids" class="oe_inline" widget="many2many_tags"/>
+                                        <label for="x_setting_related_approver_users_ids" class="o_light_label mr16"/>
+                                        <field name="x_setting_related_approver_users_ids" class="oe_inline" widget="many2many_tags"/>
                                     </div>
                                 </div>
                             </div>
