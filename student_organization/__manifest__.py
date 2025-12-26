@@ -32,7 +32,6 @@
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
         'data/product_template_attribute_line.xml',
-        'data/product_template_attribute_value.xml',
         'data/product_product.xml',
         'data/pos_payment_method.xml',
         'data/pos_config.xml',
