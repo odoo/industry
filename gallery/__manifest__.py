@@ -21,7 +21,6 @@
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
         'data/product_template_attribute_line.xml',
-        'data/product_template_attribute_value.xml',
         'data/product_product.xml',
         'data/product_pricelist.xml',
         'data/product_pricelist_item.xml',

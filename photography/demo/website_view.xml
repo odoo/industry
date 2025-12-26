@@ -399,21 +399,27 @@
           <div class="d-flex align-items-start justify-content-between gap-3">
             <h5 class="card-title m-0 text-break" t-field="appointment.name" itemprop="name"/>
           </div>
-          <div class="d-flex gap-2 flex-wrap align-items-center">
-            <div itemprop="location" class="o_wappointment_card_location d-flex gap-1 fw-bold smaller text-muted text-break">
+          <div class="o_wappointment_card_infos">
+            <div itemprop="location" class="o_wappointment_card_location d-flex gap-1 fw-bold small text-muted text-break">
               <t t-if="appointment.location_id">
-                <i class="fa fa-map-marker lh-base" role="presentation"/>
+                <i class="fa fa-fw fa-map-marker lh-base" role="presentation"/>
                 <span t-field="appointment.location_id" t-options="{'widget': 'contact', 'fields': ['name']}"/>
               </t>
               <t t-else="">
-                <i class="fa fa-video-camera lh-base" role="presentation"/>
+                <i class="fa fa-fw fa-video-camera lh-base" role="presentation"/>
                 <span class="o_not_editable">Online</span>
               </t>
+            </div>
+            <div t-if="not appointment.hide_duration and (appointment.category != 'custom')" class="d-flex gap-1 fw-bold small text-muted text-break">
+              <i class="fa fa-fw fa-clock-o lh-base"/>
+              <span t-out="appointment.appointment_duration"
+                t-options="{'widget': 'duration', 'unit': 'hour'}"/>
             </div>
           </div>
           <span t-if="not is_html_empty(appointment.message_intro)" class="o_wappointment_message_intro card-text text-muted overflow-hidden" t-field="appointment.message_intro" itemprop="message_intro" placeholder="Add an intro message here..."/>
           <div class="mt-auto">
-            <a t-attf-href="/appointment/#{appointment.id}" t-attf-title="Book {{appointment.name}}" role="button" class="btn btn-primary w-100 mt-3 o_not_editable" contenteditable="false">Book now</a>
+            <a t-attf-href="/appointment/#{appointment.id}?#{keep_query('filter_appointment_type_ids', 'filter_staff_user_ids', 'filter_resource_ids', 'invite_token')}"
+              t-attf-title="Book {{appointment.name}}" role="button" class="btn btn-primary w-100 mt-3 o_not_editable" contenteditable="false">Book now</a>
           </div>
         </div>
       </t>
