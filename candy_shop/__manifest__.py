@@ -5,7 +5,7 @@
     'depends': [
         'base_industry_data',
         'knowledge',
-        'pos_enterprise',
+        'pos_iot',
         'purchase_stock',
         'sale_management',
         'website_sale_stock',
