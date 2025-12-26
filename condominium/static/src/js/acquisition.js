@@ -47,6 +47,15 @@ registry.category("web_tour.tours").add("Condominium_Acquisition", {
         run: "click"
     },
     {
+        trigger: ".o_field_widget[name='plan_id'] .o-autocomplete--input",
+        content: "Select the right quotation template",
+        run: "click"
+    },
+    {
+        trigger: ".o-autocomplete--dropdown-item:nth-child(2) > a",
+        run: "click"
+    },
+    {
         trigger: ".o_statusbar_buttons > button[name='action_confirm']",
         content: "If the quote is accepted, confirm it",
         run: "click"
@@ -68,6 +77,19 @@ registry.category("web_tour.tours").add("Condominium_Acquisition", {
     {
         trigger: ".o_field_widget[name='partner_id'] .o_form_uri",
         content: "Open the customer to create the condominium setup",
+        run: "click"
+    },
+    {
+        trigger: ".o_field_widget[name='country_id'] .o-autocomplete--input",
+        content: "Open the country dropdown",
+        run: "click"
+    },
+    {
+        trigger: ".dropdown-item.ui-menu-item-wrapper:contains('Search more')",
+        run: "click"
+    },
+    {
+        trigger: ".o_data_cell[name='name']:contains('Belgium')",
         run: "click"
     },
     {
