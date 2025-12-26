@@ -23,7 +23,6 @@
     'data': [
         'data/resource_calendar.xml',
         'data/ir_attachment.xml',
-        'data/ir_default.xml',
         'data/ir_model_fields.xml',
         'data/event_tag_category.xml',
         'data/event_tag.xml',

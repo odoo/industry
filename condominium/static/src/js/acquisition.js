@@ -24,9 +24,9 @@ registry.category("web_tour.tours").add("Condominium_Acquisition", {
         run: "click"
     },
     {
-        trigger: ".o_radio_item:nth-child(2) > .o_form_label",
-        content: "Set the condominium as company",
-        run: "click"
+        trigger: ".o_field_widget[name='vat'] .o-autocomplete--input",
+        content: "Set a TIN for your company",
+        run: "edit BE0477472701"
     },
     {
         trigger: ".o_field_widget[name='email'] .o_input",

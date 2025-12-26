@@ -37,20 +37,16 @@ for record in records:
     start_datetime = record.start_datetime.astimezone(tz=dateutil.tz.UTC)
     end_datetime = record.end_datetime.astimezone(tz=dateutil.tz.UTC)
     if record.start_datetime and str(record.start_datetime.time()) != f"{int(pickup_time):02d}:{int(pickup_time % 1 * 60):02d}:00":
-        start = timezone(tz).localize(datetime.datetime(year=start_datetime.year, month=start_datetime.month, day=start_datetime.day, hour=int(pickup_time), minute=int(pickup_time % 1 * 60), second=0))
-        start_datetime = start.astimezone(tz=dateutil.tz.UTC)
-        if start_datetime >= end_datetime:
-            start_datetime = start_datetime - datetime.timedelta(days=1)
+        start = datetime.datetime(year=start_datetime.year, month=start_datetime.month, day=start_datetime.day, hour=int(pickup_time), minute=int(pickup_time % 1 * 60), second=0)
+        start_datetime = start.astimezone(tz=timezone(tz))
+        if start_datetime >= end_datetime: start_datetime = start_datetime - datetime.timedelta(days=1)
     if record.end_datetime and str(record.end_datetime.time()) != f"{int(return_time):02d}:{int(return_time % 1 * 60):02d}:00":
-        end = timezone(tz).localize(datetime.datetime(year=end_datetime.year, month=end_datetime.month, day=end_datetime.day, hour=int(return_time), minute=int(return_time % 1 * 60), second=0))
-        end_datetime = end.astimezone(tz=dateutil.tz.UTC)
-        if start_datetime >= end_datetime:
-            end_datetime = end_datetime + datetime.timedelta(days=1)
+        end = datetime.datetime(year=end_datetime.year, month=end_datetime.month, day=end_datetime.day, hour=int(return_time), minute=int(return_time % 1 * 60), second=0)
+        end_datetime = end.astimezone(tz=timezone(tz))
+        if start_datetime >= end_datetime: end_datetime = end_datetime + datetime.timedelta(days=1)
     record['start_datetime'] = start_datetime.replace(tzinfo=None)
     record['end_datetime'] = end_datetime.replace(tzinfo=None)
-for record in records:
-    if not record.sale_line_id:
-        continue
+for record in records.filtered('sale_line_id'):
     nights = 0
     if record.sale_line_id.planning_slot_ids:
         nights = sum(record.sale_line_id.planning_slot_ids.mapped('x_nights'))

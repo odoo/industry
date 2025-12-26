@@ -26,7 +26,6 @@
         'data/product_template.xml',
         'data/product_attribute_value.xml',
         'data/product_template_attribute_line.xml',
-        'data/product_template_attribute_value.xml',
         'data/product_product.xml',
         'data/product_public_category.xml',
         'data/project_task_type.xml',

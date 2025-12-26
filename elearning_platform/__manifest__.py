@@ -22,7 +22,6 @@
         'data/product_attribute_value.xml',
         'data/product_pricelist_item.xml',
         'data/product_template_attribute_line.xml',
-        'data/product_template_attribute_value.xml',
         'data/product_product.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
