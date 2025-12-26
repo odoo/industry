@@ -1,6 +1,5 @@
 {
     'name': 'Vineyard',
-    'version': '1.0',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
@@ -19,6 +18,7 @@
     ],
     'data': [
         'data/res_config_setting.xml',
+        'data/hr_employee.xml',
         'data/stock_warehouse.xml',
         'data/ir_sequence.xml',
         'data/ir_model_fields.xml',

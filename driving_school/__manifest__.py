@@ -27,7 +27,6 @@
         'data/appointment_type.xml',
         'data/mail_template.xml',
         'data/product_template_attribute_line.xml',
-        'data/product_template_attribute_value.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
         'data/sign_template.xml',

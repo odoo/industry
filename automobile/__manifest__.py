@@ -34,7 +34,6 @@
         'data/product_pricelist.xml',
         'data/product_pricelist_item.xml',
         'data/product_template_attribute_line.xml',
-        'data/product_template_attribute_value.xml',
         'data/product_product.xml',
         'data/knowledge_cover.xml',
         'data/res_config_settings.xml',
