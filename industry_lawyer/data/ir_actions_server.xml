@@ -18,19 +18,58 @@ for claimant_line in claimants_lines:   # One invoice per claimant
 
     <record id="action_update_additional_contacts" model="ir.actions.server">
         <field name="code"><![CDATA[
-record['partner_ids'] = [(4, pid) for pid in set(record.partner_ids.mapped('x_claimants_line_ids.x_claimants').ids)]
-        ]]></field>
+mail_compose_partners = record.partner_ids
+suggested_approval = mail_compose_partners[:1].mapped('x_suggest_approval')
+if suggested_approval: record.write({'x_approval': suggested_approval[0]})
+partners = [(4, pid) for pid in set(mail_compose_partners.mapped('x_claimants_line_ids.x_claimants').ids)]
+is_user_high_group = env.user.has_group('industry_lawyer.group_high')
+record.write({'partner_ids': partners, 'x_is_user_high_group': is_user_high_group})
+        ]]>        </field>
         <field name="model_id" ref="mail.model_mail_compose_message"/>
         <field name="state">code</field>
-        <field name="name">Update Additional Contacts in Mail Compose</field>
+        <field name="name">Industry Lawyer: Update Additional Contacts in Mail Compose</field>
     </record>
 
     <record id="action_submit_for_approval" model="ir.actions.server">
-        <field name="code"><![CDATA[
-            raise UserError(records)
-        ]]></field>
+        <field name="code"><![CDATA[FIELDS_TO_REMOVE = {'force_send', 'mail_auto_delete', 'model_description', 'force_email_lang'}
+for wizard in records:
+    wizard.partner_ids.write({'x_suggest_approval': wizard.x_approval})
+    body_html = wizard.body
+    res_ids = wizard._evaluate_res_ids()
+    post_values_all = wizard._prepare_mail_values(res_ids)
+
+    for res_id, post_values in post_values_all.items():
+        for key in FIELDS_TO_REMOVE:
+            post_values.pop(key, None)
+        post_values.update({'body_html': body_html, 'x_approval_status': 'pending'})
+
+        env['mail.mail'].sudo().create(post_values)
+        ]]>        </field>
         <field name="model_id" ref="mail.model_mail_compose_message"/>
         <field name="state">code</field>
-        <field name="name">Submit For Approval</field>
+        <field name="name">Industry Lawyer: Submit For Approval</field>
+    </record>
+    <record id="action_open_document" model="ir.actions.server">
+        <field name="code">
+            <![CDATA[
+action = {'type': 'ir.actions.act_url', 'url': f'/web/content/{record.id}?download=true'}
+]]>
+        </field>
+        <field name="model_id" ref="base.model_ir_attachment"/>
+        <field name="state">code</field>
+        <field name="name">Industry Lawyer: Download Docs</field>
+    </record>
+    <record id="action_send_and_close_email" model="ir.actions.server">
+        <field name="code">
+            <![CDATA[records.send()
+action = env['ir.actions.act_window']._for_xml_id('industry_lawyer.approval_email_action')
+]]>
+        </field>
+        <field name="name">Industry Lawyer: Send &amp; Close</field>
+        <field name="model_id" ref="mail.model_mail_mail"/>
+        <field name="sequence">1</field>
+        <field name="binding_model_id" ref="mail.model_mail_mail"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
     </record>
 </odoo>
