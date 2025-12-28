@@ -51,10 +51,10 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='subject']" position="before">
-                <field name="x_approval" invisible="context.get('default_model') != 'sale.order'"/>
+                <field name="x_approval" domain="[('x_is_high_user_group', '=', True)]" invisible="x_is_user_high_group or context.get('default_model') != 'sale.order'"/>
             </xpath>
             <xpath expr="//footer/button[@name='action_send_mail']" position="after">
-                <button string="Submit for Approval" class="btn-primary" name="%(action_submit_for_approval)d" invisible="context.get('default_model') != 'sale.order'"/>
+                <button string="Submit for Approval" type="action" class="btn-primary" name="%(action_submit_for_approval)d" invisible="x_is_user_high_group or context.get('default_model') != 'sale.order'"/>
             </xpath>
         </field>
     </record>
@@ -88,7 +88,7 @@
         <field name="type">list</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='state']" position="replace">
-               <field name="x_approval_status" widget="badge" decoration-muted="x_approval_status in ('sent', 'cancelled')" decoration-info="state=='pending'" decoration-danger="state=='cancelled'"/>
+               <field name="x_approval_status" widget="badge" decoration-muted="x_approval_status in ('sent', 'cancelled')" decoration-info="x_approval_status=='pending'" decoration-danger="x_approval_status=='cancelled'"/>
             </xpath>
             <xpath expr="//button[@name='send']" position="attributes">
                 <attribute name="string">Approve and Send </attribute>
@@ -136,26 +136,34 @@
             <xpath expr="//page[@name='advanced']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+            <xpath expr="//field[@name='body_content']" position="attributes">
+                <attribute name="readonly">x_approval_state=='03_approved'</attribute>
+            </xpath>
             <xpath expr="//page[@name='failure_reason']" position="attributes">
                 <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_send_and_close']" position="replace">
+                <button name="%(action_send_and_close_email)d" string="Approve &amp; Send" type="action" class="oe_highlight" invisible="state != 'pending' or message_type == 'user_notification'"/>
             </xpath>
             <xpath expr="//field[@name='unrestricted_attachment_ids']" position="inside">
                 <list>
                     <field name="name" editable="bottom"/>
                     <field name="create_date"/>
+                    <button icon="fa-external-link" type="action" name="%(action_open_document)d" filename="name" title="Download File" class="btn btn-link"/>
                 </list>
             </xpath>
         </field>
     </record>
-    <!-- <record id="view_res_group_form_custom" model="ir.ui.view">
+    <record id="view_res_group_form_custom" model="ir.ui.view">
         <field name="inherit_id" ref="base.view_groups_form"/>
         <field name="mode">extension</field>
         <field name="model">res.groups</field>
+        <field name="active" eval="True"/>
         <field name="name">res.groups.form.inherit</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
             <xpath expr="//group/group" position="inside">
-                <field name="x_approval_group"/>
+                <field name="x_approval_groups"/>
             </xpath>
             <xpath expr="//field[@name='privilege_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
@@ -182,7 +190,21 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
         </field>
-    </record> -->
+    </record>
+
+    <record id="view_res_group_list_custom" model="ir.ui.view">
+        <field name="inherit_id" ref="base.view_groups_list"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="model">res.groups</field>
+        <field name="name">res.groups.list.inherit</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='privilege_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
 
     <record id="approval_config_settings_action" model="ir.actions.act_window">
       <field name="view_id" ref="view_approval_config_settings"/>
