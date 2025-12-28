@@ -37,24 +37,24 @@ export class ApprovalStateSelection extends StateSelectionField {
         });
         this.icons = {
             "01_in_progress": "o_status",
-            "02_changes_requested": "o_status o_status_green",
-            "03_approved": "fa fa-lg fa-exclamation-circle",
+            "03_approved": "o_status o_status_green",
+            "02_changes_requested": "fa fa-lg fa-exclamation-circle",
             "1_done": "fa fa-lg fa-check-circle",
             "1_canceled": "fa fa-lg fa-times-circle",
             "04_waiting_normal": "fa fa-lg fa-hourglass-o",
         };
         this.colorIcons = {
             "01_in_progress": "",
-            "02_changes_requested": "text-success",
-            "03_approved": "o_status_02_changes_requested",
+            "03_approved": "text-success",
+            "02_changes_requested": "o_status_changes_requested",
             "1_done": "text-success",
             "1_canceled": "text-danger",
             "04_waiting_normal": "btn-outline-info",
         };
         this.colorButton = {
             "01_in_progress": "btn-outline-secondary",
-            "02_changes_requested": "btn-outline-success",
-            "03_approved": "btn-outline-warning",
+            "03_approved": "btn-outline-success",
+            "02_changes_requested": "btn-outline-warning",
             "1_done": "btn-outline-success",
             "1_canceled": "btn-outline-danger",
             "04_waiting_normal": "btn-outline-info",
