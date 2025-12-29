@@ -342,4 +342,46 @@ if record.opportunity_id:
     jobs.write({'x_quotation_sales_order': record.id})
         ]]></field>
     </record>
+    <!-- scope 6 point 1-->
+    <record id="ir_actions_server_create_talent_from_employee" model="ir.actions.server">
+        <field name="name">Create Talent from Employee</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="hr.model_hr_employee"/>
+        <field name="code"><![CDATA[
+for employee in records:
+    if employee.x_linked_talent_id:
+        raise UserError("This employee already has a linked talent/applicant.")
+    default_pool = env['hr.talent.pool'].search([], limit=1)
+    if not default_pool:
+        raise UserError("No Talent Pool found. Please create one first.")
+    talent = env['hr.applicant'].create({
+        'partner_name':employee.name,
+        'email_from':employee.work_email,
+        'partner_phone':employee.work_phone,
+        'employee_id':employee.id,
+        'talent_pool_ids': [(6, 0, [default_pool.id])],
+    })
+    employee['x_linked_talent_id'] = talent.id
+    for skill in employee.current_employee_skill_ids:
+        env['hr.applicant.skill'].create({
+            'applicant_id': talent.id,
+            'skill_id': skill.skill_id.id,
+            'skill_level_id': skill.skill_level_id.id,
+            'level_progress': skill.level_progress,
+            'skill_type_id': skill.skill_type_id.id,
+            'valid_to': skill.valid_to,
+        })
+    for application in employee.applicant_ids:
+        application.write({
+            'employee_id': employee.id,
+            'pool_applicant_id': talent.id,
+        })
+action = {
+    "type": "ir.actions.act_window",
+    "res_model": "hr.applicant",
+    "view_mode": "form",
+    "res_id": talent.id,
+}]]></field>
+    </record>
 </odoo>
