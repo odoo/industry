@@ -29,6 +29,35 @@
             </xpath>
         </field>
     </record>
+    <record id="product_view_kanban_catalog" model="ir.ui.view">
+        <field name="name">HVAC kanban catalog view for Product Template</field>
+        <field name="inherit_id" ref="stock.product_view_kanban_catalog"/>
+        <field name="mode">extension</field>
+        <field name="model">product.product</field>
+        <field name="priority">160</field>
+        <field name="type">kanban</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <field name="id" position="after">
+                <field name="product_document_count"/>
+            </field>
+            <div name="o_kanban_qty_available_and_on_hand" position="after">
+                <div class="d-flex flex-row justify-content-center">
+                    <div name="related_documents_div" class="col text-end">
+                        <t name="related_documents" t-if="record.product_document_count.raw_value">
+                            <a type="action" name="%(action_product_related_document)d">
+                                <span class="fw-bold" t-out="record.product_document_count.raw_value"/>
+                                <span class="small"> Documents</span>
+                            </a>
+                        </t>
+                    </div>
+                </div>
+            </div>
+            <div name="related_documents_div" position="before">
+                <div name="o_kanban_qty_available_and_on_hand" position="move"/>
+            </div>
+        </field>
+    </record>
     <record id="sale_order_form_view" model="ir.ui.view">
         <field name="name">HVAC form view for Sale Order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
@@ -56,7 +85,7 @@
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button class="oe_stat_button" icon="fa-rotate-right" type="action" name="%(get_maintenances_action)d">
+                <button class="oe_stat_button" icon="fa-rotate-right" type="action" name="%(get_maintenances_action)d" context="{'default_partner_id': partner_ids and partner_ids[0]}">
                     <field widget="statinfo" name="x_sale_order_count" string="Maintenances"/>
                 </button>
                 <button class="oe_stat_button" icon="fa-flash" type="action" name="%(get_field_services_action)d">
@@ -287,5 +316,41 @@
                 <attribute name="optional">show</attribute>
             </xpath>
         </field>
+    </record>
+    <record id="product_document_list_view_extended" model="ir.ui.view">
+        <field name="name">hvac.product.document.list.view.extended</field>
+        <field name="model">product.document</field>
+        <field name="inherit_id" ref="sale.product_document_list" />
+        <field name="active" eval="True" />
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="x_document_tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="product_document_kanban_view_extended" model="ir.ui.view">
+        <field name="name">hvac.product.document.kanban.view.extended</field>
+        <field name="model">product.document</field>
+        <field name="inherit_id" ref="sale.product_document_kanban" />
+        <field name="active" eval="True" />
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//main/div/div" position="replace"/>
+            <xpath expr="//main" position="inside">
+                <field name="x_document_tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <footer>
+                    <div class="d-flex ms-auto align-items-center">
+                        <button string="Share" type="action" name="%(server_action_share_document)d" class="btn-secondary"/>
+                    </div>
+                </footer>
+            </xpath>
+        </field>
+    </record>
+    <record id="action_product_related_document" model="ir.actions.act_window">
+        <field name="view_mode">kanban,list</field>
+        <field name="view_ids" eval="[(5,0,0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('product_document_kanban_view_extended')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('product_document_list_view_extended')})]"/>
     </record>
 </odoo>
