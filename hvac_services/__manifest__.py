@@ -1,10 +1,12 @@
 {
     'name': 'HVAC Services',
+    'version': '1.1',
     'category': 'Services',
     'depends': [
         'appointment_account_payment',
         'base_industry_data',
         'contacts',
+        'documents',
         'hr',
         'industry_fsm_sale_report',
         'industry_fsm_stock',
@@ -21,6 +23,7 @@
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
+        'data/documents_tag.xml',
         'data/product_category.xml',
         'data/hr_job.xml',
         'data/ir_models.xml',
@@ -36,6 +39,7 @@
         'data/worksheet_template.xml',
         'data/project_project.xml',
         'data/product_template.xml',
+        'data/product_document.xml',
         'data/product_product.xml',
         'data/sale_order_template_line.xml',
         'data/base_automation.xml',
