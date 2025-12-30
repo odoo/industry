@@ -53,6 +53,11 @@
                             />
                         </group>
                     </group>
+                    <notebook>
+                        <page name="description_page" string="Description">
+                            <field name="description" type="html" options="{'collaborative': true, 'resizable': false}" placeholder="Add details about this remark..."/>
+                        </page>
+                    </notebook>
                 </sheet>
                 <chatter/>
             </form>
@@ -117,7 +122,7 @@
                 <field string="Category" name="x_remark_category_ids" filter_domain="[('x_remark_category_ids.x_name', 'like', self)]"/>
             </xpath>
             <xpath expr="//field[@name='user_ids']" position="replace">
-                <field string="Owner" name="x_owner_id" filter_domain="['|', ('x_owner_id.name', 'like', self), x_owner_id.user_ids.name', 'like', self)]"/>
+                <field string="Owner" name="x_owner_id" filter_domain="['|', ('x_owner_id.name', 'like', self), ('x_owner_id.user_ids.name', 'like', self)]"/>
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="replace"/>
             <xpath expr="//field[@name='sale_order_id']" position="replace"/>
@@ -147,6 +152,42 @@
             <xpath expr="//filter[@name='groupby_worksheet_template']" position="replace"/>
             <xpath expr="//filter[@name='user']" position="replace">
                 <filter string="Owner" name="x_owner_id" context="{'group_by': 'x_owner_id'}" />
+            </xpath>
+        </field>
+    </record>
+    <record id="quick_create_task_form" model="ir.ui.view">
+        <field name="name">construction_remarks.form.quick_create</field>
+        <field name="model">project.task</field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="project.quick_create_task_form"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='display_name']" position="attributes">
+                <attribute name="string">Remark Title</attribute>
+                <attribute name="placeholder">e.g. Missing Window</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_ids']" position="replace">
+                <field name="x_owner_id"/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <field name="x_date" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="view_x_remark_kanban">
+        <field name="name">construction.remarks.x_remark.view.kanban</field>
+        <field name="model">project.task</field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="project.view_task_kanban"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="default_group_by">x_stage_id</attribute>
+                <attribute name="quick_create_view">construction_remarks.quick_create_task_form</attribute>
+            </xpath>
+            <xpath expr="//field[@name='stage_id']" position="replace">
+                <field name="stage_id"/>
             </xpath>
         </field>
     </record>
