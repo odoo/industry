@@ -85,6 +85,13 @@
     <field name="model_id" ref="product.model_product_template"/>
     <field name="name">x_is_a_room_offer</field>
   </record>
+  <record id="product_model_product_template_x_has_city_tax_field" model="ir.model.fields">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Has City Tax</field>
+    <field name="model_id" ref="product.model_product_template"/>
+    <field name="name">x_has_city_tax</field>
+  </record>
   <record id="product_model_product_template_x_is_stay_tax_field" model="ir.model.fields">
     <field name="ttype">boolean</field>
     <field name="copied" eval="True"/>
@@ -239,7 +246,7 @@ for record in self: record['x_city_tax'] = record.x_nights * record.x_guests
     <field name="name">x_slot_ids</field>
     <field name="depends">x_sale_order_id</field>
     <field name="compute"><![CDATA[
-for record in self: record['x_slot_ids'] = record.x_sale_order_id.order_line.planning_slot_ids.ids
+for record in self: record['x_slot_ids'] = record.x_sale_order_id.order_line.planning_slot_ids.filtered(lambda s: any(product.x_has_city_tax for product in s.role_product_ids)).ids
       ]]></field>
   </record>
   <record id="x_model_city_tax_x_total" model="ir.model.fields">
