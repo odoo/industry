@@ -171,7 +171,7 @@
     <field name="arch" type="xml">
       <xpath expr="//group[@name='group_general']" position="inside">
         <field name="x_is_a_room_offer" invisible="type != 'service'"/>
-        <field name="x_is_stay_tax" string="Is City Tax" invisible="type != 'service'"/>
+        <field name="x_is_stay_tax" invisible="type != 'service'"/>
         <field name="x_related_has_stayover_cleaning" groups="booking_engine.group_house_keeping" invisible="not x_is_a_room_offer"/>
         <field name="x_related_has_checkout_cleaning" groups="booking_engine.group_house_keeping" invisible="not x_is_a_room_offer"/>
       </xpath>
@@ -181,6 +181,7 @@
       <xpath expr="//group[@name='group_general']" position="before">
         <group invisible="not x_is_a_room_offer">
           <field name="x_is_a_room_offer"/>
+          <field name="x_has_city_tax" />
         </group>
       </xpath>
       <xpath expr="//label[@for='list_price']" position="attributes">
@@ -222,8 +223,8 @@
               </control>
               <field name="name"/>
               <field name="role_ids" string="Stay offers" widget="many2many_tags" options="{'color_field': 'color'}"/>
-              <field name="calendar_id"/>
-              <field name="company_id" optional="show"/>
+              <field name="calendar_id" optional="hide"/>
+              <field name="company_id" optional="hide"/>
             </list>
           </field>
         </page>
@@ -233,6 +234,20 @@
     <field name="mode">extension</field>
     <field name="model">product.template</field>
     <field name="name">product.template.product.form.inherit.booking_engine</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="product_product_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//label[@for='lst_price']" position="attributes">
+        <attribute name="invisible">x_is_a_room_offer</attribute>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="product.product_normal_form_view"/>
+    <field name="mode">extension</field>
+    <field name="model">product.product</field>
+    <field name="name">product.product.form.inherit.booking_engine</field>
     <field name="priority">160</field>
     <field name="type">form</field>
     <field name="active" eval="True"/>
