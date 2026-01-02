@@ -18,7 +18,6 @@
         'data/product_public_category.xml',
         'data/product_template.xml',
         'data/product_template_attribute_line.xml',
-        'data/product_template_attribute_value.xml',
         'data/product_product.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
