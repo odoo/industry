@@ -59,6 +59,7 @@
         'data/website_theme_apply.xml',
     ],
     'demo': [
+        'demo/product_attribute_value.xml',
         'demo/res_partner.xml',
         'demo/hr_department.xml',
         'demo/hr_employee.xml',
