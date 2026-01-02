@@ -64,7 +64,6 @@
         'demo/product_template.xml',
         'demo/product_image.xml',
         'demo/product_template_attribute_line.xml',
-        'demo/product_template_attribute_value.xml',
         'demo/product_product.xml',
         'demo/x_product_template_line.xml',
         'demo/create_link.xml',
