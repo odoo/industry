@@ -1,6 +1,5 @@
 {
     'name': 'Deposit Management',
-    'version': '1.0',
     'category': 'Inventory/Inventory',
     'depends': [
         'base_automation',
