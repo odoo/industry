@@ -39,17 +39,15 @@
                             <field name="x_location"/>
                             <field name="x_remark_category_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
                         </group>
-                        <group colspan="2" name="product_template_images" string="Remark Media">
+                        <group colspan="4" string="Remark Media">
                             <field
-                                colspan="2"
+                                colspan="4"
                                 name="x_remark_image_ids"
-                                class="o_website_sale_image_list"
+                                class="o_remark_image_list"
                                 context="{'default_x_remark_id': id, 'default_name': name}"
                                 mode="kanban"
-                                add-label="Add Media"
+                                add-label="Add Image"
                                 nolabel="1"
-                                widget="project_remark_x2_many_media_viewer"
-                                options="{'convert_to_webp': True}"
                             />
                         </group>
                     </group>
@@ -87,7 +85,7 @@
         <field name="type">list</field>
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
-            <list>
+            <list default_order="x_reference">
                 <!-- column_invisible fields required for the modal to save them -->
                 <field name="project_id" column_invisible="1"/>
                 <field name="x_is_remark" column_invisible="1"/>
@@ -155,7 +153,7 @@
             </xpath>
         </field>
     </record>
-    <record id="quick_create_task_form" model="ir.ui.view">
+    <record model="ir.ui.view" id="quick_create_task_form">
         <field name="name">construction_remarks.form.quick_create</field>
         <field name="model">project.task</field>
         <field name="active" eval="True"/>
@@ -233,27 +231,18 @@
             <form string="Remark Images">
                 <field name="x_sequence" invisible="1"/>
                 <div class="row o_website_sale_image_modal">
-                    <div class="col-md-6 col-xl-5">
-                        <label for="x_name" string="Image Name"/>
-                        <h2><field name="x_name" placeholder="Image Name"/></h2>
-                        <label for="x_remark_id" string="Remark"/>
-                        <field name="x_remark_id"/><br/>
-                        <label for="x_video_url" string="Video URL"/><br/>
-                        <field name="x_video_url"/><br/>
-                    </div>
-                    <div class="col-md-6 col-xl-7 text-center o_website_sale_image_modal_container">
+                    <group>
+                        <group>
+                            <field name="x_name" placeholder="Image Name"/>
+                        </group>
+                        <group>
+                            <field name="x_remark_id"/>
+                        </group>
+                    </group>
+                    <div class="col-md-12 col-xl-12 text-center o_website_sale_image_modal_container">
                         <div class="row">
                             <div class="col">
                                 <field name="x_image_1920" widget="image"/>
-                            </div>
-                            <div class="col" invisible="x_video_url in ['', False]">
-                                <div class="o_video_container p-2">
-                                    <span>Video Preview</span>
-                                    <field name="x_embed_code" class="mt-2" widget="video_preview"/>
-                                    <h4 class="o_invalid_warning text-muted text-center" invisible="x_embed_code">
-                                        Please enter a valid Video URL.
-                                    </h4>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -268,17 +257,14 @@
         <field name="arch" type="xml">
             <kanban string="Remark Images" default_order="x_sequence">
                 <field name="x_remark_id" invisible="1"/>
-                <field name="x_embed_code" invisible="1"/>
-                <field name="x_video_url" invisible="1"/>
-                <field name="x_can_image_1024_be_zoomed" invisible="1"/>
                 <field name="x_sequence" widget="handle"/>
                 <templates>
                     <t t-name="card" class="p-0 border-0">
                         <div class="card">
-                            <div class="o_squared_image">
+                            <div class="o_squared_image o_field_widget">
                                 <field class="card-img-top" name="x_image_1920" widget="x2_many_image"/>
                             </div>
-                            <div class="p-2 m-0 bg-200" t-attf-title="#{record.x_name.value}">
+                            <div class="p-2 m-0" t-attf-title="#{record.x_name.value}">
                                 <field name="x_name" class="small fs-5 text-truncate d-block"/>
                             </div>
                             <!-- below 100 Kb: good -->
@@ -296,7 +282,7 @@
                                 <t t-set="size_status" t-value="'text-bg-danger'"/>
                                 <t t-set="message">Optimization required! Reduce the image size or increase your compression settings.</t>
                             </t>
-                            <span t-attf-class="badge #{size_status} o_product_image_size" t-att-title="message"></span>
+                            <span t-attf-class="badge #{size_status}" t-att-title="message"></span>
                         </div>
                     </t>
                 </templates>
