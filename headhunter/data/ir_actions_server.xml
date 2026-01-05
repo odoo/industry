@@ -40,43 +40,6 @@ for lead in records:
         <field name="state">next_activity</field>
         <field name="activity_type_id" ref="mail.mail_activity_data_call"/>
     </record>
-    <record id="todo_activity_server_action" model="ir.actions.server">
-        <field name="name">Create To-Do</field>
-        <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
-        <field name="state">code</field>
-        <field name="base_automation_id" ref="create_activity_on_talent_poll_automation"/>
-        <field name="code"><![CDATA[
-for record in records:
-    env["mail.activity"].create(
-        {
-            "activity_type_id": env.ref("mail.mail_activity_data_todo").id,
-            "summary": "Candidate is hired, Please update the availability",
-            "res_model_id": env.ref("hr_recruitment.model_hr_applicant").id,
-            "res_id": record.pool_applicant_id.id if record.pool_applicant_id else record.id,
-            "user_id": record.user_id.id if record.user_id else record.create_uid.id,
-        }
-    )
-    job = record.job_id
-    if job:
-        sales_order = job.x_quotation_sales_order
-        if sales_order:
-            env['mail.activity'].create({
-                'res_model_id': env['ir.model'].sudo().search([('model', '=', 'sale.order')], limit=1).id,
-                'res_id': sales_order.id,
-                'activity_type_id': env.ref('mail.mail_activity_data_todo').id,
-                'summary': "One hire has been processed.",
-                'user_id': sales_order.user_id.id,
-            })
-        else:
-            env['mail.activity'].create({
-                'res_model_id': env['ir.model'].sudo().search([('model', '=', 'hr.job')], limit=1).id,
-                'res_id': job.id,
-                'activity_type_id': env.ref('mail.mail_activity_data_todo').id,
-                'summary': "Invoice completed without a sales order?",
-                'user_id': job.user_id.id,
-            })
-    ]]></field>
-    </record>
     <record id="ir_actions_server_view_sales_order" model="ir.actions.server">
         <field name="name">View Sales Order</field>
         <field name="model_id" ref="hr.model_hr_job"/>
@@ -103,22 +66,6 @@ for record in records:
         'res_id': record.x_opportunity.id,
         'type': 'ir.actions.act_window',
     }
-    ]]></field>
-    </record>
-    <record id="ir_actions_server_view_invoices" model="ir.actions.server">
-        <field name="name">View Invoices</field>
-        <field name="model_id" ref="hr.model_hr_job"/>
-        <field name="state">code</field>
-        <field name="binding_model_id" ref="hr.model_hr_job"/>
-        <field name="code"><![CDATA[
-invoices = record.x_invoices
-action = {
-    'res_model': 'account.move',
-    'type': 'ir.actions.act_window',
-}
-if invoices:
-    action.update({'view_mode': 'form', 'res_id':invoices.id} if len(invoices) == 1 else {'view_mode': 'list,form', 'domain': [('id', 'in', invoices.ids)]})
-action
     ]]></field>
     </record>
     <record id="ir_actions_server_706" model="ir.actions.server">
@@ -152,28 +99,6 @@ partner_ids = record.x_hiring_team_contact.ids if record.x_hiring_team_contact e
 action = env['portal.wizard'].with_context(default_partner_ids=partner_ids).action_open_wizard()
     ]]></field>
     </record>
-    <record id="ir_actions_server_712" model="ir.actions.server">
-        <field name="code"><![CDATA[
-record_to_update = record.x_status_bar == 'open' and record.active and record.is_published
-for j in record.x_similar_job_ids:
-    if record_to_update and record.id not in j.x_similar_job_ids.ids:
-        j['x_similar_job_ids'] = [(4, record.id)]
-    elif not record_to_update and record.id in j.x_similar_job_ids.ids:
-        j['x_similar_job_ids'] = [(3, record.id)]]]></field>
-        <field name="model_id" ref="hr.model_hr_job"/>
-        <field name="base_automation_id" ref="base_automation_sync_as_per_status"/>
-        <field name="state">code</field>
-        <field name="name">Execute Code</field>
-  </record>
-  <record id="ir_actions_server_713" model="ir.actions.server">
-        <field name="code"><![CDATA[
-for similar in record.x_similar_job_ids.filtered(lambda j: j.x_status_bar == 'open' and j.active and j.is_published and record not in j.x_similar_job_ids):
-    similar['x_similar_job_ids'] = [(4, record.id)]]]></field>
-        <field name="model_id" ref="hr.model_hr_job"/>
-        <field name="base_automation_id" ref="base_automation_job_add"/>
-        <field name="state">code</field>
-        <field name="name">Execute Code</field>
-  </record>
   <!-- mail pop up server action -->
     <record id="ir_actions_server_for_email_pop_up" model="ir.actions.server">
         <field name="binding_model_id" ref="hr_recruitment.model_hr_applicant"/>
@@ -310,26 +235,6 @@ action = {
     }
 }]]></field>
     </record>
-    <record id="ir_actions_server_view_job_position_from_partner" model="ir.actions.server">
-        <field name="name">View Job Position from partner</field>
-        <field name="model_id" ref="base.model_res_partner"/>
-        <field name="state">code</field>
-        <field name="binding_model_id" ref="base.model_res_partner"/>
-        <field name="code"><![CDATA[
-domain = [('x_customer', '=', record.id), ('x_status_bar', '!=', 'done'), ('active', '=', True)]
-jobs = record.x_partner_job_ids.filtered(lambda j: j.x_status_bar != 'done' and j.active)
-action = {
-    'type': 'ir.actions.act_window',
-    'name': 'Job Positions',
-    'res_model': 'hr.job',
-    'view_mode': 'list,form',
-    'domain': domain,
-}
-if jobs:
-    action.update({'view_mode': 'form', 'res_id': jobs.id} if len(jobs) == 1 else {'view_mode': 'list,form', 'domain': [('id', 'in', jobs.ids)]})
-action
-]]></field>
-    </record>
     <!-- Scope 4 point 1 -->
     <record id="ir_actions_server_fill_jobs_from_opportunity" model="ir.actions.server">
         <field name="name">Execute Code</field>
@@ -341,47 +246,5 @@ if record.opportunity_id:
     jobs = record.opportunity_id.x_job_positions.filtered(lambda j: not j.x_quotation_sales_order)
     jobs.write({'x_quotation_sales_order': record.id})
         ]]></field>
-    </record>
-    <!-- scope 6 point 1-->
-    <record id="ir_actions_server_create_talent_from_employee" model="ir.actions.server">
-        <field name="name">Create Talent from Employee</field>
-        <field name="model_id" ref="hr.model_hr_employee"/>
-        <field name="state">code</field>
-        <field name="binding_model_id" ref="hr.model_hr_employee"/>
-        <field name="code"><![CDATA[
-for employee in records:
-    if employee.x_linked_talent_id:
-        raise UserError("This employee already has a linked talent/applicant.")
-    default_pool = env['hr.talent.pool'].search([], limit=1)
-    if not default_pool:
-        raise UserError("No Talent Pool found. Please create one first.")
-    talent = env['hr.applicant'].create({
-        'partner_name':employee.name,
-        'email_from':employee.work_email,
-        'partner_phone':employee.work_phone,
-        'employee_id':employee.id,
-        'talent_pool_ids': [(6, 0, [default_pool.id])],
-    })
-    employee['x_linked_talent_id'] = talent.id
-    for skill in employee.current_employee_skill_ids:
-        env['hr.applicant.skill'].create({
-            'applicant_id': talent.id,
-            'skill_id': skill.skill_id.id,
-            'skill_level_id': skill.skill_level_id.id,
-            'level_progress': skill.level_progress,
-            'skill_type_id': skill.skill_type_id.id,
-            'valid_to': skill.valid_to,
-        })
-    for application in employee.applicant_ids:
-        application.write({
-            'employee_id': employee.id,
-            'pool_applicant_id': talent.id,
-        })
-action = {
-    "type": "ir.actions.act_window",
-    "res_model": "hr.applicant",
-    "view_mode": "form",
-    "res_id": talent.id,
-}]]></field>
     </record>
 </odoo>
