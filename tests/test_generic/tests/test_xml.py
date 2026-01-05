@@ -9,6 +9,7 @@ from lxml import etree
 from collections import defaultdict
 
 from odoo.tests import tagged, get_db_name
+from odoo.tools.mail import single_email_re
 from .industry_case import IndustryCase, get_industry_path
 
 _logger = logging.getLogger(__name__)
@@ -171,6 +172,7 @@ class TestEnv(IndustryCase):
                 self._check_res_config_setting(tree)
                 self._check_context_to_stop_mail_sending(tree, file_name, module)
                 self._check_text_based_xpath(tree, file_name)
+                self._check_portal_login_is_email(tree, file_name)
                 if root.split('/')[-1] == 'data':
                     self._check_view_active(tree, file_name)
                     self._check_is_published_false(tree, file_name)
@@ -628,3 +630,13 @@ class TestEnv(IndustryCase):
                     file_name,
                     expr,
                 )
+
+    def _check_portal_login_is_email(self, root, file_name):
+        for record in root.xpath("//record[@model='res.users']"):
+            for login in (record.xpath("./field[@name='login']/text()")):
+                if login and not single_email_re.match(login):
+                    _logger.error(
+                        "The login %s in file %s is incorrect. You should use a valid email format as a login.",
+                        login,
+                        file_name,
+                    )
