@@ -68,7 +68,6 @@
         'demo/res_users.xml',
         'demo/account_analytic_account.xml',
         'demo/x_meter_reading.xml',
-        'demo/x_property_line_tenant.xml',
         'demo/x_property_line_meter_reading.xml',
         'demo/hr_employee.xml',
         'demo/account_move.xml',
