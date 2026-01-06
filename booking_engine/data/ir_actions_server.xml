@@ -39,18 +39,15 @@ for record in records:
     if record.start_datetime and str(record.start_datetime.time()) != f"{int(pickup_time):02d}:{int(pickup_time % 1 * 60):02d}:00":
         start = timezone(tz).localize(datetime.datetime(year=start_datetime.year, month=start_datetime.month, day=start_datetime.day, hour=int(pickup_time), minute=int(pickup_time % 1 * 60), second=0))
         start_datetime = start.astimezone(tz=dateutil.tz.UTC)
-        if start_datetime >= end_datetime:
-            start_datetime = start_datetime - datetime.timedelta(days=1)
+        if start_datetime >= end_datetime: start_datetime = start_datetime - datetime.timedelta(days=1)
     if record.end_datetime and str(record.end_datetime.time()) != f"{int(return_time):02d}:{int(return_time % 1 * 60):02d}:00":
         end = timezone(tz).localize(datetime.datetime(year=end_datetime.year, month=end_datetime.month, day=end_datetime.day, hour=int(return_time), minute=int(return_time % 1 * 60), second=0))
         end_datetime = end.astimezone(tz=dateutil.tz.UTC)
-        if start_datetime >= end_datetime:
-            end_datetime = end_datetime + datetime.timedelta(days=1)
+        if start_datetime >= end_datetime: end_datetime = end_datetime + datetime.timedelta(days=1)
     record['start_datetime'] = start_datetime.replace(tzinfo=None)
     record['end_datetime'] = end_datetime.replace(tzinfo=None)
 for record in records:
-    if not record.sale_line_id:
-        continue
+    if not record.sale_line_id: continue
     nights = 0
     if record.sale_line_id.planning_slot_ids:
         nights = sum(record.sale_line_id.planning_slot_ids.mapped('x_nights'))
@@ -92,5 +89,32 @@ if record.order_id.rental_status == "returned":
     action = record.env['ir.actions.act_window']._for_xml_id('booking_engine.open_x_city_tax_action')
     action['context'] = {'search_default_x_sale_order_id': record.order_id.id, 'default_x_sale_order_id': record.order_id.id}
 ]]></field>
+    </record>
+    <record id="industry_create_roles" model="ir.actions.server">
+        <field name="name">Create Plan Services</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code">
+for record in records: env['planning.role'].create({'name': record.name, 'sync_shift_rental': True, 'x_is_a_room_offer': True, 'product_ids': [record.id]})
+        </field>
+    </record>
+    <record id="industry_edit_roles" model="ir.actions.server">
+        <field name="name">Edit Plan Services</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code">
+for record in records: record.planning_role_id.write({'name': record.name})
+        </field>
+    </record>
+    <record id="industry_delete_roles" model="ir.actions.server">
+        <field name="name">Delete Plan Services</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code">
+if records: records.planning_role_id.unlink()
+        </field>
     </record>
 </odoo>
