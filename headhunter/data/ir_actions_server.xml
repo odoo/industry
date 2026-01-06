@@ -171,6 +171,18 @@ for applicant in records:
     applicant.x_cv_sent_ids.write({'x_is_published': False})
 ]]></field>
     </record>
+    <record id="action_unpublish_cv_sent_model" model="ir.actions.server">
+        <field name="name">Unpublish CV</field>
+        <field name="model_id" ref="x_cv_sent_application_model"/>
+        <field name="binding_model_id" ref="x_cv_sent_application_model"/>
+        <field name="binding_type">action</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for cv in records:
+    cv['x_is_published'] = False
+    cv.x_applicant_id.write({'x_published': False})
+]]></field>
+    </record>
     <record id="ir_actions_server_view_job_positions" model="ir.actions.server">
         <field name="name">View Job Positions</field>
         <field name="model_id" ref="crm.model_crm_lead"/>
@@ -232,6 +244,23 @@ action = {
     'res_model': 'hr.job',
     'context': {
         'default_x_opportunity': record.id,
+        'default_x_customer': record.partner_id.id if record.partner_id else False,
+    }
+}]]></field>
+    </record>
+    <record id="ir_actions_server_create_new_sale_order_from_job_position" model="ir.actions.server">
+        <field name="name">Create New Sales Order</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="hr.model_hr_job"/>
+        <field name="code"><![CDATA[
+action = {
+    'view_mode': 'form',
+    'type': 'ir.actions.act_window',
+    'res_model': 'sale.order',
+    'context': {
+        'default_x_job_id': record.id,
+        'default_partner_id': record.x_customer.id if record.x_customer else False,
     }
 }]]></field>
     </record>
