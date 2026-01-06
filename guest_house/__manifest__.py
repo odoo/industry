@@ -1,6 +1,6 @@
 {
     'name': 'Guest House',
-    'version': '1.3',
+    'version': '1.4',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -8,9 +8,8 @@
         'booking_engine',
     ],
     'data': [
-        'data/planning_role.xml',
-        'data/resource_resource.xml',
         'data/product_template.xml',
+        'data/resource_resource.xml',
         'data/product_product.xml',
         'data/product_template_attribute_line.xml',
         'data/product_template_attribute_value.xml',
