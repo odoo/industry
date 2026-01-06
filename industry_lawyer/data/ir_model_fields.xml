@@ -42,6 +42,13 @@
         <field name="name">x_approval</field>
         <field name="relation">res.users</field>
     </record>
+    <record id="field_x_approval_in_account_move_send" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">Approval By</field>
+        <field name="model_id" ref="account.model_account_move_send_wizard"/>
+        <field name="name">x_invoice_approval_by</field>
+        <field name="relation">res.users</field>
+    </record>
     <record id="field_x_is_high_user_group" model="ir.model.fields">
         <field name="name">x_is_high_user_group</field>
         <field name="depends">group_ids</field>
@@ -63,27 +70,11 @@ for user in users: user['x_is_high_user_group'] = get_rank(user) > current_user_
         <field name="model_id" ref="mail.model_res_users"/>
         <field name="store" eval="True"/>
     </record>
-    <record id="field_x_approval_required" model="ir.model.fields">
-        <field name="name">x_approval_required</field>
-        <field name="ttype">selection</field>
-        <field name="field_description">Approval Required</field>
-        <field name="model_id" ref="base.model_res_config_settings"/>
-    </record>
-    <record id="x_approval_required_field_selection_mendatory" model="ir.model.fields.selection">
-        <field name="name">Mendatory</field>
-        <field name="field_id" ref="field_x_approval_required" />
-        <field name="value">mendatory</field>
-    </record>
-    <record id="x_approval_required_field_selection_optional" model="ir.model.fields.selection">
-        <field name="name">Optional</field>
-        <field name="field_id" ref="field_x_approval_required" />
-        <field name="value">optional</field>
-    </record>
     <record id="field_x_approval_status" model="ir.model.fields">
         <field name="name">x_approval_status</field>
         <field name="ttype">selection</field>
         <field name="field_description">Approval Status</field>
-        <field name="model_id" ref="mail.model_mail_mail"/>
+        <field name="model_id" ref="model_x_approval_mail"/>
     </record>
     <record id="x_approval_status_field_selection_pending" model="ir.model.fields.selection">
         <field name="name">Pending</field>
@@ -104,7 +95,8 @@ for user in users: user['x_is_high_user_group'] = get_rank(user) > current_user_
         <field name="name">x_approval_state</field>
         <field name="ttype">selection</field>
         <field name="field_description">Approval State</field>
-        <field name="model_id" ref="mail.model_mail_mail"/>
+        <field name="model_id" ref="model_x_approval_mail"/>
+        <field name="tracking">1</field>
     </record>
     <record id="x_approval_state_field_selection_01_in_progress" model="ir.model.fields.selection">
         <field name="name">In Progress</field>
@@ -145,6 +137,13 @@ for user in users: user['x_is_high_user_group'] = get_rank(user) > current_user_
         <field name="name">x_is_user_high_group</field>
         <field name="on_delete" eval="False"/>
     </record>
+    <record id="field_x_is_user_high_group_of_account_move_send" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Is User High Group</field>
+        <field name="model_id" ref="account.model_account_move_send_wizard"/>
+        <field name="name">x_is_user_high_groups</field>
+        <field name="on_delete" eval="False"/>
+    </record>
     <record id="field_x_suggest_approval" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="field_description">Suggest Approval</field>
@@ -152,5 +151,139 @@ for user in users: user['x_is_high_user_group'] = get_rank(user) > current_user_
         <field name="name">x_suggest_approval</field>
         <field name="readonly" eval="True"/>
         <field name="relation">res.users</field>
+    </record>
+    <record id="field_x_approved_by" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">Approved By</field>
+        <field name="model_id" ref="mail.model_mail_mail"/>
+        <field name="name">x_approved_by_uid</field>
+        <field name="relation">res.users</field>
+    </record>
+    <record id="field_x_approval_required" model="ir.model.fields">
+        <field name="name">x_approval_required</field>
+        <field name="ttype">selection</field>
+        <field name="field_description">Approval Required</field>
+        <field name="model_id" ref="base.model_res_company"/>
+    </record>
+    <record id="x_approval_required_field_selection_mendatory" model="ir.model.fields.selection">
+        <field name="name">Mendatory</field>
+        <field name="field_id" ref="field_x_approval_required" />
+        <field name="value">mendatory</field>
+    </record>
+    <record id="x_approval_required_field_selection_optional" model="ir.model.fields.selection">
+        <field name="name">Optional</field>
+        <field name="field_id" ref="field_x_approval_required" />
+        <field name="value">optional</field>
+    </record>
+    <record id="field_x_approval_required_config_settings" model="ir.model.fields">
+        <field name="name">x_approval_required</field>
+        <field name="ttype">selection</field>
+        <field name="related">company_id.x_approval_required</field>
+        <field name="field_description">Approval Required</field>
+        <field name="model_id" ref="base.model_res_config_settings"/>
+    </record>
+    <record id="field_x_approval_required_mail_compose" model="ir.model.fields">
+        <field name="name">x_approval_required</field>
+        <field name="ttype">selection</field>
+        <field name="related">record_company_id.x_approval_required</field>
+        <field name="field_description">Approval Required</field>
+        <field name="model_id" ref="mail.model_mail_compose_message"/>
+    </record>
+    <record id="field_x_approval_required_account_wizard_send" model="ir.model.fields">
+        <field name="name">x_approval_required</field>
+        <field name="ttype">selection</field>
+        <field name="related">company_id.x_approval_required</field>
+        <field name="field_description">Approval Required</field>
+        <field name="model_id" ref="account.model_account_move_send_wizard"/>
+    </record>
+    <record id="field_x_mail_mail" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">Email</field>
+        <field name="model_id" ref="model_x_approval_mail"/>
+        <field name="name">x_mail_mail</field>
+        <field name="relation">mail.mail</field>
+    </record>
+    <record id="field_x_subject" model="ir.model.fields">
+        <field name="name">x_subject</field>
+        <field name="ttype">char</field>
+        <field name="related">x_mail_mail.subject</field>
+        <field name="field_description">Subject</field>
+        <field name="model_id" ref="model_x_approval_mail"/>
+    </record>
+    <record id="field_x_author_id" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">User</field>
+        <field name="related">x_mail_mail.x_approved_by_uid</field>
+        <field name="model_id" ref="model_x_approval_mail"/>
+        <field name="name">x_author_id</field>
+        <field name="relation">res.users</field>
+    </record>
+    <record id="field_x_email_from" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">From</field>
+        <field name="related">x_mail_mail.author_id</field>
+        <field name="model_id" ref="model_x_approval_mail"/>
+        <field name="name">x_email_from</field>
+        <field name="on_delete" eval="False"/>
+        <field name="relation">res.partner</field>
+    </record>
+    <record id="field_x_email_to" model="ir.model.fields">
+        <field name="ttype">many2many</field>
+        <field name="field_description">To</field>
+        <field name="related">x_mail_mail.recipient_ids</field>
+        <field name="model_id" ref="model_x_approval_mail"/>
+        <field name="name">x_email_to</field>
+        <field name="on_delete" eval="False"/>
+        <field name="relation">res.partner</field>
+        <field name="relation_table">x_res_partner_x_approval_mail_rel</field>
+    </record>
+    <record id="field_x_email_cc" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="field_description">Cc</field>
+        <field name="model_id" ref="model_x_approval_mail"/>
+        <field name="name">x_email_cc</field>
+        <field name="related">x_mail_mail.email_cc</field>
+        <field name="on_delete" eval="False"/>
+    </record>
+    <record id="field_x_scheduled_date" model="ir.model.fields">
+        <field name="ttype">datetime</field>
+        <field name="field_description">Scheduled Date</field>
+        <field name="related">x_mail_mail.scheduled_date</field>
+        <field name="model_id" ref="model_x_approval_mail"/>
+        <field name="name">x_scheduled_date</field>
+        <field name="on_delete" eval="False"/>
+    </record>
+    <record id="field_x_date" model="ir.model.fields">
+        <field name="ttype">datetime</field>
+        <field name="field_description">datetime</field>
+        <field name="related">x_mail_mail.date</field>
+        <field name="model_id" ref="model_x_approval_mail"/>
+        <field name="name">x_date</field>
+        <field name="on_delete" eval="False"/>
+    </record>
+    <!-- <record id="field_x_body_content" model="ir.model.fields">
+        <field name="ttype">html</field>
+        <field name="field_description">Body</field>
+        <field name="model_id" ref="model_x_approval_mail"/>
+        <field name="name">x_body_content</field>
+        <field name="on_delete" eval="False"/>
+    </record> -->
+    <record id="field_x_attachment_ids" model="ir.model.fields">
+        <field name="ttype">many2many</field>
+        <field name="field_description">Unrestricted Attachment_ids</field>
+        <field name="model_id" ref="model_x_approval_mail"/>
+        <field name="name">x_attachment_ids</field>
+        <field name="related">x_mail_mail.attachment_ids</field>
+        <field name="on_delete" eval="False"/>
+        <field name="relation">ir.attachment</field>
+        <field name="relation_table">x_ir_attachment_x_approval_mail_rel</field>
+    </record>
+    <record id="field_x_body_content" model="ir.model.fields">
+        <field name="ttype">html</field>
+        <field name="field_description">Body</field>
+        <field name="model_id" ref="model_x_approval_mail"/>
+        <field name="related">x_mail_mail.body_content</field>
+        <field name="name">x_body_html</field>
+        <field name="on_delete" eval="False"/>
     </record>
 </odoo>
