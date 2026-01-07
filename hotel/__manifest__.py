@@ -1,6 +1,6 @@
 {
     'name': 'Hotel',
-    'version': '1.3',
+    'version': '1.4',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -11,10 +11,9 @@
         'web_studio',
     ],
     'data': [
-        'data/planning_role.xml',
-        'data/resource_resource.xml',
         'data/pos_config.xml',
         'data/product_template.xml',
+        'data/resource_resource.xml',
         'data/product_template_attribute_line.xml',
         'data/product_image.xml',
         'data/product_product.xml',
