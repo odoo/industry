@@ -1,5 +1,5 @@
 {
-    'name': 'test',
+    'name': 'Generic industry tests',
     'version': '1.0',
     'category': 'Hidden/Tests',
     'description': """A module to test Odoo code with various linters.""",
