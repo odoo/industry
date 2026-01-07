@@ -10,8 +10,7 @@ from .industry_case import IndustryCase
 class TestEnv(IndustryCase):
 
     def test_payment_demo(self):
-        db_name = get_db_name()
-        if not db_name.endswith('imported_with_demo'):
+        if not self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1):
             return
         if self.env['ir.module.module']._get('website_sale').state == 'installed':
             self.assertTrue(
