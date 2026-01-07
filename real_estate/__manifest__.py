@@ -26,6 +26,7 @@
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
         'data/ir_model_fields.xml',
+        'data/product_attribute_post.xml',
         'data/crm_team.xml',
         'data/mail_template.xml',
         'data/sign_template.xml',
