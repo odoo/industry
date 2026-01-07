@@ -8,7 +8,7 @@ import re
 from lxml import etree
 from collections import defaultdict
 
-from odoo.tests import tagged, get_db_name
+from odoo.tests import tagged
 from .industry_case import IndustryCase, get_industry_path
 
 _logger = logging.getLogger(__name__)
@@ -127,7 +127,7 @@ class TestEnv(IndustryCase):
                         manifest_content = decoded_content
                     continue
 
-                if root.split('/')[-1] == 'demo' and get_db_name().endswith('imported_no_demo'):
+                if root.split('/')[-1] == 'demo' and not self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1):
                     continue
                 try:
                     tree = etree.fromstring(encoded_content)
@@ -156,7 +156,7 @@ class TestEnv(IndustryCase):
                         is_studio_required = self._check_studio(tree, file_name)
         self._check_manifest(manifest_content, is_studio_required)
         self._check_records_without_user_id(checked_records_with_user)
-        if not get_db_name().endswith('imported_no_demo'):
+        if self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1):
             in_use_files = {file.lstrip('/') for file in in_use_files}
             for file in static_files - in_use_files:
                 if 'description' not in file:
