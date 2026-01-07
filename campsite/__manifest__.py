@@ -1,6 +1,6 @@
 {
     'name': 'Campsite',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -11,12 +11,11 @@
         'web_studio',
     ],
     'data': [
-        'data/planning_role.xml',
-        'data/resource_resource.xml',
         'data/pos_config.xml',
         'data/product_category.xml',
         'data/product_public_category.xml',
         'data/product_template.xml',
+        'data/resource_resource.xml',
         'data/product_template_attribute_line.xml',
         'data/product_product.xml',
         'data/knowledge_article.xml',

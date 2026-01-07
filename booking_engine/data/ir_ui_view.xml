@@ -169,12 +169,65 @@
   </record>
   <record id="product_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
-        <xpath expr="//field[@name='default_code']" position="after">
+      <xpath expr="//group[@name='group_general']" position="inside">
+        <field name="x_is_a_room_offer" invisible="type != 'service'"/>
+        <field name="x_is_stay_tax" string="Is City Tax" invisible="type != 'service'"/>
+      </xpath>
+      <xpath expr="//group[@name='group_general']" position="attributes">
+        <attribute name="invisible">x_is_a_room_offer</attribute>
+      </xpath>
+      <xpath expr="//group[@name='group_general']" position="before">
+        <group invisible="not x_is_a_room_offer">
           <field name="x_is_a_room_offer"/>
-          <field name="x_is_stay_tax" string="Is City Tax"/>
-        </xpath>
+        </group>
+      </xpath>
+      <xpath expr="//label[@for='list_price']" position="attributes">
+        <attribute name="invisible">x_is_a_room_offer</attribute>
+      </xpath>
+      <xpath expr="//div[@name='list_price_uom']" position="attributes">
+        <attribute name="invisible">x_is_a_room_offer</attribute>
+      </xpath>
+      <xpath expr="//label[@for='standard_price']" position="attributes">
+        <attribute name="invisible">x_is_a_room_offer</attribute>
+      </xpath>
+      <xpath expr="//div[@name='standard_price_uom']" position="attributes">
+        <attribute name="invisible">x_is_a_room_offer</attribute>
+      </xpath>
+      <xpath expr="//field[@name='tax_string']" position="attributes">
+        <attribute name="invisible">x_is_a_room_offer</attribute>
+      </xpath>
+      <xpath expr="//field[@name='planning_role_id']" position="attributes">
+        <attribute name="required">planning_enabled and not x_is_a_room_offer</attribute>
+      </xpath>
+      <xpath expr="//notebook" position="inside">
+        <page string="Resources" name="resources" invisible="not x_is_a_room_offer">
+          <span invisible="id">Please save this product to edit the resources.</span>
+          <field name="x_resource_ids"
+                 domain="[('x_is_stay_resource', '=', True)]"
+                 invisible="not id"
+                 context="{
+                  'default_x_is_stay_resource': 1,
+                  'default_resource_type': 'material',
+                  'default_role_ids': [planning_role_id],
+                  'list_view_ref': 'booking_engine.booking_engine_resource_list',
+                  'form_view_ref': 'booking_engine.booking_engine_resource_form',
+                  'has_product': 1,
+                 }"
+          >
+            <list editable="bottom" multi_edit="1" open_form_view="True">
+              <control>
+                <create name="add_new_resource" string="Add a resource"/>
+              </control>
+              <field name="name"/>
+              <field name="role_ids" string="Stay offers" widget="many2many_tags" options="{'color_field': 'color'}"/>
+              <field name="calendar_id"/>
+              <field name="company_id" optional="show"/>
+            </list>
+          </field>
+        </page>
+      </xpath>
     </field>
-    <field name="inherit_id" ref="product.product_template_only_form_view"/>
+    <field name="inherit_id" ref="sale_planning.product_template_form_view_invoice_policy_inherit_sale_planning"/>
     <field name="mode">extension</field>
     <field name="model">product.template</field>
     <field name="name">product.template.product.form.inherit.booking_engine</field>
@@ -269,18 +322,13 @@
   </record>
   <record id="booking_engine_offers_list" model="ir.ui.view">
     <field name="arch" type="xml">
-        <xpath expr="//field[@name='default_code']" position="after">
-          <field name="display_price" optional="show"/>
-          <field name="planning_role_id" optional="show"/>
-        </xpath>
-        <xpath expr="//field[@name='list_price']" position="attributes">
-          <attribute name="optional">hide</attribute>
-        </xpath>
-        <xpath expr="//field[@name='standard_price']" position="attributes">
-          <attribute name="optional">hide</attribute>
-        </xpath>
-        <xpath expr="//field[@name='uom_id']" position="after">
-          <field name="company_id" groups="base.group_multi_company"/>
+        <xpath expr="//list" position="replace">
+          <list>
+            <field name="name"/>
+            <field name="display_price" string="Base Price"/>
+            <field name="x_resource_ids" widget="many2many_tags"/>
+            <field name="company_id" groups="base.group_multi_company"/>
+          </list>
         </xpath>
     </field>
     <field name="inherit_id" ref="product.product_template_tree_view"/>
@@ -412,15 +460,23 @@
   </record>
   <record id="booking_engine_resource_form" model="ir.ui.view">
     <field name="arch" type="xml">
+        <xpath expr="//field[@name='role_ids']" position="attributes">
+          <attribute name="string">Stay Offers</attribute>
+          <attribute name="invisible">context.get('has_product')</attribute>
+        </xpath>
+        <xpath expr="//field[@name='default_role_id']" position="attributes">
+          <attribute name="string">Default Stay Offer</attribute>
+          <attribute name="invisible">context.get('has_product')</attribute>
+        </xpath>
         <xpath expr="//field[@name='tz']" position="after">
-          <field name="x_occupant_ids" widget="many2many_tags"/>
+          <field name="x_occupant_ids" widget="many2many_tags" invisible="context.get('has_product')"/>
         </xpath>
         <xpath expr="//field[@name='calendar_id']" position="attributes">
           <attribute name="domain">[('company_id', 'in', (False, company_id))]</attribute>
         </xpath>
     </field>
     <field name="inherit_id" ref="planning.resource_resource_form_view_inherit"/>
-    <field name="mode">extension</field>
+    <field name="mode">primary</field>
     <field name="model">resource.resource</field>
     <field name="name">resource.resource.form.inherit.booking_engine</field>
     <field name="priority">99</field>
@@ -438,9 +494,12 @@
         <xpath expr="//field[@name='calendar_id']" position="attributes">
           <attribute name="domain">[('company_id', 'in', (False, company_id))]</attribute>
         </xpath>
+        <xpath expr="//field[@name='role_ids']" position="attributes">
+          <attribute name="string">Stay Offers</attribute>
+        </xpath>
     </field>
     <field name="inherit_id" ref="planning.resource_resource_tree_view_inherit"/>
-    <field name="mode">extension</field>
+    <field name="mode">primary</field>
     <field name="model">resource.resource</field>
     <field name="name">resource.resource.list.inherit.booking_engine</field>
     <field name="priority">99</field>

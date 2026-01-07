@@ -15,4 +15,25 @@
     <field name="filter_domain">[('rental_start_date', '!=', False), ('rental_return_date', '!=', False)]</field>
     <field name="trigger_field_ids" eval="[(6, 0, [ref('sale_renting.field_sale_order__rental_start_date'), ref('sale_renting.field_sale_order__rental_return_date')])]"/>
   </record>
+  <record id="industry_on_product_template_create" model="base.automation">
+    <field name="model_id" ref="product.model_product_template"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('industry_create_roles')])]"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="filter_domain">[("x_is_a_room_offer", "!=", False), ("planning_role_id", "=", False)]</field>
+    <field name="name">Create role on stay offer creation</field>
+  </record>
+  <record id="industry_on_product_template_edit" model="base.automation">
+    <field name="model_id" ref="product.model_product_template"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('industry_edit_roles')])]"/>
+    <field name="trigger">on_write</field>
+    <field name="filter_domain">[("x_is_a_room_offer", "!=", False)]</field>
+    <field name="name">Edit role name on stay offer modification</field>
+  </record>
+  <record id="industry_on_product_template_delete" model="base.automation">
+    <field name="model_id" ref="product.model_product_template"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('industry_delete_roles')])]"/>
+    <field name="trigger">on_unlink</field>
+    <field name="filter_domain">[("x_is_a_room_offer", "!=", False)]</field>
+    <field name="name">Delete role on stay offer deletion</field>
+  </record>
 </odoo>

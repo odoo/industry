@@ -1,6 +1,6 @@
 {
     'name': 'Booking Engine',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Hidden/Tools',
     'author': 'Odoo S.A.',
     'depends': [
@@ -24,12 +24,12 @@
         'data/sale_temporal_recurrence.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
+        'data/resource_calendar_data.xml',
         'data/ir_ui_view.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_ui_menu.xml',
         'data/website_view.xml',
         'data/website_menu.xml',
-        'data/resource_calendar_data.xml',
         'data/product_category.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
