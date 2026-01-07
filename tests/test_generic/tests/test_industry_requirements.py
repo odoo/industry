@@ -3,7 +3,7 @@
 import logging
 import re
 
-from odoo.tests import tagged, get_db_name
+from odoo.tests import tagged
 from odoo.tools import cloc
 
 from .industry_case import IndustryCase
@@ -15,8 +15,7 @@ _logger = logging.getLogger(__name__)
 class TestEnv(IndustryCase):
 
     def test_payment_demo(self):
-        db_name = get_db_name()
-        if db_name.endswith('imported_no_demo'):
+        if not self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1):
             return
         no_online_payment_industries = [
             'bike_leasing',
