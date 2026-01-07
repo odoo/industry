@@ -15,8 +15,8 @@ _logger = logging.getLogger(__name__)
 class TestEnv(IndustryCase):
 
     def test_payment_demo(self):
-        db_name = get_db_name()
-        if db_name.endswith('imported_no_demo'):
+        ir_modules = self.env['ir.module.module'].search([('demo', '=', True)])
+        if not ir_modules:
             return
         no_online_payment_industries = [
             'bike_leasing',
