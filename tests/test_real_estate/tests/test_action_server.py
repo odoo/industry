@@ -164,7 +164,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
             'name': 'Test Client',
             'email': 'client@test.com',
             'x_categories_ids': self.env.ref('real_estate.product_public_category_1'),
-            'x_region_ids': self.region_value_1,
+            'x_criteria_ids': self.region_value_1,
             'x_subscribe': True,
         })
 
@@ -235,20 +235,20 @@ class RealEstateAutomationsTestCase(TransactionCase):
             'name': 'Fred',
             'email': 'fred@test.com',
             'x_categories_ids': self.env.ref('real_estate.product_public_category_1'),
-            'x_region_ids': self.region_value_1,
+            'x_criteria_ids': self.region_value_1,
         })
         client_2 = self.env['res.partner'].create({
             'name': 'Fred2',
             'email': 'fred2@test.com',
             'x_categories_ids': self.env.ref('real_estate.product_public_category_1'),
-            'x_region_ids': self.region_value_1,
+            'x_criteria_ids': self.region_value_1,
         })
         # One non-matching user
         self.env['res.partner'].create({
             'name': 'Fred3',
             'email': 'fred3@test.com',
             'x_categories_ids': self.env.ref('real_estate.product_public_category_1'),
-            'x_region_ids': self.region_value_2,
+            'x_criteria_ids': self.region_value_2,
         })
 
         # check the field x_contact_matches_properties
@@ -272,7 +272,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
             'name': 'Fred',
             'email': 'fred@test.com',
             'x_categories_ids': self.env.ref('real_estate.product_public_category_1'),
-            'x_region_ids': self.region_value_1,
+            'x_criteria_ids': self.region_value_1,
         })
 
         create_lead_action = self.env['ir.actions.server'].browse(self.env.ref('real_estate.create_lead_from_match_server_action').id)
