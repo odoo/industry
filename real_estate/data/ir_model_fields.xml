@@ -144,16 +144,6 @@ mapped_data = {product.id: count for product, count in lead_data}
 for product in self: product['x_x_interested_in_crm_lead_count'] = mapped_data.get(product.id, 0)
         ]]></field>
     </record>
-    <record id="field_res_partner_regions_ids" model="ir.model.fields">
-        <field name="name">x_region_ids</field>
-        <field name="field_description">Regions</field>
-        <field name="model_id" ref="base.model_res_partner"/>
-        <field name="ttype">many2many</field>
-        <field name="copied" eval="True"/>
-        <field name="relation">product.attribute.value</field>
-        <field name="relation_table">x_product_attribute_value_res_partner_rel</field>
-        <field name="domain" eval="[('attribute_id', '=', ref('product_attribute_10'))]"/>
-    </record>
     <record id="field_res_partner_categories_ids" model="ir.model.fields">
         <field name="name">x_categories_ids</field>
         <field name="field_description">Categories</field>
@@ -176,26 +166,6 @@ for product in self: product['x_x_interested_in_crm_lead_count'] = mapped_data.g
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="ttype">integer</field>
         <field name="copied" eval="True"/>
-    </record>
-    <record id="field_res_partner_type_ids" model="ir.model.fields">
-        <field name="name">x_type</field>
-        <field name="field_description">Type</field>
-        <field name="model_id" ref="base.model_res_partner"/>
-        <field name="ttype">many2many</field>
-        <field name="copied" eval="True"/>
-        <field name="relation">product.attribute.value</field>
-        <field name="relation_table">x_product_attribute_value_res_partner_rel_1</field>
-        <field name="domain" eval="[('attribute_id', '=', ref('product_attribute_11'))]"/>
-    </record>
-    <record id="field_res_partner_condition_ids" model="ir.model.fields">
-        <field name="name">x_condition_ids</field>
-        <field name="field_description">Condition</field>
-        <field name="model_id" ref="base.model_res_partner"/>
-        <field name="ttype">many2many</field>
-        <field name="copied" eval="True"/>
-        <field name="relation">product.attribute.value</field>
-        <field name="relation_table">x_product_attribute_value_res_partner_rel_2</field>
-        <field name="domain" eval="[('attribute_id', '=', ref('product_attribute_12'))]"/>
     </record>
     <record id="field_res_partner_subscribe" model="ir.model.fields">
         <field name="name">x_subscribe</field>
@@ -301,6 +271,22 @@ for partner in self: partner['x_x_contact_matches_properties_product_template_co
         <field name="selectable" eval="False"/>
         <field name="store" eval="False"/>
     </record>
+    <record id="x_is_matchmaking_field_product_attribute" model="ir.model.fields">
+        <field name="name">x_is_matchmaking</field>
+        <field name="field_description">Matchmaking</field>
+        <field name="ttype">boolean</field>
+        <field name="model_id" ref="product.model_product_attribute"/>
+    </record>
+    <record id="field_res_partner_criteria_ids" model="ir.model.fields">
+        <field name="name">x_criteria_ids</field>
+        <field name="field_description">Criterias</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="ttype">many2many</field>
+        <field name="copied" eval="True"/>
+        <field name="relation">product.attribute.value</field>
+        <field name="relation_table">x_product_attribute_value_res_partner_rel</field>
+        <field name="domain" eval="[('attribute_id.x_is_matchmaking', '=', True)]"/>
+    </record>
     <record id="field_res_partner_matching_properties" model="ir.model.fields">
         <field name="compute"><![CDATA[
 attribute_field_names = self.env['ir.model.fields'].search_fetch([("ttype", "in", ["many2many", "many2one"]), ("relation", "=", "product.attribute.value"), ("model_id", "=", self.env.ref('base.model_res_partner').id)], ['name']).mapped('name')
@@ -322,7 +308,7 @@ for record in self:
     else: record['x_property_matches_contacts'] = False 
         ]]></field>
         <field name="ttype">many2many</field>
-        <field name="depends">x_categories_ids, x_region_ids, x_type, x_condition_ids, x_min_price, x_max_price</field>
+        <field name="depends">x_categories_ids, x_criteria_ids, x_min_price, x_max_price</field>
         <field name="field_description">Property matches (Contacts)</field>
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="name">x_property_matches_contacts</field>
@@ -570,44 +556,5 @@ for partner in self: partner['x_interested_in_ids'] = [(6, 0, data.get(partner.i
         <field name="field_description">Is Offer</field>
         <field name="model_id" ref="sign.model_sign_template"/>
         <field name="ttype">boolean</field>
-    </record>
-    <record id="x_is_matchmaking_field_product_attribute" model="ir.model.fields">
-        <field name="name">x_is_matchmaking</field>
-        <field name="field_description">Matchmaking</field>
-        <field name="ttype">boolean</field>
-        <field name="model_id" ref="product.model_product_attribute"/>
-    </record>
-    <record id="x_attribute_region_is_matchmaking_field_product_attribute" model="ir.model.fields">
-        <field name="name">x_attribute_region_is_matchmaking</field>
-        <field name="field_description">Region Matchmaking</field>
-        <field name="ttype">boolean</field>
-        <field name="model_id" ref="base.model_res_partner"/>
-        <field name="store" eval="False"/>
-        <field name="compute"><![CDATA[
-for record in self:
-    record['x_attribute_region_is_matchmaking'] = record.env.ref('real_estate.product_attribute_10').x_is_matchmaking
-]]></field>
-    </record>
-    <record id="x_attribute_type_is_matchmaking_field_product_attribute" model="ir.model.fields">
-        <field name="name">x_attribute_type_is_matchmaking</field>
-        <field name="field_description">Type Matchmaking</field>
-        <field name="ttype">boolean</field>
-        <field name="model_id" ref="base.model_res_partner"/>
-        <field name="store" eval="False"/>
-        <field name="compute"><![CDATA[
-for record in self:
-    record['x_attribute_type_is_matchmaking'] = record.env.ref('real_estate.product_attribute_11').x_is_matchmaking
-]]></field>
-    </record>
-    <record id="x_attribute_condition_is_matchmaking_field_product_attribute" model="ir.model.fields">
-        <field name="name">x_attribute_condition_is_matchmaking</field>
-        <field name="field_description">Region Matchmaking</field>
-        <field name="ttype">boolean</field>
-        <field name="model_id" ref="base.model_res_partner"/>
-        <field name="store" eval="False"/>
-        <field name="compute"><![CDATA[
-for record in self:
-    record['x_attribute_condition_is_matchmaking'] = record.env.ref('real_estate.product_attribute_12').x_is_matchmaking
-]]></field>
     </record>
 </odoo>
