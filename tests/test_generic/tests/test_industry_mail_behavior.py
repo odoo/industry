@@ -2,7 +2,7 @@
 
 import logging
 
-from odoo.tests import get_db_name, tagged
+from odoo.tests import tagged
 from .industry_case import IndustryCase
 
 _logger = logging.getLogger(__name__)
@@ -11,15 +11,13 @@ _logger = logging.getLogger(__name__)
 @tagged('post_install', '-at_install')
 class IndustryMailBehaviorTestCase(IndustryCase):
     def test_user_notification_type(self):
-        db_name = get_db_name()
-        if db_name.endswith('imported_no_demo'):
+        if not self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1):
             return
         for user in self.env['res.users'].search([('group_ids', 'in', [self.env.ref('base.group_user').id, self.env.ref('base.group_system').id]), ('notification_type', '!=', 'inbox')]):
             _logger.warning("Notification type should remain 'inbox' for all users, not the case for %s (%d).", user.name, user.id)
 
     def test_mail_generated(self):
-        db_name = get_db_name()
-        if db_name.endswith('imported_with_demo'):
+        if self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1):
             return
 
         mails = self.env['mail.mail'].search([('model', '!=', False), ('model', '!=', 'hr.expense')])
