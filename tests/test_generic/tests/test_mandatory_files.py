@@ -8,7 +8,7 @@ from pathlib import Path
 import re
 
 from odoo import release
-from odoo.tests import get_db_name, tagged
+from odoo.tests import tagged
 from odoo.tools.translate import trans_export
 
 from .industry_case import IndustryCase, get_industry_path
@@ -43,8 +43,7 @@ class FileTest(IndustryCase):
                 # skip test if master
                 continue
 
-            db_name = get_db_name()
-            if db_name.endswith('imported_no_demo'):
+            if not self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1):
                 return
             with io.BytesIO() as buf:
                 trans_export(False, [module], buf, 'po', self.env)
