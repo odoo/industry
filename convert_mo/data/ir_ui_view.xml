@@ -12,8 +12,6 @@
             </xpath>
         </field>
     </record>
-
-
     <record id="action_convert_product_wizard" model="ir.actions.act_window">
         <field name="name">Convert Product</field>
         <field name="res_model">x_convert_product_wizard</field>
@@ -27,16 +25,12 @@
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <xpath expr="//list/field[@name='forecast_availability']" position="after">
-                <field name="x_first_quant_id" column_invisible="1"/>
-                <field name="x_first_quant_quantity" column_invisible="1"/>
                 <button name="%(action_convert_product_wizard)d"
                     string="convert"
                     type="action"
                     invisible="not x_show_convert_visible"
                     context="{
                         'default_x_product_id': product_id,
-                        'default_x_quant_id': x_first_quant_id,
-                        'default_x_quantity': x_first_quant_quantity,
                         'default_x_move_id': id,
                         'default_x_keep_lot_sn': True,
                     }"
@@ -44,7 +38,6 @@
             </xpath>
         </field>
     </record>
-
     <record id="view_product_search_convert" model="ir.ui.view">
         <field name="name">product.product.search.convert</field>
         <field name="model">product.product</field>
@@ -68,7 +61,6 @@
             </list>
         </field>
     </record>
-
     <record id="view_convert_product_wizard_form" model="ir.ui.view">
         <field name="name">convert.product.wizard.form</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
@@ -79,14 +71,14 @@
                     <field name="x_move_id" invisible="True"/>
                     <field name="x_product_id" string="Product to Convert" readonly="x_product_id" required="True"/>
                     <field name="x_quant_id" string="Pick From"
-                        domain="[('id', 'in', x_allowed_quant_id)]"
-                        options="{'no_create': True}"
+                        domain="[('product_id', '=', x_product_id), ('location_id', 'child_of', x_move_location_id)]"
+                        options="{'no_create': True, 'no_open': True}"
                         readonly="not x_move_id"
                         required="True"
                         context="{
                             'default_location_id': x_move_id.location_id,
                             'default_product_id': x_move_id.product_id,
-                            'search_view_ref': 'stock.view_stock_quant_search',
+                            'search_view_ref': 'stock.quant_search_view',
                             'list_view_ref': 'stock.view_stock_quant_tree',
                             'form_view_ref': 'stock.view_stock_quant_form',
                             'readonly_form': True,
@@ -94,12 +86,10 @@
                         }"/>
                     <field name="x_quantity" string="Quantity"/>
                 </group>
-
                 <group>
                     <field name="x_keep_lot_sn" string="Keep Lot/SN" invisible="x_source_tracking not in ('serial', 'lot')"/>
-                    <field name="x_new_lot_sn" string="New Lot/SN" invisible="x_keep_lot_sn"/>
+                    <field name="x_new_lot_sn" string="New Lot/SN" invisible="x_keep_lot_sn" placeholder="No Lot/SN, product traced by quantity."/>
                 </group>
-
                 <group>
                     <field name="x_product_convert_into" string="Convert into"
                         required="True"
@@ -113,7 +103,6 @@
                         }"
                     />
                 </group>
-
                 <footer>
                     <button string="Convert" class="btn-primary" type="action" name="%(action_convert_generate_mo)d"/>
                     <button string="Discard" special="cancel"/>
@@ -121,11 +110,6 @@
             </form>
         </field>
     </record>
-
-
-    <!-- part 3 product conversion from stock quants -->
-
-    <!-- add convert button at header -->
     <record id="view_stock_quant_tree_inventory_editable_convert" model="ir.ui.view">
         <field name="name">stock.quant.inventory.list.editable.convert</field>
         <field name="model">stock.quant</field>

@@ -17,6 +17,6 @@
     'demo': [
         'demo/res_users.xml',
     ],
-    'license': 'LGPL-3',
+    'license': 'OEEL-1',
     'author': 'Odoo S.A.',
 }

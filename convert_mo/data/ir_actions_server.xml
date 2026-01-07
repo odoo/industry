@@ -11,8 +11,6 @@ move = wizard.x_move_id
 if wizard.x_quantity <= 0 or wizard.x_quantity > wizard.x_quant_id.quantity:
     raise UserError(f"Quantity to convert must be positive and less than or equal to available quantity(available quantity is {wizard.x_quant_id.quantity}).")
 
-
-# Create MO
 mo = env['mrp.production'].create({
     'product_id': wizard.x_product_convert_into.id,
     'product_qty': wizard.x_quantity,
@@ -22,7 +20,6 @@ mo = env['mrp.production'].create({
     'origin': move.reference or move.picking_id.name if move else wizard.x_quant_id.display_name,
     'user_id': env.user.id,
 })
-
 move_raw = env['stock.move'].create({
     'product_id': wizard.x_product_id.id,
     'product_uom_qty': wizard.x_quantity,
@@ -78,7 +75,6 @@ else:
     )
         ]]></field>
     </record>
-
     <record id="action_stock_quant_convert_product" model="ir.actions.server">
         <field name="name">Convert Product From Stock Quants</field>
         <field name="model_id" ref="stock.model_stock_quant"/>
@@ -94,8 +90,6 @@ action['context'] = {
     'default_x_quantity': quant.quantity,
     'default_x_keep_lot_sn': True,
 }
-action
         ]]></field>
     </record>
-
 </odoo>
