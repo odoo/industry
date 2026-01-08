@@ -24,7 +24,6 @@
         'data/sale_temporal_recurrence.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
-        'data/resource_calendar_data.xml',
         'data/ir_ui_view.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_ui_menu.xml',
