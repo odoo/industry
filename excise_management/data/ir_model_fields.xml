@@ -168,66 +168,6 @@ for template in self:
         <field name="related">tax_group_id.x_is_excise</field>
         <field name="readonly" eval="True"/>
     </record>
-    <record id="stock_move_fiscal_deposit_move" model="ir.model.fields">
-      <field name="ttype">selection</field>
-      <field name="depends">location_id,location_dest_id</field>
-      <field name="field_description">Fiscal deposit move</field>
-      <field name="model_id" ref="stock.model_stock_move"/>
-      <field name="name">x_fiscal_deposit_move</field>
-      <field name="readonly" eval="True"/>
-    </record>
-    <record id="stock_move_fiscal_deposit_move_selection_none" model="ir.model.fields.selection">
-        <field name="name">None</field>
-        <field name="field_id" ref="stock_move_fiscal_deposit_move" />
-        <field name="value">none</field>
-    </record>
-    <record id="stock_move_fiscal_deposit_move_selection_entry" model="ir.model.fields.selection">
-        <field name="name">Entry</field>
-        <field name="field_id" ref="stock_move_fiscal_deposit_move" />
-        <field name="value">entry</field>
-    </record>
-    <record id="stock_move_fiscal_deposit_move_selection_entry_fd" model="ir.model.fields.selection">
-        <field name="name">Entry from FD</field>
-        <field name="field_id" ref="stock_move_fiscal_deposit_move" />
-        <field name="value">entry fd</field>
-    </record>
-    <record id="stock_move_fiscal_deposit_move_selection_entry_exit" model="ir.model.fields.selection">
-        <field name="name">Exit</field>
-        <field name="field_id" ref="stock_move_fiscal_deposit_move" />
-        <field name="value">exit</field>
-    </record>
-    <record id="stock_move_fiscal_deposit_move_selection_exit_fd" model="ir.model.fields.selection">
-        <field name="name">Exit to FD</field>
-        <field name="field_id" ref="stock_move_fiscal_deposit_move" />
-        <field name="value">exit fd</field>
-    </record>
-    <record id="stock_move_fiscal_deposit_move_selection_transfer" model="ir.model.fields.selection">
-        <field name="name">Transfer</field>
-        <field name="field_id" ref="stock_move_fiscal_deposit_move" />
-        <field name="value">transfer</field>
-    </record>
-    <record id="stock_move_fiscal_deposit_move" model="ir.model.fields">
-        <field name="compute"><![CDATA[for record in self:
-    record['x_fiscal_deposit_move'] = "none"
-    if record.location_id.usage == 'internal' and record.location_dest_id.usage == 'internal':
-        if record.location_id.warehouse_id.x_is_fiscal_deposit and record.location_dest_id.warehouse_id.x_is_fiscal_deposit:
-            record['x_fiscal_deposit_move'] = "transfer"
-        elif record.location_id.warehouse_id.x_is_fiscal_deposit:
-            record['x_fiscal_deposit_move'] = "exit"
-        elif record.location_dest_id.warehouse_id.x_is_fiscal_deposit:
-            record['x_fiscal_deposit_move'] = "entry"
-    elif record.location_id.warehouse_id.x_is_fiscal_deposit:
-        if record.picking_id.partner_id.property_account_position_id.x_is_fiscal_deposit:
-            record['x_fiscal_deposit_move'] = "exit fd"
-        else:
-            record['x_fiscal_deposit_move'] = "exit"
-    elif record.location_dest_id.warehouse_id.x_is_fiscal_deposit:
-        if record.picking_id.partner_id.property_account_position_id.x_is_fiscal_deposit:
-            record['x_fiscal_deposit_move'] = "entry fd"
-        else:
-            record['x_fiscal_deposit_move'] = "entry"
-        ]]></field>
-    </record>
     <record id="stock_move_currency" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="field_description">Currency</field>
@@ -238,16 +178,11 @@ for template in self:
         <field name="readonly" eval="True"/>
     </record>
     <record id="stock_move_excise_amount" model="ir.model.fields">
-      <field name="compute"><![CDATA[for record in self:
-    amount = record.quantity * record.product_id.x_excise_amount
-    record['x_excise_amount'] = 0
-    if record.x_fiscal_deposit_move == "exit":
-        record['x_excise_amount'] = -amount
-    elif record.x_fiscal_deposit_move == "entry":
-        record['x_excise_amount'] = amount
+      <field name="compute"><![CDATA[
+for record in self: record['x_excise_amount'] = record.quantity * record.product_id.x_excise_amount
     ]]></field>
       <field name="ttype">monetary</field>
-      <field name="depends">quantity, product_id, x_fiscal_deposit_move</field>
+      <field name="depends">quantity, product_id</field>
       <field name="field_description">Excise Amount</field>
       <field name="model_id" ref="stock.model_stock_move"/>
       <field name="name">x_excise_amount</field>
@@ -264,15 +199,11 @@ for template in self:
       <field name="relation">x_excise_category</field>
     </record>
     <record id="stock_move_excise_quantity" model="ir.model.fields">
-      <field name="compute"><![CDATA[for record in self:
-    record['x_excise_quantity'] = 0
-    if record.x_fiscal_deposit_move and 'exit' in record.x_fiscal_deposit_move:
-        record['x_excise_quantity'] = -1 * record.quantity * record.product_id.x_excise_quantity
-    elif record.x_fiscal_deposit_move and 'entry' in record.x_fiscal_deposit_move:
-        record['x_excise_quantity'] = +1 * record.quantity * record.product_id.x_excise_quantity
+      <field name="compute"><![CDATA[
+for record in self: record['x_excise_quantity'] = record.quantity * record.product_id.x_excise_quantity
 ]]></field>
       <field name="ttype">float</field>
-      <field name="depends">quantity, product_id, x_fiscal_deposit_move</field>
+      <field name="depends">quantity, product_id</field>
       <field name="field_description">Excise Quantity</field>
       <field name="model_id" ref="stock.model_stock_move"/>
       <field name="name">x_excise_quantity</field>
@@ -280,15 +211,10 @@ for template in self:
     </record>
     <record id="stock_move_excise_packaging_units" model="ir.model.fields">
         <field name="compute"><![CDATA[
-for record in self:
-    record['x_packaging_units'] = 0
-    if record.x_fiscal_deposit_move and 'exit' in record.x_fiscal_deposit_move:
-        record['x_packaging_units'] = -1 * record.quantity * record.product_id.x_packaging_units
-    elif record.x_fiscal_deposit_move and 'entry' in record.x_fiscal_deposit_move:
-        record['x_packaging_units'] = +1 * record.quantity * record.product_id.x_packaging_units
+for record in self: record['x_packaging_units'] = record.quantity * record.product_id.x_packaging_units
         ]]></field>
         <field name="ttype">integer</field>
-        <field name="depends">quantity, product_id, x_fiscal_deposit_move</field>
+        <field name="depends">quantity, product_id</field>
         <field name="field_description">Packaging Units</field>
         <field name="model_id" ref="stock.model_stock_move"/>
         <field name="name">x_packaging_units</field>
@@ -653,5 +579,54 @@ for record in self:
         <field name="model_id" ref="base.model_res_config_settings"/>
         <field name="relation">res.users</field>
         <field name="related">company_id.x_reporter_id</field>
+    </record>
+    <record id="stock_warehouse_excise_license" model="ir.model.fields">
+        <field name="name">x_excise_license_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Excise License</field>
+        <field name="model_id" ref="stock.model_stock_warehouse"/>
+        <field name="relation">x_excise_license</field>
+    </record>
+    <record id="excise_license_name" model="ir.model.fields">
+        <field name="name">x_name</field>
+        <field name="ttype">char</field>
+        <field name="field_description">Name</field>
+        <field name="model_id" ref="excise_license"/>
+    </record>
+    <record id="excise_license_warehouse_ids" model="ir.model.fields">
+        <field name="name">x_warehouse_ids</field>
+        <field name="ttype">one2many</field>
+        <field name="field_description">Warehouses</field>
+        <field name="model_id" ref="excise_license"/>
+        <field name="relation">stock.warehouse</field>
+        <field name="relation_field">x_excise_license_id</field>
+    </record>
+    <record id="excise_license_active" model="ir.model.fields">
+        <field name="name">x_active</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">Active</field>
+        <field name="model_id" ref="excise_license"/>
+    </record>
+    <record id="excise_license_id_excise_report" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">Excise License</field>
+        <field name="model_id" ref="excise_report"/>
+        <field name="name">x_excise_license_id</field>
+        <field name="relation">x_excise_license</field>
+        <field name="on_delete">restrict</field>
+    </record>
+    <record id="stock_move_color" model="ir.model.fields">
+        <field name="name">x_color</field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Color</field>
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="compute"><![CDATA[
+active_license_id = self.env.context.get('license_id')
+for record in self:
+    src = record.location_id.warehouse_id.x_excise_license_id.id == active_license_id
+    dst = record.location_dest_id.warehouse_id.x_excise_license_id.id == active_license_id
+    record['x_color'] = 1 if src and not dst else 2 if dst and not src else 0
+            ]]></field>
+        <field name="store" eval="False"/>
     </record>
 </odoo>

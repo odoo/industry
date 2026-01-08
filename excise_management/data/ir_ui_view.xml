@@ -49,24 +49,6 @@
             </xpath>
         </field>
     </record>
-    <record id="stock_move_view_pivot" model="ir.ui.view">
-        <field name="name">stock.move.view.pivot.excise</field>
-        <field name="model">stock.move</field>
-        <field name="priority">99</field>
-        <field name="type">pivot</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <pivot string="Excises Analysis">
-                <field name="packaging_uom_qty" invisible="1"/>
-                <field name="x_excise_quantity" type="measure" options="{'digits':[8,4]}"/>
-                <field name="x_packaging_units" type="measure"/>
-                <field name="x_excise_category" type="col"/>
-                <field name="x_excise_unit" type="col"/>
-                <field name="date" type="row"/>
-                <field name="x_fiscal_deposit_move" type="row"/>
-            </pivot>
-        </field>
-    </record>
     <record id="stock_move_view_search" model="ir.ui.view">
         <field name="name">stock.move.view.search.inherit.excise</field>
         <field name="inherit_id" ref="stock.view_move_search"/>
@@ -91,6 +73,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='resupply_wh_ids']" position="after">
                 <field name="x_is_fiscal_deposit"/>
+                <field name="x_excise_license_id" invisible="not x_is_fiscal_deposit" options="{'no_open':true,'no_create_edit':true}"/>
             </xpath>
         </field>
     </record>
@@ -115,20 +98,20 @@
         <field name="type">list</field>
         <field name="arch" type="xml">
             <list default_order="date, picking_id, sequence" string="Moves" create="0">
+                <field name="x_color" column_invisible="True"/>
                 <field name="date_deadline" optional="hide"/>
                 <field name="date" optional="show"/>
                 <field name="picking_id" optional="show" widget="many2one"/>
-                <field name="x_fiscal_deposit_move" optional="show"/>
                 <field name="product_id" optional="show"/>
                 <field name="product_uom" optional="show" groups="uom.group_uom" widget="many2one_uom"/>
                 <field name="product_uom_qty" optional="show"/>
                 <field name="x_excise_category" optional="show"/>
-                <field name="x_excise_amount" optional="show"/>
+                <field name="x_excise_amount" optional="show" decoration-danger="(x_color == 1 or (location_usage in ('internal','transit')) and (location_dest_usage not in ('internal','transit')))" decoration-success="(x_color == 2 or (location_usage not in ('internal','transit')) and (location_dest_usage in ('internal','transit')))"/>
                 <field name="x_currency_id" column_invisible="True"/>
-                <field name="x_excise_quantity" optional="show" options="{'digits':[8,6]}"/>
+                <field name="x_excise_quantity" optional="show" options="{'digits':[8,6]}" decoration-danger="(x_color == 1 or (location_usage in ('internal','transit')) and (location_dest_usage not in ('internal','transit')))" decoration-success="(x_color == 2 or (location_usage not in ('internal','transit')) and (location_dest_usage in ('internal','transit')))"/>
                 <field name="x_excise_unit" optional="show"/>
-                <field name="x_packaging_units" optional="show" invisible="not x_packaging_units" width="130px"/>
-                <field name="x_packaging_amount" optional="show" invisible="not x_packaging_amount" width="130px"/>
+                <field name="x_packaging_units" optional="show" invisible="not x_packaging_units" width="130px" decoration-danger="(x_color == 1 or (location_usage in ('internal','transit')) and (location_dest_usage not in ('internal','transit')))" decoration-success="(x_color == 2 or (location_usage not in ('internal','transit')) and (location_dest_usage in ('internal','transit')))"/>
+                <field name="x_packaging_amount" optional="show" invisible="not x_packaging_amount" width="130px" decoration-danger="(x_color == 1 or (location_usage in ('internal','transit')) and (location_dest_usage not in ('internal','transit')))" decoration-success="(x_color == 2 or (location_usage not in ('internal','transit')) and (location_dest_usage in ('internal','transit')))"/>
             </list>
         </field>
     </record>
@@ -207,7 +190,6 @@
                         <list create="0" edit="0" delete="0" editable="bottom">
                             <field name="x_currency_id" column_invisible="1"/>
                             <field name="x_excise_category"/>
-                            <field name="x_fiscal_deposit_move" invisible="not x_excise_category"/>
                             <field name="x_excise_quantity" options="{'digits':[8,4]}" invisible="not x_excise_category"/>
                             <field name="x_excise_unit" invisible="not x_excise_category"/>
                             <field name="x_excise_amount" invisible="not x_excise_category"/>
@@ -220,12 +202,12 @@
         </field>
     </record>
     <record id="list_view_x_excise_report" model="ir.ui.view">
-        <field name="name">Excise Report</field>
+        <field name="name">Excise Reports</field>
         <field name="model">x_excise_report</field>
         <field name="active" eval="True"/>
         <field name="type">list</field>
         <field name="arch" type="xml">
-            <list name="excise_report">
+            <list name="excise_report" edit="0" default_group_by="x_excise_license_id" default_order="x_from_date desc" expand="1">
                 <field name="x_name" />
                 <field name="x_from_date" optional="show" widget="daterange" options="{'end_date_field': 'x_to_date','numeric': true, 'always_range': true}"/>
                 <field name="x_external_id" />
@@ -254,7 +236,8 @@
                     </div>
                     <group>
                         <group>
-                            <field name="x_from_date" widget="daterange" options="{'end_date_field': 'x_to_date', 'numeric': true, 'always_range':true}" string="Period" default_focus="true" readonly="x_state == 'done'"/>
+                            <field name="x_excise_license_id" default_focus="true" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
+                            <field name="x_from_date" widget="daterange" options="{'end_date_field': 'x_to_date', 'numeric': true, 'always_range':true}" string="Period" readonly="x_state == 'done'"/>
                         </group>
                         <group>
                             <field name="x_external_id"/>
@@ -269,11 +252,12 @@
                                     <field name="x_currency_id" column_invisible="1"/>
                                     <field name="x_excise_category_id"/>
                                     <field name="x_excise_move_type"/>
-                                    <field name="x_excise_quantity" options="{'digits':[8,4]}"/>
+                                    <field name="x_excise_quantity" options="{'digits':[8,4]}" decoration-danger="(x_excise_move_type in ('exit', 'exit fd'))" decoration-success="(x_excise_move_type in ('entry', 'entry fd'))" decoration-info="x_excise_move_type == 'transfer'" decoration-muted="x_excise_move_type == 'none'"/>
                                     <field name="x_excise_unit"/>
-                                    <field name="x_excise_amount"/>
-                                    <field name="x_excise_packaging_units" invisible="not x_excise_packaging_units" width="130px"/>
-                                    <field name="x_excise_packaging_amount" invisible="not x_excise_packaging_amount" width="130px"/>
+                                    <field name="x_excise_amount" decoration-danger="(x_excise_move_type in ('exit', 'exit fd'))" decoration-success="(x_excise_move_type in ('entry', 'entry fd'))" decoration-info="x_excise_move_type == 'transfer'" decoration-muted="x_excise_move_type == 'none'"/>
+                                    <field name="x_excise_packaging_units" invisible="not x_excise_packaging_units" width="130px" decoration-danger="(x_excise_move_type in ('exit', 'exit fd'))" decoration-success="(x_excise_move_type in ('entry', 'entry fd'))" decoration-info="x_excise_move_type == 'transfer'" decoration-muted="x_excise_move_type == 'none'"/>
+                                    <field name="x_excise_packaging_amount" invisible="not x_excise_packaging_amount" width="130px" decoration-danger="(x_excise_move_type in ('exit', 'exit fd'))" decoration-success="(x_excise_move_type in ('entry', 'entry fd'))" decoration-info="x_excise_move_type == 'transfer'" decoration-muted="x_excise_move_type == 'none'"/>
+                                    <button name="%(action_excise_report_line_stock_moves)d" type="action" string="Moves"/>
                                 </list>
                             </field>
                         </page>
@@ -316,6 +300,18 @@
                     </setting>
                 </block>
             </xpath>
+        </field>
+    </record>
+    <record id="list_view_x_excise_license" model="ir.ui.view">
+        <field name="name">Excise Licenses</field>
+        <field name="model">x_excise_license</field>
+        <field name="active" eval="True"/>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <list name="excise_license" editable="bottom">
+                <field name="x_name"/>
+                <field name="x_warehouse_ids" widget="many2many_tags" domain="[('x_is_fiscal_deposit','=',True)]"/>
+            </list>
         </field>
     </record>
 </odoo>
