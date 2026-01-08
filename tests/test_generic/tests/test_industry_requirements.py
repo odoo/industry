@@ -25,10 +25,11 @@ class TestEnv(IndustryCase):
         if any(m in self.installed_modules for m in no_online_payment_industries):
             # we don't pay the cart in this industry, we get a quote or fill a form
             return
-        if self.env['ir.module.module']._get('website_sale').state == 'installed':
+        all_dependencies = self.env["ir.module.module.dependency"].all_dependencies(self.installed_industries)
+        if any('website_payment' in deps for deps in all_dependencies.values()):
             self.assertTrue(
                 self.env['ir.module.module']._get('payment_demo').state == 'installed',
-                "Payment Demo module should be installed in demo when Website Sale is installed. "
+                "Payment Demo module should be installed in demo when Website Payment is installed. "
                 "Call 'button_immediate_install' on 'base.module_payment_demo' in demo."
             )
 
