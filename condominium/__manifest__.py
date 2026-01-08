@@ -27,6 +27,7 @@
         'data/base_automation.xml',
         'data/account_analytic_plan.xml',
         'data/ir_filters.xml',
+        'data/meter_view.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_ui_view.xml',
         'data/qweb_view.xml',
