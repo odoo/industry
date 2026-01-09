@@ -27,12 +27,15 @@ for record in records:
 ]]></field>
     </record>
     <record model="ir.actions.server" id="action_x_remark_write_project_stage_on_create_or_write">
-        <field name="name">Write Task Stage</field>
+        <field name="name">Construction - Remarks: Write Stages on Create or Write</field>
         <field name="model_id" ref="project.model_project_task"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[ 
 for record in records: 
-    if record.x_is_remark: record['stage_id'] = record.x_stage_id
+    if record.x_is_remark:
+        record['stage_id'] = record.x_stage_id
+        available_stages = record.project_id.type_ids.filtered(lambda s: s.x_is_remark_stage) 
+        if not record.x_stage_id and available_stages: record['x_stage_id'] = available_stages[0]
 ]]></field>
     </record>
     <!-- 
@@ -46,8 +49,7 @@ for record in records:
         <field name="code"><![CDATA[
 action = env['ir.actions.act_window']._for_xml_id('construction_remarks.window_action_project_x_remark_list_view')  # Otherwise Remarks embedded becomes the same as the Tasks button 
 ctx = env.context.copy()
-ctx.update({'kanban_view_ref': 'construction_remarks.view_x_remark_kanban', 'list_view_ref': 'construction_remarks.view_x_remark_list', 'form_view_ref': 'construction_remarks.view_x_remark_form', 'search_default_open_remarks': 1, 
-            'default_project_id': record.id if record else env.context.get('active_id'), 'default_x_is_remark': True, 'default_x_stage_id': env.ref('construction_remarks.project_remark_type_1').id,
+ctx.update({'search_default_open_remarks': 1, 'default_project_id': record.id if record else env.context.get('active_id'), 'default_x_is_remark': True, 'default_x_is_remark_stage': 1,
             'active_id': record.id if record else env.context.get('active_id'),                                              # Otherwise no topbar
             'active_model': 'project.project', 'parent_action_id': 442,                                                      # Otherwise setting error
             'current_embedded_action_id': env.ref('construction_remarks.construction_remarks_embedded_action_x_remark').id,  # Otherwise button not selected
@@ -55,7 +57,7 @@ ctx.update({'kanban_view_ref': 'construction_remarks.view_x_remark_kanban', 'lis
 action.update({'context': ctx, 'res_model': 'project.task', 'domain': [('x_is_remark', '=', True), ('project_id', '=', ctx.get('active_id'))]})
 ]]></field>
     </record>
-    <!-- gemini test -->
+    <!-- window action to reference in server action to get a proper context -->
     <record model="ir.actions.act_window" id="window_action_project_x_remark_list_view">
     <field name="name">Remarks</field>
     <field name="res_model">project.task</field>
