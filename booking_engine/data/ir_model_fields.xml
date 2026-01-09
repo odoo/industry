@@ -84,7 +84,7 @@
     <field name="field_description">Is Stay Offer</field>
     <field name="model_id" ref="product.model_product_template"/>
     <field name="name">x_is_a_room_offer</field>
-    </record>
+  </record>
   <record id="product_model_product_template_x_is_stay_tax_field" model="ir.model.fields">
     <field name="ttype">boolean</field>
     <field name="copied" eval="True"/>
@@ -381,4 +381,214 @@ for record in self: record['x_guests_count'] = self.env['x_guests_line'].search_
     <field name="readonly" eval="True"/>
     <field name="name">x_guests_count</field>
   </record>
+
+  <!-- House Keeping -->
+    <!-- Planning.role fields -->
+    <record id="_x_has_stayover_cleaning_field_planning_role" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Stayover Cleaning</field>
+        <field name="model_id" ref="planning.model_planning_role"/>
+        <field name="name">x_has_stayover_cleaning</field>
+        <field name="help">When set, on a daily basis, stay-over house keeping tasks are created for resources in stay-over occupancy.</field>
+    </record>
+    <record id="x_has_checkout_cleaning_field_planning_role" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Checkout Cleaning</field>
+        <field name="model_id" ref="planning.model_planning_role"/>
+        <field name="name">x_has_checkout_cleaning</field>
+        <field name="help">When set, on a daily basis, check-out house keeping tasks are created for resources in due out occupancy.</field>
+    </record>
+
+    <!-- Product.product fields -->
+    <record id="_x_has_stayover_cleaning_field_product_template" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Stayover Cleaning</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="related">planning_role_id.x_has_stayover_cleaning</field>
+        <field name="store" eval="False"/>
+        <field name="name">x_related_has_stayover_cleaning</field>
+        <field name="help">When set, on a daily basis, stay-over house keeping tasks are created for resources in stay-over occupancy.</field>
+    </record>
+    <record id="x_has_checkout_cleaning_field_product_template" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Checkout Cleaning</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="related">planning_role_id.x_has_checkout_cleaning</field>
+        <field name="store" eval="False"/>
+        <field name="name">x_related_has_checkout_cleaning</field>
+        <field name="help">When set, on a daily basis, check-out house keeping tasks are created for resources in due out occupancy.</field>
+    </record>
+
+    <!-- Project.project fields -->
+    <record id="x_is_house_keeping_project_field_project_project" model="ir.model.fields">
+        <field name="name">x_is_house_keeping_project</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">House Keeping Project</field>
+        <field name="help"><![CDATA[When set, the tasks from this project are used for house keeping management in the accommodation app.]]></field>
+        <field name="readonly" eval="True"/>
+        <field name="model_id" ref="project.model_project_project" />
+    </record>
+
+    <!-- project.task fields -->
+    <record id="x_resource_id_field_resource_resource" model="ir.model.fields">
+        <field name="name">x_resource_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Resource</field>
+        <field name="model_id" ref="project.model_project_task" />
+        <field name="relation">resource.resource</field>
+    </record>
+    <record id="x_employee_id_field_project_task" model="ir.model.fields">
+        <field name="name">x_employee_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Employee</field>
+        <field name="model_id" ref="project.model_project_task" />
+        <field name="relation">hr.employee</field>
+    </record>
+    <record id="x_cleaning_field_project_task" model="ir.model.fields">
+        <field name="name">x_cleaning</field>
+        <field name="ttype">selection</field>
+        <field name="field_description">Cleaning</field>
+        <field name="model_id" ref="project.model_project_task" />
+    </record>
+    <record id="x_cleaning_field_selection_stayover" model="ir.model.fields.selection">
+        <field name="name">Stayover</field>
+        <field name="field_id" ref="x_cleaning_field_project_task" />
+        <field name="value">stayover</field>
+    </record>
+    <record id="x_cleaning_field_selection_checkout" model="ir.model.fields.selection">
+        <field name="name">Checkout</field>
+        <field name="field_id" ref="x_cleaning_field_project_task" />
+        <field name="value">checkout</field>
+    </record>
+
+    <!-- resource.resource fields -->
+    <record id="x_occupancy_field_resource_resource" model="ir.model.fields">
+        <field name="name">x_occupancy</field>
+        <field name="ttype">selection</field>
+        <field name="field_description">Occupancy</field>
+        <field name="model_id" ref="resource.model_resource_resource" />
+    </record>
+    <record id="x_occupancy_field_selection_vacant" model="ir.model.fields.selection">
+        <field name="name">Vacant</field>
+        <field name="field_id" ref="x_occupancy_field_resource_resource" />
+        <field name="value">vacant</field>
+    </record>
+    <record id="x_occupancy_field_selection_occupied" model="ir.model.fields.selection">
+        <field name="name">Occupied</field>
+        <field name="field_id" ref="x_occupancy_field_resource_resource" />
+        <field name="value">occupied</field>
+    </record>
+    <record id="x_occupancy_field_selection_stayover" model="ir.model.fields.selection">
+        <field name="name">Stayover</field>
+        <field name="field_id" ref="x_occupancy_field_resource_resource" />
+        <field name="value">stayover</field>
+    </record>
+    <record id="x_occupancy_field_selection_due_out" model="ir.model.fields.selection">
+        <field name="name">Due Out</field>
+        <field name="field_id" ref="x_occupancy_field_resource_resource" />
+        <field name="value">due_out</field>
+    </record>
+
+    <record id="x_task_ids_field_project_task" model="ir.model.fields">
+        <field name="name">x_task_ids</field>
+        <field name="ttype">one2many</field>
+        <field name="field_description">Tasks</field>
+        <field name="model_id" ref="resource.model_resource_resource" />
+        <field name="relation">project.task</field>
+        <field name="relation_field">x_resource_id</field>
+    </record>
+    <record id="x_ongoing_task_id_field_resource_resource" model="ir.model.fields">
+        <field name="name">x_ongoing_task_id</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_ongoing_task_id'] = False
+    for task in record.x_task_ids:
+        if not task.is_closed : record['x_ongoing_task_id'] = task.id
+]]></field>
+        <field name="ttype">many2one</field>
+        <field name="depends">x_task_ids, x_task_ids.stage_id</field>
+        <field name="field_description">Ongoing Task</field>
+        <field name="model_id" ref="resource.model_resource_resource" />
+        <field name="readonly" eval="True" />
+        <field name="relation">project.task</field>
+    </record>
+    <record id="x_house_keeping_stage_id_field_resource_resource" model="ir.model.fields">
+        <field name="name">x_house_keeping_stage_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">House Keeping Stage</field>
+        <field name="model_id" ref="resource.model_resource_resource" />
+        <field name="relation">project.task.type</field>
+        <field name="related">x_ongoing_task_id.stage_id</field>
+    </record>
+    <record id="x_is_in_stage_clean_field_resource_resource" model="ir.model.fields">
+        <field name="name">x_is_in_stage_clean</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">Is In House Keeping Stage Clean</field>
+        <field name="model_id" ref="resource.model_resource_resource" />
+        <field name="depends">x_house_keeping_stage_id</field>
+        <field name="compute"><![CDATA[
+for record in self: record['x_is_in_stage_clean'] = record.x_house_keeping_stage_id and record.x_house_keeping_stage_id == record.env.ref('booking_engine.project_task_type_17', raise_if_not_found=False)
+]]></field>
+    </record>
+    <record id="x_resource_employee_id_field_resource_resource" model="ir.model.fields">
+        <field name="name">x_resource_employee_id</field>
+        <field name="ttype">many2one</field>
+        <field name="related">x_ongoing_task_id.x_employee_id</field>
+        <field name="field_description">Task Employee</field>
+        <field name="model_id" ref="resource.model_resource_resource" />
+        <field name="readonly" eval="True" />
+        <field name="relation">hr.employee</field>
+        <field name="store" eval="False" />
+    </record>
+
+    <record id="x_task_occupancy_field_project_task" model="ir.model.fields">
+        <field name="name">x_task_occupancy</field>
+        <field name="ttype">selection</field>
+        <field name="related">x_resource_id.x_occupancy</field>
+        <field name="field_description">Occupancy</field>
+        <field name="model_id" ref="project.model_project_task" />
+        <field name="readonly" eval="True" />
+        <field name="store" eval="False" />
+    </record>
+
+    <!-- Colors for fields -->
+    <record id="x_cleaning_color_field_project_task" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="field_description">Cleaning Color</field>
+        <field name="model_id" ref="project.model_project_task" />
+        <field name="name">x_cleaning_color</field>
+        <field name="store" eval="False"/>
+        <field name="depends">x_cleaning</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_cleaning_color'] = 1 if record.x_cleaning == 'checkout' else 3        
+]]></field>
+    </record>
+    <record id="x_occupancy_color_field_resource_resource" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="field_description">Occupancy Color</field>
+        <field name="model_id" ref="resource.model_resource_resource" />
+        <field name="name">x_occupancy_color</field>
+        <field name="depends">x_occupancy</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_occupancy_color'] = 13 if record.x_occupancy == 'vacant' else 3
+]]></field>
+    </record>
+    <record id="x_task_stage_color_field_project_task" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="field_description">Task Stage Color</field>
+        <field name="model_id" ref="resource.model_resource_resource" />
+        <field name="name">x_task_stage_color</field>
+        <field name="store" eval="False"/>
+        <field name="related">x_house_keeping_stage_id.color</field>
+    </record>
+    <record id="x_task_occupancy_color_field_project_task" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="field_description">Occupancy Color</field>
+        <field name="model_id" ref="project.model_project_task" />
+        <field name="name">x_task_occupancy_color</field>
+        <field name="store" eval="False"/>
+        <field name="related">x_resource_id.x_occupancy_color</field>
+    </record>
 </odoo>
