@@ -78,7 +78,7 @@ for record in records:
     if record['x_status_bar'] == 'done':
         record['website_published'] = False
     if record['website_published'] and record['x_status_bar'] == 'draft':
-        raise UserError("You cannot publish a Draft Job Position. Please set status to Open before publishing.")
+        raise UserError("You cannot publish a Draft Job Position.")
     if record['x_status_bar'] == 'draft' and record.all_application_count > 0:
         raise UserError("You cannot set this job position back to Draft because applications already exist.")]]></field>
     </record>
@@ -133,11 +133,13 @@ if env.context.get('x_from_cv_send'):
     attachments = applicant.x_is_shared_cv
     for attachment in attachments:
         attachment.write({'public': True})
+    availability_date = applicant.availability or sent_date
     env['x_cv_sent_application'].create({
         'x_applicant_id': applicant.id,
         'x_job_id': applicant.job_id.id,
         'x_cv': [(6, 0, record.attachment_ids.ids)],
-        'x_availability': applicant.availability,
+        'x_available': applicant.x_available,
+        'x_availability': availability_date,
         'x_cv_sent_date': sent_date,
         'x_is_published': True,
         })
@@ -261,6 +263,7 @@ action = {
     'context': {
         'default_x_job_id': record.id,
         'default_partner_id': record.x_customer.id if record.x_customer else False,
+        'default_opportunity_id': record.x_opportunity.id if record.x_opportunity else False,
     }
 }]]></field>
     </record>

@@ -16,7 +16,7 @@
                     <field name="x_available" optional="hide" />
                 </xpath>
                 <xpath expr="//list" position="inside">
-                    <button name="%(ir_actions_server_for_email_pop_up)d" string="Send CV" type="action" class="btn btn-outline-primary btn-sm" invisible="x_is_cv_sent"/>
+                    <button name="%(ir_actions_server_for_email_pop_up)d" string="Send CV" type="action" class="btn btn-outline-primary btn-sm" invisible="x_is_cv_sent or not x_is_shared_cv"/>
                     <button string="CV Sent" class="btn btn-outline-success btn-sm" invisible="not x_is_cv_sent"/>
                 </xpath>
             </data>
@@ -106,6 +106,9 @@
                 <xpath expr="//filter[@name='applicants']" position="after">
                     <filter string="Job Positions" name="job_positions" domain="[('job_id.x_status_bar', 'not in', ['draft', 'done'])]"/>
                 </xpath>
+                <xpath expr="//filter[@name='applicant_availability']" position="attributes">
+                    <attribute name="domain">['&amp;', ('x_available', '=', True), '|', ('availability', '&lt;=', 'today'), ('availability','=', False)]</attribute>
+                </xpath>
             </data>
         </field>
     </record>
@@ -132,7 +135,7 @@
                 </t>
             </xpath>
             <xpath expr="//field[@name='rotting_days']" position="after">
-                <button name="%(ir_actions_server_for_email_pop_up)d" string="Send CV" type="action" class="btn btn-outline-primary btn-sm" invisible="x_is_cv_sent"/>
+                <button name="%(ir_actions_server_for_email_pop_up)d" string="Send CV" type="action" class="btn btn-outline-primary btn-sm" invisible="x_is_cv_sent or not x_is_shared_cv"/>
                 <button string="CV Sent" class="btn btn-outline-success btn-sm" invisible="not x_is_cv_sent"/>
             </xpath>
         </field>
@@ -185,7 +188,8 @@
                 <field name="x_applicant_id"/>
                 <field name="x_job_id"/>
                 <field name="x_cv" widget="many2many_binary"/>
-                <field name="x_availability"/>
+                <field name="x_available"/>
+                <field name="x_availability" invisible="not x_available"/>
                 <field name="x_cv_sent_date"/>
                 <field name="x_is_published"/>
             </list>
@@ -205,7 +209,8 @@
                             <field name="x_cv" widget="many2many_binary"/>
                         </group>
                         <group>
-                            <field name="x_availability"/>
+                            <field name="x_available"/>
+                            <field name="x_availability" invisible="not x_available"/>
                             <field name="x_cv_sent_date"/>
                             <field name="x_is_published"/>
                         </group>
