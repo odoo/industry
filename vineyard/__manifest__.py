@@ -1,5 +1,11 @@
 {
     'name': 'Vineyard',
+<<<<<<< 8c5b01eec4a7c2c9a4951900e60256e695c3a93c
+||||||| ef05dda602ae116405e06e33282729334e374e4a
+    'version': '1.0',
+=======
+    'version': '1.1',
+>>>>>>> c34e23096cddc1e6c2d8fad1d0f4109fe5b09a36
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [

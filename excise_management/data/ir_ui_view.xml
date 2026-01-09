@@ -11,6 +11,8 @@
                 <field name="x_name"/>
                 <field name="x_description" optional="show"/>
                 <field name="x_unit_id" string="Reporting unit"/>
+                <field name="x_packaging_tax" optional="show"/>
+                <field name="x_currency_id" optional="hide"/>
             </list>
         </field>
     </record>
@@ -39,6 +41,10 @@
                         <field name="x_excise_quantity" class="oe_inline" force_save="1" options="{'digits':[8,6]}"/>
                         <field name="x_excise_unit" force_save="1" readonly="True" options="{'no_open': True}"/>
                     </div>
+                    <label for="x_packaging_units" invisible="not x_excise_category"/>
+                    <div class="d-flex" name="excise_packaging_unit" invisible="not x_excise_category">
+                        <field name="x_packaging_units"/>
+                    </div>
                 </group>
             </xpath>
         </field>
@@ -51,7 +57,9 @@
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <pivot string="Excises Analysis">
+                <field name="packaging_uom_qty" invisible="1"/>
                 <field name="x_excise_quantity" type="measure" options="{'digits':[8,4]}"/>
+                <field name="x_packaging_units" type="measure"/>
                 <field name="x_excise_category" type="col"/>
                 <field name="x_excise_unit" type="col"/>
                 <field name="date" type="row"/>
@@ -119,6 +127,8 @@
                 <field name="x_currency_id" column_invisible="True"/>
                 <field name="x_excise_quantity" optional="show" options="{'digits':[8,6]}"/>
                 <field name="x_excise_unit" optional="show"/>
+                <field name="x_packaging_units" optional="show" invisible="not x_packaging_units" width="130px"/>
+                <field name="x_packaging_amount" optional="show" invisible="not x_packaging_amount" width="130px"/>
             </list>
         </field>
     </record>
@@ -183,13 +193,29 @@
         </field>
     </record>
      <record id="view_picking_form" model="ir.ui.view">
-        <field name="name">stock.picking.form.inherit.external.id</field>
+        <field name="name">stock.picking.form.inherit.excise.management</field>
         <field name="model">stock.picking</field>
         <field name="active" eval="True"/>
         <field name="inherit_id" ref="stock.view_picking_form" />
         <field name="arch" type="xml">
             <xpath expr="//field[@name='origin']" position="after">
                 <field name="x_external_id" />
+            </xpath>
+            <xpath expr="//form//page[@name='note']" position="after">
+                <page string="Excises" name="excises">
+                    <field name="move_ids">
+                        <list create="0" edit="0" delete="0" editable="bottom">
+                            <field name="x_currency_id" column_invisible="1"/>
+                            <field name="x_excise_category"/>
+                            <field name="x_fiscal_deposit_move" invisible="not x_excise_category"/>
+                            <field name="x_excise_quantity" options="{'digits':[8,4]}" invisible="not x_excise_category"/>
+                            <field name="x_excise_unit" invisible="not x_excise_category"/>
+                            <field name="x_excise_amount" invisible="not x_excise_category"/>
+                            <field name="x_packaging_units" invisible="not x_packaging_units" width="130px"/>
+                            <field name="x_packaging_amount" invisible="not x_packaging_amount" width="130px"/>
+                        </list>
+                    </field>
+                </page>
             </xpath>
         </field>
     </record>
@@ -243,9 +269,11 @@
                                     <field name="x_currency_id" column_invisible="1"/>
                                     <field name="x_excise_category_id"/>
                                     <field name="x_excise_move_type"/>
-                                    <field name="x_excise_quantity"/>
+                                    <field name="x_excise_quantity" options="{'digits':[8,4]}"/>
                                     <field name="x_excise_unit"/>
                                     <field name="x_excise_amount"/>
+                                    <field name="x_excise_packaging_units" invisible="not x_excise_packaging_units" width="130px"/>
+                                    <field name="x_excise_packaging_amount" invisible="not x_excise_packaging_amount" width="130px"/>
                                 </list>
                             </field>
                         </page>

@@ -42,16 +42,16 @@ class ActionServerTestCase(TransactionCase):
         excise_category = self.env.ref("excise_management.x_excise_category_S001")
         self.assertTrue(excise_category.x_sales_tax_id,
             "Creating an excise category should give it sales taxes automatically")
-        self.assertEqual(excise_category.x_sales_tax_id.formula, 'quantity * product.x_excise_amount',
-            "The sales tax of the excise category should have its formula equal to 'quantity * product.x_excise_amount'")
+        self.assertEqual(excise_category.x_sales_tax_id.formula, '(quantity * uom.factor) * (product.x_excise_amount + product.x_packaging_units * product.x_excise_packaging_tax)',
+            "The sales tax of the excise category should have its formula equal to '(quantity * uom.factor) * (product.x_excise_amount + product.x_packaging_units * product.x_excise_packaging_tax)'")
         self.assertEqual(excise_category.x_sales_tax_id.type_tax_use, 'sale',
             "The sales tax of the excise category should have its type equal to 'sale'")
         self.assertEqual(excise_category.x_sales_tax_id.tax_group_id, self.env.ref('excise_management.excises_tax_group'),
             "The sales tax of the excise category should have its tax group set to the excises tax group")
         self.assertTrue(excise_category.x_purchase_tax_id,
             "Creating an excise category should give it purchase taxes automatically")
-        self.assertEqual(excise_category.x_purchase_tax_id.formula, 'quantity * product.x_excise_amount',
-            "The purchase tax of the excise category should have its formula equal to 'quantity * product.x_excise_amount'")
+        self.assertEqual(excise_category.x_purchase_tax_id.formula, '(quantity * uom.factor) * (product.x_excise_amount + product.x_packaging_units * product.x_excise_packaging_tax)',
+            "The purchase tax of the excise category should have its formula equal to '(quantity * uom.factor) * (product.x_excise_amount + product.x_packaging_units * product.x_excise_packaging_tax)'")
         self.assertEqual(excise_category.x_purchase_tax_id.type_tax_use, 'purchase',
             "The purchase tax of the excise category should have its type equal to 'purchase'")
         self.assertEqual(excise_category.x_purchase_tax_id.tax_group_id, self.env.ref('excise_management.excises_tax_group'),
