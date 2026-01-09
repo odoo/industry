@@ -31,7 +31,7 @@ class TestEnv(IndustryCase):
             self.assertTrue(
                 self.env['ir.module.module']._get('payment_demo').state == 'installed',
                 "Payment Demo module should be installed in demo when Website Payment is installed. "
-                "Call 'button_immediate_install' on 'base.module_payment_demo' in demo.",
+                "Call 'button_install' on 'base.module_payment_demo' in demo.",
             )
 
     def test_welcome_article_and_notification_exist(self):
