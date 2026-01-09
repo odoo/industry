@@ -9,7 +9,7 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <field name="x_stage_id" domain="[('x_is_remark_stage', '=', True)]" widget="rotting_statusbar_duration" options="{'clickable': '1', 'fold_field': 'fold'}" invisible="not project_id and not x_stage_id"/>
+                    <field name="x_stage_id" domain="[('x_is_remark_stage', '=', True), ('project_ids', 'in', project_id)]" widget="rotting_statusbar_duration" options="{'clickable': '1', 'fold_field': 'fold'}" invisible="not project_id and not x_stage_id"/>
                 </header>
                 <sheet>
                     <div class="d-flex justify-content-between align-items-center">
@@ -182,10 +182,11 @@
             
             <xpath expr="//kanban" position="attributes">
                 <attribute name="default_group_by">x_stage_id</attribute>
+                <attribute name="group_create">1</attribute>
                 <attribute name="quick_create_view">construction_remarks.quick_create_task_form</attribute>
             </xpath>
             <xpath expr="//field[@name='stage_id']" position="replace">
-                <field name="stage_id"/>
+                <field name="x_stage_id"/>
             </xpath>
         </field>
     </record>
@@ -352,7 +353,6 @@
                         'default_project_id': x_project_id,
                         'default_x_event_id': id,
                         'default_x_is_remark': True,
-                        'default_x_stage_id': %(project_remark_type_1)d,
                         'form_view_ref': 'construction_remarks.view_x_remark_form', 
                         'list_view_ref': 'construction_remarks.view_x_remark_list_one2many',
                     }"/>
@@ -374,7 +374,6 @@
                         'default_project_id': project_id,
                         'default_x_update_id': id,
                         'default_x_is_remark': True,
-                        'default_x_stage_id': %(project_remark_type_1)d,
                         'form_view_ref': 'construction_remarks.view_x_remark_form', 
                         'list_view_ref': 'construction_remarks.view_x_remark_list_one2many',
                     }"/>
