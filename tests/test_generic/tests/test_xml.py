@@ -123,6 +123,7 @@ class TestEnv(IndustryCase):
         static_files = set()
         in_use_files = set()
         checked_records_with_user = {}
+        ir_module = self.env['ir.module.module'].search([('name', '=', module)])
         for root, dirs, files in os.walk(path):
             # sort the directory by alphabetical order so static directory is read first.
             dirs.sort(reverse=True)
@@ -147,7 +148,7 @@ class TestEnv(IndustryCase):
                         manifest_content = decoded_content
                     continue
 
-                if root.split('/')[-1] == 'demo' and get_db_name().endswith('imported_no_demo'):
+                if root.split('/')[-1] == 'demo' and not ir_module.demo:
                     continue
                 try:
                     tree = etree.fromstring(encoded_content)
@@ -178,7 +179,7 @@ class TestEnv(IndustryCase):
                         is_studio_required = self._check_studio(tree, file_name)
         self._check_manifest(manifest_content, is_studio_required, escape_studio_test=module in ESCAPE_STUDIO_TEST)
         self._check_records_without_user_id(checked_records_with_user)
-        if not get_db_name().endswith('imported_no_demo'):
+        if ir_module.demo:
             in_use_files = {file.lstrip('/') for file in in_use_files}
             for file in static_files - in_use_files:
                 if 'description' not in file:
