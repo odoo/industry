@@ -12,7 +12,6 @@
         'data/ir_model.xml',
         'data/ir_model_access.xml',
         'data/ir_model_fields.xml',
-        'data/project_task_type.xml',
         'data/ir_default.xml',
         'data/ir_ui_view.xml',
         'data/ir_actions_act_window.xml',
@@ -24,16 +23,12 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'construction_remarks/static/src/js/kanban_controller.js',
-            'construction_remarks/static/src/js/relational_model.js',
-            'construction_remarks/static/src/js/x2many_image_field.js',
+            'construction_remarks/static/src/js/patch.js',
             'construction_remarks/static/src/scss/remark_image_kanban.scss',
         ],
     },
     'cloc_exclude': [
-        "static/src/js/kanban_controller.js",
-        "static/src/js/relational_model.js",
-        "static/src/js/x2many_image_field.js",
+        "static/src/js/patch.js",
         "static/src/scss/remark_image_kanban.scss",
     ],
     'license': 'OEEL-1',
