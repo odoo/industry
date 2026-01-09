@@ -286,7 +286,7 @@ class TestEnv(IndustryCase):
         if 'payment_demo' in dependency_list:
             _logger.warning(
                 "'payment_demo' should not be in the dependencies. Instead, call "
-                "'button_immediate_install' on 'base.module_payment_demo' in demo."
+                "'button_install' on 'base.module_payment_demo' in demo."
             )
 
         if escape_studio_test:
@@ -645,6 +645,12 @@ class TestEnv(IndustryCase):
                     "You should use button_choose_theme instead of button_immediate_install in %s.",
                     file_name,
                 )
+            else:
+                _logger.warning(
+                    "You should use button_install instead of button_immediate_install in %s.",
+                    file_name,
+                )
+
         if root.xpath("//function[@name='_theme_load' and @model='ir.module.module']"):
             _logger.warning(
                 "You should use button_choose_theme instead of _theme_load in %s.",
