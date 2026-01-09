@@ -337,4 +337,17 @@ action = { 'type': 'ir.actions.act_window', 'name': 'Create Task', 'res_model': 
         <field name="state">code</field>
         <field name="name">Condominium: Create Task from Motion</field>
     </record>
+    <record id="action_update_voter_line_of_motion" model="ir.actions.server">
+        <field name="code"><![CDATA[event_id = record.event_id
+if event_id.x_vote_ids:
+    for motion_line in event_id.x_vote_ids:
+        attendee_id = record.partner_id.id
+        if (record.x_attending or record.x_delegating) and attendee_id not in list(motion_line.x_attendee_vote_ids.mapped('x_attendee').ids):
+            motion_line.write({'x_attendee_vote_ids': [(0, 0, {'x_attendee': attendee_id})]})
+        ]]></field>
+        <field name="model_id" ref="calendar.model_calendar_attendee"/>
+        <field name="state">code</field>
+        <field name="name">Update Voter Lines Of Motion</field>
+        <field name="usage">base_automation</field>
+    </record>
 </odoo>
