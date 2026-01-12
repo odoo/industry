@@ -39,17 +39,6 @@
                             <field name="x_location"/>
                             <field name="x_remark_category_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
                         </group>
-                        <group colspan="4" string="Remark Media">
-                            <field
-                                colspan="4"
-                                name="x_remark_image_ids"
-                                class="o_remark_image_list"
-                                context="{'default_x_remark_id': id, 'default_name': name}"
-                                mode="kanban"
-                                add-label="Add Image"
-                                nolabel="1"
-                            />
-                        </group>
                     </group>
                     <notebook>
                         <page name="description_page" string="Description">
@@ -57,7 +46,7 @@
                         </page>
                     </notebook>
                 </sheet>
-                <chatter/>
+                <chatter open_attachments="True"/>
             </form>
         </field>
     </record>
@@ -221,73 +210,6 @@
             <list editable="top">
                 <field name="x_name"/>
             </list>
-        </field>
-    </record>
-<!-- remark image -->
-    <record model="ir.ui.view" id="view_x_remark_image_form">
-        <field name="name">construction.remarks.x_remark_image.view.form</field>
-        <field name="model">x_remark_image</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <form string="Remark Images">
-                <field name="x_sequence" invisible="1"/>
-                <div class="row o_website_sale_image_modal">
-                    <group>
-                        <group>
-                            <field name="x_name" placeholder="Image Name"/>
-                        </group>
-                        <group>
-                            <field name="x_remark_id"/>
-                        </group>
-                    </group>
-                    <div class="col-md-12 col-xl-12 text-center o_website_sale_image_modal_container">
-                        <div class="row">
-                            <div class="col">
-                                <field name="x_image_1920" widget="image"/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </field>
-    </record>
-    <record model="ir.ui.view" id="view_x_remark_image_form_kanban">
-        <field name="name">construction.remarks.x_remark_image.view.kanban</field>
-        <field name="model">x_remark_image</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <kanban string="Remark Images" default_order="x_sequence">
-                <field name="x_remark_id" invisible="1"/>
-                <field name="x_sequence" widget="handle"/>
-                <templates>
-                    <t t-name="card" class="p-0 border-0">
-                        <div class="card">
-                            <div class="o_squared_image o_field_widget">
-                                <field class="card-img-top" name="x_image_1920" widget="x2_many_image"/>
-                            </div>
-                            <div class="p-2 m-0" t-attf-title="#{record.x_name.value}">
-                                <field name="x_name" class="small fs-5 text-truncate d-block"/>
-                            </div>
-                            <!-- below 100 Kb: good -->
-                            <t t-if="record.x_image_1920.raw_value.length &lt; 100*1000">
-                                <t t-set="size_status" t-value="'text-bg-success'"/>
-                                <t t-set="message">Acceptable file size</t>
-                            </t>
-                            <!-- below 1000 Kb: decent -->
-                            <t t-elif="record.x_image_1920.raw_value.length &lt; 1000*1000">
-                                <t t-set="size_status" t-value="'text-bg-warning'" />
-                                <t t-set="message">Huge file size. The image should be optimized/reduced.</t>
-                            </t>
-                            <!-- above 1000 Kb: bad -->
-                            <t t-else="1">
-                                <t t-set="size_status" t-value="'text-bg-danger'"/>
-                                <t t-set="message">Optimization required! Reduce the image size or increase your compression settings.</t>
-                            </t>
-                            <span t-attf-class="badge #{size_status}" t-att-title="message"></span>
-                        </div>
-                    </t>
-                </templates>
-            </kanban>
         </field>
     </record>
 <!-- remark stage -->
