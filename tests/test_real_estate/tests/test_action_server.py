@@ -23,8 +23,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
     def test_create_technical_partner(self):
         product = self.env['product.template'].create({
             'name': 'Test Property',
-        })
-        product.write({
+            'categ_id': self.env.ref('real_estate.product_category_5').id,
             'x_street': '123 Main St',
             'x_city': 'Springfield',
             'x_zip_code': '1234',
