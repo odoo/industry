@@ -23,7 +23,6 @@
         'data/mail_message.xml',
         'data/web_views.xml',
         'data/views.xml',
-        'data/product_pricing.xml',
         'data/res_config_settings.xml',
     ],
     'demo': [

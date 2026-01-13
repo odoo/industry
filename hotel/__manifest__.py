@@ -21,7 +21,6 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/views.xml',
-        'data/product_pricing.xml',
         'data/res_config_settings.xml',
     ],
     'demo': [
