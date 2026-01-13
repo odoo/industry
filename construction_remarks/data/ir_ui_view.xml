@@ -209,6 +209,7 @@
         <field name="arch" type="xml">
             <list editable="top">
                 <field name="x_name"/>
+                <field name="x_color" widget="color_picker"/>
             </list>
         </field>
     </record>
@@ -257,6 +258,18 @@
             </xpath>
         </field>
     </record>
+<!-- hiding partner_id in remarks kanban card view -->
+    <record model="ir.ui.view" id="view_task_kanban">
+        <field name="name">project.task.kanban.inherited</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban/templates/t[@t-name='card']//field[@name='partner_id']" position="attributes">
+                <attribute name="invisible">context.get('template_project') or context.get('hide_partner_id')</attribute>
+            </xpath>
+        </field>
+    </record>
+
 <!-- new notebook pages in existing models -->
     <record model="ir.ui.view" id="view_calendar_event_form_inherit">
         <field name="name">calendar.event.form.inherit</field>
