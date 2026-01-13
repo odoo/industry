@@ -39,7 +39,6 @@ USELESS_FIELDS = {
     'pos.order': ['date_order', 'pos_reference', 'company_id', 'state', 'currency_id', 'last_order_preparation_change'],
     'pos.order.line': ['total_cost', 'company_id', 'full_product_name'],
     'product.attribute.value': ['color'],
-    'product.product': ['lst_price'],
     'product.template.attribute.value': ['color'],
     'project.tags': ['color'],
     'project.task': ['company_id'],

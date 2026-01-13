@@ -18,7 +18,6 @@
         'data/mail_message.xml',
         'data/ir_ui_menu.xml',
         'data/ir_ui_view.xml',
-        'data/product_pricing.xml',
         'data/website_view.xml',
         'data/res_config_settings.xml',
     ],

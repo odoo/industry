@@ -20,7 +20,6 @@
         'data/views.xml',
         'data/ir_ui_view.xml',
         'data/web_views.xml',
-        'data/product_pricing.xml',
         'data/res_config_settings.xml',
     ],
     'demo': [
