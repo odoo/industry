@@ -12,17 +12,13 @@
         <field name="code"><![CDATA[
 for record in records:
     # project already has remarks
-    if (project := record.project_id) and (remarks := project.x_remark_ids) and (last_refs := remarks.filtered(lambda r: r.x_reference).sorted('create_date desc')): 
-        pid, rid = last_refs[0].x_reference.split('-')
+    if (project := record.project_id) and (remarks := project.x_remark_ids) and (last_refs := remarks.filtered(lambda r: r.x_reference).sorted('create_date desc')): pid, rid = last_refs[0].x_reference.split('-')
     # project has no remarks but has SO
-    elif project and (so := project.sale_order_id):
-        pid, rid = so.name[1:], 0
+    elif project and (so := project.sale_order_id): pid, rid = so.name[1:], 0
     # no SO but made from SO
-    elif project and (soid := project.name.split('-')[0].strip()).startswith('S') and soid[1:].isnumeric():
-        pid, rid = soid[1:], 0
+    elif project and (soid := project.name.split('-')[0].strip()).startswith('S') and soid[1:].isnumeric(): pid, rid = soid[1:], 0
     # should not be possible because project has to exist for a Remark
-    else:
-        pid, rid = '00000', 0
+    else: pid, rid = '00000', 0
     record['x_reference'] = f"{pid}-{int(rid) + 1:05d}"
 ]]></field>
     </record>
