@@ -30,7 +30,6 @@
         'data/project_task_type.xml',
         'data/project_project.xml',
         'data/uom_uom.xml',
-        'data/product_pricing.xml',
         'data/product_product.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',

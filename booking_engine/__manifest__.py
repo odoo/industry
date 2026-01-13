@@ -23,7 +23,6 @@
         'data/project_project.xml',
         'data/account_tax.xml',
         'data/product_template.xml',
-        'data/sale_temporal_recurrence.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
         'data/resource_calendar_data.xml',

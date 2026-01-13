@@ -29,10 +29,10 @@ elif record.x_total > 0:
         <field name="state">code</field>
         <field name="name">Fix Slot Times</field>
         <field name="code"><![CDATA[
-pickup_time = env.ref('sale_renting.recurrence_nightly').pickup_time
-return_time = env.ref('sale_renting.recurrence_nightly').return_time
 tz = env.ref('website.default_website').tz
 for record in records:
+    pickup_time = record.sale_line_id.product_id.pickup_time or 18.0
+    return_time = record.sale_line_id.product_id.return_time or 9.0
     if not record.role_id.x_is_a_room_offer: continue
     start_datetime = record.start_datetime.astimezone(tz=dateutil.tz.UTC)
     end_datetime = record.end_datetime.astimezone(tz=dateutil.tz.UTC)
@@ -65,9 +65,9 @@ for record in records:
         <field name="usage">base_automation</field>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-pickup_time = env.ref('sale_renting.recurrence_nightly').pickup_time
-return_time = env.ref('sale_renting.recurrence_nightly').return_time
 for record in records:
+    pickup_time = record.order_line.filtered('product_id.rent_periodicity').mapped('product_id')[:1].pickup_time or 18.0
+    return_time = record.order_line.filtered('product_id.rent_periodicity').mapped('product_id')[:1].return_time or 9.0
     tz = env.ref('website.default_website').tz
     rental_start_date = record.rental_start_date.astimezone(tz=dateutil.tz.gettz(tz))
     start = rental_start_date.replace(hour=int(pickup_time), minute=int(pickup_time % 1 * 60), second=0)
