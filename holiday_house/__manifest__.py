@@ -14,6 +14,7 @@
         'data/product_template_attribute_line.xml',
         'data/product_image.xml',
         'data/product_product.xml',
+        'data/planning_role_post.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
