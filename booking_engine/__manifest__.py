@@ -27,6 +27,7 @@
         'data/base_automation.xml',
         'data/resource_calendar_data.xml',
         'data/ir_cron.xml',
+        'data/res_config_settings.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_ui_view.xml',
         'data/ir_ui_menu.xml',
@@ -35,7 +36,6 @@
         'data/product_category.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
-        'data/res_config_settings.xml',
     ],
     'demo': [
         'demo/res_users.xml',
