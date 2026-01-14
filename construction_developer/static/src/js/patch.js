@@ -7,7 +7,7 @@ import { ProjectTaskKanbanDynamicGroupList } from "@project/views/project_task_k
 patch(KanbanController.prototype, {
     async openRecord(record, { newWindow } = {}) { // Opens the remark form view when clicking on a remark kanban card instead of the default kanban behavior.
         if (record.data.x_is_remark) {
-            return this.actionService.doAction("construction_developer.action_x_remark_form_view", { additionalContext: { active_id: record.resId }, props: { resId: record.resId }});}
+            return this.actionService.doAction("construction_developer.action_x_remark_form_view", { additionalContext: { active_id: record.resId }, props: { resId: record.resId, resIds: record.model.root.records.map((r) => r.resId) }});}
         return super.openRecord(record, { newWindow }); }});
 
 // Override isGroupedByStage to include x_stage_id to be able to quick create stages
