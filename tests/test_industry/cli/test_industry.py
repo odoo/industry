@@ -6,6 +6,7 @@ import sys
 import time
 
 from odoo import api, sql_db
+from odoo.addons.base_automation.models import base_automation
 from odoo.cli.command import Command
 from odoo.modules.registry import Registry
 from odoo.service import server
@@ -22,6 +23,14 @@ _logger = logging.getLogger(__name__)
 
 ROOT_PATH = pathlib.Path(__file__).parent.parent.parent.parent
 
+
+def job_log_level(status, duration):
+    return (logging.ERROR if status != 'done'
+        else logging.WARNING if duration > 10
+        else logging.INFO if duration > 1
+        else logging.DEBUG)
+
+base_automation.job_log_level = job_log_level
 
 class Test_Industry(Command):
     def run(self, args):
