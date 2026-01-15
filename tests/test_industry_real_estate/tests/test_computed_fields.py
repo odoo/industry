@@ -10,11 +10,11 @@ class ComputedFieldsTestCase(TransactionCase):
         for sale_order in self.env['sale.order'].search([('x_account_analytic_account_id', '!=', False)]):
             aa = sale_order.x_account_analytic_account_id
             if rental_contract := aa.x_rental_contract_id:
-                start_date = sale_order.x_rental_start_date
+                start_date = sale_order.start_date
                 self.assertTrue(
                     (sale_order == rental_contract) or (
                         aa == rental_contract.x_account_analytic_account_id and (
-                            (start_date < rental_contract.x_rental_start_date) or
+                            (start_date < rental_contract.start_date) or
                             (start_date > datetime.date.today())
                         )
                     )
@@ -22,5 +22,5 @@ class ComputedFieldsTestCase(TransactionCase):
             else:
                 self.assertTrue(
                     sale_order.subscription_state in ['5_renewed', '6_churn']
-                    or sale_order.x_rental_start_date > datetime.date.today()
+                    or sale_order.start_date > datetime.date.today()
                 )
