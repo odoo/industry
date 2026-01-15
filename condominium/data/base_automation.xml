@@ -12,6 +12,7 @@
         <field name="model_id" ref="model_x_property_line_owner"/>
         <field name="action_server_ids" eval="[(6, 0, [ref('action_update_property_current_owner')])]"/>
         <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('field_property_line_owner')])]"/>
     </record>
     <record id="automation_archive_related_accounts" model="base.automation">
         <field name="name">Condominium: On property deletion</field>
@@ -23,21 +24,21 @@
         <field name="name">Condominium: On Vote Edit</field>
         <field name="model_id" ref="model_x_calendar_event_line_motion"/>
         <field name="action_server_ids" eval="[(6, 0, [ref('action_populate_voters')])]"/>
-        <field name="trigger">on_create_or_write</field>
+        <field name="trigger">on_create_or_write</field>  <!-- TODOVAVA why not on_create ? -->
         <field name="filter_domain">[("id", "!=", False)]</field>
         <field name="filter_pre_domain">[("id", "=", False)]</field>
     </record>
     <record id="automation_call_distribute_costs_on_update" model="base.automation">
         <field name="name">Condominium: On Distribution input update</field>
         <field name="model_id" ref="account.model_account_move"/>
-        <field name="action_server_ids" eval="[(6, 0, [ref('action_call_distribute_costs_on_update')])]"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('ir_actions_server_distribute_costs')])]"/>
         <field name="trigger">on_change</field>
         <field name="on_change_field_ids" eval="[(6, 0, [ref('account.field_account_move__invoice_line_ids'), ref('distribution_key_account_move_field'), ref('field_account_move_period_end'), ref('field_account_move_period_start')])]"/>
     </record>
     <record id="automation_call_distribute_costs_on_save" model="base.automation">
         <field name="name">Condominium: On Distribution input save</field>
         <field name="model_id" ref="account.model_account_move"/>
-        <field name="action_server_ids" eval="[(6, 0, [ref('action_call_distribute_costs_on_save')])]"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('ir_actions_server_distribute_costs')])]"/>
         <field name="trigger">on_create_or_write</field>
         <field name="trigger_field_ids" eval="[(6, 0, [ref('account.field_account_move__invoice_line_ids'), ref('distribution_key_account_move_field'), ref('field_account_move_period_end'), ref('field_account_move_period_start')])]"/>
     </record>

@@ -9,6 +9,7 @@
     <field name="active" eval="True"/>
     <field name="type">form</field>
     <field name="arch" type="xml">
+    <!-- TODOVAVA do it from scratch -->
       <data>
         <xpath expr="//field[@name='code']" position="replace"/>
         <xpath expr="//form//label[@for='name']" position="replace"/>
@@ -56,23 +57,23 @@
     <field name="type">form</field>
     <field name="arch" type="xml">
       <xpath expr="//header" position="inside">
-        <button name="%(ir_act_server_split_so_per_owner)d" string="Split per Owner" type="action" invisible="not x_company_partner_id or state != 'draft'"/>
+        <button name="%(ir_act_server_split_per_property)d" string="Split per Owner" type="action" invisible="not x_company_partner_id or state != 'draft'"/>
       </xpath>
       <xpath expr="//button[@name='action_sale_order_log']" position="after">
-        <button name="%(sale_order_button_action)d" class="oe_stat_button" icon="fa-dollar" type="action" invisible="x_source_sales_order_sale_order_count == 0">
-          <field widget="statinfo" name="x_source_sales_order_sale_order_count" string="Sales Orders"/>
+        <button name="%(sale_order_button_action)d" class="oe_stat_button" icon="fa-dollar" type="action" invisible="x_x_source_sales_order_sale_order_count == 0">
+          <field widget="statinfo" name="x_x_source_sales_order_sale_order_count" string="Sales Orders"/>
         </button>
       </xpath>
       <xpath expr="//field[@name='tag_ids']" position="after">
         <field name="x_source_sales_order"/>
       </xpath>
-      <xpath expr="//label[@for='pricelist_id']" position="attributes">
-        <attribute name="string">Distribution Key</attribute>
-      </xpath>
-      <xpath expr="//field[@name='pricelist_id']" position="attributes">
-        <attribute name="options">{"no_open": false, "no_create": true}</attribute>
-        <attribute name="placeholder">Area as distribution key</attribute>
-      </xpath>
+        <xpath expr="//field[@name='sale_order_template_id']" position="after">
+          <field name="x_distribution_key"/>
+          <!-- options="{'create_name_field': 'x_name'}" -->
+        </xpath>
+        <!-- <xpath expr="//page[@name='order_lines']/field[@name='order_line']/list" position="attributes">
+          <attribute name="open_form_view">true</attribute>
+        </xpath> -->
     </field>
   </record>
   <record id="default_list_view_building" model="ir.ui.view">
@@ -133,7 +134,7 @@
   </record>
   <record id="default_search_view_building" model="ir.ui.view">
     <field name="model">x_buildings</field>
-    <field name="name">x_buildings.form.condominium</field>
+    <field name="name">x_buildings.search.condominium</field>
     <field name="type">search</field>
     <field name="active" eval="True"/>
     <field name="arch" type="xml">
@@ -158,7 +159,7 @@
       </list>
     </field>
   </record>
-  <record id="default_form_view_building_tags" model="ir.ui.view">
+  <!-- <record id="default_form_view_building_tags" model="ir.ui.view">
     <field name="model">x_buildings_tag</field>
     <field name="name">x_buildings_tag.form.condominium</field>
     <field name="type">form</field>
@@ -175,27 +176,7 @@
         </sheet>
       </form>
     </field>
-  </record>
-  <record id="analytic_account_kanban_view" model="ir.ui.view">
-    <field name="name">account.analytic.account.kanban.condominium</field>
-    <field name="mode">primary</field>
-    <field name="active" eval="True"/>
-    <field name="model">account.analytic.account</field>
-    <field name="priority">99</field>
-    <field name="type">kanban</field>
-    <field name="arch" type="xml">
-      <kanban default_group_by="x_building" quick_create_view="condominium.quick_create_account_form">
-        <templates>
-          <t t-name="card">
-            <field name="name" display="full" placeholder="e.g. Apartment A0"/>
-            <field name="x_tags" display="full"/>
-            <field name="x_type" display="full"/>
-            <field name="partner_id" display="full" widget="many2one_avatar"/>
-          </t>
-        </templates>
-      </kanban>
-    </field>
-  </record>
+  </record> -->
   <record id="account_analytic_plan_form_view_inherit" model="ir.ui.view">
     <field name="name">account.analytic.plan.inherit.form.condominium</field>
     <field name="model">account.analytic.plan</field>
@@ -271,82 +252,6 @@
       </search>
     </field>
   </record>
-  <record id="default_list_view_for_x_ratios" model="ir.ui.view">
-    <field name="name">x_ratios.list.condominium</field>
-    <field name="model">x_ratios</field>
-    <field name="active" eval="True"/>
-    <field name="type">list</field>
-    <field name="arch" type="xml">
-      <list>
-        <field name="x_sequence" widget="handle" />
-        <field name="x_name" />
-        <field name="x_company_id" groups="base.group_multi_company" />
-      </list>
-    </field>
-  </record>
-  <record id="default_form_view_for_x_ratios" model="ir.ui.view">
-    <field name="name">x_ratios.form.condominium</field>
-    <field name="model">x_ratios</field>
-    <field name="active" eval="True"/>
-    <field name="type">form</field>
-    <field name="arch" type="xml">
-      <form>
-        <header/>
-        <sheet string="Ratios">
-          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active" />
-          <group>
-            <group>
-              <field name="x_property" options='{"create_name_field": "x_name", "no_create": true}'/>
-              <field name="x_pricelist" options='{"no_create": true}'/>
-              <field name="x_company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
-              <field name="x_building"/>
-              <field name="x_property_ratios"/>
-            </group>
-            <group>
-              <field name="x_type"/>
-              <field name="x_area"/>
-              <field name="x_ratio"/>
-            </group>
-          </group>
-        </sheet>
-        <chatter/>
-      </form>
-    </field>
-  </record>
-  <record id="default_search_view_for_x_ratios" model="ir.ui.view">
-    <field name="name">x_ratios.search.condominium</field>
-    <field name="model">x_ratios</field>
-    <field name="active" eval="True"/>
-    <field name="type">search</field>
-    <field name="arch" type="xml">
-      <search>
-        <field name="x_name"/>
-        <separator/>
-        <filter string="Archived" name="archived_x_ratios" domain="[['x_active', '=', False]]"/>
-        <separator/>
-      </search>
-    </field>
-  </record>
-  <record id="product_pricelist_list_view_inherit" model="ir.ui.view">
-    <field name="name">product.pricelist.list.condominium</field>
-    <field name="inherit_id" ref="product.product_pricelist_view_tree" />
-    <field name="mode">extension</field>
-    <field name="model">product.pricelist</field>
-    <field name="active" eval="True"/>
-    <field name="priority">99</field>
-    <field name="type">list</field>
-    <field name="arch" type="xml">
-      <xpath expr="//field[@name='name']" position="attributes">
-        <attribute name="string">Distribution Key</attribute>
-      </xpath>
-      <xpath expr="//field[@name='country_group_ids']" position="attributes">
-        <attribute name="column_invisible">True</attribute>
-      </xpath>
-      <xpath expr="//field[@name='company_id']" position="attributes">
-        <attribute name="column_invisible">True</attribute>
-      </xpath>
-    </field>
-  </record>
   <record id="res_partner_form_view_inherit" model="ir.ui.view">
     <field name="name">res.partner.form.condominium</field>
     <field name="inherit_id" ref="base.view_partner_form"/>
@@ -365,9 +270,6 @@
         <button class="oe_stat_button" icon="fa-home" type="action" name="%(condominium_property_count_contact_smart_button)d" invisible="not x_x_condominium_x_property_count">
           <field widget="statinfo" name="x_x_condominium_x_property_count" string="Properties" />
         </button>
-      </xpath>
-      <xpath expr="//field[@name='property_product_pricelist']" position="after">
-        <field name="x_condominium_properties" widget="many2many_tags" force_save="1" readonly="True" />
       </xpath>
       <xpath expr="//sheet/notebook" position="inside">
         <page string="Vendors" invisible="not ref_company_ids">
@@ -390,15 +292,10 @@
           </field>
         </page>
       </xpath>
-      <xpath expr="//field[@name='x_condominium_properties']" position="replace"/>
       <xpath expr="//button[@name='action_see_documents']" position="after">
         <button class="oe_stat_button" icon="fa-home" type="action" name="%(owner_properties_contact_smart_button)d" invisible="not x_x_current_owner_x_property_count">
           <field widget="statinfo" name="x_x_current_owner_x_property_count" string="Properties"/>
         </button>
-      </xpath>
-      <xpath expr="//field[@name='child_ids']" position="after">
-        <field name="x_ownership_properties"/>
-        <field name="x_co_ownership_properties"/>
       </xpath>
     </field>
   </record>
@@ -415,34 +312,6 @@
         <field name="x_companies" string="Condominiums"/>
       </field>
     </field>
-  </record>
-  <record id="sale_order_form_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <data>
-        <xpath expr="//field[@name='sale_order_template_id']" position="after">
-          <field name="x_distribution_key" options="{'create_name_field': 'x_name'}"/>
-        </xpath>
-        <xpath expr="//label[@for='pricelist_id']" position="attributes">
-          <attribute name="string">Pricelist</attribute>
-        </xpath>
-        <xpath expr="//field[@name='pricelist_id']" position="attributes">
-          <attribute name="placeholder"/>
-        </xpath>
-        <xpath expr="//group[@name='sale_header']" position="after">
-          <group name="sale_header_group"/>
-        </xpath>
-        <xpath expr="//page[@name='order_lines']/field[@name='order_line']/list" position="attributes">
-          <attribute name="open_form_view">true</attribute>
-        </xpath>
-      </data>
-    </field>
-    <field name="inherit_id" ref="sale.view_order_form"/>
-    <field name="mode">extension</field>
-    <field name="model">sale.order</field>
-    <field name="name">sale.order.form.condominium</field>
-    <field name="priority">160</field>
-    <field name="active" eval="True"/>
-    <field name="type">form</field>
   </record>
   <record id="x_property_list_view" model="ir.ui.view">
     <field name="arch" type="xml">
@@ -481,7 +350,7 @@
             <group name="property_group_detailright">
               <field name="x_tags" widget="many2many_tags"/>
               <field name="x_parent" options="{'create_name_field': 'x_name'}" domain="[('x_company_id', 'in', allowed_company_ids)]"/>
-              <field name="x_current_owner" force_save="1" readonly="True"/>
+              <field name="x_current_owner" force_save="1"/>
               <field name="x_company_id" string="Company"/>
               <field name="x_condominium" force_save="1" readonly="True"/>
             </group>
@@ -495,7 +364,7 @@
                   <field name="x_quantity" optional="show"/>
                   <field name="x_usage" optional="show"/>
                   <field name="x_description" optional="show"/>
-                  <field name="x_image" optional="show"/>
+                  <field name="x_image" optional="show" widget="binary"/>
                 </list>
                 <form>
                   <sheet string="Meter Reading" name="meter_readings_sheet">
@@ -513,22 +382,18 @@
                         <field name="x_property"/>
                       </group>
                     </group>
-                    <group name="meter_readings_group_detail_separator">
-                      <separator/>
-                    </group>
                   </sheet>
                 </form>
               </field>
             </page>
             <page string="Owners" name="owners_page">
               <field name="x_owner_ids">
-                <list editable="top">
+                <list editable="top" open_form_view="false">
                   <field name="x_sequence" widget="handle"/>
                   <field name="x_start_date" required="True"/>
-                  <field optional="show" name="x_end_date"/>
+                  <field name="x_end_date" optional="show"/>
                   <field name="x_owner" required="True" widget="many2one_avatar_user"/>
-                  <field optional="show" name="x_co_owners" widget="many2many_tags_avatar"/>
-                  <field optional="show" name="x_account" options="{'no_create': true}" readonly="True" widget="many2one_tax_tags" column_invisible="True"/>
+                  <field name="x_co_owners" optional="show" widget="many2many_tags_avatar"/>
                 </list>
               </field>
             </page>
@@ -537,13 +402,10 @@
                 <list editable="top">
                   <field name="x_sequence" widget="handle"/>
                   <field name="x_start_date" required="True"/>
-                  <field optional="show" name="x_end_date"/>
-                  <field name="x_tenant" column_required="True" widget="many2one_avatar_user"/>
+                  <field name="x_end_date" optional="show"/>
+                  <field name="x_tenant" required="True" widget="many2one_avatar_user"/>
                 </list>
               </field>
-            </page>
-            <page string="Accounts" name="accounts_page" invisible="True">
-              <field name="x_account_ids"/>
             </page>
           </notebook>
         </sheet>
@@ -567,141 +429,6 @@
     <field name="model">x_property</field>
     <field name="active" eval="True"/>
     <field name="name">x_property.search.condominium</field>
-    <field name="type">search</field>
-  </record>
-  <record id="x_property_line_meter_reading_list_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <list>
-        <field name="x_sequence" widget="handle"/>
-        <field name="x_name"/>
-      </list>
-    </field>
-    <field name="model">x_property_line_meter_reading</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_property_line_meter_reading.list.condominium</field>
-    <field name="type">list</field>
-  </record>
-  <record id="x_property_line_meter_reading_form_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <form>
-        <header/>
-        <sheet string="property_line">
-          <div class="oe_title">
-            <h1>
-              <field name="x_name" required="1" placeholder="Name..."/>
-            </h1>
-          </div>
-          <group name="property_line_meter_reading_group">
-            <group name="property_line_meter_reading_group_left"/>
-            <group name="property_line_meter_reading_group_right"/>
-          </group>
-        </sheet>
-      </form>
-    </field>
-    <field name="model">x_property_line_meter_reading</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_property_line_meter_reading.form.condominium</field>
-    <field name="type">form</field>
-  </record>
-  <record id="x_property_line_meter_reading_search_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <search>
-        <field name="x_name"/>
-      </search>
-    </field>
-    <field name="model">x_property_line_meter_reading</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_property_line_meter_reading.search.condominium</field>
-    <field name="type">search</field>
-  </record>
-  <record id="x_property_line_owner_list_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <list>
-        <field name="x_sequence" widget="handle"/>
-        <field name="x_name"/>
-      </list>
-    </field>
-    <field name="model">x_property_line_owner</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_property_line_owner.list.condominium</field>
-    <field name="type">list</field>
-  </record>
-  <record id="x_property_line_owner_form_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <form>
-        <header/>
-        <sheet string="property_line">
-          <div class="oe_title">
-            <h1>
-              <field name="x_name" required="1" placeholder="Name..."/>
-            </h1>
-          </div>
-          <group name="property_line_owner_group">
-            <group name="property_line_owner_group_left"/>
-            <group name="property_line_owner_group_right"/>
-          </group>
-        </sheet>
-      </form>
-    </field>
-    <field name="model">x_property_line_owner</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_property_line_owner.form.condominium</field>
-    <field name="type">form</field>
-  </record>
-  <record id="x_property_line_owner_search_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <search>
-        <field name="x_name"/>
-      </search>
-    </field>
-    <field name="model">x_property_line_owner</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_property_line_owner.search.condominium</field>
-    <field name="type">search</field>
-  </record>
-  <record id="x_property_line_tenant_list_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <list>
-        <field name="x_sequence" widget="handle"/>
-        <field name="x_name"/>
-      </list>
-    </field>
-    <field name="model">x_property_line_tenant</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_property_line_tenant.list.condominium</field>
-    <field name="type">list</field>
-  </record>
-  <record id="x_property_line_tenant_form" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <form>
-        <header/>
-        <sheet string="property_line">
-          <div class="oe_title">
-            <h1>
-              <field name="x_name" required="1" placeholder="Name..."/>
-            </h1>
-          </div>
-          <group name="property_line_tenant_group">
-            <group name="property_line_tenant_group_left"/>
-            <group name="property_line_tenant_group_right"/>
-          </group>
-        </sheet>
-      </form>
-    </field>
-    <field name="model">x_property_line_tenant</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_property_line_tenant.form.condominium</field>
-    <field name="type">form</field>
-  </record>
-  <record id="x_property_line_tenant_search_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <search>
-        <field name="x_name"/>
-      </search>
-    </field>
-    <field name="model">x_property_line_tenant</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_property_line_tenant.search.condominium</field>
     <field name="type">search</field>
   </record>
   <record id="x_property_kanban_view" model="ir.ui.view">
@@ -748,6 +475,7 @@
     <field name="type">list</field>
   </record>
   <record id="account_analytic_account_search_view" model="ir.ui.view">
+  <!-- TODOVAVA from scratch -->
     <field name="arch" type="xml">
       <xpath expr="//filter[@name='inactive']" position="after">
         <separator/>
@@ -791,50 +519,6 @@
     <field name="priority">160</field>
     <field name="type">form</field>
   </record>
-  <record id="ir_default_tree_view_inherit" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <data>
-        <xpath expr="//field[@name='json_value']" position="after">
-          <field name="company_id" optional="show"/>
-        </xpath>
-      </data>
-    </field>
-    <field name="inherit_id" ref="base.ir_default_tree_view"/>
-    <field name="mode">extension</field>
-    <field name="model">ir.default</field>
-    <field name="active" eval="True"/>
-    <field name="name">ir.default.list.condominium</field>
-    <field name="priority">99</field>
-    <field name="type">list</field>
-  </record>
-  <record id="ir_default_form_view_inherit" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <data>
-        <xpath expr="//field[@name='user_id']" position="after">
-          <field name="company_id"/>
-        </xpath>
-      </data>
-    </field>
-    <field name="inherit_id" ref="base.ir_default_form_view"/>
-    <field name="mode">extension</field>
-    <field name="model">ir.default</field>
-    <field name="active" eval="True"/>
-    <field name="name">ir.default.form.condominium</field>
-    <field name="priority">99</field>
-    <field name="type">form</field>
-  </record>
-  <record id="x_calendar_event_line_motion_list_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <list>
-        <field name="x_sequence" widget="handle"/>
-        <field name="x_name"/>
-      </list>
-    </field>
-    <field name="model">x_calendar_event_line_motion</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_calendar_event_line_motion.list.condominium</field>
-    <field name="type">list</field>
-  </record>
   <record id="x_calendar_event_line_motion_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <form>
@@ -855,17 +539,17 @@
               <widget name="web_ribbon" title="Rejected" invisible="x_outcome != 'Rejected'" bg_color="text-bg-danger"/>
             </group>
             <group name="calendar_event_line_motion_group_right">
-              <field name="x_vote_criteria" options="{'create_name_field': 'x_name'}" string="Motion Criteria" required="x_abstention &lt; 1"/>
-              <field name="x_in_favor" force_save="1" readonly="True" widget="percentage"/>
-              <field name="x_against" widget="percentage" force_save="1" readonly="True"/>
-              <field name="x_abstention" widget="percentage"/>
+              <field name="x_vote_criteria" options="{'create_name_field': 'x_name'}" string="Motion Criteria"/>
+              <field name="x_in_favor" widget="percentage" force_save="1"/>
+              <field name="x_against" widget="percentage" force_save="1"/>
+              <field name="x_abstention" widget="percentage" force_save="1"/>
               <button name="%(action_set_votes_as_all_against)d" string="All Against" type="action"/>
               <button name="%(action_set_votes_as_all_favor)d" string="All In Favor" type="action"/>
               <field name="x_attendee_vote_ids" nolabel="1" colspan="2">
                 <list editable="bottom" open_form_view="false" delete="false" duplicate="false" create="false">
                   <field name="x_sequence" widget="handle"/>
-                  <field optional="show" name="x_attendee" readonly="True"/>
-                  <field optional="show" name="x_vote" widget="radio" options="{'horizontal': true}"/>
+                  <field name="x_attendee" optional="show" readonly="True"/>
+                  <field name="x_vote" optional="show" widget="radio" options="{'horizontal': true}"/>
                 </list>
               </field>
             </group>
@@ -877,62 +561,6 @@
     <field name="active" eval="True"/>
     <field name="name">x_calendar_event_line_motion.form.condominium</field>
     <field name="type">form</field>
-  </record>
-  <record id="x_calendar_event_line_motion_search_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <search>
-        <field name="x_name"/>
-      </search>
-    </field>
-    <field name="model">x_calendar_event_line_motion</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_calendar_event_line_motion.search.condominium</field>
-    <field name="type">search</field>
-  </record>
-  <record id="x_calendar_event_line_motion_line_vote_list_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <list>
-        <field name="x_sequence" widget="handle"/>
-        <field name="x_name"/>
-      </list>
-    </field>
-    <field name="model">x_calendar_event_line_motion_line_vote</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_calendar_event_line_motion_line_vote.list.condominium</field>
-    <field name="type">list</field>
-  </record>
-  <record id="x_calendar_event_line_motion_line_vote_form_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <form>
-        <header/>
-        <sheet string="calendar_event_line_a1bce_line">
-          <div class="oe_title">
-            <h1>
-              <field name="x_name" required="1" placeholder="Name..."/>
-            </h1>
-          </div>
-          <group name="calendar_event_line_motion_line_vote_group">
-            <group name="calendar_event_line_motion_line_vote_group_left"/>
-            <group name="calendar_event_line_motion_line_vote_group_right"/>
-          </group>
-        </sheet>
-      </form>
-    </field>
-    <field name="model">x_calendar_event_line_motion_line_vote</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_calendar_event_line_motion_line_vote.form.condominium</field>
-    <field name="type">form</field>
-  </record>
-  <record id="x_calendar_event_line_motion_line_vote_search_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <search>
-        <field name="x_name"/>
-      </search>
-    </field>
-    <field name="model">x_calendar_event_line_motion_line_vote</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_calendar_event_line_motion_line_vote.search.condominium</field>
-    <field name="type">search</field>
   </record>
   <record id="x_vote_criteria_list_view" model="ir.ui.view">
     <field name="arch" type="xml">
@@ -961,7 +589,7 @@
           </div>
           <group name="x_vote_criteria_group">
             <group name="x_vote_criteria_group_left">
-              <field name="x_acceptation_threshold" widget="percentage" force_save="0" readonly="False" required="True"/>
+              <field name="x_acceptation_threshold" widget="percentage"/>
             </group>
             <group name="x_vote_criteria_group_right"/>
           </group>
@@ -1054,13 +682,13 @@
             <group name="motions_group_main">
               <group name="motions_group_left">
                 <field name="x_voting_key" options="{'create_name_field': 'x_name'}"/>
-                <field name="x_attending_ratio" widget="percentage" force_save="1" readonly="True" string="Attending and Delegating Ratio"/>
-                <field name="x_attending_owners" string="Attending and Delegating Owners"/>
+                <field name="x_attending_ratio" widget="percentage" force_save="1"/>
+                <field name="x_attending_owners"/>
               </group>
               <group name="motions_group_right"/>
             </group>
             <field name="x_vote_ids">
-              <form>
+            <!--   <form>
                 <header/>
                 <sheet string="calendar_event_line" name="calendar_event_line_sheet">
                   <div class="oe_title" name="calendar_event_line_div">
@@ -1089,7 +717,7 @@
                     </group>
                   </group>
                 </sheet>
-              </form>
+              </form> -->
               <list editable="bottom" open_form_view="true">
                 <field name="x_name" string="Motion"/>
                 <field name="x_outcome" widget="badge" decoration-danger="x_outcome == 'Rejected'" decoration-success="x_outcome == 'Approved'" invisible="x_outcome == False" optional="show"/>
@@ -1107,7 +735,7 @@
     <field name="priority">160</field>
     <field name="type">form</field>
   </record>
-  <record id="account_report_line_form_inherit" model="ir.ui.view">
+  <!-- <record id="account_report_line_form_inherit" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
         <xpath expr="//field[@name='user_groupby']" position="after">
@@ -1122,7 +750,7 @@
     <field name="name">account.report.line.form.condominium</field>
     <field name="priority">99</field>
     <field name="type">form</field>
-  </record>
+  </record> -->
   <record id="view_move_line_tree_inherit" model="ir.ui.view">
     <field name="arch" type="xml">
       <data>
@@ -1138,73 +766,6 @@
     <field name="active" eval="True"/>
     <field name="priority">160</field>
     <field name="type">list</field>
-  </record>
-  <record id="x_period_list_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <list editable="bottom" default_order="x_start_date desc">
-        <field name="x_sequence" widget="handle"/>
-        <field name="x_start_date" optional="show"/>
-        <field name="x_end_date" optional="show"/>
-        <field name="x_name" string="Name"/>
-      </list>
-    </field>
-    <field name="model">x_period</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_period.list.condominium</field>
-    <field name="type">list</field>
-  </record>
-  <record id="x_period_form_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <form>
-        <header/>
-        <sheet string="Period">
-          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
-          <field name="x_active" invisible="1"/>
-          <div class="oe_title">
-            <h1>
-              <field name="x_name" required="1" placeholder="Name..."/>
-            </h1>
-          </div>
-          <group name="x_period_group">
-            <group name="x_period_group_left">
-              <field name="x_start_date" required="True"/>
-              <field name="x_end_date" required="True"/>
-            </group>
-            <group name="x_period_group_right"/>
-          </group>
-        </sheet>
-        <chatter/>
-      </form>
-    </field>
-    <field name="model">x_period</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_period.form.condominium</field>
-    <field name="type">form</field>
-  </record>
-  <record id="default_search_view_period" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <search>
-        <field name="x_name"/>
-        <separator/>
-        <filter date="x_date" name="filter_date" string="Date"/>
-        <separator/>
-        <filter string="Archived" name="archived_x_period" domain="[['x_active', '=', False]]"/>
-        <separator/>
-      </search>
-    </field>
-    <field name="model">x_period</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_period.search.condominium</field>
-    <field name="type">search</field>
-  </record>
-  <record id="default_calendar_vie_aa7c70be-7624-4171-969f-1890532903fd" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <calendar date_start="x_date" create_name_field="x_name"/>
-    </field>
-    <field name="model">x_period</field>
-    <field name="active" eval="True"/>
-    <field name="name">x_period.calendar.condominium</field>
-    <field name="type">calendar</field>
   </record>
   <record id="view_invoice_tree_inherit" model="ir.ui.view">
     <field name="arch" type="xml">
@@ -1288,7 +849,7 @@
         <field name="x_sequence" widget="handle"/>
         <field name="x_name"/>
         <field name="x_based_on" optional="show"/>
-        <field name="x_meter" optional="show"/>
+        <field name="x_meter" optional="show" invisible="x_based_on != 'Meter Readings'"/>
       </list>
     </field>
     <field name="model">x_distribution_key</field>
@@ -1314,7 +875,7 @@
           <group name="x_distribution_key_group">
             <group name="x_distribution_key_group_left">
               <field name="x_based_on" required="True"/>
-              <field name="x_meter" options="{'create_name_field': 'x_name'}" invisible="x_based_on != 'Meter Readings'" force_save="0" readonly="False" required="x_based_on == 'Meter Readings'"/>
+              <field name="x_meter" options="{'create_name_field': 'x_name'}" invisible="x_based_on != 'Meter Readings'" force_save="0" required="x_based_on == 'Meter Readings'"/>
             </group>
             <group name="x_distribution_key_group_right">
               <field name="x_company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
@@ -1370,7 +931,7 @@
           </page>
         </xpath>
         <xpath expr="//form/header" position="inside">
-          <button string="Distribute Costs" name="%(distribute_costs)d" type="action"/>
+          <button string="Distribute Costs" name="%(ir_actions_server_distribute_costs)d" type="action"/>
         </xpath>
         <xpath expr="//field[@name='x_period_start']" position="attributes">
           <attribute name="required">x_based_on == "Meter Readings"</attribute>
