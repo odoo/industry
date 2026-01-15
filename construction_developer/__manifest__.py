@@ -17,12 +17,14 @@
         'data/ir_ui_menu.xml',
         'data/ir_embedded_actions.xml',
         'data/project_project.xml',
+        'data/project_task_type.xml',
         'data/base_automation.xml',
         'data/qweb_view.xml',
         'data/product_template.xml',
         'data/product_product.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
+        'data/x_remark_category.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -31,6 +33,7 @@
         'demo/sale_order_line.xml',
         'demo/project_task.xml',
         'demo/sale_order_post.xml',
+        'demo/ir_attachment.xml',
     ],
     'assets': {
         'web.assets_backend': [
