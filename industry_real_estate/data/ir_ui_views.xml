@@ -155,7 +155,7 @@
         <field name="active" eval="True"/>
         <field name="priority">100</field>
         <field name="arch" type="xml">
-            <gantt date_start="x_rental_start_date" date_stop="end_date" color="partner_id" default_scale="year" display_unavailability="true" string="Availability" />
+            <gantt date_start="start_date" date_stop="end_date" color="partner_id" default_scale="year" display_unavailability="true" string="Availability" />
         </field>
     </record>
 
@@ -163,22 +163,26 @@
         <field name="model">sale.order</field>
         <field name="mode">primary</field>
         <field name="active" eval="True"/>
-        <field name="priority">100</field>
+        <field name="priority">15</field>
         <field name="inherit_id" ref="sale_subscription.sale_subscription_order_view_form"/>
         <field name="arch" type="xml">
             <field name="partner_id" position="attributes">
                 <attribute name="string">Tenant</attribute>
             </field>
             <field name="partner_id" position="after">
-                <field name="x_account_analytic_account_id"/>
+                <field name="x_account_analytic_account_id" readonly="state == 'sale'"/>
                 <field name="x_guarant_partner_id"/>
             </field>
-            <field name="validity_date" position="before">
-                <field name="x_rental_start_date" required="x_account_analytic_account_id"/>
-            </field>
-            <field name="end_date" position="attributes">
-                <attribute name="required">True</attribute>
-            </field>
+            <xpath expr="//div[@name='plan_block']/span" position="replace"/>
+            <xpath expr="//div[@name='plan_block']/field[@name='end_date']" position="replace"/>
+            <xpath expr="//div[@name='plan_block']" position="after">
+                <label string="From" for="start_date"/>
+                <div class="o_row">
+                    <field name="start_date"/>
+                    <span>to</span>
+                    <field name="end_date" required="True"/>
+                </div>
+            </xpath>
         </field>
     </record>
     <record id="meters_list_view" model="ir.ui.view">
