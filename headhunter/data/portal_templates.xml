@@ -36,26 +36,38 @@
                         <tr>
                             <th>Applicant</th>
                             <th>Job Position</th>
+                            <th>Available</th>
                             <th>Availability</th>
-                            <th>CV Sent Date</th>
                             <th>CV</th>
+                            <th>CV Sent Date</th>
                         </tr>
                     </thead>
                     <t t-foreach="user_applicants" t-as="app">
                         <tr>
                             <td><t t-out="app.x_applicant_id.partner_name"/></td>
                             <td><t t-out="app.x_job_id.name"/></td>
-                            <td><t t-out="app.x_available"/></td>
-                            <td><t t-out="app.x_availability"/></td>
-                            <td><t t-out="app.x_cv_sent_date"/></td>
                             <td>
-                                <t t-if="app.x_cv">
-                                    <a t-att-href="'/web/content/%s?filename=%s&amp;download=false' % (app.x_cv.id, app.x_cv.name)" target="_blank">
-                                        <i class="fa fa-file-pdf-o me-1"/>
-                                        <t t-out="app.x_cv.name or 'View CV'"/>
-                                    </a>
+                                <t t-if="app.x_available">
+                                    <span class="btn btn-outline-success btn-sm">Yes</span>
+                                </t>
+                                <t t-else="">
+                                    <span class="btn btn-outline-danger btn-sm">No</span>
                                 </t>
                             </td>
+                            <td><t t-out="app.x_availability"/></td>
+                            <td>
+                                <t t-if="app.x_cv">
+                                    <t t-foreach="app.x_cv" t-as="cv">
+                                        <div>
+                                            <a t-att-href="'/web/content/%s?filename=%s&amp;download=false' % (cv.id, cv.name)" target="_blank">
+                                                <i class="fa fa-file-pdf-o me-1"/>
+                                                <t t-out="cv.name or 'View CV'"/>
+                                            </a>
+                                        </div>
+                                    </t>
+                                </t>
+                            </td>
+                            <td><t t-out="app.x_cv_sent_date"/></td>
                         </tr>
                     </t>
                 </t>
