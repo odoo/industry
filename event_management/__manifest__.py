@@ -10,6 +10,7 @@
         'knowledge',
         'maintenance',
         'project_purchase',
+        'purchase_alternative',
         'purchase_requisition',
         'sale_pdf_quote_builder',
         'sale_planning',

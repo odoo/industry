@@ -8,6 +8,7 @@
         'hr_calendar',
         'knowledge',
         'project_enterprise',
+        'purchase_alternative',
         'purchase_requisition',
         'sale_crm',
         'sale_management',
