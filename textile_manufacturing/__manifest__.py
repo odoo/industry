@@ -5,6 +5,7 @@
     'author': 'Odoo S.A.',
     'depends': [
         'base_industry_data',
+        'convert_mo',
         'crm_enterprise',
         'documents_project',
         'hr_timesheet',
@@ -23,6 +24,7 @@
         'data/documents_document.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/product_attribute.xml',
         'data/product_category.xml',
         'data/product_template.xml',
         'data/product_attribute_value.xml',
