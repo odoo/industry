@@ -1,6 +1,6 @@
 {
     'name': 'Textile Manufacturing',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
@@ -10,6 +10,7 @@
         'hr_timesheet',
         'knowledge',
         'mrp_subcontracting',
+        'product_conversion',
         'purchase_mrp',
         'quality_mrp_workorder',
         'sale_project',
@@ -23,6 +24,7 @@
         'data/documents_document.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/product_attribute.xml',
         'data/product_category.xml',
         'data/product_template.xml',
         'data/product_attribute_value.xml',
