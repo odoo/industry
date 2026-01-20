@@ -7,6 +7,7 @@
         'knowledge',
         'pos_sale',
         'product_expiry',
+        'purchase_alternative',
         'purchase_requisition',
         'sale_purchase_stock',
         'web_studio',
