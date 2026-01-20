@@ -79,7 +79,7 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="mode">extension</field>
         <field name="model">sale.order</field>
-        <field name="name">sale.order.form.inherit.construction_show_line_numbering</field>
+        <field name="name">sale.order.form.inherit.construction_developer</field>
         <field name="priority">1600</field>
         <field name="type">form</field>
         <field name="active" eval="True"/>
@@ -93,9 +93,328 @@
         <field name="inherit_id" ref="sale.account_invoice_form"/>
         <field name="mode">extension</field>
         <field name="model">account.move</field>
-        <field name="name">account.move.form.inherit.construction_show_line_numbering</field>
+        <field name="name">account.move.form.inherit.construction_developer</field>
         <field name="priority">1600</field>
         <field name="type">form</field>
         <field name="active" eval="True"/>
+    </record>
+<!-- remark -->
+    <record id="view_x_remark_form" model="ir.ui.view">
+        <field name="name">construction.remarks.project.task.form</field>
+        <field name="model">project.task</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="x_stage_id" domain="[('x_is_remark_stage', '=', True), ('project_ids', 'in', project_id)]" widget="rotting_statusbar_duration" options="{'clickable': '1', 'fold_field': 'fold'}" invisible="not project_id and not x_stage_id"/>
+                </header>
+                <sheet>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="d-flex w-100">
+                            <field name="name" options="{'line_breaks': False}" widget="text" class="o_task_name text-truncate w-md-75 w-100 pe-2" placeholder="Remark Title..."/>
+                        </h1>
+                        <div class="d-flex justify-content-end align-items-center px-1" invisible="not active or is_template or has_project_template">
+                            <field name="priority" class="h3 pe-2" widget="priority_switch"/>
+                        </div>
+                        <div class="d-flex justify-content-end o_state_container" invisible="not active or is_template or has_project_template">
+                            <field name="state" widget="project_task_state_selection" class="o_task_state_widget" />
+                        </div>
+                    </div>
+                    <group>
+                        <field name="x_is_remark" invisible="1"/>
+                        <field name="x_stage_id" invisible="1"/>
+                        <group>
+                            <field name="project_id" required="True"/>
+                            <field name="x_reference" readonly="True" invisible="not id"/>
+                            <field name="x_event_id" readonly="True" invisible="x_update_id or not (x_update_id or x_event_id)"/>
+                            <field name="x_update_id" readonly="True" invisible="x_event_id or not (x_update_id or x_event_id)"/>
+                            <field name="x_owner_id" string="Owner"/>
+                        </group>
+                        <group>
+                            <field name="x_date" widget="date"/>
+                            <field name="date_deadline" decoration-danger="date_deadline and date_deadline &lt; current_date" decoration-bf="date_deadline and date_deadline &lt; current_date"/>
+                            <field name="x_location"/>
+                            <field name="x_remark_category_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="description_page" string="Description">
+                            <field name="description" type="html" options="{'collaborative': true, 'resizable': false}" placeholder="Add details about this remark..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter open_attachments="True"/>
+            </form>
+        </field>
+    </record>
+    <record id="view_x_remark_list" model="ir.ui.view">
+        <field name="name">construction.remarks.x_remark.view.list</field>
+        <field name="model">project.task</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list default_order="priority DESC,x_date">
+                <field name="x_reference"/>
+                <field name="priority" widget="priority" options="{'is_toggle_mode': false}"/>
+                <field name="x_remark_category_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+                <field name="name"/>
+                <field name="x_owner_id"/>
+                <field name="date_deadline" widget="remaining_days"/>
+                <field name="x_stage_id"/>
+                <field name="state" widget="project_task_state_selection" class="o_task_state_widget"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_x_remark_list_one2many" model="ir.ui.view">
+        <field name="name">construction.remarks.x_remark.view.list.one2many</field>
+        <field name="model">project.task</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list default_order="x_reference">
+                <!-- column_invisible fields required for the modal to save them -->
+                <field name="project_id" column_invisible="1"/>
+                <field name="x_is_remark" column_invisible="1"/>
+                <field name="x_event_id" column_invisible="1"/>
+                <field name="x_stage_id" column_invisible="1"/>
+                <field name="x_reference" invisible="not id"/>
+                <field name="priority" widget="priority" options="{'is_toggle_mode': false}"/>
+                <field name="x_remark_category_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+                <field name="name"/>
+                <field name="x_owner_id"/>
+                <field name="date_deadline" widget="remaining_days"/>
+                <field name="state" widget="project_task_state_selection" class="o_task_state_widget"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_x_remark_search" model="ir.ui.view">
+        <field name="name">construction.remarks.x_remark.view.search</field>
+        <field name="model">project.task</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="project.view_task_search_form"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="attributes">
+                <attribute name="string">Remark</attribute>
+            </xpath>
+        <!-- search bar fields -->
+            <xpath expr="//field[@name='name']" position="replace">
+                <field string="Name &amp; Description" name="name" filter_domain="['|', ('name', 'like', self), ('description', 'like', self)]"/>
+            </xpath>
+            <xpath expr="//field[@name='tag_ids']" position="replace">
+                <field string="Category" name="x_remark_category_ids" filter_domain="[('x_remark_category_ids.x_name', 'like', self)]"/>
+            </xpath>
+            <xpath expr="//field[@name='user_ids']" position="replace">
+                <field string="Owner" name="x_owner_id" filter_domain="['|', ('x_owner_id.name', 'like', self), ('x_owner_id.user_ids.name', 'like', self)]"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="replace"/>
+            <xpath expr="//field[@name='sale_order_id']" position="replace"/>
+            <xpath expr="//field[@name='worksheet_template_id']" position="replace"/>
+            <xpath expr="//field[@name='user_skill_ids']" position="replace"/>
+            <xpath expr="//field[@name='activity_user_id']" position="replace"/>
+            <xpath expr="//field[@name='activity_type_id']" position="replace"/>
+        <!-- filters -->
+            <xpath expr="//filter[@name='my_tasks']" position="replace">
+                <filter string="My Remarks" name="my_remarks" domain="[('x_owner_id.user_ids', '=', uid)]"/>
+            </xpath>
+            <xpath expr="//filter[@name='unassigned']" position="attributes">
+                <attribute name="domain">[('x_owner_id', '=', False)]</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='private_tasks']" position="replace"/>
+            <xpath expr="//filter[@name='favorite_projects']" position="replace"/>
+            <xpath expr="//filter[@name='blocking']" position="replace"/>
+            <xpath expr="//filter[@name='templates']" position="replace"/>
+        <!-- group by -->
+            <xpath expr="//filter[@name='tags']" position="replace">
+                <filter string="Category" name="x_remark_category_ids" context="{'group_by': 'x_remark_category_ids'}"/>
+            </xpath>
+            <xpath expr="//filter[@name='stage']" position="attributes">
+                <attribute name="context">{'group_by': 'x_stage_id', 'x_stage_id_domain': [('x_stage_id.x_is_remark_stage', '=', True)]}</attribute>
+                <attribute name="domain">[('x_stage_id.x_is_remark_stage', '=', True)]</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='groupby_worksheet_template']" position="replace"/>
+            <xpath expr="//filter[@name='user']" position="replace">
+                <filter string="Owner" name="x_owner_id" context="{'group_by': 'x_owner_id'}" />
+            </xpath>
+        </field>
+    </record>
+    <record id="quick_create_task_form" model="ir.ui.view">
+        <field name="name">construction_developer.form.quick_create</field>
+        <field name="model">project.task</field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="project.quick_create_task_form"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='display_name']" position="attributes">
+                <attribute name="string">Remark Title</attribute>
+                <attribute name="placeholder">e.g. Missing Window</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_ids']" position="replace">
+                <field name="x_owner_id"/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <field name="x_date" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_x_remark_kanban" model="ir.ui.view">
+        <field name="name">construction.remarks.x_remark.view.kanban</field>
+        <field name="model">project.task</field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="project.view_task_kanban"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="default_group_by">x_stage_id</attribute>
+                <attribute name="group_create">1</attribute>
+                <attribute name="quick_create_view">construction_developer.quick_create_task_form</attribute>
+            </xpath>
+            <xpath expr="//field[@name='stage_id']" position="replace">
+                <field name="x_stage_id"/>
+            </xpath>
+        </field>
+    </record>
+<!-- remark category -->
+    <record id="view_x_remark_category_form" model="ir.ui.view">
+        <field name="name">construction.remarks.x_remark_category.view.form</field>
+        <field name="model">x_remark_category</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form>
+                <header/>
+                <sheet string="Remark Categories">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="d-flex w-100">
+                            <field name="x_name" options="{'line_breaks': False}" widget="text" class="o_task_name text-truncate w-md-75 w-100 pe-2" placeholder="Category Name..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="x_color" widget="color_picker"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_x_remark_category_list" model="ir.ui.view">
+        <field name="name">construction.remarks.x_remark_category.view.list</field>
+        <field name="model">x_remark_category</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list editable="top">
+                <field name="x_name"/>
+                <field name="x_color" widget="color_picker"/>
+            </list>
+        </field>
+    </record>
+<!-- remark stage -->
+    <record id="view_task_type_tree_inherited" model="ir.ui.view">
+        <field name="name">project.type.list.inherited</field>
+        <field name="model">project.task.type</field>
+        <field name="mode">extension</field>
+        <field name="inherit_id" ref="project.task_type_tree_inherited"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="x_is_remark_stage" column_invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+<!-- hiding remarks in existing task views -->
+    <record id="view_task_form2" model="ir.ui.view">
+        <field name="name">project.task.form.inherited</field>
+        <field name="model">project.task</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="(//field[@name='stage_id'])[1]" position="attributes">
+                <attribute name="domain">[('x_is_remark_stage', '=', False), ('project_ids', 'in', project_id)]</attribute>
+            </xpath>
+            <xpath expr="(//field[@name='stage_id'])[2]" position="attributes">
+                <attribute name="domain">[('x_is_remark_stage', '=', False), ('project_ids', 'in', project_id)]</attribute>
+            </xpath>
+            <xpath expr="(//field[@name='stage_id'])[3]" position="attributes">
+                <attribute name="domain">[('x_is_remark_stage', '=', False), ('project_ids', 'in', project_id)]</attribute>
+            </xpath>
+        </field>
+    </record>
+    <record id="project_task_in_project_view_kanban_inherited" model="ir.ui.view">
+        <field name="name">project.task.in.project.kanban.inherited</field>
+        <field name="model">project.task</field>
+        <field name="mode">extension</field>
+        <field name="inherit_id" ref="project_enterprise.view_task_kanban_inherited"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="inside">
+                <field name="x_is_remark" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+<!-- hiding partner_id in remarks kanban card view -->
+    <record id="view_task_kanban" model="ir.ui.view">
+        <field name="name">project.task.kanban.inherited</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_kanban"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban/templates/t[@t-name='card']//field[@name='partner_id']" position="attributes">
+                <attribute name="invisible">context.get('template_project') or context.get('hide_partner_id')</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_ids']" position="before">
+                <field name="x_reference" class="text-muted"/>
+            </xpath>
+        </field>
+    </record>
+
+<!-- new notebook pages in existing models -->
+    <record id="view_calendar_event_form_inherit" model="ir.ui.view">
+        <field name="name">calendar.event.form.inherit</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
+        <field name="model">calendar.event</field>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='page_invitations']" position="after" invisible="not location">
+                <page name="remarks" string="Remarks">
+                    <group class="mb-0">
+                        <field name="x_project_id" class="mb-0"/>
+                    </group>
+                    <field name="x_remark_ids" readonly="not x_project_id" nolabel="1" context="{
+                        'default_project_id': x_project_id,
+                        'default_x_event_id': id,
+                        'default_x_is_remark': True,
+                        'form_view_ref': 'construction_developer.view_x_remark_form', 
+                        'list_view_ref': 'construction_developer.view_x_remark_list_one2many',
+                    }"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <record id="project_update_view_form_inherit" model="ir.ui.view">
+        <field name="name">project.update.view.form.inherit</field>
+        <field name="inherit_id" ref="project.project_update_view_form"/>
+        <field name="model">project.update</field>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='description']" position="after">
+                <page name="remarks" string="Remarks">
+                    <field name="x_remark_ids" nolabel="1" context="{
+                        'default_project_id': project_id,
+                        'default_x_update_id': id,
+                        'default_x_is_remark': True,
+                        'form_view_ref': 'construction_developer.view_x_remark_form', 
+                        'list_view_ref': 'construction_developer.view_x_remark_list_one2many',
+                    }"/>
+                </page>
+            </xpath>
+        </field>
     </record>
 </odoo>

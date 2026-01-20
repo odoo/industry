@@ -2,7 +2,7 @@
 <odoo>
     <record id="action_initialize_sales_order_line_sequence_on_sales_order_create" model="ir.actions.server">
         <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="name">Construction: Initialize Sales Order Line Sequence on Sales Order create</field>
+        <field name="name">Construction Developer: Initialize Sales Order Line Sequence on Sales Order create</field>
         <field name="state">code</field>
         <field name="code"><![CDATA[
 sequences = record.order_line.mapped('sequence')
@@ -21,7 +21,7 @@ for sol in record.order_line: sol['sequence'] = seqs[sol.id] + 1
     <record id="action_sol_update_progress_increment_on_change" model="ir.actions.server">
         <field name="model_id" ref="sale.model_sale_order_line"/>
         <field name="state">code</field>
-        <field name="name">Construction: Update Progress Increment on Quantity Increment change</field>
+        <field name="name">Construction Developer: Update Progress Increment on Quantity Increment change</field>
         <field name="code"><![CDATA[
 record['x_progress_increment'] = record.x_quantity_increment / record.product_uom_qty if record.product_uom_qty > 0 else False
 ]]></field>
@@ -29,7 +29,7 @@ record['x_progress_increment'] = record.x_quantity_increment / record.product_uo
     <record id="action_sol_update_quantity_increment_on_change" model="ir.actions.server">
         <field name="model_id" ref="sale.model_sale_order_line"/>
         <field name="state">code</field>
-        <field name="name">Construction: Update Quantity Increment on Progress Increment change</field>
+        <field name="name">Construction Developer: Update Quantity Increment on Progress Increment change</field>
         <field name="code"><![CDATA[
 record['x_quantity_increment'] = record.x_progress_increment * record.product_uom_qty
 ]]></field>
@@ -37,7 +37,7 @@ record['x_quantity_increment'] = record.x_progress_increment * record.product_uo
     <record id="action_sol_update_section_progress" model="ir.actions.server">
         <field name="model_id" ref="sale.model_sale_order_line"/>
         <field name="state">code</field>
-        <field name="name">Construction: Update Quantity Increment on section button click</field>
+        <field name="name">Construction Developer: Update Quantity Increment on section button click</field>
         <field name="code"><![CDATA[
 lines = record.order_id.order_line.sorted(key=lambda sol: sol.sequence)
 i = [sol.sequence for sol in lines].index(record.sequence) + 1
@@ -60,6 +60,44 @@ action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': 
 ]]></field>
         <field name="model_id" ref="sale.model_sale_order_line"/>
         <field name="state">code</field>
-        <field name="name">Construction: Update Quantity Delivered</field>
+        <field name="name">Construction Developer: Update Quantity Delivered</field>
+    </record>
+    <!-- 
+    server action and not compute because otherwise compute generates the same ID if
+    creating multiple remarks from a one2many list since they are not saved yet so
+    we cannot access the previous reference, resulting in duplicates
+    -->
+    <record id="action_x_remark_generate_x_reference_on_create" model="ir.actions.server">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Generate Remark Reference on Create</field>
+        <field name="code"><![CDATA[
+for record in records.filtered(lambda r: r.x_is_remark):
+    # project already has remarks
+    if (project := record.project_id) and (remarks := project.x_remark_ids) and (last_refs := remarks.filtered(lambda r: r.x_reference).sorted('create_date desc')): 
+        pid, rid = last_refs[0].x_reference.split('-')
+    # project has no remarks but has SO
+    elif project and (so := project.sale_order_id):  
+        pid, rid = so.name[1:], 0
+    # no SO but made from SO
+    elif project and (soid := project.name.split('-')[0].strip()).startswith('S') and soid[1:].isnumeric(): 
+        pid, rid = soid[1:], 0
+    # should not be possible because project has to exist for a Remark
+    else:
+        pid, rid = '00000', 0
+    record['x_reference'] = f"{pid}-{int(rid) + 1:05d}"
+]]></field>
+    </record>
+    <record id="action_x_remark_write_project_stage_on_create_or_write" model="ir.actions.server">
+        <field name="name">Construction Developer: Write Stages on Create or Write</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[ 
+for record in records: 
+    if record.x_is_remark:
+        record['stage_id'] = record.x_stage_id
+        available_stages = record.project_id.type_ids.filtered(lambda s: s.x_is_remark_stage) 
+        if not record.x_stage_id and available_stages: record['x_stage_id'] = available_stages[0]
+]]></field>
     </record>
 </odoo>

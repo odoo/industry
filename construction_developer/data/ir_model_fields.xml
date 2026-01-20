@@ -74,4 +74,153 @@ for sol in self: sol['x_is_deliverable'] = not sol.display_type and sol.is_servi
 for record in self: record['x_display_button'] = record.display_type in ['line_section', 'line_subsection'] and any(child.x_is_deliverable for child in record.order_id.order_line if record.id in [child.parent_id.id, child.parent_id.parent_id.id])
 ]]></field>
     </record>
+
+<!-- 
+    Remarks: New Models
+-->
+
+<!-- Remark Category -->
+    <record id="field_x_remark_category_x_name" model="ir.model.fields">
+        <field name="model_id" ref="model_x_remark_category"/>
+        <field name="ttype">char</field>
+        <field name="name">x_name</field>
+        <field name="field_description">Name</field>
+        <field name="required" eval="True"/>
+    </record>
+    <record id="field_x_remark_category_x_color" model="ir.model.fields">
+        <field name="model_id" ref="model_x_remark_category"/>
+        <field name="ttype">integer</field>
+        <field name="name">x_color</field>
+        <field name="field_description">Color</field>
+    </record>
+
+<!-- Remark (is a project task) -->
+    <record id="field_x_remark_x_is_remark" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">boolean</field>
+        <field name="name">x_is_remark</field>
+        <field name="field_description">Is Remark</field>
+    </record>
+    <record id="field_x_remark_x_date" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">date</field>
+        <field name="name">x_date</field>
+        <field name="field_description">Date</field>
+        <field name="tracking">1</field>
+        <field name="compute"><![CDATA[
+for record in self: record['x_date'] = record['x_date'] or datetime.datetime.today().date()
+]]></field>
+    </record>
+    <record id="field_x_remark_x_reference" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">char</field>
+        <field name="name">x_reference</field>
+        <field name="field_description">Reference</field>
+        <field name="depends">project_id</field>
+        <field name="tracking">1</field>
+    </record>
+    <record id="field_x_remark_x_location" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">char</field>
+        <field name="name">x_location</field>
+        <field name="field_description">Location</field>
+        <field name="tracking">1</field>
+    </record>
+    <record id="field_x_remark_x_category" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">many2many</field>
+        <field name="relation">x_remark_category</field>
+        <field name="name">x_remark_category_ids</field>
+        <field name="field_description">Category</field>
+        <field name="tracking">1</field>
+    </record>
+    <record id="field_x_remark_x_event_id" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">calendar.event</field>
+        <field name="on_delete" eval="False"/>
+        <field name="name">x_event_id</field>
+        <field name="field_description">Event</field>
+    </record>
+    <record id="field_x_remark_x_project_update_id" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">project.update</field>
+        <field name="on_delete" eval="False"/>
+        <field name="name">x_update_id</field>
+        <field name="field_description">Project Update</field>
+    </record>
+    <record id="field_x_remark_x_owner_id" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.partner</field>
+        <field name="on_delete" eval="False"/>
+        <field name="name">x_owner_id</field>
+        <field name="field_description">Owner</field>
+        <field name="tracking">1</field>
+    </record>
+    <record id="field_x_remark_x_stage_id" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">project.task.type</field>
+        <field name="on_delete" eval="False"/>
+        <field name="name">x_stage_id</field>
+        <field name="field_description">Remark Stage</field>
+        <field name="tracking">1</field>
+        <field name="group_expand" eval="True"/>
+        <field name="domain">[('x_is_remark_stage', '=', True)]</field>
+    </record>
+
+<!-- 
+    Remarks: External Models
+-->
+<!-- project.task.type -->
+    <record id="field_project_task_type_x_is_remark_stage" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_task_type"/>
+        <field name="ttype">boolean</field>
+        <field name="name">x_is_remark_stage</field>
+        <field name="field_description">Is Remark Stage</field>
+    </record>
+<!-- calendar.event -->
+    <record id="field_event_x_project_id" model="ir.model.fields">
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">project.project</field>
+        <field name="name">x_project_id</field>
+        <field name="field_description">Project</field>
+    </record>
+    <record id="field_event_x_remark_ids" model="ir.model.fields">
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="ttype">one2many</field>
+        <field name="relation">project.task</field>
+        <field name="relation_field">x_event_id</field>
+        <field name="name">x_remark_ids</field>
+        <field name="field_description">Remarks</field>
+    </record>
+<!-- project.project -->
+    <record id="field_project_x_event_ids" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="ttype">one2many</field>
+        <field name="relation">calendar.event</field>
+        <field name="relation_field">x_project_id</field>
+        <field name="name">x_event_ids</field>
+        <field name="field_description">Events</field>
+    </record>
+    <record id="field_project_x_remark_ids" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="ttype">one2many</field>
+        <field name="relation">project.task</field>
+        <field name="relation_field">project_id</field>
+        <field name="name">x_remark_ids</field>
+        <field name="field_description">Remarks</field>
+    </record>
+<!-- project.update -->
+    <record id="field_project_update_x_remark_ids" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_update"/>
+        <field name="ttype">one2many</field>
+        <field name="relation">project.task</field>
+        <field name="relation_field">x_update_id</field>
+        <field name="name">x_remark_ids</field>
+        <field name="field_description">Remarks</field>
+    </record>
 </odoo>

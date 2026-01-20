@@ -8,4 +8,93 @@
         <field name="view_mode">list</field>
         <field name="domain">[('order_id.project_id','=', active_id)]</field>
     </record>
+<!-- remark -->
+    <record id="action_project_x_remark_kanban_view" model="ir.actions.act_window">
+        <field name="name">Remarks</field>
+        <field name="res_model">project.task</field>
+        <field name="domain">[('x_is_remark', '=', True), ('project_id', '=', active_id)]</field>
+        <field name="context">{
+            'search_default_open_tasks': 1,
+            'default_project_id': active_id,
+            'default_x_is_remark': True,
+            'default_x_is_remark_stage': True,
+            'active_id': active_id,
+            'force_open_attachments': 1,
+            'hide_partner_id': 1,
+        }</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_x_remark_search"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_x_remark_kanban')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_x_remark_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_x_remark_form')})]"/>
+        <field name="help"><![CDATA[
+            <p class="o_view_nocontent_smiling_face">
+                No remarks, let's create one!
+            </p>
+        ]]></field>
+    </record>
+    <record id="action_x_remark_form_view" model="ir.actions.act_window">
+        <field name="name">Remarks</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">form</field>
+        <field name="search_view_id" ref="view_x_remark_search"/>
+        <field name="view_id" ref="view_x_remark_form"/>
+        <field name="context" eval="{
+            'default_x_is_remark': True,
+            'force_open_attachments': 1,
+        }"/>
+    </record>
+    <record id="menu_action_project_x_remark_kanban_view" model="ir.actions.act_window">
+        <field name="name">Remarks</field>
+        <field name="res_model">project.task</field>
+        <field name="view_id" ref="view_x_remark_list"/>
+        <field name="view_mode">list,form,search</field>
+        <field name="search_view_id" ref="view_x_remark_search"/>
+        <field name="domain">[('x_is_remark', '=', True)]</field>
+        <field name="context" eval="{
+            'form_view_ref': 'construction_developer.view_x_remark_form',
+            'search_default_open_remarks': 1,
+            'default_x_is_remark': True,
+            'force_open_attachments': 1,
+        }"/>
+        <field name="help"><![CDATA[
+            <p class="o_view_nocontent_smiling_face">
+                No remarks, let's create one!
+            </p>
+        ]]></field>
+    </record>
+<!-- remark category -->
+    <record id="menu_action_x_remark_category_list_view" model="ir.actions.act_window">
+        <field name="name">Remark Categories</field>
+        <field name="res_model">x_remark_category</field>
+        <field name="view_id" ref="view_x_remark_category_list"/>
+        <field name="view_mode">list,form,search</field>
+    </record>
+<!-- remark stage -->
+    <record id="menu_action_x_remark_stage_list_view" model="ir.actions.act_window">
+        <field name="name">Remark Stages</field>
+        <field name="res_model">project.task.type</field>
+        <field name="view_id" ref="view_task_type_tree_inherited"/>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('x_is_remark_stage', '=', True)]</field>
+        <field name="context">{'default_x_is_remark_stage': True}</field>
+    </record>
+    <!-- filter out remark stages from the project stages view -->
+    <record id="project.open_task_type_form" model="ir.actions.act_window" forcecreate="0">
+        <field name="domain">[('user_id', '=', False), ('x_is_remark_stage', '=', False)]</field>
+    </record>
+<!-- task -->
+    <!-- filter out remarks from project tasks view -->
+    <record id="project.action_view_all_task" model="ir.actions.act_window" forcecreate="0">
+        <field name="domain">[('has_template_ancestor', '=', False), ('x_is_remark', '=', False)]</field>
+    </record>
+    <!-- filter out remarks from my tasks view -->
+    <record id="project.action_view_my_task" model="ir.actions.act_window" forcecreate="0">
+        <field name="domain">[('user_ids', 'in', uid), ('has_template_ancestor', '=', False), ('x_is_remark', '=', False)]</field>
+    </record>
+    <!-- filter out remarks from project tasks report -->
+    <record id="project.action_project_task_user_tree" model="ir.actions.act_window" forcecreate="0">
+        <field name="domain">[('has_template_ancestor', '=', False), ('stage_id.x_is_remark_stage', '=', False)]</field>
+    </record>
 </odoo>
