@@ -3,20 +3,21 @@ import ast
 import os
 from io import BytesIO
 from zipfile import ZipFile, ZIP_DEFLATED
+import pathlib
 
 
 class IndustryUtils:
-    def __init__(self, industry_path: str):
-        self.industry_path = industry_path
+    def __init__(self):
+        self.industry_path = pathlib.Path(__file__).parent
 
     def get_zip(self, module_name: str):
         output = BytesIO()
         zf = ZipFile(output, "w", ZIP_DEFLATED)
         industry_modules = self.get_industry_dependencies(module_name)
-        dirs = [self.industry_path + module for module in industry_modules]
+        dirs = [self.industry_path / module for module in industry_modules]
         for dir in dirs:
             for dirname, _, files in os.walk(dir):
-                zip_dirname = os.sep.join(dirname.split(os.sep)[1:])
+                zip_dirname = os.sep.join(dirname.split(os.sep)[len(self.industry_path.parts):])
                 zf.write(dirname, zip_dirname)
                 for filename in files:
                     zf.write(os.path.join(dirname, filename), os.path.join(zip_dirname, filename))
@@ -24,7 +25,7 @@ class IndustryUtils:
         return output
 
     def get_manifest(self, industry: str):
-        return self.industry_path + industry + '/__manifest__.py'
+        return self.industry_path / industry / '__manifest__.py'
 
     def is_industry(self, module: str):
         return os.path.exists(self.get_manifest(module))
