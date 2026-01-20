@@ -106,6 +106,7 @@ CONTEXT_MODELS_DICT = {
     'calendar.event': 'no_mail_to_attendees',
     'helpdesk.ticket': 'mail_notrack',
     'hr.applicant': 'mail_notrack',
+    'res.partner': 'no_vat_validation',  # not linked to mail, but avoid redundant code
     **SKIP_CONTEXT_DICT_FOR_DEMO
 }
 
@@ -597,7 +598,7 @@ class TestEnv(IndustryCase):
             model_name = record.get('model')
             if not model_name or model_name not in CONTEXT_MODELS_DICT:
                 continue
-            record_context = record.get('context') or ''
+            record_context = record.get('context') or record.getparent().get('context') or ''
             expected_context = CONTEXT_MODELS_DICT.get(model_name)
             if model_name in SKIP_CONTEXT_DICT_FOR_DEMO:
                 record_xml_id = record.get('id') if "." in record.get('id') else module + '.' + record.get('id')
