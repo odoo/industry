@@ -15,6 +15,7 @@
             t-value="sale_order.x_so_contract_type if sale_order.x_so_contract_type in ('fixed_price', 'open_book') else
             'fixed_price' if order_lines_with_product and all(ol.x_sol_contract_type == 'fixed_price' for ol in order_lines_with_product) else
             'open_book' if order_lines_with_product and all(ol.x_sol_contract_type == 'open_book' for ol in order_lines_with_product) else False"/>
+            <t t-set="show_type_column" t-value="sale_order.x_so_contract_type == 'per_line' and not effective_contract_type"/>
         </xpath>
         <xpath expr="//div[@id='customer_info']" position="inside">
             <t t-if="effective_contract_type">
@@ -24,19 +25,19 @@
             </t>
         </xpath>
         <xpath expr="//th[@id='product_name_header']" position="after">
-            <t t-if="sale_order.x_so_contract_type == 'per_line' and not effective_contract_type">
+            <t t-if="show_type_column">
                 <th class="text-start" id="contract_type">Type</th>
             </t>
         </xpath>
         <xpath expr="//td[@name='td_product_name']" position="after">
-            <t t-if="sale_order.x_so_contract_type == 'per_line' and not effective_contract_type">
+            <t t-if="show_type_column">
                 <td name="td_contract_type" t-att-class="padding_class">
                     <span name="span_contract_type" t-out="''.join([s[0].upper() for s in line.x_sol_contract_type.split('_')])"/>
                 </td>
             </t>
         </xpath>
         <xpath expr="//div[@name='total']" position="after">
-            <t t-if="sale_order.x_so_contract_type == 'per_line' and not effective_contract_type">
+            <t t-if="show_type_column">
                 <div id="contract_type_abbreviation" name="contract_type_abbreviation">
                     <p class="mb-0"><strong>Contract Type</strong></p>
                     <t t-foreach="sale_order.order_line._fields['x_sol_contract_type'].selection" t-as="option">
@@ -44,6 +45,13 @@
                     </t>
                 </div>
             </t>
+        </xpath>
+        <xpath expr="//t[@t-set='section_name_colspan']" position="after">
+            <t t-set="section_name_colspan" t-value="section_name_colspan + 1 + (1 if show_type_column else 0)"/>
+        </xpath>
+        <xpath expr="//td[@name='td_section_group_name']" position="attributes">
+            <attribute name="t-att-colspan">2 + (1 if show_type_column else 0)
+            </attribute>
         </xpath>
     </template>
     <template id="sale_order_report_document_inherit" inherit_id="sale.report_saleorder_document">
@@ -61,6 +69,7 @@
             t-value="doc.x_so_contract_type if doc.x_so_contract_type in ('fixed_price', 'open_book') else
             'fixed_price' if order_lines_with_product and all(ol.x_sol_contract_type == 'fixed_price' for ol in order_lines_with_product) else
             'open_book' if order_lines_with_product and all(ol.x_sol_contract_type == 'open_book' for ol in order_lines_with_product) else False"/>
+            <t t-set="show_type_column" t-value="doc.x_so_contract_type == 'per_line' and not effective_contract_type"/>
         </xpath>
         <xpath expr="//div[@id='informations']" position="inside">
             <div t-if="effective_contract_type" class="col">
@@ -69,19 +78,19 @@
             </div>
         </xpath>
         <xpath expr="//th[@name='th_description']" position="after">
-            <t t-if="doc.x_so_contract_type == 'per_line' and not effective_contract_type">
+            <t t-if="show_type_column">
                 <th class="text-start" id="contract_type">Type</th>
             </t>
         </xpath>
         <xpath expr="//td[@name='td_product_name']" position="after">
-            <t t-if="doc.x_so_contract_type == 'per_line' and not effective_contract_type">
+            <t t-if="show_type_column">
                 <td name="td_contract_type" t-att-class="padding_class">
                     <span name="span_contract_type" t-out="''.join([s[0].upper() for s in line.x_sol_contract_type.split('_')])"/>
                 </td>
             </t>
         </xpath>
         <xpath expr="//div[@name='total']" position="after">
-            <t t-if="doc.x_so_contract_type == 'per_line' and not effective_contract_type">
+            <t t-if="show_type_column">
                 <div id="contract_type_abbreviation" name="contract_type_abbreviation">
                     <p class="mb-0" style="color: rgb(153, 41, 72);"><strong>Contract Type</strong></p>
                     <t t-foreach="doc.order_line._fields['x_sol_contract_type'].selection" t-as="option">
@@ -89,6 +98,13 @@
                     </t>
                 </div>
             </t>
+        </xpath>
+        <xpath expr="//t[@t-set='section_name_colspan']" position="after">
+            <t t-set="section_name_colspan" t-value="section_name_colspan + 1 + (1 if show_type_column else 0)"/>
+        </xpath>
+        <xpath expr="//td[@name='td_section_group_name']" position="attributes">
+            <attribute name="t-att-colspan">2 + (1 if show_type_column else 0)
+            </attribute>
         </xpath>
     </template>
     <template id="account_move_portal_content_inherit" inherit_id="account.bill_preview">
@@ -109,6 +125,12 @@
             <td style="color: rgb(128, 128, 128);" name="account_invoice_line_sequence" t-att-class="padding_class">
                 <span t-field="line.sequence"></span>
             </td>
+        </xpath>
+        <xpath expr="//t[@t-set='line_colspan']" position="after">
+            <t t-set="line_colspan" t-value="line_colspan + 1"/>
+        </xpath>
+        <xpath expr="//td[@name='td_quantity_grouped']" position="attributes">
+            <attribute name="t-att-colspan">2</attribute>
         </xpath>
     </template>
 </odoo>
