@@ -25,4 +25,16 @@
         <field name="tax_group_id" ref="excises_tax_group"/>
         <field name="fiscal_position_ids" model="account.fiscal.position" eval="[Command.link(fp) for fp in obj().search([('x_is_fiscal_deposit', '=', True)]).ids]"/>
     </record>
+
+    <function name="write" model="account.tax">
+        <value eval="[ref('no_excise_tax_sale'), ref('no_excise_tax_purchase')]"/>
+        <value model="account.tax" eval="
+            {'ubl_cii_tax_category_code': 'Z'}
+            if obj().env['ir.module.module'].search_count([
+                ('name', '=', 'account_edi_ubl_cii'),
+                ('state', '=', 'installed')
+            ], limit=1)
+            else {}
+        "/>
+    </function>
 </odoo>

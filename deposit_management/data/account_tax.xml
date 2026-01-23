@@ -61,4 +61,16 @@
         <field name="type_tax_use">purchase</field>
         <field name="tax_group_id" ref="deposit_tax_group"/>
     </record>
+
+    <function name="write" model="account.tax">
+        <value eval="[ref('account_tax_01_sale'), ref('account_tax_21_sale'), ref('account_tax_24_sale'), ref('account_tax_45_sale'), ref('account_tax_01_purchase'), ref('account_tax_21_purchase'), ref('account_tax_24_purchase'), ref('account_tax_45_purchase')]"/>
+        <value model="account.tax" eval="
+            {'ubl_cii_tax_category_code': 'O'}
+            if obj().env['ir.module.module'].search_count([
+                ('name', '=', 'account_edi_ubl_cii'),
+                ('state', '=', 'installed')
+            ], limit=1)
+            else {}
+        "/>
+    </function>
 </odoo>
