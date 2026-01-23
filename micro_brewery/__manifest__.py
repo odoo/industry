@@ -1,6 +1,6 @@
 {
     'name': 'Microbrewery',
-    'version': '2.3',
+    'version': '2.4',
     'category': 'Supply Chain',
     'depends': [
         'account',
@@ -13,6 +13,7 @@
         'mrp_subcontracting',
         'pos_restaurant',
         'pos_sale',
+        'quality_control',
         'sale_purchase',
         'sale_renting',
         'web_studio',
@@ -80,6 +81,7 @@
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
         'demo/stock_picking.xml',
+        'demo/quality_point.xml',
         'demo/website_attachment.xml',
         'demo/website_view.xml',
         'demo/website_page.xml',
