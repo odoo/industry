@@ -12,7 +12,6 @@
         'sale_purchase',
         'website_crm',
         'website_helpdesk',
-        'website_sale_comparison',
         'website_sale_stock',
     ],
     'data': [
