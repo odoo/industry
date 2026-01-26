@@ -7,7 +7,6 @@
         'point_of_sale',
         'purchase_stock',
         'stock',
-        'website_sale_comparison_wishlist',
         'website_sale_loyalty',
     ],
     'data': [
