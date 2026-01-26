@@ -17,7 +17,7 @@
         'stock_barcode',
         'website_crm',
         'website_sale_collect',
-        'website_sale_stock_wishlist',
+        'website_sale_stock',
     ],
     'data': [
         'data/ir_attachment_pre.xml',
