@@ -12,9 +12,7 @@
         'website_crm',
         'website_sale_autocomplete',
         'website_sale_collect',
-        'website_sale_comparison',
         'website_sale_loyalty',
-        'website_sale_wishlist',
     ],
     'data': [
         'data/res_config_settings.xml',
