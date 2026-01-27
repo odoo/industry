@@ -46,4 +46,5 @@
     'cloc_exclude': [
         'data/website_view.xml',
     ],
+    'images': ['images/main.png'],
 }
