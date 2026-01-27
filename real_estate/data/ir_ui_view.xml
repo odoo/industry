@@ -179,6 +179,35 @@
         </xpath>
     </field>
   </record>
+  <record id="product_attribute_value_list_view" model="ir.ui.view">
+    <field name="name">product.attribute.value.list.view</field>
+    <field name="mode">primary</field>
+    <field name="active" eval="True"/>
+    <field name="model">product.attribute.value</field>
+    <field name="priority">200</field>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+        <list default_order="attribute_id asc">
+            <field name="name"/>
+        </list>
+    </field>
+  </record>
+  <record id="product_attribute_value_search_view" model="ir.ui.view">
+    <field name="name">product.attribute.value.search.view</field>
+    <field name="mode">primary</field>
+    <field name="active" eval="True"/>
+    <field name="model">product.attribute.value</field>
+    <field name="priority">200</field>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+        <search string="Search Partner">
+            <field name="attribute_id"/>
+            <group name="group_by">
+                <filter name="attribute_group_by" string="Attribute" domain="[]" context="{'group_by' : 'attribute_id'}" />
+            </group>
+        </search>
+    </field>
+  </record>
   <record id="default_map_view_for_product_template" model="ir.ui.view">
     <field name="name">Default map view for product.template</field>
     <field name="model">product.template</field>
@@ -213,11 +242,9 @@
         <xpath expr="//page[@name='internal_notes']" position="after">
           <page string="Matchmaking">
             <group>
-              <group string="Criterias">
+              <group string="Criteria">
                 <field name="x_categories_ids" widget="many2many_tags"/>
-                <field name="x_region_ids" widget="many2many_tags" string="Regions"/>
-                <field name="x_type" widget="many2many_tags"/>
-                <field name="x_condition_ids" widget="many2many_tags"/>
+                <field name="x_criteria_ids" widget="many2many_tags" context="{'list_view_ref': 'product_attribute_value_list_view'}"/>
                 <field name="x_min_price"/>
                 <field name="x_max_price"/>
               </group>
@@ -415,5 +442,19 @@
         (5, 0, 0),
         (0, 0, {'view_mode': 'calendar', 'view_id': ref('calendar_view_for_appointment_type')}),
     ]"/>
+  </record>
+  <record id="product_attribute_form_view_extended" model="ir.ui.view">
+    <field name="name">product.attribute.form customization</field>
+    <field name="inherit_id" ref="product.product_attribute_view_form"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">product.attribute</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='create_variant']" position="after">
+          <field name="x_is_matchmaking"/>
+        </xpath>
+    </field>
   </record>
 </odoo>
