@@ -212,7 +212,7 @@ class TestEnv(IndustryCase):
                     self._check_base_records_update(tree, file_name, module)
                     if not is_studio_required:
                         is_studio_required = self._check_studio(tree, file_name)
-            if "/demo" in root:
+            if root.split('/')[-1] == 'demo':
                 self._check_main_company_inherit_is_present(root, files, module)
 
         if manifest_content is None:
