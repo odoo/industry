@@ -51,13 +51,14 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='subject']" position="before">
-                <field name="x_approval" options="{'no_create': True, 'no_create_edit': True}" domain="[('x_is_high_user_group', '=', True)]" invisible="x_is_user_high_group or context.get('active_model') not in ('sale.order', 'crm.lead')"/>
+                <field name="x_show_approval" invisible="0"/>
+                <field name="x_approval" options="{'no_create': True, 'no_create_edit': True}" domain="[('x_is_high_user_group', '=', True)]" invisible="not x_show_approval"/>
             </xpath>
             <xpath expr="//footer/button[@name='action_send_mail']" position="attributes">
                 <attribute name="invisible">x_approval_required=='mendatory'</attribute>
             </xpath>
             <xpath expr="//footer/button[@name='action_send_mail']" position="after">
-                <button string="Submit for Approval" type="action" class="btn-primary" name="%(action_submit_for_approval)d" invisible="x_is_user_high_group or context.get('active_model') not in ('sale.order', 'crm.lead')"/>
+                <button string="Submit for Approval" type="action" class="btn-primary" name="%(action_submit_for_approval)d" invisible="not x_show_approval"/>
             </xpath>
         </field>
     </record>
@@ -71,13 +72,13 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='subject']" position="before">
-                <field name="x_invoice_approval_by" options="{'no_create': True, 'no_create_edit': True}" domain="[('x_is_high_user_group', '=', True)]" invisible="x_is_user_high_groups or context.get('active_model') != 'account.move'"/>
+                <field name="x_invoice_approval_by" options="{'no_create': True, 'no_create_edit': True}" domain="[('x_is_high_user_group', '=', True)]" invisible="context.get('active_model') != 'account.move'"/>
             </xpath>
             <xpath expr="//button[@name='action_send_and_print']" position="attributes">
                 <attribute name="invisible">x_approval_required=='mendatory'</attribute>
             </xpath>
             <xpath expr="//button[@name='action_send_and_print']" position="after">
-                <button string="Submit for Approval" type="action" class="btn-primary" name="%(action_submit_for_approval_in_account_move_send)d" invisible="x_is_user_high_groups or context.get('active_model') != 'account.move'"/>
+                <button string="Submit for Approval" type="action" class="btn-primary" name="%(action_submit_for_approval_in_account_move_send)d" invisible="context.get('active_model') != 'account.move'"/>
             </xpath>
         </field>
     </record>
@@ -111,7 +112,7 @@
             <list>
                 <field name="x_date"/>
                 <field name="x_author_id"/>
-                <field name="x_subject"/>
+                <field name="x_name"/>
                 <field name="x_approval_status"  widget="badge" decoration-danger="x_approval_status=='cancelled'" decoration-success="x_approval_status=='sent'" decoration-info="x_approval_status=='pending'"/>
                 <button name="%(action_send_and_close_email)d" string="Approve &amp; Send" type="action" icon="fa-paper-plane" invisible="x_approval_status != 'pending'"/>
                 <button name="%(action_mark_outgoing)d" string="Retry" type="action" icon="fa-repeat" invisible="x_approval_status != 'cancelled'"/>
@@ -146,7 +147,7 @@
                 <sheet>
                     <div class="d-flex justify-content-between align-items-center">
                         <h1 class="d-flex w-100">
-                            <field name="x_subject" options="{'line_breaks': False}" widget="text" class="o_task_name text-truncate w-md-75 w-100 pe-2" placeholder="Subject"/>
+                            <field name="x_name" options="{'line_breaks': False}" widget="text" class="o_task_name text-truncate w-md-75 w-100 pe-2" placeholder="Subject"/>
                         </h1>
                         <div class="d-flex justify-content-end o_state_container">
                             <field name="x_approval_state" widget="approval_state_selection" class="o_task_state_widget"/>
@@ -232,7 +233,10 @@
         <field name="type">list</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='privilege_id']" position="attributes">
-                <attribute name="invisible">1</attribute>
+                <attribute name="optional">hide</attribute>
+            </xpath>
+            <xpath expr="//field[@name='implied_ids']" position="attributes">
+                <attribute name="optional">show</attribute>
             </xpath>
         </field>
     </record>
