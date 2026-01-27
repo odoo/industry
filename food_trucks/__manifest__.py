@@ -12,8 +12,8 @@
         'sale_crm',
     ],
     'data': [
+        'data/pos_config.xml',
         'data/crm_tag.xml',
-        'data/pos_payment_method.xml',
         'data/uom_uom.xml',
         'data/product_product.xml',
         'data/restaurant_floor.xml',
@@ -24,7 +24,6 @@
         'data/res_config_settings.xml',
     ],
     'demo': [
-        'demo/pos_config.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/hr_department.xml',

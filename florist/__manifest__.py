@@ -22,7 +22,6 @@
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/pos_category.xml',
-        'data/pos_payment_method.xml',
         'data/pos_config.xml',
         'data/product_category.xml',
         'data/uom_uom.xml',

@@ -52,7 +52,6 @@
         'demo/payment_provider_demo_post.xml',
         'demo/payment_provider.xml',
         'demo/payment_method.xml',
-        'demo/pos_config.xml',
         'demo/pos_session.xml',
         'demo/pos_order.xml',
         'demo/pos_order_line.xml',

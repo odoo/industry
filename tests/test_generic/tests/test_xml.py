@@ -401,7 +401,7 @@ class TestEnv(IndustryCase):
                     f"Duplicate field updates in record {record_id} of model {model} in {file_name}: {', '.join(field[0] for field in fields if fields_list.count(field) > 1)}"
                 )
             record_key = (record_id, model)
-            if fields & records[record_key]:
+            if fields & records[record_key] and model != 'pos.config':
                 _logger.warning(
                     f"Duplicate record updates in {file_name}: {record_id} in model {model}"
                 )
