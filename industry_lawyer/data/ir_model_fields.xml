@@ -58,7 +58,7 @@ groups = {3: self.env.ref("industry_lawyer.group_high", raise_if_not_found=False
     1: self.env.ref("industry_lawyer.group_low", raise_if_not_found=False)}
 def get_rank(user):
     for rank, group in groups.items():
-        if group and group in user.group_ids: return rank
+        if group and user.group_ids and group in user.group_ids: return rank
     return 0
 current_user = self.env.user
 current_user_rank = get_rank(current_user)
@@ -203,8 +203,8 @@ for user in users: user['x_is_high_user_group'] = get_rank(user) > current_user_
         <field name="name">x_mail_mail</field>
         <field name="relation">mail.mail</field>
     </record>
-    <record id="field_x_subject" model="ir.model.fields">
-        <field name="name">x_subject</field>
+    <record id="field_x_name" model="ir.model.fields">
+        <field name="name">x_name</field>
         <field name="ttype">char</field>
         <field name="related">x_mail_mail.subject</field>
         <field name="field_description">Subject</field>
@@ -285,5 +285,29 @@ for user in users: user['x_is_high_user_group'] = get_rank(user) > current_user_
         <field name="related">x_mail_mail.body_content</field>
         <field name="name">x_body_html</field>
         <field name="on_delete" eval="False"/>
+    </record>
+    <record id="field_x_current_model" model="ir.model.fields">
+        <field name="name">x_current_model</field>
+        <field name="ttype">char</field>
+        <field name="field_description">Current Model</field>
+        <field name="model_id" ref="mail.model_mail_compose_message"/>
+    </record>
+    <record id="field_x_show_approval" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+ctx = self._context
+self['x_show_approval'] = self.model in ('sale.order', 'crm.lead')
+]]></field>
+        <field name="ttype">boolean</field>
+        <field name="depends">partner_ids</field>
+        <field name="field_description">active_model</field>
+        <field name="model_id" ref="mail.model_mail_compose_message"/>
+        <field name="name">x_show_approval</field>
+    </record>
+    <record id="field_x_current_record_id" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">Current Record</field>
+        <field name="model_id" ref="account.model_account_move_send_wizard"/>
+        <field name="name">x_current_record_id</field>
+        <field name="relation">account.move</field>
     </record>
 </odoo>
