@@ -31,26 +31,17 @@ elif record.x_total > 0:
         <field name="code"><![CDATA[
 pickup_time = env.ref('sale_renting.recurrence_nightly').pickup_time
 return_time = env.ref('sale_renting.recurrence_nightly').return_time
-tz = env.ref('website.default_website').tz
+tz = timezone(env.ref('website.default_website').tz)
 for record in records:
     if not record.role_id.x_is_a_room_offer: continue
-    start_datetime = record.start_datetime.astimezone(tz=dateutil.tz.UTC)
-    end_datetime = record.end_datetime.astimezone(tz=dateutil.tz.UTC)
-    if record.start_datetime and str(record.start_datetime.time()) != f"{int(pickup_time):02d}:{int(pickup_time % 1 * 60):02d}:00":
-        start = timezone(tz).localize(datetime.datetime(year=start_datetime.year, month=start_datetime.month, day=start_datetime.day, hour=int(pickup_time), minute=int(pickup_time % 1 * 60), second=0))
-        start_datetime = start.astimezone(tz=dateutil.tz.UTC)
-        if start_datetime >= end_datetime: start_datetime = start_datetime - datetime.timedelta(days=1)
-    if record.end_datetime and str(record.end_datetime.time()) != f"{int(return_time):02d}:{int(return_time % 1 * 60):02d}:00":
-        end = timezone(tz).localize(datetime.datetime(year=end_datetime.year, month=end_datetime.month, day=end_datetime.day, hour=int(return_time), minute=int(return_time % 1 * 60), second=0))
-        end_datetime = end.astimezone(tz=dateutil.tz.UTC)
-        if start_datetime >= end_datetime: end_datetime = end_datetime + datetime.timedelta(days=1)
-    record['start_datetime'] = start_datetime.replace(tzinfo=None)
+    start_datetime = record.start_datetime.astimezone(tz=dateutil.tz.UTC).replace(hour=int(pickup_time), minute=int(pickup_time % 1 * 60)).astimezone(tz)
+    end_datetime = record.end_datetime.astimezone(tz=dateutil.tz.UTC).replace(hour=int(return_time), minute=int(return_time % 1 * 60)).astimezone(tz)
+    if start_datetime >= end_datetime: end_datetime = end_datetime + datetime.timedelta(days=1)
     record['end_datetime'] = end_datetime.replace(tzinfo=None)
+    record['start_datetime'] = start_datetime.replace(tzinfo=None)
 for record in records:
     if not record.sale_line_id: continue
-    nights = 0
-    if record.sale_line_id.planning_slot_ids:
-        nights = sum(record.sale_line_id.planning_slot_ids.mapped('x_nights'))
+    nights = sum(record.sale_line_id.planning_slot_ids.mapped('x_nights')) if record.sale_line_id.planning_slot_ids else 0
     record.sale_line_id.update({
         'start_date': record.start_datetime,
         'return_date': record.end_datetime,
@@ -68,15 +59,10 @@ for record in records:
 pickup_time = env.ref('sale_renting.recurrence_nightly').pickup_time
 return_time = env.ref('sale_renting.recurrence_nightly').return_time
 for record in records:
-    tz = env.ref('website.default_website').tz
-    rental_start_date = record.rental_start_date.astimezone(tz=dateutil.tz.gettz(tz))
-    start = rental_start_date.replace(hour=int(pickup_time), minute=int(pickup_time % 1 * 60), second=0)
-    record['rental_start_date'] = start.astimezone(tz=dateutil.tz.UTC).replace(tzinfo=None)
-
-    rental_return_date = record.rental_return_date.astimezone(tz=dateutil.tz.gettz(tz))
-    end = rental_return_date.replace(hour=int(return_time), minute=int(return_time % 1 * 60), second=0)
-    record['rental_return_date'] = end.astimezone(tz=dateutil.tz.UTC).replace(tzinfo=None)
+    record['rental_start_date'] = record.rental_start_date.replace(hour=int(pickup_time), minute=int(pickup_time % 1 * 60))
+    record['rental_return_date'] = record.rental_return_date.replace(hour=int(return_time), minute=int(return_time % 1 * 60))
     record.action_update_rental_prices()
+    record.order_line._compute_name()
 ]]></field>
     </record>
     <record id="apply_rental_check_out" model="ir.actions.server">
