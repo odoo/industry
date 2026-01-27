@@ -1,5 +1,29 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+    <record id="field_sale_order_line_x_reference" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="field_description">Line Reference</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_reference</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="depends">sequence,order_id.name</field>
+        <field name="compute"><![CDATA[
+for sol in self: sol['x_reference'] = f"{sol.order_id.name}.{sol.sequence}"
+        ]]></field>
+    </record>
+    <record id="field_account_move_line_x_reference" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="field_description">Line Reference</field>
+        <field name="model_id" ref="sale.model_account_move_line"/>
+        <field name="name">x_reference</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="depends">sale_line_ids,sale_line_ids.x_reference</field>
+        <field name="compute"><![CDATA[
+for aml in self: aml['x_reference'] = (aml.sale_line_ids.x_reference if len(aml.sale_line_ids) == 1 else "Multi") if aml.sale_line_ids else ""
+        ]]></field>
+    </record>
     <record id="field_sale_order_line_x_delivered_progress" model="ir.model.fields">
         <field name="ttype">float</field>
         <field name="field_description">Delivered Progress</field>
