@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Website Industry - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code">
+website = env.ref('hotel.website_industry')
+
+to_deactivate = [
+    # Presets
+    'website.header_call_to_action',
+    'website.header_search_box',
+    'website.header_text_element',
+    'website.footer_custom',
+    'website_sale.carousel_product_indicators_left',
+    'website_sale.cta_wrapper_large',
+    'website_sale.filmstrip_categories_bordered',
+    'website_sale.product_buy_now_large',
+    'website_sale.product_quantity_large',
+    'website_sale.products_attributes_collapsible',
+    'website_sale.products_categories_list_collapsible',
+    'website_sale_renting.shop_rental_datepicker_opt',
+    # Default static pages
+    'website.homepage',
+    'website.contactus',
+]
+
+to_activate = [
+    # Presets
+    'website_sale.carousel_product_indicators_bottom',
+    'website_sale.cta_wrapper_boxed',
+    'website_sale.floating_bar',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+
+# Default menu items to remove
+menus.search(base_domain + [('url', 'in', ['/appointment'])]).unlink()
+# Rename /shop menu to "Rooms"
+menus.search(base_domain + [('url', '=', '/shop')], limit=1).write({'name': 'Rooms'})
+        </field>
+    </record>
+
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
