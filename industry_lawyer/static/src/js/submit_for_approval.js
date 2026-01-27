@@ -4,20 +4,22 @@ import { patch } from "@web/core/utils/patch";
 import { Composer } from "@mail/core/common/composer";
 
 patch(Composer.prototype, {
-    async sendMessageSubmitForApproval() {
-        await this.processMessage(async (value) => {
-            await this._sendMessage(
-                value,
-                this.postData,
-                {
-                    ...this.extraData,
-                    context: {
-                        ...(this.extraData.context || {}),
-                        default_x_submit_for_approval: true,
-                    },
-                }
-            );
+
+    async onClickSubmitForApproval(ev) {
+        const composer = this.props.composer;
+        const actionXmlId = ev.currentTarget.dataset.actionXmlid;
+        if (!actionXmlId) {
+            throw new Error("Submit approval server action XMLID not found");
+        }
+        await this.env.services.action.doAction(actionXmlId, {
+            additionalContext: {
+                default_model: composer.thread.model,
+                default_res_id: composer.thread.id,
+                body: composer.composerHtml,
+                attachment_ids: composer.attachments.map(a => a.id),
+                partner_ids: composer.thread.suggestedRecipients.filter(r => r.partner_id).map(r => r.partner_id),
+            },
         });
+        this.clear();
     },
 });
-
