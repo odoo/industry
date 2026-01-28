@@ -78,7 +78,7 @@ class ServerActionsTestCase(TransactionCase):
                 'type': 'service',
                 'uom_id': cls.product_uom.id,
             }).id,
-            'product_uom_id': cls.product_uom.id,
+            'uom_id': cls.product_uom.id,
         })
 
     def test_make_deposit_storable_delivery_invoice_automation(self):
