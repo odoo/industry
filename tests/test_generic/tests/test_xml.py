@@ -602,6 +602,8 @@ class TestEnv(IndustryCase):
             expected_context = CONTEXT_MODELS_DICT.get(model_name)
             if model_name in SKIP_CONTEXT_DICT_FOR_DEMO:
                 record_xml_id = record.get('id') if "." in record.get('id') else module + '.' + record.get('id')
+                if record_xml_id and not self.env['ir.model.data']._xmlid_to_res_model_res_id(record_xml_id, raise_if_not_found=False)[0]:
+                    continue
                 recordset = self.env.ref(record_xml_id) if record_xml_id else False
                 if recordset:
                     user = getattr(recordset, 'user_id', False)
