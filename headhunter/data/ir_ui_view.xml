@@ -12,6 +12,13 @@
                 <xpath expr="//field[@name='create_date']" position="after">
                     <field name="x_opportunities" optional="show" />
                 </xpath>
+                <xpath expr="//field[@name='availability']" position="before">
+                    <field name="x_available" optional="hide" />
+                </xpath>
+                <xpath expr="//list" position="inside">
+                    <button name="%(ir_actions_server_for_email_pop_up)d" string="Send CV" type="action" class="btn btn-outline-primary btn-sm" invisible="x_is_cv_sent or not x_is_shared_cv"/>
+                    <button name="%(ir_actions_server_for_email_pop_up)d" string="CV Sent" type="action" class="btn btn-outline-success btn-sm" invisible="not x_is_cv_sent"/>
+                </xpath>
             </data>
         </field>
     </record>
@@ -26,8 +33,19 @@
         <field name="arch" type="xml">
             <data>
                 <xpath expr="//button[@name='action_redirect_to_page_views']" position="replace">
-                    <button class="oe_stat_button" icon="fa-users" type="action" name="%(headhunter_crm_case_categ0_act_job)d">
+                    <button class="oe_stat_button" icon="fa-users" type="action" name="%(ir_actions_server_view_applicants)d" invisible="not x_opportunities_count">
                         <field widget="statinfo" name="x_opportunities_count" string="Applicants" />
+                    </button>
+                </xpath>
+                <xpath expr="//header" position="inside">
+                    <button name="%(ir_actions_server_create_new_job_from_opportunity)d" string="Create New Job" type="action" invisible="x_job_positions" class="btn-primary"/>
+                </xpath>
+                <xpath expr="//button[@name='action_view_sale_quotation']" position="after">
+                    <button class="oe_stat_button" icon="fa-bell" type="action" name="%(ir_actions_server_view_job_positions)d" invisible="not x_job_position_count">
+                        <field widget="statinfo" name="x_job_position_count" string="Job Positions" />
+                    </button>
+                    <button class="oe_stat_button" icon="fa-send" type="action" name="%(ir_actions_server_view_sent_cvs)d" invisible="not x_job_position_count">
+                        <field widget="statinfo" name="x_cv_sent_count" string="Sent CV'S"/>
                     </button>
                 </xpath>
             </data>
@@ -43,8 +61,25 @@
         <field name="priority">500</field>
         <field name="arch" type="xml">
             <data>
-                <xpath expr="//field[@name='job_id']" position="before">
+                <xpath expr="//field[@name='linkedin_profile']" position="after">
+                    <field name="x_is_shared_cv" widget="many2many_binary"/>
+                </xpath>
+                <xpath expr="//field[@name='priority']" position="before">
+                    <field name="employee_id"/>
+                </xpath>
+                <xpath expr="//field[@name='type_id']" position="after">
+                    <field name="x_available"/>
+                </xpath>
+                <xpath expr="//field[@name='department_id']" position="after">
+                    <field name="x_published"/>
                     <field name="x_opportunities" widget="many2many_tags"/>
+                </xpath>
+                <xpath expr="//field[@name='availability']" position="attributes">
+                    <attribute name="invisible">not x_available</attribute>
+                </xpath>
+                <xpath expr="//header" position="inside">
+                    <button name="%(ir_actions_server_for_email_pop_up)d" string="Send CV" type="action" class="btn btn-outline-primary" invisible="x_is_cv_sent or not x_is_shared_cv"/>
+                    <button name="%(ir_actions_server_for_email_pop_up)d" string="CV Sent" type="action" class="btn btn-outline-success" invisible="not x_is_cv_sent"/>
                 </xpath>
             </data>
         </field>
@@ -66,7 +101,183 @@
                 <xpath expr="//filter[@name='responsible']" position="after">
                     <filter name="group_by_opportunities" string="Opportunities" context="{'group_by': 'x_opportunities'}" />
                 </xpath>
+                <xpath expr="//filter[@name='applicants']" position="after">
+                    <filter string="Job Positions" name="job_positions" domain="[('job_id.x_status_bar', 'not in', ['draft', 'done'])]"/>
+                </xpath>
+                <xpath expr="//filter[@name='applicant_availability']" position="attributes">
+                    <attribute name="domain">['&amp;', ('x_available', '=', True), '|', ('availability', '&lt;=', 'today'), ('availability','=', False)]</attribute>
+                </xpath>
             </data>
+        </field>
+    </record>
+    <record id="hr_kanban_view_applicant_inherit_view" model="ir.ui.view">
+        <field name="name">hr.applicants.kanban.inherit.view</field>
+        <field name="model">hr.applicant</field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="hr_recruitment.hr_kanban_view_applicant"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="inside">
+                <field name="x_available"/>
+                <field name="availability"/>
+            </xpath>
+            <xpath expr="//t[@t-name='card']/field[@name='partner_name']" position="after">
+                <t t-if="record.x_available.raw_value === false">
+                    <div class="text-muted small mt-1">
+                        <span class="text-danger fw-bold">Unavailable</span>
+                    </div>
+                </t>
+                <t t-elif="record.availability.raw_value">
+                    <div class="text-muted small mt-1">
+                        <field class="text-warning fw-bold" name="availability"/>
+                    </div>
+                </t>
+            </xpath>
+            <xpath expr="//field[@name='rotting_days']" position="after">
+                <button name="%(ir_actions_server_for_email_pop_up)d" string="Send CV" type="action" class="btn btn-outline-primary btn-sm" invisible="x_is_cv_sent or not x_is_shared_cv"/>
+                <button name="%(ir_actions_server_for_email_pop_up)d" string="CV Sent" type="action" class="btn btn-outline-success btn-sm" invisible="not x_is_cv_sent"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_hr_job_form_inherit_view" model="ir.ui.view">
+        <field name="name">hr.job.form.inherit.view</field>
+        <field name="model">hr.job</field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="hr.view_hr_job_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="x_status_bar" widget="statusbar" options="{'clickable': '1'}"/>
+                <button name="%(ir_actions_server_create_new_sale_order_from_job_position)d" string="Create Sales order" type="action" invisible="x_quotation_sales_order" class="btn-primary"/>
+            </xpath>
+             <xpath expr="/form//field[@name='is_published']" position="after">
+                <button class="oe_stat_button" type="action" name="%(ir_actions_server_view_opportunity)d" invisible="not x_opportunity" string="Opportunity" icon="fa-tag"/>
+                <button class="oe_stat_button" type="action" name="%(ir_actions_server_view_sales_order)d" invisible="not x_quotation_sales_order" string="Sales Order" icon="fa-edit"/>
+            </xpath>
+            <xpath expr="//group[@id='job_skills']/field[@name='current_job_skill_ids']" position="after">
+                <field name="x_recruitment_type"/>
+                <field name="x_customer" invisible="x_recruitment_type != &quot;External&quot;"/>
+                <field name="x_hiring_team_contact" widget="many2many_tags_email" invisible="x_recruitment_type != &quot;External&quot;" domain="[('id', 'in', x_customer_children_ids)]"/>
+                <button name="%(ir_actions_server_check_portal_access)d" string="Grant Portal Access" type="action" class="btn-primary" invisible="not x_has_portal_access"/>
+            </xpath>
+            <xpath expr="//page[@name='recruitment_page']/group/group[@name='hiring_process']/div" position="after">
+                <field name="x_opportunity"/>
+                <field name="x_quotation_sales_order"/>
+                <field name="x_invoices" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="hr_job_survey_inherit_view" model="ir.ui.view">
+        <field name="name">hr.job.survery.form.inherit.view</field>
+        <field name="model">hr.job</field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="hr_recruitment.hr_job_survey"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']/button[@name='%(hr_recruitment.action_hr_job_applications)d']" position="attributes">
+                <attribute name="invisible">x_status_bar == 'draft'</attribute>
+            </xpath>
+        </field>
+    </record>
+    <!-- cv sent views -->
+    <record id="view_cv_sent_applicant_list" model="ir.ui.view">
+        <field name="name">cv.sent.applicant.list</field>
+        <field name="model">x_cv_sent_application</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list string="CV Sent Applicants" create="0" editable="bottom">
+                <field name="x_applicant_id" readonly="1"/>
+                <field name="x_job_id" readonly="1"/>
+                <field name="x_cv" widget="many2many_binary" readonly="1"/>
+                <field name="x_available" readonly="1"/>
+                <field name="x_availability" invisible="not x_available" readonly="1"/>
+                <field name="x_cv_sent_date" readonly="1"/>
+                <field name="x_is_published" readonly="0"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_cv_sent_applicant_form" model="ir.ui.view">
+        <field name="name">cv.sent.applicant.form</field>
+        <field name="model">x_cv_sent_application</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form string="CV Sent Applicant">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="x_applicant_id"/>
+                            <field name="x_job_id" readonly="1"/>
+                            <field name="x_cv" widget="many2many_binary"/>
+                        </group>
+                        <group>
+                            <field name="x_available"/>
+                            <field name="x_availability" invisible="not x_available"/>
+                            <field name="x_cv_sent_date"/>
+                            <field name="x_is_published"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_cv_sent_applicant_search" model="ir.ui.view">
+        <field name="name">cv.sent.applicant.search</field>
+        <field name="model">x_cv_sent_application</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <search string="Search CV Sent Applicants">
+                <field name="x_applicant_id"/>
+                <field name="x_job_id"/>
+                <group>
+                    <filter name="group_by_job" string="Job Position" context="{'group_by':'x_job_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="view_hr_job_kanban_inherit_view" model="ir.ui.view">
+        <field name="name">hr.job.view.kanban.inherit</field>
+        <field name="model">hr.job</field>
+        <field name="inherit_id" ref="hr_recruitment.view_hr_job_kanban"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//t[@t-name='card']/div[1]" position="before">
+                <div class="ribbon ribbon-top-right" invisible="x_status_bar != 'draft'">
+                    <span class="text-bg-warning">Draft</span>
+                </div>
+                <div class="ribbon ribbon-top-right" invisible="x_status_bar != 'done'">
+                    <span class="text-bg-primary">Done</span>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='no_of_recruitment']/." position="before">
+                <div class="col align-content-center">
+                    <div class="d-flex justify-content-center">
+                        <field name="x_cv_count" class="number"/>
+                        <div class="number_description fs-4 lh-1"> CV's<br/>sent
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+            <xpath expr="//t[@t-name='menu']//div[@name='menu_view_job_posts']" position="after">
+                <div role="menuitem" name="menu_view_opportunities">
+                    <a name="%(ir_actions_server_view_opportunity)d" invisible="not x_opportunity" type="action">Opportunities</a>
+                </div>
+                <div role="menuitem" name="menu_view_sales_order">
+                    <a name="%(ir_actions_server_view_sales_order)d" invisible="not x_quotation_sales_order" type="action">Sales Order</a>
+                </div>
+            </xpath>
+            <xpath expr="//t[@t-name='menu']//div[@name='menu_new_applications']" position="after">
+                <div role="menuitem" name="menu_new_sales_order">
+                    <a name="%(ir_actions_server_create_new_sale_order_from_job_position)d" invisible="x_quotation_sales_order" type="action">Sales Order</a>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_sale_order_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="x_job_positions" widget="many2many_tags" domain="[('x_customer','=', partner_id), ('x_quotation_sales_order','=', False)]"/>
+            </xpath>
         </field>
     </record>
 </odoo>

@@ -40,4 +40,243 @@ for lead in records:
         <field name="state">next_activity</field>
         <field name="activity_type_id" ref="mail.mail_activity_data_call"/>
     </record>
+    <record id="ir_actions_server_view_sales_order" model="ir.actions.server">
+        <field name="name">View Sales Order</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="hr.model_hr_job"/>
+        <field name="code"><![CDATA[
+    action = {
+        'view_mode': 'form',
+        'res_model': 'sale.order',
+        'res_id': record.x_quotation_sales_order.id,
+        'type': 'ir.actions.act_window',
+    }
+    ]]></field>
+    </record>
+    <record id="ir_actions_server_view_opportunity" model="ir.actions.server">
+        <field name="name">View Opportunity</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="hr.model_hr_job"/>
+        <field name="code"><![CDATA[
+    action = {
+        'view_mode': 'form',
+        'res_model': 'crm.lead',
+        'res_id': record.x_opportunity.id,
+        'type': 'ir.actions.act_window',
+    }
+    ]]></field>
+    </record>
+    <record id="ir_actions_server_706" model="ir.actions.server">
+        <field name="name">Execute Code</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="base_automation_id" ref="status_update_base_automation"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for record in records:
+    if record['x_status_bar'] == 'done':
+        record['website_published'] = False
+    if record['website_published'] and record['x_status_bar'] == 'draft':
+        raise UserError("You cannot publish a Draft Job Position.")
+    if record['x_status_bar'] == 'draft' and record.all_application_count > 0:
+        raise UserError("You cannot set this job position back to Draft because applications already exist.")]]></field>
+    </record>
+    <record id="ir_actions_server_link_to_job" model="ir.actions.server">
+        <field name="name">Execute Code</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="base_automation_id" ref="base_automation_sale_linked_to_job_position"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[record.x_job_id.write({'x_quotation_sales_order': record.id})]]></field>
+    </record>
+    <record id="ir_actions_server_check_portal_access" model="ir.actions.server">
+        <field name="name">Check Portal Access</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="hr.model_hr_job"/>
+        <field name="code"><![CDATA[
+partner_ids = record.x_hiring_team_contact.ids if record.x_hiring_team_contact else []
+action = env['portal.wizard'].with_context(default_partner_ids=partner_ids).action_open_wizard()
+    ]]></field>
+    </record>
+  <!-- mail pop up server action -->
+    <record id="ir_actions_server_for_email_pop_up" model="ir.actions.server">
+        <field name="binding_model_id" ref="hr_recruitment.model_hr_applicant"/>
+        <field name="code"><![CDATA[
+ctx = {
+    'default_model': 'hr.applicant',
+    'default_res_ids': [record.id],
+    'default_template_id': env.ref('headhunter.mail_template_60').id,
+    'default_composition_mode': 'comment',
+    'default_attachment_ids': [(6, 0, record.x_is_shared_cv.ids)],
+    'force_email': True,
+    'x_from_cv_send': True,
+}
+if record.job_id.x_customer:
+    ctx['default_partner_ids'] = [(6, 0, [record.job_id.x_customer.id])]
+action =  {
+    'type': 'ir.actions.act_window',
+    'res_model': 'mail.compose.message',
+    'view_mode': 'form',
+    'views': [(env.ref('mail.email_compose_message_wizard_form').id, 'form')],
+    'target': 'new',
+    'context': ctx,
+}]]></field>
+        <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
+        <field name="state">code</field>
+        <field name="name">To open email pop up</field>
+    </record>
+    <record id="ir_actions_server_718" model="ir.actions.server">
+        <field name="code"><![CDATA[applicant = env['hr.applicant'].browse(record.res_id)
+if env.context.get('x_from_cv_send'):
+    sent_date = datetime.date.today()
+    attachments = applicant.x_is_shared_cv
+    for attachment in attachments:
+        attachment.write({'public': True})
+    availability_date = applicant.availability or sent_date
+    env['x_cv_sent_application'].create({
+        'x_applicant_id': applicant.id,
+        'x_job_id': applicant.job_id.id,
+        'x_cv': [(6, 0, record.attachment_ids.ids)],
+        'x_available': applicant.x_available,
+        'x_availability': availability_date,
+        'x_cv_sent_date': sent_date,
+        'x_is_published': True,
+        })
+    applicant['x_is_cv_sent'] = True,
+    applicant['x_published'] = True,
+        ]]></field>
+        <field name="model_id" ref="mail.model_mail_message"/>
+        <field name="state">code</field>
+        <field name="name">Execute Code</field>
+        <field name="base_automation_id" ref="base_automation_to_send_mail"/>
+    </record>
+    <record id="cv_sent_applicants_route" model="ir.actions.server">
+        <field name="name">Route displaying CV Sent Applicants</field>
+        <field name="model_id" ref="x_cv_sent_application_model"/>
+        <field name="state">code</field>
+        <field name="website_published">True</field>
+        <field name="website_path">cv_sent_applicants</field>
+        <field name="code"><![CDATA[
+response = request.render('headhunter.portal_cv_sent_applicants')
+]]></field>
+    </record>
+    <record id="action_unpublish_cv" model="ir.actions.server">
+        <field name="name">Unpublish CV</field>
+        <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
+        <field name="binding_model_id" ref="hr_recruitment.model_hr_applicant"/>
+        <field name="binding_type">action</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for applicant in records:
+    applicant['x_published'] = False
+    applicant.x_cv_sent_ids.write({'x_is_published': False})
+]]></field>
+    </record>
+    <record id="action_unpublish_cv_sent_model" model="ir.actions.server">
+        <field name="name">Unpublish CV</field>
+        <field name="model_id" ref="x_cv_sent_application_model"/>
+        <field name="binding_model_id" ref="x_cv_sent_application_model"/>
+        <field name="binding_type">action</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for cv in records:
+    cv['x_is_published'] = False
+    cv.x_applicant_id.write({'x_published': False})
+]]></field>
+    </record>
+    <record id="ir_actions_server_view_job_positions" model="ir.actions.server">
+        <field name="name">View Job Positions</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="crm.model_crm_lead"/>
+        <field name="code"><![CDATA[
+jobs = records.mapped('x_job_positions').filtered(lambda job: job.active)
+action = {
+    'res_model': 'hr.job',
+    'type': 'ir.actions.act_window',
+}
+if jobs:
+    action.update({'view_mode': 'form', 'res_id': jobs.id} if len(jobs) == 1 else {'view_mode': 'list,form', 'domain': [('id', 'in', jobs.ids)]})
+action
+    ]]></field>
+    </record>
+    <record id="ir_actions_server_view_applicants" model="ir.actions.server">
+        <field name="name">View Applicants</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="crm.model_crm_lead"/>
+        <field name="code"><![CDATA[
+applicants = env['hr.applicant'].search([('x_opportunities', 'in', records.ids)])
+action = {
+    'res_model': 'hr.applicant',
+    'type': 'ir.actions.act_window',
+}
+if applicants:
+    action.update({'view_mode': 'form', 'res_id': applicants.id} if len(applicants) == 1 else {'view_mode': 'list,form', 'domain': [('id', 'in', applicants.ids)]})
+action
+    ]]></field>
+    </record>
+    <record id="ir_actions_server_view_sent_cvs" model="ir.actions.server">
+        <field name="name">View sent cv's</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="crm.model_crm_lead"/>
+        <field name="code"><![CDATA[
+job_ids = record.x_job_positions.ids
+domain = [('job_id', 'in', job_ids), ('x_is_cv_sent', '=', True)]
+action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Sent CVs',
+    'res_model': 'hr.applicant',
+    'view_mode': 'list,form',
+    'domain': domain,
+    'context': {'group_by': 'job_id'},
+}]]></field>
+    </record>
+    <record id="ir_actions_server_create_new_job_from_opportunity" model="ir.actions.server">
+        <field name="name">Create New Job</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="crm.model_crm_lead"/>
+        <field name="code"><![CDATA[
+action = {
+    'view_mode': 'form',
+    'type': 'ir.actions.act_window',
+    'res_model': 'hr.job',
+    'context': {
+        'default_x_opportunity': record.id,
+        'default_x_customer': record.partner_id.id if record.partner_id else False,
+    }
+}]]></field>
+    </record>
+    <record id="ir_actions_server_create_new_sale_order_from_job_position" model="ir.actions.server">
+        <field name="name">Create New Sales Order</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="hr.model_hr_job"/>
+        <field name="code"><![CDATA[
+action = {
+    'view_mode': 'form',
+    'type': 'ir.actions.act_window',
+    'res_model': 'sale.order',
+    'context': {
+        'default_x_job_id': record.id,
+        'default_partner_id': record.x_customer.id if record.x_customer else False,
+        'default_opportunity_id': record.x_opportunity.id if record.x_opportunity else False,
+    }
+}]]></field>
+    </record>
+    <!-- Scope 4 point 1 -->
+    <record id="ir_actions_server_fill_jobs_from_opportunity" model="ir.actions.server">
+        <field name="name">Execute Code</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="base_automation_id" ref="base_automation_to_prefill_jobs_from_opportunity"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if record.opportunity_id:
+    jobs = record.opportunity_id.x_job_positions.filtered(lambda j: not j.x_quotation_sales_order)
+    jobs.write({'x_quotation_sales_order': record.id})
+        ]]></field>
+    </record>
 </odoo>
