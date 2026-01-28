@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="x_is_convert_attribute_field_product_attribute" model="ir.model.fields">
+        <field name="name">x_is_convert_attribute</field>
+        <field name="field_description">Convert Attribute</field>
+        <field name="model_id" ref="product.model_product_attribute"/>
+        <field name="ttype">boolean</field>
+    </record>
+    <record id="x_show_convert_visible_field_stock_picking" model="ir.model.fields">
+        <field name="name">x_show_convert_visible</field>
+        <field name="field_description">Show Convert Button</field>
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="ttype">boolean</field>
+        <field name="store">False</field>
+        <field name="compute"><![CDATA[
+for move in self:
+    move['x_show_convert_visible'] = (move.product_id.is_storable and move.picking_type_id.code not in ('incoming', 'dropship') and move.picking_id.state in ('waiting', 'confirmed', 'assigned', 'done'))
+        ]]></field>
+    </record>
+    <record id="x_field_convert_product_wizard_move_id" model="ir.model.fields">
+        <field name="name">x_move_id</field>
+        <field name="field_description">Stock Move</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.move</field>
+    </record>
+    <record id="x_field_convert_product_wizard_move_location_id" model="ir.model.fields">
+        <field name="name">x_move_location_id</field>
+        <field name="field_description">Stock Move Location</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.location</field>
+        <field name="related">x_move_id.location_id</field>
+    </record>
+    <record id="x_field_convert_product_wizard_product_id" model="ir.model.fields">
+        <field name="name">x_product_id</field>
+        <field name="field_description">Product To Convert</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">product.product</field>
+    </record>
+    <record id="field_convert_product_wizard_quant_id" model="ir.model.fields">
+        <field name="name">x_quant_id</field>
+        <field name="field_description">Available Quant</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.quant</field>
+        <field name="compute"><![CDATA[
+for wizard in self:
+    move_line = wizard.x_move_id.move_line_ids[:1]
+    wizard['x_quant_id'] = move_line and self.env['stock.quant'].search([('product_id', '=', move_line.product_id.id), ('location_id', '=', move_line.location_id.id), ('lot_id', '=', move_line.lot_id.id)], limit=1) or False
+        ]]></field>  
+    </record>
+    <record id="field_convert_product_wizard_quantity" model="ir.model.fields">
+        <field name="name">x_quantity</field>
+        <field name="field_description">Quantity to Convert</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="ttype">float</field>
+        <field name="depends">x_quant_id</field>
+        <field name="compute"><![CDATA[
+for wizard in self:
+    quant = wizard.x_quant_id
+    move_line = wizard.x_move_id.move_line_ids.filtered(lambda ml: ml.location_id == quant.location_id and ml.lot_id == quant.lot_id and ml.product_id == quant.product_id)[:1]
+    wizard['x_quantity'] = move_line.quantity if move_line else 0.0
+        ]]></field>
+    </record>
+    <record id="field_convert_product_wizard_keep_lot" model="ir.model.fields">
+        <field name="name">x_keep_lot_sn</field>
+        <field name="field_description">Keep Lot/Serial</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="ttype">boolean</field>
+    </record>
+    <record id="field_convert_product_wizard_new_lot_id" model="ir.model.fields">
+        <field name="name">x_new_lot_sn</field>
+        <field name="field_description">New Lot/Serial</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="ttype">char</field>
+    </record>
+    <record id="field_convert_product_wizard_grade_id" model="ir.model.fields">
+        <field name="name">x_product_convert_into</field>
+        <field name="field_description">Product Convert Into</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">product.product</field>
+    </record>
+    <record id="field_convert_wizard_product_tracking" model="ir.model.fields">
+        <field name="name">x_source_tracking</field>
+        <field name="field_description">Source Tracking</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="ttype">selection</field>
+        <field name="related">x_product_id.tracking</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="field_convert_product_wizard_source_tmpl_id" model="ir.model.fields">
+        <field name="name">x_source_product_tmpl_id</field>
+        <field name="field_description">Product To Convert Template</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="ttype">integer</field>
+        <field name="store" eval="False"/>
+        <field name="related">x_product_id.product_tmpl_id.id</field>
+    </record>
+    <record id="x_allowed_product_ids_field" model="ir.model.fields">
+        <field name="name">x_allowed_product_ids</field>
+        <field name="field_description">Allowed Target Products</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="ttype">many2many</field>
+        <field name="relation">product.product</field>
+        <field name="store">False</field>
+        <field name="depends">x_product_id, x_keep_lot_sn, x_new_lot_sn</field>
+        <field name="compute"><![CDATA[
+for wizard in self:
+    allowed = wizard.env['product.product']
+    source = wizard.x_product_id
+    if not source:
+        wizard['x_allowed_product_ids'] = [(6, 0, [])]
+        continue
+    
+    src_ptavs = source.product_template_attribute_value_ids
+    src_convert = src_ptavs.filtered(lambda p: p.attribute_id.x_is_convert_attribute)
+    src_fixed = src_ptavs - src_convert
+
+    domain = [('id', '!=', source.id)]
+    if src_convert:
+        domain.append(('product_tmpl_id', '=', source.product_tmpl_id.id))
+        products = wizard.env['product.product'].search(domain)
+        for product in products:
+            tgt_ptavs = product.product_template_attribute_value_ids
+            if not all(val.product_attribute_value_id in tgt_ptavs.mapped('product_attribute_value_id') for val in src_fixed): continue
+            if all(val.product_attribute_value_id in tgt_ptavs.mapped('product_attribute_value_id') for val in src_convert): continue
+            allowed |= product
+    else:
+        if wizard.x_keep_lot_sn or wizard.x_new_lot_sn:
+            domain.append(('tracking', '=', source.tracking))
+        else:
+            domain.append(('tracking', 'not in', ('lot', 'serial')))
+        products = wizard.env['product.product'].search(domain)
+        allowed |= products
+
+    wizard['x_allowed_product_ids'] = [(6, 0, allowed.ids)]
+        ]]></field>
+    </record>
+</odoo>

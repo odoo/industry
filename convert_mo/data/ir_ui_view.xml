@@ -1,0 +1,129 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="product_attribute_view_form_convert_mo" model="ir.ui.view">
+        <field name="name">product.attribute.view.form.convert.mo</field>
+        <field name="model">product.attribute</field>
+        <field name="inherit_id" ref="product.product_attribute_view_form"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='create_variant']" position="after">
+                <field name="x_is_convert_attribute"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="action_convert_product_wizard" model="ir.actions.act_window">
+        <field name="name">Convert Product</field>
+        <field name="res_model">x_convert_product_wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    <record id="view_picking_form_inherit_convert_mo" model="ir.ui.view">
+        <field name="name">view.picking.form.inherit.convert.mo</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list/field[@name='forecast_availability']" position="after">
+                <button name="%(action_convert_product_wizard)d"
+                    string="convert"
+                    type="action"
+                    invisible="not x_show_convert_visible"
+                    context="{
+                        'default_x_product_id': product_id,
+                        'default_x_move_id': id,
+                        'default_x_keep_lot_sn': True,
+                    }"
+                />
+            </xpath>
+        </field>
+    </record>
+    <record id="view_product_search_convert" model="ir.ui.view">
+        <field name="name">product.product.search.convert</field>
+        <field name="model">product.product</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <search>
+                <filter string="Same Template Products"
+                    name="same_template_products"
+                    domain="[('product_tmpl_id','in', [context.get('source_product_tmpl_id')]),]"/>
+            </search>
+        </field>
+    </record>
+    <record id="view_product_product_tree_convert" model="ir.ui.view">
+        <field name="name">product.product.tree.convert</field>
+        <field name="model">product.product</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list string="Convert Products" create="false" edit="false" delete="false">
+                <field name="display_name" string="Product Display Name"/>
+                <field name="is_storable" string="Is Storable ?"/>
+                <field name="tracking" string="Trace by"/>
+                <field name="product_tmpl_id" string="Product Template"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_convert_product_wizard_form" model="ir.ui.view">
+        <field name="name">convert.product.wizard.form</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form string="Convert Product" create="false" edit="false">
+                <group>
+                    <field name="x_move_id" invisible="True"/>
+                    <field name="x_product_id" string="Product to Convert" readonly="x_product_id" required="True"/>
+                    <field name="x_quant_id" string="Pick From"
+                        domain="[('product_id', '=', x_product_id), ('location_id', 'child_of', x_move_location_id)]"
+                        options="{'no_create': True, 'no_open': True}"
+                        readonly="not x_move_id"
+                        required="True"
+                        context="{
+                            'default_location_id': x_move_id.location_id,
+                            'default_product_id': x_move_id.product_id,
+                            'search_view_ref': 'stock.quant_search_view',
+                            'list_view_ref': 'stock.view_stock_quant_tree',
+                            'form_view_ref': 'stock.view_stock_quant_form',
+                            'readonly_form': True,
+                            'show_src_package': True
+                        }"/>
+                    <field name="x_quantity" string="Quantity"/>
+                </group>
+                <group>
+                    <field name="x_keep_lot_sn" string="Keep Lot/SN" invisible="x_source_tracking not in ('serial', 'lot')"/>
+                    <field name="x_new_lot_sn" string="New Lot/SN" invisible="x_keep_lot_sn" placeholder="No Lot/SN, product traced by quantity."/>
+                </group>
+                <group>
+                    <field name="x_product_convert_into" string="Convert into"
+                        required="True"
+                        domain="[('id', 'in', x_allowed_product_ids)]"
+                        options="{'no_create': True}"
+                        context="{
+                            'source_product_tmpl_id': x_source_product_tmpl_id,
+                            'search_view_ref': 'convert_mo.view_product_search_convert',
+                            'search_default_same_template_products': 1,
+                            'list_view_ref': 'convert_mo.view_product_product_tree_convert',
+                        }"
+                    />
+                </group>
+                <footer>
+                    <button string="Convert" class="btn-primary" type="action" name="%(action_convert_generate_mo)d"/>
+                    <button string="Discard" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="view_stock_quant_tree_inventory_editable_convert" model="ir.ui.view">
+        <field name="name">stock.quant.inventory.list.editable.convert</field>
+        <field name="model">stock.quant</field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="stock.view_stock_quant_tree_inventory_editable"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='stock.action_stock_request_count']" position="after">
+                <button name="%(action_stock_quant_convert_product)d"
+                    string="convert"
+                    type="action"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

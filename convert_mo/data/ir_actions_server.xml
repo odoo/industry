@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="action_convert_generate_mo" model="ir.actions.server">
+        <field name="name">Convert Product → Generate MO</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+wizard = records[0]
+move = wizard.x_move_id
+
+if wizard.x_quantity <= 0 or wizard.x_quantity > wizard.x_quant_id.quantity:
+    raise UserError(f"Quantity to convert must be positive and less than or equal to available quantity(available quantity is {wizard.x_quant_id.quantity}).")
+
+mo = env['mrp.production'].create({
+    'product_id': wizard.x_product_convert_into.id,
+    'product_qty': wizard.x_quantity,
+    'product_uom_id': wizard.x_product_convert_into.uom_id.id,
+    'location_src_id': wizard.x_quant_id.location_id.id,
+    'location_dest_id': wizard.x_quant_id.location_id.id,
+    'origin': move.reference or move.picking_id.name if move else wizard.x_quant_id.display_name,
+    'user_id': env.user.id,
+    'bom_id': False,
+})
+move_raw = env['stock.move'].create({
+    'product_id': wizard.x_product_id.id,
+    'product_uom_qty': wizard.x_quantity,
+    'product_uom': wizard.x_product_id.uom_id.id,
+    'raw_material_production_id': mo.id,
+})
+move_line = env['stock.move.line'].create({
+    'move_id': move_raw.id,
+    'product_id': wizard.x_product_id.id,
+    'lot_id': wizard.x_quant_id.lot_id.id,
+    'quantity': wizard.x_quantity,
+})
+
+lot_name = False
+if wizard.x_keep_lot_sn:
+    lot_name = wizard.x_quant_id.lot_id.name
+elif not wizard.x_keep_lot_sn and wizard.x_new_lot_sn:
+    lot_name = wizard.x_new_lot_sn
+if lot_name:
+    lot = env['stock.lot'].create({
+        'name': lot_name,
+        'product_id': wizard.x_product_convert_into.id,
+    })
+    mo.write({'lot_producing_ids': [(6,0,lot.ids)]})
+    
+mo.action_confirm()
+mo.button_mark_done()
+
+if move:
+    mo.message_post(
+        body=(
+            'Manufacturing Order created from Convert action in this operation: '
+            '<a href="/odoo" data-oe-id="%i" data-oe-model="stock.picking" >%s</a>'
+            % (move.picking_id.id, move.picking_id.name)
+        ),
+        body_is_html=True
+    )
+    move.picking_id.message_post(
+        body=(
+            f'<b>{move.product_id.display_name}</b> from location <b>{move.location_id.display_name}</b> converted into <b>{wizard.x_product_convert_into.display_name}</b> in Manufacturing Order '
+            '<a href="/odoo" data-oe-id="%i" data-oe-model="mrp.production" >%s</a>'
+            % (mo.id, mo.name)
+        ),
+        body_is_html=True
+    )
+else:
+    mo.message_post(
+        body=(
+            'Manufacturing Order created from Convert action in this Physical Inventory: '
+            '<a href="/odoo" data-oe-id="%i" data-oe-model="stock.quant" >%s</a>'
+            % (wizard.x_quant_id.id, wizard.x_quant_id.display_name)
+        ),
+        body_is_html=True
+    )
+        ]]></field>
+    </record>
+    <record id="action_stock_quant_convert_product" model="ir.actions.server">
+        <field name="name">Convert Product From Stock Quants</field>
+        <field name="model_id" ref="stock.model_stock_quant"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if not records or len(records) != 1:
+    raise UserError("This action is limited to a single line.")
+quant = records[0]
+action = env.ref('convert_mo.action_convert_product_wizard').read()[0]
+action['context'] = {
+    'default_x_product_id': quant.product_id.id,
+    'default_x_quant_id': quant.id,
+    'default_x_quantity': quant.quantity,
+    'default_x_keep_lot_sn': True,
+}
+        ]]></field>
+    </record>
+</odoo>
