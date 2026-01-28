@@ -57,19 +57,29 @@ for idx, tax in enumerate(all_taxes, start=1):
         <field name="active" eval="True"/>
         <field name="nextcall" eval="(datetime.now() + timedelta(days=(0 - datetime.now().weekday()) % 7)).strftime('%Y-%m-%d %H:%M:%S')" />
         <field name="code"><![CDATA[
-last_report_date = env['x_excise_report'].search([], order='x_to_date desc', limit=1).x_to_date
-from_date = last_report_date if last_report_date else datetime.date.today() - datetime.timedelta(days=7)
-if from_date < datetime.date.today():
-    res_id = env['x_excise_report'].create({'x_from_date': from_date, 'x_to_date': datetime.date.today(), 'x_reporter_id': env.company.x_reporter_id.id or env.ref('base.user_admin').id})
-    env['mail.activity'].create({'activity_type_id': env.ref('mail.mail_activity_data_todo').id, 'summary': f"Excise Report {res_id.x_name}",'res_model_id': env.ref('excise_management.excise_report').id, 'res_id': res_id.id, 'user_id': res_id.x_reporter_id.id, 'date_deadline': datetime.date.today() + datetime.timedelta(weeks=1)})
+excise_licenses = env['x_excise_license'].search([]).ids or [False]
+last_excise_report = env['x_excise_report'].search([('x_excise_license_id', 'in', excise_licenses)])
+for license in excise_licenses:
+    from_date, to_date = max(last_excise_report.filtered(lambda r: r.x_excise_license_id.id == license).mapped('x_to_date'), default=datetime.date.today() - datetime.timedelta(days=7)), datetime.date.today()
+    if from_date < to_date:
+        res_id = env['x_excise_report'].create({'x_from_date': from_date, 'x_to_date': to_date, 'x_reporter_id': env.company.x_reporter_id.id or env.ref('base.user_admin').id, 'x_excise_license_id': license})
+        env['mail.activity'].create({'activity_type_id': env.ref('mail.mail_activity_data_todo').id, 'summary': f"Excise Report {res_id.x_name}",'res_model_id': env.ref('excise_management.excise_report').id, 'res_id': res_id.id, 'user_id': res_id.x_reporter_id.id, 'date_deadline': to_date + datetime.timedelta(weeks=1)})
         ]]></field>
     </record>
     <record id="action_excise_report_stock_moves" model="ir.actions.server">
         <field name="model_id" ref="excise_report"/>
         <field name="state">code</field>
-        <field name="name">Open stock moves</field>
+        <field name="name">Open stock moves from Excise Report</field>
         <field name="code"><![CDATA[
-action = {'view_mode': 'list', 'res_model': 'stock.move', 'type': 'ir.actions.act_window', 'domain': [('id', 'in', record.x_line_ids.mapped('x_move_ids.id'))], 'view_id': env.ref('excise_management.stock_move_view_list').id, 'name': 'Excises Analysis',}
+action = {'view_mode': 'list', 'res_model': 'stock.move', 'type': 'ir.actions.act_window', 'domain': [('id', 'in', record.x_line_ids.mapped('x_move_ids.id'))], 'context': {'license_id': record.x_excise_license_id.id},'view_id': env.ref('excise_management.stock_move_view_list').id, 'name': 'Excises Analysis',}
+        ]]></field>
+    </record>
+    <record id="action_excise_report_line_stock_moves" model="ir.actions.server">
+        <field name="model_id" ref="excise_report_line"/>
+        <field name="state">code</field>
+        <field name="name">Open stock moves from Excise Report Line</field>
+        <field name="code"><![CDATA[
+action = {'view_mode': 'list', 'res_model': 'stock.move', 'type': 'ir.actions.act_window', 'domain': [('id', 'in', record.x_move_ids.ids)], 'context': {'license_id': record.x_excise_report_id.x_excise_license_id.id},'view_id': env.ref('excise_management.stock_move_view_list').id, 'name': 'Excises Analysis',}
         ]]></field>
     </record>
     <record id="ir_action_compute_excise_report_line" model="ir.actions.server">
@@ -78,19 +88,52 @@ action = {'view_mode': 'list', 'res_model': 'stock.move', 'type': 'ir.actions.ac
         <field name="state">code</field>
         <field name="code"><![CDATA[
 for record in records:
-    all_moves_ids = env['stock.move']._read_group([
+    all_moves = env['stock.move']._read_group([
         ('date', '>=', record.x_from_date),
         ('date', '<', record.x_to_date),
-        ('x_excise_category', '!=', False), ('x_fiscal_deposit_move', 'not in', ['none', False]), ('state', '=', 'done'),
+        '|', ('location_id.warehouse_id.x_excise_license_id', '=', record.x_excise_license_id.id),
+        ('location_dest_id.warehouse_id.x_excise_license_id', '=', record.x_excise_license_id.id),
+        ('x_excise_category', '!=', False), ('state', '=', 'done'),
     ],
-    groupby=['x_excise_category', 'x_fiscal_deposit_move'],
-    aggregates=['x_excise_quantity:sum', 'x_excise_amount:sum', 'x_packaging_units:sum', 'x_packaging_amount:sum', 'id:recordset']
-    )
+    groupby=['x_excise_category'], aggregates=['id:recordset'])
+
+    processed_moves_ids = {}
+    for cat, moves in all_moves:
+        for move in moves:
+            if move.location_id.warehouse_id.x_is_fiscal_deposit and move.location_id.warehouse_id.x_excise_license_id == record.x_excise_license_id:
+                if move.location_dest_id.warehouse_id.x_is_fiscal_deposit:
+                    if move.location_dest_id.warehouse_id.x_excise_license_id == record.x_excise_license_id:  m_type = "transfer"
+                    else:   m_type = "exit fd"
+                else:
+                    if move.partner_id.property_account_position_id.x_is_fiscal_deposit:    m_type = "exit fd"
+                    else:   m_type = "exit"
+            elif move.location_dest_id.warehouse_id.x_is_fiscal_deposit and move.location_dest_id.warehouse_id.x_excise_license_id == record.x_excise_license_id:
+                if move.location_id.warehouse_id.x_is_fiscal_deposit:
+                    if move.location_id.warehouse_id.x_excise_license_id == record.x_excise_license_id:  m_type = "transfer"
+                    else:   m_type = "entry fd"
+                else:
+                    if move.partner_id.property_account_position_id.x_is_fiscal_deposit:    m_type = "entry fd"
+                    else:   m_type = "entry"
+            else: m_type = "none"
+
+            processed_moves_ids.setdefault(cat, {}).setdefault(m_type, {'qty': 0.0, 'amt': 0.0, 'pkg_unit': 0.0, 'pkg_amount': 0.0, 'move': [],})
+
+            processed_moves_ids[cat][m_type]['qty'] += move.x_excise_quantity
+            processed_moves_ids[cat][m_type]['amt'] += move.x_excise_amount
+            processed_moves_ids[cat][m_type]['pkg_unit'] += move.x_packaging_units
+            processed_moves_ids[cat][m_type]['pkg_amount'] += move.x_packaging_amount
+            processed_moves_ids[cat][m_type]['move'].append(move.id)
+
+    processed_result = [
+        (cat, m_type, data['qty'], data['amt'], data['pkg_unit'], data['pkg_amount'], data['move'])
+        for cat, types in processed_moves_ids.items()   for m_type, data in types.items()
+        ]
+
     record['x_line_ids'] = [
         (5, 0, 0), *[(0, 0, {
-            'x_excise_category_id': cat.id, 'x_excise_move_type': m_type, 'x_excise_quantity': qty, 'x_excise_amount': amt, 'x_excise_packaging_units': pkg_unit, 'x_excise_packaging_amount': pkg_amount, 'x_move_ids': [(6, 0, moves.ids)],
+            'x_excise_category_id': cat.id, 'x_excise_move_type': m_type, 'x_excise_quantity': qty, 'x_excise_amount': amt, 'x_excise_packaging_units': pkg_unit, 'x_excise_packaging_amount': pkg_amount, 'x_move_ids': [(6, 0, moves)],
         })
-        for cat, m_type, qty, amt, pkg_unit, pkg_amount, moves in all_moves_ids ]
+        for cat, m_type, qty, amt, pkg_unit, pkg_amount, moves in processed_result ]
     ]
         ]]></field>
     </record>

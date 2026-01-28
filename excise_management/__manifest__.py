@@ -1,6 +1,6 @@
 {
     'name': 'Excise Management',
-    'version': '2.5',
+    'version': '2.6',
     'category': 'Inventory/Inventory',
     'author': 'Odoo S.A.',
     'depends': [
