@@ -34,7 +34,6 @@
         'data/mrp_routing_workcenter.xml',
         'data/quality_point.xml',
         'data/mail_message.xml',
-        'data/pos_payment_method.xml',
         'data/knowledge_article_favorite.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',

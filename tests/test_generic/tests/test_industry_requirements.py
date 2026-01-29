@@ -1,12 +1,16 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import logging
+import os
+import pathlib
 import re
 
-from odoo.tests import tagged, get_db_name
+from lxml import etree
+
+from odoo.tests import get_db_name, tagged
 from odoo.tools import cloc
 
-from .industry_case import IndustryCase
+from .industry_case import IndustryCase, get_industry_path
 
 _logger = logging.getLogger(__name__)
 
@@ -30,7 +34,7 @@ class TestEnv(IndustryCase):
             self.assertTrue(
                 self.env['ir.module.module']._get('payment_demo').state == 'installed',
                 "Payment Demo module should be installed in demo when Website Payment is installed. "
-                "Call 'button_immediate_install' on 'base.module_payment_demo' in demo."
+                "Call 'button_immediate_install' on 'base.module_payment_demo' in demo.",
             )
 
     def test_welcome_article_and_notification_exist(self):
@@ -39,11 +43,11 @@ class TestEnv(IndustryCase):
                 continue
             ref = self.env.ref(f"{module}.welcome_article", raise_if_not_found=False)
             self.assertTrue(
-                ref, f"You forgot to define a record with id='welcome_article' in module '{module}'."
+                ref, f"You forgot to define a record with id='welcome_article' in module '{module}'.",
             )
             ref = self.env.ref(f"{module}.welcome_article_body", raise_if_not_found=False)
             self.assertTrue(
-                ref, f"You forgot to define a template with id='welcome_article_body' in module '{module}'."
+                ref, f"You forgot to define a template with id='welcome_article_body' in module '{module}'.",
             )
             if not (ref := self.env.ref(module + '.notification_knowledge', raise_if_not_found=False)):
                 _logger.warning("You forgot to define a `mail.message` with `id=notification_knowledge`.")
@@ -76,7 +80,7 @@ class TestEnv(IndustryCase):
         for model in models:
             if model in self.env and "is_published" in self.env[model]._fields:
                 records = self.env[model].search(
-                    [("is_published", "=", True), ("sale_ok", "=", False)]
+                    [("is_published", "=", True), ("sale_ok", "=", False)],
                 )
 
                 self.assertFalse(
@@ -91,7 +95,7 @@ class TestEnv(IndustryCase):
         pattern = r'https?://www\.odoo\.com/documentation/(?!latest/)(.*)/'
         for module in self.installed_modules:
             knowledges = self.env['ir.model.data'].search(
-                [('model', '=', 'knowledge.article'), ('module', '=', module)]
+                [('model', '=', 'knowledge.article'), ('module', '=', module)],
             )
             if not knowledges:
                 continue
@@ -103,4 +107,81 @@ class TestEnv(IndustryCase):
                     matches,
                     "Found links to Odoo documentation using version-specific URLs in module '%s' knowledge article: %s. Please use '/latest/' instead."
                     % (module, matches),
+                )
+
+    @staticmethod
+    def _are_pos_config_and_onboarding_used(path, folder_data, folder_name):
+        pos_config_defined = False
+        pos_config_count = 0
+        load_onboarding_called = False
+        load_count = 0
+        for file_name in folder_data:
+            file_path = os.path.join(path, folder_name, file_name)
+            encoded_content = pathlib.Path(file_path).read_bytes()
+            try:
+                tree = etree.fromstring(encoded_content)
+            except etree.XMLSyntaxError as e:
+                _logger.error("XML syntax error in file %s: %s", file_name, e)
+                return False, 0, False, 0
+            for record in tree.xpath("//function[@model='pos.config']"):
+                function_name = record.get('name')
+                if 'load_onboarding_' in function_name:
+                    load_onboarding_called = True
+                    load_count += 1
+            for record in tree.xpath("//record"):
+                model_name = record.get('model')
+                if model_name == 'pos.config':
+                    pos_config_defined = True
+                    pos_config_count += 1
+        return pos_config_defined, pos_config_count, load_onboarding_called, load_count
+
+    def test_pos_requirements(self):
+        all_dependencies = self.env["ir.module.module.dependency"].all_dependencies(self.installed_industries)
+        if not any('point_of_sale' in deps for deps in all_dependencies.values()):
+            return
+        for module in self.installed_industries:
+            path = get_industry_path() + module
+            data, demo = [], []
+            for root, dirs, files in os.walk(path):
+                for file_name in files:
+                    if file_name.endswith('.xml'):
+                        if root.split('/')[-1] == 'data':
+                            data.append(file_name)
+                        elif root.split('/')[-1] == 'demo':
+                            demo.append(file_name)
+            data_pos_config_defined, data_pos_count, data_load_onboarding_called, data_load_count = TestEnv._are_pos_config_and_onboarding_used(path, data, 'data')
+            demo_pos_config_defined, demo_pos_count, demo_load_onboarding_called, demo_load_count = TestEnv._are_pos_config_and_onboarding_used(path, demo, 'demo')
+            if demo_pos_config_defined and not demo_load_onboarding_called and not data_load_onboarding_called:
+                _logger.warning(
+                    "In module '%s', a pos.config is defined in the demo, but no load_onboarding_ scenario function is called in the data or in the demo. You should load a scenario in the data to set up the POS properly, and if needed overwrite some fields.",
+                    module,
+                )
+            elif demo_load_onboarding_called and not data_load_onboarding_called:
+                _logger.warning(
+                    "In module '%s', a load_onboarding_ scenario function is called in the demo, but not in the data. You should call it in the data to set up the POS properly.",
+                    module,
+                )
+            elif data_pos_config_defined and not data_load_onboarding_called:
+                _logger.warning(
+                    "In module '%s', a pos.config is defined in the data, but no load_onboarding_ scenario function is called in the data. You should load a scenario in the data to set up the POS properly, and if needed overwrite some fields.",
+                    module,
+                )
+            elif not data_pos_config_defined and not data_load_onboarding_called:
+                _logger.warning(
+                    "The module '%s' depends on point_of_sale, but no load_onboarding_ scenario function is called in the data. You should load a scenario in the data to set up the POS properly.",
+                    module,
+                )
+            elif data_load_count < data_pos_count:
+                _logger.warning(
+                    "In module '%s', the number of pos.config defined in data (%d) does not match the number of load_onboarding_ scenario functions called in data (%d). Each pos.config should be set up by a load_onboarding_ function.",
+                    module,
+                    data_pos_count,
+                    data_load_count,
+                )
+            elif demo_pos_count > demo_load_count + data_load_count:
+                _logger.warning(
+                    "In module '%s', the number of pos.config defined in demo (%d) is greater than the total number of load_onboarding_ scenario functions called in data and demo (%d). Each pos.config should be set up by a load_onboarding_ function.",
+                    module,
+                    demo_pos_count,
+                    demo_load_count + data_load_count,
                 )

@@ -33,6 +33,7 @@
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
+        'data/pos_config.xml',
     ],
     'demo': [
         'demo/resource_calendar_data.xml',

@@ -26,7 +26,6 @@
         'data/product_template_attribute_value.xml',
         'data/product_product.xml',
         'data/product_combo_item.xml',
-        'data/pos_payment_method.xml',
         'data/pos_config.xml',
         'data/pos_prep_display.xml',
         'data/knowledge_cover.xml',
