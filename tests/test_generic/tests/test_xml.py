@@ -95,22 +95,11 @@ ESCAPE_STUDIO_TEST = [
     'construction',
 ]
 
-SKIP_CONTEXT_DICT_FOR_DEMO = {
-    'crm.lead': 'mail_auto_subscribe_no_notify',
-    'event.event': 'mail_auto_subscribe_no_notify',
-    'hr.job': 'mail_auto_subscribe_no_notify',
-    'mailing.mailing': 'mail_auto_subscribe_no_notify',
-    'project.project': 'mail_auto_subscribe_no_notify',
-    'project.task': 'mail_auto_subscribe_no_notify',
-    'stock.picking': 'skip_sms',
+FUNCTION_CONTEXT_DICT_WITHOUT_USER = {
+    'sale.advance.payment.inv': 'create_invoices',
+    'sale.order': '_create_invoices',
 }
-CONTEXT_MODELS_DICT = {
-    'calendar.event': 'no_mail_to_attendees',
-    'helpdesk.ticket': 'mail_notrack',
-    'hr.applicant': 'mail_notrack',
-    'res.partner': 'no_vat_validation',  # not linked to mail, but avoid redundant code
-    **SKIP_CONTEXT_DICT_FOR_DEMO
-}
+
 RISKY_FIELDS = {
     "domain",
     "context",
@@ -207,7 +196,7 @@ class TestEnv(IndustryCase):
                 self._check_dates_are_relative(tree, file_name)
                 self._check_static_values_in_inputs(tree, file_name)
                 self._check_res_config_setting(tree)
-                self._check_context_to_stop_mail_sending(tree, file_name, module)
+                self._check_context_to_stop_mail_sending(tree, file_name)
                 self._check_text_based_xpath(tree, file_name)
                 self._check_portal_login_is_email(tree, file_name)
                 if root.split('/')[-1] == 'data':
@@ -682,31 +671,64 @@ class TestEnv(IndustryCase):
                         line,
                     )
 
-    def _check_context_to_stop_mail_sending(self, root, file_name, module):
+    def _check_context_to_stop_mail_sending(self, root, file_name):
+
+        def log_warning(expected_context):
+            _logger.warning(
+                "Context should be used in file '%s' for model '%s' to prevent mail pollution when using %s function. "
+                "Expected context: '%s'. Found context: %s",
+                file_name,
+                model_name,
+                func_name,
+                ', '.join(expected_context),
+                function.get('context') or 'None'
+            )
         for record in root.xpath("//record"):
             model_name = record.get('model')
-            if not model_name or model_name not in CONTEXT_MODELS_DICT:
+            if model_name != 'slide.channel':
                 continue
-            record_context = record.get('context') or record.getparent().get('context') or ''
-            expected_context = CONTEXT_MODELS_DICT.get(model_name)
-            if model_name in SKIP_CONTEXT_DICT_FOR_DEMO:
-                record_xml_id = record.get('id') if "." in record.get('id') else module + '.' + record.get('id')
-                recordset = self.env.ref(record_xml_id) if record_xml_id else False
-                if recordset:
-                    user = getattr(recordset, 'user_id', False)
-                    if not user or user.notification_type == 'inbox':
-                        continue
+            for user_field in record.xpath(".//field[@name='user_id']"):
+                user_id = user_field.get('eval') or user_field.get('ref')
+                if user_id and user_id != 'False':
+                    _logger.warning(
+                        "Remove or set user_id to False in file '%s' for model '%s' to prevent mail pollution.",
+                        file_name,
+                        model_name
+                    )
 
-            context_dict = ast.literal_eval(record_context) if record_context else {}
-            if expected_context not in context_dict:
-                _logger.warning(
-                    "Context should be used in file '%s' for model '%s' to prevent mail pollution. "
-                    "Expected context: '%s'. Found context: %s",
-                    file_name,
-                    model_name,
-                    expected_context,
-                    record_context or 'None'
+        for function in root.xpath("//function"):
+            func_name = function.get('name')
+            model_name = function.get('model')
+            raw_context = function.get('context', '{}')
+            try:
+                context_dict = ast.literal_eval(raw_context)
+                context_dict.update(ast.literal_eval(root.get('context', '{}')))
+            except (ValueError, SyntaxError):
+                context_dict = {}
+            if model_name == 'sale.order' and func_name == 'action_confirm':
+                SaleOrder = self.env['sale.order']
+                has_subscription = ('is_subscription' in SaleOrder._fields
+                    and SaleOrder.search_count([('is_subscription', '=', True)]) > 0
                 )
+                if has_subscription:
+                    expected_context = ['mail_auto_subscribe_no_notify', 'mail_notrack']
+                    if not all(context in context_dict for context in expected_context):
+                        log_warning(expected_context)
+
+            if model_name in FUNCTION_CONTEXT_DICT_WITHOUT_USER and func_name == FUNCTION_CONTEXT_DICT_WITHOUT_USER.get(model_name):
+                expected_context = ['mail_auto_subscribe_no_notify']
+                if not all(context in context_dict for context in expected_context):
+                    log_warning(expected_context)
+
+            if func_name == 'write':
+                for value in function.xpath(".//value"):
+                    write_value = value.get('eval')
+                    if not write_value or ('user_id' not in write_value and 'user_ids' not in write_value):
+                        continue
+                    expected_context = ['mail_auto_subscribe_no_notify']
+                    if not all(context in context_dict for context in expected_context):
+                        log_warning(expected_context)
+                        break
 
     def _check_text_based_xpath(self, root, file_name):
         TEXT_XPATH_PATTERN = re.compile(r"text\(")

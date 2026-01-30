@@ -24,7 +24,6 @@
         'data/hr_job.xml',
     ],
     'demo': [
-        'demo/res_users.xml',
         'demo/website_view.xml',
         'demo/delivery_carrier.xml',
         'demo/crm_tag.xml',
