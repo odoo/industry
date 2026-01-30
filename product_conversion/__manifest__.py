@@ -15,9 +15,6 @@
         'data/ir_ui_view.xml',
         'data/base_automation.xml',
     ],
-    'demo': [
-        'demo/res_users.xml',
-    ],
     'assets': {
         'web.assets_backend': [
             'product_conversion/static/src/js/barcode_picking_model.js',

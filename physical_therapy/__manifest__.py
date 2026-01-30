@@ -27,7 +27,6 @@
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/calendar_event.xml',
-        'demo/res_users.xml',
         'demo/account_move.xml',
         'demo/account_move_line.xml',
         'demo/account_move_post.xml',
