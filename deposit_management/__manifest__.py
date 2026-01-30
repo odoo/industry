@@ -20,9 +20,6 @@
         'data/account_tax.xml',
         'data/res_config_settings.xml',
     ],
-    'demo': [
-        'demo/res_users.xml',
-    ],
     'cloc_exclude': [
         'data/qweb_view.xml',
     ],
