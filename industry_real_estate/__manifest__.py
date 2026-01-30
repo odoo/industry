@@ -46,7 +46,6 @@
         'data/uninstall_hook.xml',
     ],
     'demo': [
-        'demo/res_users.xml',
         'demo/x_buildings.xml',
         'demo/account_analytic_account.xml',
         'demo/ir_attachment.xml',

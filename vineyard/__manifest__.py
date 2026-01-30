@@ -43,7 +43,6 @@
         'data/knowledge_article_favorite.xml',
     ],
     'demo': [
-        'demo/res_users.xml',
         'demo/product_product.xml',
         'demo/appointment_type.xml',
         'demo/crm_tag.xml',
