@@ -49,7 +49,6 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
-        'demo/res_users.xml',
         'demo/res_partner.xml',
         'demo/account_analytic_plan.xml',
         'demo/account_analytic_account.xml',

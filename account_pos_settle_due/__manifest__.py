@@ -13,8 +13,5 @@
         'data/base_automation.xml',
         'data/ir_ui_view.xml',
     ],
-    'demo': [
-        'demo/res_users.xml',
-    ],
     'license': 'OEEL-1',
 }
