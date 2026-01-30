@@ -39,7 +39,6 @@
         'data/product_attribute_value.xml',
     ],
     'demo': [
-        'demo/res_users.xml',
         'demo/website_menu.xml',
         'demo/payment_provider_demo.xml',
     ],

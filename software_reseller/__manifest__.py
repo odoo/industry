@@ -38,7 +38,6 @@
         'data/mail_message.xml',
     ],
     'demo': [
-        'demo/res_users.xml',
         'demo/hr_department.xml',
         'demo/res_partner.xml',
         'demo/hr_employee.xml',

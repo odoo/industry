@@ -41,7 +41,6 @@
         'data/hr_job.xml',
     ],
     'demo': [
-        'demo/res_users.xml',
         'demo/event_event.xml',
         'demo/event_question.xml',
         'demo/event_slot.xml',

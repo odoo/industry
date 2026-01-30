@@ -22,9 +22,6 @@
         'data/ir_default.xml',
         'data/base_automation.xml',
     ],
-    'demo': [
-        'demo/res_users.xml',
-    ],
     'license': 'OEEL-1',
     'images': ['images/main.png'],
     'website': "https://www.odoo.com/all-industries",
