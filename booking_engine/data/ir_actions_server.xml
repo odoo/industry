@@ -31,7 +31,7 @@ elif record.x_total > 0:
         <field name="code"><![CDATA[
 tz = timezone(env.ref('website.default_website').tz)
 for record in records:
-    if not record.role_id.x_is_a_room_offer: continue
+    if not (record.role_id.x_is_a_room_offer and record.start_datetime and record.end_datetime): continue
     pickup_time = record.sale_line_id.product_id.pickup_time
     return_time = record.sale_line_id.product_id.return_time
     start_datetime = record.start_datetime.astimezone(tz=dateutil.tz.UTC).replace(hour=int(pickup_time), minute=int(pickup_time % 1 * 60)).astimezone(tz)
