@@ -72,12 +72,12 @@ action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': 
         <field name="state">code</field>
         <field name="name">Construction Developer: Generate Remark Reference on Create</field>
         <field name="code"><![CDATA[
-for record in records.filtered(lambda r: r.x_is_remark):
+for record in records:
     # project already has remarks
-    if (project := record.project_id) and (remarks := project.x_remark_ids) and (last_refs := remarks.filtered(lambda r: r.x_reference).sorted('create_date desc')): 
+    if (project := record.project_id) and (last_refs := env['project.task'].search([('x_is_remark', '=', True), ('project_id', '=', project.id)]).filtered('x_reference').sorted('create_date desc')): 
         pid, rid = last_refs[0].x_reference.split('-')
     # project has no remarks but has SO
-    elif project and (so := project.sale_order_id):  
+    elif so := project.sale_order_id:  
         pid, rid = so.name[1:], 0
     # no SO but made from SO
     elif project and (soid := project.name.split('-')[0].strip()).startswith('S') and soid[1:].isnumeric(): 
@@ -94,10 +94,9 @@ for record in records.filtered(lambda r: r.x_is_remark):
         <field name="state">code</field>
         <field name="code"><![CDATA[ 
 for record in records: 
-    if record.x_is_remark:
-        record['stage_id'] = record.x_stage_id
-        available_stages = record.project_id.type_ids.filtered(lambda s: s.x_is_remark_stage) 
-        if not record.x_stage_id and available_stages: record['x_stage_id'] = available_stages[0]
+    record['stage_id'] = record.x_stage_id
+    available_stages = record.project_id.type_ids.filtered('x_is_remark_stage') 
+    if not record.x_stage_id and available_stages: record['x_stage_id'] = available_stages[0]
 ]]></field>
     </record>
 </odoo>

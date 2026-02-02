@@ -135,9 +135,9 @@
                         <field name="x_stage_id" invisible="1"/>
                         <group>
                             <field name="project_id" required="True"/>
-                            <field name="x_reference" readonly="True" invisible="not id"/>
-                            <field name="x_event_id" readonly="True" invisible="x_update_id or not (x_update_id or x_event_id)"/>
-                            <field name="x_update_id" readonly="True" invisible="x_event_id or not (x_update_id or x_event_id)"/>
+                            <field name="x_reference" invisible="not id"/>
+                            <field name="x_event_id" invisible="x_update_id or not (x_update_id or x_event_id)"/>
+                            <field name="x_update_id" invisible="x_event_id or not (x_update_id or x_event_id)"/>
                             <field name="x_owner_id" string="Owner"/>
                         </group>
                         <group>
@@ -264,6 +264,7 @@
                 <field name="x_owner_id"/>
             </xpath>
             <xpath expr="//group" position="inside">
+                <!-- trigger the computation of x_date -->
                 <field name="x_date" invisible="1"/>
             </xpath>
         </field>
@@ -319,19 +320,6 @@
             </list>
         </field>
     </record>
-<!-- remark stage -->
-    <record id="view_task_type_tree_inherited" model="ir.ui.view">
-        <field name="name">project.type.list.inherited</field>
-        <field name="model">project.task.type</field>
-        <field name="mode">extension</field>
-        <field name="inherit_id" ref="project.task_type_tree_inherited"/>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <xpath expr="//list" position="inside">
-                <field name="x_is_remark_stage" column_invisible="1"/>
-            </xpath>
-        </field>
-    </record>
 <!-- hiding remarks in existing task views -->
     <record id="view_task_form2" model="ir.ui.view">
         <field name="name">project.task.form.inherited</field>
@@ -341,13 +329,7 @@
         <field name="mode">extension</field>
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
-            <xpath expr="(//field[@name='stage_id'])[1]" position="attributes">
-                <attribute name="domain">[('x_is_remark_stage', '=', False), ('project_ids', 'in', project_id)]</attribute>
-            </xpath>
-            <xpath expr="(//field[@name='stage_id'])[2]" position="attributes">
-                <attribute name="domain">[('x_is_remark_stage', '=', False), ('project_ids', 'in', project_id)]</attribute>
-            </xpath>
-            <xpath expr="(//field[@name='stage_id'])[3]" position="attributes">
+            <xpath expr="//field[@name='stage_id']" position="attributes">
                 <attribute name="domain">[('x_is_remark_stage', '=', False), ('project_ids', 'in', project_id)]</attribute>
             </xpath>
         </field>
@@ -360,6 +342,7 @@
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <xpath expr="//kanban" position="inside">
+                <!-- needed by the JS patch -->
                 <field name="x_is_remark" invisible="1"/>
             </xpath>
         </field>
@@ -389,7 +372,7 @@
         <field name="active" eval="True"/>
         <field name="type">form</field>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='page_invitations']" position="after" invisible="not location">
+            <xpath expr="//page[@name='page_invitations']" position="after">
                 <page name="remarks" string="Remarks">
                     <group class="mb-0">
                         <field name="x_project_id" class="mb-0"/>
