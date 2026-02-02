@@ -51,8 +51,8 @@ echo "Debug: $DEBUG"
 
 INDUSTRY_PATH="industry/"
 PYTHON_BIN="python3"
-ODOO_BIN="community/odoo-bin"
-ADDONS_PATH="$INDUSTRY_PATH/tests,enterprise,community/addons,community/odoo/addons,design-themes"
+ODOO_BIN="odoo/odoo-bin"
+ADDONS_PATH="$INDUSTRY_PATH/tests,enterprise,odoo/addons,odoo/odoo/addons,design-themes"
 TEST_TAGS="/test_generic,/test_$INDUSTRY_NAME"
 DEP_DB="dep-$INDUSTRY_NAME"
 

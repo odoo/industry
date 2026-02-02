@@ -159,7 +159,7 @@ class TestEnv(IndustryCase):
                 self._check_dates_are_relative(tree, file_name)
                 self._check_static_values_in_inputs(tree, file_name)
                 self._check_res_config_setting(tree)
-                self._check_context_to_stop_mail_sending(tree, file_name, module)
+                self._check_context_to_stop_mail_sending(tree, file_name)
                 self._check_text_based_xpath(tree, file_name)
                 self._check_portal_login_is_email(tree, file_name)
                 if root.split('/')[-1] == 'data':
@@ -582,7 +582,7 @@ class TestEnv(IndustryCase):
                         line,
                     )
 
-    def _check_context_to_stop_mail_sending(self, root, file_name, module):
+    def _check_context_to_stop_mail_sending(self, root, file_name):
 
         def log_warning(expected_context):
             _logger.warning(
