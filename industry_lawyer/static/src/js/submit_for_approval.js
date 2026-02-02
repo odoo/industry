@@ -20,6 +20,8 @@ patch(Composer.prototype, {
                 partner_ids: composer.thread.suggestedRecipients.filter(r => r.partner_id).map(r => r.partner_id),
             },
         });
+        await composer.thread.fetchNewMessages();
+        // await this.sendMessage();
         this.clear();
     },
 });

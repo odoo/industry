@@ -6,11 +6,23 @@
         <field name="field_description">Is Group Of People</field>
         <field name="model_id" ref="base.model_res_partner"/>
     </record>
+
+
     <record id="field_claimants_id" model="ir.model.fields">
         <field name="name">x_claimants_id</field>
         <field name="ttype">many2one</field>
-        <field name="field_description">Claimant relation field</field>
+        <field name="field_description">Claimant Reference</field>
         <field name="model_id" ref="model_claimants_line"/>
+        <field name="on_delete" eval="False"/>
+        <field name="relation">res.partner</field>
+    </record>
+    <record id="field_x_claimants" model="ir.model.fields">
+        <field name="name">x_claimants</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Claimant</field>
+        <field name="model_id" ref="model_claimants_line"/>
+        <field name="on_delete" eval="False"/> <!-- Set field to NULL when related record is deleted -->
+        <!-- <field name="on_delete">cascade</field> -->
         <field name="relation">res.partner</field>
     </record>
     <record id="x_claimants_line_ids" model="ir.model.fields">
@@ -21,19 +33,12 @@
         <field name="field_description">Claimants Line</field>
         <field name="model_id" ref="base.model_res_partner"/>
     </record>
+
     <record id="field_x_share" model="ir.model.fields">
         <field name="name">x_share</field>
         <field name="ttype">float</field>
         <field name="field_description">% Share</field>
         <field name="model_id" ref="model_claimants_line"/>
-    </record>
-    <record id="field_x_claimants" model="ir.model.fields">
-        <field name="name">x_claimants</field>
-        <field name="ttype">many2one</field>
-        <field name="field_description">Claimant</field>
-        <field name="model_id" ref="model_claimants_line"/>
-        <field name="on_delete" eval="False"/>
-        <field name="relation">res.partner</field>
     </record>
     <record id="field_x_approval" model="ir.model.fields">
         <field name="ttype">many2one</field>
@@ -135,14 +140,12 @@ for user in users: user['x_is_high_user_group'] = get_rank(user) > current_user_
         <field name="field_description">Is User High Group</field>
         <field name="model_id" ref="mail.model_mail_compose_message"/>
         <field name="name">x_is_user_high_group</field>
-        <field name="on_delete" eval="False"/>
     </record>
     <record id="field_x_is_user_high_group_of_account_move_send" model="ir.model.fields">
         <field name="ttype">boolean</field>
         <field name="field_description">Is User High Group</field>
         <field name="model_id" ref="account.model_account_move_send_wizard"/>
         <field name="name">x_is_user_high_groups</field>
-        <field name="on_delete" eval="False"/>
     </record>
     <record id="field_x_suggest_approval" model="ir.model.fields">
         <field name="ttype">many2one</field>
@@ -243,7 +246,6 @@ for user in users: user['x_is_high_user_group'] = get_rank(user) > current_user_
         <field name="model_id" ref="model_x_approval_mail"/>
         <field name="name">x_email_cc</field>
         <field name="related">x_mail_mail.email_cc</field>
-        <field name="on_delete" eval="False"/>
     </record>
     <record id="field_x_scheduled_date" model="ir.model.fields">
         <field name="ttype">datetime</field>
@@ -251,7 +253,6 @@ for user in users: user['x_is_high_user_group'] = get_rank(user) > current_user_
         <field name="related">x_mail_mail.scheduled_date</field>
         <field name="model_id" ref="model_x_approval_mail"/>
         <field name="name">x_scheduled_date</field>
-        <field name="on_delete" eval="False"/>
     </record>
     <record id="field_x_date" model="ir.model.fields">
         <field name="ttype">datetime</field>
@@ -259,14 +260,12 @@ for user in users: user['x_is_high_user_group'] = get_rank(user) > current_user_
         <field name="related">x_mail_mail.date</field>
         <field name="model_id" ref="model_x_approval_mail"/>
         <field name="name">x_date</field>
-        <field name="on_delete" eval="False"/>
     </record>
     <!-- <record id="field_x_body_content" model="ir.model.fields">
         <field name="ttype">html</field>
         <field name="field_description">Body</field>
         <field name="model_id" ref="model_x_approval_mail"/>
         <field name="name">x_body_content</field>
-        <field name="on_delete" eval="False"/>
     </record> -->
     <record id="field_x_attachment_ids" model="ir.model.fields">
         <field name="ttype">many2many</field>
@@ -274,7 +273,6 @@ for user in users: user['x_is_high_user_group'] = get_rank(user) > current_user_
         <field name="model_id" ref="model_x_approval_mail"/>
         <field name="name">x_attachment_ids</field>
         <field name="related">x_mail_mail.attachment_ids</field>
-        <field name="on_delete" eval="False"/>
         <field name="relation">ir.attachment</field>
         <field name="relation_table">x_ir_attachment_x_approval_mail_rel</field>
     </record>
@@ -284,7 +282,6 @@ for user in users: user['x_is_high_user_group'] = get_rank(user) > current_user_
         <field name="model_id" ref="model_x_approval_mail"/>
         <field name="related">x_mail_mail.body_content</field>
         <field name="name">x_body_html</field>
-        <field name="on_delete" eval="False"/>
     </record>
     <record id="field_x_current_model" model="ir.model.fields">
         <field name="name">x_current_model</field>
@@ -294,8 +291,8 @@ for user in users: user['x_is_high_user_group'] = get_rank(user) > current_user_
     </record>
     <record id="field_x_show_approval" model="ir.model.fields">
         <field name="compute"><![CDATA[
-ctx = self._context
-self['x_show_approval'] = self.model in ('sale.order', 'crm.lead')
+for record in self:
+    record['x_show_approval'] = record.model in ('sale.order', 'crm.lead')
 ]]></field>
         <field name="ttype">boolean</field>
         <field name="depends">partner_ids</field>
@@ -303,6 +300,20 @@ self['x_show_approval'] = self.model in ('sale.order', 'crm.lead')
         <field name="model_id" ref="mail.model_mail_compose_message"/>
         <field name="name">x_show_approval</field>
     </record>
+
+    <record id="field_x_show_approval_for_move_send" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_show_approval'] = record.model == 'account.move'
+]]></field>
+        <field name="ttype">boolean</field>
+        <field name="depends">mail_partner_ids</field>
+        <field name="field_description">active_model</field>
+        <field name="model_id" ref="account.model_account_move_send_wizard"/>
+        <field name="name">x_show_approval</field>
+    </record>
+
+
     <record id="field_x_current_record_id" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="field_description">Current Record</field>
@@ -310,4 +321,26 @@ self['x_show_approval'] = self.model in ('sale.order', 'crm.lead')
         <field name="name">x_current_record_id</field>
         <field name="relation">account.move</field>
     </record>
+
+    <!-- <record id="field_x_char" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+self['x_char'] = self.move_id
+]]></field>
+        <field name="ttype">char</field>
+        <field name="depends">mail_partner_ids</field>
+        <field name="field_description">x_char</field>
+        <field name="model_id" ref="account.model_account_move_send_wizard"/>
+        <field name="name">x_char</field>
+    </record> -->
+
+    <!-- <record id="field_x_show_approval" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+self['x_show_approval'] = self.move_id in ('sale.order', 'crm.lead')
+]]></field>
+        <field name="ttype">boolean</field>
+        <field name="depends">partner_ids</field>
+        <field name="field_description">active_model</field>
+        <field name="model_id" ref="account.model_account_move_send_wizard"/>
+        <field name="name">x_show_approval</field>
+    </record> -->
 </odoo>
