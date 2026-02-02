@@ -6,19 +6,17 @@ patch(Composer.prototype, {
         await super.setup(...arguments);
         const composer = this.props.composer;
         const thread = composer?.thread;
-        if (!thread || !["sale.order", "account.move", "crm.lead"].includes(thread.model)) {
+
+        if (!(thread && thread.suggestedRecipients?.length && ["sale.order", "account.move", "crm.lead"].includes(thread.model))) {
             return;
         }
-
         const orm = this.env.services.orm;
-
-        // Get sale order
-        const [order] = await orm.searchRead(thread.model, [["id", "=", thread.id]], ["partner_id"]);
-        debugger;
+        // Get current record
+        const [record] = await orm.searchRead(thread.model, [["id", "=", thread.id]], ["partner_id"]);
         // Get claimant partners from customer
-        const claimantLines = await orm.searchRead("x_claimants_line", [["x_claimants_id", "=", order.partner_id]], ["x_claimants"]);
+        const claimantLines = await orm.searchRead("x_claimants_line", [["x_claimants_id", "=", record.partner_id]], ["x_claimants"]);
         
-        const claimantPartnerIds = claimantLines.map(line => line.x_claimants?.[0]).filter(Boolean);
+        const claimantPartnerIds = claimantLines.map(line => line.x_claimants?.[0]);
 
         const partners = await orm.searchRead("res.partner", [["id", "in", claimantPartnerIds]], ["name", "email"]);
 
