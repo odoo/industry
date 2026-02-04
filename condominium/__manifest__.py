@@ -53,7 +53,6 @@
     'demo': [
         'demo/res_partner.xml',
         'demo/res_company.xml',
-        'demo/res_users.xml',
         'demo/x_buildings.xml',
         'demo/account_analytic_account.xml',
         'demo/x_distribution_key.xml',
