@@ -1,10 +1,11 @@
 {
     'name': 'Summer Camps',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
         'appointment_crm',
+        'base_automation',
         'base_industry_data',
         'crm_enterprise',
         'event_crm',
@@ -14,11 +15,16 @@
         'sale_project',
         'sign',
         'survey',
+        'web_studio',
         'website_crm',
         'website_event_sale',
     ],
     'data': [
         'data/ir_attachment.xml',
+        'data/ir_model_fields.xml',
+        'data/ir_actions_server.xml',
+        'data/ir_ui_view.xml',
+        'data/base_automation.xml',
         'data/appointment_type.xml',
         'data/appointment_slot.xml',
         'data/product_template.xml',
@@ -33,6 +39,7 @@
         'data/sign_document.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
+        'data/website_event_templates.xml',
         'data/website_menu.xml',
     ],
     'demo': [
@@ -63,6 +70,7 @@
     'license': 'OEEL-1',
     'cloc_exclude': [
         'data/knowledge_article.xml',
+        'data/website_event_templates.xml',
         "demo/website_view.xml",
     ],
     'images': [
