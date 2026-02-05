@@ -94,4 +94,23 @@
         <field name="trigger">on_create</field>
         <field name="action_server_ids" eval="[(6, 0, [ref('action_x_remark_generate_x_reference_on_create')])]"/>
     </record>
+    <record id="automation_update_product_cost_and_vendor_list_from_purchase_order" model="base.automation">
+        <field name="name">Construction: On Purchase Order confirmation</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_update_product_cost_and_vendor_list_from_purchase_order')])]"/>
+        <field name="trigger">on_state_set</field>
+        <field name="trg_selection_field_id" ref="purchase.selection__purchase_order__state__purchase"/>
+        <field name="filter_domain">[('state', '=', 'purchase')]</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('purchase.field_purchase_order__state')])]"/>
+    </record>
+    <record id="automation_update_product_cost_and_vendor_list_from_vendor_bill" model="base.automation">
+        <field name="name">Construction: On Vendor Bill confirmation</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_update_product_cost_and_vendor_list_from_vendor_bill')])]"/>
+        <field name="trigger">on_state_set</field>
+        <field name="trg_selection_field_id" ref="account.selection__account_move__state__posted"/>
+        <field name="filter_pre_domain">[("move_type", "=", "in_invoice")]</field>
+        <field name="filter_domain">[('state', '=', 'posted')]</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('account.field_account_move__state')])]"/>
+    </record>
 </odoo>
