@@ -11,12 +11,12 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='company_type']" position="before">
                 <div class="d-flex align-items-center">
-                    <field name="x_is_group_of_people" class="m-0 p-0"/>
-                    <label for="x_is_group_of_people" class="m-0">Is Group Of People</label>
+                    <field name="x_group_of_people" widget="boolean" class="m-0 p-0"/>
+                    <label for="x_group_of_people" class="m-0">Group Of People</label>
                 </div>
             </xpath>
             <xpath expr="//page[@name='internal_notes']" position="before">
-                <page name='claimants' string="Claimants" invisible="not x_is_group_of_people">
+                <page name='claimants' string="Claimants" invisible="not x_group_of_people">
                     <field name="x_claimants_line_ids">
                         <list editable="bottom">
                             <field name="x_claimants" widget="many2one"/>
@@ -37,10 +37,26 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="%(ir_act_server_split_per_property)d" string="Split Invoice" type="action" invisible="not invoice_count"/>
+                <button name="%(action_split_invoice_per_claimant_from_so)d" string="Split Invoice" type="action" invisible="not invoice_count and not x_is_visible"/>
             </xpath>
         </field>
     </record>
+
+    <record id="account_move_form_custom" model="ir.ui.view">
+        <field name="name">account.move.form.industry_lawyer</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="%(action_split_invoice_per_claimant)d" string="Split Invoice" type="action" invisible="not x_is_visible or state != 'draft'"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="email_compose_message_wizard_form_custom" model="ir.ui.view">
         <field name="name">mail.compose.message.form.industry_lawyer</field>
         <field name="model">mail.compose.message</field>
@@ -52,13 +68,13 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='subject']" position="before">
                 <!-- <field name="x_show_approval" invisible="1"/> -->
-                <field name="x_approval" options="{'no_create': True, 'no_create_edit': True}" domain="[('x_is_high_user_group', '=', True)]" invisible="not x_show_approval"/>
+                <field name="x_approval_id" options="{'no_create': True, 'no_create_edit': True}" domain="[('x_is_high_user_group', '=', True)]" invisible="not x_show_approval"/>
             </xpath>
             <xpath expr="//footer/button[@name='action_send_mail']" position="attributes">
                 <attribute name="invisible">x_approval_required=='mendatory'</attribute>
             </xpath>
             <xpath expr="//footer/button[@name='action_send_mail']" position="after">
-                <button string="Submit for Approval" type="action" class="btn-primary" name="%(action_submit_for_approval)d" invisible="not x_show_approval"/>
+                <button string="Submit for Approval" type="action" class="btn-primary" name="%(action_submit_for_approval)d" invisible="not x_show_approval or x_is_high_group_user"/>
             </xpath>
         </field>
     </record>
@@ -79,7 +95,7 @@
                 <attribute name="invisible">x_approval_required=='mendatory'</attribute>
             </xpath>
             <xpath expr="//button[@name='action_send_and_print']" position="after">
-                <button string="Submit for Approval" type="action" class="btn-primary" name="%(action_submit_for_approval_in_account_move_send)d" invisible="not x_show_approval"/>
+                <button string="Submit for Approval" type="action" class="btn-primary" name="%(action_submit_for_approval_in_account_move_send)d" invisible="not x_show_approval or x_is_high_group_move_sender"/>
             </xpath>
         </field>
     </record>
@@ -115,7 +131,7 @@
                 <field name="x_author_id"/>
                 <field name="x_name"/>
                 <field name="x_approval_status"  widget="badge" decoration-danger="x_approval_status=='cancelled'" decoration-success="x_approval_status=='sent'" decoration-info="x_approval_status=='pending'"/>
-                <button name="%(action_send_and_close_email)d" string="Approve &amp; Send" type="action" icon="fa-paper-plane" invisible="x_approval_status != 'pending'"/>
+                <button name="%(action_send_and_close_email)d" string="Approve &amp; Send" type="action" icon="fa-paper-plane" invisible="not x_is_approver or x_approval_status != 'pending'"/>
                 <button name="%(action_mark_outgoing)d" string="Retry" type="action" icon="fa-repeat" invisible="x_approval_status != 'cancelled'"/>
                 <button name="%(action_cancel)d" string="Cancel" type="action" icon="fa-times-circle" invisible="x_approval_status == 'cancelled'"/>
             </list>
@@ -140,7 +156,7 @@
         <field name="arch" type="xml">
             <form string="Approval Email">
                 <header>
-                    <button name="%(action_send_and_close_email)d" string="Approve &amp; Send" type="action" class="oe_highlight" invisible="x_approval_status != 'pending'"/>
+                    <button name="%(action_send_and_close_email)d" string="Approve &amp; Send" type="action" class="oe_highlight" invisible="not x_is_approver or x_approval_status != 'pending'"/>
                     <button name="%(action_mark_outgoing)d" string="Retry" type="action" invisible="x_approval_status != 'cancelled'"/>
                     <button name="%(action_cancel)d" string="Cancel" type="action" invisible="x_approval_status == 'cancelled'"/>
                     <field name="x_approval_status" widget="statusbar" statusbar_visible="pending,sent,cancelled"/>
@@ -167,7 +183,7 @@
                     </group>
                     <notebook>
                         <page string="Body" name="body">
-                            <field name="x_body_html" readonly="x_approval_state=='03_approved'"/>
+                            <field name="x_body_html" readonly="x_approval_state == '03_approved' or x_approval_status == 'sent'"/>
                         </page>
                         <page string="Attachments" name="attachments">
                             <!-- <div class="alert alert-warning" role="alert" invisible="restricted_attachment_count == 0">
@@ -198,7 +214,7 @@
         <field name="arch" type="xml">
             <xpath expr="//group" position="inside">
                 <group>
-                    <field name="x_approval_groups"/>
+                    <field name="x_approval_groups" invisible='1'/>
                 </group>
             </xpath>
             <xpath expr="//group/group" position="attributes">
