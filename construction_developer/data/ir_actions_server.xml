@@ -221,4 +221,48 @@ action = {
         <field name="code"><![CDATA[
 env['x_work_item'].search([("x_active", "!=", False), ("id", "not in", records.ids), ("x_product_id", "in", records.x_product_id.ids), ("x_is_template", "!=", False)]).write({'x_active': False})]]></field>
     </record>
+    <record id="action_update_product_cost_and_vendor_list_from_purchase_order" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for record in records:
+    partner_id = record.partner_id.id if not record.partner_id.parent_id else record.partner_id.parent_id.id
+    for line in record.order_line:
+        server_action = env['ir.actions.server'].browse(env.ref('construction_developer.action_update_product_cost_and_vendor_list').id)
+        server_action.with_context(active_id=line.product_id.id, active_model="product.product", partner_id=partner_id, qty=line.product_qty, price=line.price_unit).sudo().run()
+        ]]></field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="state">code</field>
+        <field name="name">Construction: Update Product Cost and Vendor List (from Purchase Order)</field>
+        <field name="usage">base_automation</field>
+    </record>
+    <record id="action_update_product_cost_and_vendor_list_from_vendor_bill" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for record in records:
+    partner_id = record.partner_id.id if not record.partner_id.parent_id else record.partner_id.parent_id.id
+    for line in record.invoice_line_ids:
+        server_action = env['ir.actions.server'].browse(env.ref('construction_developer.action_update_product_cost_and_vendor_list').id)
+        server_action.with_context(active_id=line.product_id.id, active_model="product.product", partner_id=partner_id, qty=line.quantity, price=line.price_unit).sudo().run()
+        ]]></field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="name">Construction: Update Product Cost and Vendor List (from Vendor Bill)</field>
+        <field name="usage">base_automation</field>
+    </record>
+    <record id="action_update_product_cost_and_vendor_list" model="ir.actions.server">
+        <field name="code"><![CDATA[
+partner_id, qty, price = (env.context.get(k) for k in ('partner_id', 'qty', 'price'))
+if supplier_info := env['product.supplierinfo'].search([('partner_id', '=', partner_id), ('product_tmpl_id', '=', record.product_tmpl_id.id), ('product_id', 'in', [record.id, False]), '|', ('min_qty', '=', qty), ('price', '=', price)], limit=1):
+    if not supplier_info.product_id:    supplier_info['product_id'] = record.id
+    if float_compare(price, supplier_info.price, precision_digits=2) == 0:
+        supplier_info['min_qty'] = qty
+    elif float_compare(qty, supplier_info.min_qty, precision_digits=2) == 0:
+        supplier_info['price'] = price
+else:
+    supplier_info = env['product.supplierinfo'].create({'partner_id': partner_id, 'product_tmpl_id': record.product_tmpl_id.id, 'product_id': record.id, 'min_qty': qty, 'price': price, 'delay': 0})
+record['standard_price'] = price
+((env['product.supplierinfo'].search([('partner_id', '=', partner_id), ('product_tmpl_id', '=', record.product_tmpl_id.id), ('product_id', '=', record.id), ('min_qty', '>=', qty), ('price', '>=', price)])) - supplier_info).unlink()
+        ]]></field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="state">code</field>
+        <field name="name">Construction: Update Product Cost and Vendor List</field>
+    </record>
 </odoo>
