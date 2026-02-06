@@ -7,7 +7,7 @@ balance_account_section_name = "Customer account balance"
 if not any(line.name == balance_account_section_name and line.display_type == 'line_section' for line in record.invoice_line_ids):
     env['account.move.line'].create({'move_id': record.id, 'name': balance_account_section_name, 'display_type': 'line_section'})
 for order in pos_orders:
-    date = timezone('UTC').localize(order.date_order).astimezone(tz=timezone(env.user.tz or 'UTC')).strftime('%Y-%m-%d %H:%M')
+    date = order.date_order.replace(tzinfo=timezone('UTC')).astimezone(timezone(env.user.tz or 'UTC')).strftime('%Y-%m-%d %H:%M')
     name = f"{order.name} ({date})\n" + "\n".join(f"{line.qty} x {line.product_id.display_name}" for line in order.lines)
     env['account.move.line'].create({'move_id': record.id, 'name': name, 'price_unit': order.customer_due_total, 'x_pos_order_id': order.id})
 ]]></field>
