@@ -22,6 +22,7 @@
         'data/ir_model.xml',
         'data/ir_model_access.xml',
         'data/ir_model_fields.xml',
+        'data/res_users.xml',
         'data/res_groups.xml',
         'data/ir_default.xml',
         'data/ir_actions_act_window.xml',

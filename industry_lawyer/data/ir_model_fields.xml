@@ -176,12 +176,24 @@ for user in users: user['x_is_high_user_group'] = get_rank(user) > current_user_
         <field name="model_id" ref="account.model_account_move_send_wizard"/>
         <field name="name">x_is_high_group_move_sender</field>
     </record>
+
+
     <record id="field_x_suggest_approval" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="on_delete" eval="False"/>
         <field name="field_description">Suggest Approval</field>
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="name">x_suggest_approval</field>
+        <field name="readonly" eval="True"/>
+        <field name="relation">res.users</field>
+    </record>
+
+    <record id="field_x_suggest_approver" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="on_delete" eval="False"/>
+        <field name="field_description">Suggest Approver</field>
+        <field name="model_id" ref="base.model_res_users"/>
+        <field name="name">x_suggest_approver</field>
         <field name="readonly" eval="True"/>
         <field name="relation">res.users</field>
     </record>
@@ -217,20 +229,29 @@ for user in users: user['x_is_high_user_group'] = get_rank(user) > current_user_
         <field name="field_description">Approval Required</field>
         <field name="model_id" ref="base.model_res_config_settings"/>
     </record>
-    <record id="field_x_approval_required_mail_compose" model="ir.model.fields">
-        <field name="name">x_approval_required</field>
-        <field name="ttype">selection</field>
-        <field name="related">record_company_id.x_approval_required</field>
-        <field name="field_description">Approval Required</field>
+
+    <!-- on going  -->
+    <record id="field_x_display_send_button_mail_compose" model="ir.model.fields">
+        <field name="name">x_display_send_button</field>
+        <field name="ttype">boolean</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_display_send_button'] = record.env.user.has_group('industry_lawyer.group_high') or record.env.company.x_approval_required == 'optional'
+]]></field>
         <field name="model_id" ref="mail.model_mail_compose_message"/>
+        <field name="store" eval="False"/>
     </record>
-    <record id="field_x_approval_required_account_wizard_send" model="ir.model.fields">
-        <field name="name">x_approval_required</field>
-        <field name="ttype">selection</field>
-        <field name="related">company_id.x_approval_required</field>
-        <field name="field_description">Approval Required</field>
+    <record id="field_x_display_send_button_move_send" model="ir.model.fields">
+        <field name="name">x_display_send_button</field>
+        <field name="ttype">boolean</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_display_send_button'] = record.env.user.has_group('industry_lawyer.group_high') or record.env.company.x_approval_required == 'optional'
+]]></field>
         <field name="model_id" ref="account.model_account_move_send_wizard"/>
+        <field name="store" eval="False"/>
     </record>
+
     <record id="field_x_mail_mail" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="field_description">Email</field>
@@ -303,7 +324,7 @@ for user in users: user['x_is_high_user_group'] = get_rank(user) > current_user_
     </record> -->
     <record id="field_x_attachment_ids" model="ir.model.fields">
         <field name="ttype">many2many</field>
-        <field name="field_description">Unrestricted Attachment_ids</field>
+        <field name="field_description">Attachments</field>
         <field name="model_id" ref="model_x_approval_mail"/>
         <field name="name">x_attachment_ids</field>
         <field name="related">x_mail_mail.attachment_ids</field>
@@ -368,4 +389,19 @@ for record in self:
         <field name="name">x_is_approver</field>
         <field name="store" eval="False"/>
     </record>
+
+    <record id="field_x_related_document_model" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="field_description">Related Document Model</field>
+        <field name="model_id" ref="model_x_approval_mail"/>
+        <field name="name">x_res_model</field>
+    </record>
+
+    <record id="field_x_related_document_id" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="field_description">Related Document Id</field>
+        <field name="model_id" ref="model_x_approval_mail"/>
+        <field name="name">x_res_id</field>
+    </record>
+
 </odoo>
