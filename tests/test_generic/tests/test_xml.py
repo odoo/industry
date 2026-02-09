@@ -124,6 +124,8 @@ class TestEnv(IndustryCase):
         static_files = set()
         in_use_files = set()
         checked_records_with_user = {}
+        uninitialized_sessions = []
+        session_functions = []
         for root, dirs, files in os.walk(path):
             # sort the directory by alphabetical order so static directory is read first.
             dirs.sort(reverse=True)
@@ -173,6 +175,8 @@ class TestEnv(IndustryCase):
                 self._check_context_to_stop_mail_sending(tree, file_name, module)
                 self._check_text_based_xpath(tree, file_name)
                 self._check_portal_login_is_email(tree, file_name)
+                self._check_pos_session(tree, file_name, uninitialized_sessions)
+                self._check_session_function(tree, session_functions)
                 if root.split('/')[-1] == 'data':
                     self._check_view_active(tree, file_name)
                     self._check_is_published_false(tree, file_name)
@@ -180,6 +184,7 @@ class TestEnv(IndustryCase):
                         is_studio_required = self._check_studio(tree, file_name)
         self._check_manifest(manifest_content, is_studio_required, escape_studio_test=module in ESCAPE_STUDIO_TEST)
         self._check_records_without_user_id(checked_records_with_user)
+        self._check_uninitialized_sessions(uninitialized_sessions, session_functions)
         if not get_db_name().endswith('imported_no_demo'):
             in_use_files = {file.lstrip('/') for file in in_use_files}
             for file in static_files - in_use_files:
@@ -640,3 +645,31 @@ class TestEnv(IndustryCase):
                         login,
                         file_name,
                     )
+
+    def _check_pos_session(self, root, file_name, uninitialized_records):
+        for record in root.xpath("//record[@model='pos.session']"):
+            if not record.xpath("./field[@name='state']/text()"):
+                uninitialized_records.append((record.get('id'), file_name))
+
+    def _check_session_function(self, root, session_functions):
+        session_functions.extend(list(root.xpath("//function[@model='pos.session' and @name='action_pos_session_closing_control']")))
+
+    def _check_uninitialized_sessions(self, uninitialized_sessions, session_functions):
+        def error_message(record_id, file_name):
+            return _logger.warning(
+                            "pos.session record with id '%s' in file %s is not initialized. "
+                            "Please initialize the session properly by setting state='opened' or 'closed' or add a call to action_pos_session_closing_control.",
+                            record_id,
+                            file_name,
+                        )
+        if uninitialized_sessions and not session_functions:
+            for record_id, file_name in uninitialized_sessions:
+                error_message(record_id, file_name)
+            return
+        for u in uninitialized_sessions:
+            # <function eval="ref('id')"/>
+            cond1 = any(u[0] in f.get('eval', '') for f in session_functions)
+            # <function><value eval="ref('id')"></function>
+            cond2 = any((val := f.xpath('//value')) and val[0].get('eval', '') for f in session_functions)
+            if not (cond1 or cond2):
+                error_message(u[0], u[1])
