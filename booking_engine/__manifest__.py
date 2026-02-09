@@ -1,6 +1,6 @@
 {
     'name': 'Booking Engine',
-    'version': '1.6',
+    'version': '1.7',
     'category': 'Hidden/Tools',
     'author': 'Odoo S.A.',
     'depends': [
@@ -15,6 +15,7 @@
         'website_sale_renting',
     ],
     'data': [
+        'data/product_pricelist.xml',
         'data/res_groups.xml',
         'data/project_task_type.xml',
         'data/ir_model.xml',
@@ -36,6 +37,7 @@
         'data/product_category.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
+        'data/product_pricelist_item.xml',
     ],
     'demo': [
         'demo/res_users.xml',
