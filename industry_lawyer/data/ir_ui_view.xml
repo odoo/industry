@@ -11,15 +11,15 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='company_type']" position="before">
                 <div class="d-flex align-items-center">
-                    <field name="x_group_of_people" widget="boolean" class="m-0 p-0"/>
-                    <label for="x_group_of_people" class="m-0">Group Of People</label>
+                    <field name="x_group_of_claimants" widget="boolean" class="m-0 p-0"/>
+                    <label for="x_group_of_claimants" class="m-0">Group Of Claimants</label>
                 </div>
             </xpath>
             <xpath expr="//page[@name='internal_notes']" position="before">
-                <page name='claimants' string="Claimants" invisible="not x_group_of_people">
+                <page name='claimants' string="Claimants" invisible="not x_group_of_claimants">
                     <field name="x_claimants_line_ids">
                         <list editable="bottom">
-                            <field name="x_claimants" widget="many2one"/>
+                            <field name="x_claimant_id" widget="many2one"/>
                             <field name="x_share"/>
                         </list>
                     </field>
@@ -37,11 +37,10 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="%(action_split_invoice_per_claimant_from_so)d" string="Split Invoice" type="action" invisible="not invoice_count and not x_is_visible"/>
+                <button name="%(action_split_invoice_per_claimant_from_so)d" string="Split Invoice" type="action" invisible="not invoice_count or not x_show_split_invoice"/>
             </xpath>
         </field>
     </record>
-
     <record id="account_move_form_custom" model="ir.ui.view">
         <field name="name">account.move.form.industry_lawyer</field>
         <field name="model">account.move</field>
@@ -52,11 +51,10 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="%(action_split_invoice_per_claimant)d" string="Split Invoice" type="action" invisible="not x_is_visible or state != 'draft'"/>
+                <button name="%(action_split_invoice_per_claimant)d" string="Split Invoice" type="action" invisible="not x_show_split_invoice or state != 'draft'"/>
             </xpath>
         </field>
     </record>
-
     <record id="email_compose_message_wizard_form_custom" model="ir.ui.view">
         <field name="name">mail.compose.message.form.industry_lawyer</field>
         <field name="model">mail.compose.message</field>
@@ -67,8 +65,7 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='subject']" position="before">
-                <!-- <field name="x_show_approval" invisible="1"/> -->
-                <field name="x_approval_id" options="{'no_create': True, 'no_create_edit': True}" domain="[('x_is_high_user_group', '=', True)]" invisible="not x_show_approval"/>
+                <field name="x_approver_id" options="{'no_create': True, 'no_create_edit': True}" domain="[('x_is_higher_group_user', '=', True)]" invisible="not x_show_approval"/>
             </xpath>
             <xpath expr="//footer/button[@name='action_send_mail']" position="attributes">
                 <attribute name="invisible">not x_display_send_button</attribute>
@@ -89,7 +86,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='subject']" position="before">
                 <!-- <field name="x_char"/> -->
-                <field name="x_invoice_approval_by" options="{'no_create': True, 'no_create_edit': True}" domain="[('x_is_high_user_group', '=', True)]" invisible="not x_show_approval"/>
+                <field name="x_invoice_approver_id" options="{'no_create': True, 'no_create_edit': True}" domain="[('x_is_higher_group_user', '=', True)]" invisible="not x_show_approval"/>
             </xpath>
             <xpath expr="//button[@name='action_send_and_print']" position="attributes">
                 <attribute name="invisible">not x_display_send_button</attribute>

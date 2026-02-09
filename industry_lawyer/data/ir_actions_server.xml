@@ -1,13 +1,22 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+    <record id="action_devide_share_equally" model="ir.actions.server">
+        <field name="code"><![CDATA[
+claimants_lines = record.x_claimant_parent_id.x_claimants_line_ids
+claimants_lines.write({'x_share': 100/len(claimants_lines)})
+]]>        </field>
+        <field name="model_id" ref="model_claimants_line"/>
+        <field name="state">code</field>
+        <field name="name">Industry Lawyer: split % of share equally</field>
+    </record>
+
     <record id="action_split_invoice_per_claimant_from_so" model="ir.actions.server">
         <field name="code"><![CDATA[
 claimants_lines = record.partner_id.x_claimants_line_ids
 for claimant_line in claimants_lines:   # One invoice per claimant
     for invoice in record.invoice_ids:
-        new_invoice = invoice.copy({'partner_id': claimant_line.x_claimants.id})
+        new_invoice = invoice.copy({'partner_id': claimant_line.x_claimant_id.id})
         for orig_line, new_line in zip(invoice.invoice_line_ids, new_invoice.invoice_line_ids):
-            # if orig_line.product_id:
             new_line.write({'price_unit': new_line.price_unit / len(claimants_lines) if new_line.price_unit else 0.0})
         invoice.write({'state': 'cancel'})
 action = env['ir.actions.act_window']._for_xml_id('account.action_move_out_invoice')
@@ -16,34 +25,27 @@ action = env['ir.actions.act_window']._for_xml_id('account.action_move_out_invoi
         <field name="state">code</field>
         <field name="name">Industry Lawyer: Split Invoice per Claimant From Quotation</field>
     </record>
-
-
-
     <record id="action_split_invoice_per_claimant" model="ir.actions.server">
         <field name="code"><![CDATA[
 claimants_lines = record.partner_id.x_claimants_line_ids
 for claimant_line in claimants_lines:   # One invoice per claimant
-    new_invoice = record.copy({'partner_id': claimant_line.x_claimants.id})
+    new_invoice = record.copy({'partner_id': claimant_line.x_claimant_id.id})
     for orig_line, new_line in zip(record.invoice_line_ids, new_invoice.invoice_line_ids):
-        # if orig_line.product_id:
         new_line.write({'price_unit': new_line.price_unit / len(claimants_lines) if new_line.price_unit else 0.0})
     record.write({'state': 'cancel'})
+action = env['ir.actions.act_window']._for_xml_id('account.action_move_out_invoice')
 ]]>        </field>
         <field name="model_id" ref="sale.model_account_move"/>
         <field name="state">code</field>
         <field name="name">Industry Lawyer: Split Invoice per Claimant</field>
     </record>
-
-
-
     <record id="action_update_additional_contacts" model="ir.actions.server">
         <field name="code"><![CDATA[
 current_record = env[record.model].browse(record._evaluate_res_ids())
-if not record.partner_ids: #only for crm lead
-    record['partner_ids']=  [(6, 0, [current_record.partner_id.id])]
-suggest_approver = env.user.x_suggest_approver
-if suggest_approver: record.write({'x_approval_id': suggest_approver})
-record.write({'partner_ids': [(4, pid) for pid in set(record.partner_ids.mapped('x_claimants_line_ids.x_claimants').ids)], 'x_is_high_group_user': env.user.has_group('industry_lawyer.group_high')})
+if not record.partner_ids: record['partner_ids'] = [(6, 0, [current_record.partner_id.id])] #only for crm lead
+suggest_approver = env.user.x_suggest_approver_id
+if suggest_approver: record.write({'x_approver_id': suggest_approver.id})
+record.write({'partner_ids': [(4, pid) for pid in set(record.partner_ids.mapped('x_claimants_line_ids.x_claimant_id').ids)], 'x_is_high_group_user': env.user.has_group('industry_lawyer.group_high')})
         ]]>        </field>
         <field name="model_id" ref="mail.model_mail_compose_message"/>
         <field name="state">code</field>
@@ -51,9 +53,9 @@ record.write({'partner_ids': [(4, pid) for pid in set(record.partner_ids.mapped(
     </record>
     <record id="action_update_additional_contacts_in_account_move_send" model="ir.actions.server">
         <field name="code"><![CDATA[
-suggest_approver = env.user.x_suggest_approver
-if suggest_approver: record.write({'x_invoice_approval_by': suggest_approver})
-record.write({'mail_partner_ids': [(4, pid) for pid in set(record.mail_partner_ids.mapped('x_claimants_line_ids.x_claimants').ids)], 'x_is_high_group_move_sender': env.user.has_group('industry_lawyer.group_high')})
+suggest_approver = env.user.x_suggest_approver_id
+if suggest_approver: record.write({'x_invoice_approver_id': suggest_approver.id})
+record.write({'mail_partner_ids': [(4, pid) for pid in set(record.mail_partner_ids.mapped('x_claimants_line_ids.x_claimant_id').ids)], 'x_is_high_group_move_sender': env.user.has_group('industry_lawyer.group_high')})
         ]]>        </field>
         <field name="model_id" ref="account.model_account_move_send_wizard"/>
         <field name="state">code</field>
@@ -127,12 +129,12 @@ mail = env['mail.mail'].with_context(mail_create_nolog=True).create({
         'subject': currect_record.name or '',
         'recipient_ids': ctx.get('partner_ids'),
 })
-mail_for_approval = env['x_approval_mail'].create({'x_mail_mail': mail.id, 'x_approval_status': 'pending'})
+mail_for_approval = env['x_approval_mail'].create({'x_mail_id': mail.id, 'x_approval_status': 'pending'})
         ]]></field>
     </record>
     <record id="action_submit_for_approval" model="ir.actions.server">
         <field name="code"><![CDATA[
-if not record.x_approval_id: raise UserError("Please select an approval user before submitting this email for approval.")
+if not record.x_approver_id: raise UserError("Please select an approval user before submitting this email for approval.")
 mail = env['mail.mail'].create({'attachment_ids': [(6, 0, [attach.id for attach in record.attachment_ids])],
     'body_html': record.body or '',
     'partner_ids': record.partner_ids.ids,
@@ -142,10 +144,10 @@ mail = env['mail.mail'].create({'attachment_ids': [(6, 0, [attach.id for attach 
     'subject': record.subject or '',
     'recipient_ids': [(6, 0, record.partner_ids.ids)],
     'reply_to': record.reply_to or False,})
-mail_for_approval = env['x_approval_mail'].create({'x_mail_mail': mail.id, 'x_approval_status': 'pending', 'x_approved_by_id': record.x_approval_id.id, 'x_res_model': record.model, 'x_res_id': record._evaluate_res_ids()[0]})
-env.user.write({'x_suggest_approver': record.x_approval_id.id})
-high_group_user_mail = mail.copy({'x_author_id': record.x_approval_id.id})
-mail_for_approval.copy({'x_mail_mail': high_group_user_mail.id})
+mail_for_approval = env['x_approval_mail'].create({'x_mail_id': mail.id, 'x_approval_status': 'pending', 'x_approved_by_id': record.x_approver_id.id, 'x_res_model': record.model, 'x_res_id': record._evaluate_res_ids()[0]})
+env.user.write({'x_suggest_approver_id': record.x_approver_id.id})
+high_group_user_mail = mail.copy({'x_author_id': record.x_approver_id.id})
+mail_for_approval.copy({'x_mail_id': high_group_user_mail.id})
         ]]>        </field>
         <field name="model_id" ref="mail.model_mail_compose_message"/>
         <field name="state">code</field>
@@ -153,8 +155,7 @@ mail_for_approval.copy({'x_mail_mail': high_group_user_mail.id})
     </record>
     <record id="action_submit_for_approval_in_account_move_send" model="ir.actions.server">
         <field name="code"><![CDATA[
-if not record.x_invoice_approval_by: raise UserError("Please select an approval user before submitting this email for approval.")
-
+if not record.x_invoice_approver_id: raise UserError("Please select an approval user before submitting this email for approval.")
 move_id = record.move_id
 invoice_attachment_id = move_id.invoice_pdf_report_id
 if invoice_attachment_id:
@@ -174,18 +175,17 @@ mail = env['mail.mail'].create({
     'x_author_id': env.user.id,
     'subject': record.subject or '',
     'recipient_ids': [(6, 0, record.mail_partner_ids.ids)],})
-mail_for_approval = env['x_approval_mail'].create({'x_mail_mail': mail.id, 'x_approval_status': 'pending', 'x_approved_by_id': record.x_invoice_approval_by.id, 'x_res_model': record.model, 'x_res_id': move_id.id})
-env.user.write({'x_suggest_approval': record.x_invoice_approval_by.id})
-high_group_user_mail = mail.copy({'x_author_id': record.x_invoice_approval_by.id})
-mail_for_approval.copy({'x_mail_mail': high_group_user_mail.id})
+mail_for_approval = env['x_approval_mail'].create({'x_mail_id': mail.id, 'x_approval_status': 'pending', 'x_approved_by_id': record.x_invoice_approver_id.id, 'x_res_model': record.model, 'x_res_id': move_id.id})
+env.user.write({'x_suggest_approver_id': record.x_invoice_approver_id.id})
+high_group_user_mail = mail.copy({'x_author_id': record.x_invoice_approver_id.id})
+mail_for_approval.copy({'x_mail_id': high_group_user_mail.id})
         ]]>        </field>
         <field name="model_id" ref="account.model_account_move_send_wizard"/>
         <field name="state">code</field>
         <field name="name">Industry Lawyer: Submit For Approval in Account Move Send</field>
     </record>
     <record id="action_open_document" model="ir.actions.server">
-        <field name="code">
-            <![CDATA[
+        <field name="code"><![CDATA[
 action = {'type': 'ir.actions.act_url', 'url': f'/web/content/{record.id}?download=true'}
 ]]>
         </field>
@@ -197,7 +197,7 @@ action = {'type': 'ir.actions.act_url', 'url': f'/web/content/{record.id}?downlo
         <field name="code">
             <![CDATA[
 for record in records:
-    mail = record.x_mail_mail
+    mail = record.x_mail_id
     mail.send()
     if mail.state == 'sent':
         env[records.x_res_model].browse(records.x_res_id).message_post(body = record.x_body_html, message_type='comment', subtype_xmlid = 'mail.mt_comment', attachment_ids = record.x_attachment_ids.ids)
@@ -215,7 +215,7 @@ action = env['ir.actions.act_window']._for_xml_id('industry_lawyer.approval_emai
     <record id="action_mark_outgoing" model="ir.actions.server">
         <field name="code">
             <![CDATA[records.write({'x_approval_status': 'pending'})
-for rec in records: rec.x_mail_mail.write({'state': 'outgoing'})
+for rec in records: rec.x_mail_id.write({'state': 'outgoing'})
             ]]>
         </field>
         <field name="name">Industry Lawyer: Retry</field>
@@ -227,7 +227,7 @@ for rec in records: rec.x_mail_mail.write({'state': 'outgoing'})
     <record id="action_cancel" model="ir.actions.server">
         <field name="code">
             <![CDATA[records.write({'x_approval_status': 'cancelled'})
-for rec in records: rec.x_mail_mail.write({'state': 'cancel'})
+for rec in records: rec.x_mail_id.write({'state': 'cancel'})
             ]]>
         </field>
         <field name="name">Industry Lawyer: Cancel</field>
@@ -236,4 +236,30 @@ for rec in records: rec.x_mail_mail.write({'state': 'cancel'})
         <field name="binding_view_types">form</field>
         <field name="state">code</field>
     </record>
+
+    <!-- <record id="action_link_task_attachment_to_project_documents" model="ir.actions.server">
+        <field name="name">Industry Lawyer: Link Task Attachments to Project Documents</field>
+        <field name="model_id" ref="base.model_ir_attachment"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+project = env.ref('industry_lawyer.project_project_3', raise_if_not_found=False)
+folder = env.ref('industry_lawyer.documents_folder_10', raise_if_not_found=False)
+if project and folder:
+    documents = env['documents.document']
+    for attachment in records:
+        if attachment.res_model != 'project.task' or not attachment.res_id:
+            continue
+        task = env['project.task'].browse(attachment.res_id)
+        if task.project_id.id != project.id:
+            continue
+        if documents.search_count([('attachment_id', '=', attachment.id)]):
+            continue
+        documents.create({
+            'attachment_id': attachment.id,
+            'folder_id': folder.id,
+            'name': attachment.name or task.name,
+            'company_id': folder.company_id.id,
+        })
+        ]]></field>
+    </record> -->
 </odoo>

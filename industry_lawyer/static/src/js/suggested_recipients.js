@@ -14,9 +14,9 @@ patch(Composer.prototype, {
         // Get current record
         const [record] = await orm.searchRead(thread.model, [["id", "=", thread.id]], ["partner_id"]);
         // Get claimant partners from customer
-        const claimantLines = await orm.searchRead("x_claimants_line", [["x_claimants_id", "=", record.partner_id]], ["x_claimants"]);
+        const claimantLines = await orm.searchRead("x_claimants_line", [["x_claimant_parent_id", "=", record.partner_id]], ["x_claimant_id"]);
         
-        const claimantPartnerIds = claimantLines.map(line => line.x_claimants?.[0]);
+        const claimantPartnerIds = claimantLines.map(line => line.x_claimant_id?.[0]);
 
         const partners = await orm.searchRead("res.partner", [["id", "in", claimantPartnerIds]], ["name", "email"]);
 
