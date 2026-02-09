@@ -453,13 +453,6 @@ for record in self: record['x_company_partner_id'] = record.partner_id and recor
     <field name="readonly" eval="True"/>
     <field name="store" eval="False"/>
   </record>
-  <record id="property_line_field_sequence" model="ir.model.fields">
-    <field name="ttype">integer</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Sequence</field>
-    <field name="model_id" ref="model_x_property_owner"/>
-    <field name="name">x_sequence</field>
-  </record>
   <record id="property_line_property_field" model="ir.model.fields">
     <field name="ttype">many2one</field>
     <field name="copied" eval="True"/>
@@ -497,13 +490,6 @@ for record in self: record['x_company_partner_id'] = record.partner_id and recor
     <field name="name">x_owner_ids</field>
     <field name="relation">x_property_owner</field>
     <field name="relation_field">x_property_id</field>
-  </record>
-  <record id="property_line_sequence_field" model="ir.model.fields">
-    <field name="ttype">integer</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Sequence</field>
-    <field name="model_id" ref="model_x_property_tenant"/>
-    <field name="name">x_sequence</field>
   </record>
   <record id="property_line_field_property" model="ir.model.fields">
     <field name="ttype">many2one</field>
@@ -784,8 +770,7 @@ for record in self: record['x_companies'] = [(6, 0, record.x_property_ids.x_cond
   </record>
   <record id="field_calendar_attendee_ratio" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self:
-  voting_key = record.event_id.x_voting_key_id
-  record['x_ratio'] = sum(voting_key.x_ratio_ids.filtered(lambda l: l.x_owner == record.partner_id).mapped('x_ratio')) if voting_key else 0.0
+  record['x_ratio'] = sum(record.event_id.x_voting_key_id.x_ratio_ids.filtered(lambda l: l.x_owner == record.partner_id).mapped('x_ratio')) if record.event_id.x_voting_key_id else 0.0
     ]]></field>
     <field name="ttype">float</field>
     <field name="depends">event_id.x_voting_key_id</field>
@@ -886,11 +871,10 @@ for record in self: record['x_companies'] = [(6, 0, record.x_property_ids.x_cond
   <record id="field_motion_total_in_favor" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self:
     event = record.x_calendar_event_id
-    voting_key = event.x_voting_key_id
-    if event.x_attending_ratio > 0 and voting_key:
+    if event.x_attending_ratio > 0 and event.x_voting_key_id:
         voters = record.x_attendee_vote_ids.filtered(lambda a: a.x_vote == 'In Favor').x_attendee_id.ids
         x_in_favor = sum(attendee.x_ratio for attendee in event.attendee_ids if (attendee.x_delegating or attendee.x_attending) and attendee.partner_id.id in voters)
-        record['x_in_favor'] = x_in_favor / sum([x_ratio.x_ratio for x_ratio in voting_key.x_ratio_ids]) / event.x_attending_ratio
+        record['x_in_favor'] = x_in_favor / sum([x_ratio.x_ratio for x_ratio in event.x_voting_key_id.x_ratio_ids]) / event.x_attending_ratio
     else: record['x_in_favor'] = 0]]></field>
     <field name="ttype">float</field>
     <field name="depends">x_attendee_vote_ids</field>
@@ -904,11 +888,10 @@ for record in self: record['x_companies'] = [(6, 0, record.x_property_ids.x_cond
   <record id="field_motion_total_against" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self:
     event = record.x_calendar_event_id
-    voting_key = event.x_voting_key_id
-    if event.x_attending_ratio > 0 and voting_key:
+    if event.x_attending_ratio > 0 and event.x_voting_key_id:
         voters = record.x_attendee_vote_ids.filtered(lambda a: a.x_vote == 'Against').x_attendee_id.ids
         x_against = sum(attendee.x_ratio for attendee in event.attendee_ids if (attendee.x_delegating or attendee.x_attending) and attendee.partner_id.id in voters)
-        record['x_against'] = x_against / sum([x_ratio.x_ratio for x_ratio in voting_key.x_ratio_ids]) / event.x_attending_ratio
+        record['x_against'] = x_against / sum([x_ratio.x_ratio for x_ratio in event.x_voting_key_id.x_ratio_ids]) / event.x_attending_ratio
     else: record['x_against'] = 0]]></field>
     <field name="ttype">float</field>
     <field name="depends">x_attendee_vote_ids</field>
@@ -922,11 +905,10 @@ for record in self: record['x_companies'] = [(6, 0, record.x_property_ids.x_cond
   <record id="field_motion_total_abstention" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self:
     event = record.x_calendar_event_id
-    voting_key = event.x_voting_key_id
-    if event.x_attending_ratio > 0 and voting_key:
+    if event.x_attending_ratio > 0 and event.x_voting_key_id:
         voters = record.x_attendee_vote_ids.filtered(lambda a: a.x_vote == 'Abstention').x_attendee_id.ids
         x_abstention = sum(attendee.x_ratio for attendee in event.attendee_ids if (attendee.x_delegating or attendee.x_attending) and attendee.partner_id.id in voters)
-        record['x_abstention'] = x_abstention / sum([x_ratio.x_ratio for x_ratio in voting_key.x_ratio_ids]) / event.x_attending_ratio
+        record['x_abstention'] = x_abstention / sum([x_ratio.x_ratio for x_ratio in event.x_voting_key_id.x_ratio_ids]) / event.x_attending_ratio
     else: record['x_abstention'] = 0]]></field>
     <field name="ttype">float</field>
     <field name="depends">x_attendee_vote_ids</field>
@@ -939,10 +921,8 @@ for record in self: record['x_companies'] = [(6, 0, record.x_property_ids.x_cond
   </record>
   <record id="field_motion_outcome" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self:
-    if not record.x_vote_criteria or (record.x_in_favor == 0 and record.x_against == 0):
-        record['x_outcome'] = False
-    else:
-        record['x_outcome'] = 'Approved' if record.x_in_favor >= record.x_vote_criteria.x_acceptation_threshold else 'Rejected'
+    if not record.x_vote_criteria or (record.x_in_favor == 0 and record.x_against == 0): record['x_outcome'] = False
+    else: record['x_outcome'] = 'Approved' if record.x_in_favor >= record.x_vote_criteria.x_acceptation_threshold else 'Rejected'
     ]]>    </field>
     <field name="ttype">selection</field>
     <field name="depends">x_attendee_vote_ids, x_vote_criteria</field>
@@ -1139,8 +1119,7 @@ for line in self: line['x_share'] =  (line.x_amount / line.x_split_analytic_item
   </record>
   <record id="field_x_share_total" model="ir.model.fields">
     <field name="name">x_share_total</field>
-    <field name="compute"><![CDATA[for record in self:
-    record['x_share_total'] =  sum(line.x_share for line in record.x_line_ids)
+    <field name="compute"><![CDATA[for record in self: record['x_share_total'] =  sum(line.x_share for line in record.x_line_ids)
       ]]>    </field>
     <field name="ttype">float</field>
     <field name="depends">x_line_ids.x_share</field>

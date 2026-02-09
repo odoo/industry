@@ -48,7 +48,7 @@ else:
                         overlap_start = max(account.x_start_date, record.x_period_start)
                         # compute overlap end once
                         overlap_end = account.x_end_date if account.x_end_date else record.x_period_end
-                        analytic_distribution[account.id] = (overlap_end - overlap_start).days  * ratio.x_ratio
+                        analytic_distribution[account.id] = ((overlap_end - overlap_start).days + 1) * ratio.x_ratio
                 elif account.partner_id.id == ratio.x_owner.id: analytic_distribution[account.id] = ratio.x_ratio
     # Meter distribution
     if record.x_distribution_key.x_based_on == "Meter Readings" and record.x_period_start and record.x_period_end:
@@ -58,6 +58,7 @@ else:
                 billstart = findClosestMeterReading(record.x_period_start, meter_reading_ids)
                 billend = findClosestMeterReading(record.x_period_end, meter_reading_ids)
                 for account in property.x_account_ids:
+                    if not account.x_start_date or account.x_start_date > record.x_period_end or (account.x_end_date and account.x_end_date <= record.x_period_start): continue
                     mrostart = findClosestMeterReading(account.x_start_date, meter_reading_ids)
                     mrostart_date = mrostart.x_date
                     billend_date = billend.x_date
@@ -190,11 +191,37 @@ for line in property_id.x_owner_ids:
     if not (owner_id := line.x_owner): continue
     if not line.x_end_date: property_id.write({'x_current_owner': owner_id.id})
     if not env['account.analytic.account'].search_count([('x_property', '=', property_id.id), ('partner_id', '=', owner_id.id)], limit=1):
-        line['x_account'] = env['account.analytic.account'].create({'name': f"{property_id.x_name} - {owner_id.name}", 'x_property': property_id.id, 'partner_id': owner_id.id, 'x_owner_line': line.id, 'company_id': property_id.x_company_id.id}).id
+        line['x_account'] = env['account.analytic.account'].create({'name': property_id.x_name, 'x_property': property_id.id, 'partner_id': owner_id.id, 'x_owner_line': line.id, 'company_id': property_id.x_company_id.id}).id
 ]]></field>
         <field name="model_id" ref="model_x_property_owner"/>
         <field name="state">code</field>
         <field name="name">Condominium: Update Property Current Owner</field>
+        <field name="usage">base_automation</field>
+    </record>
+    <record id="action_validate_property_owner_dates" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for line in record:
+    if line.x_end_date and line.x_end_date < line.x_start_date: raise UserError("End Date must be empty or after Start Date.")
+    domain = [('id', '!=', line.id), ('x_property_id', '=', line.x_property_id.id), ('x_start_date', '!=', False), '|', ('x_end_date', '=', False), ('x_end_date', '>=', line.x_start_date)]
+    if line.x_end_date: domain.append(('x_start_date', '<=', line.x_end_date))
+    if env['x_property_owner'].search_count(domain, limit=1): raise UserError("Owner dates cannot overlap for the same property. Ensure that ownership periods do not overlap.")
+]]></field>
+        <field name="model_id" ref="model_x_property_owner"/>
+        <field name="state">code</field>
+        <field name="name">Condominium: Validate Owner Dates</field>
+        <field name="usage">base_automation</field>
+    </record>
+    <record id="action_validate_property_tenant_dates" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for line in record:
+    if line.x_end_date and line.x_end_date < line.x_start_date: raise UserError("End Date must be empty or after Start Date.")
+    domain = [('id', '!=', line.id), ('x_property_id', '=', line.x_property_id.id), ('x_start_date', '!=', False), '|', ('x_end_date', '=', False), ('x_end_date', '>=', line.x_start_date)]
+    if line.x_end_date: domain.append(('x_start_date', '<=', line.x_end_date))
+    if env['x_property_tenant'].search_count(domain, limit=1): raise UserError("Tenant dates cannot overlap for the same property. Ensure that tenancy periods do not overlap.")
+]]></field>
+        <field name="model_id" ref="model_x_property_tenant"/>
+        <field name="state">code</field>
+        <field name="name">Condominium: Validate Tenant Dates</field>
         <field name="usage">base_automation</field>
     </record>
     <record id="action_archive_related_accounts" model="ir.actions.server">
