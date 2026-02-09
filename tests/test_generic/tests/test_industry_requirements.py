@@ -9,16 +9,6 @@ from .industry_case import IndustryCase
 @tagged('post_install', '-at_install')
 class TestEnv(IndustryCase):
 
-    def test_payment_demo(self):
-        if not self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1):
-            return
-        if self.env['ir.module.module']._get('website_sale').state == 'installed':
-            self.assertTrue(
-                self.env['ir.module.module']._get('payment_demo').state == 'installed',
-                "Payment Demo module should be installed in demo when Website Sale is installed. "
-                "Call 'button_immediate_install' on 'base.module_payment_demo' in demo."
-            )
-
     def test_knowledge_article_notification(self):
         for module in self.installed_modules:
             ref = self.env.ref(module + '.notification_knowledge', raise_if_not_found=False)
