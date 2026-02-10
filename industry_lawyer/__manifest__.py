@@ -22,7 +22,6 @@
         'data/ir_model.xml',
         'data/ir_model_access.xml',
         'data/ir_model_fields.xml',
-        'data/res_users.xml',
         'data/res_groups.xml',
         'data/ir_default.xml',
         'data/ir_actions_act_window.xml',
@@ -53,6 +52,7 @@
         'data/website_view.xml',
         'data/website_page.xml',
         'data/website_theme_apply.xml',
+        'data/res_users.xml',
     ],
     'demo': [
         'demo/res_users.xml',
