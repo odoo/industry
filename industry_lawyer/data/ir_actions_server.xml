@@ -69,38 +69,19 @@ record.write({'mail_partner_ids': [(4, pid) for pid in set(record.mail_partner_i
 ctx = env.context
 currect_record = env[ctx.get('default_model')].browse(ctx.get('default_res_id'))
 msg_vals = {
-            # author
             'author_id': currect_record.env.user.id,
             'author_guest_id': False,
             'email_from': False,
-            # document
             'model': currect_record._name,
             'res_id': currect_record.id,
-            # content
-            'body': ctx.get('body'),  # escape if text, keep if markup
+            'body': ctx.get('body'),
             'message_type': 'comment',
             'parent_id': currect_record._message_compute_parent_id(currect_record.env.user.partner_id.id),
             'subject':  False,
-            # 'subtype_id': subtype_id,
-            # recipients
             'partner_ids': ctx.get('partner_ids'),
             'record_company_id': currect_record._mail_get_companies(default=currect_record.env.company)[currect_record.id].id,
-            # 'incoming_email_to': incoming_email_to,
-            # 'incoming_email_cc': incoming_email_cc,
-            # 'outgoing_email_to': outgoing_email_to,
         }
-
-# message = currect_record._message_create([msg_vals])
 message = currect_record.message_post(body = ctx.get('body'), message_type='comment', subtype_xmlid='mail.mt_comment')
-# message = currect_record.with_context(
-#     mail_notify=False,
-#     mail_create_nosubscribe=True,
-#     mail_auto_subscribe_no_notify=True,
-# ).message_post(
-#     body=ctx.get('body'),
-#     message_type='comment',
-#     subtype_xmlid='mail.mt_comment',
-# )
 
 partners_data = currect_record._notify_get_recipients(message, msg_vals=msg_vals)
 for _lang, render_values, recipients_group in currect_record._notify_get_classified_recipients_iterator(
@@ -114,12 +95,7 @@ for _lang, render_values, recipients_group in currect_record._notify_get_classif
             subtitles=None,
         ):
             # generate notification email content
-            mail_body = currect_record._notify_by_email_render_layout(
-                message,
-                recipients_group,
-                msg_vals=msg_vals,
-                render_values=render_values,
-            )
+            mail_body = currect_record._notify_by_email_render_layout(message, recipients_group, msg_vals=msg_vals, render_values=render_values,)
 mail = env['mail.mail'].with_context(mail_create_nolog=True).create({
         'body_html': mail_body or '',
         'mail_message_id': message.id,
@@ -128,6 +104,7 @@ mail = env['mail.mail'].with_context(mail_create_nolog=True).create({
         'x_author_id': env.user.id,
         'subject': currect_record.name or '',
         'recipient_ids': ctx.get('partner_ids'),
+        # 'state': 'outgoing',
 })
 mail_for_approval = env['x_approval_mail'].create({'x_mail_id': mail.id, 'x_approval_status': 'pending'})
         ]]></field>
@@ -239,27 +216,32 @@ for rec in records: rec.x_mail_id.write({'state': 'cancel'})
 
     <!-- <record id="action_link_task_attachment_to_project_documents" model="ir.actions.server">
         <field name="name">Industry Lawyer: Link Task Attachments to Project Documents</field>
-        <field name="model_id" ref="base.model_ir_attachment"/>
+        <field name="model_id" ref="project.model_project_task"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
 project = env.ref('industry_lawyer.project_project_3', raise_if_not_found=False)
 folder = env.ref('industry_lawyer.documents_folder_10', raise_if_not_found=False)
 if project and folder:
-    documents = env['documents.document']
-    for attachment in records:
-        if attachment.res_model != 'project.task' or not attachment.res_id:
-            continue
-        task = env['project.task'].browse(attachment.res_id)
+    documents = env['documents.document'].sudo()
+    for task in records.sudo():
         if task.project_id.id != project.id:
             continue
-        if documents.search_count([('attachment_id', '=', attachment.id)]):
+        message = task.message_ids.sorted('id')[-1:]  # latest message only
+        if not message or not message.attachment_ids:
             continue
-        documents.create({
-            'attachment_id': attachment.id,
-            'folder_id': folder.id,
-            'name': attachment.name or task.name,
-            'company_id': folder.company_id.id,
-        })
+        for attachment in message.attachment_ids:
+            if documents.search_count([('attachment_id', '=', attachment.id)]):
+                continue
+            try:
+                documents.create({
+                    'attachment_id': attachment.id,
+                    'folder_id': folder.id,
+                    'name': attachment.name or task.name,
+                    'company_id': (folder.company_id or task.company_id).id,
+                })
+            except Exception:
+                # Do not block message posting if documents creation fails.
+                continue
         ]]></field>
     </record> -->
 </odoo>
