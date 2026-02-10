@@ -11,22 +11,24 @@ patch(Composer.prototype, {
         if (!actionXmlId) {
             throw new Error("Submit approval server action XMLID not found");
         }
-        await this.env.services.action.doAction(actionXmlId, {
-            additionalContext: {
-                default_model: composer.thread.model,
-                default_res_id: composer.thread.id,
-                body: composer.composerHtml,
-                attachment_ids: composer.attachments.map(a => a.id),
-                partner_ids: composer.thread.suggestedRecipients.filter(r => r.partner_id).map(r => r.partner_id),
-            },
+        await this.processMessage(async (value) => {
+            const thread = this.thread ?? composer.targetThread;
+            await this.env.services.action.doAction(actionXmlId, {
+                additionalContext: {
+                    default_model: thread?.model,
+                    default_res_id: thread?.id,
+                    body: value,
+                    attachment_ids: composer.attachments.map((a) => a.id),
+                    partner_ids: (thread?.suggestedRecipients || []).filter((r) => r.partner_id).map((r) => r.partner_id),
+                },
+            });
+            // await thread?.fetchNewMessages();
+            // this.suggestion?.clearRawMentions();
+            // this.suggestion?.clearCannedResponses();
+            // if (thread) {
+            //     thread.additionalRecipients = [];
+            // }
+            // composer.emailAddSignature = true;
         });
-
-        // window.location.reload();
-        // await composer.thread.fetchNewMessages();
-        // await this.sendMessage();
-        // this.state.active = false;
-        // this.clear();
-        // this.state.active = true;
-        // this.ref.el?.focus();
     },
 });
