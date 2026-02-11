@@ -377,6 +377,7 @@ class TestEnv(IndustryCase):
             records[record_key] |= fields
 
     def _check_fields(self, root, file_name):
+        search_pattern = re.compile(r"\.search\((.*)\)\.id\b", re.DOTALL)
         for record in root.xpath("//record"):
             model_name = record.get('model')
             if not model_name:
@@ -428,6 +429,28 @@ class TestEnv(IndustryCase):
                     continue
                 if not field and model_name != 'ir.ui.view':
                     _logger.warning("Field %s not defined for model %s", field_name, model_name)
+
+            # Check if limit=1 is present in search([...]).id
+            fields_with_eval = record.xpath(".//field[@eval]")
+            for field in fields_with_eval:
+                eval_val = field.get('eval')
+                match = search_pattern.search(eval_val)
+                if not match:
+                    continue
+                search_args = match.group(1)
+                if not re.search(r"limit\s*=\s*1", search_args):
+                    _logger.warning(
+                        "Missing 'limit=1' in search() used with '.id' in XML eval.\n"
+                        "File: %s | Model: %s | Record ID: %s | Field: %s\n"
+                        "Eval: %s\n"
+                        "Hint: For a single record, use `search([...], limit=1).id`; "
+                        "for multiple records, use `search([...]).ids`",
+                        file_name,
+                        model_name,
+                        record.get("id"),
+                        field.get("name"),
+                        eval_val,
+                    )
 
     def _check_view_active(self, root, file_name):
         for record in root.xpath("//record[@model='ir.ui.view']"):
