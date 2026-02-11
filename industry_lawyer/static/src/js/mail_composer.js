@@ -25,7 +25,7 @@ patch(Composer.prototype, {
             const companyId = user.activeCompany.id;
             if (companyId) {
                 const [company] = await this.env.services.orm.read("res.company", [companyId], ["x_approval_required"]);
-                this.state.isApprovalOptional = company?.x_approval_required === "optional";
+                this.state.isApprovalOptional = company.x_approval_required === "mendatory";
             }
         });
     },
