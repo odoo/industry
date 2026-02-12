@@ -2,31 +2,18 @@
 <odoo>
     <record id="action_devide_share_equally" model="ir.actions.server">
         <field name="code"><![CDATA[
-if env.context.get('skip_claimant_share_rebalance'):
-    pass
+if env.context.get('skip_claimant_share_rebalance'): pass
 else:
     old_values_ctx = env.context.get('old_values')
-    is_create = old_values_ctx is None
     old_values = old_values_ctx or {}
-    line_model = env['x_claimants_line']
 
     def _write(lines, vals):
-        if lines:
-            lines.with_context(skip_claimant_share_rebalance=True).write(vals)
+        lines.with_context(skip_claimant_share_rebalance=True).write(vals)
 
-    def _rebalance(parent, adjust_line=None, reset_manual=False):
+    def _rebalance(parent, adjust_line=None):
         lines = parent.x_claimants_line_ids
-        if not lines:
-            return
-
-        if reset_manual:
-            _write(lines, {'x_share_is_manual': False})
-            manual_lines = line_model.browse()
-            auto_lines = lines
-        else:
-            manual_lines = lines.filtered('x_share_is_manual')
-            auto_lines = lines - manual_lines
-
+        manual_lines = lines.filtered('x_share_is_manual')
+        auto_lines = lines - manual_lines
         manual_total = sum(line.x_share for line in manual_lines)
         if manual_lines and manual_total > 100.0:
             if adjust_line and adjust_line.id in manual_lines.ids:
@@ -41,125 +28,44 @@ else:
 
         if auto_lines:
             remaining = 100.0 - manual_total
-            if remaining < 0.0:
-                remaining = 0.0
-            auto_lines = auto_lines.sorted('id')
-            if len(auto_lines) == 1:
-                _write(auto_lines, {'x_share': remaining})
-            else:
-                per = remaining / len(auto_lines)
-                head = auto_lines[:-1]
-                last = auto_lines[-1]
-                _write(head, {'x_share': per})
-                last_share = remaining - (per * len(head))
-                _write(last, {'x_share': last_share})
+            if remaining < 0.0: remaining = 0.0
+            per = remaining / len(auto_lines)
+            _write(auto_lines, {'x_share': per})
             return
 
         if manual_lines:
-            total = sum(line.x_share for line in manual_lines)
-            if abs(total - 100.0) > 0.000001:
-                if adjust_line and adjust_line.id in manual_lines.ids:
-                    line_to_adjust = adjust_line
-                else:
-                    line_to_adjust = manual_lines.sorted('id')[-1]
-                other_total = total - line_to_adjust.x_share
+            total = sum(manual_lines.mapped('x_share'))
+            if abs(total - 100.0) > 0:
+                other_total = total - adjust_line.x_share
                 new_val = max(0.0, 100.0 - other_total)
-                if line_to_adjust.x_share != new_val:
-                    _write(line_to_adjust, {'x_share': new_val})
+                if adjust_line.x_share != new_val:
+                    _write(adjust_line, {'x_share': new_val})
 
     parents = {}
-    adjust_line_by_parent = {}
+    adjust_line = None
     for line in records:
+        if line.x_share < 0: raise UserError('you can not add a nagative value in claimant share as percentage')
         parent = line.x_claimant_parent_id
-        if parent:
-            parents[parent.id] = parent
+        parents[parent.id] = parent
         old = old_values.get(line.id, {})
-        if 'x_share' in old and old['x_share'] != line.x_share:
+        if 'x_share' in old:
             _write(line, {'x_share_is_manual': True})
-            if parent:
-                adjust_line_by_parent[parent.id] = line
-        if 'x_claimant_parent_id' in old and old['x_claimant_parent_id']:
-            old_parent = env['res.partner'].browse(old['x_claimant_parent_id'])
-            if old_parent:
-                parents[old_parent.id] = old_parent
+            adjust_line = line
 
     for parent_id, parent in parents.items():
-        _rebalance(parent, adjust_line_by_parent.get(parent_id), reset_manual=is_create)
+        _rebalance(parent, adjust_line)
 ]]>        </field>
         <field name="model_id" ref="model_claimants_line"/>
         <field name="state">code</field>
         <field name="name">Industry Lawyer: Rebalance Claimant Share</field>
     </record>
-    <record id="action_rebalance_claimant_share_on_unlink" model="ir.actions.server">
-        <field name="code"><![CDATA[
-if env.context.get('skip_claimant_share_rebalance'):
-    pass
-else:
-    line_model = env['x_claimants_line']
-
-    def _write(lines, vals):
-        if lines:
-            lines.with_context(skip_claimant_share_rebalance=True).write(vals)
-
-    def _rebalance(parent, exclude_lines=None):
-        lines = parent.x_claimants_line_ids
-        if exclude_lines:
-            lines = lines - exclude_lines
-        if not lines:
-            return
-
-        manual_lines = lines.filtered('x_share_is_manual')
-        auto_lines = lines - manual_lines
-
-        manual_total = sum(line.x_share for line in manual_lines)
-        if manual_lines and manual_total > 100.0:
-            line_to_adjust = manual_lines.sorted('id')[-1]
-            other_total = manual_total - line_to_adjust.x_share
-            new_val = max(0.0, 100.0 - other_total)
-            if line_to_adjust.x_share != new_val:
-                _write(line_to_adjust, {'x_share': new_val})
-            manual_total = other_total + new_val
-
-        if auto_lines:
-            remaining = 100.0 - manual_total
-            if remaining < 0.0:
-                remaining = 0.0
-            auto_lines = auto_lines.sorted('id')
-            if len(auto_lines) == 1:
-                _write(auto_lines, {'x_share': remaining})
-            else:
-                per = remaining / len(auto_lines)
-                head = auto_lines[:-1]
-                last = auto_lines[-1]
-                _write(head, {'x_share': per})
-                last_share = remaining - (per * len(head))
-                _write(last, {'x_share': last_share})
-            return
-
-        if manual_lines:
-            total = sum(line.x_share for line in manual_lines)
-            if abs(total - 100.0) > 0.000001:
-                line_to_adjust = manual_lines.sorted('id')[-1]
-                other_total = total - line_to_adjust.x_share
-                new_val = max(0.0, 100.0 - other_total)
-                if line_to_adjust.x_share != new_val:
-                    _write(line_to_adjust, {'x_share': new_val})
-
-    parents = {}
-    to_remove_by_parent = {}
-    for line in records:
-        parent = line.x_claimant_parent_id
-        if not parent:
-            continue
-        parents[parent.id] = parent
-        to_remove_by_parent[parent.id] = to_remove_by_parent.get(parent.id, line_model.browse()) | line
-
-    for parent_id, parent in parents.items():
-        _rebalance(parent, exclude_lines=to_remove_by_parent.get(parent_id))
-]]>        </field>
-        <field name="model_id" ref="model_claimants_line"/>
+    <record id="action_calculate_claimant_share_on_create_and_delete_claimant_line" model="ir.actions.server">
+        <field name="code"><![CDATA[claimants_line_ids = records.x_claimants_line_ids
+if claimants_line_ids: claimants_line_ids.write({'x_share': 100 / len(claimants_line_ids)})
+        ]]></field>
+        <field name="model_id" ref="base.model_res_partner"/>
         <field name="state">code</field>
-        <field name="name">Industry Lawyer: Rebalance Claimant Share on Deletion</field>
+        <field name="name">Industry Lawyer: Calculate Claimant Share on Create and Delete Claimant line</field>
     </record>
 
     <record id="action_split_invoice_per_claimant_from_so" model="ir.actions.server">
