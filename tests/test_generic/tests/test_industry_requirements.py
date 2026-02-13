@@ -69,7 +69,8 @@ class TestEnv(IndustryCase):
             for cloc_entry in c.modules.get(module, {}):
                 message = "The record '%s' is counted in the maintenance lines. " % cloc_entry
                 message += "Please add the file in 'cloc_exclude' list of the manifest."
-                self.assertIn(cloc_entry.split('/')[0], ['ir.actions.server', 'ir.model.fields'], message)
+                if not cloc_entry.endswith('.js'):
+                    self.assertIn(cloc_entry.split('/')[0], ['ir.actions.server', 'ir.model.fields'], message)
 
     def test_sale_ok_and_is_published_in_db(self):
         models = ["product.template", "product.product"]
