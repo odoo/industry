@@ -52,7 +52,6 @@
         'data/website_view.xml',
         'data/website_page.xml',
         'data/website_theme_apply.xml',
-        'data/res_users.xml',
     ],
     'demo': [
         'demo/res_users.xml',
