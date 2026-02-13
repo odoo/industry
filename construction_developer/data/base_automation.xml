@@ -4,17 +4,17 @@
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="action_server_ids" eval="[(6, 0, [ref('action_initialize_sales_order_line_sequence_on_sales_order_create')])]"/>
         <field name="trigger">on_create</field>
-        <field name="name">Construction: Initialize Sales Order Line Sequence on Sales Order create</field>
+        <field name="name">Construction Developer: Initialize Sales Order Line Sequence on Sales Order create</field>
     </record>
     <record id="automation_update_progress_increment_on_change" model="base.automation">
-        <field name="name">Construction: Update Sale Order Line Progress Increment on Quantity Increment change</field>
+        <field name="name">Construction Developer: Update Sale Order Line Progress Increment on Quantity Increment change</field>
         <field name="model_id" ref="sale.model_sale_order_line"/>
         <field name="action_server_ids" eval="[(6, 0, [ref('action_sol_update_progress_increment_on_change')])]"/>
         <field name="trigger">on_change</field>
         <field name="on_change_field_ids" eval="[(6, 0, [ref('field_sale_order_line_x_quantity_increment')])]"/>
     </record>
     <record id="automation_update_quantity_increment_on_change" model="base.automation">
-        <field name="name">Construction: Update Sale Order Line Quantity Increment on Progress Increment change</field>
+        <field name="name">Construction Developer: Update Sale Order Line Quantity Increment on Progress Increment change</field>
         <field name="model_id" ref="sale.model_sale_order_line"/>
         <field name="action_server_ids" eval="[(6, 0, [ref('action_sol_update_quantity_increment_on_change')])]"/>
         <field name="trigger">on_change</field>
@@ -77,5 +77,21 @@
         <field name="trigger">on_create_or_write</field>
         <field name="filter_domain">[('x_is_template', '!=', False), ('x_product_id', '=', False)]</field>
         <field name="name">Construction: Work Item - On save of work item template without product</field>
+    </record>
+    <!-- 
+    this is needed to set a default stage based on the project's
+    -->
+    <record id="automation_x_remark_write_remark_stage_on_create_or_write" model="base.automation">
+        <field name="name">Construction Developer: Write Remark Stages on Write</field>
+        <field name="model_id" ref="model_x_remark"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[('x_stage_id', '=', False)]</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_x_remark_write_remark_stage_on_create_or_write')])]"/>
+    </record>
+    <record id="automation_x_remark_generate_x_reference_on_create" model="base.automation">
+        <field name="name">Construction Developer: Generate Remark References on Create</field>
+        <field name="model_id" ref="model_x_remark"/>
+        <field name="trigger">on_create</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_x_remark_generate_x_reference_on_create')])]"/>
     </record>
 </odoo>

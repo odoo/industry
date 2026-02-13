@@ -89,7 +89,7 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="mode">extension</field>
         <field name="model">sale.order</field>
-        <field name="name">sale.order.form.inherit.construction_show_line_numbering</field>
+        <field name="name">sale.order.form.inherit.construction_developer</field>
         <field name="priority">1600</field>
         <field name="type">form</field>
         <field name="active" eval="True"/>
@@ -107,7 +107,7 @@
         <field name="inherit_id" ref="sale.account_invoice_form"/>
         <field name="mode">extension</field>
         <field name="model">account.move</field>
-        <field name="name">account.move.form.inherit.construction_show_line_numbering</field>
+        <field name="name">account.move.form.inherit.construction_developer</field>
         <field name="priority">1600</field>
         <field name="type">form</field>
         <field name="active" eval="True"/>
@@ -218,5 +218,301 @@
         <field name="priority">1600</field>
         <field name="type">form</field>
         <field name="active" eval="True"/>
+    </record>
+<!-- remark -->
+    <record id="view_x_remark_form" model="ir.ui.view">
+        <field name="name">construction_developer.x_remark.form</field>
+        <field name="model">x_remark</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="x_stage_id" domain="[('x_project_ids', 'in', x_project_id)]" widget="statusbar" options="{'clickable': '1'}" invisible="not x_project_id and not x_stage_id"/>
+                </header>
+                <sheet>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="d-flex w-100">
+                            <field name="x_name" default_focus="1" options="{'line_breaks': False}" widget="text" class="text-truncate w-md-75 w-100 pe-2" placeholder="Remark Title..."/>
+                        </h1>
+                        <div class="d-flex justify-content-end align-items-center px-1">
+                            <field name="x_priority" class="h3 pe-2" widget="priority_switch"/>
+                        </div>
+                        <div class="d-flex justify-content-end o_state_container">
+                            <field name="x_state" widget="project_remark_state_selection" class="o_task_state_widget" />
+                        </div>
+                    </div>
+                    <group>
+                        <field name="x_stage_id" invisible="1"/>
+                        <group>
+                            <field name="x_project_id" required="True"/>
+                            <field name="x_partner_id" string="Owner"/>
+                            <field name="x_reference" invisible="not id"/>
+                            <field name="x_event_id" invisible="x_update_id or not (x_update_id or x_event_id)"/>
+                            <field name="x_update_id" invisible="x_event_id or not (x_update_id or x_event_id)"/>
+                        </group>
+                        <group>
+                            <field name="x_date" widget="date"/>
+                            <field name="x_date_deadline" decoration-danger="x_date_deadline and x_date_deadline &lt; current_date" decoration-bf="x_date_deadline and x_date_deadline &lt; current_date"/>
+                            <field name="x_location" placeholder="ex. 2nd floor, bathroom"/>
+                            <field name="x_remark_category_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="description_page" string="Description">
+                            <field name="x_description" type="html" options="{'collaborative': true, 'resizable': false}" placeholder="Add details about this remark..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="view_x_remark_list" model="ir.ui.view">
+        <field name="name">construction.remarks.x_remark.view.list</field>
+        <field name="model">x_remark</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list default_order="x_priority,x_reference">
+                <field name="x_reference"/>
+                <field name="x_priority" widget="priority" options="{'is_toggle_mode': false}"/>
+                <field name="x_remark_category_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+                <field name="x_name"/>
+                <field name="x_partner_id"/>
+                <field name="x_date_deadline" widget="remaining_days"/>
+                <field name="x_stage_id"/>
+                <field name="x_state" widget="project_remark_state_selection" class="o_task_state_widget"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_x_remark_list_one2many" model="ir.ui.view">
+        <field name="name">construction.remarks.x_remark.view.list.one2many</field>
+        <field name="model">x_remark</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list default_order="x_priority, x_reference">
+                <!-- column_invisible fields required for the modal to save them -->
+                <field name="x_project_id" column_invisible="1"/>
+                <field name="x_event_id" column_invisible="1"/>
+                <field name="x_stage_id" column_invisible="1"/>
+                <field name="x_reference" invisible="not id"/>
+                <field name="x_priority" widget="priority" options="{'is_toggle_mode': false}"/>
+                <field name="x_remark_category_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+                <field name="x_name"/>
+                <field name="x_partner_id"/>
+                <field name="x_date_deadline" widget="remaining_days"/>
+                <field name="x_state" widget="project_remark_state_selection" class="o_task_state_widget"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_x_remark_search" model="ir.ui.view">
+        <field name="name">construction_developer.x_remark.view.search</field>
+        <field name="model">x_remark</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <search>
+                <field name="x_name" string="Remarks" filter_domain="[('x_name', 'ilike', self)]"/>
+                <field name="x_remark_category_ids"/>
+                <field name="x_stage_id"/>
+                <field name="x_project_id"/>
+                <field name="x_partner_id" operator="child_of"/>
+                <filter string="My Remarks" name="user_remarks" domain="[('x_partner_id.user_ids', '=', uid)]"/>
+                <filter string="Unassigned" name="unassigned" domain="[('x_partner_id', '=', False)]"/>
+                <separator/>
+                <filter string="Creation Date" name="creation_date_filter" date="create_date"/>
+                <filter string="Deadline" name="date_deadline" date="x_date_deadline">
+                    <filter name="deadline_future" string="Future" domain="[('x_date_deadline', '&gt;=', 'today +1d')]"/>
+                    <filter name="deadline_this_week" string="This Week" domain="[
+                        ('x_date_deadline', '&gt;=', '=week_start'),
+                        ('x_date_deadline', '&lt;', '=week_start +1w'),
+                    ]"/>
+                    <filter name="deadline_today" string="Today" domain="[
+                        ('x_date_deadline', '&gt;=', 'today'),
+                        ('x_date_deadline', '&lt;', 'today +1d'),
+                    ]"/>
+                    <filter name="deadline_past_due" string="Overdue" domain="[('x_date_deadline', '&lt;', 'today')]"/>
+                </filter>
+                <separator/>
+                <filter string="Open" name="open_remarks" domain="[('x_state', 'not in', ['1_done', '1_canceled'])]"/>
+                <filter string="Closed" name="closed_remarks" domain="[('x_state', 'in', ['1_done', '1_canceled'])]"/>
+                <separator/>
+                <group>
+                    <filter string="Owner" name="owner" context="{'group_by': 'x_partner_id'}"/>
+                    <filter string="Stage" name="stage" context="{'group_by': 'x_stage_id'}"/>
+                    <filter string="Project" name="project" context="{'group_by': 'x_project_id'}"/>
+                    <filter string="Priority" name="groupby_priority" context="{'group_by': 'x_priority'}"/>
+                    <filter string="Categories" name="categories" context="{'group_by': 'x_remark_category_ids'}"/>
+                    <filter string="Creation Date" name="create_date" context="{'group_by': 'create_date'}"/>
+                    <filter string="Deadline" name="deadline" context="{'group_by': 'x_date_deadline'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="quick_create_remark_form" model="ir.ui.view">
+        <field name="name">construction_developer.x_remark.form.quick_create</field>
+        <field name="model">x_remark</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form class="o_form_project_tasks">
+                <group>
+                    <field name="x_name" string="Remark Title" placeholder="e.g. Broken window" required="1"/>
+                    <field name="x_project_id"
+                            widget="project"
+                            invisible="context.get('default_x_project_id', False)"
+                            placeholder="Private"
+                            class="o_project_task_project_field"
+                    />
+                    <field name="x_partner_id"/>
+                    <!-- trigger the computation of x_date -->
+                    <field name="x_date" invisible="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+    <record id="view_x_remark_kanban" model="ir.ui.view">
+        <field name="name">construction_developer.x_remark.view.kanban</field>
+        <field name="model">x_remark</field>
+        <field name="type">kanban</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <kanban default_group_by="x_stage_id" group_create="1" quick_create_view="construction_developer.quick_create_remark_form">
+                <templates>
+                    <t t-name="card">
+                        <main t-att-class="['1_done', '1_canceled'].includes(record.x_state.raw_value) ? 'opacity-50' : ''">
+                            <field name="x_name" display="full" placeholder="e.g. Apartment A0"/>
+                            <div class="text-muted d-flex flex-column">
+                                <field name="x_partner_id"/>
+                            </div>
+                            <field name="x_remark_category_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+                            <field t-if="record.x_date_deadline.raw_value" invisible="x_state in ['1_done', '1_canceled']" name="x_date_deadline" widget="remaining_days"/>
+                            <footer t-if="!selection_mode" class="pt-1">
+                                <div class="d-flex align-items-center gap-1">
+                                    <field name="x_priority" class="pt-1" widget="priority"/>
+                                </div>
+                                <div class="d-flex ms-auto">
+                                    <field name="x_reference" class="text-muted"/>
+                                    <field name="x_state" class="ms-1" widget="project_remark_state_selection" options="{'is_toggle_mode': false}"/>
+                                </div>
+                            </footer>
+                        </main>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+<!-- remark stage -->
+    <record id="view_x_remark_stage_form" model="ir.ui.view">
+        <field name="name">construction.remarks.x_remark_stage.view.form</field>
+        <field name="model">x_remark_stage</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form>
+                <header/>
+                <sheet string="Remark Stages">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="d-flex w-100">
+                            <field name="x_name" options="{'line_breaks': False}" widget="text" class="o_task_name text-truncate w-md-75 w-100 pe-2" placeholder="Stage Name..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="x_project_ids" widget="many2many_tags"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_x_remark_stage_list" model="ir.ui.view">
+        <field name="name">construction.remarks.x_remark_stage.view.list</field>
+        <field name="model">x_remark_stage</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list editable="top" default_order="x_sequence">
+                <field name="x_sequence" widget="handle" optional="show"/>
+                <field name="x_name"/>
+                <field name="x_project_ids" widget="many2many_tags" required="True"/>
+            </list>
+        </field>
+    </record>
+<!-- remark category -->
+    <record id="view_x_remark_category_form" model="ir.ui.view">
+        <field name="name">construction.remarks.x_remark_category.view.form</field>
+        <field name="model">x_remark_category</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <form>
+                <header/>
+                <sheet string="Remark Categories">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="d-flex w-100">
+                            <field name="x_name" options="{'line_breaks': False}" widget="text" class="o_task_name text-truncate w-md-75 w-100 pe-2" placeholder="Category Name..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="x_color" widget="color_picker"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_x_remark_category_list" model="ir.ui.view">
+        <field name="name">construction.remarks.x_remark_category.view.list</field>
+        <field name="model">x_remark_category</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list editable="top">
+                <field name="x_name"/>
+                <field name="x_color" widget="color_picker"/>
+            </list>
+        </field>
+    </record>
+
+<!-- new notebook pages in existing models -->
+    <record id="view_calendar_event_form_inherit" model="ir.ui.view">
+        <field name="name">calendar.event.form.inherit</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
+        <field name="model">calendar.event</field>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='page_invitations']" position="after">
+                <page name="remarks" string="Remarks">
+                    <group class="mb-0">
+                        <field name="x_project_id" class="mb-0"/>
+                    </group>
+                    <field name="x_remark_ids" readonly="not x_project_id" nolabel="1" context="{
+                        'default_x_project_id': x_project_id,
+                        'default_x_event_id': id,
+                        'list_view_ref': 'construction_developer.view_x_remark_list_one2many',
+                    }"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <record id="project_update_view_form_inherit" model="ir.ui.view">
+        <field name="name">project.update.view.form.inherit</field>
+        <field name="inherit_id" ref="project.project_update_view_form"/>
+        <field name="model">project.update</field>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='description']" position="after">
+                <page name="remarks" string="Remarks">
+                    <field name="x_remark_ids" nolabel="1" context="{
+                        'default_x_project_id': project_id,
+                        'default_x_update_id': id,
+                        'list_view_ref': 'construction_developer.view_x_remark_list_one2many',
+                    }"/>
+                </page>
+            </xpath>
+        </field>
     </record>
 </odoo>
