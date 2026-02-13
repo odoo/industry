@@ -39,6 +39,7 @@
         'data/crm_stage.xml',
         'data/crm_tag.xml',
         'data/product_product.xml',
+        'data/sale_order_spreadsheet.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
         'data/knowledge_cover.xml',

@@ -223,7 +223,9 @@ for user in users: user['x_is_higher_group_user'] = get_rank(user) > current_use
         <field name="name">x_display_send_button</field>
         <field name="ttype">boolean</field>
         <field name="compute"><![CDATA[
-for record in self: record['x_display_send_button'] = record.env.user.has_group('industry_lawyer.group_high') or record.env.company.x_approval_required == 'optional'
+for record in self:
+    approval_required = record.env.company.x_approval_required
+    record['x_display_send_button'] = record.env.user.has_group('industry_lawyer.group_high') or approval_required == 'optional' if approval_required else True
 ]]></field>
         <field name="model_id" ref="mail.model_mail_compose_message"/>
         <field name="store" eval="False"/>
@@ -232,7 +234,9 @@ for record in self: record['x_display_send_button'] = record.env.user.has_group(
         <field name="name">x_display_send_button</field>
         <field name="ttype">boolean</field>
         <field name="compute"><![CDATA[
-for record in self: record['x_display_send_button'] = record.env.user.has_group('industry_lawyer.group_high') or record.env.company.x_approval_required == 'optional'
+for record in self:
+    approval_required = record.env.company.x_approval_required
+    record['x_display_send_button'] = record.env.user.has_group('industry_lawyer.group_high') or approval_required == 'optional' if approval_required else True
 ]]></field>
         <field name="model_id" ref="account.model_account_move_send_wizard"/>
         <field name="store" eval="False"/>
@@ -302,12 +306,6 @@ for record in self: record['x_display_send_button'] = record.env.user.has_group(
         <field name="model_id" ref="model_x_approval_mail"/>
         <field name="name">x_date</field>
     </record>
-    <!-- <record id="field_x_body_content" model="ir.model.fields">
-        <field name="ttype">html</field>
-        <field name="field_description">Body</field>
-        <field name="model_id" ref="model_x_approval_mail"/>
-        <field name="name">x_body_content</field>
-    </record> -->
     <record id="field_x_attachment_ids" model="ir.model.fields">
         <field name="ttype">many2many</field>
         <field name="field_description">Attachments</field>
@@ -324,12 +322,6 @@ for record in self: record['x_display_send_button'] = record.env.user.has_group(
         <field name="related">x_mail_id.body_content</field>
         <field name="name">x_body_html</field>
     </record>
-    <!-- <record id="field_x_current_model" model="ir.model.fields">
-        <field name="name">x_current_model</field>
-        <field name="ttype">char</field>
-        <field name="field_description">Current Model</field>
-        <field name="model_id" ref="mail.model_mail_compose_message"/>
-    </record> -->
     <record id="field_x_show_approval" model="ir.model.fields">
         <field name="compute"><![CDATA[
 for record in self: record['x_show_approval'] = record.model in ('sale.order', 'crm.lead')
