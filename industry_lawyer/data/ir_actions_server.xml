@@ -263,34 +263,17 @@ for rec in records: rec.x_mail_id.write({'state': 'cancel'})
         <field name="state">code</field>
     </record>
 
-    <!-- <record id="action_link_task_attachment_to_project_documents" model="ir.actions.server">
-        <field name="name">Industry Lawyer: Link Task Attachments to Project Documents</field>
-        <field name="model_id" ref="project.model_project_task"/>
+    <record id="action_link_attachment_to_project_documents" model="ir.actions.server">
+        <field name="name">Industry Lawyer: Link Attachments to Project Documents</field>
+        <field name="model_id" ref="base.model_ir_attachment"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
 project = env.ref('industry_lawyer.project_project_3', raise_if_not_found=False)
-folder = env.ref('industry_lawyer.documents_folder_10', raise_if_not_found=False)
-if project and folder:
-    documents = env['documents.document'].sudo()
-    for task in records.sudo():
-        if task.project_id.id != project.id:
-            continue
-        message = task.message_ids.sorted('id')[-1:]  # latest message only
-        if not message or not message.attachment_ids:
-            continue
-        for attachment in message.attachment_ids:
-            if documents.search_count([('attachment_id', '=', attachment.id)]):
-                continue
-            try:
-                documents.create({
-                    'attachment_id': attachment.id,
-                    'folder_id': folder.id,
-                    'name': attachment.name or task.name,
-                    'company_id': (folder.company_id or task.company_id).id,
-                })
-            except Exception:
-                # Do not block message posting if documents creation fails.
-                continue
+folder = project.documents_folder_id
+res_id = record.res_id
+
+if project and folder and record.res_model == 'project.task' and res_id in project.task_ids.ids:
+    env['documents.document'].create({'attachment_id': attachment.id, 'folder_id': folder.id, 'name': attachment.name or project.name})
         ]]></field>
-    </record> -->
+    </record>
 </odoo>
