@@ -6,16 +6,12 @@ import { _t } from "@web/core/l10n/translation";
 
 export class ApplyToSectionWidget extends Component {
     static template = "construction_developer.ApplyToSectionButton";
-    static props = {
-        ...standardWidgetProps,
-        record: Object,
-    };
+    static props = { ...standardWidgetProps, record: Object };
 
     setup() {
         this.actionService = useService("action");
         this.display_button = this.props.record.data.x_display_button;
-        this.button_text = this.props.record.data.display_type == 'line_section' ? _t('Apply to section') : _t('Apply to subsection');
-    }
+        this.button_text = this.props.record.data.display_type == 'line_section' ? _t('Apply to section') : _t('Apply to subsection'); }
 
     async applyToSection() {
         await this.props.record.save()  // might have pending changes not saved to the server
@@ -23,12 +19,8 @@ export class ApplyToSectionWidget extends Component {
             type: "action",
             resId: this.props.record.data.id,
             name: "construction_developer.action_sol_update_section_progress",
-            resModel: "sale.order.line",
-        });
-    }
-}
+            resModel: "sale.order.line" });}}
 
-export const applyToSectionWidget = {
-    component: ApplyToSectionWidget,
-};
+export const applyToSectionWidget = { component: ApplyToSectionWidget };
+
 registry.category("view_widgets").add("apply_to_section_widget", applyToSectionWidget);

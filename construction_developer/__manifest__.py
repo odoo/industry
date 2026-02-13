@@ -1,6 +1,6 @@
 {
     'name': 'Construction Developer',
-    'version': '1.3',
+    'version': '1.4',
     'category': 'Construction',
     'depends': [
         'base_industry_data',
@@ -19,6 +19,7 @@
         'data/ir_ui_menu.xml',
         'data/ir_embedded_actions.xml',
         'data/project_project.xml',
+        'data/x_remark_stage.xml',
         'data/base_automation.xml',
         'data/qweb_view.xml',
         'data/product_template.xml',
@@ -27,6 +28,7 @@
         'data/x_work_item_line.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
+        'data/x_remark_category.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -35,20 +37,26 @@
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/project_task.xml',
+        'demo/x_remark_stage.xml',
+        'demo/x_remark.xml',
         'demo/sale_order_post.xml',
+        'demo/ir_attachment.xml',
     ],
     'assets': {
         'web.assets_backend': [
             'construction_developer/static/src/widgets/apply_to_section_widget.js',
             'construction_developer/static/src/widgets/apply_to_section_widget.xml',
+            'construction_developer/static/src/widgets/project_remark_state_selection.js',
             'construction_developer/static/src/scss/sale_order.scss',
+            'construction_developer/static/src/js/mail_chatter.xml',
+            'construction_developer/static/src/js/patch.js',
         ],
     },
     'cloc_exclude': [
         'data/qweb_view.xml',
         'static/src/scss/sale_order.scss',
-        'static/src/widgets/apply_to_section_widget.js',
         'static/src/widgets/apply_to_section_widget.xml',
+        "static/src/js/mail_chatter.xml",
     ],
     'images': ['images/main.png'],
     'license': 'OEEL-1',
