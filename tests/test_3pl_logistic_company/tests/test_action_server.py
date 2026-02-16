@@ -63,6 +63,7 @@ class AutomationsTestCase(TransactionCase):
         self.assertFalse(stock_picking_1.owner_id, "Owner should NOT be updated if products have different owners.")
 
 
+@tagged('post_install', '-at_install')
 class ServerActionTestCase(TransactionCase):
     @classmethod
     def setUpClass(cls):
