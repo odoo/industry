@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- channex mapping views -->
+    <record id="x_channex_mapping_form_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="x_model_type" />
+                        <field name="x_id_local" />
+                    </group>
+                    <group>
+                        <field name="x_id_remote" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+        <field name="model">x_channex_mapping</field>
+        <field name="name">Mapping Table Form</field>
+        <field name="active" eval="True"/>
+        <field name="type">form</field>
+    </record>
+    <record id="x_channex_mapping_list_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <list>
+                <field name="x_model_type" />
+                <field name="x_id_local" />
+                <field name="x_id_remote" />
+            </list>
+        </field>
+        <field name="model">x_channex_mapping</field>
+        <field name="name">Mapping Table list</field>
+        <field name="active" eval="True"/>
+        <field name="type">list</field>
+    </record>
+    <!-- cron data send lines views -->
+     <record id="x_channex_datas_cron_lines_list_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <list>
+                <field name="x_payload" />
+                <field name="x_operation" />
+            </list>
+        </field>
+        <field name="model">x_channex_datas_cron_lines</field>
+        <field name="name">Datas cron lines list</field>
+        <field name="active" eval="True"/>
+        <field name="type">list</field>
+    </record>
+    <!-- res company views -->
+    <record id="res_company_extends" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='phone']" position="before">
+                <field name="x_channex_api_key" password="True"/>
+            </xpath>
+        </field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="model">res.company</field>
+        <field name="name">Res company form view extension</field>
+        <field name="active" eval="True"/>
+        <field name="type">form</field>
+    </record>
+    <!-- ir cron views -->
+    <record id="ir_cron_extends" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='group_ids']" position="after">
+                <field name="x_debug_last_answer"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page name="Datas sending">
+                    <field name="x_datas_to_send"/>
+                </page>
+            </xpath>
+        </field>
+        <field name="inherit_id" ref="base.ir_cron_view_form"/>
+        <field name="model">ir.cron</field>
+        <field name="name">ir.cron form view extension</field>
+        <field name="active" eval="True"/>
+        <field name="type">form</field>
+    </record>
+    <!-- res config settings views -->
+     <record id="res_config_settings_extends" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='active_user_setting']" position="after">
+                <setting id="channex_setting">
+                    <button name="%(update_ari)d" icon="oi-arrow-right" type="action" string="Push ARI" class="btn-link"/>
+                </setting>
+            </xpath>
+        </field>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="model">res.config.settings</field>
+        <field name="name">res.config.settings form view extension</field>
+        <field name="active" eval="True"/>
+        <field name="type">form</field>
+    </record>
+</odoo>
