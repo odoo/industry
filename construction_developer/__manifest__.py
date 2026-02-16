@@ -36,6 +36,7 @@
         'demo/sale_order_line.xml',
         'demo/project_task.xml',
         'demo/sale_order_post.xml',
+        'demo/account_move.xml',
     ],
     'assets': {
         'web.assets_backend': [
