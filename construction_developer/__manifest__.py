@@ -41,6 +41,7 @@
         'demo/x_remark.xml',
         'demo/sale_order_post.xml',
         'demo/ir_attachment.xml',
+        'demo/account_move.xml',
     ],
     'assets': {
         'web.assets_backend': [

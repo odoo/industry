@@ -59,6 +59,7 @@
         'demo/planning_recurrency.xml',
         'demo/planning_slot.xml',
         'demo/sale_order_spreadsheet.xml',
+        'demo/project_project_post.xml',
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
