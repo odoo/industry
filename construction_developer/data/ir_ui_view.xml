@@ -10,8 +10,9 @@
                 <header>
                     <button class="btn btn-primary" name="%(action_sol_update_qty_delivered)d" type="action" string="Update Delivery"/>
                 </header>
-                <field name="order_id" widget="many2one" readonly="True"/>
+                <field name="x_reference" readonly="True"/>
                 <field name="name" readonly="True"/>
+                <field name="x_sol_contract_type" optional="hide"/>
                 <field name="product_uom_qty" string="Qty" readonly="True"
                     invisible="display_type"
                 />
@@ -70,7 +71,7 @@
     <record id="sale_order_form_view_inherit" model="ir.ui.view">
         <field name="arch" type="xml">
             <xpath expr="//list//field[@name='sequence']" position="after">
-                <field name="sequence" optional="show" decoration-muted="1" width="30" options="{'hide_trailing_zeros': true}" string="#"/>
+                <field name="sequence" optional="show" column_invisible="not parent.id" decoration-muted="1" width="30" options="{'hide_trailing_zeros': true}" string="#"/>
             </xpath>
             <xpath expr="//form" position="attributes">
                 <attribute name="class" add="o_so_form" separator=" "/>
@@ -79,10 +80,10 @@
                 <attribute name="width">150px</attribute>
             </xpath>
             <xpath expr="//notebook//page[@name='other_information']//field[@name='invoice_status']" position="after">
-                <field name="x_so_contract_type"/>
+                <field name="x_so_contract_type" readonly="state == 'sale'"/>
             </xpath>
             <xpath expr="//notebook//page[@name='order_lines']//list//field[@name='tax_ids']" position="after">
-                <field name="x_sol_contract_type" option="show" invisible="not product_id" column_invisible="parent.x_so_contract_type != 'per_line'" width="150px"/>
+                <field name="x_sol_contract_type" optional="show" readonly="parent.state == 'sale'" invisible="not product_id" column_invisible="parent.x_so_contract_type != 'per_line'" width="150px"/>
             </xpath>
         </field>
         <field name="inherit_id" ref="sale.view_order_form"/>
