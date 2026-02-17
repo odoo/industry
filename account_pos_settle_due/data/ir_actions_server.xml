@@ -4,7 +4,7 @@
         <field name="code"><![CDATA[
 pos_orders = env['pos.order'].search([('partner_id', '=', record.partner_id.id), ('state', '=', 'paid'), ('customer_due_total', '>', 0), ('id', 'not in', record.invoice_line_ids.x_pos_order_id.ids)])
 balance_account_section_name = "Customer account balance"
-if not any(line.name == balance_account_section_name and line.display_type == 'line_section' for line in record.invoice_line_ids):
+if pos_orders and not any(line.name == balance_account_section_name and line.display_type == 'line_section' for line in record.invoice_line_ids):
     env['account.move.line'].create({'move_id': record.id, 'name': balance_account_section_name, 'display_type': 'line_section'})
 for order in pos_orders:
     date = timezone('UTC').localize(order.date_order).astimezone(tz=timezone(env.user.tz or 'UTC')).strftime('%Y-%m-%d %H:%M')
