@@ -65,6 +65,7 @@
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
+        'demo/sale_order_spreadsheet.xml',
         'demo/knowledge_article.xml',
         'demo/knowledge_article_favorite.xml',
         'demo/documents_document.xml',
