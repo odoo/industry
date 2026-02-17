@@ -67,8 +67,10 @@
             <xpath expr="//field[@name='subject']" position="before">
                 <field name="x_approver_id" options="{'no_create': True, 'no_create_edit': True}" domain="[('x_is_higher_group_user', '=', True)]" invisible="not x_show_approval"/>
             </xpath>
+            <!-- TODO: remove during review -->
+            <!-- Add a original logic for hide 'Send' button as we dont want to break Send/Log/Schedule behavior -->
             <xpath expr="//footer/button[@name='action_send_mail']" position="attributes">
-                <attribute name="invisible">not x_display_send_button</attribute>
+                <attribute name="invisible">(subtype_is_log or composition_mode == 'comment' and not composition_batch and scheduled_date) or not partner_ids_all_have_email or not x_display_send_button</attribute>
             </xpath>
             <xpath expr="//footer/button[@name='action_send_mail']" position="after">
                 <button string="Submit for Approval" type="action" class="btn-primary" name="%(action_submit_for_approval)d" invisible="not x_show_approval or x_is_high_group_user"/>
@@ -85,7 +87,6 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='subject']" position="before">
-                <!-- <field name="x_char"/> -->
                 <field name="x_invoice_approver_id" options="{'no_create': True, 'no_create_edit': True}" domain="[('x_is_higher_group_user', '=', True)]" invisible="not x_show_approval"/>
             </xpath>
             <xpath expr="//button[@name='action_send_and_print']" position="attributes">
