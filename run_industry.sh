@@ -4,7 +4,7 @@ set -euo pipefail
 # Usage function
 usage() {
   echo "Usage: ./industry/run_industry.sh -n <industry-name> [-i | -d] [-t] [-p] [-r | -h]"
-  echo "  -n <industry-name>   Name of the industry to run"
+  echo "  -n <industry-name>   Name of the industry to run (comma-separated for multiple)"
   echo "  -i                   Import this industry without demo"
   echo "  -d                   Import this industry with demo"
   echo "  -t                   Run tests for the installed industry"
@@ -41,7 +41,16 @@ if [[ $DEMO == True ]]; then
   INSTALL=true
 fi
 
-echo "Industry: $INDUSTRY_NAME"
+INDUSTRY_PATH="industry/"
+PYTHON_BIN="python3"
+ODOO_BIN="odoo/odoo-bin"
+ADDONS_PATH="$INDUSTRY_PATH/tests,enterprise,odoo/addons,odoo/odoo/addons,design-themes"
+IFS=',' read -r -a MODULES <<< "$INDUSTRY_NAME"
+MODULES=($(printf '%s\n' "${MODULES[@]}" | sort))
+DB_NAME=$(IFS=- ; echo "${MODULES[*]}")
+DEP_DB="dep-$DB_NAME"
+
+echo "Industries: $DB_NAME"
 echo "Install: $INSTALL"
 echo "Demo: $DEMO"
 echo "Test: $TEST"
@@ -49,24 +58,21 @@ echo "Reset DB: $RESET"
 echo "Hard reset DB: $HARD_RESET"
 echo "Debug: $DEBUG"
 
-INDUSTRY_PATH="industry/"
-PYTHON_BIN="python3"
-ODOO_BIN="odoo/odoo-bin"
-ADDONS_PATH="$INDUSTRY_PATH/tests,enterprise,odoo/addons,odoo/odoo/addons,design-themes"
-TEST_TAGS="/test_generic,/test_$INDUSTRY_NAME"
-DEP_DB="dep-$INDUSTRY_NAME"
+for module in "${MODULES[@]}"; do
+  #check module exists
+  if [ ! -d "$INDUSTRY_PATH$module" ]; then
+    echo "Module '$module' does not exist."
+    exit 1
+  fi
+  #check manifest exists
+  if [ ! -f "$INDUSTRY_PATH$module/__manifest__.py" ]; then
+    echo "Manifest file for '$module' not found."
+    exit 1
+  fi
+done
 
-#check module exists
-if [ ! -d "$INDUSTRY_PATH$INDUSTRY_NAME" ]; then
-  echo "Module '$INDUSTRY_NAME' does not exist."
-  exit 1
-fi
-
-#check manifest exists
-if [ ! -f "$INDUSTRY_PATH$INDUSTRY_NAME/__manifest__.py" ]; then
-  echo "Manifest file not found."
-  exit 1
-fi
+TEST_TAGS="/test_generic"$(IFS= ; echo ",/test_${MODULES[*]}")
+TEST_MODULES="test_generic"$(IFS= ; echo ",test_${MODULES[*]}")
 
 #try to init the db to check if it exists
 if $PYTHON_BIN $ODOO_BIN db init $DEP_DB >/dev/null 2>&1; then
@@ -99,8 +105,8 @@ fi
 
 # reload db when reset
 if $RESET || $HARD_RESET; then
-  echo "Copying database '$DEP_DB' into '$INDUSTRY_NAME'..."
-  $PYTHON_BIN $ODOO_BIN db duplicate $DEP_DB $INDUSTRY_NAME --force
+  echo "Copying database '$DEP_DB' into '$DB_NAME'..."
+  $PYTHON_BIN $ODOO_BIN db duplicate $DEP_DB $DB_NAME --force
 fi
 
 # install industry module 
@@ -117,14 +123,14 @@ print("")
 env.cr.commit()
 exit()
 EOF
-  cat "$TMP_INSTALL_PY" | $PYTHON_BIN $ODOO_BIN shell --addons-path="$ADDONS_PATH" -d $INDUSTRY_NAME
+  cat "$TMP_INSTALL_PY" | $PYTHON_BIN $ODOO_BIN shell --addons-path="$ADDONS_PATH" -d $DB_NAME
   rm -f "$TMP_INSTALL_PY"
 fi
 
 if $TEST; then
   echo "Running tests..."
-  $PYTHON_BIN $ODOO_BIN --addons-path="$ADDONS_PATH" -i test_generic,test_$INDUSTRY_NAME -d $INDUSTRY_NAME --test-tags $TEST_TAGS
+  $PYTHON_BIN $ODOO_BIN --addons-path="$ADDONS_PATH" -i $TEST_MODULES -d $DB_NAME --test-tags $TEST_TAGS
 else
   echo "Starting Odoo server..."
-  $PYTHON_BIN $ODOO_BIN --addons-path="$ADDONS_PATH" -d $INDUSTRY_NAME
+  $PYTHON_BIN $ODOO_BIN --addons-path="$ADDONS_PATH" -d $DB_NAME
 fi

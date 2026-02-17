@@ -11,10 +11,10 @@ class IndustryUtils:
         self.enterprise_path = os.path.join(industry_path, '../enterprise/')
         self.industry_path = industry_path
 
-    def get_zip(self, module_name: str):
+    def get_zip(self, module_names: str):
         output = BytesIO()
         zf = ZipFile(output, "w", ZIP_DEFLATED)
-        industry_modules = self.get_industry_dependencies(module_name)
+        industry_modules = self.get_industry_dependencies(module_names)
         dirs = [self.industry_path + module for module in industry_modules]
         for dir in dirs:
             for dirname, _, files in os.walk(dir):
@@ -34,10 +34,11 @@ class IndustryUtils:
     def get_all_industries(self):
         return [name for name in os.listdir(self.industry_path) if self.is_industry(name)]
 
-    def get_dependencies(self, module_name: str, full_standard_list: bool = False):
-        industries = {module_name} if self.is_industry(module_name) else set()
+    def get_dependencies(self, module_names: str, full_standard_list: bool = False):
+        modules = [m.strip() for m in module_names.split(',')]
+        industries = {module for module in modules if self.is_industry(module)}
         other_dep = set()
-        to_check = [module_name]
+        to_check = list(modules)
         while to_check:
             current_module = to_check.pop()
             manifest_file = self.get_manifest(current_module)
@@ -62,12 +63,12 @@ class IndustryUtils:
                     industries.add(dep)
         return industries, other_dep
 
-    def get_industry_dependencies(self, module_name: str):
-        return self.get_dependencies(module_name)[0]
+    def get_industry_dependencies(self, module_names: str):
+        return self.get_dependencies(module_names)[0]
 
-    def install_internal_dependencies(self, module_name: str, env):
-        dependencies = self.get_dependencies(module_name)[1]
-        modules = env['ir.module.module'].search([('name', 'in', dependencies)])
+    def install_internal_dependencies(self, module_names: str, env):
+        dependencies = self.get_dependencies(module_names)[1]
+        modules = env['ir.module.module'].search([('name', 'in', list(dependencies))])
         return modules.button_immediate_install()
 
     def has_module_dependency(self, module_name: str, dependency_module_name: str):
