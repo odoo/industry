@@ -1,16 +1,106 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<odoo noupdate="1">
-    <record model="res.config.settings" id="res_config_settings_enable">
-        <field name="group_uom" eval="1"/>
-        <field name="group_sale_order_template" eval="1"/>
-        <field name="group_discount_per_so_line" eval="1"/>
-        <field name="group_stock_multi_locations" eval="1"/>
-        <field name="group_mrp_routings" eval="1"/>
-        <field name="group_mrp_workorder_dependencies" eval="1"/>
-        <field name="group_mrp_wo_tablet_timer" eval="1"/>
-        <field name="group_unlocked_by_default" eval="1"/>
-        <field name="group_product_pricelist" eval="1"/>
+<odoo>
+    <data noupdate="1">
+        <record model="res.config.settings" id="res_config_settings_enable">
+            <field name="group_uom" eval="1"/>
+            <field name="group_sale_order_template" eval="1"/>
+            <field name="group_discount_per_so_line" eval="1"/>
+            <field name="group_stock_multi_locations" eval="1"/>
+            <field name="group_mrp_routings" eval="1"/>
+            <field name="group_mrp_workorder_dependencies" eval="1"/>
+            <field name="group_mrp_wo_tablet_timer" eval="1"/>
+            <field name="group_unlocked_by_default" eval="1"/>
+            <field name="group_product_pricelist" eval="1"/>
+        </record>
+
+        <function model="res.config.settings" name="execute" eval="[ref('res_config_settings_enable')]"/>
+    </data>
+
+    <record id="field_res_company_x_module_food_drinks_labels" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Food &amp; Drinks Labels</field>
+        <field name="model_id" ref="base.model_res_company"/>
+        <field name="name">x_module_food_drinks_labels</field>
+        <field name="store" eval="True"/>
+    </record>
+    <record id="field_res_config_setting_x_module_food_drinks_labels" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="related">company_id.x_module_food_drinks_labels</field>
+        <field name="field_description">Food &amp; Drinks Labels</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="name">x_module_food_drinks_labels</field>
     </record>
 
-    <function model="res.config.settings" name="execute" eval="[ref('res_config_settings_enable')]"/>
+    <record id="action_toggle_food_drinks_labels" model="ir.actions.server">
+        <field name="code"><![CDATA[
+def toggle_food_drink_label(state):
+    if state:
+        module = env['ir.module.module'].search(domain=[('name', '=', 'web_studio')],limit=1)
+        if module and module.state != 'installed':
+            module.button_immediate_install()
+
+    if report := env.ref('stock.action_report_lot_label', raise_if_not_found=False):
+        report['paperformat_id'] = env.ref('food_distribution.report_paperformat_1').id if state else env.ref('product.paperformat_label_sheet').id
+    for to_unarchive in [
+        'food_distribution_inherit_product_template_only_form_view',
+        'food_distribution_inherit_report_lot_label',
+        'food_distribution_inherit_report_lot_label_expiry',
+        'x_nutritional_facts_list_view',
+        'x_nutritional_facts_form_view',
+        'x_nutritional_facts_search_view',
+        'inventory_nutritional_facts_menu'
+    ]:
+        env.ref(f'food_distribution.{to_unarchive}')['active'] = state
+
+    if state and (cloc_entry_id := env.ref('__cloc_exclude__.food_distribution_field_x_product_template_ingredients_details', raise_if_not_found=False)):
+        env['ir.model.data'].search([
+            ('name', '=', 'food_distribution_field_x_product_template_ingredients_details'),
+            ('model', '=', 'ir.model.fields'),
+            ('module', '=', '__cloc_exclude__'),
+            ('res_id', '=', cloc_entry_id.id),
+        ], limit=1).unlink()
+    elif not state and (cloc_entry_id := env.ref('food_distribution.field_x_product_template_ingredients_details', raise_if_not_found=False)) and not env.ref('__cloc_exclude__.food_distribution_field_x_product_template_ingredients_details', raise_if_not_found=False):
+        env['ir.model.data'].create({
+            'name': 'food_distribution_field_x_product_template_ingredients_details',
+            'model': 'ir.model.fields',
+            'module': '__cloc_exclude__',
+            'res_id': cloc_entry_id.id,
+        })
+toggle_food_drink_label(record.x_module_food_drinks_labels)
+    ]]></field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="state">code</field>
+        <field name="name">Food Distribution: Toggle Food &amp; Drinks Labels</field>
+        <field name="usage">base_automation</field>
+    </record>
+    <record id="automation_toggle_food_drinks_labels" model="base.automation">
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_toggle_food_drinks_labels')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Food Distribution: Toggle Food &amp; Drinks Labels</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('field_res_config_setting_x_module_food_drinks_labels')])]"/>
+    </record>
+
+    <record id="res_config_settings_form_view_inherited" model="ir.ui.view">
+        <field name="name">res.config.settings.form.view.inherited.food.distribution</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="40"/>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Food Distribution" name="food_distribution" logo="/food_distribution/static/description/icon.png">
+                    <block title="Traceability" name="food_distribution_traceability_block">
+                        <setting id="food_distribution_food_drinks_labels_setting" help="Capture food and drink data on product and leverage them in printed labels.">
+                            <field name="x_module_food_drinks_labels"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <function name="run" model="ir.actions.server" context="{'active_model': 'res.config.settings', 'active_id': ref('res_config_settings_enable')}">
+        <value eval="[ref('action_toggle_food_drinks_labels')]"/>
+    </function>
 </odoo>

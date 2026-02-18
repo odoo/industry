@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="x_nutritional_facts_list_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <list default_order="x_sequence asc,id desc" editable="bottom">
+                <field name="x_sequence" widget="handle"/>
+                <field name="x_name"/>
+                <field name="x_unit" optional="show"/>
+                <field name="x_parent" optional="show"/>
+            </list>
+        </field>
+        <field name="model">x_nutritional_facts</field>
+        <field name="name">Nutritional Facts List View</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+    </record>
+    <record id="x_nutritional_facts_form_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <form>
+                <sheet string="Nutritional Facts">
+                    <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+                    <field name="x_active" invisible="1"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="x_name" placeholder="Name..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="x_unit"/>
+                        </group>
+                        <group>
+                            <field name="x_parent"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+        <field name="model">x_nutritional_facts</field>
+        <field name="name">Nutritional Facts Form View</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+    </record>
+    <record id="x_nutritional_facts_search_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <search>
+                <field name="x_name"/>
+                <separator/>
+                <filter string="Archived" name="archived_x_nutritional_facts" domain="[('x_active', '=', False)]"/>
+                <separator/>
+            </search>
+        </field>
+        <field name="model">x_nutritional_facts</field>
+        <field name="name">Nutritional Facts Search View</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+    </record>
+    <record id="food_distribution_inherit_product_template_only_form_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <xpath expr="/form//notebook" position="inside">
+                <page string="Label" name="label">
+                    <group name="label_basic_details">
+                        <group>
+                            <field name="x_is_allergen"/>
+                            <field name="x_label_note"/>
+                        </group>
+                    </group>
+                    <group name="label_details">
+                        <group name="ingredients">
+                            <field name="x_ingredient_ids">
+                                <list default_order="x_sequence asc, x_share desc" editable="bottom">
+                                    <field name="x_sequence" widget="handle"/>
+                                    <field optional="show" name="x_ingredient_id" required="1"/>
+                                    <field optional="show" name="x_share" invisible="False" column_invisible="False" options="{'enable_formatting':true}"/>
+                                    <field optional="show" name="x_is_allergen"/>
+                                </list>
+                            </field>
+                            <field name="x_ingredient_details" invisible="1"/>
+                        </group>
+                        <group name="nutritional_facts">
+                            <field name="x_nutritional_fact_ids">
+                                <list default_order="x_sequence asc, x_per_100g desc" editable="bottom">
+                                    <field optional="show" name="x_nutritional_fact_id" required="1"/>
+                                    <field optional="show" name="x_per_100g"/>
+                                    <field optional="show" name="x_unit"/>
+                                </list>
+                            </field>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="model">product.template</field>
+        <field name="name">food.distribution.inherit.product.template.only.form.view</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>
