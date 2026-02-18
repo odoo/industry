@@ -1,7 +1,7 @@
 {
     'name': 'Coworking',
     'version': '1.0',
-    'category': 'Service',
+    'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
         'base_industry_data',
