@@ -1,6 +1,6 @@
 {
     'name': 'Law Firm',
-    'version': '1.2',
+    'version': '2.0',
     'category': 'Services',
     'depends': [
         'contacts',
