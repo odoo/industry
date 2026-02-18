@@ -1,6 +1,6 @@
 {
     'name': 'Food Distribution',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
@@ -18,13 +18,24 @@
         'sale_purchase_stock',
         'spreadsheet_sale_management',
         'stock_barcode',
+        'web_studio',
     ],
     'data': [
+        'data/ir_model.xml',
+        'data/ir_model_access.xml',
+        'data/ir_model_fields.xml',
+        'data/ir_default.xml',
+        'data/ir_ui_view.xml',
+        'data/ir_actions_act_window.xml',
+        'data/ir_ui_menu.xml',
+        'data/qweb_view.xml',
+        'data/report_paperformat.xml',
         'data/res_config_settings.xml',
         'data/res_company.xml',
         'data/knowledge_article.xml',
         'data/product_category.xml',
         'data/uom_uom.xml',
+        'data/x_nutritional_facts.xml',
         'data/product_template.xml',
         'data/product_product.xml',
         'data/mrp_bom.xml',
@@ -56,6 +67,7 @@
     'license': 'OEEL-1',
     'cloc_exclude': [
         'data/knowledge_article.xml',
+        'data/qweb_view.xml',
     ],
     'images': [
         'images/main.png',
