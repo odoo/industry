@@ -1,0 +1,253 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="action_rebalance_claimant_share" model="ir.actions.server">
+        <field name="code"><![CDATA[
+if env.context.get('skip_claimant_share_rebalance'): pass
+else:
+    old_values = env.context.get('old_values') or {}
+
+    def _write(lines, vals):
+        lines.with_context(skip_claimant_share_rebalance=True).write(vals)
+
+    def _adjust_manual(adjust_line, manual_total):
+        other_total = manual_total - adjust_line.x_share
+        new_val = max(0.0, 100.0 - other_total)
+        _write(adjust_line, {'x_share': new_val})
+        return other_total + new_val
+
+    def _rebalance(record, adjust_line=None):
+        lines = record.x_claimant_parent_id.x_claimants_line_ids
+        manual_lines = lines.filtered('x_share_is_manual')
+        auto_lines = lines - manual_lines
+        manual_total = sum(manual_lines.mapped('x_share'))
+
+        if manual_lines and manual_total > 100.0: manual_total = _adjust_manual(adjust_line, manual_total)
+
+        if auto_lines:
+            remaining = max(0.0, 100.0 - manual_total)
+            _write(auto_lines, {'x_share': remaining / len(auto_lines)})
+            return
+
+        if manual_lines and 100.0 - manual_total > 0: _adjust_manual(adjust_line, manual_total)
+
+    for line in records:
+        if line.x_share < 0: raise UserError('you can not add a nagative value in claimant share as percentage')
+        if 'x_share' in old_values.get(line.id, {}): _write(line, {'x_share_is_manual': True})
+    _rebalance(record, line)
+]]>        </field>
+        <field name="model_id" ref="model_claimants_line"/>
+        <field name="state">code</field>
+        <field name="name">Industry Lawyer: Rebalance Claimant Share</field>
+    </record>
+    <record id="action_devide_claimant_share_on_craete_and_unlink" model="ir.actions.server">
+        <field name="code"><![CDATA[claimants_line_ids = records.x_claimants_line_ids
+if claimants_line_ids: claimants_line_ids.write({'x_share': 100 / len(claimants_line_ids)})
+        ]]></field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="name">Industry Lawyer: Calculate Claimant Share on Create and Delete Claimant line</field>
+    </record>
+    <record id="action_split_invoice_per_claimant_from_so" model="ir.actions.server">
+        <field name="code"><![CDATA[
+claimants_lines = record.partner_id.x_claimants_line_ids
+for claimant_line in claimants_lines:   # One invoice per claimant
+    for invoice in record.invoice_ids:
+        new_invoice = invoice.copy({'partner_id': claimant_line.x_claimant_id.id})
+        for orig_line, new_line in zip(invoice.invoice_line_ids, new_invoice.invoice_line_ids):
+            new_line.write({'price_unit': new_line.price_unit / len(claimants_lines) if new_line.price_unit else 0.0})
+        invoice.write({'state': 'cancel'})
+action = env['ir.actions.act_window']._for_xml_id('account.action_move_out_invoice')
+]]>        </field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Industry Lawyer: Split Invoice per Claimant From Quotation</field>
+    </record>
+    <record id="action_split_invoice_per_claimant" model="ir.actions.server">
+        <field name="code"><![CDATA[
+claimants_lines = record.partner_id.x_claimants_line_ids
+for claimant_line in claimants_lines:   # One invoice per claimant
+    new_invoice = record.copy({'partner_id': claimant_line.x_claimant_id.id})
+    for orig_line, new_line in zip(record.invoice_line_ids, new_invoice.invoice_line_ids):
+        new_line.write({'price_unit': new_line.price_unit / len(claimants_lines) if new_line.price_unit else 0.0})
+    record.write({'state': 'cancel'})
+action = env['ir.actions.act_window']._for_xml_id('account.action_move_out_invoice')
+]]>        </field>
+        <field name="model_id" ref="sale.model_account_move"/>
+        <field name="state">code</field>
+        <field name="name">Industry Lawyer: Split Invoice per Claimant</field>
+    </record>
+    <record id="action_update_additional_contacts_of_mail_composition" model="ir.actions.server">
+        <field name="code"><![CDATA[
+current_record = env[record.model].browse(record._evaluate_res_ids())
+if not record.partner_ids:
+    default_partners = current_record.mapped('partner_id').ids
+    record['partner_ids'] = [(6, 0, default_partners)]
+suggest_approver = env.user.x_suggest_approver_id
+vals = {'partner_ids': [(4, pid) for pid in set(record.partner_ids.mapped('x_claimants_line_ids.x_claimant_id').ids)],}
+if suggest_approver: vals['x_approver_id'] = suggest_approver.id
+record.write(vals)
+        ]]>        </field>
+        <field name="model_id" ref="mail.model_mail_compose_message"/>
+        <field name="state">code</field>
+        <field name="name">Industry Lawyer: Update Additional Contacts in Mail Compose</field>
+    </record>
+    <record id="action_update_additional_contacts_of_account_move_send" model="ir.actions.server">
+        <field name="code"><![CDATA[
+suggest_approver = env.user.x_suggest_approver_id
+vals = {'mail_partner_ids': [(4, pid) for pid in set(record.mail_partner_ids.mapped('x_claimants_line_ids.x_claimant_id').ids)],}
+if suggest_approver: vals['x_invoice_approver_id'] = suggest_approver.id
+record.write(vals)
+        ]]>        </field>
+        <field name="model_id" ref="account.model_account_move_send_wizard"/>
+        <field name="state">code</field>
+        <field name="name">Industry Lawyer: Update Additional Contacts in Account Move Send</field>
+    </record>
+    <record id="action_submit_for_approval_test" model="ir.actions.server">
+        <field name="name">Submit For Approval</field>
+        <field name="model_id" ref="mail.model_mail_mail"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+ctx = env.context
+currect_record = env[ctx.get('default_model')].browse(ctx.get('default_res_id'))
+msg_vals = {
+            'author_id': currect_record.env.user.id,
+            'author_guest_id': False,
+            'email_from': False,
+            'model': currect_record._name,
+            'res_id': currect_record.id,
+            'body': ctx.get('body'),
+            'message_type': 'comment',
+            'parent_id': currect_record._message_compute_parent_id(currect_record.env.user.partner_id.id),
+            'subject':  False,
+            'partner_ids': ctx.get('partner_ids'),
+            'record_company_id': currect_record._mail_get_companies(default=currect_record.env.company)[currect_record.id].id,
+        }
+message = currect_record.message_post(body = ctx.get('body'), message_type='comment', subtype_xmlid='mail.mt_comment')
+
+partners_data = currect_record._notify_get_recipients(message, msg_vals=msg_vals)
+for _lang, render_values, recipients_group in currect_record._notify_get_classified_recipients_iterator(
+            message,
+            partners_data,
+            msg_vals=msg_vals,
+            model_description=False,
+            force_email_company=False,
+            force_email_lang=False,
+            force_record_name=False,
+            subtitles=None,
+        ):
+            # generate notification email content
+            mail_body = currect_record._notify_by_email_render_layout(message, recipients_group, msg_vals=msg_vals, render_values=render_values,)
+mail = env['mail.mail'].with_context(mail_create_nolog=True).create({
+        'body_html': mail_body or '',
+        'mail_message_id': message.id,
+        'partner_ids': ctx.get('partner_ids'),
+        'author_id': env.user.partner_id.id,
+        'x_author_id': env.user.id,
+        'subject': currect_record.name or '',
+        'recipient_ids': ctx.get('partner_ids'),
+        # 'state': 'outgoing',
+})
+mail_for_approval = env['x_approval_mail'].create({'x_mail_id': mail.id, 'x_approval_status': 'pending'})
+        ]]></field>
+    </record>
+    <record id="action_submit_for_approval" model="ir.actions.server">
+        <field name="code"><![CDATA[
+approver_id = record.x_approver_id
+if not approver_id: raise UserError("Please select an approval user before submitting this email for approval.")
+mail = env['mail.mail'].create({'attachment_ids': [(6, 0, record.attachment_ids.ids)], 'body_html': record.body or '', 'partner_ids': record.partner_ids.ids, 'author_id': env.user.partner_id.id, 'x_author_id': env.user.id, 'scheduled_date': record.scheduled_date, 'subject': record.subject or '', 'recipient_ids': [(6, 0, record.partner_ids.ids)], 'reply_to': record.reply_to or False,})
+mail_for_approval = env['x_approval_mail'].create({'x_mail_id': mail.id, 'x_approval_status': 'pending', 'x_approved_by_id': approver_id.id, 'x_res_model': record.model, 'x_res_id': record._evaluate_res_ids()[0]})
+env.user.write({'x_suggest_approver_id': approver_id.id})
+approver_mail = mail.copy({'x_author_id': approver_id.id})
+mail_for_approval.copy({'x_mail_id': approver_mail.id})
+        ]]>        </field>
+        <field name="model_id" ref="mail.model_mail_compose_message"/>
+        <field name="state">code</field>
+        <field name="name">Industry Lawyer: Submit For Approval</field>
+    </record>
+    <record id="action_submit_for_approval_in_account_move_send" model="ir.actions.server">
+        <field name="code"><![CDATA[
+invoice_approver_id = record.x_invoice_approver_id
+if not invoice_approver_id: raise UserError("Please select an approval user before submitting this email for approval.")
+move_id = record.move_id
+invoice_attachment_id = move_id.invoice_pdf_report_id
+if invoice_attachment_id: invoice_attachment_id.write({'res_id': False, 'res_field': False})
+else:
+    invoices_data_pdf = {move: {**record._get_default_sending_settings(move, from_cron=False, **record._get_sending_settings()),} for move in move_id}
+    record._prepare_invoice_pdf_report(invoices_data_pdf)
+    pdf_attachment_values = invoices_data_pdf[move_id]['pdf_attachment_values']
+    invoice_attachment_id = record.env['ir.attachment'].create({'name': pdf_attachment_values.get('name'), 'raw': pdf_attachment_values.get('raw'), 'type': 'binary'})
+
+mail = env['mail.mail'].create({'attachment_ids': [(6, 0, [invoice_attachment_id.id])], 'body_html': record.body or '', 'partner_ids': record.mail_partner_ids.ids, 'author_id': env.user.partner_id.id, 'x_author_id': env.user.id, 'subject': record.subject or '', 'recipient_ids': [(6, 0, record.mail_partner_ids.ids)],})
+mail_for_approval = env['x_approval_mail'].create({'x_mail_id': mail.id, 'x_approval_status': 'pending', 'x_approved_by_id': invoice_approver_id.id, 'x_res_model': record.model, 'x_res_id': move_id.id})
+env.user.write({'x_suggest_approver_id': invoice_approver_id.id})
+approver_mail = mail.copy({'x_author_id': invoice_approver_id.id})
+mail_for_approval.copy({'x_mail_id': approver_mail.id})
+        ]]>        </field>
+        <field name="model_id" ref="account.model_account_move_send_wizard"/>
+        <field name="state">code</field>
+        <field name="name">Industry Lawyer: Submit For Approval in Account Move Send</field>
+    </record>
+    <record id="action_open_document" model="ir.actions.server">
+        <field name="code"><![CDATA[
+action = {'type': 'ir.actions.act_url', 'url': f'/web/content/{record.id}?download=true'}
+]]>
+        </field>
+        <field name="model_id" ref="base.model_ir_attachment"/>
+        <field name="state">code</field>
+        <field name="name">Industry Lawyer: Download Docs</field>
+    </record>
+    <record id="action_send_and_close_email" model="ir.actions.server">
+        <field name="code">
+            <![CDATA[
+for record in records:
+    mail = record.x_mail_id
+    mail.send()
+    if mail.state == 'sent':
+        env[records.x_res_model].browse(records.x_res_id).message_post(body = record.x_body_html, message_type='comment', subtype_xmlid = 'mail.mt_comment', attachment_ids = record.x_attachment_ids.ids)
+        records.write({'x_approval_status': 'sent'})
+action = env['ir.actions.act_window']._for_xml_id('industry_lawyer.approval_email_action')
+]]>
+        </field>
+        <field name="name">Approve &amp; Send</field>
+        <field name="model_id" ref="model_x_approval_mail"/>
+        <field name="sequence">1</field>
+        <field name="binding_model_id" ref="model_x_approval_mail"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+    </record>
+    <record id="action_mark_outgoing" model="ir.actions.server">
+        <field name="code">
+            <![CDATA[records.write({'x_approval_status': 'pending'})
+for rec in records: rec.x_mail_id.write({'state': 'outgoing'})
+            ]]>
+        </field>
+        <field name="name">Industry Lawyer: Retry</field>
+        <field name="model_id" ref="model_x_approval_mail"/>
+        <field name="binding_model_id" ref="model_x_approval_mail"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+    </record>
+    <record id="action_cancel" model="ir.actions.server">
+        <field name="code">
+            <![CDATA[records.write({'x_approval_status': 'cancelled'})
+for rec in records: rec.x_mail_id.write({'state': 'cancel'})
+            ]]>
+        </field>
+        <field name="name">Industry Lawyer: Cancel</field>
+        <field name="model_id" ref="model_x_approval_mail"/>
+        <field name="binding_model_id" ref="model_x_approval_mail"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+    </record>
+    <record id="action_link_attachment_to_project_documents" model="ir.actions.server">
+        <field name="name">Industry Lawyer: Link Attachments to Project Documents</field>
+        <field name="model_id" ref="base.model_ir_attachment"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+project = env.ref('industry_lawyer.project_project_3', raise_if_not_found=False)
+folder = project.documents_folder_id
+if project and folder and record.res_model == 'project.task' and record.res_id in project.task_ids.ids:
+    env['documents.document'].create({'attachment_id': attachment.id, 'folder_id': folder.id, 'name': attachment.name or project.name})
+        ]]></field>
+    </record>
+</odoo>
