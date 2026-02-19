@@ -166,16 +166,6 @@ for user in users: user['x_is_higher_group_user'] = get_rank(user) > current_use
         <field name="model_id" ref="base.model_res_groups"/>
         <field name="name">x_approval_groups</field>
     </record>
-    <!-- <record id="field_x_suggest_approval" model="ir.model.fields">
-        <field name="ttype">many2one</field>
-        <field name="on_delete" eval="False"/>
-        <field name="field_description">Suggest Approval</field>
-        <field name="model_id" ref="base.model_res_partner"/>
-        <field name="name">x_suggest_approval</field>
-        <field name="readonly" eval="True"/>
-        <field name="relation">res.users</field>
-    </record> -->
-
     <record id="field_x_suggest_approver_id" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="on_delete" eval="False"/>
@@ -185,7 +175,6 @@ for user in users: user['x_is_higher_group_user'] = get_rank(user) > current_use
         <field name="readonly" eval="True"/>
         <field name="relation">res.users</field>
     </record>
-
     <record id="field_x_mail_author_id" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="field_description">User</field>
@@ -217,8 +206,6 @@ for user in users: user['x_is_higher_group_user'] = get_rank(user) > current_use
         <field name="field_description">Approval Required</field>
         <field name="model_id" ref="base.model_res_config_settings"/>
     </record>
-
-    <!-- on going  -->
     <record id="field_x_display_send_button_mail_compose" model="ir.model.fields">
         <field name="name">x_display_send_button</field>
         <field name="ttype">boolean</field>
@@ -241,7 +228,6 @@ for record in self:
         <field name="model_id" ref="account.model_account_move_send_wizard"/>
         <field name="store" eval="False"/>
     </record>
-
     <record id="field_x_mail_id" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="field_description">Email</field>
@@ -324,7 +310,7 @@ for record in self:
     </record>
     <record id="field_x_show_approval" model="ir.model.fields">
         <field name="compute"><![CDATA[
-for record in self: record['x_show_approval'] = record.model in ('sale.order', 'crm.lead')
+for record in self: record['x_show_approval'] = record.model in ('sale.order', 'crm.lead') and not record.env.user.has_group('industry_lawyer.group_high')
 ]]></field>
         <field name="ttype">boolean</field>
         <field name="depends">partner_ids</field>
@@ -332,10 +318,9 @@ for record in self: record['x_show_approval'] = record.model in ('sale.order', '
         <field name="model_id" ref="mail.model_mail_compose_message"/>
         <field name="name">x_show_approval</field>
     </record>
-
     <record id="field_x_show_approval_for_move_send" model="ir.model.fields">
         <field name="compute"><![CDATA[
-for record in self: record['x_show_approval'] = record.model == 'account.move'
+for record in self: record['x_show_approval'] = record.model == 'account.move' and not record.env.user.has_group('industry_lawyer.group_high')
 ]]></field>
         <field name="ttype">boolean</field>
         <field name="depends">mail_partner_ids</field>
@@ -343,27 +328,26 @@ for record in self: record['x_show_approval'] = record.model == 'account.move'
         <field name="model_id" ref="account.model_account_move_send_wizard"/>
         <field name="name">x_show_approval</field>
     </record>
-
-
-    <!-- todo need to be review -->
-    <record id="field_mail_compose_message_x_is_higher_group_user" model="ir.model.fields">
+    <!-- <record id="field_mail_compose_message_x_is_higher_group_user" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self: record['x_is_high_group_user'] = record.env.user.has_group('industry_lawyer.group_high')
+]]></field>
         <field name="ttype">boolean</field>
         <field name="field_description">Is User High Group</field>
         <field name="model_id" ref="mail.model_mail_compose_message"/>
         <field name="name">x_is_high_group_user</field>
+        <field name="store" eval="False"/>
     </record>
     <record id="field_account_move_x_is_higher_group_sender" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self: record['x_is_high_group_move_sender'] = record.env.user.has_group('industry_lawyer.group_high')
+]]></field>
         <field name="ttype">boolean</field>
         <field name="field_description">Is High Group Invoice Sender</field>
         <field name="model_id" ref="account.model_account_move_send_wizard"/>
         <field name="name">x_is_high_group_move_sender</field>
-    </record>
-
-
-
-
-
-
+        <field name="store" eval="False"/>
+    </record> -->
 
 
 
@@ -404,5 +388,4 @@ for record in self: record['x_is_approver'] = record.x_approved_by_id.id == reco
         <field name="model_id" ref="model_x_approval_mail"/>
         <field name="name">x_res_id</field>
     </record>
-
 </odoo>
