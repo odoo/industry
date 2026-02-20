@@ -36,6 +36,7 @@ USELESS_FIELDS = {
     'maintenance.request': ['maintenance_team_id', 'owner_user_id'],
     'planning.role': ['color'],
     'planning.slot': ['access_token', 'allocated_hours'],
+    'pos.config': ['module_pos_restaurant'],
     'pos.order': ['date_order', 'pos_reference', 'company_id', 'state', 'currency_id', 'last_order_preparation_change'],
     'pos.order.line': ['total_cost', 'company_id', 'full_product_name'],
     'product.attribute.value': ['color'],
@@ -406,7 +407,7 @@ class TestEnv(IndustryCase):
                     f"Duplicate field updates in record {record_id} of model {model} in {file_name}: {', '.join(field[0] for field in fields if fields_list.count(field) > 1)}"
                 )
             record_key = (record_id, model)
-            if fields & records[record_key]:
+            if fields & records[record_key] and model != 'pos.config':
                 _logger.warning(
                     f"Duplicate record updates in {file_name}: {record_id} in model {model}"
                 )

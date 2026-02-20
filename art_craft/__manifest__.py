@@ -1,6 +1,6 @@
 {
     'name': 'Arts & Crafts Store',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Retail',
     'depends': [
         'hr_hourly_cost',
@@ -40,7 +40,6 @@
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
-        'data/pos_payment_method.xml',
         'data/pos_config.xml',
         'data/mail_message.xml',
         'data/website_view.xml',

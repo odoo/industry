@@ -1,6 +1,6 @@
 {
     'name': 'Student Organization',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -35,7 +35,6 @@
         'data/product_template_attribute_line.xml',
         'data/product_template_attribute_value.xml',
         'data/product_product.xml',
-        'data/pos_payment_method.xml',
         'data/pos_config.xml',
         'data/product_pricelist_item.xml',
         'data/project_task_type.xml',

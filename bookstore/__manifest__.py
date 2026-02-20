@@ -1,6 +1,6 @@
 {
     'name': 'Bookstore',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Retail',
     'depends': [
         'account_followup',
@@ -29,7 +29,6 @@
         'data/product_category.xml',
         'data/product_pricelist.xml',
         'data/product_product.xml',
-        'data/pos_payment_method.xml',
         'data/pos_config.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',

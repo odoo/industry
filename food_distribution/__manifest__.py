@@ -1,6 +1,6 @@
 {
     'name': 'Food Distribution',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
@@ -34,7 +34,6 @@
         'data/mrp_routing_workcenter.xml',
         'data/quality_point.xml',
         'data/mail_message.xml',
-        'data/pos_payment_method.xml',
         'data/knowledge_article_favorite.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',

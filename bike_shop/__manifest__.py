@@ -1,6 +1,6 @@
 {
     'name': 'Bike Shop',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Retail',
     'author': 'Odoo S.A.',
     'depends': [
@@ -35,8 +35,8 @@
         'data/knowledge_article.xml',
         'data/hr_job.xml',
         'data/pos_category.xml',
-        'data/pos_payment_method.xml',
         'data/pos_config.xml',
+        'data/pos_payment_method.xml',
         'data/project_task_type.xml',
         'data/project_project.xml',
         'data/helpdesk_team.xml',
