@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="field_x_group_of_claimants" model="ir.model.fields">
-        <field name="name">x_group_of_claimants</field>
+    <record id="field_x_claimant_group" model="ir.model.fields">
+        <field name="name">x_claimant_group</field>
         <field name="ttype">boolean</field>
-        <field name="field_description">Group Of People</field>
+        <field name="field_description">Claimant Group</field>
         <field name="model_id" ref="base.model_res_partner"/>
     </record>
     <record id="field_x_claimant_parent_id" model="ir.model.fields">
@@ -387,5 +387,30 @@ for record in self: record['x_is_approver'] = record.x_approved_by_id.id == reco
         <field name="field_description">Related Document Id</field>
         <field name="model_id" ref="model_x_approval_mail"/>
         <field name="name">x_res_id</field>
+    </record>
+
+
+
+
+    <record id="field_x_selected_claimant_ids" model="ir.model.fields">
+        <field name="ttype">many2many</field>
+        <field name="field_description">Selected Claimant</field>
+        <field name="compute"><![CDATA[
+for record in self: record['x_selected_claimant_ids'] = [(6, 0, [line.x_claimant_id.id for line in record.x_claimants_line_ids])]
+]]></field>
+        <field name="depends">x_claimants_line_ids</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="name">x_selected_claimant_ids</field>
+        <field name="relation">res.partner</field>
+        <field name="relation_table">x_res_partner_res_partner_rel</field>
+    </record>
+    <record id="field_x_selected_claimant_ids_in_so" model="ir.model.fields">
+        <field name="ttype">many2many</field>
+        <field name="field_description">Selected Claimant</field>
+        <field name="related">partner_id.x_selected_claimant_ids</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="name">x_selected_claimant_ids</field>
+        <field name="relation">res.partner</field>
+        <field name="relation_table">x_res_partner_sale_order_rel</field>
     </record>
 </odoo>
