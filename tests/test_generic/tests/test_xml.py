@@ -393,7 +393,7 @@ class TestEnv(IndustryCase):
                         else None
                     ),
                 )
-                for field in record.xpath(".//field")
+                for field in record.xpath(".//field[not(ancestor::field[@name='arch'])]")
             ]
             fields = frozenset(fields_list)
             if len(fields_list) != len(fields):
