@@ -9,17 +9,14 @@
         <field name="priority">17</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='company_type']" position="before">
-                <div class="d-flex align-items-center">
-                    <field name="x_group_of_claimants" widget="boolean" class="m-0 p-0"/>
-                    <label for="x_group_of_claimants" class="m-0">Group Of Claimants</label>
-                </div>
+            <xpath expr="//field[@name='parent_id']" position="before">
+                <field name="x_claimant_group" widget="boolean"/>
             </xpath>
-            <xpath expr="//page[@name='internal_notes']" position="before">
-                <page name='claimants' string="Claimants" invisible="not x_group_of_claimants">
+            <xpath expr="//page[@name='sales_purchases']" position="before">
+                <page name='claimants' string="Claimants" invisible="not x_claimant_group">
                     <field name="x_claimants_line_ids">
                         <list editable="bottom">
-                            <field name="x_claimant_id" widget="many2one"/>
+                            <field name="x_claimant_id" widget="many2one" domain="[('id', 'not in', parent.x_selected_claimant_ids)]"/>
                             <field name="x_share"/>
                         </list>
                     </field>
@@ -36,8 +33,11 @@
         <field name="priority">160</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
-            <xpath expr="//header" position="inside">
+            <xpath expr="//header/button[@id='create_invoice']" position="after">
                 <button name="%(action_split_invoice_per_claimant_from_so)d" string="Split Invoice" type="action" invisible="not invoice_count or not x_show_split_invoice"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="x_selected_claimant_ids" readonly='1' widget="many2many_avatar_user"/>
             </xpath>
         </field>
     </record>
@@ -109,8 +109,15 @@
             <xpath expr="//form" position="inside">
                 <app data-string="Approval Settings" string="Approvals" name="approvals_settings" logo="/industry_lawyer/static/description/icon.png" groups="base.group_system">
                     <block title="Approval Settings">
-                        <setting id="approvals_settings" string="Approval Required" help="Choose whether email approval is optional or mandatory before sending">
+                        <setting id="approval_required" string="Approval Required" help="Choose whether email approval is optional or mandatory before sending">
                             <field name="x_approval_required" class="o_light_label" widget="radio"/>
+                        </setting>
+                    </block>
+                    <block>
+                        <setting id="manage_approvals_groups" string="Manage Approval Groups">
+                            <div class="content-group">
+                                <button name="%(approval_groups_action)d" type="action" string="Manage Approval Groups" icon="oi-arrow-right" class="btn-link"/>
+                            </div>
                         </setting>
                     </block>
                 </app>
@@ -118,7 +125,7 @@
         </field>
     </record>
     <record id="view_approval_mail_list_custom" model="ir.ui.view">
-        <field name="name">x_approval_mail.list.condominium</field>
+        <field name="name">x_approval_mail.list.industry_lawyer</field>
         <field name="model">x_approval_mail</field>
         <field name="mode">primary</field>
         <field name="type">list</field>
@@ -251,6 +258,25 @@
             </xpath>
             <xpath expr="//field[@name='implied_ids']" position="attributes">
                 <attribute name="optional">show</attribute>
+                <attribute name="string">Approves For</attribute>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="user_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_invoice_list_confirm_entries_quick_action" model="ir.ui.view">
+        <field name="name">account.invoice.list.confirm.entries.industry_lawyer</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="invoice_origin" string="Source Document"/>
+            </xpath>
+            <xpath expr="//list/header/button[@name='action_force_register_payment']" position="after">
+                <button name="%(account.action_validate_account_moves)d" string="Confirm Entries" type="action" groups="account.group_account_invoice"/>
             </xpath>
         </field>
     </record>
