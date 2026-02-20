@@ -106,45 +106,16 @@ record.write(vals)
         <field name="code"><![CDATA[
 ctx = env.context
 currect_record = env[ctx.get('default_model')].browse(ctx.get('default_res_id'))
-msg_vals = {
-            'author_id': currect_record.env.user.id,
-            'author_guest_id': False,
-            'email_from': False,
-            'model': currect_record._name,
-            'res_id': currect_record.id,
-            'body': ctx.get('body'),
-            'message_type': 'comment',
-            'parent_id': currect_record._message_compute_parent_id(currect_record.env.user.partner_id.id),
-            'subject':  False,
-            'partner_ids': ctx.get('partner_ids'),
-            'record_company_id': currect_record._mail_get_companies(default=currect_record.env.company)[currect_record.id].id,
-        }
-message = currect_record.message_post(body = ctx.get('body'), message_type='comment', subtype_xmlid='mail.mt_comment')
-
+current_user = env.user
+msg_vals = {'author_id': current_user.id, 'model': currect_record._name, 'res_id': currect_record.id, 'body': ctx.get('body'), 'message_type': 'comment', 'parent_id': currect_record._message_compute_parent_id(current_user.partner_id.id), 'partner_ids': ctx.get('partner_ids'), 'record_company_id': env.company.id,}
+message = currect_record.message_post(body = ctx.get('body'), message_type = 'comment', subtype_xmlid = 'mail.mt_comment', attachment_ids = ctx.get('attachment_ids') or [],)
 partners_data = currect_record._notify_get_recipients(message, msg_vals=msg_vals)
-for _lang, render_values, recipients_group in currect_record._notify_get_classified_recipients_iterator(
-            message,
-            partners_data,
-            msg_vals=msg_vals,
-            model_description=False,
-            force_email_company=False,
-            force_email_lang=False,
-            force_record_name=False,
-            subtitles=None,
-        ):
-            # generate notification email content
-            mail_body = currect_record._notify_by_email_render_layout(message, recipients_group, msg_vals=msg_vals, render_values=render_values,)
-mail = env['mail.mail'].with_context(mail_create_nolog=True).create({
-        'body_html': mail_body or '',
-        'mail_message_id': message.id,
-        'partner_ids': ctx.get('partner_ids'),
-        'author_id': env.user.partner_id.id,
-        'x_author_id': env.user.id,
-        'subject': currect_record.name or '',
-        'recipient_ids': ctx.get('partner_ids'),
-        # 'state': 'outgoing',
-})
-mail_for_approval = env['x_approval_mail'].create({'x_mail_id': mail.id, 'x_approval_status': 'pending'})
+for _lang, render_values, recipients_group in currect_record._notify_get_classified_recipients_iterator(message, partners_data, msg_vals=msg_vals,):
+    # generate notification email content
+    mail_body = currect_record._notify_by_email_render_layout(message, recipients_group, msg_vals=msg_vals, render_values=render_values,)
+
+mail = env['mail.mail'].with_context(mail_create_nolog=True).create({'body_html': mail_body or '', 'mail_message_id': message.id, 'partner_ids': ctx.get('partner_ids'), 'author_id': current_user.partner_id.id, 'x_author_id': current_user.id, 'subject': currect_record.name or '', 'recipient_ids': ctx.get('partner_ids'),})
+env['x_approval_mail'].create({'x_mail_id': mail.id, 'x_approval_status': 'pending'})
         ]]></field>
     </record>
     <record id="action_submit_for_approval" model="ir.actions.server">
