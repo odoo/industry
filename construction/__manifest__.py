@@ -7,7 +7,7 @@
         'crm_enterprise',
         'documents',
         'helpdesk',
-        'industry_fsm_stock',
+        'planning_field_service_sale_stock',
         'knowledge',
         'purchase_stock',
         'sale_crm',
