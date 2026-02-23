@@ -20,8 +20,7 @@
         <field name="field_description">Claimant</field>
         <field name="model_id" ref="model_claimants_line"/>
         <field name="required" eval="True"/>
-        <field name="on_delete" eval="False"/> <!-- Set field to NULL when related record is deleted -->
-        <!-- <field name="on_delete">cascade</field> -->
+        <field name="on_delete" eval="False"/>
         <field name="relation">res.partner</field>
     </record>
     <record id="x_claimants_line_ids" model="ir.model.fields">
@@ -32,15 +31,11 @@
         <field name="field_description">Claimants Line</field>
         <field name="model_id" ref="base.model_res_partner"/>
     </record>
-    <!-- Claimant share fields. x_share stays editable; x_share_is_manual tracks user overrides. -->
     <record id="field_x_share" model="ir.model.fields">
         <field name="name">x_share</field>
         <field name="ttype">float</field>
         <field name="field_description">% Share</field>
         <field name="model_id" ref="model_claimants_line"/>
-        <field name="store" eval="True"/>
-        <!-- <field name="compute" eval="False"/>
-        <field name="depends" eval="False"/> -->
     </record>
     <record id="field_x_share_is_manual" model="ir.model.fields">
         <field name="name">x_share_is_manual</field>
@@ -52,7 +47,7 @@
     <record id="field_sale_order_x_show_split_invoice" model="ir.model.fields">
         <field name="name">x_show_split_invoice</field>
         <field name="compute"><![CDATA[
-for record in self: record['x_show_split_invoice'] = len(record.partner_id.x_claimants_line_ids) > 1
+for record in self: record['x_show_split_invoice'] = len(record.x_selected_claimant_ids) > 1
 ]]></field>
         <field name="ttype">boolean</field>
         <field name="field_description">Show Split Invoice</field>
@@ -79,9 +74,9 @@ for record in self: record['x_show_split_invoice'] = len(record.partner_id.x_cla
     </record>
     <record id="field_x_invoice_approver_id" model="ir.model.fields">
         <field name="ttype">many2one</field>
-        <field name="field_description">Approval By</field>
+        <field name="field_description">Approver</field>
         <field name="model_id" ref="account.model_account_move_send_wizard"/>
-        <field name="name">x_invoice_approver_id</field>
+        <field name="name">x_approver_id</field>
         <field name="relation">res.users</field>
         <field name="on_delete" eval="False"/>
     </record>
@@ -102,7 +97,7 @@ users = self.search([]) if current_user in self else self
 for user in users: user['x_is_higher_group_user'] = get_rank(user) > current_user_rank
 ]]></field>
         <field name="ttype">boolean</field>
-        <field name="field_description">Is High User Group</field>
+        <field name="field_description">Is Higher Group User</field>
         <field name="model_id" ref="mail.model_res_users"/>
         <field name="store" eval="True"/>
     </record>
@@ -328,33 +323,6 @@ for record in self: record['x_show_approval'] = record.model == 'account.move' a
         <field name="model_id" ref="account.model_account_move_send_wizard"/>
         <field name="name">x_show_approval</field>
     </record>
-    <!-- <record id="field_mail_compose_message_x_is_higher_group_user" model="ir.model.fields">
-        <field name="compute"><![CDATA[
-for record in self: record['x_is_high_group_user'] = record.env.user.has_group('industry_lawyer.group_high')
-]]></field>
-        <field name="ttype">boolean</field>
-        <field name="field_description">Is User High Group</field>
-        <field name="model_id" ref="mail.model_mail_compose_message"/>
-        <field name="name">x_is_high_group_user</field>
-        <field name="store" eval="False"/>
-    </record>
-    <record id="field_account_move_x_is_higher_group_sender" model="ir.model.fields">
-        <field name="compute"><![CDATA[
-for record in self: record['x_is_high_group_move_sender'] = record.env.user.has_group('industry_lawyer.group_high')
-]]></field>
-        <field name="ttype">boolean</field>
-        <field name="field_description">Is High Group Invoice Sender</field>
-        <field name="model_id" ref="account.model_account_move_send_wizard"/>
-        <field name="name">x_is_high_group_move_sender</field>
-        <field name="store" eval="False"/>
-    </record> -->
-
-
-
-
-
-
-    <!-- from here -->
     <record id="field_x_approved_by_id" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="field_description">Approved By</field>
@@ -363,10 +331,9 @@ for record in self: record['x_is_high_group_move_sender'] = record.env.user.has_
         <field name="name">x_approved_by_id</field>
         <field name="relation">res.users</field>
     </record>
-
     <record id="field_x_is_approver" model="ir.model.fields">
         <field name="compute"><![CDATA[
-for record in self: record['x_is_approver'] = record.x_approved_by_id.id == record.env.uid
+for record in self: record['x_is_approver'] = record.x_approved_by_id.id == record.env.uid and record.x_approval_status == 'pending'
 ]]></field>
         <field name="ttype">boolean</field>
         <field name="field_description">Is Approver</field>
@@ -374,24 +341,18 @@ for record in self: record['x_is_approver'] = record.x_approved_by_id.id == reco
         <field name="name">x_is_approver</field>
         <field name="store" eval="False"/>
     </record>
-
     <record id="field_x_related_document_model" model="ir.model.fields">
         <field name="ttype">char</field>
         <field name="field_description">Related Document Model</field>
         <field name="model_id" ref="model_x_approval_mail"/>
         <field name="name">x_res_model</field>
     </record>
-
     <record id="field_x_related_document_id" model="ir.model.fields">
         <field name="ttype">integer</field>
         <field name="field_description">Related Document Id</field>
         <field name="model_id" ref="model_x_approval_mail"/>
         <field name="name">x_res_id</field>
     </record>
-
-
-
-
     <record id="field_x_selected_claimant_ids" model="ir.model.fields">
         <field name="ttype">many2many</field>
         <field name="field_description">Selected Claimant</field>

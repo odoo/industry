@@ -5,7 +5,6 @@
 if env.context.get('skip_claimant_share_rebalance'): pass
 else:
     old_values = env.context.get('old_values') or {}
-
     def _write(lines, vals):
         lines.with_context(skip_claimant_share_rebalance=True).write(vals)
 
@@ -49,12 +48,12 @@ if claimants_line_ids: claimants_line_ids.write({'x_share': 100 / len(claimants_
     </record>
     <record id="action_split_invoice_per_claimant_from_so" model="ir.actions.server">
         <field name="code"><![CDATA[
-claimants_lines = record.partner_id.x_claimants_line_ids
-for claimant_line in claimants_lines:   # One invoice per claimant
+claimants = record.x_selected_claimant_ids
+for claimant in claimants:   # One invoice per claimant
     for invoice in record.invoice_ids:
-        new_invoice = invoice.copy({'partner_id': claimant_line.x_claimant_id.id})
+        new_invoice = invoice.copy({'partner_id': claimant.id})
         for orig_line, new_line in zip(invoice.invoice_line_ids, new_invoice.invoice_line_ids):
-            new_line.write({'price_unit': new_line.price_unit / len(claimants_lines) if new_line.price_unit else 0.0})
+            new_line.write({'price_unit': new_line.price_unit / len(claimants)})
         invoice.write({'state': 'cancel'})
 action = env['ir.actions.act_window']._for_xml_id('account.action_move_out_invoice')
 ]]>        </field>
@@ -68,7 +67,7 @@ claimants_lines = record.partner_id.x_claimants_line_ids
 for claimant_line in claimants_lines:   # One invoice per claimant
     new_invoice = record.copy({'partner_id': claimant_line.x_claimant_id.id})
     for orig_line, new_line in zip(record.invoice_line_ids, new_invoice.invoice_line_ids):
-        new_line.write({'price_unit': new_line.price_unit / len(claimants_lines) if new_line.price_unit else 0.0})
+        new_line.write({'price_unit': new_line.price_unit / len(claimants_lines)})
     record.write({'state': 'cancel'})
 action = env['ir.actions.act_window']._for_xml_id('account.action_move_out_invoice')
 ]]>        </field>
@@ -80,7 +79,7 @@ action = env['ir.actions.act_window']._for_xml_id('account.action_move_out_invoi
         <field name="code"><![CDATA[
 if record.composition_mode == 'comment' and not record.partner_ids: record['partner_ids'] = [(6, 0, env[record.model].browse(record._evaluate_res_ids()).partner_id.ids)]
 suggest_approver = env.user.x_suggest_approver_id
-vals = {'partner_ids': [(4, pid) for pid in set(record.partner_ids.mapped('x_claimants_line_ids.x_claimant_id').ids)],}
+vals = {'partner_ids': [(4, pid) for pid in record.partner_ids.mapped('x_claimants_line_ids.x_claimant_id').ids],}
 if suggest_approver: vals['x_approver_id'] = suggest_approver.id
 record.write(vals)
         ]]>        </field>
@@ -91,8 +90,8 @@ record.write(vals)
     <record id="action_update_additional_contacts_of_account_move_send" model="ir.actions.server">
         <field name="code"><![CDATA[
 suggest_approver = env.user.x_suggest_approver_id
-vals = {'mail_partner_ids': [(4, pid) for pid in set(record.mail_partner_ids.mapped('x_claimants_line_ids.x_claimant_id').ids)],}
-if suggest_approver: vals['x_invoice_approver_id'] = suggest_approver.id
+vals = {'mail_partner_ids': [(4, pid) for pid in record.mail_partner_ids.mapped('x_claimants_line_ids.x_claimant_id').ids],}
+if suggest_approver: vals['x_approver_id'] = suggest_approver.id
 record.write(vals)
         ]]>        </field>
         <field name="model_id" ref="account.model_account_move_send_wizard"/>
@@ -135,7 +134,7 @@ for current_record in env[record.model].browse(record._evaluate_res_ids()):
     </record>
     <record id="action_submit_for_approval_in_account_move_send" model="ir.actions.server">
         <field name="code"><![CDATA[
-invoice_approver_id = record.x_invoice_approver_id
+invoice_approver_id = record.x_approver_id
 if not invoice_approver_id: raise UserError("Please select an approval user before submitting this email for approval.")
 move_id = record.move_id
 invoice_attachment_id = move_id.invoice_pdf_report_id
@@ -145,7 +144,6 @@ else:
     record._prepare_invoice_pdf_report(invoices_data_pdf)
     pdf_attachment_values = invoices_data_pdf[move_id]['pdf_attachment_values']
     invoice_attachment_id = record.env['ir.attachment'].create({'name': pdf_attachment_values.get('name'), 'raw': pdf_attachment_values.get('raw'), 'type': 'binary'})
-
 mail = env['mail.mail'].create({'attachment_ids': [(6, 0, [invoice_attachment_id.id])], 'body_html': record.body or '', 'partner_ids': record.mail_partner_ids.ids, 'author_id': env.user.partner_id.id, 'x_author_id': env.user.id, 'subject': record.subject or '', 'recipient_ids': [(6, 0, record.mail_partner_ids.ids)],})
 mail_for_approval = env['x_approval_mail'].create({'x_mail_id': mail.id, 'x_approval_status': 'pending', 'x_approved_by_id': invoice_approver_id.id, 'x_res_model': record.model, 'x_res_id': move_id.id})
 env.user.write({'x_suggest_approver_id': invoice_approver_id.id})
