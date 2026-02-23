@@ -22,13 +22,6 @@ patch(Composer.prototype, {
                     partner_ids: (thread?.suggestedRecipients || []).filter((r) => r.partner_id).map((r) => r.partner_id),
                 },
             });
-            // await thread?.fetchNewMessages();
-            // this.suggestion?.clearRawMentions();
-            // this.suggestion?.clearCannedResponses();
-            // if (thread) {
-            //     thread.additionalRecipients = [];
-            // }
-            // composer.emailAddSignature = true;
         });
     },
 });
