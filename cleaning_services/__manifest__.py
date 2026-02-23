@@ -6,7 +6,7 @@
         'base_industry_data',
         'crm_sale_subscription',
         'hr',
-        'industry_fsm_sale',
+        'planning_field_service_sale_timesheet',
         'knowledge',
         'project_purchase',
         'project_sale_subscription',
