@@ -3,7 +3,6 @@
     'category': 'Retail',
     'depends': [
         'crm',
-        'documents_fsm',
         'documents_project_sale',
         'helpdesk_account',
         'helpdesk_repair',
