@@ -4,7 +4,7 @@
     'author': 'Odoo S.A.',
     'depends': [
         'base_industry_data',
-        'industry_fsm_sale_report',
+        'planning_field_service_sale_worksheet',
         'knowledge',
         'purchase',
         'quality_control',
