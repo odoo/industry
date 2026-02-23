@@ -7,7 +7,7 @@
         'base_industry_data',
         'contacts',
         'helpdesk',
-        'industry_fsm_stock',
+        'planning_field_service_sale_stock',
         'knowledge',
         'point_of_sale',
         'purchase_stock',
