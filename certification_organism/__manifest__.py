@@ -5,7 +5,7 @@
         'crm',
         'hr_holidays',
         'hr_timesheet',
-        'industry_fsm_sale_report',
+        'planning_field_service_sale_worksheet',
         'knowledge',
         'product_margin',
         'project',
