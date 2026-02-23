@@ -6,7 +6,7 @@
         'base_industry_data',
         'crm_enterprise',
         'documents_sign',
-        'industry_fsm_sale_report',
+        'planning_field_service_worksheet',
         'knowledge',
         'pos_online_payment',
         'sale_crm',
