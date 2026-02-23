@@ -2,8 +2,8 @@
     'name': 'Gardening',
     'category': 'Construction',
     'depends': [
-        'industry_fsm_sale_report',
-        'industry_fsm_stock',
+        'planning_field_service_sale_worksheet',
+        'planning_field_service_sale_stock',
         'knowledge',
         'sale_crm',
         'sale_purchase_stock',
