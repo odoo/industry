@@ -3,7 +3,7 @@
     'category': 'Services',
     'depends': [
         'hr',
-        'industry_fsm',
+        'planning_field_service',
         'knowledge',
         'project_sale_subscription',
         'sale_timesheet',
