@@ -4,10 +4,10 @@
     'depends': [
         'account_followup',
         'helpdesk_account',
-        'helpdesk_fsm',
+        'helpdesk_planning_field_service',
         'helpdesk_repair',
-        'industry_fsm_sale_report',
-        'industry_fsm_stock',
+        'planning_field_service_sale_worksheet',
+        'planning_field_service_sale_stock',
         'mrp_account',
         'product_expiry',
         'project_sms',
