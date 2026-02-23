@@ -7,7 +7,7 @@
         'base_industry_data',
         'crm',
         'excise_management',
-        'industry_fsm_sale_report',
+        'planning_field_service_sale_worksheet',
         'knowledge',
         'mrp_plm',
         'pos_enterprise',
