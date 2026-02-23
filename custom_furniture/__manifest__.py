@@ -7,7 +7,7 @@
         'calendar',
         'crm',
         'hr',
-        'industry_fsm_report',
+        'planning_field_service_worksheet',
         'knowledge',
         'mrp_workorder',
         'planning',
