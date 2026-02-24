@@ -1,0 +1,414 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="x_pets_list_view" model="ir.ui.view">
+    <field name="name">x_pets.list.view</field>
+    <field name="model">x_pets</field>
+    <field name="active" eval="True"/>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+        <field name="x_species_id" optional="show"/>
+        <field name="x_breed_id" optional="show"/>
+        <field name="x_gender" optional="show"/>
+        <field name="x_standard_package_ids" optional="show" widget="many2many_tags"/>
+        <field name="x_user_id" widget="many2one_avatar_user"/>
+      </list>
+    </field>
+  </record>
+  <record id="x_pets_form_view" model="ir.ui.view">
+    <field name="name">x_pets.form.view</field>
+    <field name="model">x_pets</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="%(ir_actions_server_create_sale_order_from_pets)d" string="Create Order" type="action" class="btn-primary"/>
+        </header>
+        <sheet string="Pets">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <div name="button_box" class="oe_button_box">
+            <button name="%(action_window_sale_order)d" class="oe_stat_button" icon="fa-shopping-cart" type="action" invisible="not x_pets_sale_order_count">
+              <field widget="statinfo" name="x_pets_sale_order_count" string="Sales Order"/>
+            </button>
+          </div>
+          <field name="x_active" invisible="1"/>
+          <field name="x_avatar_image" widget="image" class="oe_avatar" options="{'size':[0,180]}"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="main_group">
+            <group name="left_group" string="Main">
+              <field name="x_owner_ids" widget="many2many_tags"/>
+              <field name="x_user_id" widget="many2one_avatar_user"/>
+            </group>
+            <group name="right_group" string="Grooming">
+              <field name="x_standard_package_ids" widget="many2many_tags"/>
+              <field name="x_preferred_haircut_style"/>
+              <field name="x_bathing_preferences"/>
+            </group>
+          </group>
+          <notebook name="notebook">
+            <page string="Details" name="details_page">
+              <group name="main_group_details">
+                <group name="general_group" string="General">
+                  <field name="x_species_id" options="{'create_name_field': 'x_name'}"/>
+                  <field name="x_breed_id" options="{'create_name_field': 'x_name'}"/>
+                  <field name="x_size_class"/>
+                  <field name="x_weight"/>
+                  <field name="x_date_of_birth"/>
+                  <field name="x_gender"/>
+                  <field name="x_coat_type"/>
+                  <field name="x_coat_condition"/>
+                </group>
+                <group name="safety_medical_group" string="Safety &amp; Medical">
+                  <field name="x_behavior" widget="selection_badge" string="Temperament"/>
+                  <field name="x_owner_presence_required"/>
+                  <field name="x_escape_risk"/>
+                  <field name="x_neutered_spayed"/>
+                  <field name="x_muzzle_required"/>
+                  <field name="x_can_share_room_with_other_pets"/>
+                  <field name="x_treatment_ids" widget="many2many_tags"/>
+                  <field name="x_medical_issue_ids" widget="many2many_tags"/>
+                  <field name="x_allergies_ids" widget="many2many_tags"/>
+                </group>
+              </group>
+            </page>
+            <page string="Notes" name="notes_page">
+              <field name="x_notes" string="Notes" placeholder="Enter your notes"/>
+            </page>
+          </notebook>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+  <record id="x_pets_search_view" model="ir.ui.view">
+    <field name="name">x_pets.search.view</field>
+    <field name="model">x_pets</field>
+    <field name="active" eval="True"/>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <field name="x_user_id"/>
+        <filter string="My Pets" name="my_x_pets" domain="[['x_user_id', '=', uid]]"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_pets" domain="[['x_active', '=', False]]"/>
+        <separator/>
+        <filter name="groupby_x_user" string="Responsible" context="{'group_by': 'x_user_id'}" domain="[]"/>
+      </search>
+    </field>
+  </record>
+  <record id="x_medical_issues_list_view" model="ir.ui.view">
+    <field name="name">x_medical_issues.list.view</field>
+    <field name="model">x_medical_issues</field>
+    <field name="active" eval="True"/>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <list editable="bottom">
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+  </record>
+  <record id="x_medical_issues_form_view" model="ir.ui.view">
+    <field name="name">x_medical_issues.form.view</field>
+    <field name="model">x_medical_issues</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <form>
+        <h1>
+          <field name="x_name" required="1" placeholder="Name..."/>
+        </h1>
+      </form>
+    </field>
+  </record>
+  <record id="x_medical_issues_search_view" model="ir.ui.view">
+    <field name="name">x_medical_issues.search.view</field>
+    <field name="model">x_medical_issues</field>
+    <field name="active" eval="True"/>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_medical_issues" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+  </record>
+  <record id="x_treatments_list_view" model="ir.ui.view">
+    <field name="name">x_treatments.list.view</field>
+    <field name="model">x_treatments</field>
+    <field name="active" eval="True"/>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <list editable="bottom" open_form_view="True">
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+  </record>
+  <record id="x_treatments_form_view" model="ir.ui.view">
+    <field name="name">x_treatments.form.view</field>
+    <field name="model">x_treatments</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <form>
+          <h1>
+            <field name="x_name" required="1" placeholder="Name..."/>
+          </h1>
+          <group>
+            <field name="x_notes" placeholder="Type down your notes here..." nolabel="1" class="mt-2"/>
+          </group>
+      </form>
+    </field>
+  </record>
+  <record id="x_treatments_search_view" model="ir.ui.view">
+    <field name="name">x_treatments.search.view</field>
+    <field name="model">x_treatments</field>
+    <field name="active" eval="True"/>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_treatments" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+  </record>
+  <record id="x_allergies_list_view" model="ir.ui.view">
+    <field name="name">x_allergies.list.view</field>
+    <field name="model">x_allergies</field>
+    <field name="active" eval="True"/>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <list editable="bottom" open_form_view="True">
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+  </record>
+  <record id="x_allergies_form_view" model="ir.ui.view">
+    <field name="name">x_allergies.form.view</field>
+    <field name="model">x_allergies</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <form>
+        <h1>
+          <field name="x_name" required="1" placeholder="Name..."/>
+        </h1>
+        <group>
+          <field name="x_notes" placeholder="Type down your notes here..." nolabel="1" class="mt-2"/>
+        </group>
+      </form>
+    </field>
+  </record>
+  <record id="x_allergies_search_view" model="ir.ui.view">
+    <field name="name">x_allergies.search.view</field>
+    <field name="model">x_allergies</field>
+    <field name="active" eval="True"/>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_allergies" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+  </record>
+  <record id="x_pets_kanban_view" model="ir.ui.view">
+    <field name="name">x_pets.kanban.view</field>
+    <field name="model">x_pets</field>
+    <field name="active" eval="True"/>
+    <field name="priority">99</field>
+    <field name="type">kanban</field>
+    <field name="arch" type="xml">
+      <kanban>
+        <templates>
+          <t t-name="card">
+            <field name="x_avatar_image" display="full" widget="contact_image" options="{'zoom':false,'size':[0,90]}"/>
+            <field name="x_name" class="fw-bold"/>
+            <field name="x_species_id" class="fw-bold"/>
+            <field name="x_breed_id" widget="badge"/>
+            <field name="x_behavior" widget="badge"/>
+            <field name="x_standard_package_ids"/>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+  <record id="x_species_list_view" model="ir.ui.view">
+    <field name="name">x_species.list.view</field>
+    <field name="model">x_species</field>
+    <field name="active" eval="True"/>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+  </record>
+  <record id="x_species_form_view" model="ir.ui.view">
+    <field name="name">x_species.form.view</field>
+    <field name="model">x_species</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <form>
+          <h1>
+            <field name="x_name" required="1" placeholder="Name..."/>
+          </h1>
+        <notebook>
+          <page string="Details" name="lines">
+            <field name="x_species_line_ids"/>
+          </page>
+        </notebook>
+      </form>
+    </field>
+  </record>
+  <record id="x_species_search_view" model="ir.ui.view">
+    <field name="name">x_species_id.search.view</field>
+    <field name="model">x_species</field>
+    <field name="active" eval="True"/>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_species" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+  </record>
+  <record id="x_species_line_list_view" model="ir.ui.view">
+    <field name="name">x_species_line.list.view</field>
+    <field name="model">x_species_line</field>
+    <field name="active" eval="True"/>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <list editable="bottom">
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+  </record>
+  <record id="x_species_line_form_view" model="ir.ui.view">
+    <field name="name">x_species_line.form.view</field>
+    <field name="model">x_species_line</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <form>
+        <h1>
+          <field name="x_name" required="1" placeholder="Name..."/>
+        </h1>
+      </form>
+    </field>
+  </record>
+  <record id="x_species_line_search_view" model="ir.ui.view">
+    <field name="name">x_species_line.search.view</field>
+    <field name="model">x_species_line</field>
+    <field name="active" eval="True"/>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+  </record>
+  <record id="sale_order_form_customization" model="ir.ui.view">
+    <field name="name">sale.order.form customization</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="mode">extension</field>
+    <field name="model">sale.order</field>
+    <field name="active" eval="True"/>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='partner_shipping_id']" position="after">
+          <field name="x_pet_ids" widget="many2many_tags"/>
+        </xpath>
+        <xpath expr="//div[@name='button_box']/button[@name='action_view_calendar_events']" position="replace">
+          <button name="%(action_window_calendar_event)d" class="oe_stat_button" icon="fa-calendar" type="action">
+            <field widget="statinfo" name="x_meeting_count" string="Meetings"/>
+          </button>
+        </xpath>
+      </data>
+    </field>
+  </record>
+  <record id="res_partner_form_customization" model="ir.ui.view">
+    <field name="name">res.partner.form customization</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="mode">extension</field>
+    <field name="model">res.partner</field>
+    <field name="active" eval="True"/>
+    <field name="priority">200</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <xpath expr="//notebook/page[@name='contact_addresses']" position="before">
+        <page string="Pets" name="pets_page">
+          <field name="x_linked_pet_ids"/>
+      </page>
+      </xpath>
+    </field>
+  </record>
+  <record id="calendar_event_form_customization" model="ir.ui.view">
+    <field name="name">calendar.event.form customization</field>
+    <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
+    <field name="mode">extension</field>
+    <field name="model">calendar.event</field>
+    <field name="active" eval="True"/>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <div name="button_box" class="oe_button_box">
+        <button name="%(action_window_sale_order_server_action)d" class="oe_stat_button" icon="fa-dollar" type="action">
+          <field widget="statinfo" name="x_sale_order_count" string="Sales Order"/>
+        </button>
+      </div>
+      <xpath expr="//page[@name='notes']" position="before">
+        <page string="Pets">
+          <field name="x_pet_ids">
+            <list>
+              <field name="x_sequence" widget="handle"/>
+              <field name="x_name"/>
+              <field name="x_species_id" optional="show"/>
+              <field name="x_breed_id" optional="show"/>
+              <field name="x_gender" optional="show"/>
+              <field name="x_standard_package_ids" optional="show" widget="many2many_tags"/>
+              <field name="x_user_id" optional="show" widget="many2one_avatar_user"/>
+              <button name="%(ir_actions_server_view_button)d" type="action" string="View"/>
+            </list>
+          </field>
+        </page>
+      </xpath>
+    </field>
+  </record>
+  <record id="sale_order_list_customization" model="ir.ui.view">
+    <field name="name">sale.order.list customization</field>
+    <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
+    <field name="mode">extension</field>
+    <field name="model">sale.order</field>
+    <field name="active" eval="True"/>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='partner_id']" position="after">
+        <field name="x_pet_ids" optional="show" widget="many2many_tags"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>
