@@ -4,9 +4,8 @@
     'author': 'Odoo S.A.',
     'depends': [
         'base_industry_data',
-        'industry_fsm_sale',
         'knowledge',
-        'planning',
+        'planning_field_service_sale_timesheet',
         'pos_restaurant',
         'sale_crm',
     ],

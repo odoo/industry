@@ -1,11 +1,12 @@
 {
     'name': 'Machine & Tools Rental',
+    'version': '1.1',
     'category': 'Construction',
     'author': 'Odoo S.A.',
     'depends': [
         'base_industry_data',
-        'industry_fsm_sale_report',
         'knowledge',
+        'planning_field_service_sale_worksheet',
         'purchase',
         'quality_control',
         'sale_crm',

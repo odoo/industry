@@ -3,8 +3,8 @@
     'category': 'Services',
     'depends': [
         'hr',
-        'industry_fsm',
         'knowledge',
+        'planning_field_service',
         'project_sale_subscription',
         'sale_timesheet',
         'web_studio',
@@ -14,14 +14,10 @@
     ],
     'data': [
         'data/res_config_settings.xml',
-        'data/ir_model.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
-        'data/qweb_view.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_ui_menu.xml',
-        'data/ir_model_access.xml',
-        'data/ir_rule.xml',
         'data/worksheet_template.xml',
         'data/account_analytic_account.xml',
         'data/project_task_type.xml',
@@ -61,7 +57,6 @@
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
-        "data/qweb_view.xml",
         "data/website_view.xml",
         "static/src/js/my_tour.js",
         "demo/website_view.xml",
