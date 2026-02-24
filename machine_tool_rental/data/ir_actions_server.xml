@@ -28,7 +28,7 @@ for task in records: task['x_run_time_meter_when_done'] = task.x_serial_id.x_run
         <field name="code"><![CDATA[
 for maintenance_rule in env['x_recurring_maintenance_rules'].search([('x_active', '=', True)]):
     for serial in maintenance_rule.x_product_id.x_serial_ids:
-        tasks = env['project.task'].search([('is_fsm', '=', True), ('x_serial_id', '=', serial.id), ('x_recurring_maintenance_rule_id', '=', maintenance_rule.id)])
+        tasks = env['project.task'].search([('x_serial_id', '=', serial.id), ('x_recurring_maintenance_rule_id', '=', maintenance_rule.id)])
         last_maintenance = max(tasks.filtered(lambda t: t.state == '1_done').mapped('x_run_time_meter_when_done'), default=0.0)
         on_maintenance = len(tasks.filtered(lambda t: t.state not in ['1_done', '1_canceled'])) > 0
         if not on_maintenance and serial.x_run_time_meter_h - last_maintenance >= maintenance_rule.x_run_time_increment_h:
@@ -39,8 +39,7 @@ for maintenance_rule in env['x_recurring_maintenance_rules'].search([('x_active'
                 'under_warranty': True,
                 'x_maintenance': 'recurrent',
                 'x_recurring_maintenance_rule_id': maintenance_rule.id,
-                'is_fsm': True,
-                'project_id': env.ref('industry_fsm.fsm_project').id,
+                'project_id': env.ref('planning_field_service_sale_timesheet.fsm_project').id,
             })
     ]]></field>
     </record>
@@ -109,8 +108,7 @@ for record in records:
             'x_serial_id': lot.id,
             'partner_id': record.picking_id.partner_id.id,
             'under_warranty': True,
-            'is_fsm': True,
-            'project_id': env.ref('industry_fsm.fsm_project').id,
+            'project_id': env.ref('planning_field_service_sale_timesheet.fsm_project').id,
             'x_maintenance': 'corrective',
         })
         ]]></field>
