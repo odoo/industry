@@ -5,8 +5,8 @@
     'depends': [
         'account_followup',
         'helpdesk_repair',
-        'industry_fsm_sale',
         'knowledge',
+        'planning_field_service_sale_timesheet',
         'purchase_stock',
         'sale_crm',
         'sale_purchase',

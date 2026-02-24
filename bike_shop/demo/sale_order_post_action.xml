@@ -6,12 +6,12 @@
 
     <function model="project.task" name="write">
         <value model="project.task" eval="obj().env.ref('bike_shop.sale_order_line_3').task_id.id"/>
-        <value eval="{'priority': '1' ,'stage_id': ref('industry_fsm.planning_project_stage_0'), 'tag_ids': [ref('project_tags_1'), ref('project_tags_2')]}"/>
+        <value eval="{'priority': '1' ,'stage_id': ref('planning_field_service_sale_timesheet.planning_project_stage_0'), 'tag_ids': [ref('project_tags_1'), ref('project_tags_2')]}"/>
     </function>
 
     <function model="project.task" name="write">
         <value model="sale.order.line" eval="obj().env.ref('bike_shop.sale_order_line_7').task_id.id"/>
-        <value eval="{'under_warranty': '1', 'stage_id': ref('industry_fsm.planning_project_stage_2'), 'tag_ids': [ref('project_tags_4'), ref('project_tags_3')]}"/>
+        <value eval="{'stage_id': ref('project_task_type_1'), 'tag_ids': [ref('project_tags_4'), ref('project_tags_3')]}"/>
     </function>
 
     <function model="sale.order.line" name="write">
@@ -21,16 +21,32 @@
 
     <function model="project.task" name="write">
         <value model="project.task" eval="obj().env.ref('bike_shop.sale_order_line_8').task_id.id"/>
-        <value eval="{'under_warranty': '1', 'planned_date_begin': datetime.now() - relativedelta(days=1), 'date_deadline': datetime.now(), 'stage_id': ref('industry_fsm.planning_project_stage_3')}"/>
+        <value eval="{'planned_date_begin': datetime.now() - relativedelta(days=1), 'date_deadline': datetime.now(), 'stage_id': ref('planning_field_service_sale_timesheet.planning_project_stage_3'), 'state': '1_done'}"/>
     </function>
 
     <function model="project.task" name="write">
         <value model="project.task" eval="obj().env.ref('bike_shop.sale_order_line_10').task_id.id"/>
-        <value eval="{'under_warranty': '1', 'task_properties': {'serial_number_id': ref('stock_lot_19')}}"/>
+        <value eval="{'task_properties': {'serial_number_id': ref('stock_lot_19')}}"/>
     </function>
 
-    <function model="project.task" name="action_fsm_validate">
-        <value model="project.task" eval="obj().env.ref('bike_shop.sale_order_line_8').task_id.id"/>
+    <record id="planning_slot_1" model="planning.slot">
+        <field name="sale_line_id" ref="sale_order_line_7"/>
+        <field name="worksheet_template_id" ref="worksheet_template"/>
+        <field name="under_warranty" eval="True"/>
+    </record>
+    <record id="planning_slot_3" model="planning.slot">
+        <field name="sale_line_id" ref="sale_order_line_8"/>
+        <field name="worksheet_template_id" ref="worksheet_template"/>
+        <field name="under_warranty" eval="True"/>
+    </record>
+    <record id="planning_slot_2" model="planning.slot">
+        <field name="sale_line_id" ref="sale_order_line_10"/>
+        <field name="worksheet_template_id" ref="worksheet_template"/>
+        <field name="under_warranty" eval="True"/>
+    </record>
+
+    <function model="planning.slot" name="action_complete">
+        <value model="sale.order.line" eval="ref('planning_slot_3')"/>
     </function>
 
     <function model="stock.picking" name="button_validate" context="{'skip_sms': True}">

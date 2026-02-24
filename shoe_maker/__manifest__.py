@@ -1,11 +1,12 @@
 {
     'name': 'Shoemaker',
+    'version': '1.1',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
         'base_industry_data',
-        'industry_fsm_stock',
         'knowledge',
+        'planning_field_service_sale_stock',
         'pos_sale',
         'purchase',
         'sale_management',

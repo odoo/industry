@@ -151,7 +151,7 @@
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook[1]" position="inside">
-                <page string="Serials" name="serials_page" invisible="not is_fsm">
+                <page string="Serials" name="serials_page">
                     <field name="x_serials" context="{'search_default_partner_ids': partner_id}">
                         <list string="Lots/Serial Numbers">
                             <field name="name" decoration-bf="1" string="Serial Number" help="Unique Serial Number"/>
@@ -168,9 +168,9 @@
             </xpath>
         </field>
     </record>
-    <record id="industry_fsm.project_task_list_view" model="ir.ui.view" forcecreate="1">
+    <record id="project_task_list_view" model="ir.ui.view" forcecreate="1">
         <field name="name">HVAC list view for project task</field>
-        <field name="inherit_id" ref="industry_fsm.project_task_view_list_fsm"/>
+        <field name="inherit_id" ref="project.view_task_tree2"/>
         <field name="mode">extension</field>
         <field name="model">project.task</field>
         <field name="priority">9990</field>
@@ -186,17 +186,6 @@
             <xpath expr="//field[@name='date_deadline']" position="attributes">
                 <attribute name="optional">show</attribute>
             </xpath>
-        </field>
-    </record>
-    <record id="project_task_list_view" model="ir.ui.view">
-        <field name="name">HVAC list view for project task</field>
-        <field name="inherit_id" ref="project.view_task_tree2"/>
-        <field name="mode">extension</field>
-        <field name="model">project.task</field>
-        <field name="priority">160</field>
-        <field name="type">list</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
             <xpath expr="//list[1]" position="attributes">
                 <attribute name="default_group_by"/>
                 <attribute name="default_order">planned_date_begin desc</attribute>
@@ -208,83 +197,6 @@
                 <attribute name="optional">show</attribute>
             </xpath>
         </field>
-    </record>
-    <record id="x_project_task_worksheet_template_form_view" model="ir.ui.view">
-        <field name="model">x_project_task_worksheet_template</field>
-        <field name="name">template_view_INST/MAIN/REPA_Worksheet</field>
-        <field name="type">form</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <form create="false" duplicate="false">
-                <sheet>
-                    <h1 invisible="context.get('default_x_project_task_id')">
-                        <field name="x_project_task_id"/>
-                    </h1>
-                    <group>
-                        <field name="x_operation" widget="selection_badge" required="True"/>
-                        <field name="x_date" string="Date" required="True"/>
-                    </group>
-                    <group string="Repair" invisible="x_operation != &quot;Repair&quot;">
-                        <field name="x_primary_root_cause"/>
-                        <field name="x_root_cause_comments" help="Provide details if additional root cause led to the repair operation"/>
-                    </group>
-                    <group string="Refrigerant">
-                        <field name="x_refrigerant_product" 
-                            domain="[('x_is_refrigerant', '!=', False)]" 
-                            required="x_removed_refrigerant != 0 or x_added_refrigerant != 0"/>
-                        <field name="x_removed_refrigerant" invisible="x_operation == &quot;Installation&quot;"/>
-                        <field name="x_added_refrigerant"/>
-                    </group>
-                    <group string="Conformity">
-                        <field name="x_product_is_functional" string="Product is functional after operation"/>
-                        <field name="x_comments" placeholder="Add details about your intervention..."/>
-                        <field widget="signature" name="x_worker_signature" force_save="0" readonly="False" required="True"/>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-    <record id="x_project_task_worksheet_template_list_view" model="ir.ui.view">
-        <field name="model">x_project_task_worksheet_template</field>
-        <field name="name">list_view_INST/MAIN/REPA_Worksheet</field>
-        <field name="type">list</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <list default_order="create_date DESC">
-                <field name="create_date"/>
-                <field name="x_name"/>
-            </list>
-        </field>
-    </record>
-    <record id="x_project_task_worksheet_template_pivot_view" model="ir.ui.view">
-        <field name="model">x_project_task_worksheet_template</field>
-        <field name="name">Default pivot view for x_project_task_worksheet_template</field>
-        <field name="type">pivot</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <pivot string="Refrigerant Consumption">
-                <field name="x_added_refrigerant" type="measure"/>
-                <field name="x_removed_refrigerant" type="measure"/>
-                <field name="x_refrigerant_product" type="col"/>
-                <field name="x_date" interval="month" type="row"/>
-            </pivot>
-        </field>
-    </record>
-    <record id="x_project_task_worksheet_template_search_view" model="ir.ui.view">
-        <field name="name">search_view_INST/MAIN/REPA_Worksheet</field>
-        <field name="model">x_project_task_worksheet_template</field>
-        <field name="type">search</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <search>
-                <field name="x_name"/>
-                <filter string="Created on" date="create_date" name="create_date"/>
-                <filter name="group_by_month" string="Created on" context="{'group_by': 'create_date:month'}"/>
-            </search>
-        </field>
-    </record>
-    <record id="x_project_task_worksheet_template_ir_actions_get_worksheets" model="ir.actions.act_window">
-        <field name="search_view_id" ref="x_project_task_worksheet_template_search_view"/>
     </record>
     <record id="x_new_devices_view_form" model="ir.ui.view">
         <field name="name">x.new.devices.view.form</field>
