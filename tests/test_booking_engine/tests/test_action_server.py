@@ -31,6 +31,12 @@ class BookingEngineAutomationsTestCase(TransactionCase):
             'planning_role_id': cls.room_role.id,
             'rent_ok': True,
         })
+        cls.room_offer_template = cls.env['product.template'].create({
+            'name': 'Room Offer Template',
+            'type': 'service',
+            'sale_ok': True,
+            'x_is_a_room_offer': True,
+        })
 
     def _create_sale_line(self):
         order = self.env['sale.order'].with_context(in_rental_app=True).create({
@@ -93,6 +99,10 @@ class BookingEngineAutomationsTestCase(TransactionCase):
             microsecond=0,
         )
         return expected_start, expected_end
+
+    def _create_room_offer_product(self, name):
+        product = self.room_offer_template.copy({'name': name})
+        return product, product.planning_role_id
 
     def test_industry_fix_slot_times_server_action(self):
         """Test for the industry_fix_slot_times server action."""
@@ -158,14 +168,7 @@ class BookingEngineAutomationsTestCase(TransactionCase):
                          "The automation should align rental_return_date to the return time on write")
 
     def test_automation_create_role_on_room_offer_create(self):
-        product = self.env['product.template'].create({
-            'name': 'Test Room Offer',
-            'type': 'service',
-            'sale_ok': True,
-            'x_is_a_room_offer': True,
-        })
-
-        role = product.planning_role_id
+        product, role = self._create_room_offer_product('Test Room Offer')
         self.assertTrue(role, "A planning role should be created for a room offer product")
         self.assertEqual(role.name, product.name,
                          "The planning role should be created with the product name")
@@ -177,34 +180,75 @@ class BookingEngineAutomationsTestCase(TransactionCase):
                       "The planning role should be linked to the product")
 
     def test_automation_edit_role_name_on_room_offer_edit(self):
-        product = self.env['product.template'].create({
-            'name': 'Room Offer Original',
-            'type': 'service',
-            'sale_ok': True,
-            'x_is_a_room_offer': True,
-        })
-        role = product.planning_role_id
+        product, role = self._create_room_offer_product('Room Offer Original')
         self.assertTrue(role, "A planning role should exist for a room offer product")
-
         new_name = 'Room Offer Updated'
         product.write({'name': new_name})
-        role.invalidate_cache()
 
         self.assertEqual(role.name, new_name,
                          "The planning role name should update when the product name changes")
 
     def test_automation_delete_role_on_room_offer_delete(self):
-        product = self.env['product.template'].create({
-            'name': 'Room Offer To Delete',
-            'type': 'service',
-            'sale_ok': True,
-            'x_is_a_room_offer': True,
-        })
-        role = product.planning_role_id
+        product, role = self._create_room_offer_product('Room Offer To Delete')
         self.assertTrue(role, "A planning role should exist for a room offer product")
 
-        role_id = role.id
         product.unlink()
 
-        self.assertFalse(self.env['planning.role'].browse(role_id).exists(),
+        self.assertFalse(self.env['planning.role'].browse(role.id).exists(),
                          "The planning role should be deleted when the product is deleted")
+
+    def test_automation_set_resources_occupied_on_check_in(self):
+        order, sale_line = self._create_sale_line()
+        print('at this stage order.rental_status is draft')
+
+        resource = self.env['resource.resource'].create({
+            'name': 'Room Resource',
+            'resource_type': 'material',
+            'default_role_id': self.room_role.id,
+            'role_ids': [Command.link(self.room_role.id)],
+        })
+        self.env['planning.slot'].create({
+            'role_id': self.room_role.id,
+            'resource_id': resource.id,
+            'sale_line_id': sale_line.id,
+            'start_datetime': datetime(2026, 2, 1, 12, 0),
+            'end_datetime': datetime(2026, 2, 2, 12, 0),
+        })
+        order.action_confirm()
+        print('at this stage  order.rental_status is pickup')
+
+        sale_line.write({'qty_delivered': 1.0})
+        print('at this stage  order.rental_status is return')
+
+
+        self.assertEqual(order.rental_status, 'return',
+                         "Test precondition: rental_status should be 'return' after pickup")
+        self.assertEqual(resource.x_occupancy, 'occupied',
+                         "The automation should mark room resources as occupied on check in")
+
+    def test_automation_set_resources_vacant_on_check_out(self):
+        order, sale_line = self._create_sale_line()
+
+        resource = self.env['resource.resource'].create({
+            'name': 'Room Resource',
+            'resource_type': 'material',
+            'default_role_id': self.room_role.id,
+            'role_ids': [Command.link(self.room_role.id)],
+            'x_occupancy': 'occupied',
+        })
+        self.env['planning.slot'].create({
+            'role_id': self.room_role.id,
+            'resource_id': resource.id,
+            'sale_line_id': sale_line.id,
+            'start_datetime': datetime(2026, 2, 1, 12, 0),
+            'end_datetime': datetime(2026, 2, 2, 12, 0),
+        })
+        order.action_confirm()
+
+        sale_line.write({'qty_delivered': 1.0})
+        sale_line.write({'qty_returned': 1.0})
+
+        self.assertEqual(order.rental_status, 'returned',
+                         "Test precondition: rental_status should be 'returned' after return")
+        self.assertEqual(resource.x_occupancy, 'vacant',
+                         "The automation should mark room resources as vacant on check out")
