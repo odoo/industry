@@ -25,7 +25,7 @@ class IndustryUtils:
         return output
 
     def get_manifest(self, industry: str):
-        return str(self.industry_path) + industry + '/__manifest__.py'
+        return str(self.industry_path) + '/' + industry + '/__manifest__.py'
 
     def is_industry(self, module: str):
         return os.path.exists(self.get_manifest(module))
