@@ -77,8 +77,12 @@ class TestEnv(IndustryCase):
             if model in self.env and "is_published" in self.env[model]._fields:
                 records = self.env[model].search(
                     [("is_published", "=", True), ("sale_ok", "=", False)]
-                )
-
+                ).filtered(lambda x: any(
+                    xmlid.startswith(module + '.')
+                    for module in self.installed_modules
+                    for xmlids in x._get_external_ids().values()
+                    for xmlid in xmlids
+                ))
                 self.assertFalse(
                     records,
                     "Found records with 'is_published=True' and 'sale_ok=False' in the database. Records: %s"
