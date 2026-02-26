@@ -8,7 +8,7 @@
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='create_variant']" position="after">
-                <field name="x_is_convert_attribute"/>
+                <field name="x_is_convert_attribute" invisible="create_variant == 'no_variant'"/>
             </xpath>
         </field>
     </record>
@@ -24,16 +24,28 @@
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
-            <xpath expr="//list/field[@name='forecast_availability']" position="after">
+            <xpath expr="//header" position="inside">
                 <button name="%(action_convert_product_wizard)d"
                     string="Convert"
                     type="action"
                     invisible="not x_show_convert"
                     context="{
-                        'default_x_product_id': product_id,
-                        'default_x_move_id': id,
+                        'default_x_picking_id': id,
                     }"
                 />
+            </xpath>
+            <xpath expr="//button[@name='action_detailed_operations']" position="before">
+                <button name="%(action_stock_picking_view_conversions)d" type="action"
+                    class="oe_stat_button" icon="fa-exchange" invisible="not x_conversion_count">
+                    <div class="o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="x_conversion_count"/>
+                        </span>
+                        <span class="o_stat_text">
+                            Conversions
+                        </span>
+                    </div>
+                </button>
             </xpath>
         </field>
     </record>
@@ -70,7 +82,10 @@
             <form string="Convert Product" create="false" edit="false">
                 <group>
                     <field name="x_move_id" invisible="True"/>
-                    <field name="x_product_id" string="Product to Convert" readonly="x_product_id" required="True"/>
+                    <field name="x_product_id" string="Product to Convert" 
+                        readonly="not x_picking_id" 
+                        required="True"
+                        domain="[('id', 'in', x_convertable_product_ids)]"/>
                     <field name="x_quant_id" string="Pick From"
                         domain="[('product_id', '=', x_product_id), ('location_id', 'child_of', x_move_location_id)]"
                         options="{'no_create': True, 'no_open': True}"
@@ -102,6 +117,12 @@
                             'search_default_same_template_products': 1,
                             'list_view_ref': 'product_conversion.view_product_product_tree_convert',
                         }"
+                    />
+                </group>
+                <group invisible="not x_show_destination_location">
+                    <field name="x_destination_location_id" string="Destination Location"
+                        domain="[('usage', '=', 'internal')]"
+                        placeholder="Same as source location if empty."
                     />
                 </group>
                 <footer>
