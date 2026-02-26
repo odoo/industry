@@ -1,5 +1,6 @@
 {
     'name': 'Product Conversion & Grading Management',
+    'version': '1.1',
     'category': 'Inventory',
     'depends': [
         'mrp',
@@ -12,9 +13,20 @@
         'data/ir_actions_server.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
+        'data/base_automation.xml',
+        'data/ir_attachment_pre.xml',
     ],
     'demo': [
         'demo/res_users.xml',
+    ],
+    'assets': {
+        'web.assets_backend': [
+            'product_conversion/static/src/js/barcode_picking_model.js',
+            'product_conversion/static/src/xml/main.xml',
+        ]
+    },
+    "cloc_exclude": [
+        "static/src/xml/main.xml",
     ],
     'license': 'OEEL-1',
     'images': ['images/main.png'],
