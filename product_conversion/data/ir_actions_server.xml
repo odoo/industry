@@ -16,10 +16,11 @@ for wizard in records:
         'product_qty': wizard.x_quantity,
         'product_uom_id': wizard.x_product_convert_into.uom_id.id,
         'location_src_id': wizard.x_quant_id.location_id.id,
-        'location_dest_id': wizard.x_quant_id.location_id.id,
+        'location_dest_id': wizard.x_destination_location_id.id or wizard.x_quant_id.location_id.id,
         'origin': move.reference or move.picking_id.name if move else wizard.x_quant_id.display_name,
         'user_id': env.user.id,
         'bom_id': False,
+        'x_picking_id': move.picking_id.id if move else False,
     })
     move_raw = env['stock.move'].create({
         'product_id': wizard.x_product_id.id,
@@ -100,6 +101,43 @@ action['context'] = {
     'default_x_quant_id': quant.id,
     'default_x_quantity': quant.quantity,
 }
+        ]]></field>
+    </record>
+    <record id="action_stock_picking_view_conversions" model="ir.actions.server">
+        <field name="name">View Conversions</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if not records or len(records) != 1:
+    raise UserError("This action is limited to a single operation.")
+
+picking = records[0]
+mos = picking.x_conversions
+
+if len(mos) == 1:
+    action = {
+        'type': 'ir.actions.act_window',
+        'name': 'Conversion',
+        'res_model': 'mrp.production',
+        'view_mode': 'form',
+        'res_id': mos.id,
+        'target': 'current',
+    }
+else:
+    action = env['ir.actions.act_window']._for_xml_id('mrp.mrp_production_action')
+    action['domain'] = [('id', 'in', mos.ids)]
+    action['context'] = {'search_default_todo': 0}
+        ]]></field>
+    </record>
+    <record id="action_reset_convert_attribute" model="ir.actions.server">
+        <field name="name">Reset Convert Attribute</field>
+        <field name="model_id" ref="product.model_product_attribute"/>
+        <field name="state">code</field>
+        <field name="binding_model_id" ref="product.model_product_attribute"/>
+        <field name="code"><![CDATA[
+for record in records:
+    if record.create_variant == 'no_variant':
+        record.write({'x_is_convert_attribute': False})
         ]]></field>
     </record>
 </odoo>
