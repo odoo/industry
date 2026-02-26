@@ -161,7 +161,7 @@ for wi in records:
         'service_policy': "delivered_manual",
         'list_price': wi.x_unit_price,
         'standard_price': wi.x_unit_cost,
-        'uom_id': wi.x_unit_id.id,
+        'uom_id': wi.x_unit_custom_id.id,
     })
     wi.write({'x_product_id': new_product.id})
 ]]></field>
@@ -178,13 +178,14 @@ if record.x_sale_order_line_id:
     })
 elif record.x_targeted_so_id:
     env['ir.actions.server'].browse(env.ref('construction_developer.server_action_create_product_for_wi').id).run()
-    env['sale.order.line'].create({
+    sol = env['sale.order.line'].create({
         'order_id': record.x_targeted_so_id.id,
         'product_id': record.x_product_id.id,
         'price_unit': record.x_unit_price,
         'purchase_price': record.x_unit_cost,
         'x_line_work_item_id': record.id,
     })
+    record.write({'x_sale_order_line_id': sol.id})
 ]]></field>
     </record>
     <record id="server_action_create_associated_work_item" model="ir.actions.server">
