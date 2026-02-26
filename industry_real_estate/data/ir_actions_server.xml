@@ -2,16 +2,16 @@
 <odoo>
     <record id="action_create_invoice_meters" model="ir.actions.server">
         <field name="name">Create Invoice for Meter Readings</field>
-        <field name="model_id" ref="analytic.model_account_analytic_account"/>
+        <field name="model_id" ref="property_assets_distribution.model_x_property"/>
         <field name="state">code</field>
         <field name="code">
 <![CDATA[
-for analytic_account in records:
-    meter_readings = analytic_account.x_property_meter_reading_ids.filtered(lambda l: not l.x_invoice_id and l.x_usage > 0)
+for property in records:
+    meter_readings = property.x_meter_reading_ids.filtered(lambda l: not l.x_invoice_id and l.x_usage > 0)
     if meter_readings:
         invoice = env['account.move'].create({
             'move_type': 'out_invoice',
-            'partner_id': analytic_account.x_rental_contract_id.partner_id.id,
+            'partner_id': property.x_rental_contract_id.partner_id.id,
         })
         for meter_reading in meter_readings:
             env['account.move.line'].create({
@@ -19,7 +19,7 @@ for analytic_account in records:
                 'price_unit': meter_reading.x_meter_id.x_price,
                 'name': str(meter_reading.x_date) + ' - ' + meter_reading.x_description if meter_reading.x_description else meter_reading.x_date,
                 'quantity' : meter_reading.x_usage,
-                'analytic_distribution': {analytic_account.id: 100},
+                'x_property_id': property.id,
             })
         meter_readings['x_invoice_id'] = invoice.id
         action = env['ir.actions.act_window']._for_xml_id('account.action_move_out_invoice_type')
@@ -29,23 +29,46 @@ for analytic_account in records:
         </field>
     </record>
 
-    <record id="action_server_set_usage_meter_reading" model="ir.actions.server" >
-        <field name="name">Meter Reading</field>
-        <field name="model_id" ref="model_meter_reading"/>
+    <record id="action_view_invoice" model="ir.actions.server">
+        <field name="name">View Invoices</field>
+        <field name="model_id" ref="property_assets_distribution.model_x_property"/>
         <field name="state">code</field>
-        <field name="base_automation_id" ref="automation_set_usage_meter_reading"/>
-        <field name="code"><![CDATA[
-mrs = env['x_meter_reading'].search([
-    ('id', 'in', record.x_account_analytic_account_id.x_property_meter_reading_ids.ids),
-    ('x_meter_id', '=', record.x_meter_id.id)], order='x_date')
-previous_mr = False
-for mr in mrs:
-    if previous_mr:
-        mr['x_usage'] = mr['x_quantity'] - previous_mr['x_quantity']
-    else :
-        mr['x_usage'] = 0
-    previous_mr = mr
-]]>
+        <field name="code">
+action = env['ir.actions.act_window']._for_xml_id('account.action_move_out_invoice_type')
+if records:
+    action['domain'] = [('line_ids.x_property_id', 'in', records.ids), ('move_type', '=', 'out_invoice')]
+else:
+    action['domain'] = [('id', '=', False)]
+action['context'] = {'default_move_type': 'out_invoice'}
+if len(records) == 1:
+    action['context']['default_line_ids'] = [(0, 0, {'x_property_id': records.id})]
+        </field>
+    </record>
+
+    <record id="action_view_vendor_bill" model="ir.actions.server">
+        <field name="name">View Vendor Bills</field>
+        <field name="model_id" ref="property_assets_distribution.model_x_property"/>
+        <field name="state">code</field>
+        <field name="code">
+action = env['ir.actions.act_window']._for_xml_id('account.action_move_in_invoice_type')
+if records:
+    action['domain'] = [('line_ids.x_property_id', 'in', records.ids), ('move_type', '=', 'in_invoice')]
+else:
+    action['domain'] = [('id', '=', False)]
+action['context'] = {'default_move_type': 'in_invoice'}
+if len(records) == 1:
+    action['context']['default_line_ids'] = [(0, 0, {'x_property_id': records.id})]
+        </field>
+    </record>
+
+    <record id="subscriptions_action" model="ir.actions.server">
+        <field name="name">View Subscriptions</field>
+        <field name="model_id" ref="property_assets_distribution.model_x_property"/>
+        <field name="state">code</field>
+        <field name="code">
+action = env['ir.actions.act_window']._for_xml_id('sale.action_orders')
+action['domain'] = [('x_property_id', 'in', records.ids), ('is_subscription', '=', True)]
+action['context'] = {'default_is_subscription': True}
         </field>
     </record>
 </odoo>

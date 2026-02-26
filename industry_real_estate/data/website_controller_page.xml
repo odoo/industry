@@ -19,7 +19,7 @@
                                 </span>
                             </button>
                             </div>
-                            <input name="order" type="hidden" class="o_search_order_by" t-att-value="order_by if order_by else 'name asc'"/>
+                            <input name="order" type="hidden" class="o_search_order_by" t-att-value="order_by if order_by else 'x_name asc'"/>
                         </form>
                         <t t-call="website_studio.listing_layout_switcher"/>
                         </div>
@@ -55,7 +55,7 @@
     </template>
 
     <template id="website_listing_details_account_analytic_account" name="Properties">
-        <t t-set="additional_title"><t t-esc="record.name"/></t>
+        <t t-set="additional_title"><t t-esc="record.x_name"/></t>
         <t t-call="website.layout">
             <div id="o_website_record_page wrap">
             <div class="oe_structure oe_new" data-editor-message="Drag building blocks to customize the header of single record pages."/>
@@ -73,7 +73,7 @@
                 <div class="d-flex flex-row my-4 flex-wrap align-items-center justify-content-between">
                     <div class="col-lg-4 mt-lg-4 col-sm-12">
                         <h1 class="h1"><span t-field="record.display_name"/></h1>
-                        <p class="o_website_monetary" t-field="record.sudo().x_property_building_id.x_name"/>
+                        <p class="o_website_monetary" t-field="record.sudo().x_building.x_name"/>
                         <div class="o_website_html mb-3" t-field="record.x_website_description"
                             data-editor-message="Drag building blocks to edit the website description of this record."/>
                     </div>
@@ -100,14 +100,11 @@
 
     <record id="website_controller_page_1" model="website.controller.page">
         <field name="name">Properties</field> <!-- page title -->
-        <field name="model_id" ref="analytic.model_account_analytic_account"/>
+        <field name="model_id" ref="property_assets_distribution.model_x_property"/>
         <field name="website_id" ref="website.default_website"/>
         <field name="website_published" eval="True"/>
         <field name="view_id" ref="website_listing_account_analytic_account"/>
         <field name="record_view_id" ref="website_listing_details_account_analytic_account"/>
-        <field name="record_domain" eval="[
-            ('x_is_property', '=', True),
-            ('x_is_published', '=', True)
-        ]"/>
+
     </record>
 </odoo>

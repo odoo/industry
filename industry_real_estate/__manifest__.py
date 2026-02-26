@@ -1,6 +1,6 @@
 {
     'name': 'Property Management',
-    'version': '1.2',
+    'version': '2.0',
     'category': 'Services',
     'depends': [
         'base_automation',
@@ -9,16 +9,13 @@
         'crm_iap_mine',
         'knowledge',
         'project_sale_subscription',
+        'property_assets_distribution',
         'sale_crm',
         'website_crm',
         'website_studio',
     ],
     'data': [
-        'data/account_analytic_plan.xml',
-        'data/ir_default.xml',
-        'data/ir_model.xml',
         'data/ir_model_fields.xml',
-        'data/ir_model_2.xml',
         'data/crm_stages.xml',
         'data/res_config_setting.xml',
         'data/ir_attachment_pre.xml',
@@ -31,7 +28,6 @@
         'data/ir_attachment_post.xml',
         'data/ir_model_access.xml',
         'data/ir_rule.xml',
-        'data/base_automation.xml',
         'data/ir_actions_server.xml',
         'data/website_controller_page.xml',
         'data/ir_ui_views.xml',
@@ -46,8 +42,7 @@
     ],
     'demo': [
         'demo/res_users.xml',
-        'demo/x_buildings.xml',
-        'demo/account_analytic_account.xml',
+        'demo/x_property.xml',
         'demo/ir_attachment.xml',
         'demo/res_partner.xml',
         'demo/crm_tag.xml',

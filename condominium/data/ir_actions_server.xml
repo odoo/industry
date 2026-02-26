@@ -86,17 +86,6 @@ else:
 records.action_confirm()
 ]]>        </field>
     </record>
-    <record id="action_server_set_usage_meter_reading" model="ir.actions.server">
-        <field name="name">Condominium: Compute Meter Reading Consumption</field>
-        <field name="model_id" ref="model_meter_reading"/>
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-previous_mr = False
-for mr in env['x_meter_reading'].search([('id', 'in', record.x_property.x_meter_reading_ids.ids), ('x_meter_id', '=', record.x_meter_id.id)], order='x_date'):
-    mr['x_usage'] = mr.x_quantity - previous_mr.x_quantity if previous_mr else 0
-    previous_mr = mr
-]]></field>
-    </record>
     <record id="confirm_analytic_account_item_split_action" model="ir.actions.server">
         <field name="name">Confirm Account Analytic Line</field>
         <field name="state">code</field>
@@ -208,27 +197,14 @@ for line in record:
 ]]></field>
         <field name="model_id" ref="model_x_property_owner"/>
         <field name="state">code</field>
-        <field name="name">Condominium: Validate Owner Dates</field>
-        <field name="usage">base_automation</field>
-    </record>
-    <record id="action_validate_property_tenant_dates" model="ir.actions.server">
-        <field name="code"><![CDATA[
-for line in record:
-    if line.x_end_date and line.x_end_date < line.x_start_date: raise UserError("End Date must be empty or after Start Date.")
-    domain = [('id', '!=', line.id), ('x_property_id', '=', line.x_property_id.id), ('x_start_date', '!=', False), '|', ('x_end_date', '=', False), ('x_end_date', '>=', line.x_start_date)]
-    if line.x_end_date: domain.append(('x_start_date', '<=', line.x_end_date))
-    if env['x_property_tenant'].search_count(domain, limit=1): raise UserError("Tenant dates cannot overlap for the same property. Ensure that tenancy periods do not overlap.")
-]]></field>
-        <field name="model_id" ref="model_x_property_tenant"/>
-        <field name="state">code</field>
-        <field name="name">Condominium: Validate Tenant Dates</field>
+        <field name="name">Validate Owner Dates</field>
         <field name="usage">base_automation</field>
     </record>
     <record id="action_archive_related_accounts" model="ir.actions.server">
         <field name="code"><![CDATA[
 record.x_owner_ids.x_account.write({'active': False})
 ]]></field>
-        <field name="model_id" ref="model_x_property"/>
+        <field name="model_id" ref="property_assets_distribution.model_x_property"/>
         <field name="state">code</field>
         <field name="name">Condominium: Archive related accounts</field>
         <field name="usage">base_automation</field>

@@ -1,0 +1,31 @@
+{
+    'name': 'Property Assets & Distribution',
+    'version': '1.0',
+    'category': 'Hidden/Tools',
+    'depends': [
+        'web_studio',
+    ],
+    'data': [
+        'data/ir_model.xml',
+        'data/ir_model_access.xml',
+        'data/ir_model_fields.xml',
+        'data/ir_model_2.xml',
+        'data/ir_default.xml',
+        'data/ir_actions_server.xml',
+        'data/base_automation.xml',
+        'data/ir_ui_view.xml',
+        'data/ir_actions_act_window.xml',
+        'data/x_buildings_tag.xml',
+        'data/x_meters.xml',
+        'data/x_properties_tag.xml',
+        'data/x_properties_types.xml',
+    ],
+    'demo': [
+        'demo/res_partner.xml',
+        'demo/x_buildings.xml',
+        'demo/x_property.xml',
+        'demo/x_meter_reading.xml',
+    ],
+    'license': 'OEEL-1',
+    'author': 'Odoo S.A.',
+}
