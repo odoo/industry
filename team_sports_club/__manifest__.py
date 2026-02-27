@@ -1,6 +1,6 @@
 {
     'name': 'Team Sports Club',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Health and Fitness',
     'author': 'Odoo S.A.',
     'depends': [
@@ -18,8 +18,8 @@
         'sale_project_stock',
         'web_studio',
         'website_appointment_sale_project',
-        'website_crm_partner_assign',
         'website_event_sale',
+        'website_partnership',
         'website_sale_stock',
     ],
     'data': [
