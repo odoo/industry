@@ -256,4 +256,45 @@
             </t>
         </field>
     </record>
+    <template inherit_id='website_sale.cta_wrapper' id="product" name="rename of add to cart">
+        <xpath expr="//a[@id='add_to_cart']" position="replace">
+            <a data-animation-selector=".o_wsale_product_images" role="button" id="interested_in_this_property"
+            t-attf-class="btn btn-primary js_check_product flex-grow-1" href="#Interested-in-this-property"
+            class="btn btn-primary js_check_product flex-grow-1">
+                <i class="fa fa-envelope me-2"/> Contact us
+            </a>
+        </xpath>
+    </template>
+    <template inherit_id='website_sale.product_quantity' id="quantity" name="remove quantity selector">
+        <xpath expr="//div[@id='add_to_cart_wrap']//a[hasclass('css_quantity_minus')]" position="replace"></xpath>
+        <xpath expr="//div[@id='add_to_cart_wrap']//input[@name='add_qty']" position="replace"></xpath>
+        <xpath expr="//div[@id='add_to_cart_wrap']//a[hasclass('css_quantity_plus')]" position="replace"></xpath>
+    </template>
+    <record id="ir_ui_view_3022" model="ir.ui.view">
+        <field name="inherit_id" ref="website_sale.header_cart_link"/>
+        <field name="key">website_sale.header_hide_empty_cart_link</field>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="name">Header Hide Empty Cart link</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+        <field name="arch" type="xml">
+        <xpath expr="//t[@t-set='show_cart']" position="after">
+            <t t-set="show_cart" t-value="website_sale_cart_quantity"/>
+        </xpath>
+        </field>
+    </record>
+
+    <function model="ir.ui.view" name="write">
+        <value eval="[ref('website_sale.product_terms_and_conditions')]" />
+        <value eval="{'active': False}" />
+    </function>
+    <function model="ir.ui.view" name="write">
+        <value eval="[ref('website.header_search_box')]" />
+        <value eval="{'active': False}" />
+    </function>
+    <function model="ir.ui.view" name="write">
+        <value eval="[ref('website_sale.product_picture_magnify_click')]" />
+        <value eval="{'active': True}" />
+    </function>
 </odoo>
