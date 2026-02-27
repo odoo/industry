@@ -307,3 +307,132 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         task.stage_id = self.stage_ready
         self.assertEqual(resource.x_house_keeping_stage_id, self.stage_ready,
                          "Resource cleaning stage should update when task stage changes")
+
+
+    def _create_guest_product(self, adults=2, children=1):
+        attribute = self.env['product.attribute'].create({
+            'name': 'Guest Count',
+            'x_captures_guests': True,
+        })
+        value = self.env['product.attribute.value'].create({
+            'name': f'{adults}A{children}C',
+            'attribute_id': attribute.id,
+            'x_adults': adults,
+            'x_children': children,
+        })
+        product_template = self.env['product.template'].create({
+            'name': 'Guest Product',
+            'type': 'service',
+            'x_is_stay_tax': True,
+            'attribute_line_ids': [Command.create({
+                'attribute_id': attribute.id,
+                'value_ids': [Command.link(value.id)],
+            })],
+        })
+        return product_template.product_variant_id
+
+
+    def test_action_update_city_tax(self):
+        product = self._create_guest_product(adults=2, children=1)
+
+        order = self.env['sale.order'].create({
+            'partner_id': self.partner.id,
+        })
+
+        order_line = self.env['sale.order.line'].create({
+            'order_id': order.id,
+            'product_id': product.id,
+            'product_uom_qty': 1,
+        })
+
+        print(order_line.sequence)
+
+        order.action_confirm()
+        service_product = self.env['product.template'].create({
+            'name': 'Service Product',
+            'type': 'service',
+            'sale_ok': True,
+            'planning_enabled': False,
+            'x_is_a_room_offer': True,
+            'x_has_city_tax': True,
+        })
+        new_role = self.env['planning.role'].create({
+            'name': 'Resource Role',
+            'product_ids': [Command.link(service_product.id)],
+        })
+        new_resource = self.env['resource.resource'].create({
+            'name': 'Resource 1',
+            'resource_type': 'material',
+        })
+        self.env['planning.slot'].create({
+            'role_id': new_role.id,
+            'resource_id': new_resource.id,
+            'sale_line_id': order_line.id,
+            'start_datetime': datetime(2026, 2, 5, 9, 0),
+            'end_datetime': datetime(2026, 2, 6, 9, 0),
+        })
+        city_tax = self.env['x_city_tax'].create({'x_sale_order_id': order.id})
+
+        order_line_sequence = order_line.sequence
+        self.env.ref('booking_engine.update_city_tax_action').with_context(active_id=city_tax.id, active_model='x_city_tax').run()
+
+        stay_tax_lines = order_line.filtered(lambda l: l.product_id.x_is_stay_tax)
+        self.assertEqual(len(stay_tax_lines), 1,
+                         "Server action should create a stay tax line if missing")
+        self.assertEqual(stay_tax_lines.sequence, order_line_sequence + 1,
+                         "Stay tax line sequence should be updated")
+        self.assertEqual(stay_tax_lines.product_uom_qty, city_tax.x_total,
+                         "Stay tax line quantity should match city tax total")
+        self.assertEqual(stay_tax_lines.qty_delivered, city_tax.x_total,
+                         "Stay tax line delivered quantity should match city tax total")
+
+        order_2 = self.env['sale.order'].create({
+            'partner_id': self.partner.id,
+        })
+
+        product.write({'x_is_stay_tax': False})
+
+        order_line_2 = self.env['sale.order.line'].create({
+            'order_id': order_2.id,
+            'product_id': product.id,
+            'product_uom_qty': 1,
+        })
+
+        order_2.action_confirm()
+        service_product_2 = self.env['product.template'].create({
+            'name': 'Service Product',
+            'type': 'service',
+            'sale_ok': True,
+            'planning_enabled': False,
+            'x_is_a_room_offer': True,
+            'x_has_city_tax': True,
+        })
+        new_role_2 = self.env['planning.role'].create({
+            'name': 'Resource Role',
+            'product_ids': [Command.link(service_product_2.id)],
+        })
+        new_resource_2 = self.env['resource.resource'].create({
+            'name': 'Resource 1',
+            'resource_type': 'material',
+        })
+        self.env['planning.slot'].create({
+            'role_id': new_role_2.id,
+            'resource_id': new_resource_2.id,
+            'sale_line_id': order_line_2.id,
+            'start_datetime': datetime(2026, 2, 5, 9, 0),
+            'end_datetime': datetime(2026, 2, 6, 9, 0),
+        })
+        city_tax = self.env['x_city_tax'].create({'x_sale_order_id': order_2.id})
+        self.env.ref('booking_engine.update_city_tax_action').with_context(active_id=city_tax.id, active_model='x_city_tax').run()
+
+        self.assertEqual(len(order_2.order_line), 2,
+                         "Server action should update existing order line")
+        
+        city_tax_order_line = order_2.order_line - order_line_2
+                
+        self.assertEqual(city_tax_order_line.product_id.x_is_stay_tax, True,
+                         "City tax order line product have a x_is_stay_tax true")
+        self.assertEqual(city_tax_order_line.product_uom_qty, city_tax.x_total,
+                         "City tax order line quantity should match city tax total")
+        self.assertEqual(city_tax_order_line.qty_delivered, city_tax.x_total,
+                         "City tax order line delivered quantity should match city tax total") 
