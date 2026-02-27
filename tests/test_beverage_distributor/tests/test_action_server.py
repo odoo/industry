@@ -62,7 +62,6 @@ class ServerActionsTestCase(TransactionCase):
         })
         cls.product_uom = cls.env['uom.uom'].create({
             'name': 'Unit of Measure 1',
-            'rounding': 0.01
         })
         cls.manfacturing_order = cls.env['mrp.production'].create({
             'name': 'Manufacturing Order 1',
