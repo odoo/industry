@@ -3,7 +3,8 @@
 from datetime import datetime, timedelta
 
 from odoo import Command
-from odoo.tests import tagged
+from odoo.exceptions import UserError
+from odoo.tests import tagged, Form
 from odoo.tests.common import TransactionCase
 
 
@@ -37,6 +38,12 @@ class BookingEngineAutomationsTestCase(TransactionCase):
             'sale_ok': True,
             'x_is_a_room_offer': True,
         })
+        cls.project = cls.env['project.project'].create({
+            'name': 'Housekeeping Project',
+            'x_is_house_keeping_project': True,
+        })
+        cls.stage_clean = cls.env.ref('booking_engine.project_task_type_17')
+        cls.stage_ready = cls.env.ref('booking_engine.project_task_type_18')
 
     def _create_sale_line(self):
         order = self.env['sale.order'].with_context(in_rental_app=True).create({
@@ -252,3 +259,51 @@ class BookingEngineAutomationsTestCase(TransactionCase):
                          "Test precondition: rental_status should be 'returned' after return")
         self.assertEqual(resource.x_occupancy, 'vacant',
                          "The automation should mark room resources as vacant on check out")
+
+    def test_automation_on_task_stage_clean(self):
+        self.env['ir.config_parameter'].sudo().set_param('booking_engine.x_approvers_setting', '0')
+
+        task = self.env['project.task'].create({
+            'name': 'Housekeeping Task',
+            'project_id': self.project.id,
+            'stage_id': self.stage_clean.id,
+        })
+
+        self.assertEqual(task.stage_id, self.stage_ready,
+                         "Task should move to ready stage when no approvers are required")
+        self.assertEqual(task.state, '1_done',
+                         "Task should be done when no approvers are required")
+
+    def test_automation_on_task_stage_ready(self):
+        self.env['ir.config_parameter'].sudo().set_param('booking_engine.x_approvers_setting', '1')
+        self.env.company.write({'x_setting_approver_users_ids': [(5, 0, 0)]})
+        task = self.env['project.task'].create({
+            'name': 'Housekeeping Task',
+            'project_id': self.project.id,
+            'stage_id': self.stage_clean.id,
+        })
+
+        with self.assertRaises(UserError):
+            with Form(task) as t:
+                t.stage_id = self.stage_ready
+
+    def test_automation_update_task_cleaning_state(self):
+        self.env['ir.config_parameter'].sudo().set_param('booking_engine.x_approvers_setting', '1')
+        resource = self.env['resource.resource'].create({
+            'name': 'Housekeeping Resource',
+            'resource_type': 'material',
+        })
+
+        task = self.env['project.task'].create({
+            'name': 'Housekeeping Task',
+            'project_id': self.project.id,
+            'x_resource_id': resource.id,
+            'stage_id': self.stage_clean.id,
+        })
+
+        self.assertEqual(resource.x_house_keeping_stage_id, self.stage_clean,
+                         "Resource cleaning stage should match task stage on create")
+
+        task.stage_id = self.stage_ready
+        self.assertEqual(resource.x_house_keeping_stage_id, self.stage_ready,
+                         "Resource cleaning stage should update when task stage changes")

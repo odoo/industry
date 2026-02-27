@@ -264,3 +264,65 @@ class ComputedFieldsTestCase(TransactionCase):
 
         self.assertEqual(guests_line.x_sol_resource_ids, new_resource,
                          "Guest line resource ids should reflect sale order line resources")
+
+    def test_x_guests_computation(self):
+        guest_1 = self.env['res.partner'].create({'name': 'Guest 1'})
+        guest_2 = self.env['res.partner'].create({'name': 'Guest 2'})
+        order = self._create_sale_order(self.partner)
+
+        guests_line = self.env['x_guests_line'].create({
+            'x_sale_order_id': order.id,
+            'x_guest_partner_id': guest_1.id,
+        })
+        self.env['x_guests_line'].create({
+            'x_sale_order_id': order.id,
+            'x_guest_partner_id': guest_2.id,
+        })
+
+        self.assertEqual(order.x_guests, guest_1 + guest_2,
+                         "Order guests should match the guest lines")
+
+        guests_line.unlink()
+        self.assertEqual(order.x_guests, guest_2,
+                         "Order guests should update when guest lines change")
+
+    # def test_x_occupant_ids_computation(self):
+    #     guest_1 = self.env['res.partner'].create({'name': 'Occupant 1'})
+    #     guest_2 = self.env['res.partner'].create({'name': 'Occupant 2'})
+    #     order = self._create_sale_order(self.partner)
+
+    #     order_line = self.env['sale.order.line'].create({
+    #         'order_id': order.id,
+    #         'product_id': self.product_template.product_variant_id.id,
+    #         'product_uom_qty': 1,
+    #         'qty_delivered': 1,
+    #         'qty_returned': 0,
+    #     })
+    #     resource = self.env['resource.resource'].create({
+    #         'name': 'Room 404',
+    #         'resource_type': 'material',
+    #     })
+    #     self.env['planning.slot'].create({
+    #         'resource_id': resource.id,
+    #         'sale_line_id': order_line.id,
+    #         'start_datetime': datetime(2026, 2, 9, 10, 0),
+    #         'end_datetime': datetime(2026, 2, 10, 10, 0),
+    #     })
+
+    #     self.env['x_guests_line'].create({
+    #         'x_sale_order_id': order.id,
+    #         'x_guest_partner_id': guest_1.id,
+    #         'x_room_resource_id': resource.id,
+    #     })
+    #     self.env['x_guests_line'].create({
+    #         'x_sale_order_id': order.id,
+    #         'x_guest_partner_id': guest_2.id,
+    #         'x_room_resource_id': resource.id,
+    #     })
+
+    #     self.assertEqual(resource.x_occupant_ids, guest_1 + guest_2,
+    #                      "Resource occupants should match guests assigned to the room")
+
+    #     order_line.qty_returned = 1
+    #     self.assertFalse(resource.x_occupant_ids,
+    #                      "Resource occupants should be empty when there is no ongoing booking")
