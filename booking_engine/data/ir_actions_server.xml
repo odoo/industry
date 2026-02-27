@@ -40,6 +40,17 @@ for record in (records or []):
         record.write({'start_datetime': start_datetime, 'end_datetime': end_datetime})
         ]]></field>
     </record>
+    <record id="industry_limit_slot_resources" model="ir.actions.server">
+        <field name="model_id" ref="planning.model_planning_slot"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="name">Allow only one resource per slot for rooms</field>
+        <field name="code"><![CDATA[
+for slot in records:
+    if len(slot.resource_ids) > 1 and any(role.x_is_a_room_offer for role in slot.resource_ids.mapped('role_ids')):
+        raise UserError("Only one room can be assigned to a planning slot")
+        ]]></field>
+    </record>
     <record id="industry_set_rental_hours" model="ir.actions.server">
         <field name="name">Set Rental Start/Return Hours</field>
         <field name="model_id" ref="sale.model_sale_order"/>
@@ -99,8 +110,8 @@ if records: records.planning_role_id.unlink()
         <field name="name">HouseKeeping: Set resources as occupied</field>
         <field name="code"><![CDATA[
 if slots := record.order_line.planning_slot_ids:
-    for slot in slots.filtered(lambda s: s.resource_id.role_ids and any(role.x_is_a_room_offer for role in s.resource_id.role_ids)):
-        slot.resource_id['x_occupancy'] = 'occupied'
+    for slot in slots.filtered(lambda s: any(role.x_is_a_room_offer for role in s.resource_ids.role_ids)):
+        slot.resource_ids['x_occupancy'] = 'occupied'
 ]]></field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
@@ -109,8 +120,8 @@ if slots := record.order_line.planning_slot_ids:
         <field name="name">HouseKeeping: Set resources as vacant</field>
         <field name="code"><![CDATA[
 if slots := record.order_line.planning_slot_ids:
-    for slot in slots.filtered(lambda s: s.resource_id.role_ids and any(role.x_is_a_room_offer for role in s.resource_id.role_ids)):
-        slot.resource_id['x_occupancy'] = 'vacant'
+    for slot in slots.filtered(lambda s: any(role.x_is_a_room_offer for role in s.resource_ids.role_ids)):
+        slot.resource_ids['x_occupancy'] = 'vacant'
 ]]></field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
@@ -157,18 +168,18 @@ if (project := env['project.project'].search([('x_is_house_keeping_project', '='
     newtasks = []
     last_midnight = datetime.datetime.today().replace(hour=0, minute=0)
     for slot in env['planning.slot'].search([('start_datetime', '<', last_midnight),('end_datetime', '>', last_midnight)]):
-        if any(role.x_is_a_room_offer for role in slot.resource_id.role_ids):
+        if any(role.x_is_a_room_offer for role in slot.resource_ids.role_ids):
             end_today = slot.end_datetime < last_midnight + datetime.timedelta(hours=24)
             if (end_today and not slot.role_id.x_has_checkout_cleaning) or (not end_today and not slot.role_id.x_has_stayover_cleaning):
                 continue
-            slot.resource_id.write({'x_occupancy': 'due_out' if end_today else 'stayover'})
+            slot.resource_ids.write({'x_occupancy': 'due_out' if end_today else 'stayover'})
             newtasks.append({
-                'name': "HK " + slot.resource_id.name,
+                'name': "HK " + slot.resource_ids[:1].name,
                 'project_id': project.id,
                 'partner_id': slot.sale_line_id.order_id.partner_id.id,
                 'description': "Automatically generated house keeping task.",
                 'date_deadline': (last_midnight + datetime.timedelta(hours=24)),
-                'x_resource_id': slot.resource_id.id,
+                'x_resource_id': slot.resource_ids[:1].id,
                 'x_cleaning': 'checkout' if end_today else 'stayover',
                 'user_ids': [(5,0)],
             })

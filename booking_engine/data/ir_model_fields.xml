@@ -169,15 +169,6 @@ for record in self: record['x_order_involves_room'] = any(line.product_id.x_is_a
 ]]></field>
     <field name="depends">order_line.qty_delivered</field>
   </record>
-  <record id="resource_x_on_going_booking" model="ir.model.fields">
-    <field name="ttype">one2many</field>
-    <field name="domain">[('sale_line_id.qty_delivered', '&gt;', 0), ('sale_line_id.qty_returned', '=', 0)]</field>
-    <field name="field_description">Ongoing Booking</field>
-    <field name="model_id" ref="resource.model_resource_resource"/>
-    <field name="relation">planning.slot</field>
-    <field name="relation_field">resource_id</field>
-    <field name="name">x_ongoing_booking</field>
-  </record>
   <record id="model_product_attribute_x_captures_guests" model="ir.model.fields">
     <field name="ttype">boolean</field>
     <field name="copied" eval="True"/>
@@ -217,12 +208,15 @@ for record in self: record['x_order_involves_room'] = any(line.product_id.x_is_a
     <field name="selectable" eval="False"/>
     <field name="store" eval="False"/>
   </record>
-  <record id="model_sale_order_line_x_resource_id" model="ir.model.fields">
-    <field name="ttype">many2one</field>
-    <field name="related">planning_slot_ids.resource_id</field>
-    <field name="field_description">Resource</field>
+  <record id="model_sale_order_line_x_resource_ids" model="ir.model.fields">
+    <field name="ttype">many2many</field>
+    <field name="depends">planning_slot_ids.resource_ids</field>
+    <field name="compute"><![CDATA[for record in self:
+    record['x_resource_ids'] = [(6, 0, record.planning_slot_ids.resource_ids.ids)]
+]]></field>
+    <field name="field_description">Resources</field>
     <field name="model_id" ref="sale.model_sale_order_line"/>
-    <field name="name">x_resource_id</field>
+    <field name="name">x_resource_ids</field>
     <field name="readonly" eval="True"/>
     <field name="relation">resource.resource</field>
     <field name="store" eval="False"/>
@@ -340,7 +334,7 @@ for record in self: record['x_total'] = sum(record.x_slot_ids.mapped('x_city_tax
     <field name="depends">x_sale_order_id.order_line</field>
     <field name="store" eval="False"/>
     <field name="compute"><![CDATA[ 
-for record in self: record['x_sol_resource_ids'] = record.x_sale_order_id.mapped('order_line.x_resource_id.id')
+for record in self: record['x_sol_resource_ids'] = [(6, 0, record.x_sale_order_id.order_line.x_resource_ids.ids)]
       ]]></field>
   </record>
   <record id="x_model_guests_line_x_guest_identity_check" model="ir.model.fields">
@@ -374,13 +368,13 @@ for record in self: record['x_sol_resource_ids'] = record.x_sale_order_id.mapped
 for record in self:  record['x_guests'] = [(6, 0, record.x_guest_line_ids.mapped('x_guest_partner_id').ids)]
       ]]></field>
   </record>
-  <record id="rental_order_wizard_x_resource_id" model="ir.model.fields">
-    <field name="ttype">many2one</field>
-    <field name="field_description">Resource</field>
+  <record id="rental_order_wizard_x_resource_ids" model="ir.model.fields">
+    <field name="ttype">many2many</field>
+    <field name="field_description">Resources</field>
     <field name="model_id" ref="sale_renting.model_rental_order_wizard_line"/>
-    <field name="name">x_resource_id</field>
+    <field name="name">x_resource_ids</field>
     <field name="relation">resource.resource</field>
-    <field name="related">order_line_id.x_resource_id</field>
+    <field name="related">order_line_id.x_resource_ids</field>
   </record>
   <record id="resource_x_occupant_ids" model="ir.model.fields">
     <field name="name">x_occupant_ids</field>
@@ -389,9 +383,11 @@ for record in self:  record['x_guests'] = [(6, 0, record.x_guest_line_ids.mapped
     <field name="model_id" ref="resource.model_resource_resource"/>
     <field name="relation">res.partner</field>
     <field name="readonly" eval="True"/>
-    <field name="depends">x_ongoing_booking.sale_order_id.x_guest_line_ids, x_ongoing_booking</field>
+    <field name="store" eval="False"/>
     <field name="compute"><![CDATA[
-for record in self: record['x_occupant_ids'] = [(6, 0, record.x_ongoing_booking[:1].sale_order_id.x_guest_line_ids.filtered(lambda l: l.x_room_resource_id.id == record.id).mapped('x_guest_partner_id').ids)] if record.x_ongoing_booking else [(5, 0, 0)]
+for record in self:
+    x_ongoing_booking_id = self.env['planning.slot'].search([('resource_ids', 'in', record.id), ('sale_line_id.qty_delivered', '>', 0), ('sale_line_id.qty_returned', '=', 0)], limit=1)
+    record['x_occupant_ids'] = [(6, 0, x_ongoing_booking_id.sale_order_id.x_guest_line_ids.filtered(lambda l: l.x_room_resource_id.id == record.id).mapped('x_guest_partner_id').ids)] if x_ongoing_booking_id else [(5, 0, 0)]
   ]]></field>
   </record>
   <record id="res_partner_x_ongoing_bookings" model="ir.model.fields">
@@ -402,7 +398,8 @@ for record in self: record['x_occupant_ids'] = [(6, 0, record.x_ongoing_booking[
     <field name="readonly" eval="True"/>
     <field name="name">x_ongoing_bookings</field>
     <field name="compute"><![CDATA[ 
-for record in self: record['x_ongoing_bookings'] = self.env['resource.resource'].search([('x_occupant_ids', 'in', record.id)]).ids
+resources = self.env['resource.resource'].search([])
+for record in self: record['x_ongoing_bookings'] = resources.filtered(lambda r: record.id in r.x_occupant_ids).ids
     ]]></field>
     <field name="store" eval="False"/>
   </record>
