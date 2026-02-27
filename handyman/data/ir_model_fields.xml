@@ -1,5 +1,29 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+    <record id="x_section_id_field" model="ir.model.fields">
+        <field name="name">x_section_id</field>
+        <field name="field_description">Section ID</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="ttype">many2one</field>
+        <field name="compute"><![CDATA[
+all_sections = self._read_group(domain=[('order_id', 'in', self.mapped('order_id.id')), ('display_type', '=', 'line_section')], groupby=['order_id'], aggregates=['sequence:array_agg','id:array_agg'])
+data = {order.id: [seqs, ids] for order, seqs, ids in all_sections}
+for line in self:
+    line['x_section_id'] = False
+    seqs, ids = data.get(line.order_id.id, ([], []))
+    for s, i in zip(seqs, ids):
+        line['x_section_id'] = i if (line.x_section_id and line.x_section_id.id < s < line.sequence) or s < line.sequence else line.x_section_id]]></field>
+        <field name="depends">order_id.order_line</field>
+        <field name="readonly" eval="True"/>
+        <field name="relation">sale.order.line</field>
+    </record>
+    <record id="field_x_currency_id" model="ir.model.fields">
+        <field name="name">x_currency_id</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.currency</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="related">project_id.currency_id</field>
+    </record>
     <record id="new_material_budget_related_field" model="ir.model.fields">
         <field name="name">x_related_material_budget_field</field>
         <field name="ttype">monetary</field>
@@ -13,7 +37,7 @@ for task in self:
         <field name="model_id" ref="project.model_project_task"/>
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
-        <field name="currency_field">currency_id</field>
+        <field name="currency_field">x_currency_id</field>
     </record>
     <record id="x_task_field" model="ir.model.fields">
         <field name="name">x_task_id</field>
@@ -45,7 +69,7 @@ for task in self:
         <field name="model_id" ref="project.model_project_task"/>
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
-        <field name="currency_field">currency_id</field>
+        <field name="currency_field">x_currency_id</field>
     </record>
     <record id="x_percent_bills_1_field" model="ir.model.fields">
         <field name="name">x_percent_bills_1</field>
@@ -140,22 +164,5 @@ for project in self:
         <field name="model_id" ref="project.model_project_project"/>
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
-    </record>
-    <record id="x_section_id_field" model="ir.model.fields">
-        <field name="name">x_section_id</field>
-        <field name="field_description">Section ID</field>
-        <field name="model_id" ref="sale.model_sale_order_line"/>
-        <field name="ttype">many2one</field>
-        <field name="compute"><![CDATA[
-all_sections = self._read_group(domain=[('order_id', 'in', self.mapped('order_id.id')), ('display_type', '=', 'line_section')], groupby=['order_id'], aggregates=['sequence:array_agg','id:array_agg'])
-data = {order.id: [seqs, ids] for order, seqs, ids in all_sections}
-for line in self:
-    line['x_section_id'] = False
-    seqs, ids = data.get(line.order_id.id, ([], []))
-    for s, i in zip(seqs, ids):
-        line['x_section_id'] = i if (line.x_section_id and line.x_section_id.id < s < line.sequence) or s < line.sequence else line.x_section_id]]></field>
-        <field name="depends">order_id.order_line</field>
-        <field name="readonly" eval="True"/>
-        <field name="relation">sale.order.line</field>
     </record>
 </odoo>
