@@ -31,7 +31,7 @@
   <record id="rental_order_view_inherit" model="ir.ui.view">
     <field name="arch" type="xml">
       <xpath expr="//list//field[@name='product_id']" position="after">
-        <field name="x_resource_id" readonly="1"/>
+        <field name="x_resource_ids" widget="many2many_tags" readonly="1"/>
       </xpath>
       <xpath expr="//button[@name='apply']" position="replace">
         <button string="Validate" class="btn btn-primary" type="action" name="%(apply_rental_check_out)d" data-hotkey="q"/>
@@ -125,7 +125,6 @@
         <xpath expr="//search[1]/separator[4]" position="replace"/>
         <xpath expr="//filter[@name='materials']" position="replace"/>
         <xpath expr="//filter[@name='employees']" position="replace"/>
-        <xpath expr="//filter[@name='my_sale_orders']" position="replace"/>
         <xpath expr="//filter[@name='my_role']" position="replace"/>
         <xpath expr="//filter[@name='unwanted_shifts']" position="replace"/>
         <xpath expr="//filter[@name='my_department_shifts']" position="replace"/>
@@ -133,10 +132,9 @@
         <xpath expr="//filter[@name='my_shifts']" position="replace"/>
         <xpath expr="//filter[@name='open_shifts']" position="replace"/>
         <xpath expr="//field[@name='employee_skill_ids']" position="replace"/>
-        <xpath expr="//field[@name='job_title']" position="replace"/>
         <xpath expr="//field[@name='manager_id']" position="replace"/>
         <xpath expr="//field[@name='department_id']" position="replace"/>
-        <xpath expr="//field[@name='resource_id']" position="before">
+        <xpath expr="//field[@name='resource_ids']" position="before">
           <field name="partner_id"/>
         </xpath>
         <xpath expr="//filter[@name='group_by_role']" position="after">
@@ -155,7 +153,7 @@
     <field name="arch" type="xml">
         <xpath expr="//field[@name='product_template_id']" position="after">
           <field name="x_total_guests" optional="hide"/>
-          <field name="x_resource_id" optional="hide"/>
+          <field name="x_resource_ids" widget="many2many_tags" optional="hide"/>
         </xpath>
     </field>
     <field name="inherit_id" ref="sale.view_order_form"/>
@@ -248,7 +246,7 @@
   </record>
   <record id="planning_kanban_view" model="ir.ui.view">
     <field name="arch" type="xml">
-        <xpath expr="//field[@name='sale_line_id']" position="replace">
+        <xpath expr="//div[@name='sale']" position="replace">
           <field name="sale_order_id" display="full" widget="many2one" class="d-block" context="{'form_view_ref': 'booking_engine.rental_order_view', 'in_rental_app': 1}"/>
         </xpath>
     </field>
@@ -434,7 +432,7 @@
   </record>
   <record id="booking_engine_schedule_form" model="ir.ui.view">
     <field name="arch" type="xml">
-        <xpath expr="//field[@name='resource_id']" position="attributes">
+        <xpath expr="//field[@name='resource_ids']" position="attributes">
           <attribute name="domain">[("role_ids.x_is_a_room_offer", "=", True)]</attribute>
         </xpath>
         <xpath expr="//field[@name='role_id']" position="attributes">
@@ -452,7 +450,7 @@
   <record id="booking_engine_planning_gantt_view" model="ir.ui.view">
     <field name="arch" type="xml">
         <xpath expr="//gantt[1]" position="attributes">
-          <attribute name="default_group_by">resource_id</attribute>
+          <attribute name="default_group_by">resource_ids</attribute>
           <attribute name="default_range">month</attribute>
           <attribute name="sample">0</attribute>
           <attribute name="precision">{"day":"hour:full","week":"day:half","month":"day:half","year":"day:full"}</attribute>
