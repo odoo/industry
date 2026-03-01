@@ -1,6 +1,6 @@
 {
     'name': 'Team Sports Club',
-    'version': '1.1',
+    'version': '1.3',
     'category': 'Health and Fitness',
     'author': 'Odoo S.A.',
     'depends': [
@@ -60,8 +60,8 @@
         'demo/appointment_type.xml',
         'demo/planning_recurrency.xml',
         'demo/calendar_event.xml',
-        'demo/pos_session.xml',
         'demo/pos_prep_display.xml',
+        'demo/pos_session.xml',
         'demo/planning_slot.xml',
         'demo/product_template.xml',
         'demo/res_partner.xml',

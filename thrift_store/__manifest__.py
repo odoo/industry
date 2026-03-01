@@ -1,6 +1,6 @@
 {
     'name': 'Thrift Store',
-    'version': '1.0',
+    'version': '1.2',
     'category': 'Retail',
     'depends': [
         'base_industry_data',

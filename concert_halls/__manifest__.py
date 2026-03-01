@@ -1,6 +1,6 @@
 {
     'name': 'Concert Halls',
-    'version': '1.0',
+    'version': '1.2',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -8,6 +8,7 @@
         'event_sale',
         'knowledge',
         'pos_event',
+        'pos_restaurant',
         'project_enterprise',
         'social',
         'website_crm',

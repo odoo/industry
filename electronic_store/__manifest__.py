@@ -1,6 +1,6 @@
 {
     'name': 'Electronic Store',
-    'version': '1.0',
+    'version': '1.2',
     'category': 'Retail',
     'depends': [
         'crm',
@@ -39,7 +39,6 @@
         'data/worksheet_template.xml',
         'data/project_project.xml',
         'data/product_product.xml',
-        'data/pos_payment_method.xml',
         'data/pos_config.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
