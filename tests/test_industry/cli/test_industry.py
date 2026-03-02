@@ -25,6 +25,7 @@ def job_log_level(status, duration):
         else logging.INFO if duration > 1
         else logging.DEBUG)
 
+
 base_automation.job_log_level = job_log_level
 
 
