@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from odoo import Command
 from odoo.exceptions import UserError
-from odoo.tests import tagged, Form
+from odoo.tests import tagged, Form, freeze_time
 from odoo.tests.common import TransactionCase
 
 
@@ -232,7 +232,7 @@ class BookingEngineAutomationsTestCase(TransactionCase):
                          "Test precondition: rental_status should be 'return' after pickup")
         self.assertEqual(resource.x_occupancy, 'occupied',
                          "The automation should mark room resources as occupied on check in")
-
+    # here
     def test_automation_set_resources_vacant_on_check_out(self):
         order, sale_line = self._create_sale_line()
 
@@ -259,6 +259,96 @@ class BookingEngineAutomationsTestCase(TransactionCase):
                          "Test precondition: rental_status should be 'returned' after return")
         self.assertEqual(resource.x_occupancy, 'vacant',
                          "The automation should mark room resources as vacant on check out")
+
+    def test_action_update_rooms_server_action(self):
+        self.room_role.write({
+            'x_has_checkout_cleaning': True,
+        })
+        order, sale_line = self._create_sale_line()
+        # order.action_confirm()
+
+        resource_due_out = self.env['resource.resource'].create({
+            'name': 'Room Resource Due Out',
+            'resource_type': 'material',
+            'default_role_id': self.room_role.id,
+            'role_ids': [Command.link(self.room_role.id)],
+        })
+        # resource_stayover = self.env['resource.resource'].create({
+        #     'name': 'Room Resource Stayover',
+        #     'resource_type': 'material',
+        #     'default_role_id': self.room_role.id,
+        #     'role_ids': [Command.link(self.room_role.id)],
+        # })
+
+
+        with freeze_time('2026-03-02 00:00:00'):
+            last_midnight = datetime(2026, 3, 2, 0, 0)
+            pickup_hour = int(self.recurrence.pickup_time)
+            pickup_minute = int(self.recurrence.pickup_time % 1 * 60)
+            return_hour = int(self.recurrence.return_time)
+            return_minute = int(self.recurrence.return_time % 1 * 60)
+            start_previous_day = (last_midnight - timedelta(days=1)).replace(
+                hour=pickup_hour,
+                minute=pickup_minute,
+                second=0,
+                microsecond=0,
+            )
+            end_today = last_midnight.replace(
+                hour=return_hour,
+                minute=return_minute,
+                second=0,
+                microsecond=0,
+            )
+            end_next_day = (last_midnight + timedelta(days=1)).replace(
+                hour=return_hour,
+                minute=return_minute,
+                second=0,
+                microsecond=0,
+            )
+            breakpoint()
+
+            self.env['planning.slot'].create({
+                'role_id': self.room_role.id,
+                'resource_id': resource_due_out.id,
+                'sale_line_id': sale_line.id,
+                'start_datetime': start_previous_day,
+                'end_datetime': end_today,
+            })
+            # self.env['planning.slot'].create({
+            #     'role_id': self.room_role.id,
+            #     'resource_id': resource_stayover.id,
+            #     'sale_line_id': sale_line.id,
+            #     'start_datetime': start_previous_day,
+            #     'end_datetime': end_next_day,
+            # })
+
+            self.env.ref('booking_engine.server_action_update_rooms').run()
+
+        self.assertEqual(resource_due_out.x_occupancy, 'due_out',
+                         "The server action should set due out occupancy for checkout rooms")
+        # self.assertEqual(resource_stayover.x_occupancy, 'stayover',
+        #                  "The server action should set stayover occupancy for stayover rooms")
+
+        tasks = self.env['project.task'].search([
+            ('name', '=like', 'HK%'),
+            ('x_resource_id', '=', resource_due_out.id),
+            ('partner_id', '=', order.partner_id.id),
+        ])
+
+        task_by_resource = {task.x_resource_id.id: task for task in tasks}
+        # self.assertSetEqual(
+        #     set(task_by_resource.keys()),
+        #     {resource_due_out.id, resource_stayover.id},
+        #     "Housekeeping tasks should be created for both due out and stayover resources",
+        # )
+        self.assertEqual(task_by_resource[resource_due_out.id].x_cleaning, 'checkout',
+                         "Checkout tasks should be marked as checkout cleaning")
+        # self.assertEqual(task_by_resource[resource_stayover.id].x_cleaning, 'stayover',
+        #                  "Stayover tasks should be marked as stayover cleaning")
+        self.assertEqual(task_by_resource[resource_due_out.id].date_deadline, last_midnight + timedelta(hours=24),
+                         "Checkout task deadline should be end of the day")
+        # self.assertEqual(task_by_resource[resource_stayover.id].date_deadline, last_midnight + timedelta(hours=24),
+        #                  "Stayover task deadline should be end of the day")
 
     def test_automation_on_task_stage_clean(self):
         self.env['ir.config_parameter'].sudo().set_param('booking_engine.x_approvers_setting', '0')
@@ -344,8 +434,6 @@ class BookingEngineAutomationsTestCase(TransactionCase):
             'product_id': product.id,
             'product_uom_qty': 1,
         })
-
-        print(order_line.sequence)
 
         order.action_confirm()
         service_product = self.env['product.template'].create({
@@ -436,3 +524,25 @@ class BookingEngineAutomationsTestCase(TransactionCase):
                          "City tax order line quantity should match city tax total")
         self.assertEqual(city_tax_order_line.qty_delivered, city_tax.x_total,
                          "City tax order line delivered quantity should match city tax total") 
+
+    def test_action_apply_rental_check_out_opens_city_tax(self):
+        order, sale_line = self._create_sale_line()
+        self.product.write({'x_has_city_tax': True})
+        order.action_confirm()
+        sale_line.write({'qty_delivered': 1.0})
+        return_action = order.action_open_return()
+        wizard = Form(self.env['rental.order.wizard'].with_context(return_action['context'])).save()
+
+        action = self.env.ref('booking_engine.apply_rental_check_out').with_context(
+            active_id=wizard.id, active_model='rental.order.wizard'
+        ).run()
+
+        self.assertEqual(order.rental_status, 'returned',
+                         "Test precondition: rental_status should be 'returned' after return")
+        self.assertTrue(action, "Server action should return a City Tax action on checkout")
+        self.assertEqual(action.get('res_model'), 'x_city_tax',
+                         "Server action should open the City Tax form")
+        self.assertEqual(action['context'].get('search_default_x_sale_order_id'), order.id,
+                         "City Tax action should search on the current sale order")
+        self.assertEqual(action['context'].get('default_x_sale_order_id'), order.id,
+                         "City Tax action should default to the current sale order")

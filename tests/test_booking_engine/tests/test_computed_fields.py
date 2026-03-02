@@ -14,7 +14,6 @@ class ComputedFieldsTestCase(TransactionCase):
         super().setUpClass()
         cls.country = cls.env.ref('base.be')
         cls.partner = cls.env['res.partner'].create({'name': 'Test Partner'})
-        cls.pricelist = cls.env['product.pricelist'].create({'name': 'Test Pricelist'})
         cls.product_template = cls.env['product.template'].create({
             'name': 'Test Room Offer',
             'type': 'service',
@@ -24,24 +23,24 @@ class ComputedFieldsTestCase(TransactionCase):
 
     def test_x_identity_check_computation(self):
         self.assertEqual(self.partner.x_identity_check, 'na',
-                         "Identity check should be 'na' when Nationality field is empty")
+                         "Identity check should be 'na' when Nationality field is empty.")
 
         self.partner.write({'x_nationality': self.country.id})
         self.assertEqual(self.partner.x_identity_check, 'invalid',
-                         "Identity check should be 'invalid' when only Nationality field is set")
+                         "Identity check should be 'invalid' when only Nationality is set, And Document Type, and Document Number are not set for customer.")
 
         self.partner.write({
             'x_document_type': 'Passport',
             'x_document_number': 'A1234567',
         })
         self.assertEqual(self.partner.x_identity_check, 'ok',
-                         "Identity check should be 'ok' when Nationality, Document Type, and Document Number are set")
+                         "Identity check should be 'ok' when Nationality, Document Type, and Document Number are set.")
 
         self.partner.write({'x_document_number': False})
         self.assertEqual(self.partner.x_identity_check, 'invalid',
-                         "Identity check should be 'invalid' when Document Type or Document Number is missing")
+                         "Identity check should be 'invalid' when Document Type or Document Number is missing.")
 
-
+    # need to write this guest_product in class 
     def _create_guest_product(self, adults=2, children=1):
         attribute = self.env['product.attribute'].create({
             'name': 'Guest Count',
@@ -53,7 +52,7 @@ class ComputedFieldsTestCase(TransactionCase):
             'x_adults': adults,
             'x_children': children,
         })
-        template = self.env['product.template'].create({
+        product_template = self.env['product.template'].create({
             'name': 'Guest Product',
             'type': 'service',
             'attribute_line_ids': [Command.create({
@@ -61,12 +60,11 @@ class ComputedFieldsTestCase(TransactionCase):
                 'value_ids': [Command.link(value.id)],
             })],
         })
-        return template.product_variant_id
+        return product_template.product_variant_id
 
     def _create_sale_order(self, partner, in_rental_app=False, **kwargs):
         vals = {
             'partner_id': partner.id,
-            'pricelist_id': self.pricelist.id,
         }
         if in_rental_app:
             vals.update({
@@ -78,16 +76,7 @@ class ComputedFieldsTestCase(TransactionCase):
 
     def test_x_order_involves_room_computation(self):
         order = self._create_sale_order(self.partner)
-        self.product_template.write({'x_is_a_room_offer': False,})
-        self.env['sale.order.line'].create({
-            'order_id': order.id,
-            'product_id': self.product_template.product_variant_id.id,
-            'product_uom_qty': 1,
-        })
-        self.assertFalse(order.x_order_involves_room,
-                         "Order should not involve room when no room offer is present")
-
-        product2 = self.env['product.template'].create({
+        product_template = self.env['product.template'].create({
             'name': 'Test Room Offer',
             'type': 'service',
             'x_is_a_room_offer': True,
@@ -95,18 +84,31 @@ class ComputedFieldsTestCase(TransactionCase):
 
         self.env['sale.order.line'].create({
             'order_id': order.id,
-            'product_id': product2.product_variant_id.id,
+            'product_id': product_template.product_variant_id.id,
             'product_uom_qty': 1,
         })
 
         self.assertTrue(order.x_order_involves_room,
                         "Order should involve room when a room offer product is present in order line")
 
+        # Remove all order lines
+        order.order_line.unlink()
+
+        product_template.write({'x_is_a_room_offer': False,})
+
+        self.env['sale.order.line'].create({
+            'order_id': order.id,
+            'product_id': product_template.product_variant_id.id,
+            'product_uom_qty': 1,
+        })
+        self.assertFalse(order.x_order_involves_room,
+                         "Order should not involve room when no room offer product is present in order line")
+        self.product_template.write({'x_is_a_room_offer': True,})
+
     def test_x_picked_up_computation(self):
         order = self._create_sale_order(self.partner, in_rental_app=True)
 
         self.product_template.write({'rent_ok': True,})
-        
         order_line = self.env['sale.order.line'].with_context(in_rental_app=True).create({
             'order_id': order.id,
             'product_id': self.product_template.product_variant_id.id,
@@ -130,17 +132,18 @@ class ComputedFieldsTestCase(TransactionCase):
             'product_uom_qty': 1,
         })
 
-        self.assertEqual(order_line.x_total_guests, 3,
-                         "Total guests should sum of adults and children from the selected attribute value")
+        self.assertEqual(order_line.x_total_guests, 3, "Total guests should be the sum of adults and children.")
 
     def test_x_nights_and_city_tax_computation(self):
         order = self._create_sale_order(self.partner)
         product = self._create_guest_product(adults=2, children=0)
+
         order_line = self.env['sale.order.line'].create({
             'order_id': order.id,
             'product_id': product.id,
             'product_uom_qty': 1,
         })
+
         start = datetime(2026, 2, 1, 14, 0)
         end = datetime(2026, 2, 3, 10, 0)
         slot = self.env['planning.slot'].create({
@@ -151,10 +154,9 @@ class ComputedFieldsTestCase(TransactionCase):
         })
 
         expected_nights = int(((end - start).total_seconds() + 86399) // 86400)
-        self.assertEqual(slot.x_nights, expected_nights, "Nights should be computed from start/end datetimes")
+        self.assertEqual(slot.x_nights, expected_nights, "Nights should be computed according to start/end datetimes")
         self.assertEqual(slot.x_city_tax, expected_nights * order_line.x_total_guests,
-                         "City tax should be nights multiplied by guests")
-
+                         "City tax should be nights multiplied by total guests.")
 
     def test_city_tax_slot_ids_and_total_computation(self):
         order = self._create_sale_order(self.partner)
