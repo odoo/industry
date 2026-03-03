@@ -305,7 +305,6 @@ class BookingEngineAutomationsTestCase(TransactionCase):
                 second=0,
                 microsecond=0,
             )
-            breakpoint()
 
             self.env['planning.slot'].create({
                 'role_id': self.room_role.id,
