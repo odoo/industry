@@ -43,7 +43,7 @@ registry.category("web_tour.tours").add("Condominium_Acquisition", {
         run: "click"
     },
     {
-        trigger: ".o-autocomplete--dropdown-item:nth-child(1) > a",
+        trigger: ".o-autocomplete--dropdown-item:contains('Kick-Off Quote') > a",
         run: "click"
     },
     {
@@ -52,7 +52,7 @@ registry.category("web_tour.tours").add("Condominium_Acquisition", {
         run: "click"
     },
     {
-        trigger: ".o-autocomplete--dropdown-item:nth-child(2) > a",
+        trigger: ".o-autocomplete--dropdown-item:contains('Quarterly') > a",
         run: "click"
     },
     {
