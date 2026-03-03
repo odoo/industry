@@ -27,32 +27,4 @@
     <field name="field_id" ref="stock_model_stock_storage_category_x_serial_status_field" />
     <field name="value">maintenance</field>
   </record>
-  <record id="to_invoice_total_uninvoiced_balance" model="ir.model.fields">
-    <field name="compute"><![CDATA[
-for record in self:
-    record['x_amount_to_invoice'] = 0
-    for so in record.sale_order_ids:
-        record['x_amount_to_invoice'] += so.amount_to_invoice
-        if so.invoice_status == 'to invoice' and so.is_rental_order:
-            rental_amount = sum(so.order_line.filtered('is_product_rentable').mapped('amount_to_invoice'))
-            last_date = so.x_last_invoice or so.rental_start_date.date()
-            next_date = min(so.rental_return_date, datetime.datetime.today()).date()
-            record['x_amount_to_invoice'] += rental_amount * ((next_date - last_date).days / so.duration_days - 1)
-]]></field>
-    <field name="ttype">monetary</field>
-    <field name="field_description">Total Uninvoiced</field>
-    <field name="model_id" ref="base.model_res_partner"/>
-    <field name="name">x_amount_to_invoice</field>
-    <field name="currency_field">currency_id</field>
-    <field name="readonly" eval="True"/>
-    <field name="selectable" eval="False"/>
-    <field name="store" eval="False"/>
-  </record>
-  <record id="sale_model_sale_order_x_last_invoice_field" model="ir.model.fields">
-    <field name="ttype">date</field>
-    <field name="field_description">Last invoice</field>
-    <field name="model_id" ref="sale.model_sale_order"/>
-    <field name="name">x_last_invoice</field>
-    <field name="readonly" eval="True"/>
-  </record>
 </odoo>

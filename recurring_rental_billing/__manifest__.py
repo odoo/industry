@@ -1,0 +1,28 @@
+{
+    'name': 'Recurring Rental Billing',
+    'version': '1.0',
+    'category': 'Sales/Sales',
+    'author': 'Odoo S.A.',
+    'depends': [
+        'base_industry_data',
+        'industry_fsm_sale_report',
+        'knowledge',
+        'sale_crm',
+        'sale_renting',
+        'web_studio',
+    ],
+    'data': [
+        'data/ir_model_fields.xml',
+        'data/ir_actions_act_window.xml',
+        'data/ir_actions_server.xml',
+        'data/ir_ui_view.xml',
+        'data/sale_order_template.xml',
+        'data/product_category.xml',
+        'data/product_pricing.xml',
+        'data/res_config_settings.xml',
+    ],
+    'license': 'OEEL-1',
+    'images': ['images/main.png'],
+    'url': "https://www.odoo.com/trial?industry&selected_app=machine_tool_rental",
+    'website': "https://www.odoo.com/all-industries",
+}
