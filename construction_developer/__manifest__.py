@@ -22,6 +22,7 @@
         'data/x_remark_stage.xml',
         'data/base_automation.xml',
         'data/qweb_view.xml',
+        'data/product_category.xml',
         'data/product_template.xml',
         'data/product_product.xml',
         'data/x_work_item.xml',
@@ -29,6 +30,7 @@
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
         'data/x_remark_category.xml',
+        'data/ir_model_post.xml',
     ],
     'demo': [
         'demo/res_partner.xml',

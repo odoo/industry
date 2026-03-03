@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!--
+        Drop the physical table Odoo auto-created (no _auto = False in XML model) when creating the model
+        We need it to create it as a VIEW and not a TABLE (auto-created)
+        HAS to be executed after adding fields, or the table is recreated every time and produces warnings
+    -->
+    <record id="server_action_delete_model_table" model="ir.actions.server">
+        <field name="name">Construction Developer: Remove auto-created SQL table</field>
+        <field name="model_id" ref="model_x_margin_analysis_report"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+env.cr.execute('DROP TABLE IF EXISTS x_margin_analysis_report CASCADE')
+]]></field>
+    </record>
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_delete_model_table')]"/>
+    <function model="ir.actions.server" name="unlink">
+        <value model="ir.actions.server" eval="ref('server_action_delete_model_table')"/>
+    </function>
+</odoo>
