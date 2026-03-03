@@ -94,7 +94,7 @@ if $HARD_RESET; then
 import sys
 sys.path.append('$INDUSTRY_PATH')
 from utils import IndustryUtils
-IndustryUtils('$INDUSTRY_PATH').install_internal_dependencies('$INDUSTRY_NAME', env)
+IndustryUtils().install_internal_dependencies('$INDUSTRY_NAME', env)
 print("")
 env.cr.commit()
 exit()
@@ -117,7 +117,7 @@ if $INSTALL; then
 import sys
 sys.path.append('$INDUSTRY_PATH')
 from utils import IndustryUtils
-zip = IndustryUtils('$INDUSTRY_PATH').get_zip('$INDUSTRY_NAME')
+zip = IndustryUtils().get_zip('$INDUSTRY_NAME')
 env['ir.module.module']._import_zipfile(zip, force=False, with_demo=$DEMO)
 print("")
 env.cr.commit()
