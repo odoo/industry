@@ -6,7 +6,7 @@ from odoo.tools.translate import trans_export
 from .industry_case import IndustryCase
 
 
-@tagged('-standard', 'pot_export')
+@tagged('post_install', '-at_install', '-standard', 'pot_export')
 class PotExportTest(IndustryCase):
     @common.no_retry
     def test_export_industry_pot(self):
