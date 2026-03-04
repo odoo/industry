@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="server_action_create_admin_employee_in_demo" model="ir.actions.server">
+        <field name="name">Industry HR demo data: Conditionally create admin user</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+# in case mitchell admin was created in the db in a previous version
+# or the user created their own admin employee from the admin user 
+if not (admin_user := env.ref('base.user_admin')).employee_id: admin_user.action_create_employee()
+env['ir.model.data']._update_xmlids([{'xml_id': 'hr.employee_admin', 'record': admin_user.employee_id}])
+fetch = lambda id: env['ir.model.data']._xmlid_to_res_id(id, raise_if_not_found=False)
+vals = [('name', "Casey Admin"),
+        ('department_id', fetch('hr.dep_administration')),
+        ('job_title', "Chief Executive Administrator"),
+        ('address_id', fetch('base.main_partner')),
+        ('work_phone', "+1 555-555-5555"),
+        ('private_email', "administrator@private.example.com"),
+        ('work_email', "administrator@yourcompany.example.com"),
+        ('structure_type_id', fetch('hr.structure_type_employee')),
+        ('image_1920', env.ref('base.partner_admin').image_1920)]
+admin = env.ref('hr.employee_admin')
+if (vals_to_write := {field: val for field, val in vals if not admin[field]}):
+    admin.write(vals_to_write)
+]]></field>
+    </record>
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_create_admin_employee_in_demo')]"/>
+    <function model="ir.actions.server" name="unlink">
+        <value model="ir.actions.server" eval="ref('server_action_create_admin_employee_in_demo')"/>
+    </function>
+</odoo>

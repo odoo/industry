@@ -1,8 +1,10 @@
 {
     'name': 'Museum',
+    'version': '1.1',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
+        'base_industry_data',
         'calendar',
         'documents_sign',
         'hr',
