@@ -15,7 +15,7 @@ class PotExportTest(IndustryCase):
         for module_name in self.installed_industries:
             module = self.env['ir.module.module'].search([('name', '=', module_name)], limit=1)
             with io.BytesIO() as buf:
-                if not trans_export(False, [module_name], buf, 'po', self.env.cr):
+                if not trans_export(False, [module_name], buf, 'po', self.env):
                     # No terms to translate, so skip saving the file.
                     continue
                 common.save_test_file(
