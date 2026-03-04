@@ -1,6 +1,6 @@
 {
     'name': 'Construction Developer',
-    'version': '1.7',
+    'version': '1.8',
     'category': 'Construction',
     'depends': [
         'base_industry_data',
@@ -39,7 +39,6 @@
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
         'demo/project_project.xml',
-        'demo/project_task.xml',
         'demo/x_remark_stage.xml',
         'demo/x_remark.xml',
         'demo/sale_order_post.xml',
