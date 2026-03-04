@@ -1,6 +1,6 @@
 {
     'name': 'Construction Builder',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Construction',
     'depends': [
         'base_industry_data',
