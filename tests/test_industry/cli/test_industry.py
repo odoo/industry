@@ -3,7 +3,7 @@ import optparse
 import pathlib
 import sys
 
-from odoo import api, sql_db
+from odoo import api
 from odoo.addons.base_automation.models import base_automation
 from odoo.cli.command import Command
 from odoo.modules import db
@@ -69,11 +69,7 @@ class Test_Industry(Command):
                     target_db = init_db
                 else:
                     target_db = f"{init_db}-{industry_module}"
-                    with sql_db.db_connect('postgres').cursor() as cr:
-                        cr.execute("SELECT datname FROM pg_database WHERE datname = %s", (target_db,), log_exceptions=False)
-                        db_exists = cr.fetchall()
-
-                    if db_exists:
+                    if db.exist(target_db):
                         if config.get('drop_if_exists'):
                             db.drop(target_db)
                         elif test_enable:
