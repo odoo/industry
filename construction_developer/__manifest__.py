@@ -34,16 +34,16 @@
     ],
     'demo': [
         'demo/res_partner.xml',
-        'demo/project_project.xml',
         'demo/product_supplierinfo.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
+        'demo/sale_order_confirm.xml',
+        'demo/project_project.xml',
         'demo/project_task.xml',
         'demo/x_remark_stage.xml',
         'demo/x_remark.xml',
         'demo/sale_order_post.xml',
         'demo/ir_attachment.xml',
-        'demo/account_move.xml',
     ],
     'assets': {
         'web.assets_backend': [
