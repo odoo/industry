@@ -269,7 +269,7 @@ record['standard_price'] = price
     <record id="action_compute_margin_analysis" model="ir.actions.server">
         <field name="model_id" ref="product.model_product_product"/>
         <field name="state">code</field>
-        <field name="name">Construction Developer: Commpute Margin Analysis</field>
+        <field name="name">Construction Developer: Compute Margin Analysis</field>
         <field name="code"><![CDATA[
 env.cr.execute('''
 CREATE OR REPLACE VIEW x_margin_analysis_report AS (
@@ -287,8 +287,10 @@ CREATE OR REPLACE VIEW x_margin_analysis_report AS (
            COALESCE(wil.x_quantity * (wil.x_unit_price - wil.x_unit_cost) * sol.product_uom_qty, 
                     sol.product_uom_qty * (sol.price_unit - sol.purchase_price)) AS x_margin,
 
-           COALESCE((wil.x_unit_price - wil.x_unit_cost) / NULLIF(wil.x_unit_price, 0), 
-                    (sol.price_unit - sol.purchase_price) / NULLIF(sol.price_unit, 0)) AS x_margin_percent
+           CASE WHEN wil.x_work_item_id IS NOT NULL
+                THEN (wil.x_unit_price - wil.x_unit_cost) / NULLIF(wil.x_unit_price, 0)
+                ELSE (sol.price_unit - sol.purchase_price) / NULLIF(sol.price_unit, 0) 
+           END AS x_margin_percent
     FROM sale_order_line sol LEFT JOIN x_work_item_line wil 
     ON sol.x_line_work_item_id = wil.x_work_item_id
     WHERE sol.display_type IS NULL AND sol.product_id IS NOT NULL)''')
