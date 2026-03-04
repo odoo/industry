@@ -12,7 +12,7 @@ class PotExportTest(IndustryCase):
     def test_export_industry_pot(self):
         """Export the source terms for every installed industry module and save them."""
 
-        for module_name in self.installed_industries:
+        for module_name in self.installed_modules:
             module = self.env['ir.module.module'].search([('name', '=', module_name)], limit=1)
             with io.BytesIO() as buf:
                 if not trans_export(False, [module_name], buf, 'po', self.env.cr):
