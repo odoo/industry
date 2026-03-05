@@ -1,7 +1,9 @@
 {
     'name': 'Audit & Certification',
+    'version': '1.1',
     'category': 'Services',
     'depends': [
+        'base_industry_data',
         'crm',
         'hr_holidays',
         'hr_timesheet',
@@ -39,7 +41,6 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
-        'demo/hr_employee.xml',
         'demo/res_users.xml',
         'demo/res_partner.xml',
         'demo/hr_leave.xml',

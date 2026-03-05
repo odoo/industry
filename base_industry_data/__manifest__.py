@@ -1,11 +1,12 @@
 {
     'name': 'Industry base',
+    'version': '1.2',
     'author': 'Odoo S.A.',
-    'version': '1.1',
     'category': 'Hidden/Tools',
     'depends': [
         'base',
         'digest',
+        'hr',
         'knowledge',
     ],
     'data': [
@@ -13,6 +14,7 @@
         'data/res_partner_category.xml',
     ],
     'demo': [
+        'demo/hr_employee.xml',
         'demo/ir_cron.xml',
         'demo/res_users.xml',
         'demo/res_partner.xml',

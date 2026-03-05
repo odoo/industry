@@ -1,8 +1,9 @@
 {
     'name': 'Toy Store',
+    'version': '1.1',
     'category': 'Retail',
     'depends': [
-        'hr',
+        'base_industry_data',
         'knowledge',
         'point_of_sale',
         'purchase_stock',
