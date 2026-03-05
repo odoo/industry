@@ -17,7 +17,6 @@
         'website_sale_collect',
     ],
     'data': [
-        'data/hr_employee.xml',
         'data/product_pricelist.xml',
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',

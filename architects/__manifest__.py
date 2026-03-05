@@ -1,10 +1,12 @@
 {
     'name': 'Architecture Firm',
+    'version': '1.1',
     'category': 'Services',
     'depends': [
         'account_followup',
         'base_automation',
         'base_geolocalize',
+        'base_industry_data',
         'crm_enterprise',
         'documents_hr',
         'documents_project_sale',
@@ -45,7 +47,6 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
-        'demo/hr_employee.xml',
         'demo/res_users.xml',
         'demo/res_partner.xml',
         'demo/appointment_type.xml',
