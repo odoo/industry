@@ -280,6 +280,23 @@ record['standard_price'] = price
         <field name="state">code</field>
         <field name="name">Construction Developer: Compute Margin Analysis</field>
         <field name="code"><![CDATA[
+# Since a simple server action executed only once in e.g. ir_model_post.xml to 
+# drop the db after model creation only once does not work on the runbot for 
+# some reason, do this instead
+# Ask Postgres what the type of 'x_margin_analysis_report' currently is
+env.cr.execute('''
+    SELECT relkind 
+    FROM pg_class 
+    WHERE relname = 'x_margin_analysis_report'
+''')
+result = env.cr.fetchone()  # fetch the result of the query that was just executed
+
+# Drop the physical table Odoo auto-created (no _auto = False in XML model) when creating the model
+# We need it to create it as a VIEW and not a TABLE (auto-created)
+# 'r': ordinary TABLE, i.e. not a VIEW ('v')
+if result and result[0] == 'r': env.cr.execute('DROP TABLE x_margin_analysis_report CASCADE')
+
+# Actual logic
 env.cr.execute('''
 CREATE OR REPLACE VIEW x_margin_analysis_report AS (
     SELECT ROW_NUMBER() OVER () AS id,

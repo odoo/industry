@@ -30,7 +30,6 @@
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
         'data/x_remark_category.xml',
-        'data/ir_model_post.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
