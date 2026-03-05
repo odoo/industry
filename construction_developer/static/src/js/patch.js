@@ -1,8 +1,9 @@
 import { patch } from "@web/core/utils/patch";
 import { ORM } from "@web/core/orm_service";
 import { RelationalModel } from "@web/model/relational_model/relational_model";
+import { ListRenderer } from "@web/views/list/list_renderer";
 
-// Display only project-specific remark stages when grouping by x_stage_id (either in search view or kanban stages)
+// In the Remarks search/kanban views, displays only project-specific remark stages when grouping by x_stage_id
 patch(RelationalModel.prototype, { async _postprocessReadGroup(config, { groups, length }) {
     let { groups: res_groups } = await super._postprocessReadGroup(config, { groups, length });
     // because multiple nested groupbys are possible, we need to check if x_stage_id is the current groupby
@@ -12,5 +13,19 @@ patch(RelationalModel.prototype, { async _postprocessReadGroup(config, { groups,
                                .map((group) => { group.x_sequence = stageIdsProjectsList.find((stage) => stage.id === group.rawValue[0]).x_sequence; return group; }).sort((group_a, group_b) => group_a.x_sequence - group_b.x_sequence);}
     return { groups: res_groups, length: res_groups.length };}});
 
-// Allow the user to drag and drop remark stages to reorder them like project stages, and save the new order in the x_sequence field
+// In the Remarks kanban view, allow the user to drag and drop remark stages to reorder them like project stages, and save the new order in the x_sequence field
 patch(ORM.prototype, { webResequence(model, ids, kwargs = {}) { return super.webResequence(model, ids, model === "x_remark_stage" ? { ...kwargs, 'specification': {'x_sequence': {}}, 'field_name': "x_sequence" } : kwargs); }});
+
+// In the Margin Analysis list view, 
+// Computes the margin % from the summed costs & prices instead of summing margin percentages
+patch(ListRenderer.prototype, { formatGroupAggregate(group, column) {
+    // Writes the correct margin % in the grouped list items 
+        if (group.model.config.resModel == "x_margin_analysis_report" && ["x_quantity", "x_margin_percent"].includes(column.name)) {
+            return { value: (column.name == "x_margin_percent" && group.aggregates["x_total_price"]) ? Math.round(100 * (group.aggregates["x_margin"]) / group.aggregates["x_total_price"]).toString() + " %" : "" };}
+        return super.formatGroupAggregate(group, column);},
+    // Writes the correct margin % in the aggregate line below the list
+    computeAggregates() { const aggregates = super.computeAggregates();
+        if (aggregates && aggregates["x_margin_percent"] && aggregates["x_total_price"] && aggregates["x_margin"]) {
+            aggregates["x_margin_percent"].rawValue = aggregates["x_total_price"].rawValue ? 100 * (aggregates["x_margin"].rawValue) / aggregates["x_total_price"].rawValue : 0;
+            aggregates["x_margin_percent"].value = Math.round(aggregates["x_margin_percent"].rawValue).toString() + " %";}
+        return aggregates;}})

@@ -1,5 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+    <record id="server_action_update_x_cost_nature" model="ir.actions.server">
+        <field name="name">Construction Developer: Update Product Category Cost Nature</field>
+        <field name="model_id" ref="product.model_product_category"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+# Simple, 1 level check to facilitate creating new subcategories. We don't support more complex operations
+for record in records.filtered('parent_id'): record['x_cost_nature'] = record.x_cost_nature or record.parent_id.x_cost_nature
+]]></field>
+    </record>
     <record id="action_initialize_sales_order_line_sequence_on_sales_order_create" model="ir.actions.server">
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="name">Construction Developer: Initialize Sales Order Line Sequence on Sales Order create</field>
@@ -265,5 +274,59 @@ record['standard_price'] = price
         <field name="model_id" ref="product.model_product_product"/>
         <field name="state">code</field>
         <field name="name">Construction: Update Product Cost and Vendor List</field>
+    </record>
+    <record id="action_compute_margin_analysis" model="ir.actions.server">
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Compute Margin Analysis</field>
+        <field name="code"><![CDATA[
+# Since a simple server action executed only once in e.g. ir_model_post.xml to 
+# drop the db after model creation only once does not work on the runbot for 
+# some reason, do this instead
+# Ask Postgres what the type of 'x_margin_analysis_report' currently is
+env.cr.execute('''
+    SELECT relkind 
+    FROM pg_class 
+    WHERE relname = 'x_margin_analysis_report'
+''')
+result = env.cr.fetchone()  # fetch the result of the query that was just executed
+
+# Drop the physical table Odoo auto-created (no _auto = False in XML model) when creating the model
+# We need it to create it as a VIEW and not a TABLE (auto-created)
+# 'r': ordinary TABLE, i.e. not a VIEW ('v')
+if result and result[0] == 'r': env.cr.execute('DROP TABLE x_margin_analysis_report CASCADE')
+
+# Actual logic
+env.cr.execute('''
+CREATE OR REPLACE VIEW x_margin_analysis_report AS (
+    SELECT ROW_NUMBER() OVER () AS id,
+           sol.order_id AS x_so_id,
+           wil.x_work_item_id AS x_work_item_id,
+
+           COALESCE(wil.x_quantity * sol.product_uom_qty, sol.product_uom_qty) AS x_quantity, -- COALESCE looks at WIL first; if it's NULL (no work item), it uses SOL.
+           COALESCE(wil.x_product_id, sol.product_id) AS x_product_id,
+           COALESCE(wil.x_cost_nature, sol.x_cost_nature) AS x_cost_nature,
+           COALESCE(wil.x_category_id, sol.x_category_id) AS x_category_id,
+           COALESCE(wil.x_unit_price * wil.x_quantity * sol.product_uom_qty, sol.price_unit * sol.product_uom_qty) AS x_total_price,
+           COALESCE(wil.x_unit_cost * wil.x_quantity * sol.product_uom_qty, sol.purchase_price * sol.product_uom_qty) AS x_total_cost,
+
+           COALESCE(wil.x_quantity * (wil.x_unit_price - wil.x_unit_cost) * sol.product_uom_qty, 
+                    sol.product_uom_qty * (sol.price_unit - sol.purchase_price)) AS x_margin,
+
+           CASE WHEN wil.x_work_item_id IS NOT NULL
+                THEN (wil.x_unit_price - wil.x_unit_cost) / NULLIF(wil.x_unit_price, 0)
+                ELSE (sol.price_unit - sol.purchase_price) / NULLIF(sol.price_unit, 0) 
+           END AS x_margin_percent
+    FROM sale_order_line sol LEFT JOIN x_work_item_line wil 
+    ON sol.x_line_work_item_id = wil.x_work_item_id
+    WHERE sol.display_type IS NULL AND sol.product_id IS NOT NULL)''')
+
+# action called from a project: fetch the records from the project
+# action called from a sale order: passed in the context as active_ids 
+so_ids = env.context.get('active_ids') if not env.context.get('project_id') else env['sale.order'].search([('project_id', '=', env.context.get('project_id'))]).ids
+
+action = { 'name': "Margin Analysis", 'view_mode': 'list', 'res_model': 'x_margin_analysis_report', 'type': 'ir.actions.act_window',
+           'context': {'active_ids': so_ids, 'view_id': 'view_x_margin_report_analysis_list', 'search_default_active_so': True, 'search_default_group_by_cost_nature': True, 'search_default_group_by_category': True, 'search_default_group_by_product': True }}
+]]></field>
     </record>
 </odoo>

@@ -1,6 +1,6 @@
 {
     'name': 'Construction Developer',
-    'version': '1.7',
+    'version': '1.8',
     'category': 'Construction',
     'depends': [
         'base_industry_data',
@@ -22,6 +22,7 @@
         'data/x_remark_stage.xml',
         'data/base_automation.xml',
         'data/qweb_view.xml',
+        'data/product_category.xml',
         'data/product_template.xml',
         'data/product_product.xml',
         'data/x_work_item.xml',
@@ -32,16 +33,15 @@
     ],
     'demo': [
         'demo/res_partner.xml',
-        'demo/project_project.xml',
         'demo/product_supplierinfo.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
-        'demo/project_task.xml',
+        'demo/sale_order_confirm.xml',
+        'demo/project_project.xml',
         'demo/x_remark_stage.xml',
         'demo/x_remark.xml',
         'demo/sale_order_post.xml',
         'demo/ir_attachment.xml',
-        'demo/account_move.xml',
     ],
     'assets': {
         'web.assets_backend': [
