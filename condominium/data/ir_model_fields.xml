@@ -874,7 +874,8 @@ for record in self: record['x_companies'] = [(6, 0, record.x_property_ids.x_cond
     if event.x_attending_ratio > 0 and event.x_voting_key_id:
         voters = record.x_attendee_vote_ids.filtered(lambda a: a.x_vote == 'In Favor').x_attendee_id.ids
         x_in_favor = sum(attendee.x_ratio for attendee in event.attendee_ids if (attendee.x_delegating or attendee.x_attending) and attendee.partner_id.id in voters)
-        record['x_in_favor'] = x_in_favor / sum([x_ratio.x_ratio for x_ratio in event.x_voting_key_id.x_ratio_ids]) / event.x_attending_ratio
+        total_ratio = sum([x_ratio.x_ratio for x_ratio in event.x_voting_key_id.x_ratio_ids])
+        record['x_in_favor'] = x_in_favor / total_ratio / event.x_attending_ratio if total_ratio else 0
     else: record['x_in_favor'] = 0]]></field>
     <field name="ttype">float</field>
     <field name="depends">x_attendee_vote_ids</field>
@@ -891,7 +892,8 @@ for record in self: record['x_companies'] = [(6, 0, record.x_property_ids.x_cond
     if event.x_attending_ratio > 0 and event.x_voting_key_id:
         voters = record.x_attendee_vote_ids.filtered(lambda a: a.x_vote == 'Against').x_attendee_id.ids
         x_against = sum(attendee.x_ratio for attendee in event.attendee_ids if (attendee.x_delegating or attendee.x_attending) and attendee.partner_id.id in voters)
-        record['x_against'] = x_against / sum([x_ratio.x_ratio for x_ratio in event.x_voting_key_id.x_ratio_ids]) / event.x_attending_ratio
+        total_ratio = sum([x_ratio.x_ratio for x_ratio in event.x_voting_key_id.x_ratio_ids])
+        record['x_against'] = x_against / total_ratio / event.x_attending_ratio if total_ratio else 0
     else: record['x_against'] = 0]]></field>
     <field name="ttype">float</field>
     <field name="depends">x_attendee_vote_ids</field>
@@ -908,7 +910,8 @@ for record in self: record['x_companies'] = [(6, 0, record.x_property_ids.x_cond
     if event.x_attending_ratio > 0 and event.x_voting_key_id:
         voters = record.x_attendee_vote_ids.filtered(lambda a: a.x_vote == 'Abstention').x_attendee_id.ids
         x_abstention = sum(attendee.x_ratio for attendee in event.attendee_ids if (attendee.x_delegating or attendee.x_attending) and attendee.partner_id.id in voters)
-        record['x_abstention'] = x_abstention / sum([x_ratio.x_ratio for x_ratio in event.x_voting_key_id.x_ratio_ids]) / event.x_attending_ratio
+        total_ratio = sum([x_ratio.x_ratio for x_ratio in event.x_voting_key_id.x_ratio_ids])
+        record['x_abstention'] = x_abstention / total_ratio / event.x_attending_ratio if total_ratio else 0
     else: record['x_abstention'] = 0]]></field>
     <field name="ttype">float</field>
     <field name="depends">x_attendee_vote_ids</field>
