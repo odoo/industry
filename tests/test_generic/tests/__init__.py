@@ -7,3 +7,5 @@ from . import test_mandatory_files
 from . import test_manifest
 from . import test_pot_export
 from . import test_xml
+
+from . import test_behave
