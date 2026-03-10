@@ -109,6 +109,13 @@ CONTEXT_MODELS_DICT = {
     'res.partner': 'no_vat_validation',  # not linked to mail, but avoid redundant code
     **SKIP_CONTEXT_DICT_FOR_DEMO
 }
+RISKY_FIELDS = {
+    "domain",
+    "context",
+    "domain_force",
+    "filter_domain",
+    "filter_pre_domain",
+}
 
 
 @tagged('post_install', '-at_install')
@@ -176,6 +183,7 @@ class TestEnv(IndustryCase):
                 if root.split('/')[-1] == 'data':
                     self._check_view_active(tree, file_name)
                     self._check_is_published_false(tree, file_name)
+                    self._check_base_records_update(tree, file_name, module)
                     if not is_studio_required:
                         is_studio_required = self._check_studio(tree, file_name)
         self._check_manifest(manifest_content, is_studio_required, escape_studio_test=module in ESCAPE_STUDIO_TEST)
@@ -663,3 +671,37 @@ class TestEnv(IndustryCase):
                         login,
                         file_name,
                     )
+
+    def _check_base_records_update(self, root, file_name, module):
+        for record in root.xpath(".//record"):
+            record_id = record.get('id')
+            model = record.get('model')
+
+            if not record_id:
+                continue
+
+            record_module = record_id.split('.')[0] if "." in record_id else module
+            if record_module == module:
+                continue
+
+            for field in record.xpath(".//field"):
+                field_name = field.get('name')
+                if field_name in RISKY_FIELDS:
+                    found = False
+                    if automation := self.env.ref(module + '.uninstall_hook_base_automation', raise_if_not_found=False):
+                        for server_action in automation.action_server_ids:
+                            if any(ref in server_action.code for ref in [f"env.ref('{record_id}', raise_if_not_found=False)", f"env.ref('{record_id}')"]):
+                                found = True
+                                break
+                    if not found:
+                        _logger.warning(
+                            "Module '%s' updates base record '%s' (model: %s) from module '%s' "
+                            "in file '%s', modifying risky field '%s'. "
+                            "Add 'uninstall_hook_base_automation' and 'server_action' to safely clean references on uninstall.",
+                            module,
+                            record_id,
+                            model,
+                            record_module,
+                            file_name,
+                            field_name,
+                        )

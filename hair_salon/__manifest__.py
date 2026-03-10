@@ -1,6 +1,6 @@
 {
     'name': 'Hair Salon',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Services',
     'depends': [
         'base_automation',
@@ -38,6 +38,7 @@
         'data/appointment_type.xml',
         'data/ir_actions_actions.xml',
         'data/knowledge_tour.xml',
+        'data/uninstall_hook.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -67,6 +68,7 @@
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        "data/uninstall_hook.xml",
         "static/src/js/my_tour.js",
         "demo/website_view.xml",
     ],
