@@ -1,6 +1,6 @@
 {
     'name': 'Architecture Firm',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Services',
     'depends': [
         'account_followup',
@@ -44,6 +44,7 @@
         'data/website_view.xml',
         'data/website_theme_apply.xml',
         'data/knowledge_tour.xml',
+        'data/uninstall_hook.xml',
     ],
     'demo': [
         'demo/res_users.xml',
@@ -69,6 +70,7 @@
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        "data/uninstall_hook.xml",
         "static/src/js/my_tour.js",
         "data/website_view.xml",
         "demo/website_view.xml",
