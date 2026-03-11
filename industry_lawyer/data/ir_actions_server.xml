@@ -48,14 +48,16 @@ if claimants_line_ids: claimants_line_ids.write({'x_share': 100 / len(claimants_
     </record>
     <record id="action_split_invoice_per_claimant_from_so" model="ir.actions.server">
         <field name="code"><![CDATA[
-claimants = record.x_selected_claimant_ids
+claimants = record.x_claimant_ids
+origin = record.name
 for claimant in claimants:   # One invoice per claimant
     for invoice in record.invoice_ids:
-        new_invoice = invoice.copy({'partner_id': claimant.id})
+        new_invoice = invoice.copy({'partner_id': claimant.id, 'invoice_origin': origin})
         for orig_line, new_line in zip(invoice.invoice_line_ids, new_invoice.invoice_line_ids):
             new_line.write({'price_unit': new_line.price_unit / len(claimants)})
         invoice.write({'state': 'cancel'})
 action = env['ir.actions.act_window']._for_xml_id('account.action_move_out_invoice')
+action['context'] = {'invoice_origin': origin}
 ]]>        </field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
@@ -65,11 +67,12 @@ action = env['ir.actions.act_window']._for_xml_id('account.action_move_out_invoi
         <field name="code"><![CDATA[
 claimants_lines = record.partner_id.x_claimants_line_ids
 for claimant_line in claimants_lines:   # One invoice per claimant
-    new_invoice = record.copy({'partner_id': claimant_line.x_claimant_id.id})
+    new_invoice = record.copy({'partner_id': claimant_line.x_claimant_id.id, 'invoice_origin': record.invoice_origin or ''})
     for orig_line, new_line in zip(record.invoice_line_ids, new_invoice.invoice_line_ids):
         new_line.write({'price_unit': new_line.price_unit / len(claimants_lines)})
     record.write({'state': 'cancel'})
 action = env['ir.actions.act_window']._for_xml_id('account.action_move_out_invoice')
+action['context'] = {'invoice_origin': record.invoice_origin or record.id}
 ]]>        </field>
         <field name="model_id" ref="sale.model_account_move"/>
         <field name="state">code</field>
