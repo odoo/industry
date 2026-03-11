@@ -37,7 +37,7 @@
                 <button name="%(action_split_invoice_per_claimant_from_so)d" string="Split Invoice" type="action" invisible="not invoice_count or not x_show_split_invoice"/>
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="x_selected_claimant_ids" readonly='1' widget="many2many_avatar_user"/>
+                <field name="x_claimant_ids" invisible="not x_claimant_ids" readonly='1' widget="many2many_avatar_user"/>
             </xpath>
         </field>
     </record>
@@ -111,10 +111,6 @@
                     <block title="Approval Settings">
                         <setting id="approval_required" string="Approval Required" help="Choose whether email approval is optional or mandatory before sending">
                             <field name="x_approval_required" class="o_light_label" widget="radio"/>
-                        </setting>
-                    </block>
-                    <block>
-                        <setting id="manage_approvals_groups" string="Manage Approval Groups">
                             <div class="content-group">
                                 <button name="%(approval_groups_action)d" type="action" string="Manage Approval Groups" icon="oi-arrow-right" class="btn-link"/>
                             </div>
@@ -261,21 +257,21 @@
                 <attribute name="string">Approves For</attribute>
             </xpath>
             <xpath expr="//field[@name='name']" position="after">
-                <field name="user_ids" widget="many2many_tags"/>
+                <field name="user_ids" string="Users" widget="many2many_tags"/>
             </xpath>
         </field>
     </record>
-    <record id="view_invoice_list_confirm_entries_quick_action" model="ir.ui.view">
-        <field name="name">account.invoice.list.confirm.entries.industry_lawyer</field>
+    <record id="account_move_list_custom" model="ir.ui.view">
+        <field name="name">account.move.list.inherit</field>
         <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="inherit_id" ref="account.view_out_invoice_tree"/>
         <field name="mode">extension</field>
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="after">
                 <field name="invoice_origin" string="Source Document"/>
             </xpath>
-            <xpath expr="//list/header/button[@name='action_force_register_payment']" position="after">
+            <xpath expr="//list/header/button[@name='action_send_and_print']" position="before">
                 <button name="%(account.action_validate_account_moves)d" string="Confirm Entries" type="action" groups="account.group_account_invoice"/>
             </xpath>
         </field>
