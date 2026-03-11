@@ -51,7 +51,6 @@ USELESS_FIELDS = {
     ],
     'sale.order.line': ['qty_delivered', 'company_id'],
     'sign.template': ['name'],
-    'worksheet.template': ['color'],
 }
 
 MODELS_TO_UPDATE = {
