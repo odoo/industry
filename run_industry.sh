@@ -57,7 +57,7 @@ if $INSTALL; then
 import sys
 sys.path.append('industry/')
 from utils import IndustryUtils
-zip = IndustryUtils('$INDUSTRY_PATH').get_zip('$INDUSTRY_NAME')
+zip = IndustryUtils().get_zip('$INDUSTRY_NAME')
 res = env['ir.module.module'].sudo()._import_zipfile(zip, force=False, with_demo=$DEMO)
 print("")
 env.cr.commit()
