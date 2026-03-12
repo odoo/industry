@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="res_partner_form_view_custom" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//button[@name='sale.act_res_partner_2_sale_order']" position="after">
+        <button class="oe_stat_button" icon="fa-envelope" type="action" name="%(to_invoice_act_window)d">
+          <div class="o_form_field o_stat_info">
+            <span class="o_stat_value">
+              <field name="x_amount_to_invoice" widget='monetary'/>
+            </span>
+            <span class="o_stat_text">To Invoice</span>
+          </div>
+        </button>
+      </xpath>
+      <xpath expr="//div[@name='warning_tax']" position="before">
+        <header>
+          <button string="Consolidated Down Payment" type="action" name="%(consolidated_down_payment_server_action)d"/>
+        </header>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="mode">extension</field>
+    <field name="model">res.partner</field>
+    <field name="active" eval="True"/>
+    <field name="name">res.partner.form.view.recurring_rental_billing</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+  </record>
+  <record id="rental_order_form_view_custom" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='rental_start_date']" position="attributes">
+        <attribute name="readonly">invoice_count != 0</attribute>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="sale_renting.rental_order_form_view"/>
+    <field name="mode">extension</field>
+    <field name="model">sale.order</field>
+    <field name="name">rental.order.form.view.recurring_rental_billing</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+</odoo>
