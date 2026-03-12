@@ -1,5 +1,6 @@
 {
     'name': 'Cleaning Services',
+    'version': '1.1',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
@@ -15,6 +16,7 @@
         'data/res_config_settings.xml',
         'data/product_category.xml',
         'data/project_task_type.xml',
+        'data/planning_role.xml',
         'data/project_project.xml',
         'data/project_task_recurrence.xml',
         'data/sale_subscription_plan.xml',
