@@ -1,6 +1,6 @@
 {
     'name': 'IT Hardware & Support',
-    'version': '1.3',
+    'version': '1.4',
     'category': 'Services',
     'depends': [
         'account_followup',
@@ -21,6 +21,7 @@
         'data/project_task_type.xml',
         'data/product_category.xml',
         'data/project_project.xml',
+        'data/planning_role.xml',
         'data/product_template.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
@@ -40,6 +41,7 @@
     'demo': [
         'demo/res_users.xml',
         'demo/res_partner.xml',
+        'demo/hr_employee.xml',
         'demo/product_supplierinfo.xml',
         'demo/product_template.xml',
         'demo/stock_lot.xml',
