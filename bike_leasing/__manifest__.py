@@ -46,7 +46,6 @@
     'demo': [
         'demo/res_users.xml',
         'demo/res_partner.xml',
-        'demo/hr_employee.xml',
         'demo/product_supplierinfo.xml',
         'demo/product_template.xml',
         'demo/sale_order.xml',
