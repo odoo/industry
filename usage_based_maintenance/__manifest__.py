@@ -1,5 +1,11 @@
 {
     'name': 'Usage Based Maintenance',
+<<<<<<< bc038086f8b6e5b03ec602efc2a1fd81cbbb0694
+||||||| 2b9e5b1afb5a45a31e9dab860e09a38a94f6fd66
+    'version': '1.0',
+=======
+    'version': '1.1',
+>>>>>>> 5ec87572581e5a8ed42aa3727484c964cddb1ffa
     'category': 'Hidden/Tools',
     'author': 'Odoo S.A.',
     'depends': [
