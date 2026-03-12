@@ -38,7 +38,6 @@
         'demo/appointment_type.xml',
         'demo/hr_department.xml',
         'demo/crm_tag.xml',
-        'demo/hr_employee.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/project_task.xml',

@@ -51,7 +51,6 @@
         'demo/ir_attachment_post.xml',
         'demo/project_task.xml',
         'demo/sale_order_line.xml',
-        'demo/hr_employee.xml',
         'demo/hr_expense.xml',
         'demo/hr_expense_action.xml',
         'demo/event_event.xml',
