@@ -48,16 +48,14 @@ if claimants_line_ids: claimants_line_ids.write({'x_share': 100 / len(claimants_
     </record>
     <record id="action_split_invoice_per_claimant_from_so" model="ir.actions.server">
         <field name="code"><![CDATA[
-claimants = record.x_claimant_ids
-origin = record.name
+claimants = record.x_claimant_ids; origin = record.name; invoices = record.invoice_ids
 for claimant in claimants:   # One invoice per claimant
-    for invoice in record.invoice_ids:
+    for invoice in invoices:
         new_invoice = invoice.copy({'partner_id': claimant.id, 'invoice_origin': origin})
         for orig_line, new_line in zip(invoice.invoice_line_ids, new_invoice.invoice_line_ids):
             new_line.write({'price_unit': new_line.price_unit / len(claimants)})
-        invoice.write({'state': 'cancel'})
-action = env['ir.actions.act_window']._for_xml_id('account.action_move_out_invoice')
-action['context'] = {'invoice_origin': origin}
+invoices.write({'state': 'cancel'})
+action = {'type': 'ir.actions.act_window', 'name': 'Invoices', 'res_model': 'account.move', 'views': [(env.ref('industry_lawyer.account_move_list_custom').id, 'list'), (False, 'form')], 'domain': [('invoice_origin', '=', origin)]}
 ]]>        </field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
@@ -65,14 +63,13 @@ action['context'] = {'invoice_origin': origin}
     </record>
     <record id="action_split_invoice_per_claimant" model="ir.actions.server">
         <field name="code"><![CDATA[
-claimants_lines = record.partner_id.x_claimants_line_ids
+claimants_lines = record.partner_id.x_claimants_line_ids; len_claimants_lines = len(claimants_lines)
 for claimant_line in claimants_lines:   # One invoice per claimant
-    new_invoice = record.copy({'partner_id': claimant_line.x_claimant_id.id, 'invoice_origin': record.invoice_origin or ''})
+    new_invoice = record.copy({'partner_id': claimant_line.x_claimant_id.id, 'invoice_origin': record.invoice_origin})
     for orig_line, new_line in zip(record.invoice_line_ids, new_invoice.invoice_line_ids):
-        new_line.write({'price_unit': new_line.price_unit / len(claimants_lines)})
-    record.write({'state': 'cancel'})
-action = env['ir.actions.act_window']._for_xml_id('account.action_move_out_invoice')
-action['context'] = {'invoice_origin': record.invoice_origin or record.id}
+        new_line.write({'price_unit': new_line.price_unit / len_claimants_lines})
+record.write({'state': 'cancel'})
+action = {'type': 'ir.actions.act_window', 'name': 'Invoices', 'res_model': 'account.move', 'views': [(env.ref('industry_lawyer.account_move_list_custom').id, 'list'), (False, 'form')], 'domain': [('invoice_origin', '=', record.invoice_origin)]}
 ]]>        </field>
         <field name="model_id" ref="sale.model_account_move"/>
         <field name="state">code</field>
