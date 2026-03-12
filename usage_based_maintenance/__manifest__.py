@@ -1,6 +1,6 @@
 {
     'name': 'Usage Based Maintenance',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Hidden/Tools',
     'author': 'Odoo S.A.',
     'depends': [
