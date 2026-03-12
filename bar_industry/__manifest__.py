@@ -1,8 +1,9 @@
 {
     'name': 'Bar & Pub',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Hospitality',
     'depends': [
+        'base_industry_data',
         'hr_attendance',
         'knowledge',
         'loyalty',
@@ -13,7 +14,6 @@
         'purchase',
     ],
     'data': [
-        'data/hr_employee.xml',
         'data/res_config_settings.xml',
         'data/product_category.xml',
         'data/product_pricelist.xml',

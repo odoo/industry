@@ -1,8 +1,10 @@
 {
     'name': 'Sport Events',
+    'version': '1.1',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
+        'base_industry_data',
         'documents_sign',
         'event_crm',
         'hr_expense',
