@@ -1,6 +1,6 @@
 {
     'name': 'Solar Energy Systems',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Construction',
     'depends': [
         'account_followup',
@@ -32,6 +32,7 @@
         'data/product_category.xml',
         'data/worksheet_template.xml',
         'data/project_project.xml',
+        'data/planning_role.xml',
         'data/product_template.xml',
         'data/product_product.xml',
         'data/sale_order_template.xml',
@@ -52,6 +53,7 @@
     'demo': [
         'demo/res_users.xml',
         'demo/res_partner.xml',
+        'demo/hr_employee.xml',
         'demo/crm_tag.xml',
         'demo/crm_lead.xml',
         'demo/account_analytic_plan.xml',
