@@ -302,7 +302,9 @@ for record in self: record['x_show_approval'] = record.model == 'account.move' a
     </record>
     <record id="field_x_allowed_approver_group_ids" model="ir.model.fields">
         <field name="compute"><![CDATA[
-for record in self: record['x_allowed_approver_group_ids'] = record.env.user.group_ids.filtered(lambda g: g.x_approval_groups).implied_by_ids
+approval_groups = self.env.user.group_ids.filtered('x_approval_groups')
+highest_groups = approval_groups - approval_groups.mapped('implied_ids')
+for record in self: record['x_allowed_approver_group_ids'] = highest_groups.implied_by_ids
 ]]></field>
         <field name="ttype">many2many</field>
         <field name="field_description">Allowed Approver Groups</field>
@@ -313,7 +315,9 @@ for record in self: record['x_allowed_approver_group_ids'] = record.env.user.gro
     </record>
     <record id="field_x_allowed_approver_group_ids_move_send" model="ir.model.fields">
         <field name="compute"><![CDATA[
-for record in self: record['x_allowed_approver_group_ids'] = record.env.user.group_ids.filtered(lambda g: g.x_approval_groups).implied_by_ids
+approval_groups = self.env.user.group_ids.filtered('x_approval_groups')
+highest_groups = approval_groups - approval_groups.mapped('implied_ids')
+for record in self: record['x_allowed_approver_group_ids'] = highest_groups.implied_by_ids
 ]]></field>
         <field name="ttype">many2many</field>
         <field name="field_description">Allowed Approver Groups</field>
