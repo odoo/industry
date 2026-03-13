@@ -64,42 +64,21 @@ for record in self: record['x_show_split_invoice'] = len(record.partner_id.x_cla
         <field name="model_id" ref="account.model_account_move"/>
         <field name="store" eval="False"/>
     </record>
-    <record id="field_x_approver_id" model="ir.model.fields">
+    <record id="field_x_approver_group_id" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="field_description">Approver</field>
         <field name="model_id" ref="mail.model_mail_compose_message"/>
-        <field name="name">x_approver_id</field>
-        <field name="relation">res.users</field>
+        <field name="name">x_approver_group_id</field>
+        <field name="relation">res.groups</field>
         <field name="on_delete" eval="False"/>
     </record>
-    <record id="field_x_invoice_approver_id" model="ir.model.fields">
+    <record id="field_x_invoice_approver_group_id" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="field_description">Approver</field>
         <field name="model_id" ref="account.model_account_move_send_wizard"/>
-        <field name="name">x_approver_id</field>
-        <field name="relation">res.users</field>
+        <field name="name">x_approver_group_id</field>
+        <field name="relation">res.groups</field>
         <field name="on_delete" eval="False"/>
-    </record>
-    <record id="field_x_is_higher_group_user" model="ir.model.fields">
-        <field name="name">x_is_higher_group_user</field>
-        <field name="depends">group_ids</field>
-        <field name="compute"><![CDATA[
-groups = {3: self.env.ref("industry_lawyer.group_high", raise_if_not_found=False),
-    2: self.env.ref("industry_lawyer.group_medium", raise_if_not_found=False),
-    1: self.env.ref("industry_lawyer.group_low", raise_if_not_found=False)}
-def get_rank(user):
-    for rank, group in groups.items():
-        if group and user.group_ids and group in user.group_ids: return rank
-    return 0
-current_user = self.env.user
-current_user_rank = get_rank(current_user)
-users = self.search([]) if current_user in self else self
-for user in users: user['x_is_higher_group_user'] = get_rank(user) > current_user_rank
-]]></field>
-        <field name="ttype">boolean</field>
-        <field name="field_description">Is Higher Group User</field>
-        <field name="model_id" ref="mail.model_res_users"/>
-        <field name="store" eval="True"/>
     </record>
     <record id="field_x_approval_status" model="ir.model.fields">
         <field name="name">x_approval_status</field>
@@ -156,19 +135,17 @@ for user in users: user['x_is_higher_group_user'] = get_rank(user) > current_use
     </record>
     <record id="field_x_approval_groups" model="ir.model.fields">
         <field name="ttype">boolean</field>
-        <field name="copied" eval="True"/>
         <field name="field_description">Approval Group</field>
         <field name="model_id" ref="base.model_res_groups"/>
         <field name="name">x_approval_groups</field>
     </record>
-    <record id="field_x_suggest_approver_id" model="ir.model.fields">
+    <record id="field_x_suggest_approver_group_id" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="on_delete" eval="False"/>
         <field name="field_description">Suggest Approver</field>
         <field name="model_id" ref="base.model_res_users"/>
-        <field name="name">x_suggest_approver_id</field>
-        <field name="readonly" eval="True"/>
-        <field name="relation">res.users</field>
+        <field name="name">x_suggest_approver_group_id</field>
+        <field name="relation">res.groups</field>
     </record>
     <record id="field_x_mail_author_id" model="ir.model.fields">
         <field name="ttype">many2one</field>
@@ -323,23 +300,35 @@ for record in self: record['x_show_approval'] = record.model == 'account.move' a
         <field name="model_id" ref="account.model_account_move_send_wizard"/>
         <field name="name">x_show_approval</field>
     </record>
-    <record id="field_x_approved_by_id" model="ir.model.fields">
+    <record id="field_x_allowed_approver_group_ids" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self: record['x_allowed_approver_group_ids'] = record.env.user.group_ids.filtered(lambda g: g.x_approval_groups).implied_by_ids
+]]></field>
+        <field name="ttype">many2many</field>
+        <field name="field_description">Allowed Approver Groups</field>
+        <field name="model_id" ref="mail.model_mail_compose_message"/>
+        <field name="name">x_allowed_approver_group_ids</field>
+        <field name="relation">res.groups</field>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="field_x_allowed_approver_group_ids_move_send" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self: record['x_allowed_approver_group_ids'] = record.env.user.group_ids.filtered(lambda g: g.x_approval_groups).implied_by_ids
+]]></field>
+        <field name="ttype">many2many</field>
+        <field name="field_description">Allowed Approver Groups</field>
+        <field name="model_id" ref="account.model_account_move_send_wizard"/>
+        <field name="name">x_allowed_approver_group_ids</field>
+        <field name="relation">res.groups</field>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="field_x_approved_by_groups_id" model="ir.model.fields">
         <field name="ttype">many2one</field>
         <field name="field_description">Approved By</field>
         <field name="on_delete" eval="False"/>
         <field name="model_id" ref="model_x_approval_mail"/>
-        <field name="name">x_approved_by_id</field>
-        <field name="relation">res.users</field>
-    </record>
-    <record id="field_x_is_approver" model="ir.model.fields">
-        <field name="compute"><![CDATA[
-for record in self: record['x_is_approver'] = record.x_approved_by_id.id == record.env.uid and record.x_approval_status == 'pending'
-]]></field>
-        <field name="ttype">boolean</field>
-        <field name="field_description">Is Approver</field>
-        <field name="model_id" ref="model_x_approval_mail"/>
-        <field name="name">x_is_approver</field>
-        <field name="store" eval="False"/>
+        <field name="name">x_approved_by_groups_id</field>
+        <field name="relation">res.groups</field>
     </record>
     <record id="field_x_related_document_model" model="ir.model.fields">
         <field name="ttype">char</field>
@@ -373,5 +362,13 @@ for record in self: record['x_selected_claimant_ids'] = [(6, 0, [line.x_claimant
         <field name="name">x_claimant_ids</field>
         <field name="relation">res.partner</field>
         <field name="relation_table">x_res_partner_sale_order_rel</field>
+    </record>
+    <record id="field_x_access_by_users_ids" model="ir.model.fields">
+        <field name="ttype">many2many</field>
+        <field name="field_description">Access By Users</field>
+        <field name="model_id" ref="model_x_approval_mail"/>
+        <field name="name">x_access_by_users_ids</field>
+        <field name="relation">res.users</field>
+        <field name="relation_table">x_res_users_x_approval_mail_rel</field>
     </record>
 </odoo>
