@@ -57,6 +57,7 @@
         'data/website_page.xml',
         'data/website_menu.xml',
         'data/website_theme_apply.xml',
+        'data/website.xml',
     ],
     'demo': [
         'demo/product_attribute_value.xml',
