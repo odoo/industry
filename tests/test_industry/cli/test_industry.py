@@ -95,6 +95,7 @@ class Test_Industry(Command):
                         zip_content = utils.IndustryUtils().get_zip(industry_module)
                         env['ir.module.module']._import_zipfile(zip_content, force=False, with_demo=with_demo)
                         env['ir.module.module'].search([('id', 'not in', existing_module.ids)]).demo = with_demo
+                        env['ir.config_parameter'].set_param('test_industry.industry_module', industry_module)
                         env.cr.commit()
                 if test_enable:
                     try:

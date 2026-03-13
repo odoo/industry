@@ -1,6 +1,8 @@
 import io
+from pathlib import Path
 
 from odoo.tests import common, tagged
+from odoo.tools import config
 from odoo.tools.translate import trans_export
 
 from .industry_case import IndustryCase
@@ -11,14 +13,17 @@ class PotExportTest(IndustryCase):
     @common.no_retry
     def test_export_industry_pot(self):
         """Export the source terms for every installed industry module and save them."""
+        industry = self.env['ir.config_parameter'].sudo().get_param('test_industry.industry_module')
+        if industry:
+            industries = [industry]
+        else:
+            industries = self.installed_industries
 
-        for module_name in self.installed_industries:
-            module = self.env['ir.module.module'].search([('name', '=', module_name)], limit=1)
+        for module_name in industries:
             with io.BytesIO() as buf:
                 trans_export(False, [module_name], buf, 'po', self.env.cr)
                 # TODO: From saas-18.4, check for empty POT files using return value
-                common.save_test_file(
-                    module.name, buf.getvalue(), prefix='i18n_', extension='pot',
-                    document_type='Source Terms for %s' % module.name,
-                    date_format='',
-                )
+                dir = Path(config['screenshots'])
+                dir.mkdir(parents=True, exist_ok=True)
+                with (dir / f'i18n__{module_name}.pot').open('wb') as f:
+                    f.write(buf.getvalue())
