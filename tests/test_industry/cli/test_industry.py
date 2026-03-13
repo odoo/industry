@@ -5,6 +5,7 @@ import pathlib
 import shutil
 import subprocess
 import sys
+import threading
 
 from odoo import api, sql_db
 from odoo.cli.command import Command
@@ -85,6 +86,7 @@ class Test_Industry(Command):
                             raise ValueError(f"Database {target_db} already exists, use --drop-if-exists to drop it before installing the industry module {industry_module}")
                     if install:
                         duplicate(init_db, target_db)
+                threading.current_thread().dbname = target_db
                 registry = Registry(target_db)
                 if install:
                     with registry.cursor() as cr:
@@ -114,6 +116,7 @@ class Test_Industry(Command):
                             config['test_tags'] = ','.join([f"/{module}" for module in test_modules])
 
                         config['db_name'] = target_db
+                        threading.current_thread()._testing_industry_module = industry_module
                         _logger.info('Running tests for industry module %s in database %s', industry_module, target_db)
                         server.start(preload=[target_db], stop=True)
                     finally:
