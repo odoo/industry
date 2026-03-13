@@ -78,9 +78,9 @@ action = {'type': 'ir.actions.act_window', 'name': 'Invoices', 'res_model': 'acc
     <record id="action_update_additional_contacts_of_mail_composition" model="ir.actions.server">
         <field name="code"><![CDATA[
 if record.composition_mode == 'comment' and not record.partner_ids: record['partner_ids'] = [(6, 0, env[record.model].browse(record._evaluate_res_ids()).partner_id.ids)]
-suggest_approver = env.user.x_suggest_approver_id
+suggest_approver_group = env.user.x_suggest_approver_group_id
 vals = {'partner_ids': [(4, pid) for pid in record.partner_ids.mapped('x_claimants_line_ids.x_claimant_id').ids],}
-if suggest_approver: vals['x_approver_id'] = suggest_approver.id
+if suggest_approver_group: vals['x_approver_group_id'] = suggest_approver_group.id
 record.write(vals)
         ]]>        </field>
         <field name="model_id" ref="mail.model_mail_compose_message"/>
@@ -89,9 +89,9 @@ record.write(vals)
     </record>
     <record id="action_update_additional_contacts_of_account_move_send" model="ir.actions.server">
         <field name="code"><![CDATA[
-suggest_approver = env.user.x_suggest_approver_id
+suggest_approver_group = env.user.x_suggest_approver_group_id
 vals = {'mail_partner_ids': [(4, pid) for pid in record.mail_partner_ids.mapped('x_claimants_line_ids.x_claimant_id').ids],}
-if suggest_approver: vals['x_approver_id'] = suggest_approver.id
+if suggest_approver_group: vals['x_approver_group_id'] = suggest_approver_group.id
 record.write(vals)
         ]]>        </field>
         <field name="model_id" ref="account.model_account_move_send_wizard"/>
@@ -119,14 +119,14 @@ env['x_approval_mail'].create({'x_mail_id': mail.id, 'x_approval_status': 'pendi
     </record>
     <record id="action_submit_for_approval" model="ir.actions.server">
         <field name="code"><![CDATA[
-approver_id = record.x_approver_id
-if not approver_id: raise UserError("Please select an approval user before submitting this email for approval.")
+x_approver_group_id = record.x_approver_group_id
+if not x_approver_group_id: raise UserError("Please select an approval group before submitting this email for approval.")
+current_user= env.user
+x_access_by_users_ids = current_user | x_approver_group_id.user_ids | x_approver_group_id.implied_by_ids.mapped('user_ids')
 for current_record in env[record.model].browse(record._evaluate_res_ids()):
-    mail = env['mail.mail'].create({'attachment_ids': [(6, 0, record.attachment_ids.ids)], 'body_html': record.body or '', 'partner_ids': record.partner_ids.ids, 'author_id': env.user.partner_id.id, 'x_author_id': env.user.id, 'scheduled_date': record.scheduled_date, 'subject': record.subject or '', 'recipient_ids': [(6, 0, record.partner_ids.ids)], 'reply_to': record.reply_to or False,})
-    mail_for_approval = env['x_approval_mail'].create({'x_mail_id': mail.id, 'x_approval_status': 'pending', 'x_approved_by_id': approver_id.id, 'x_res_model': record.model, 'x_res_id': current_record.id})
-    env.user.write({'x_suggest_approver_id': approver_id.id})
-    approver_mail = mail.copy({'x_author_id': approver_id.id})
-    mail_for_approval.copy({'x_mail_id': approver_mail.id})
+    mail = env['mail.mail'].create({'attachment_ids': [(6, 0, record.attachment_ids.ids)], 'body_html': record.body or '', 'partner_ids': record.partner_ids.ids, 'author_id': current_user.partner_id.id, 'x_author_id': current_user.id, 'scheduled_date': record.scheduled_date, 'subject': record.subject or '', 'recipient_ids': [(6, 0, record.partner_ids.ids)], 'reply_to': record.reply_to or False,})
+    mail_for_approval = env['x_approval_mail'].create({'x_mail_id': mail.id, 'x_approval_status': 'pending', 'x_approved_by_groups_id': x_approver_group_id.id, 'x_res_model': record.model, 'x_res_id': current_record.id, 'x_access_by_users_ids': [(6, 0, x_access_by_users_ids.ids)]})
+current_user.write({'x_suggest_approver_group_id': x_approver_group_id.id})
         ]]>        </field>
         <field name="model_id" ref="mail.model_mail_compose_message"/>
         <field name="state">code</field>
@@ -134,9 +134,10 @@ for current_record in env[record.model].browse(record._evaluate_res_ids()):
     </record>
     <record id="action_submit_for_approval_in_account_move_send" model="ir.actions.server">
         <field name="code"><![CDATA[
-invoice_approver_id = record.x_approver_id
-if not invoice_approver_id: raise UserError("Please select an approval user before submitting this email for approval.")
+invoice_approver_group_id = record.x_approver_group_id
+if not invoice_approver_group_id: raise UserError("Please select an approval group before submitting this email for approval.")
 move_id = record.move_id
+current_user = env.user
 invoice_attachment_id = move_id.invoice_pdf_report_id
 if invoice_attachment_id: invoice_attachment_id.write({'res_id': False, 'res_field': False})
 else:
@@ -144,11 +145,10 @@ else:
     record._prepare_invoice_pdf_report(invoices_data_pdf)
     pdf_attachment_values = invoices_data_pdf[move_id]['pdf_attachment_values']
     invoice_attachment_id = record.env['ir.attachment'].create({'name': pdf_attachment_values.get('name'), 'raw': pdf_attachment_values.get('raw'), 'type': 'binary'})
-mail = env['mail.mail'].create({'attachment_ids': [(6, 0, [invoice_attachment_id.id])], 'body_html': record.body or '', 'partner_ids': record.mail_partner_ids.ids, 'author_id': env.user.partner_id.id, 'x_author_id': env.user.id, 'subject': record.subject or '', 'recipient_ids': [(6, 0, record.mail_partner_ids.ids)],})
-mail_for_approval = env['x_approval_mail'].create({'x_mail_id': mail.id, 'x_approval_status': 'pending', 'x_approved_by_id': invoice_approver_id.id, 'x_res_model': record.model, 'x_res_id': move_id.id})
-env.user.write({'x_suggest_approver_id': invoice_approver_id.id})
-approver_mail = mail.copy({'x_author_id': invoice_approver_id.id})
-mail_for_approval.copy({'x_mail_id': approver_mail.id})
+x_access_by_users_ids = current_user | x_approver_group_id.user_ids | x_approver_group_id.implied_by_ids.mapped('user_ids')
+mail = env['mail.mail'].create({'attachment_ids': [(6, 0, [invoice_attachment_id.id])], 'body_html': record.body or '', 'partner_ids': record.mail_partner_ids.ids, 'author_id': current_user.partner_id.id, 'x_author_id': current_user.id, 'subject': record.subject or '', 'recipient_ids': [(6, 0, record.mail_partner_ids.ids)],})
+mail_for_approval = env['x_approval_mail'].create({'x_mail_id': mail.id, 'x_approval_status': 'pending', 'x_approved_by_groups_id': invoice_approver_group_id.id, 'x_res_model': record.model, 'x_res_id': move_id.id, 'x_access_by_users_ids': [(6, 0, x_access_by_users_ids.ids)]})
+current_user.write({'x_suggest_approver_group_id': invoice_approver_group_id.id})
         ]]>        </field>
         <field name="model_id" ref="account.model_account_move_send_wizard"/>
         <field name="state">code</field>
