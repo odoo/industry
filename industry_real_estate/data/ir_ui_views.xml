@@ -1,80 +1,34 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
     <record id="property_form_view" model="ir.ui.view">
-        <field name="model">account.analytic.account</field>
-        <field name="mode">primary</field>
+        <field name="type">form</field>
+        <field name="model">x_property</field>
+        <field name="inherit_id" ref="property_assets_distribution.x_property_form_view"/>
         <field name="active" eval="True"/>
         <field name="priority">100</field>
         <field name="arch" type="xml">
-            <form string="Property">
-                <header>
-                    <button name="%(action_create_invoice_meters)d" type="action" string="Create Invoice" invisible="not x_rental_contract_id or x_invoice_status != 'to_invoice'"/>
-                </header>
-                <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button class="oe_stat_button" type="object" name="action_view_invoice" icon="fa-pencil-square-o" invisible="invoice_count == 0">
-                            <field string="Invoices" name="invoice_count" widget="statinfo"/>
-                        </button>
-                        <button class="oe_stat_button" type="object" name="action_view_vendor_bill" icon="fa-file-text-o" invisible="vendor_bill_count == 0">
-                            <field string="Vendor Bills" name="vendor_bill_count" widget="statinfo"/>
-                        </button>
-                        <button class="oe_stat_button" type="object" name="subscriptions_action" icon="fa-book" invisible="subscription_count == 0">
-                            <field string="Rental Contracts" name="subscription_count" widget="statinfo"/>
-                        </button>
-                    </div>
-
-                    <field name="x_property_image" widget="image" class="oe_avatar ml-3 mr-3" options="{'size': [0, 180]}"/>
-                    <div class="oe_title">
-                        <label for="name" string="Property"/>
-                        <h1>
-                            <field name="name" class="oe_inline" placeholder="e.g. Apartment Oxford Street"/>
-                        </h1>
-                    </div>
-
-                    <group>
-                        <group>
-                            <field name="x_rental_contract_id"/>
-                            <field name="x_property_building_id"/>
-                            <field name="x_property_address" required="x_is_property"/>
-                        </group>
-                        <group>
-                            <field name="currency_id" groups="base.group_multi_currency"/>
-                            <field name="x_property_type" required="x_is_property"/>
-                            <field name="x_is_published"/>
-                            <field name="x_invoice_status"/>
-                        </group>
-                    </group>
-
-                    <notebook>
-                        <page string="Description">
-                            <field name="x_website_description" placeholder="Describe your property here"/>
-                        </page>
-                        <page string="Gallery">
-                            <field name="x_property_attachment_image_ids" widget="many2many_binary" options="{'accepted_file_extensions': 'image/*'}" string="Add Images"/>
-                         </page>
-                        <page string="Documents">
-                            <field name="x_property_attachment_doc_ids" widget="many2many_binary"/>
-                        </page>
-                        <page string="Meter Readings">
-                            <field name="x_property_meter_reading_ids" context="{'default_x_account_analytic_account_id': id}">
-                                <list editable="bottom">
-                                    <field name="x_meter_id" required="True"/>
-                                    <field name="x_date"/>
-                                    <field name="x_quantity"/>
-                                    <field name="x_usage" optional="show"/>
-                                    <field name="x_description" optional="show"/>
-                                    <field name="x_invoice_id" optional="hide"/>
-                                </list>
-                            </field>
-                        </page>
-                    </notebook>
-                </sheet>
-                <chatter/>
-            </form>
+            <xpath expr="//header" position="inside">
+                <button name="%(action_create_invoice_meters)d" type="action" string="Create Invoice" invisible="not x_rental_contract_id or x_invoice_status != 'to_invoice'"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" type="action" name="%(subscriptions_action)d" icon="fa-book" invisible="x_subscription_count == 0">
+                    <field string="Rental Contracts" name="x_subscription_count" widget="statinfo"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='x_active']" position="after">
+                <field name="x_property_image" widget="image" class="oe_avatar ms-3 me-3" options="{'size': [0, 180]}"/>
+            </xpath>
+            <xpath expr="//group[@name='property_group_detailleft']" position="inside">
+                <field name="x_rental_contract_id"/>
+                <field name="x_property_address"/>
+            </xpath>
+            <xpath expr="//group[@name='property_group_detailright']" position="inside">
+                <field name="x_invoice_status"/>
+            </xpath>
         </field>
     </record>
     <record id="property_kanban_view" model="ir.ui.view">
-        <field name="model">account.analytic.account</field>
+        <field name="model">x_property</field>
         <field name="mode">primary</field>
         <field name="active" eval="True"/>
         <field name="priority">100</field>
@@ -88,10 +42,10 @@
                             </div>
                             <div class="o_kanban_details">
                                 <strong>
-                                    <field name="name"/>
+                                    <field name="x_name"/>
                                 </strong>
                                 <div class="o_kanban_record_field">
-                                    <field name="x_property_building_id"/>
+                                    <field name="x_building"/>
                                 </div>
                                 <div class="o_kanban_record_field">
                                     <field name="x_property_address" class="text-muted"/>
@@ -113,7 +67,7 @@
         <field name="arch" type="xml">
             <data>
                 <xpath expr="//group[@name='opportunity_partner']//field[@name='lost_reason_id']" position="before">
-                    <field name="x_property_id" domain="[('x_is_property', '=', True)]"/>
+                    <field name="x_property_id"/>
                 </xpath>
             </data>
         </field>
@@ -170,7 +124,7 @@
                 <attribute name="string">Tenant</attribute>
             </field>
             <field name="partner_id" position="after">
-                <field name="x_account_analytic_account_id" readonly="state == 'sale'"/>
+                <field name="x_property_id" readonly="state == 'sale'"/>
                 <field name="x_guarant_partner_id"/>
             </field>
             <xpath expr="//div[@name='plan_block']/span" position="replace"/>
@@ -185,60 +139,15 @@
             </xpath>
         </field>
     </record>
-    <record id="meters_list_view" model="ir.ui.view">
-        <field name="name">meter.tree.view</field>
+    <record id="meters_list_view_inherit" model="ir.ui.view">
         <field name="model">x_meters</field>
+        <field name="inherit_id" ref="property_assets_distribution.meters_list_view"/>
         <field name="active" eval="True"/>
         <field name="type">list</field>
         <field name="arch" type="xml">
-            <list editable="bottom">
-                <field name="x_sequence" widget="handle"/>
-                <field name="x_name"/>
+            <xpath expr="//list" position="inside">
                 <field name="x_price" optional="show"/>
-            </list>
+            </xpath>
         </field>
     </record>
-    <record id="default_list_view_building" model="ir.ui.view">
-        <field name="model">x_buildings</field>
-        <field name="name">Default list view for buildings</field>
-        <field name="type">list</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <list editable="bottom">
-                <field name="x_name"/>
-            </list>
-        </field>
-    </record>
-    <record id="default_form_view_building" model="ir.ui.view">
-        <field name="name">Default form view for buildings</field>
-        <field name="model">x_buildings</field>
-        <field name="type">form</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <form>
-                <header/>
-                <sheet string="Buildings">
-                    <div class="oe_title">
-                        <h1>
-                            <field name="x_name" required="1" placeholder="Name..."/>
-                        </h1>
-                    </div>
-                    <group>
-                        <group>
-                            <span class="fw-bold">Address</span>
-                            <div class="o_address_format">
-                                <field name="x_street" placeholder="Street..." class="o_address_street"/>
-                                <field name="x_street2" placeholder="Street 2..." class="o_address_street"/>
-                                <field name="x_city" placeholder="City" class="o_address_city"/>
-                                <field name="x_state" class="o_address_state" placeholder="State" options="{'no_open': True, 'no_quick_create': True}"/>
-                                <field name="x_zip" placeholder="ZIP" class="o_address_zip"/>
-                                <field name="x_country" placeholder="Country" class="o_address_country" options="{'no_open': True, 'no_create': True}"/>
-                            </div>
-                        </group>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
 </odoo>

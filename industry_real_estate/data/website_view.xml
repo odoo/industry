@@ -88,7 +88,13 @@
                                                                     <span class="s_website_form_label_content">Property</span>
                                                                 </label>
                                                                 <div class="col-sm">
-                                                                    <input type="text" class="form-control s_website_form_input" name="Property" id="property_text" />
+                                                                    <t t-set="property_list" t-value="request.env['x_property'].sudo().search([])"/>
+                                                                    <select class="form-select s_website_form_input" name="Property" id="property_text">
+                                                                        <option value="">Select a property...</option>
+                                                                        <t t-foreach="property_list" t-as="prop">
+                                                                            <option t-att-value="prop.x_name"><t t-out="prop.x_name"/></option>
+                                                                        </t>
+                                                                    </select>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -147,6 +153,114 @@
                     </div>
                 </t>
             </t>
+        </field>
+    </record>
+    <template id="product" name="rename of add to cart" inherit_id="website_sale.cta_wrapper">
+        <xpath expr="//a[@id='add_to_cart']" position="replace">
+            <a data-animation-selector=".o_wsale_product_images" role="button" id="interested_in_this_property"
+            t-attf-class="btn btn-primary js_check_product flex-grow-1" href="#Interested-in-this-property">
+                <i class="fa fa-envelope me-2"/> Contact us
+            </a>
+        </xpath>
+    </template>
+
+    <template id="quantity" name="remove quantity selector" inherit_id="website_sale.product_quantity">
+        <xpath expr="//div[@id='add_to_cart_wrap']//a[hasclass('css_quantity_minus')]" position="replace"></xpath>
+        <xpath expr="//div[@id='add_to_cart_wrap']//input[@name='add_qty']" position="replace"></xpath>
+        <xpath expr="//div[@id='add_to_cart_wrap']//a[hasclass('css_quantity_plus')]" position="replace"></xpath>
+    </template>
+
+    <record id="industry_real_estate_product_interest_form" model="ir.ui.view">
+        <field name="name">Interest form</field>
+        <field name="key">industry_real_estate.product_interest_form</field>
+        <field name="inherit_id" ref="website_sale.product"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+        <field name="arch" type="xml">
+            <xpath expr="//*[hasclass('oe_structure')][@id='oe_structure_website_sale_product_2']" position="replace">
+                <div class="oe_structure oe_empty oe_structure_not_nearest mt16" id="oe_structure_website_sale_product_2" data-editor-message="DROP BUILDING BLOCKS HERE TO MAKE THEM AVAILABLE ACROSS ALL PRODUCTS">
+                    <section class="s_title_form o_cc o_cc2 pt64 o_colored_level pb56" data-snippet="s_title_form" data-name="Title - Form" id="Interested-in-this-property" data-anchor="true">
+                        <div class="o_container_small">
+                            <h2 class="text-center">Interested in this property?</h2>
+                            <p class="text-center lead">Get in touch with your customers to provide them with better service. You can modify the form fields to gather more precise information.</p>
+                            <section class="s_website_form pt16 pb16" data-vcss="001" data-snippet="s_website_form" data-name="Form">
+                                <div class="container-fluid">
+                                    <form action="/website/form/" method="post" enctype="multipart/form-data" class="o_mark_required" data-mark="*" data-pre-fill="true" data-model_name="crm.lead" data-success-mode="redirect" data-success-page="/contactus-thank-you">
+                                        <div class="s_website_form_rows row s_col_no_bgcolor">
+                                            <div data-name="Field" class="s_website_form_field mb-3 col-12 s_website_form_required" data-type="char" data-translated-name="Field">
+                                                <label class="s_website_form_label" style="width: 200px" for="owyz4lqydmnd">
+                                                    <span class="s_website_form_label_content">Your Name</span>
+                                                    <span class="s_website_form_mark">      *</span>
+                                                </label>
+                                                <input class="form-control s_website_form_input" type="text" name="contact_name" required="1" placeholder="" id="owyz4lqydmnd" data-fill-with="name"/>
+                                            </div>
+                                            <div data-name="Field" class="s_website_form_field mb-3 col-12" data-type="tel" data-translated-name="Field">
+                                                <label class="s_website_form_label" style="width: 200px" for="osp0at6i4gxn">
+                                                    <span class="s_website_form_label_content">Phone Number</span>
+                                                </label>
+                                                <input class="form-control s_website_form_input" type="tel" name="phone" placeholder="" id="osp0at6i4gxn" data-fill-with="phone"/>
+                                            </div>
+                                            <div data-name="Field" class="s_website_form_field mb-3 col-12 s_website_form_required" data-type="email" data-translated-name="Field">
+                                                <label class="s_website_form_label" style="width: 200px" for="otrdrv4m744">
+                                                    <span class="s_website_form_label_content">Your Email</span>
+                                                    <span class="s_website_form_mark">      *</span>
+                                                </label>
+                                                <input class="form-control s_website_form_input" type="email" name="email_from" required="1" placeholder="" id="otrdrv4m744" data-fill-with="email"/>
+                                            </div>
+                                            <div data-name="Field" class="s_website_form_field mb-3 col-12 s_website_form_field_hidden" data-type="char" data-translated-name="Field">
+                                                <label class="s_website_form_label" style="width: 200px" for="otpj9zeau4p">
+                                                    <span class="s_website_form_label_content">Your Company</span>
+                                                    <span class="s_website_form_mark">        *</span>
+                                                </label>
+                                                <input class="form-control s_website_form_input" type="text" name="partner_name" placeholder="" id="otpj9zeau4p" data-fill-with="commercial_company_name"/>
+                                            </div>
+                                            <div data-name="Field" class="s_website_form_field mb-3 col-12 s_website_form_model_required" data-type="char" data-translated-name="Field">
+                                                <label class="s_website_form_label" style="width: 200px" for="otw2ya2767a">
+                                                    <span class="s_website_form_label_content">Subject</span>
+                                                    <span class="s_website_form_mark">    *</span>
+                                                </label>
+                                                <input class="form-control s_website_form_input" type="text" name="name" required="" placeholder="" id="otw2ya2767a" data-fill-with="undefined"/>
+                                            </div>
+                                            <div hidden="true" data-name="Field" class="s_website_form_field mb-3 col-12" data-type="many2one" data-translated-name="Field">
+                                                <label class="s_website_form_label" style="width: 200px" for="oy78fiy08x2q">
+                                                    <span class="s_website_form_label_content">Product</span>
+                                                </label>
+                                                <select class="form-select s_website_form_input" name="x_interested_in_id" id="oy78fiy08x2q">
+                                                    <option id="oy78fiy08x2q0" t-att-value="product.id" selected="selected">Default product</option>
+                                                </select>
+                                            </div>
+                                            <div data-name="Field" class="s_website_form_field mb-3 col-12 s_website_form_required" data-type="text" data-translated-name="Field">
+                                                <label class="s_website_form_label" style="width: 200px" for="oycerkkna0l9">
+                                                    <span class="s_website_form_label_content">Your Question</span>
+                                                    <span class="s_website_form_mark">      *</span>
+                                                </label>
+                                                <textarea class="form-control s_website_form_input" name="description" required="1" placeholder="" id="oycerkkna0l9" rows="3"/>
+                                            </div>
+                                            <div data-name="Field" class="s_website_form_field mb-3 col-12 s_website_form_dnone">
+                                                <div class="row s_col_no_resize s_col_no_bgcolor">
+                                                    <label class="col-form-label col-sm-auto s_website_form_label" style="width: 200px">
+                                                        <span class="s_website_form_label_content"/>
+                                                    </label>
+                                                    <div class="col-sm">
+                                                        <input type="hidden" class="form-control s_website_form_input" name="team_id" value="*VIP_customer_tag*"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-0 py-2 col-12 s_website_form_submit text-center s_website_form_no_submit_label" data-name="Submit Button">
+                                                <div style="width: 200px;" class="s_website_form_label"/>
+                                                <span id="s_website_form_result"/>
+                                                <a href="#" role="button" class="btn btn-primary s_website_form_send">Submit</a>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </section>
+                        </div>
+                    </section>
+                </div>
+            </xpath>
         </field>
     </record>
 </odoo>
