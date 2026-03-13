@@ -164,6 +164,32 @@
                                 </p>
                             </div>
                         </section>
+                        <section
+                            class="s_dynamic_snippet_products pt32 pb32 o_colored_level o_wsale_products_opt_layout_catalog o_wsale_products_opt_design_thumbs o_wsale_products_opt_name_color_regular o_wsale_products_opt_thumb_cover o_wsale_products_opt_img_secondary_show o_wsale_products_opt_img_hover_zoom_out_light o_wsale_products_opt_has_cta o_wsale_products_opt_has_wishlist o_wsale_products_opt_has_comparison o_wsale_products_opt_actions_onhover o_wsale_products_opt_wishlist_fixed o_wsale_products_opt_actions_subtle o_wsale_products_opt_rounded_2 o_wsale_products_opt_has_description"
+                            data-snippet="s_dynamic_snippet_products"
+                            data-name="Products"
+                            t-att-data-filter-id="env.ref('website_sale.dynamic_filter_newest_products').id"
+                            data-number-of-records="16"
+                            data-carousel-interval="5000"
+                            data-template-key="website_sale.dynamic_filter_template_product_product_products_item"
+                        >
+                            <div class="container">
+                                <div class="row s_nb_column_fixed">
+                                    <section class="s_dynamic_snippet_title oe_unremovable oe_unmovable d-flex flex-column flex-md-row justify-content-between mb-lg-0 pb-3 pb-md-0">
+                                        <div>
+                                            <h4>Our latest</h4>
+                                            <p class="lead">Check out what's new !</p>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <a href="/shop" class="btn btn-link">See all →</a>
+                                        </div>
+                                    </section>
+                                </div>
+                                <div class="o_not_editable">
+                                    <div class="dynamic_snippet_template"/>
+                                </div>
+                            </div>
+                        </section>
                         <section class="s_text_image pt80 pb80 o_colored_level" data-snippet="s_text_image" data-name="Text - Image" style="background-image: none;">
                             <div class="container">
                                 <div class="row align-items-center">
@@ -256,4 +282,36 @@
             </t>
         </field>
     </record>
+    <template inherit_id='website_sale.product_quantity' id="quantity" name="remove quantity selector">
+        <xpath expr="//div[@id='add_to_cart_wrap']//a[hasclass('css_quantity_minus')]" position="replace"></xpath>
+        <xpath expr="//div[@id='add_to_cart_wrap']//input[@name='add_qty']" position="replace"></xpath>
+        <xpath expr="//div[@id='add_to_cart_wrap']//a[hasclass('css_quantity_plus')]" position="replace"></xpath>
+    </template>
+    <record id="ir_ui_view_3022" model="ir.ui.view">
+        <field name="inherit_id" ref="website_sale.header_cart_link"/>
+        <field name="key">website_sale.header_hide_empty_cart_link</field>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="name">Header Hide Empty Cart link</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website.default_website"/>
+        <field name="arch" type="xml">
+        <xpath expr="//t[@t-set='show_cart']" position="after">
+            <t t-set="show_cart" t-value="website_sale_cart_quantity"/>
+        </xpath>
+        </field>
+    </record>
+
+    <function model="ir.ui.view" name="write">
+        <value eval="[ref('website_sale.product_terms_and_conditions')]" />
+        <value eval="{'active': False}" />
+    </function>
+    <function model="ir.ui.view" name="write">
+        <value eval="[ref('website.header_search_box')]" />
+        <value eval="{'active': False}" />
+    </function>
+    <function model="ir.ui.view" name="write">
+        <value eval="[ref('website_sale.product_picture_magnify_click')]" />
+        <value eval="{'active': True}" />
+    </function>
 </odoo>
