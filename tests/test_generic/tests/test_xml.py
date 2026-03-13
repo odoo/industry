@@ -109,6 +109,13 @@ CONTEXT_MODELS_DICT = {
     'hr.applicant': 'mail_notrack',
     **SKIP_CONTEXT_DICT_FOR_DEMO
 }
+RISKY_FIELDS = {
+    "domain",
+    "context",
+    "domain_force",
+    "filter_domain",
+    "filter_pre_domain",
+}
 
 
 @tagged('post_install', '-at_install')
@@ -173,6 +180,7 @@ class TestEnv(IndustryCase):
                 self._check_context_to_stop_mail_sending(tree, file_name, module)
                 self._check_text_based_xpath(tree, file_name)
                 self._check_portal_login_is_email(tree, file_name)
+                self._check_base_records_update(tree, file_name, module)
                 if root.split('/')[-1] == 'data':
                     self._check_view_active(tree, file_name)
                     self._check_is_published_false(tree, file_name)
@@ -662,4 +670,33 @@ class TestEnv(IndustryCase):
                         "The login %s in file %s is incorrect. You should use a valid email format as a login.",
                         login,
                         file_name,
+                    )
+
+    def _check_base_records_update(self, root, file_name, module):
+        if self.env.ref(module + '.uninstall_hook_base_automation', raise_if_not_found=False):
+            return
+        for record in root.xpath(".//record"):
+            record_id = record.get('id')
+            model = record.get('model')
+
+            if not record_id:
+                continue
+
+            record_module = record_id.split('.')[0] if "." in record_id else module
+            if record_module == module:
+                continue
+
+            for field in record.xpath(".//field"):
+                field_name = field.get('name')
+                if field_name in RISKY_FIELDS:
+                    _logger.warning(
+                        "Module '%s' updates base record '%s' (model: %s) from module '%s' "
+                        "in file '%s', modifying risky field '%s'. "
+                        "Add 'uninstall_hook_base_automation' to safely clean references on uninstall.",
+                        module,
+                        record_id,
+                        model,
+                        record_module,
+                        file_name,
+                        field_name,
                     )

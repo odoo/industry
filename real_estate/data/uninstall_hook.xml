@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="uninstall_hook_base_automation" model="base.automation">
+        <field name="model_id" ref="base.model_ir_module_module"/>
+        <field name="trigger">on_state_set</field>
+        <field name="trg_selection_field_id" ref="base.selection__ir_module_module__state__to_remove"/>
+        <field name="filter_domain">[('state', '=', 'to remove')]</field>
+        <field name="name">Real Estate: Uninstall Hook</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('base.field_ir_module_module__state')])]"/>
+        <field name="filter_pre_domain" eval="[('id', '=', ref('base.module_real_estate'))]"/>
+    </record>
+        <record id="uninstall_hook_action_server" model="ir.actions.server">
+        <field name="code"><![CDATA[
+sale_product_template_action = env.ref('sale.product_template_action', raise_if_not_found=False)
+sale_product_template_action['domain'] = '[("sale_ok", "=", True)]' if sale_product_template_action else ''
+
+contacts_action_contacts = env.ref('contacts.action_contacts', raise_if_not_found=False)
+contacts_action_contacts['domain'] = False if contacts_action_contacts else ''
+
+crm_lead_action_pipeline = env.ref('crm.crm_lead_action_pipeline', raise_if_not_found=False)
+crm_lead_action_pipeline['domain'] = False if crm_lead_action_pipeline else ''
+    ]]></field>
+        <field name="model_id" ref="base.model_ir_module_module"/>
+        <field name="base_automation_id" ref="uninstall_hook_base_automation"/>
+        <field name="state">code</field>
+        <field name="name">Real Estate: Uninstall Hook</field>
+        <field name="usage">base_automation</field>
+    </record>
+</odoo>
