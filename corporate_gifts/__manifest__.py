@@ -1,8 +1,10 @@
 {
     'name': 'Corporate Gifts',
+    'version': '1.1',
     'category': 'Supply Chain',
     'depends': [
         'base_automation',
+        'base_industry_data',
         'crm_enterprise',
         'crm_iap_enrich',
         'crm_iap_mine',
