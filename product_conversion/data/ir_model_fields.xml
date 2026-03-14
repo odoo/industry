@@ -6,17 +6,77 @@
         <field name="model_id" ref="product.model_product_attribute"/>
         <field name="ttype">boolean</field>
     </record>
+    <record id="x_picking_id_field_mrp_production" model="ir.model.fields">
+        <field name="name">x_picking_id</field>
+        <field name="field_description">Source Operation</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.picking</field>
+    </record>
+    <record id="x_conversions_field_stock_picking" model="ir.model.fields">
+        <field name="name">x_conversions</field>
+        <field name="field_description">Conversions</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="ttype">one2many</field>
+        <field name="relation">mrp.production</field>
+        <field name="relation_field">x_picking_id</field>
+        <field name="readonly">True</field>
+    </record>
+    <record id="x_conversion_count_field_stock_picking" model="ir.model.fields">
+        <field name="name">x_conversion_count</field>
+        <field name="field_description">Conversion Count</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="ttype">integer</field>
+        <field name="store">False</field>
+        <field name="readonly">True</field>
+        <field name="compute"><![CDATA[
+for picking in self:
+    picking['x_conversion_count'] = len(picking.x_conversions)
+        ]]></field>
+    </record>
     <record id="x_show_convert_field_stock_picking" model="ir.model.fields">
         <field name="name">x_show_convert</field>
         <field name="field_description">Show Convert Button</field>
-        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="model_id" ref="stock.model_stock_picking"/>
         <field name="ttype">boolean</field>
         <field name="store">False</field>
         <field name="readonly">True</field>
         <field name="compute"><![CDATA[
-for move in self:
-    move['x_show_convert'] = (move.product_id.is_storable and move.picking_type_id.code not in ('incoming', 'dropship') and move.picking_id.state not in ('draft', 'cancel'))
+for picking in self:
+    picking['x_show_convert'] = picking.picking_type_id.code not in ('incoming', 'dropship') and picking.state not in ('draft', 'cancel') and any(move.product_id.is_storable for move in picking.move_ids)
         ]]></field>
+    </record>
+    <record id="x_field_convert_product_wizard_picking_id" model="ir.model.fields">
+        <field name="name">x_picking_id</field>
+        <field name="field_description">Stock Picking</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.picking</field>
+    </record>
+    <record id="x_convertable_product_ids_field" model="ir.model.fields">
+        <field name="name">x_convertable_product_ids</field>
+        <field name="field_description">Convertable Products</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="ttype">many2many</field>
+        <field name="relation">product.product</field>
+        <field name="store">False</field>
+        <field name="depends">x_picking_id</field>
+        <field name="compute"><![CDATA[
+for wizard in self:
+    products = []
+    if wizard.x_picking_id:
+        for move in wizard.x_picking_id.move_ids:
+            if move.product_id.is_storable: 
+                products.append(move.product_id.id)
+    wizard['x_convertable_product_ids'] = [(6, 0, products)]
+        ]]></field>
+    </record>
+    <record id="x_field_convert_product_wizard_product_id" model="ir.model.fields">
+        <field name="name">x_product_id</field>
+        <field name="field_description">Product To Convert</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">product.product</field>
     </record>
     <record id="x_field_convert_product_wizard_move_id" model="ir.model.fields">
         <field name="name">x_move_id</field>
@@ -24,6 +84,12 @@ for move in self:
         <field name="model_id" ref="x_model_convert_product_wizard"/>
         <field name="ttype">many2one</field>
         <field name="relation">stock.move</field>
+        <field name="depends">x_product_id</field>
+        <field name="compute"><![CDATA[
+for wizard in self:
+    move = wizard.env['stock.move'].search([('picking_id', '=', wizard.x_picking_id.id), ('product_id', '=', wizard.x_product_id.id)], limit=1) 
+    wizard['x_move_id'] = move.id if move else False
+        ]]></field>
     </record>
     <record id="x_field_convert_product_wizard_move_location_id" model="ir.model.fields">
         <field name="name">x_move_location_id</field>
@@ -32,13 +98,6 @@ for move in self:
         <field name="ttype">many2one</field>
         <field name="relation">stock.location</field>
         <field name="related">x_move_id.location_id</field>
-    </record>
-    <record id="x_field_convert_product_wizard_product_id" model="ir.model.fields">
-        <field name="name">x_product_id</field>
-        <field name="field_description">Product To Convert</field>
-        <field name="model_id" ref="x_model_convert_product_wizard"/>
-        <field name="ttype">many2one</field>
-        <field name="relation">product.product</field>
     </record>
     <record id="field_convert_product_wizard_quant_id" model="ir.model.fields">
         <field name="name">x_quant_id</field>
@@ -146,6 +205,26 @@ for wizard in self:
         allowed |= products
 
     wizard['x_allowed_product_ids'] = [(6, 0, allowed.ids)]
+        ]]></field>
+    </record>
+    <record id="x_field_convert_product_wizard_destination_location_id" model="ir.model.fields">
+        <field name="name">x_destination_location_id</field>
+        <field name="field_description">Destination Location</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.location</field>
+    </record>
+    <record id="x_field_convert_product_wizard_show_destination_location" model="ir.model.fields">
+        <field name="name">x_show_destination_location</field>
+        <field name="field_description">Show Destination Location</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="ttype">boolean</field>
+        <field name="store">False</field>
+        <field name="readonly">True</field>
+        <field name="compute"><![CDATA[
+internal_locations = self.env['stock.location'].search_count([('usage', '=', 'internal')])
+for wizard in self:
+    wizard['x_show_destination_location'] = internal_locations > 1
         ]]></field>
     </record>
 </odoo>
