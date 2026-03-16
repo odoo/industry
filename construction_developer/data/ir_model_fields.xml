@@ -322,7 +322,7 @@ for record in self:
     record['x_unit_cost'] = sum(line.x_unit_cost * line.x_quantity for line in record.x_work_item_line_ids)
 ]]></field>
         <field name="ttype">monetary</field>
-        <field name="depends">x_work_item_line_ids</field>
+        <field name="depends">x_work_item_line_ids.x_unit_cost,x_work_item_line_ids.x_quantity</field>
         <field name="field_description">Unit Cost</field>
         <field name="model_id" ref="x_work_item_model"/>
         <field name="readonly" eval="True"/>
@@ -332,27 +332,32 @@ for record in self:
         <field name="name">x_unit_price</field>
         <field name="compute"><![CDATA[
 for record in self:
-    record['x_unit_price'] = sum(line.x_unit_price * line.x_quantity for line in record.x_work_item_line_ids)
+    if not record.x_is_margin_fixed:
+        record['x_unit_price'] = sum(line.x_unit_price * line.x_quantity for line in record.x_work_item_line_ids)
 ]]></field>
         <field name="ttype">monetary</field>
-        <field name="depends">x_work_item_line_ids</field>
+        <field name="depends">x_work_item_line_ids.x_unit_price,x_work_item_line_ids.x_quantity</field>
         <field name="field_description">Unit Price</field>
         <field name="model_id" ref="x_work_item_model"/>
-        <field name="readonly" eval="True"/>
         <field name="currency_field">x_currency_id</field>
     </record>
     <record id="x_unit_margin_field_x_work_item" model="ir.model.fields">
         <field name="name">x_unit_margin</field>
         <field name="compute"><![CDATA[
 for record in self:
-    record['x_unit_margin'] = (record.x_unit_price - record.x_unit_cost) / record.x_unit_price if record.x_unit_price > 0 else False
+    if not record.x_is_margin_fixed:
+        record['x_unit_margin'] = (record.x_unit_price - record.x_unit_cost) / record.x_unit_cost if record.x_unit_cost > 0 else False
 ]]></field>
         <field name="ttype">float</field>
         <field name="depends">x_unit_price,x_unit_cost</field>
         <field name="field_description">Unit Margin</field>
         <field name="model_id" ref="x_work_item_model"/>
-        <field name="readonly" eval="True"/>
-        <field name="store" eval="False"/>
+    </record>
+    <record id="x_is_margin_fixed_field_x_work_item" model="ir.model.fields">
+        <field name="name">x_is_margin_fixed</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">Fixed</field>
+        <field name="model_id" ref="x_work_item_model"/>
     </record>
 
     <record id="x_line_work_item_id_field_sale_order_line" model="ir.model.fields">
@@ -377,6 +382,32 @@ for record in self:
         <field name="readonly" eval="True"/>
         <field name="relation">x_work_item</field>
         <field name="store" eval="False"/>
+    </record>
+    <record id="x_x_product_template_x_work_items_count_field_product_template" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_x_product_template_x_work_items_count'] = record.env['x_work_item'].search_count([('x_is_template', '=', True), ('x_work_item_line_ids.x_product_id.product_tmpl_id', '=', record.id)])
+]]>    </field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Template Work items count</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="name">x_x_product_template_x_work_items_count</field>
+        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="x_x_product_product_x_work_items_count_field_product_product" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_x_product_product_x_work_items_count'] = record.env['x_work_item'].search_count([('x_is_template', '=', True), ('x_work_item_line_ids.x_product_id', '=', record.id)])
+]]>    </field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Product Work items count</field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="name">x_x_product_product_x_work_items_count</field>
+        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
     </record>
     <record id="x_product_wi_template_id_field_x_work_item" model="ir.model.fields">
         <field name="ttype">many2one</field>
