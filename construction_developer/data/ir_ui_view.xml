@@ -79,7 +79,7 @@
             <xpath expr="//notebook//page[@name='order_lines']//list//field[@name='tax_ids']" position="attributes">
                 <attribute name="width">150px</attribute>
             </xpath>
-            <xpath expr="//notebook//page[@name='other_information']//field[@name='invoice_status']" position="after">
+            <xpath expr="//notebook//page[@name='other_information']//field[@name='team_id']" position="after">
                 <field name="x_so_contract_type" readonly="state == 'sale'"/>
             </xpath>
             <xpath expr="//notebook//page[@name='order_lines']//list//field[@name='tax_ids']" position="after">
@@ -150,16 +150,22 @@
                     <group>
                         <field name="x_product_id" force_save="1" readonly="not x_is_template" invisible="x_targeted_so_id" context="{'default_type': 'service'}"/>
                         <field name="x_reference" readonly="id and not x_is_template"/>
-                        <label for="x_unit_id"/>
-                        <div class="d-flex" name="unit_quantity">
-                            <field name="x_unit_id" class="oe_inline" string="Unit" force_save="1" options="{'no_open': True}" placeholder="m²" invisible="not x_product_id"/>
-                            <field name="x_unit_custom_id" class="oe_inline" string="Unit" force_save="1" options="{'no_open': True}" placeholder="m²" invisible="x_product_id" required="not x_product_id"/>
-                        </div>
+                        <field name="x_unit_id" force_save="1" options="{'no_open': True}" placeholder="m²" invisible="not x_product_id"/>
+                        <field name="x_unit_custom_id" string="Unit" force_save="1" options="{'no_open': True}" placeholder="m²" invisible="x_product_id" required="not x_product_id"/>
                     </group>
                     <group>
                         <field name="x_unit_cost" widget="monetary" force_save="1" readonly="True"/>
-                        <field name="x_unit_price" widget="monetary" force_save="1" readonly="True"/>
-                        <field name="x_unit_margin" widget="percentage" force_save="1" readonly="True"/>
+                        <label for="x_unit_price"/>
+                        <div class="o_row">
+                            <field name="x_unit_price" class="oe_inline mw-50" widget="monetary" force_save="1" readonly="not x_is_margin_fixed"/>
+                            <button type="action" class="btn btn-secondary oe_inline" name="%(server_action_recompute_price_with_components_prices)d" invisible="not x_is_margin_fixed" string="Recompute" help="Recomputes the unit price based on components"/>
+                        </div>
+                        <label for="x_unit_margin"/>
+                        <div class="o_row">
+                            <field name="x_unit_margin" widget="percentage" class="oe_inline mw-50" force_save="1" readonly="not x_is_margin_fixed"/>
+                            <label for="x_is_margin_fixed"/>
+                            <field name="x_is_margin_fixed" class="oe_inline" force_save="1" help="When set, unit price is computed based on unit margin"/>
+                        </div>
                     </group>
                 </group>
                 <notebook>
@@ -282,6 +288,21 @@
         <field name="active" eval="True"/>
         <field name="type">form</field>
         <field name="arch" type="xml">
+            <button name="action_view_sales" position="after">
+                <button
+                    class="oe_stat_button"
+                    name="%(action_window_see_work_items_from_product_template)d"
+                    type="action" icon="fa-magic"
+                    invisible="x_x_product_template_x_work_items_count == 0"
+                >
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value d-flex gap-1">
+                            <field name="x_x_product_template_x_work_items_count" widget="statinfo" nolabel="1" class="oe_inline"/>
+                        </span>
+                        <span class="o_stat_text">Work Items</span>
+                    </div>
+                </button>
+            </button>
             <xpath expr="//form/sheet/*[1]" position="before">
                 <div class="alert alert-warning text-center o_form_header" invisible="x_uom_matches_category" role="alert">
                     <a class="close" data-bs-dismiss="alert" href="#">x</a>
@@ -294,6 +315,33 @@
                 </div>
             </xpath>
         </field>
+    </record>
+
+    <record id="product_product_form_view_extension" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <button name="action_view_sales" position="after">
+                <button
+                    class="oe_stat_button"
+                    name="%(action_window_see_work_items_from_product_product)d"
+                    type="action" icon="fa-magic"
+                    invisible="x_x_product_product_x_work_items_count == 0"
+                >
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value d-flex gap-1">
+                            <field name="x_x_product_product_x_work_items_count" widget="statinfo" nolabel="1" class="oe_inline"/>
+                        </span>
+                        <span class="o_stat_text">Work Items</span>
+                    </div>
+                </button>
+            </button>
+        </field>
+        <field name="inherit_id" ref="sale.product_form_view_sale_order_button"/>
+        <field name="mode">extension</field>
+        <field name="model">product.product</field>
+        <field name="name">product.product.form.inherit.view</field>
+        <field name="priority">1600</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
     </record>
 
 <!-- remark -->
