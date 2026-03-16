@@ -63,6 +63,32 @@
         <field name="name">Construction: Work Item - On save and unit cost/price change</field>
         <field name="trigger_field_ids" eval="[(6, 0, [ref('x_unit_cost_field_x_work_item'), ref('x_unit_price_field_x_work_item')])]"/>
     </record>
+    <record id="base_automation_product_product_on_write_unit_cost_price_change" model="base.automation">
+        <field name="model_id" ref="product.model_product_product" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_update_related_work_item_lines')])]" />
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Construction: Work Item - On save and cost/price change</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('product.field_product_product__lst_price'), ref('product.field_product_product__standard_price')])]"/>
+    </record>
+    <record id="base_automation_work_item_on_write_unit_price_when_margin_fixed" model="base.automation">
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_update_margin_if_margin_fixed')])]" />
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[("x_is_margin_fixed", "=", True)]</field>
+        <field name="name">Construction: Work Item - On save and unit price change</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_unit_price_field_x_work_item')])]"/>
+    </record>
+    <record id="base_automation_work_item_on_write_unit_margin_or_cost_when_margin_fixed" model="base.automation">
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_update_price_if_margin_fixed')])]" />
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[("x_is_margin_fixed", "=", True)]</field>
+        <field name="name">Construction: Work Item - On save and unit margin or cost change</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_unit_margin_field_x_work_item'), ref('x_unit_cost_field_x_work_item')])]"/>
+    </record>
     <record id="base_automation_work_item_on_write" model="base.automation">
         <field name="model_id" ref="x_work_item_model" />
         <field name="action_server_ids"
@@ -86,6 +112,15 @@
         <field name="trigger">on_create_or_write</field>
         <field name="filter_domain">[('x_is_template', '!=', False), ('x_product_id', '=', False)]</field>
         <field name="name">Construction: Work Item - On save of work item template without product</field>
+    </record>
+    <record id="base_automation_on_write_wi_margin_fixed_to_false" model="base.automation">
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_recompute_price_with_components_prices')])]" />
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Construction: Work Item - On Margin Fixed write to False</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_is_margin_fixed_field_x_work_item')])]"/>
+        <field name="filter_domain">[('x_is_margin_fixed', '=', False)]</field>
     </record>
     <!-- 
     this is needed to set a default stage based on the project's
