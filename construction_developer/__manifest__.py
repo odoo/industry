@@ -1,6 +1,6 @@
 {
     'name': 'Construction Developer',
-    'version': '1.7',
+    'version': '1.8',
     'category': 'Construction',
     'depends': [
         'base_industry_data',
