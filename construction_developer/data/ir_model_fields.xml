@@ -615,4 +615,181 @@ for record in self: record['x_date'] = record['x_date'] or datetime.datetime.tod
         <field name="name">x_remark_ids</field>
         <field name="field_description">Remarks</field>
     </record>
+<!-- product.category -->
+     <record id="field_product_category_x_cost_nature" model="ir.model.fields">
+        <field name="name">x_cost_nature</field>
+        <field name="field_description">Cost Nature</field>
+        <field name="ttype">selection</field>
+        <field name="model_id" ref="product.model_product_category"/>
+    </record>
+    <record id="selection_field_product_category_x_cost_nature_labour" model="ir.model.fields.selection">
+        <field name="name">Labour</field>
+        <field name="field_id" ref="field_product_category_x_cost_nature"/>
+        <field name="value">labour</field>
+    </record>
+    <record id="selection_field_product_category_x_cost_nature_material" model="ir.model.fields.selection">
+        <field name="name">Material</field>
+        <field name="field_id" ref="field_product_category_x_cost_nature"/>
+        <field name="value">material</field>
+    </record>
+    <record id="selection_field_product_category_x_cost_nature_equipment" model="ir.model.fields.selection">
+        <field name="name">Equipment</field>
+        <field name="field_id" ref="field_product_category_x_cost_nature"/>
+        <field name="value">equipment</field>
+    </record>
+<!-- product.template -->
+    <record id="field_product_template_x_uom_matches_category" model="ir.model.fields">
+        <field name="name">x_uom_matches_category</field>
+        <field name="field_description">UOM Matches Category</field>
+        <field name="ttype">boolean</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="store" eval="False"/>
+        <field name="copied" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="depends">categ_id,uom_id</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_uom_matches_category'] = record.categ_id.x_cost_nature not in ['equipment', 'labour'] or (record.uom_id and record.uom_id._has_common_reference(self.env.ref('uom.product_uom_hour')))
+]]></field>
+    </record>
+<!-- x_cost_nature_analysis_report -->
+    <record id="field_x_cost_nature_analysis_report_x_category_id" model="ir.model.fields">
+        <field name="model_id" ref="model_x_cost_nature_analysis_report"/>
+        <field name="ttype">many2one</field>
+        <field name="name">x_category_id</field>
+        <field name="field_description">Category</field>
+        <field name="relation">product.category</field>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="field_x_cost_nature_analysis_report_x_cost_nature" model="ir.model.fields">
+        <field name="model_id" ref="model_x_cost_nature_analysis_report"/>
+        <field name="ttype">selection</field>
+        <field name="name">x_cost_nature</field>
+        <field name="field_description">Cost Nature</field>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="selection_field_x_cost_nature_analysis_report_x_cost_nature_labour" model="ir.model.fields.selection">
+        <field name="name">Labour</field>
+        <field name="field_id" ref="field_x_cost_nature_analysis_report_x_cost_nature"/>
+        <field name="value">labour</field>
+    </record>
+    <record id="selection_field_x_cost_nature_analysis_report_x_cost_nature_material" model="ir.model.fields.selection">
+        <field name="name">Material</field>
+        <field name="field_id" ref="field_x_cost_nature_analysis_report_x_cost_nature"/>
+        <field name="value">material</field>
+    </record>
+    <record id="selection_field_x_cost_nature_analysis_report_x_cost_nature_equipment" model="ir.model.fields.selection">
+        <field name="name">Equipment</field>
+        <field name="field_id" ref="field_x_cost_nature_analysis_report_x_cost_nature"/>
+        <field name="value">equipment</field>
+    </record>
+
+    <record id="field_x_cost_nature_analysis_report_x_total_cost" model="ir.model.fields">
+        <field name="model_id" ref="model_x_cost_nature_analysis_report"/>
+        <field name="ttype">float</field>
+        <field name="name">x_total_cost</field>
+        <field name="field_description">Total Cost</field>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="field_x_cost_nature_analysis_report_x_total_price" model="ir.model.fields">
+        <field name="model_id" ref="model_x_cost_nature_analysis_report"/>
+        <field name="ttype">float</field>
+        <field name="name">x_total_price</field>
+        <field name="field_description">Total Price</field>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="field_x_cost_nature_analysis_report_x_product_id" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">Product</field>
+        <field name="model_id" ref="model_x_cost_nature_analysis_report"/>
+        <field name="name">x_product_id</field>
+        <field name="relation">product.product</field>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="field_x_cost_nature_analysis_report_x_so_id" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">Sale Order</field>
+        <field name="model_id" ref="model_x_cost_nature_analysis_report"/>
+        <field name="name">x_so_id</field>
+        <field name="relation">sale.order</field>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="field_x_cost_nature_analysis_report_x_work_item_id" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">Work Item</field>
+        <field name="model_id" ref="model_x_cost_nature_analysis_report"/>
+        <field name="name">x_work_item_id</field>
+        <field name="relation">x_work_item</field>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="field_x_cost_nature_analysis_report_x_margin" model="ir.model.fields">
+        <field name="model_id" ref="model_x_cost_nature_analysis_report"/>
+        <field name="ttype">float</field>
+        <field name="name">x_margin</field>
+        <field name="field_description">Margin</field>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="field_x_cost_nature_analysis_report_x_margin_percent" model="ir.model.fields">
+        <field name="model_id" ref="model_x_cost_nature_analysis_report"/>
+        <field name="ttype">float</field>
+        <field name="name">x_margin_percent</field>
+        <field name="field_description">Margin (%)</field>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="field_x_cost_nature_analysis_report_x_quantity" model="ir.model.fields">
+        <field name="model_id" ref="model_x_cost_nature_analysis_report"/>
+        <field name="ttype">float</field>
+        <field name="name">x_quantity</field>
+        <field name="field_description">Quantity</field>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="field_x_cost_nature_analysis_report_x_margin_share" model="ir.model.fields">
+        <field name="model_id" ref="model_x_cost_nature_analysis_report"/>
+        <field name="ttype">float</field>
+        <field name="name">x_margin_share</field>
+        <field name="field_description">Margin Share</field>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="field_x_cost_nature_analysis_report_x_cost_share" model="ir.model.fields">
+        <field name="model_id" ref="model_x_cost_nature_analysis_report"/>
+        <field name="ttype">float</field>
+        <field name="name">x_cost_share</field>
+        <field name="field_description">Cost Share</field>
+        <field name="readonly" eval="True"/>
+    </record>
+<!-- simplify computation of SQL query -->
+    <record id="field_sale_order_line_x_cost_nature" model="ir.model.fields">
+        <field name="name">x_cost_nature</field>
+        <field name="field_description">Cost Nature</field>
+        <field name="ttype">selection</field>
+        <field name="related">product_id.product_tmpl_id.categ_id.x_cost_nature</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="store" eval="True"/>
+    </record>
+    <record id="field_x_work_item_line_x_cost_nature" model="ir.model.fields">
+        <field name="name">x_cost_nature</field>
+        <field name="field_description">Cost Nature</field>
+        <field name="ttype">selection</field>
+        <field name="related">x_product_id.product_tmpl_id.categ_id.x_cost_nature</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="store" eval="True"/>
+    </record>
+    <record id="field_x_work_item_line_x_category_id" model="ir.model.fields">
+        <field name="name">x_category_id</field>
+        <field name="field_description">Category</field>
+        <field name="ttype">many2one</field>
+        <field name="related">x_product_id.product_tmpl_id.categ_id</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="relation">product.category</field>
+        <field name="store" eval="True"/>
+    </record>
+    <record id="field_x_sale_order_line_x_category_id" model="ir.model.fields">
+        <field name="name">x_category_id</field>
+        <field name="field_description">Category</field>
+        <field name="ttype">many2one</field>
+        <field name="related">product_id.product_tmpl_id.categ_id</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="relation">product.category</field>
+        <field name="store" eval="True"/>
+    </record>
 </odoo>
