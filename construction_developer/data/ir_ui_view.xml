@@ -203,6 +203,28 @@
         <field name="active" eval="True"/>
     </record>
 
+    <record id="project_form_view_extension" model="ir.ui.view">
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="mode">extension</field>
+        <field name="model">project.project</field>
+        <field name="name">project.project.form.inherit.view</field>
+        <field name="priority">1600</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" type="action" name="%(action_compute_cost_nature_analysis_report)d"
+                        icon="fa-indent"
+                        context="{'project_id': id}"
+                >
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Cost Nature</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
     <record id="sale_order_form_view_extension" model="ir.ui.view">
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_line']/list//field[@name='route_ids']" position="after">
@@ -210,6 +232,16 @@
             </xpath>
             <xpath expr="//create[@name='add_note_control']" position="after">
                 <button string="Add Work Item" name="%(action_window_add_work_item)d" type="action" class="px-4 btn-link" context="{'so_id': parent.id}"/>
+            </xpath>
+            <xpath expr="//form/sheet/div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" type="action" name="%(action_compute_cost_nature_analysis_report)d"
+                        icon="fa-indent"
+                        context="{'active_ids': [id]}"
+                >
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Cost Nature</span>
+                    </div>
+                </button>
             </xpath>
         </field>
         <field name="inherit_id" ref="sale.view_order_form"/>
@@ -220,6 +252,50 @@
         <field name="type">form</field>
         <field name="active" eval="True"/>
     </record>
+
+    <record id="product_category_form_view_extension" model="ir.ui.view">
+        <field name="name">product.category.view.form.inherit</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view"/>
+        <field name="mode">extension</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='first']" position="before">
+                <group name="outer">
+                    <group name="second">
+                        <field name="x_cost_nature" class="oe_inline"/>
+                    </group>
+                </group>
+            </xpath>
+            <xpath expr="//group[@name='second']" position="before">
+                <xpath expr="//group[@name='first']" position="move"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="project_template_view_form_inherit" model="ir.ui.view">
+        <field name="name">product.template.view.form.inherit</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="model">product.template</field>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/*[1]" position="before">
+                <div class="alert alert-warning text-center o_form_header" invisible="x_uom_matches_category" role="alert">
+                    <a class="close" data-bs-dismiss="alert" href="#">x</a>
+                    <div>
+                        <strong>Product Unit is not compatible with the Category Cost Nature</strong>
+                    </div>
+                    <div>
+                        Consider using a time related unit.
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
 <!-- remark -->
     <record id="view_x_remark_form" model="ir.ui.view">
         <field name="name">construction_developer.x_remark.form</field>
@@ -514,6 +590,59 @@
                     }"/>
                 </page>
             </xpath>
+        </field>
+    </record>
+
+<!-- Cost Nature Analysis views -->
+     <record id="view_x_cost_nature_analysis_report_search" model="ir.ui.view">
+        <field name="name">construction_developer.x_cost_nature_analysis_report.view.search</field>
+        <field name="model">x_cost_nature_analysis_report</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <search>
+                <field name="x_so_id" string="Sale Order" filter_domain="[('x_so_id.name', 'ilike', self)]"/>
+                <field name="x_work_item_id" string="Work Item" filter_domain="[('x_work_item_id.x_name', 'ilike', self)]"/>
+                <field name="x_product_id" string="Product" filter_domain="[('x_product_id.name', 'ilike', self)]"/>
+                <field name="x_category_id" string="Category" filter_domain="[('x_category_id.name', 'ilike', self)]"/>
+                <field name="x_cost_nature" string="Cost Nature" filter_domain="[('x_cost_nature', 'ilike', self)]"/>
+                <separator/>
+                <filter string="Material" name="material" domain="[('x_cost_nature', '=', 'material')]"/>
+                <filter string="Equipment" name="equipment" domain="[('x_cost_nature', '=', 'equipment')]"/>
+                <filter string="Labour" name="labour" domain="[('x_cost_nature', '=', 'labour')]"/>
+                <separator/>
+                <filter string="Positive Margin" name="positive_margin" domain="[('x_margin', '>', 0)]"/>
+                <filter string="Negative Margin" name="negative_margin" domain="[('x_margin', '&lt;', 0)]"/>
+                <separator/>
+                <group>
+                    <filter string="Cost Nature" name="group_by_cost_nature" context="{'group_by': 'x_cost_nature'}"/>
+                    <filter string="Category" name="group_by_category" context="{'group_by': 'x_category_id'}"/>
+                    <filter string="Sale Order" name="group_by_sale_order" context="{'group_by': 'x_so_id'}"/>
+                    <filter string="Product" name="group_by_product" context="{'group_by': 'x_product_id'}"/>
+                    <filter string="Work Item" name="group_by_work_item" context="{'group_by': 'x_work_item_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="view_x_margin_report_analysis_list" model="ir.ui.view">
+        <field name="name">x_cost_nature_analysis_report.view.list</field>
+        <field name="model">x_cost_nature_analysis_report</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list string="Cost Nature Analysis" default_order="x_margin DESC, x_total_cost DESC">
+                <field name="x_cost_nature" optional="hide"/>
+                <field name="x_category_id" widget="many2one" optional="hide"/>
+                <field name="x_so_id" widget="many2one" optional="hide"/>
+                <field name="x_product_id" widget="many2one" optional="show"/>
+                <field name="x_work_item_id" widget="many2one" optional="show"/>
+                <field name="x_quantity" optional="hide"/>
+                <field name="x_total_price" sum="Sum of Prices" optional="show"/>
+                <field name="x_total_cost" sum="Sum of Costs" optional="show"/>
+                <field name="x_cost_share" widget="percentage" sum="Sum of Cost Shares" optional="show"/>
+                <field name="x_margin" sum="Sum of Margins" optional="show"/>
+                <field name="x_margin_percent" widget="percentage" avg="Average Margin" optional="show"/>
+                <field name="x_margin_share" widget="percentage" sum="Sum of Margin Shares" optional="show"/>
+            </list>
         </field>
     </record>
 </odoo>
