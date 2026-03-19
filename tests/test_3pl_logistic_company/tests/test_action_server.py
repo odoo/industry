@@ -27,11 +27,11 @@ class AutomationsTestCase(TransactionCase):
         so = self.env['sale.order'].create({
             'partner_id': self.partner_2.id,
             'order_line': [
-                Command.create({'product_id': self.product_template_1.id, 'product_uom_qty': 1}),
+                Command.create({'product_id': self.product_template_1.product_variant_id.id, 'product_uom_qty': 1}),
             ]
         })
         so.action_confirm()
-        move_line_owner_id = self.env['stock.move.line'].search([('product_id', '=', self.product_template_1.id)], limit=1).owner_id
+        move_line_owner_id = self.env['stock.move.line'].search([('product_id', '=', self.product_template_1.product_variant_id.id)], limit=1).owner_id
         self.assertEqual(move_line_owner_id, self.partner_1, "Move line owner should match product owner")
 
     def test_base_automation_on_stock_move_changed(self):
@@ -42,8 +42,8 @@ class AutomationsTestCase(TransactionCase):
             'location_id': self.env.ref('stock.stock_location_stock').id,
             'location_dest_id': self.env.ref('stock.stock_location_customers').id,
             'move_ids': [
-                Command.create({'product_id': self.product_template_1.id, 'product_uom_qty': 1}),
-                Command.create({'product_id': self.product_template_2.id, 'product_uom_qty': 1}),
+                Command.create({'product_id': self.product_template_1.product_variant_id.id, 'product_uom_qty': 1}),
+                Command.create({'product_id': self.product_template_2.product_variant_id.id, 'product_uom_qty': 1}),
             ]
         })
         self.assertEqual(stock_picking_1.owner_id, self.partner_1, "Picking owner should match product owner if all are same.")
@@ -56,8 +56,8 @@ class AutomationsTestCase(TransactionCase):
             'location_id': self.env.ref('stock.stock_location_stock').id,
             'location_dest_id': self.env.ref('stock.stock_location_customers').id,
             'move_ids': [
-                Command.create({'product_id': self.product_template_1.id, 'product_uom_qty': 1}),
-                Command.create({'product_id': self.product_template_2.id, 'product_uom_qty': 1}),
+                Command.create({'product_id': self.product_template_1.product_variant_id.id, 'product_uom_qty': 1}),
+                Command.create({'product_id': self.product_template_2.product_variant_id.id, 'product_uom_qty': 1}),
             ]
         })
         self.assertFalse(stock_picking_1.owner_id, "Owner should NOT be updated if products have different owners.")

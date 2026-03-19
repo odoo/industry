@@ -26,7 +26,7 @@ class ComputedFieldsTestCase(TransactionCase):
         })
         cls.move_line = cls.env['stock.move.line'].create({
             'picking_id': cls.stock_picking.id,
-            'product_id': cls.product.id,
+            'product_id': cls.product.product_variant_id.id,
             'quantity': 1,
         })
         cls.quality_check = cls.env['quality.check'].create({
