@@ -29,10 +29,6 @@ class FileTest(IndustryCase):
                 'index html file': '/static/description/index.html',
                 'init': '/__init__.py',
             }
-            if needs_translation:
-                required_files.update({
-                    'pot file': f'/i18n/{module}.pot',
-                })
             if module in self.installed_industries:
                 required_files.update({
                     'icon': '/static/description/icon.png',
@@ -41,9 +37,6 @@ class FileTest(IndustryCase):
             for f, path in required_files.items():
                 if not os.path.isfile(get_industry_path() + module + path):
                     _logger.warning("Missing %s at %s", f, module + path)
-
-            if not needs_translation and os.path.isfile(get_industry_path() + module + f'/i18n/{module}.pot'):
-                _logger.warning("Remove pot file in the module at %s", module + f'/i18n/{module}.pot')
 
             weblate_config = Path(get_industry_path() + '.weblate.json').read_text(encoding="utf-8")
             if not (module_in_weblate := re.search(module, weblate_config)) and needs_translation:
