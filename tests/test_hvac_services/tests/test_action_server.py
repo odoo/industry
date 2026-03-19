@@ -110,7 +110,7 @@ class AutomationsTestCase(TransactionCase):
             active_model='res.partner',
         ).create({
             'x_partner_id': self.partner.id,
-            'x_device_id': self.device_product.product_tmpl_id.id,
+            'x_product_id': self.device_product.id,
             'x_serial_number': 'DUPLICATE-001',
             'x_delivery_date': fields.Datetime.now(),
         })
@@ -123,7 +123,7 @@ class AutomationsTestCase(TransactionCase):
             active_model='res.partner',
         ).create({
             'x_partner_id': self.partner.id,
-            'x_device_id': self.device_product.product_tmpl_id.id,
+            'x_product_id': self.device_product.id,
             'x_serial_number': 'NEW-HVAC-001',
             'x_delivery_date': fields.Datetime.now(),
         })
