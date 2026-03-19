@@ -1,6 +1,6 @@
 {
     'name': 'Real Estate Agency',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
@@ -58,6 +58,7 @@
         'data/website_page.xml',
         'data/website_menu.xml',
         'data/website_theme_apply.xml',
+        'data/uninstall_hook.xml',
     ],
     'demo': [
         'demo/product_attribute_value.xml',
@@ -87,6 +88,7 @@
     ],
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        "data/uninstall_hook.xml",
         "data/website_view.xml",
         "demo/website_view.xml",
     ],
