@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from ast import literal_eval
+import ast
+import html
 import logging
 import os
 import pathlib
@@ -85,6 +86,33 @@ ALLOWED_PYTHON_FILES = [
     '__manifest__.py',
     '__init__.py',
 ]
+
+
+def _has_valid_search(eval_string):
+    clean_eval = html.unescape(eval_string).strip()
+    try:
+        tree = ast.parse(clean_eval, mode='eval')
+    except SyntaxError:
+        # If 'eval' fails (e.g. if there's an assignment), fall back to 'exec'
+        try:
+            tree = ast.parse(clean_eval)
+        except SyntaxError:
+            # Skip test for now
+            return True
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Attribute) and node.attr == 'id':
+            call_node = node.value
+            if isinstance(call_node, ast.Call):
+                func = call_node.func
+                if (isinstance(func, ast.Attribute) and func.attr == 'search') or (
+                    isinstance(func, ast.Name) and func.id == 'search'
+                ):
+                    has_limit_1 = any(
+                        kw.arg == 'limit' and isinstance(kw.value, ast.Constant) and kw.value.value == 1
+                        for kw in call_node.keywords
+                    )
+                    return has_limit_1
+    return True
 
 
 @tagged('post_install', '-at_install')
@@ -187,7 +215,7 @@ class TestEnv(IndustryCase):
             else:
                 message += "Got '%s'." % first_line
             _logger.warning(message)
-        dependency_list = literal_eval(s)['depends']
+        dependency_list = ast.literal_eval(s)['depends']
         if 'payment_demo' in dependency_list:
             _logger.warning(
                 "'payment_demo' should not be in the dependencies. Instead, call "
@@ -377,7 +405,6 @@ class TestEnv(IndustryCase):
             records[record_key] |= fields
 
     def _check_fields(self, root, file_name):
-        search_pattern = re.compile(r"\.search\((.*)\)\.id\b", re.DOTALL)
         for record in root.xpath("//record"):
             model_name = record.get('model')
             if not model_name:
@@ -434,11 +461,7 @@ class TestEnv(IndustryCase):
             fields_with_eval = record.xpath(".//field[@eval]")
             for field in fields_with_eval:
                 eval_val = field.get('eval')
-                match = search_pattern.search(eval_val)
-                if not match:
-                    continue
-                search_args = match.group(1)
-                if not re.search(r"limit\s*=\s*1", search_args):
+                if not _has_valid_search(eval_val):
                     _logger.warning(
                         "Missing 'limit=1' in search() used with '.id' in XML eval.\n"
                         "File: %s | Model: %s | Record ID: %s | Field: %s\n"
@@ -449,6 +472,24 @@ class TestEnv(IndustryCase):
                         model_name,
                         record.get("id"),
                         field.get("name"),
+                        eval_val,
+                    )
+
+        for function in root.xpath("//function"):
+            # Check if limit=1 is present in search([...]).id
+            values_with_eval = function.xpath(".//value[@eval]")
+            for value in values_with_eval:
+                eval_val = value.get('eval')
+                if not _has_valid_search(eval_val):
+                    _logger.warning(
+                        "Missing 'limit=1' in search() used with '.id' in XML eval.\n"
+                        "File: %s | Function name: %s model: %s\n"
+                        "Eval: %s\n"
+                        "Hint: For a single record, use `search([...], limit=1).id`; "
+                        "for multiple records, use `search([...]).ids`",
+                        file_name,
+                        function.get("name"),
+                        function.get("model"),
                         eval_val,
                     )
 
