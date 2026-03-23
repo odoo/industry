@@ -14,7 +14,6 @@
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
         'data/base_automation.xml',
-        'data/ir_attachment_pre.xml',
     ],
     'demo': [
         'demo/res_users.xml',
