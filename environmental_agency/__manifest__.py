@@ -1,6 +1,6 @@
 {
     'name': 'Environmental Agency',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [

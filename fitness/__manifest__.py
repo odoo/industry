@@ -1,6 +1,6 @@
 {
     'name': 'Fitness Center',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Health and Fitness',
     'depends': [
         'base_industry_data',

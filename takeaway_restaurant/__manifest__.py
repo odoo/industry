@@ -1,5 +1,6 @@
 {
     'name': 'Takeaway Restaurant',
+    'version': '1.1',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [

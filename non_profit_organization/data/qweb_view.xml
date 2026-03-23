@@ -2,9 +2,65 @@
 <odoo>
     <!-- Reports -->
     <template id="report_fiscal_attestation_document">
-        <t t-call="web.external_layout">
-            <t t-set="o" t-value="o.with_context(lang=lang)" />
-            <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/> <!-- So that it appears in the footer of the report instead of the company VAT if it's set -->
+        <t t-set="layout_document_title">
+            <t t-if="not proforma">
+                <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">
+                    <t name="invoice_title">Fiscal Attestation</t>
+                </span>
+                <span t-elif="o.move_type == 'out_invoice' and o.state == 'draft'">
+                    <t name="draft_invoice_title">Draft Fiscal Attestation</t>
+                </span>
+                <span t-elif="o.move_type == 'out_invoice' and o.state == 'cancel'">
+                    <t name="cancelled_invoice_title">Cancelled Fiscal Attestation</t>
+                </span>
+                <span t-elif="o.move_type == 'out_refund' and o.state == 'posted'">
+                    <t name="credit_note_title">Credit Note</t>
+                </span>
+                <span t-elif="o.move_type == 'out_refund' and o.state == 'draft'">
+                    <t name="draft_credit_note_title">Draft Credit Note</t>
+                </span>
+                <span t-elif="o.move_type == 'out_refund' and o.state == 'cancel'">
+                    <t name="cancelled_credit_note_title">Cancelled Credit Note</t>
+                </span>
+                <span t-elif="o.move_type == 'in_refund'">
+                    <t name="vendor_credit_note_title">Vendor Credit Note</t>
+                </span>
+                <span t-elif="o.move_type == 'in_invoice'">
+                    <t name="vendor_bill_title">Vendor Bill</t>
+                </span>
+            </t>
+            <t t-else="">
+                <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">
+                    <t name="proforma_invoice_title">Proforma Fiscal Attestation</t>
+                </span>
+                <span t-elif="o.move_type == 'out_invoice' and o.state == 'draft'">
+                    <t name="draft_proforma_invoice_title">Draft Proforma Fiscal Attestation</t>
+                </span>
+                <span t-elif="o.move_type == 'out_invoice' and o.state == 'cancel'">
+                    <t name="cancelled_proforma_invoice_title">Cancelled Proforma Fiscal Attestation</t>
+                </span>
+                <span t-elif="o.move_type == 'out_refund' and o.state == 'posted'">
+                    <t name="proforma_credit_note_title">Proforma Credit Note</t>
+                </span>
+                <span t-elif="o.move_type == 'out_refund' and o.state == 'draft'">
+                    <t name="draft_proforma_credit_note_title">Draft Proforma Credit Note</t>
+                </span>
+                <span t-elif="o.move_type == 'out_refund' and o.state == 'cancel'">
+                    <t name="cancelled_proforma_credit_note_title">Cancelled Proforma Credit Note</t>
+                </span>
+                <span t-elif="o.move_type == 'in_refund'">
+                    <t name="proforma_vendor_credit_note_title">Proforma Vendor Credit Note</t>
+                </span>
+                <span t-elif="o.move_type == 'in_invoice'">
+                    <t name="proforma_vendor_bill_title">Proforma Vendor Bill</t>
+                </span>
+            </t>
+            <span t-if="o.name and o.name != '/'" t-field="o.name">INV/2023/0001</span>
+        </t>
+        <t t-set="o" t-value="o.with_context(lang=lang)" />
+        <t t-call="web.external_layout"
+            forced_vat="o.fiscal_position_id.foreign_vat"
+            layout_document_title="layout_document_title">
             <div class="row">
                 <t t-if="o.partner_shipping_id and (o.partner_shipping_id != o.partner_id)">
                     <div class="col-6">
@@ -50,61 +106,6 @@
             </div>
             <div class="clearfix invoice_main">
                 <div class="page mb-4">
-                    <t t-set="layout_document_title">
-                        <t t-if="not proforma">
-                            <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">
-                                <t name="invoice_title">Fiscal Attestation</t>
-                            </span>
-                            <span t-elif="o.move_type == 'out_invoice' and o.state == 'draft'">
-                                <t name="draft_invoice_title">Draft Fiscal Attestation</t>
-                            </span>
-                            <span t-elif="o.move_type == 'out_invoice' and o.state == 'cancel'">
-                                <t name="cancelled_invoice_title">Cancelled Fiscal Attestation</t>
-                            </span>
-                            <span t-elif="o.move_type == 'out_refund' and o.state == 'posted'">
-                                <t name="credit_note_title">Credit Note</t>
-                            </span>
-                            <span t-elif="o.move_type == 'out_refund' and o.state == 'draft'">
-                                <t name="draft_credit_note_title">Draft Credit Note</t>
-                            </span>
-                            <span t-elif="o.move_type == 'out_refund' and o.state == 'cancel'">
-                                <t name="cancelled_credit_note_title">Cancelled Credit Note</t>
-                            </span>
-                            <span t-elif="o.move_type == 'in_refund'">
-                                <t name="vendor_credit_note_title">Vendor Credit Note</t>
-                            </span>
-                            <span t-elif="o.move_type == 'in_invoice'">
-                                <t name="vendor_bill_title">Vendor Bill</t>
-                            </span>
-                        </t>
-                        <t t-else="">
-                            <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">
-                                <t name="proforma_invoice_title">Proforma Fiscal Attestation</t>
-                            </span>
-                            <span t-elif="o.move_type == 'out_invoice' and o.state == 'draft'">
-                                <t name="draft_proforma_invoice_title">Draft Proforma Fiscal Attestation</t>
-                            </span>
-                            <span t-elif="o.move_type == 'out_invoice' and o.state == 'cancel'">
-                                <t name="cancelled_proforma_invoice_title">Cancelled Proforma Fiscal Attestation</t>
-                            </span>
-                            <span t-elif="o.move_type == 'out_refund' and o.state == 'posted'">
-                                <t name="proforma_credit_note_title">Proforma Credit Note</t>
-                            </span>
-                            <span t-elif="o.move_type == 'out_refund' and o.state == 'draft'">
-                                <t name="draft_proforma_credit_note_title">Draft Proforma Credit Note</t>
-                            </span>
-                            <span t-elif="o.move_type == 'out_refund' and o.state == 'cancel'">
-                                <t name="cancelled_proforma_credit_note_title">Cancelled Proforma Credit Note</t>
-                            </span>
-                            <span t-elif="o.move_type == 'in_refund'">
-                                <t name="proforma_vendor_credit_note_title">Proforma Vendor Credit Note</t>
-                            </span>
-                            <span t-elif="o.move_type == 'in_invoice'">
-                                <t name="proforma_vendor_bill_title">Proforma Vendor Bill</t>
-                            </span>
-                        </t>
-                        <span t-if="o.name and o.name != '/'" t-field="o.name">INV/2023/0001</span>
-                    </t>
                     <div class="oe_structure"></div>
                     <div
                         id="informations" class="row mb-4"
@@ -234,10 +235,9 @@
                                     <table class="o_total_table table table-borderless avoid-page-break-inside">
 
                                         <!-- Tax totals summary (invoice currency) -->
-                                        <t t-if="o.tax_totals" t-call="account.document_tax_totals">
-                                            <t t-set="tax_totals" t-value="o.tax_totals"/>
-                                            <t t-set="currency" t-value="o.currency_id"/>
-                                        </t>
+                                        <t t-if="o.tax_totals" t-call="account.document_tax_totals"
+                                            tax_totals="o.tax_totals"
+                                            currency="o.currency_id"/>
 
                                         <!--Payments-->
                                         <t t-if="print_with_payments">
@@ -403,9 +403,7 @@
         </t>
     </template>
     <template id="report_fiscal_attestation_with_payments">
-        <t t-call="non_profit_organization.report_fiscal_attestation">
-            <t t-set="print_with_payments" t-value="True"/>
-        </t>
+        <t t-call="non_profit_organization.report_fiscal_attestation" print_with_payments="True"/>
     </template>
 
     <!-- Website Views -->
@@ -827,12 +825,11 @@
     <record id="website_checkout_extra_info" model="ir.ui.view">
         <field name="arch" type="xml">
         <t name="Checkout Extra Info" active="False" t-name="website_sale.extra_info">
-            <t t-call="website_sale.checkout_layout">
-            <t t-set="show_navigation_button" t-value="False"/>
-            <t t-set="redirect" t-valuef="/shop/extra_info"/>
-            <t t-set="oe_structure">
-                <div class="oe_structure" id="oe_structure_website_sale_extra_info_1"/>
-            </t>
+            <t t-set="oe_structure"><div class="oe_structure" id="oe_structure_website_sale_extra_info_1"/></t>
+            <t t-call="website_sale.checkout_layout"
+                show_navigation_button="False"
+                redirect.f="/shop/extra_info"
+                oe_structure="oe_structure">
             <h3 class="mb-4">Extra info</h3>
             <section class="s_website_form o_colored_level" data-vcss="001" data-snippet="s_website_form">
                 <div class="container">
