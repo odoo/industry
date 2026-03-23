@@ -1,5 +1,6 @@
 {
     'name': 'Solar Energy Systems',
+    'version': '1.1',
     'category': 'Construction',
     'depends': [
         'account_followup',

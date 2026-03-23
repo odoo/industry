@@ -1,5 +1,6 @@
 {
     'name': 'Climbing Gym',
+    'version': '1.1',
     'category': 'Health and Fitness',
     'depends': [
         'base_industry_data',

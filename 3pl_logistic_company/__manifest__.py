@@ -1,6 +1,6 @@
 {
     'name': '3PL Logistic Company',
-    'version': '1.1',
+    'version': '1.2',
     'author': 'Odoo S.A.',
     'category': 'Services',
     'depends': [

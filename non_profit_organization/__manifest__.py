@@ -1,6 +1,6 @@
 {
     'name': 'Nonprofit organization',
-    'version': '2.0',
+    'version': '2.1',
     'category': 'Services',
     'depends': [
         'base_industry_data',
