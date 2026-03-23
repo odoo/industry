@@ -46,10 +46,7 @@
                   </ul>
                   <ul t-if="not navbar_back_url" class="nav" t-att-data-menu_name="editable and 'Event Menu'" t-att-data-content_menu_id="editable and event.menu_id.id">
                     <t t-foreach="event.menu_id.child_id" t-as="submenu">
-                      <t t-call="website.submenu">
-                        <t t-set="item_class" t-value="'nav-item'"/>
-                        <t t-set="link_class" t-value="'nav-link text-nowrap'"/>
-                      </t>
+                      <t t-call="website.submenu" item_class.f="nav-item" link_class.f="nav-link text-nowrap"/>
                     </t>
                   </ul>
                 </nav>
@@ -100,8 +97,7 @@
     <field name="website_id" ref="website.default_website"/>
     <field name="arch" type="xml">
       <t name="Homepage" t-name="website.homepage">
-        <t t-call="website.layout">
-          <t t-set="pageName" t-value="'homepage'"/>
+        <t t-call="website.layout" pageName.f="homepage">
           <div id="wrap" class="oe_structure">
             <section class="s_sidegrid pt56 pb56 o_cc3 o_colored_level" data-snippet="s_sidegrid">
               <div class="container">
@@ -294,8 +290,8 @@
     <field name="website_id" ref="website.default_website" />
     <field name="arch" type="xml">
       <t name="Contact Us" t-name="website.contactus">
-          <t t-call="website.layout">
-              <t t-set="logged_partner" t-value="request.env['website.visitor']._get_visitor_from_request().partner_id" />
+          <t t-call="website.layout"
+              logged_partner="request.env['website.visitor']._get_visitor_from_request().partner_id">
               <t
                   t-set="contactus_form_values"
                   t-value="{                 'email_to': res_company.email,                 'name': request.params.get('name', ''),                 'phone': request.params.get('phone', ''),                 'email_from': request.params.get('email_from', ''),                 'company': request.params.get('company', ''),                 'subject': request.params.get('subject', ''),             }"
@@ -477,15 +473,15 @@
               </div>
             </t>
             <div class="o_wevent_search d-flex w-100 w-lg-25">
-              <t t-call="website.website_search_box_input">
-                <t t-set="_form_classes" t-valuef="flex-grow-1"/>
-                <t t-set="_classes" t-valuef="o_wevent_event_searchbar_form"/>
-                <t t-set="search_type">events</t>
-                <t t-set="action" t-value="'/event/'"/>
-                <t t-set="display_description" t-valuef="true"/>
-                <t t-set="display_detail" t-valuef="false"/>
-                <t t-set="search" t-value="search or searches and searches['search']"/>
-                <t t-set="placeholder">Search an event..</t>
+              <t t-call="website.website_search_box_input"
+                  _form_classes.f="flex-grow-1"
+                  _classes.f="o_wevent_event_searchbar_form"
+                  search_type.translate="events"
+                  action.f="/event"
+                  display_description.f="true"
+                  display_detail.f="false"
+                  search="search or searches and searches['search']"
+                  placeholder.translate="Search an event..">
                 <t t-foreach="searches" t-as="item">
                   <input t-if="item != 'search' and item_value != 'all'" type="hidden" t-att-name="item" t-att-value="item_value"/>
                 </t>

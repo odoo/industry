@@ -1,6 +1,6 @@
 {
     'name': 'Law Firm',
-    'version': '1.3',
+    'version': '1.4',
     'category': 'Services',
     'depends': [
         'base_industry_data',
