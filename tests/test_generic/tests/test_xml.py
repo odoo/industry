@@ -171,6 +171,7 @@ class TestEnv(IndustryCase):
                 self._check_duplicate_records(tree, file_name)
                 self._check_website_published_false(tree, file_name)
                 self._check_static_files_usage_in_xml(tree, in_use_files)
+                self._check_index_html_images(module)
                 self._check_fields(tree, file_name)
                 self._check_change_theme_method(tree, file_name)
                 self._check_dates_are_relative(tree, file_name)
@@ -210,6 +211,21 @@ class TestEnv(IndustryCase):
                     if file and not file.startswith(('web', '/web', 'https', '/unsplash'))
                 }
             )
+
+    def _check_index_html_images(self, module):
+        desc_path = os.path.join(get_industry_path(), module, "description", "index.html")
+        if not os.path.isfile(desc_path):
+            return
+
+        decoded_content = pathlib.Path(desc_path).read_text(encoding="utf-8")
+        for src in re.findall(r'<img[^>]+src=["\']([^"\']+)["\']', decoded_content):
+            if "/web/image" in src:
+                _logger.warning(
+                    "index.html in module %s uses attachment-based image src: %s. "
+                    "Please reference images directly from description/ folder instead.",
+                    module,
+                    src,
+                )
 
     def _check_manifest(self, s, need_studio, escape_studio_test):
         if (first_line := s.split('\n')[0]) != '{':
