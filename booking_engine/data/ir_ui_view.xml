@@ -193,20 +193,20 @@
       <xpath expr="//field[@name='planning_role_id']" position="attributes">
         <attribute name="required">planning_enabled and not x_is_a_room_offer</attribute>
       </xpath>
-      <xpath expr="//notebook" position="inside">
-        <page string="Resources" name="resources" invisible="not x_is_a_room_offer">
-          <span invisible="id">Please save this product to edit the resources.</span>
-          <field name="x_resource_ids"
-                 domain="[('x_is_stay_resource', '=', True)]"
-                 invisible="not id"
-                 context="{
-                  'default_x_is_stay_resource': 1,
-                  'default_resource_type': 'material',
-                  'default_role_ids': [planning_role_id],
-                  'list_view_ref': 'booking_engine.booking_engine_resource_list',
-                  'form_view_ref': 'booking_engine.booking_engine_resource_form',
-                  'has_product': 1,
-                 }"
+      <xpath expr="//group[@name='internal_notes']" position="before">
+        <group string="Resource" invisible="not x_is_a_room_offer">
+          <span invisible="id" class="text-nowrap">Please save this product to edit the resources.</span>
+          <field name="x_resource_ids" nolabel="1" colspan="4"
+              domain="[('x_is_stay_resource', '=', True)]"
+              invisible="not id"
+              context="{
+              'default_x_is_stay_resource': 1,
+              'default_resource_type': 'material',
+              'default_role_ids': [planning_role_id],
+              'list_view_ref': 'booking_engine.booking_engine_resource_list',
+              'form_view_ref': 'booking_engine.booking_engine_resource_form',
+              'has_product': 1,
+              }"
           >
             <list editable="bottom" multi_edit="1" open_form_view="True">
               <control>
@@ -218,7 +218,7 @@
               <field name="company_id" optional="hide"/>
             </list>
           </field>
-        </page>
+        </group>
       </xpath>
     </field>
     <field name="inherit_id" ref="sale_planning.product_template_form_view_invoice_policy_inherit_sale_planning"/>
@@ -356,6 +356,40 @@
     <field name="name">product.template.list.inherit.booking_engine</field>
     <field name="priority">160</field>
     <field name="type">list</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="booking_engine_offers_form" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//div[@name='options']" position="attributes">
+        <attribute name="invisible">1</attribute>
+      </xpath>
+      <xpath expr="//page[@name='general_information']/group" position="replace">
+        <group string="General" name="group_general_info">
+          <group>
+            <field name="list_price"/>
+            <field name="taxes_id" widget='many2many_tags'/>
+          </group>
+          <group>
+            <field name="categ_id" string="Category"/>
+            <field name="x_has_city_tax"/>
+          </group>
+        </group>
+        <group>
+          <group string="Channel Manager">
+            <field name="x_offer_type"/>
+          </group>
+          <group string="House Keeping" groups="booking_engine.group_house_keeping">
+            <field name="x_related_has_stayover_cleaning"/>
+            <field name="x_related_has_checkout_cleaning"/>
+          </group>
+        </group>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="product.product_template_only_form_view"/>
+    <field name="mode">primary</field>
+    <field name="model">product.template</field>
+    <field name="name">product.template.form.inherit.booking_engine</field>
+    <field name="type">form</field>
     <field name="active" eval="True"/>
   </record>
   <record id="booking_engine_planning_role_view_search" model="ir.ui.view">
@@ -583,6 +617,7 @@
       (5, 0, 0),
       (0, 0, {'view_mode': 'kanban', 'view_id': ref('product.product_template_kanban_view')}),
       (0, 0, {'view_mode': 'list', 'view_id': ref('booking_engine_offers_list')}),
+      (0, 0, {'view_mode': 'form', 'view_id': ref('booking_engine_offers_form')}),
     ]"/>
   </record>
   <record id="booking_engine_rooms_roles_action" model="ir.actions.act_window">
