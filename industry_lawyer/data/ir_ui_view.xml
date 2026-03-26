@@ -132,7 +132,7 @@
                 <field name="x_author_id"/>
                 <field name="x_name"/>
                 <field name="x_approval_status"  widget="badge" decoration-danger="x_approval_status=='cancelled'" decoration-success="x_approval_status=='sent'" decoration-info="x_approval_status=='pending'"/>
-                <button name="%(action_send_and_close_email)d" string="Approve &amp; Send" type="action" icon="fa-paper-plane" invisible="x_author_id == uid and x_approval_status != 'pending'"/>
+                <button name="%(action_send_and_close_email)d" string="Approve &amp; Send" type="action" icon="fa-paper-plane" invisible="x_author_id == uid or x_approval_status != 'pending'"/>
                 <button name="%(action_mark_outgoing)d" string="Retry" type="action" icon="fa-repeat" invisible="x_approval_status != 'cancelled'"/>
                 <button name="%(action_cancel)d" string="Cancel" type="action" icon="fa-times-circle" invisible="x_approval_status == 'cancelled'"/>
             </list>
@@ -157,7 +157,7 @@
         <field name="arch" type="xml">
             <form string="Approval Email">
                 <header>
-                    <button name="%(action_send_and_close_email)d" string="Approve &amp; Send" type="action" class="oe_highlight" invisible="x_author_id == uid and x_approval_status != 'pending'"/>
+                    <button name="%(action_send_and_close_email)d" string="Approve &amp; Send" type="action" class="oe_highlight" invisible="x_author_id == uid or x_approval_status != 'pending'"/>
                     <button name="%(action_mark_outgoing)d" string="Retry" type="action" invisible="x_approval_status != 'cancelled'"/>
                     <button name="%(action_cancel)d" string="Cancel" type="action" invisible="x_approval_status == 'cancelled'"/>
                     <field name="x_approval_status" widget="statusbar" statusbar_visible="pending,sent,cancelled"/>
@@ -214,9 +214,15 @@
                     <field name="x_approval_groups" invisible='1'/>
                 </group>
             </xpath>
-            <xpath expr="//page[@name='user_ids']/field[@name='user_ids']" position="attributes">
-                <attribute name="domain">[('group_ids', 'not in', [%(group_low)d, %(group_medium)d, %(group_high)d])]</attribute>
+            <xpath expr="//field[@name='implied_ids']" position="attributes">
+                <attribute name="context">{'default_x_approval_groups': True}</attribute>
             </xpath>
+            <xpath expr="//field[@name='implied_by_ids']" position="attributes">
+                <attribute name="context">{'default_x_approval_groups': True}</attribute>
+            </xpath>
+            <!-- <xpath expr="//page[@name='user_ids']/field[@name='user_ids']" position="attributes">
+                <attribute name="domain">[('group_ids', 'not in', [%(group_low)d, %(group_medium)d, %(group_high)d])]</attribute>
+            </xpath> -->
             <xpath expr="//group/group" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>

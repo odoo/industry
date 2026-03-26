@@ -48,12 +48,12 @@ if claimants_line_ids: claimants_line_ids.write({'x_share': 100 / len(claimants_
     </record>
     <record id="action_split_invoice_per_claimant_from_so" model="ir.actions.server">
         <field name="code"><![CDATA[
-claimants = record.x_claimant_ids; origin = record.name; invoices = record.invoice_ids
-for claimant in claimants:   # One invoice per claimant
+origin = record.name; invoices = record.invoice_ids
+for line in record.partner_id.x_claimants_line_ids:   # One invoice per claimant
     for invoice in invoices:
-        new_invoice = invoice.copy({'partner_id': claimant.id, 'invoice_origin': origin})
+        new_invoice = invoice.copy({'partner_id': line.x_claimant_id.id, 'invoice_origin': origin})
         for orig_line, new_line in zip(invoice.invoice_line_ids, new_invoice.invoice_line_ids):
-            new_line.write({'price_unit': new_line.price_unit / len(claimants)})
+            new_line.write({'price_unit': (line.x_share/100) * orig_line.price_unit})
 invoices.write({'state': 'cancel'})
 action = {'type': 'ir.actions.act_window', 'name': 'Invoices', 'res_model': 'account.move', 'views': [(env.ref('industry_lawyer.account_move_list_custom').id, 'list'), (False, 'form')], 'domain': [('invoice_origin', '=', origin)]}
 ]]>        </field>
@@ -63,11 +63,10 @@ action = {'type': 'ir.actions.act_window', 'name': 'Invoices', 'res_model': 'acc
     </record>
     <record id="action_split_invoice_per_claimant" model="ir.actions.server">
         <field name="code"><![CDATA[
-claimants_lines = record.partner_id.x_claimants_line_ids; len_claimants_lines = len(claimants_lines)
-for claimant_line in claimants_lines:   # One invoice per claimant
+for claimant_line in record.partner_id.x_claimants_line_ids:   # One invoice per claimant
     new_invoice = record.copy({'partner_id': claimant_line.x_claimant_id.id, 'invoice_origin': record.invoice_origin})
     for orig_line, new_line in zip(record.invoice_line_ids, new_invoice.invoice_line_ids):
-        new_line.write({'price_unit': new_line.price_unit / len_claimants_lines})
+        new_line.write({'price_unit': (claimant_line.x_share/100) * orig_line.price_unit})
 record.write({'state': 'cancel'})
 action = {'type': 'ir.actions.act_window', 'name': 'Invoices', 'res_model': 'account.move', 'views': [(env.ref('industry_lawyer.account_move_list_custom').id, 'list'), (False, 'form')], 'domain': [('invoice_origin', '=', record.invoice_origin)]}
 ]]>        </field>
@@ -106,15 +105,19 @@ record.write(vals)
 ctx = env.context
 currect_record = env[ctx.get('default_model')].browse(ctx.get('default_res_id'))
 current_user = env.user
-msg_vals = {'author_id': current_user.id, 'model': currect_record._name, 'res_id': currect_record.id, 'body': ctx.get('body'), 'message_type': 'comment', 'parent_id': currect_record._message_compute_parent_id(current_user.partner_id.id), 'partner_ids': ctx.get('partner_ids'), 'record_company_id': env.company.id,}
-message = currect_record.message_post(body = ctx.get('body'), message_type = 'comment', subtype_xmlid = 'mail.mt_comment', attachment_ids = ctx.get('attachment_ids') or [],)
+
+# body = ctx.get('body') + '<br/> <div class="o_approval_indicator text-muted" data-approval="pending">Waiting for approval</div>'
+
+body = ctx.get('body')
+msg_vals = {'author_id': current_user.id, 'model': currect_record._name, 'res_id': currect_record.id, 'body': body, 'message_type': 'comment', 'parent_id': currect_record._message_compute_parent_id(current_user.partner_id.id), 'partner_ids': ctx.get('partner_ids'), 'record_company_id': env.company.id,}
+message = currect_record.message_post(body = body, message_type = 'comment', subtype_xmlid = 'mail.mt_comment', attachment_ids = ctx.get('attachment_ids') or [])
 partners_data = currect_record._notify_get_recipients(message, msg_vals=msg_vals)
 for _lang, render_values, recipients_group in currect_record._notify_get_classified_recipients_iterator(message, partners_data, msg_vals=msg_vals,):
     # generate notification email content
     mail_body = currect_record._notify_by_email_render_layout(message, recipients_group, msg_vals=msg_vals, render_values=render_values,)
 
 mail = env['mail.mail'].with_context(mail_create_nolog=True).create({'body_html': mail_body or '', 'mail_message_id': message.id, 'partner_ids': ctx.get('partner_ids'), 'author_id': current_user.partner_id.id, 'x_author_id': current_user.id, 'subject': currect_record.name or '', 'recipient_ids': ctx.get('partner_ids'),})
-env['x_approval_mail'].create({'x_mail_id': mail.id, 'x_approval_status': 'pending'})
+env['x_approval_mail'].create({'x_mail_id': mail.id, 'x_approval_status': 'pending', 'x_access_by_users_ids': [(6, 0, current_user.ids)]})
         ]]></field>
     </record>
     <record id="action_submit_for_approval" model="ir.actions.server">

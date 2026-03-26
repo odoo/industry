@@ -182,9 +182,9 @@ for record in self: record['x_show_split_invoice'] = len(record.partner_id.x_cla
         <field name="name">x_display_send_button</field>
         <field name="ttype">boolean</field>
         <field name="compute"><![CDATA[
-for record in self:
-    approval_required = record.env.company.x_approval_required
-    record['x_display_send_button'] = record.env.user.has_group('industry_lawyer.group_high') or approval_required == 'optional' if approval_required else True
+approval_required = self.env.company.x_approval_required
+is_highest_group_user =  self.env.user.group_ids.filtered(lambda g: g.x_approval_groups and not g.implied_by_ids)
+for record in self: record['x_display_send_button'] = is_highest_group_user or approval_required == 'optional' if approval_required else True
 ]]></field>
         <field name="model_id" ref="mail.model_mail_compose_message"/>
         <field name="store" eval="False"/>
@@ -193,9 +193,9 @@ for record in self:
         <field name="name">x_display_send_button</field>
         <field name="ttype">boolean</field>
         <field name="compute"><![CDATA[
-for record in self:
-    approval_required = record.env.company.x_approval_required
-    record['x_display_send_button'] = record.env.user.has_group('industry_lawyer.group_high') or approval_required == 'optional' if approval_required else True
+approval_required = self.env.company.x_approval_required
+is_highest_group_user =  self.env.user.group_ids.filtered(lambda g: g.x_approval_groups and not g.implied_by_ids)
+for record in self: record['x_display_send_button'] = is_highest_group_user or approval_required == 'optional' if approval_required else True
 ]]></field>
         <field name="model_id" ref="account.model_account_move_send_wizard"/>
         <field name="store" eval="False"/>
@@ -282,7 +282,8 @@ for record in self:
     </record>
     <record id="field_x_show_approval" model="ir.model.fields">
         <field name="compute"><![CDATA[
-for record in self: record['x_show_approval'] = record.model in ('sale.order', 'crm.lead') and not record.env.user.has_group('industry_lawyer.group_high')
+is_highest_group_user =  self.env.user.group_ids.filtered(lambda g: g.x_approval_groups and not g.implied_by_ids)
+for record in self: record['x_show_approval'] = record.model in ('sale.order', 'crm.lead') and not is_highest_group_user
 ]]></field>
         <field name="ttype">boolean</field>
         <field name="depends">partner_ids</field>
@@ -292,7 +293,8 @@ for record in self: record['x_show_approval'] = record.model in ('sale.order', '
     </record>
     <record id="field_x_show_approval_for_move_send" model="ir.model.fields">
         <field name="compute"><![CDATA[
-for record in self: record['x_show_approval'] = record.model == 'account.move' and not record.env.user.has_group('industry_lawyer.group_high')
+is_highest_group_user =  self.env.user.group_ids.filtered(lambda g: g.x_approval_groups and not g.implied_by_ids)
+for record in self: record['x_show_approval'] = record.model == 'account.move' and not is_highest_group_user
 ]]></field>
         <field name="ttype">boolean</field>
         <field name="depends">mail_partner_ids</field>

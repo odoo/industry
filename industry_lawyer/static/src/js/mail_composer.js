@@ -18,9 +18,16 @@ patch(Composer.prototype, {
             this.state.isDisplayApproval = true;
         }
         onWillStart(async () => {
-            this.state.isHighGroup = await user.hasGroup(
-                "industry_lawyer.group_high"
+            debugger;
+            const approvalGroupsCount = await this.env.services.orm.searchCount(
+                "res.groups",
+                [
+                    ["user_ids", "in", user.userId],
+                    ["x_approval_groups", "=", true],
+                    ["implied_by_ids", "=", false],
+                ]
             );
+            this.state.isHighGroup = approvalGroupsCount > 0;
 
             const companyId = user.activeCompany.id;
             if (companyId) {
