@@ -24,9 +24,11 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         cls.resource = cls.env['resource.resource'].create({
             'name': 'Room Resource Due Out',
             'resource_type': 'material',
+            'calendar_id': False,
         })
         cls.role = cls.env['planning.role'].create({
             'name': 'Role',
+            'sync_shift_rental': True,
             'x_is_a_room_offer': True,
             'resource_ids': [Command.link(cls.resource.id)],
         })
