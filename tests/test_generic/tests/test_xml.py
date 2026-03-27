@@ -88,7 +88,6 @@ ALLOWED_PYTHON_FILES = [
 ]
 
 ESCAPE_STUDIO_TEST = [
-    'accounting_firm',
     'construction',
 ]
 
