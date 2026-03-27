@@ -32,6 +32,8 @@ class FileTest(IndustryCase):
             if module in self.installed_industries:
                 required_files.update({
                     'icon': '/static/description/icon.png',
+                    'icon-high': '/static/description/icon_hi.png',
+                    'icon-svg': '/static/description/icon.svg',
                     'image': '/images/main.png',
                 })
             for f, path in required_files.items():
