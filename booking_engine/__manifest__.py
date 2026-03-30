@@ -1,6 +1,6 @@
 {
     'name': 'Booking Engine',
-    'version': '1.8',
+    'version': '1.9',
     'category': 'Hidden/Tools',
     'author': 'Odoo S.A.',
     'depends': [
@@ -10,6 +10,7 @@
         'planning_hr_skills',
         'sale_project',
         'sale_renting_planning',
+        'survey',
         'web_studio',
         'website_appointment',
         'website_sale_renting',
@@ -20,6 +21,7 @@
         'data/ir_model.xml',
         'data/ir_model_access.xml',
         'data/ir_model_fields.xml',
+        'data/ir_default.xml',
         'data/project_project.xml',
         'data/account_tax.xml',
         'data/product_template.xml',
@@ -37,6 +39,9 @@
         'data/product_category.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
+        'data/survey_survey.xml',
+        'data/survey_question.xml',
+        'data/survey_question_answer.xml',
     ],
     'demo': [
         'demo/website_menu.xml',

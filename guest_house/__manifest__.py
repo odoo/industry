@@ -1,6 +1,6 @@
 {
     'name': 'Guest House',
-    'version': '1.5',
+    'version': '1.6',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [

@@ -199,4 +199,49 @@ if (project := env['project.project'].search([('x_is_house_keeping_project', '='
     env['project.task'].create(newtasks)
 ]]></field>
     </record>
+    <record id="server_action_to_archive_surveys" model="ir.actions.server">
+        <field name="name">Archive previous survey with is customer satisfaction survey</field>
+        <field name="code"><![CDATA[
+if record.x_is_customer_satisfaction_survey:
+    other_surveys = env['survey.survey'].search([('id', '!=', record.id), ('x_is_customer_satisfaction_survey', '=', True), ('active', '=', True)])
+    other_surveys.write({'active': False, 'x_is_customer_satisfaction_survey': False})
+]]></field>
+        <field name="model_id" ref="survey.model_survey_survey"/>
+        <field name="state">code</field>
+    </record>
+    <record id="ir_actions_server_send_survey" model="ir.actions.server">
+        <field name="name">Booking Engine: Send Customer Satisfaction Survey</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="usage">ir_cron</field>
+        <field name="code"><![CDATA[
+survey = env['survey.survey'].search([
+    ('x_is_customer_satisfaction_survey', '=', True),
+    ('active', '=', True)
+], limit=1)
+
+if survey:
+    delay_days = survey.x_email_delay or 0
+    today = datetime.datetime.today()
+
+    # Only include orders whose rental_return_date + x_email_delay has passed
+    orders = env['sale.order'].search([
+        ('state', '=', 'sale'),
+        ('x_order_involves_room', '=', True),
+        ('x_is_survey_sent', '=', False),
+        ('rental_return_date', '!=', False),
+    ])
+
+    sent_orders = orders.filtered(lambda o: o.partner_id and today >= o.rental_return_date + datetime.timedelta(days=delay_days))
+    if sent_orders:
+        vals_list = [{
+            'survey_id': survey.id,
+            'partner_ids': [(6, 0, [order.partner_id.id])],
+            'send_email': True,
+        } for order in sent_orders]
+
+        invites = env['survey.invite'].create(vals_list)
+        invites.action_invite()
+        sent_orders.write({'x_is_survey_sent': True})]]></field>
+    </record>
 </odoo>
