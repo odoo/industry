@@ -74,7 +74,6 @@
         'demo/helpdesk_ticket.xml',
         'demo/repair_order.xml',
         'demo/repair_order_confirm.xml',
-        'demo/stock_picking_return.xml',
         'demo/ir_attachment_post.xml',
         'demo/planning_slot.xml',
         'demo/website.xml',
