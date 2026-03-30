@@ -83,7 +83,7 @@ class Test_Industry(Command):
                 registry = Registry(target_db)
                 if install:
                     with registry.cursor() as cr:
-                        env = api.Environment(cr, api.SUPERUSER_ID, {'active_test': False})
+                        env = api.Environment(cr, api.SUPERUSER_ID, {})
                         with_demo = config.get('industry_demo') or config['with_demo']
                         _logger.info('Loading module %s into database %s %s', industry_module, target_db, with_demo and 'with demo data' or '')
                         existing_module = env['ir.module.module'].search([])
