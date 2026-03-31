@@ -1,7 +1,7 @@
 {
     'name': 'Night Clubs',
     'version': '1.0',
-    'category': 'Hospitaility',
+    'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
         'base_industry_data',
