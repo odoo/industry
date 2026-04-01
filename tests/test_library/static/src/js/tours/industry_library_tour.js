@@ -188,6 +188,11 @@ registry.category('web_tour.tours').add('industry_library_tour', {
             tooltipPosition: 'bottom'
         },
         {
+            trigger: '.o_data_row .o_field_widget[name=date] input',
+            run: 'click',
+            tooltipPosition: 'bottom'
+        },
+        {
             trigger: '.o_date_item_cell.o_today',
             run: 'click',
             tooltipPosition: 'bottom'
