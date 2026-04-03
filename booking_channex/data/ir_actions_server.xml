@@ -13,14 +13,30 @@ requests.post("https://staging.channex.io/api/v1/booking_revisions/%s/ack" % pay
 if event == 'booking_new':
     full_booking = requests.get("https://staging.channex.io/api/v1/bookings/%s" % payload_infos.get('booking_id', ''),
         headers={'Content-Type': 'application/json', 'user-api-key': env.company.x_channex_api_key}).json().get('data', {}).get('attributes', {})
+
     #To remove after development, display the booking received to have it easier to debug
     records.env.ref('booking_channex.webhook_get_booking_create_change_or_delete').message_post(body=str(full_booking))
-    new_partner = env['res.partner'].create({
-        'name': payload_infos.get('customer_name'),
-    })
+
+    customer = full_booking.get('customer', False)
+    if customer:
+        partner = env['res.partner']._retrieve_partner(name=customer.get('name', ''), phone=customer.get('phone', False), email=customer.get('mail', ''))
+        if not partner:
+            partner = env['res.partner']._retrieve_partner(name=customer.get('name', '') + ' ' + customer.get('surname', ''), phone=customer.get('phone', False), email=customer.get('mail', ''))
+        if not partner:
+            country = env['res.country'].search([('code', '=', customer.get('country', '').lower())]) if customer.get('country', False) else env['res.country']
+            state = env['res.country.state'].search(
+                [('country_id', '=', country.id), ('code', '=', customer.get('state', ''))], limit=1,
+            ) if customer.get('state', '') and country else env['res.country.state']
+            partner = env['res.partner'].create({
+                'name': customer.get('name', '') + ' ' + customer.get('surname', ''), 'email': customer.get('mail', ''), 'phone': customer.get('phone', False),
+                'state_id': state.id, 'country_id': country.id, 'zip': customer.get('zip', False), 'city': customer.get('city', ''), 'street': customer.get('address', ''),
+            })
+    else:
+        partner = env['res.partner'].create({'name': payload_infos.get('customer_name', 'channex partner')})
+    currency_id = env['res.currency'].with_context(active_test=False).search([('name', '=', full_booking.get('currency', False))], limit=1)
+    if not currency_id: raise UserError(_('Could not find currency %s', currency))
     so = env['sale.order'].create({
-        'partner_id': new_partner.id,
-        'is_rental_order': True,
+        'partner_id': partner.id, 'is_rental_order': True, 'currency_id': currency_id.id
     })
     for room in full_booking.get('rooms', []):
         room_mapping = env['x_channex_mapping'].search(
@@ -30,9 +46,19 @@ if event == 'booking_new':
             'product_id': env['product.product'].browse(room_mapping.x_id_local).id,
             'is_rental': True,
             'order_id': so.id,
+            'price_unit': room.get('amount', 0),
+            'currency_id': currency_id.id,
         })
-    so['rental_start_date'] = full_booking.get('arrival_date')
+        #if (guests := room.get('guests', [])):
+        #    env['sale.order.line'].create({
+        #        'display_type': 'line_note',
+        #        'order_id': so.id,
+        #        'name': "Guests: " + "\n".join(guest.get('name', '') + ' ' + guest.get('surname', '') for guest in guests)
+        #            + "\n" + #occupancy and days
+        #    })
+    so['rental_start_date'] = (full_booking.get('arrival_date', '') + ' ' + full_booking.get('arrival_hour', '')).strip()
     so['rental_return_date'] = full_booking.get('departure_date')
+    # assert float_compare(so['total_amount'], payload_infos.get('amount'), precision_digits=2) == 0
     env["x_channex_mapping"].create({
         "x_model_type": "booking",
         "x_id_local": so.id,
@@ -41,7 +67,13 @@ if event == 'booking_new':
     try:
         so.action_confirm()
     except Exception as exc:
-        pass #Create activity to say there's an error and it should be replaned by someone
+        env['mail.activity'].create({
+            'res_model_id': env['ir.model']._get_id('sale.order'),
+            'res_id': so.id,
+            'activity_type_id': env.ref('mail.mail_activity_data_todo').id,
+            'summary': 'Confirm Order',
+            'date_deadline': datetime.datetime.today(),
+        })
 elif booking_id := payload_infos.get('booking_id'):
     mapped_so = env["x_channex_mapping"].search([
         ("x_model_type", "=", "booking"),
@@ -52,6 +84,23 @@ elif booking_id := payload_infos.get('booking_id'):
         #take into account new reservation (could create overlapping issues later)
     elif event == 'booking_cancellation':
         env['sale.order'].browse(mapped_so.x_id_local).action_cancel()
+
+# Not used keys in booking_new
+
+# id, meta, status, services, agent, amount (use rooms), unique_id, inserted_at, channel_id, has_unacked_revisions,
+# secondary_ota, guarantee, acknowledge_status, raw_message, revision_id, is_crs_revision, ota_name, deposits, notes,
+# ota_commission, ota_reservation_code, payment_collect, payment_type, occupancy
+
+# in rooms: meta, taxes, ota_commission, is_cancelled, ota_unique_id, services, booking_room_id, guests, days
+
+# in customer: meta, language
+
+# TODO
+# use occupancy from rooms(?)
+# checkin/out_date from rooms (?)
+# rate_plan_id from rooms (?)
+# use property_id in the mapping
+# where do we store some useful info like OTA (ota_name, ota_commission, ota_reservation_code), occupancy, notes, deposits, ...?
 ]]></field>
     </record>
     <record id="cron_action_send_data_to_channex" model="ir.actions.server">
@@ -357,7 +406,7 @@ else:
         webhook_mapping,
         "Error creating webhook"
     )
-    
+
 # GROUP (Parent Company -> Channex Group)
 company = env.company
 group_mapping = get_mapping('group', company.id)
