@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="action_server_set_usage_meter_reading" model="ir.actions.server">
+        <field name="name">Compute for Meter Reading Consumption</field>
+        <field name="model_id" ref="model_meter_reading"/>
+        <field name="binding_model_id" ref="model_meter_reading"/>
+        <field name="state">code</field>
+        <field name="code">
+prv_qty = 0
+readings = env['x_meter_reading'].search([('id', 'in', record.x_property.x_meter_reading_ids.ids), ('x_meter_id', '=', record.x_meter_id.id)], order='x_date')
+for reading in readings:
+    reading['x_usage'] = reading.x_quantity - prv_qty
+    prv_qty = reading.x_quantity
+        </field>
+    </record>
+    <record id="action_validate_property_stake_holder_dates" model="ir.actions.server">
+        <field name="model_id" ref="model_x_stake_holder"/>
+        <field name="state">code</field>
+        <field name="name">Validate Stakeholder Dates</field>
+        <field name="usage">base_automation</field>
+        <field name="code"><![CDATA[
+for line in record:
+    if line.x_end_date and line.x_end_date < line.x_start_date: raise UserError("End Date must be empty or after Start Date.")
+    domain = [('id', '!=', line.id), ('x_property_id', '=', line.x_property_id.id), ('x_type', '=', line.x_type), ('x_start_date', '!=', False), '|', ('x_end_date', '=', False), ('x_end_date', '>=', line.x_start_date)]
+    if line.x_end_date: domain.append(('x_start_date', '<=', line.x_end_date))
+    if env['x_stake_holder'].search_count(domain, limit=1): raise UserError("Stakeholder dates cannot overlap for the same property. Ensure that periods do not overlap.")
+]]></field>
+    </record>
+    <record id="action_create_stake_holder_account" model="ir.actions.server">
+        <field name="model_id" ref="model_x_stake_holder"/>
+        <field name="state">code</field>
+        <field name="name">Create Stakeholder Account</field>
+        <field name="usage">base_automation</field>
+        <field name="code">
+plan = env['account.analytic.plan'].search([('x_is_a_property_plan', '=', True)], limit=1)
+for line in records:
+    if (partner := line.x_stake_holder) and not env['account.analytic.account'].search_count([('x_property', '=', line.x_property_id.id), ('partner_id', '=', partner.id), ('x_type', '=', line.x_type)]):
+        line['x_account'] = env['account.analytic.account'].create({
+            'name': line.x_property_id.x_name,
+            'plan_id': plan.id,
+            'x_property': line.x_property_id.id,
+            'partner_id': partner.id,
+            'x_stake_holder_line': line.id,
+            'company_id': line.x_property_id.x_company_id.id,
+            'x_type': line.x_type,
+        }).id
+        </field>
+    </record>
+    <record id="action_archive_related_accounts" model="ir.actions.server">
+        <field name="code">
+record.x_owner_ids.x_account.write({'active': False})
+        </field>
+        <field name="model_id" ref="model_x_property"/>
+        <field name="state">code</field>
+        <field name="name">Archive related accounts</field>
+        <field name="usage">base_automation</field>
+    </record>
+</odoo>
