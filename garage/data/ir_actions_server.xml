@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="server_action_link_appointment_type" model="ir.actions.server">
+        <field name="name">Link Appointment Type</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if record.x_appointment_type_id:
+    event = env["calendar.event"].search(
+        [
+            ("appointment_type_id", "=", record.x_appointment_type_id.id),
+            ("appointment_status", "=", "booked"),
+        ],
+        limit=1
+    )
+    action = {
+        "type": "ir.actions.act_window",
+        "res_model": "calendar.event",
+        "view_mode": "form",
+    }
+    if event:
+        action["res_id"] = event.id
+    else:
+        action["context"] = {
+            "default_appointment_type_id": record.x_appointment_type_id.id,
+            "default_name": record.name,
+        }
+]]></field>
+    </record>
+    <record id="server_action_create_sale_order" model="ir.actions.server">
+        <field name="name">Create Sale Order</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for task in records:
+    sale_order = env['sale.order'].create({
+        'partner_id': task.partner_id.id,
+        'x_vehicle_id': task.x_vehicle_id.id,
+        'x_chassis_number': task.x_chassis_number,
+        'x_task_id': task.id,
+    })
+    task['sale_order_id'] = sale_order.id
+    action = {
+        'type': 'ir.actions.act_window',
+        'res_model': 'sale.order',
+        'view_mode': 'form',
+        'res_id': sale_order.id,
+    }
+]]></field>
+    </record>
+    <record id="server_action_create_invoice" model="ir.actions.server">
+        <field name="name">Create Invoice</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for task in records:
+    invoice = env['account.move'].create({
+        'move_type': 'out_invoice',
+        'partner_id': task.partner_id.id,
+        'x_vehicle_id': task.x_vehicle_id.id,
+        'x_chassis_number': task.x_chassis_number,
+        'x_task_id': task.id,
+    })
+    task['x_is_invoice'] = True
+    action = {
+        'type': 'ir.actions.act_window',
+        'res_model': 'account.move',
+        'view_mode': 'form',
+        'res_id': invoice.id,
+    }
+]]></field>
+    </record>
+    <record id="action_update_vehicle_odometer" model="ir.actions.server">
+        <field name="name">Update Vehicle Odometer</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for task in records:
+    if task.x_vehicle_id and task.x_odometer:
+        env['fleet.vehicle.odometer'].create({
+            'value': task.x_odometer,
+            'vehicle_id': task.x_vehicle_id.id,
+            'driver_id': task.x_vehicle_id.driver_id.id,
+        })
+]]></field>
+    </record>
+</odoo>
