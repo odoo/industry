@@ -71,6 +71,7 @@ MODELS_TO_UPDATE = {
     "ir.ui.menu",
     "ir.ui.view",
     "knowledge.article",
+    "template",
     "theme.utils",
     "website.assets",
     "website.controller.page",
@@ -359,8 +360,8 @@ class TestEnv(IndustryCase):
             )
 
     def _check_update_status(self, root, filename):
-        for record in root.xpath("//record") + root.xpath("//function"):
-            model = record.get('model')
+        for record in root.xpath("//record") + root.xpath("//function") + root.xpath("//template"):
+            model = record.get('model') or record.tag
             noupdate = False
             parent = record.getparent()
             data_tag = False
