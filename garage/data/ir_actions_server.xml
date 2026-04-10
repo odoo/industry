@@ -33,20 +33,21 @@ if record.x_appointment_type_id:
         <field name="state">code</field>
         <field name="code"><![CDATA[
 for task in records:
-    sale_order = env['sale.order'].create({
-        'partner_id': task.partner_id.id,
-        'x_vehicle_id': task.x_vehicle_id.id,
-        'x_chassis_number': task.x_chassis_number,
-        'x_task_id': task.id,
-    })
-    task['sale_order_id'] = sale_order.id
-    action = {
-        'type': 'ir.actions.act_window',
-        'res_model': 'sale.order',
-        'view_mode': 'form',
-        'res_id': sale_order.id,
-    }
-]]></field>
+    if task.partner_id and task.x_vehicle_id:
+        sale_order = env['sale.order'].create({
+            'partner_id': task.partner_id.id,
+            'x_vehicle_id': task.x_vehicle_id.id,
+            'x_chassis_number': task.x_chassis_number,
+            'x_task_id': task.id,
+        })
+        task['sale_order_id'] = sale_order.id
+        action = {
+            'type': 'ir.actions.act_window',
+            'res_model': 'sale.order',
+            'view_mode': 'form',
+            'res_id': sale_order.id,
+        }
+    ]]></field>
     </record>
     <record id="server_action_create_invoice" model="ir.actions.server">
         <field name="name">Create Invoice</field>
@@ -54,21 +55,22 @@ for task in records:
         <field name="state">code</field>
         <field name="code"><![CDATA[
 for task in records:
-    invoice = env['account.move'].create({
-        'move_type': 'out_invoice',
-        'partner_id': task.partner_id.id,
-        'x_vehicle_id': task.x_vehicle_id.id,
-        'x_chassis_number': task.x_chassis_number,
-        'x_task_id': task.id,
-    })
-    task['x_is_invoice'] = True
-    action = {
-        'type': 'ir.actions.act_window',
-        'res_model': 'account.move',
-        'view_mode': 'form',
-        'res_id': invoice.id,
-    }
-]]></field>
+    if task.partner_id and task.x_vehicle_id:
+        invoice = env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': task.partner_id.id,
+            'x_vehicle_id': task.x_vehicle_id.id,
+            'x_chassis_number': task.x_chassis_number,
+            'x_task_id': task.id,
+        })
+        task['x_is_invoice'] = True
+        action = {
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.move',
+            'view_mode': 'form',
+            'res_id': invoice.id,
+        }
+    ]]></field>
     </record>
     <record id="action_update_vehicle_odometer" model="ir.actions.server">
         <field name="name">Update Vehicle Odometer</field>
@@ -82,6 +84,6 @@ for task in records:
             'vehicle_id': task.x_vehicle_id.id,
             'driver_id': task.x_vehicle_id.driver_id.id,
         })
-]]></field>
+    ]]></field>
     </record>
 </odoo>

@@ -140,4 +140,32 @@ for record in self: record['x_invoice_count'] = self.env['account.move'].search_
         <field name="model_id" ref="project.model_project_task"/>
         <field name="ttype">boolean</field>
     </record>
+    <record id="x_need_in_intervention_report_field" model="ir.model.fields">
+        <field name="name">x_need_in_intervention_report</field>
+        <field name="field_description">Need in Intervention Report</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="ttype">boolean</field>
+    </record>
+    <record id="x_in_report_field" model="ir.model.fields">
+        <field name="name">x_in_report</field>
+        <field name="field_description">In Report</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="store" eval="False"/>
+        <field name="ttype">boolean</field>
+        <field name="compute"><![CDATA[
+for line in self: line['x_in_report'] = bool(line.product_id and line.product_id.x_need_in_intervention_report)]]></field>
+    </record>
+    <record id="x_tyre_id_field" model="ir.model.fields">
+        <field name="name">x_tyre_id</field>
+        <field name="field_description">Tyres</field>
+        <field name="model_id" ref="fleet.model_fleet_vehicle"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">x_tyre_type</field>
+    </record>
+    <record id="x_motor_block_field" model="ir.model.fields">
+        <field name="name">x_motor_block</field>
+        <field name="field_description">Motor Block</field>
+        <field name="model_id" ref="fleet.model_fleet_vehicle"/>
+        <field name="ttype">char</field>
+    </record>
 </odoo>
