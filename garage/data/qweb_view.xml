@@ -1,0 +1,40 @@
+<odoo>
+    <template id="report_saleorder_document_inherit" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//t[@t-set='address']" position="inside">
+            <t t-if="doc.x_vehicle_id">
+                <div class="mt-2">
+                    <p class="mb-0">
+                        <strong>Plate Number:</strong>
+                        <span t-field="doc.x_vehicle_id.license_plate"/>
+                    </p>
+                    <p class="mb-0">
+                        <strong>Chassis Number:</strong>
+                        <span t-field="doc.x_chassis_number"/>
+                    </p>
+                </div>
+            </t>
+        </xpath>
+    </template>
+    <template id="vehicle_info_block">
+        <t t-if="o.x_vehicle_id">
+            <div class="mt-2">
+                <p class="mb-0"><strong>Plate Number:</strong> <span t-field="o.x_vehicle_id.license_plate"/></p>
+                <p class="mb-0"><strong>Chassis Number:</strong> <span t-field="o.x_chassis_number"/></p>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_invoice_document_vehicle" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[@name='address_not_same_as_shipping']/t[@t-set='address']" position="inside">
+            <t t-call="garage.vehicle_info_block"/>
+        </xpath>
+
+        <xpath expr="//div[@name='address_same_as_shipping']/t[@t-set='address']" position="inside">
+            <t t-call="garage.vehicle_info_block"/>
+        </xpath>
+
+        <xpath expr="//div[@name='no_shipping']/t[@t-set='address']" position="inside">
+            <t t-call="garage.vehicle_info_block"/>
+        </xpath>
+    </template>
+</odoo>
