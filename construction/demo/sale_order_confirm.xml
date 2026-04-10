@@ -14,18 +14,25 @@
         <value model="project.project" eval="[{'xml_id': 'construction.project_project_7', 'record': obj().search([('sale_order_id', '=', ref('construction.sale_order_6'))])}]"/>
     </function>
 
-
     <function name="button_validate" model="stock.picking" context="{'skip_sms': True}">
         <value model="stock.picking" eval="obj().env.ref('construction.sale_order_1').picking_ids.ids"/>
     </function>
+
+    <!-- Create down payments invoices -->
+    <!-- S00001 -->
     <record id="sale_advance_payment_inv_1" model="sale.advance.payment.inv">
         <field name="advance_payment_method">percentage</field>
         <field name="amount">30</field>
         <field name="sale_order_ids" eval="[Command.set([ref('sale_order_1')])]"/>
     </record>
-
     <function name="create_invoices" model="sale.advance.payment.inv" eval="[ref('sale_advance_payment_inv_1')]"/>
-    
+    <!-- S00002 -->
+    <record id="sale_advance_payment_inv_2" model="sale.advance.payment.inv">
+        <field name="advance_payment_method">percentage</field>
+        <field name="amount">30</field>
+        <field name="sale_order_ids" eval="[Command.set([ref('sale_order_6')])]"/>
+    </record>
+    <function name="create_invoices" model="sale.advance.payment.inv" eval="[ref('sale_advance_payment_inv_2')]"/>
 
     <!-- Assign sale order 1's tasks and Tasks progress-->
     <function name="write" model="project.task">
