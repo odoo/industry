@@ -3,11 +3,9 @@
 import datetime
 from dateutil.relativedelta import relativedelta
 
-from odoo.tests import tagged
 from odoo.tests.common import TransactionCase
 
 
-@tagged('post_install', '-at_install')
 class ActionServerTestCase(TransactionCase):
 
     @classmethod

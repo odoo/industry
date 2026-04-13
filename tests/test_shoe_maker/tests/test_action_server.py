@@ -2,10 +2,8 @@
 
 from odoo import fields, Command
 from odoo.tests.common import TransactionCase
-from odoo.tests import tagged
 
 
-@tagged('post_install', '-at_install')
 class ShoeMakerAutomationsTestCase(TransactionCase):
     @classmethod
     def setUpClass(cls):

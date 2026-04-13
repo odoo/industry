@@ -9,7 +9,6 @@ import re
 from lxml import etree
 from collections import defaultdict
 
-from odoo.tests import tagged
 from odoo.tools.mail import single_email_re
 from .industry_case import IndustryCase, get_industry_path
 
@@ -146,7 +145,6 @@ def _has_valid_search(eval_string):
     return True
 
 
-@tagged('post_install', '-at_install')
 class TestEnv(IndustryCase):
 
     def test_xml_files(self):

@@ -2,11 +2,9 @@
 
 from odoo import fields, Command
 from odoo.tests.common import TransactionCase
-from odoo.tests import tagged
 from odoo.exceptions import UserError
 
 
-@tagged('post_install', '-at_install')
 class AutomationsTestCase(TransactionCase):
 
     @classmethod

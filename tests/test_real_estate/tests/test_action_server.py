@@ -1,12 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo.tests.common import TransactionCase
-from odoo.tests import tagged
 import logging
 _logger = logging.getLogger(__name__)
 
 
-@tagged('post_install', '-at_install')
 class RealEstateAutomationsTestCase(TransactionCase):
     @classmethod
     def setUpClass(cls):

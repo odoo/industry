@@ -7,7 +7,6 @@ from pathlib import Path
 
 from odoo.addons.test_lint.tests.test_manifests import ManifestLinter
 from odoo.modules.module import MANIFEST_NAMES, Manifest
-from odoo.tests.common import tagged
 
 from .industry_case import CATEGORIES, IndustryCase, get_industry_path
 
@@ -32,7 +31,6 @@ MANDATORY_KEYS_INDUSTRIES = {
 }
 
 
-@tagged('post_install', '-at_install')
 class ManifestTest(ManifestLinter, IndustryCase):
 
     def _load_manifest(self, module):
