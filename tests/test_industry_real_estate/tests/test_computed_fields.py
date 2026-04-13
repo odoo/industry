@@ -2,11 +2,9 @@
 
 import datetime
 
-from odoo.tests import tagged
 from odoo.tests.common import TransactionCase
 
 
-@tagged('post_install', '-at_install')
 class ComputedFieldsTestCase(TransactionCase):
 
     def test_x_rental_contract_id_computation(self):

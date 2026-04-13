@@ -4,10 +4,8 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import fields
 from odoo.tests.common import TransactionCase
-from odoo.tests import tagged
 
 
-@tagged('post_install', '-at_install')
 class ComputedFieldsTestCase(TransactionCase):
 
     @classmethod

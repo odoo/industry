@@ -5,11 +5,10 @@ from datetime import datetime, timedelta
 from odoo import Command
 from odoo.exceptions import UserError
 from odoo.fields import Datetime
-from odoo.tests import tagged, Form, freeze_time
+from odoo.tests import Form, freeze_time
 from odoo.tests.common import TransactionCase
 
 
-@tagged("post_install", "-at_install")
 class BookingEngineAutomationsTestCase(TransactionCase):
 
     @classmethod

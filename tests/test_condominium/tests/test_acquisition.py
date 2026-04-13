@@ -1,9 +1,8 @@
 from unittest.mock import patch
 
-from odoo.tests import HttpCase, tagged
+from odoo.tests import HttpCase
 
 
-@tagged('post_install', '-at_install')
 class TestUi(HttpCase):
 
     def test_condominium_acquisition(self):
