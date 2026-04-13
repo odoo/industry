@@ -1,7 +1,21 @@
 {
     'name': 'Microbrewery',
+<<<<<<< 44142a93dfc6489c665550932c07f6317434cdf6
     'version': '2.5',
     'category': 'Supply Chain',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'version': '1.0',
+    'category': 'Supply Chain',
+    'description': """
+This module is a setup specific to support the business activities of a microbrewery such as Crafting Beer, Outside Sales, a local Bar, a local Shop and an ecommerce website.
+""",
+=======
+    'version': '1.0',
+    'category': 'Manufacturing and Supply Chain',
+    'description': """
+This module is a setup specific to support the business activities of a microbrewery such as Crafting Beer, Outside Sales, a local Bar, a local Shop and an ecommerce website.
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'account',
         'appointment_crm',
