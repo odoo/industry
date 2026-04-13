@@ -1,7 +1,25 @@
 {
+<<<<<<< a9dd20c2a7dc035cf0d8113b30c6e5c9f3300e20
     'name': 'Construction Builder',
     'version': '1.3',
     'category': 'Construction',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'name': 'Construction',
+    'version': '1.0',
+    'category': 'Construction',
+    'description': """
+This industry is ideal for construction businesses proficient in managing projects from conception to completion,
+focusing on accurate quoting, efficient planning, seamless execution, and excellent customer service, ...
+""",
+=======
+    'name': 'Construction',
+    'version': '1.0',
+    'category': 'Real Estate, Construction and Maintenance',
+    'description': """
+This industry is ideal for construction businesses proficient in managing projects from conception to completion,
+focusing on accurate quoting, efficient planning, seamless execution, and excellent customer service, ...
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'base_industry_data',
         'crm_enterprise',
