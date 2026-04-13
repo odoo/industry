@@ -1,7 +1,23 @@
 {
     'name': 'Solar Energy Systems',
     'version': '1.0',
+<<<<<<< d4e299e9f5b5be3c8d555f885604c559bcdf2ecd
     'category': 'Construction',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'category': 'Construction',
+    'description': """
+This configuration is designed for companies specializing in solar equipment and installation services.
+They cater to both residential and commercial customers,
+ensuring the efficient installation of solar panels and associated equipment.
+""",
+=======
+    'category': 'Real Estate, Construction and Maintenance',
+    'description': """
+This configuration is designed for companies specializing in solar equipment and installation services.
+They cater to both residential and commercial customers,
+ensuring the efficient installation of solar panels and associated equipment.
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'account_followup',
         'helpdesk_account',
