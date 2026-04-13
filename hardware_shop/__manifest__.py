@@ -1,7 +1,21 @@
 {
     'name': 'Hardware Store',
     'version': '1.0',
+<<<<<<< 875a02bf3c018b60fc4273a15eb87b232b13bfd4
     'category': 'Retail',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'category': 'Retail',
+    'description': """
+For Hardware Stores that carry a large selection of products: plumbing, machinery, household, gardening, carpenter and electrical, etc.
+Using Point of Sale, Inventory, Sales, Purchase, Accounting, Contact, Employee, Dashboard, Barcode, and Documents and E-commerce to grow their business.
+    """,
+=======
+    'category': 'Retail and eCommerce',
+    'description': """
+For Hardware Stores that carry a large selection of products: plumbing, machinery, household, gardening, carpenter and electrical, etc.
+Using Point of Sale, Inventory, Sales, Purchase, Accounting, Contact, Employee, Dashboard, Barcode, and Documents and E-commerce to grow their business.
+    """,
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'barcodes',
         'base_geolocalize',

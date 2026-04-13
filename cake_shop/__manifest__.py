@@ -1,7 +1,23 @@
 {
+<<<<<<< 875a02bf3c018b60fc4273a15eb87b232b13bfd4
     'name': 'Cake Shop',
     'version': '1.1',
     'category': 'Retail',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'name': 'Cake Store',
+    'version': '1.0',
+    'category': 'Retail',
+    'description': """
+This setup is for bakery store companies selling to consumers. Bakery are businesses that carry a large selection of products: puffs , cakes , pastries etc...
+""",
+=======
+    'name': 'Cake Store',
+    'version': '1.0',
+    'category': 'Food and Beverage',
+    'description': """
+This setup is for bakery store companies selling to consumers. Bakery are businesses that carry a large selection of products: puffs , cakes , pastries etc...
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'calendar',
         'contacts',

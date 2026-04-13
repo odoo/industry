@@ -1,7 +1,21 @@
 {
     'name': 'Pharmacy',
     'version': '1.0',
+<<<<<<< 875a02bf3c018b60fc4273a15eb87b232b13bfd4
     'category': 'Health and Fitness',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'category': 'Health and Fitness',
+    'description': """
+This setup is for pharmacy retail companies that purchase and sell products.
+They maintain the stock lot wise and also manage the expiry of the lots.
+""",
+=======
+    'category': 'Health, Wellness and Personal Care',
+    'description': """
+This setup is for pharmacy retail companies that purchase and sell products.
+They maintain the stock lot wise and also manage the expiry of the lots.
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'calendar',
         'contacts',
