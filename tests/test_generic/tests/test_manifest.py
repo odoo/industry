@@ -13,6 +13,24 @@ from .industry_case import CATEGORIES, IndustryCase, get_industry_path
 
 _logger = logging.getLogger(__name__)
 
+<<<<<<< 870542a7109864cd9d3beb0bfafb9a9937f1ec2a
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+CATEGORIES = ('Services', 'Retail', 'Construction', 'Hospitality', 'Health and Fitness', 'Supply Chain')
+=======
+CATEGORIES = (
+    'Business Services',
+    'Culture and Arts',
+    'Education and Training',
+    'Events, Community and Nonprofits',
+    'Food and Beverage',
+    'Health, Wellness and Personal Care',
+    'Hospitality, Tourism and Leisure',
+    'Manufacturing and Supply Chain',
+    'Real Estate, Construction and Maintenance',
+    'Retail and eCommerce',
+    'Trades and Home Services',
+)
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
 
 MANDATORY_KEYS = {
     'author': 'Odoo S.A.',

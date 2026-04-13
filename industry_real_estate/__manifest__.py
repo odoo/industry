@@ -1,7 +1,25 @@
 {
+<<<<<<< 870542a7109864cd9d3beb0bfafb9a9937f1ec2a
     'name': 'Property Management',
     'version': '1.3',
     'category': 'Services',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'name': 'Real Estate',
+    'version': '1.0',
+    'category': 'Services',
+    'description': """
+Manage your long term or mid long term rental properties
+Manage your properties, create and manage rental contracts, and streamline your entire rental process. Efficient property management.
+""",
+=======
+    'name': 'Real Estate',
+    'version': '1.0',
+    'category': 'Real Estate, Construction and Maintenance',
+    'description': """
+Manage your long term or mid long term rental properties
+Manage your properties, create and manage rental contracts, and streamline your entire rental process. Efficient property management.
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'base_automation',
         'crm_enterprise',

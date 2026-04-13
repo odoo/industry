@@ -1,6 +1,22 @@
 {
     'name': 'Surveying & Mapping',
+<<<<<<< 870542a7109864cd9d3beb0bfafb9a9937f1ec2a
     'category': 'Services',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'version': '1.0',
+    'category': 'Services',
+    'description': """
+This setup is for industrial companies who are into sureveying and measurement activities.
+It may include surveying of building properties and the measurement of completed construction activities.
+""",
+=======
+    'version': '1.0',
+    'category': 'Trades and Home Services',
+    'description': """
+This setup is for industrial companies who are into sureveying and measurement activities.
+It may include surveying of building properties and the measurement of completed construction activities.
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'base_automation',
         'crm',

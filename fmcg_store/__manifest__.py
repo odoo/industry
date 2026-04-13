@@ -1,6 +1,20 @@
 {
     'name': 'Grocery Store',
+<<<<<<< 870542a7109864cd9d3beb0bfafb9a9937f1ec2a
     'category': 'Retail',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'version': '1.0',
+    'category': 'Retail',
+    'description': """
+This module setup a Point of Sale (POS) system for a grocery store which is essential for efficiently managing various product categories, handling transactions, and providing excellent customer service.
+""",
+=======
+    'version': '1.0',
+    'category': 'Retail and eCommerce',
+    'description': """
+This module setup a Point of Sale (POS) system for a grocery store which is essential for efficiently managing various product categories, handling transactions, and providing excellent customer service.
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'account_followup',
         'knowledge',
