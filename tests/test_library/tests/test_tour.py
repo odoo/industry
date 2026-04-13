@@ -1,7 +1,6 @@
-from odoo.tests import HttpCase, tagged
+from odoo.tests import HttpCase
 
 
-@tagged('post_install', '-at_install')
 class LibraryTourTestCase(HttpCase):
     def test_return_tour(self):
         # skip test if demo data is not loaded

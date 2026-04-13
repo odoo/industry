@@ -4,10 +4,9 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import fields
 from odoo.tests.common import TransactionCase
-from odoo.tests import Form, tagged
+from odoo.tests import Form
 
 
-@tagged('post_install', '-at_install')
 class ServerActionsTestCase(TransactionCase):
 
     @classmethod

@@ -2,10 +2,9 @@
 
 from odoo import fields
 from odoo.tests.common import TransactionCase
-from odoo.tests import tagged, Form
+from odoo.tests import Form
 
 
-@tagged('post_install', '-at_install')
 class BookstoreAutomationsTestCase(TransactionCase):
     @classmethod
     def setUpClass(cls):

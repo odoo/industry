@@ -1,10 +1,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.tests import float_compare, tagged
+from odoo.tests import float_compare
 from odoo.tests.common import TransactionCase
 
 
-@tagged('post_install', '-at_install')
 class TestCostNatureAnalysisReport(TransactionCase):
 
     def test_table_values_sale_order(self):

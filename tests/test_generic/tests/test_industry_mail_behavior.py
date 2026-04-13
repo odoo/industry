@@ -2,13 +2,11 @@
 
 import logging
 
-from odoo.tests import tagged
 from .industry_case import IndustryCase
 
 _logger = logging.getLogger(__name__)
 
 
-@tagged('post_install', '-at_install')
 class IndustryMailBehaviorTestCase(IndustryCase):
     def test_user_notification_type(self):
         if not self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1):
