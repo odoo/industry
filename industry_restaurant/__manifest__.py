@@ -1,7 +1,25 @@
 {
+<<<<<<< 963a469a5cd46e1f01cc10a2bf188f2eeeee46a4
     'name': 'Fine Dining Restaurant',
     'version': '1.1',
     'category': 'Hospitality',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'name': 'Restaurant (Foods & Cafes)',
+    'version': '1.0',
+    'category': 'Hospitality',
+    'description': """
+        This Odoo module is designed to streamline and enhance the management of your restaurant operations.
+        Whether you own a fine dining establishment, a cafe, or fast-food joints, cafés, food trucks, cloud kitchens, and more.
+    """,
+=======
+    'name': 'Restaurant (Foods & Cafes)',
+    'version': '1.0',
+    'category': 'Food and Beverage',
+    'description': """
+        This Odoo module is designed to streamline and enhance the management of your restaurant operations.
+        Whether you own a fine dining establishment, a cafe, or fast-food joints, cafés, food trucks, cloud kitchens, and more.
+    """,
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'account_followup',
         'contacts',
