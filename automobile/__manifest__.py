@@ -1,7 +1,23 @@
 {
     'name': 'Automobile Spare Parts',
     'version': '1.0',
+<<<<<<< 61e38eb532845a346c2e0f26ac27b86b503a86a0
     'category': 'Retail',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'category': 'Retail',
+    'description': """
+This set-up is for the automobile trading companies selling to the customers.
+The Automobile spare parts business have the more number of items for the various car brands and the parts for the Engine,
+Maintenance and accessorises etc.
+    """,
+=======
+    'category': 'Retail and eCommerce',
+    'description': """
+This set-up is for the automobile trading companies selling to the customers.
+The Automobile spare parts business have the more number of items for the various car brands and the parts for the Engine,
+Maintenance and accessorises etc.
+    """,
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'account_check_printing',
         'account_followup',

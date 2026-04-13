@@ -1,7 +1,19 @@
 {
     'name': 'Corporate Gifts',
     'version': '1.0',
+<<<<<<< 61e38eb532845a346c2e0f26ac27b86b503a86a0
     'category': 'Supply Chain',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'category': 'Supply Chain',
+    'description': """
+This module is for marketing companies selling and producing customized corporate gifts, like mugs and t-shirts.
+""",
+=======
+    'category': 'Manufacturing and Supply Chain',
+    'description': """
+This module is for marketing companies selling and producing customized corporate gifts, like mugs and t-shirts.
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'base_automation',
         'crm_enterprise',

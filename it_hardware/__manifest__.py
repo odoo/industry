@@ -1,7 +1,21 @@
 {
     'name': 'IT Hardware & Support',
+<<<<<<< 61e38eb532845a346c2e0f26ac27b86b503a86a0
     'version': '1.1',
     'category': 'Services',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'version': '1.0',
+    'category': 'Services',
+    'description': """
+We offer IT sales, installation, and repair services for a wide range of products, including laptops, RAM, accessories, and CCTV cameras.
+""",
+=======
+    'version': '1.0',
+    'category': 'Business Services',
+    'description': """
+We offer IT sales, installation, and repair services for a wide range of products, including laptops, RAM, accessories, and CCTV cameras.
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'account_followup',
         'helpdesk_repair',
