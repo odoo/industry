@@ -1,7 +1,21 @@
 {
     'name': 'Furniture Store',
+<<<<<<< 44142a93dfc6489c665550932c07f6317434cdf6
     'version': '1.2',
     'category': 'Retail',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'version': '1.0',
+    'category': 'Retail',
+    'description': """
+This module sets up a furniture store for selling furniture like chairs, sofas, dining tables, ...
+""",
+=======
+    'version': '1.0',
+    'category': 'Retail and eCommerce',
+    'description': """
+This module sets up a furniture store for selling furniture like chairs, sofas, dining tables, ...
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'base_industry_data',
         'crm_enterprise',
