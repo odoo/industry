@@ -1,7 +1,33 @@
 {
     'name': 'Photography',
+<<<<<<< a9dd20c2a7dc035cf0d8113b30c6e5c9f3300e20
     'version': '1.1',
     'category': 'Services',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'version': '1.0',
+    'category': 'Services',
+    'description': """
+        The Odoo app for photography professionals provides a preconfigured database with all the
+        necessary features to manage their business. The app includes pre-configured products and
+        projects, a website template, and beautiful quotes to help photographers showcase their work
+        and attract new clients. With this app, photographers can easily manage their projects, track
+        their time, and create invoices. The website template allows photographers to showcase their
+        portfolio and services, and the pre-configured products make it easy to sell prints and other
+        photography-related items.
+    """,
+=======
+    'version': '1.0',
+    'category': 'Culture and Arts',
+    'description': """
+        The Odoo app for photography professionals provides a preconfigured database with all the
+        necessary features to manage their business. The app includes pre-configured products and
+        projects, a website template, and beautiful quotes to help photographers showcase their work
+        and attract new clients. With this app, photographers can easily manage their projects, track
+        their time, and create invoices. The website template allows photographers to showcase their
+        portfolio and services, and the pre-configured products make it easy to sell prints and other
+        photography-related items.
+    """,
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'crm',
         'documents_project',

@@ -1,7 +1,23 @@
 {
     'name': 'Arts & Crafts Store',
+<<<<<<< a9dd20c2a7dc035cf0d8113b30c6e5c9f3300e20
     'version': '1.1',
     'category': 'Retail',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'version': '1.0',
+    'category': 'Retail',
+    'description': """
+        This modules provide a colourful array of paints, brushes, paper, beads, tools, colourful trays and other crafting (Handmade) essentials.
+        They are a treasure trove for anyone seeking to express their creativity, explore new hobbies, or create beautiful handmade items.
+    """,
+=======
+    'version': '1.0',
+    'category': 'Culture and Arts',
+    'description': """
+        This modules provide a colourful array of paints, brushes, paper, beads, tools, colourful trays and other crafting (Handmade) essentials.
+        They are a treasure trove for anyone seeking to express their creativity, explore new hobbies, or create beautiful handmade items.
+    """,
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'knowledge',
         'pos_sale',

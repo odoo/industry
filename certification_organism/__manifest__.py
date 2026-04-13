@@ -1,7 +1,21 @@
 {
     'name': 'Audit & Certification',
+<<<<<<< a9dd20c2a7dc035cf0d8113b30c6e5c9f3300e20
     'version': '1.2',
     'category': 'Services',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'version': '1.0',
+    'category': 'Services',
+    'description': """
+This module setup your database to easily use odoo in a Audit & Certification company.
+""",
+=======
+    'version': '1.0',
+    'category': 'Business Services',
+    'description': """
+This module setup your database to easily use odoo in a Audit & Certification company.
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'base_industry_data',
         'crm',

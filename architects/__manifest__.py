@@ -1,7 +1,23 @@
 {
     'name': 'Architecture Firm',
+<<<<<<< a9dd20c2a7dc035cf0d8113b30c6e5c9f3300e20
     'version': '1.3',
     'category': 'Services',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'version': '1.0',
+    'category': 'Services',
+    'description': """
+This industry is made for Architecture Firm that sell all kind of architectural services such as feasibility studies,
+schematic design, design development, worksite follow-up, energy efficiency assessment.
+""",
+=======
+    'version': '1.0',
+    'category': 'Real Estate, Construction and Maintenance',
+    'description': """
+This industry is made for Architecture Firm that sell all kind of architectural services such as feasibility studies,
+schematic design, design development, worksite follow-up, energy efficiency assessment.
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'account_followup',
         'base_automation',
