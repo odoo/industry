@@ -1,7 +1,23 @@
 {
     'name': 'Agricultural Store',
+<<<<<<< 870542a7109864cd9d3beb0bfafb9a9937f1ec2a
     'version': '1.2',
     'category': 'Retail',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'version': '1.0',
+    'category': 'Retail',
+    'description': """
+    Tailored Setup for Agricultural Retail Businesses:
+    This module is for B2B and B2C sales of farming products, including seeds, pesticides, plant nutrition, and equipment. The setup integrates all necessary modules (Point of Sale, Inventory, Sales, Purchase, ...) to run your business with the possibility to expand into online sales with the ecommerce and website applications.
+""",
+=======
+    'version': '1.0',
+    'category': 'Retail and eCommerce',
+    'description': """
+    Tailored Setup for Agricultural Retail Businesses:
+    This module is for B2B and B2C sales of farming products, including seeds, pesticides, plant nutrition, and equipment. The setup integrates all necessary modules (Point of Sale, Inventory, Sales, Purchase, ...) to run your business with the possibility to expand into online sales with the ecommerce and website applications.
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'crm',
         'knowledge',

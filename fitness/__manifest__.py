@@ -1,7 +1,17 @@
 {
     'name': 'Fitness Center',
+<<<<<<< 870542a7109864cd9d3beb0bfafb9a9937f1ec2a
     'version': '1.2',
     'category': 'Health and Fitness',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'version': '1.0',
+    'category': 'Health and Fitness',
+    'description': "",
+=======
+    'version': '1.0',
+    'category': 'Health, Wellness and Personal Care',
+    'description': "",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'base_industry_data',
         'calendar',
