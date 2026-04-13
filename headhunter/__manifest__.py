@@ -1,7 +1,21 @@
 {
     'name': 'Talent Acquisition',
     'version': '1.0',
+<<<<<<< 963a469a5cd46e1f01cc10a2bf188f2eeeee46a4
     'category': 'Services',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'category': 'Services',
+    'description': """
+This setup is for Talent Acquisition Agency / Recruitment Agency / Staffing Agency.
+Those agencies work on two levels and with two different audiences, ...
+""",
+=======
+    'category': 'Business Services',
+    'description': """
+This setup is for Talent Acquisition Agency / Recruitment Agency / Staffing Agency.
+Those agencies work on two levels and with two different audiences, ...
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'account',
         'appointment_crm',
