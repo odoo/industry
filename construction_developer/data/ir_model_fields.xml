@@ -306,6 +306,7 @@ for record in self: record['x_margin'] = (record.x_unit_price - record.x_unit_co
         <field name="store" eval="False"/>
     </record>
 
+
     <record id="x_work_item_line_ids_field_x_work_item" model="ir.model.fields">
         <field name="name">x_work_item_line_ids</field>
         <field name="ttype">one2many</field>
@@ -823,4 +824,52 @@ for record in self:
         <field name="relation">product.category</field>
         <field name="store" eval="True"/>
     </record>
+
+    <!-- shopping list -->
+    <record id="field_x_work_item_line_x_demand" model="ir.model.fields">
+        <field name="name">x_demand</field>
+        <field name="ttype">float</field>
+        <field name="depends">x_quantity,x_work_item_id,x_work_item_id.x_sale_order_line_id,x_work_item_id.x_sale_order_line_id.product_uom_qty</field>
+        <field name="field_description">Needed</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="readonly" eval="True"/>
+        <field name="compute"><![CDATA[
+for r in self: r['x_demand'] = (r.x_quantity * (line.product_uom_qty if (line := r.x_work_item_id.x_sale_order_line_id) else 1))
+]]></field>
+    </record>
+
+    <record id="field_x_work_item_line_x_consumed" model="ir.model.fields">
+        <field name="name">x_consumed</field>
+        <field name="ttype">float</field>
+        <field name="field_description">Consumed</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="depends">x_demand,x_work_item_id,x_work_item_id.x_sale_order_line_id,x_work_item_id.x_sale_order_line_id.x_cost_nature,x_work_item_id.x_sale_order_line_id.x_delivered_progress</field>
+        <field name="compute"><![CDATA[
+for r in self: r['x_consumed'] = r.x_demand if (r.x_work_item_id.x_sale_order_line_id.x_cost_nature == 'material' and r.x_work_item_id.x_sale_order_line_id.x_delivered_progress == 100) else 0
+]]></field>
+    </record>
+
+    <record id="field_x_work_item_line_x_line_reference" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="related">x_work_item_id.x_sale_order_line_id.x_reference</field>
+        <field name="field_description">Line Reference</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="name">x_line_reference</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
+
+    <record id="field_x_work_item_line_x_sale_order_id" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="related">x_work_item_id.x_sale_order_line_id.order_id</field>
+        <field name="relation">sale.order</field>
+        <field name="field_description">Sale Order</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="name">x_sale_order_id</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
+
 </odoo>
