@@ -2,11 +2,8 @@
     'name': 'Booking Channex',
     'author': 'Odoo S.A.',
     'category': 'Hidden/Tools',
-    'auto_install': True,
     'depends': [
-        'planning',
-        'sale_management',
-        'web_studio',
+        'booking_engine',
     ],
     'data': [
         'data/ir_model.xml',
@@ -18,9 +15,6 @@
         'data/ir_cron.xml',
         'data/ir_ui_view.xml',
         'data/ir_ui_menu.xml',
-    ],
-    'demo': [
-        'demo/res_company.xml',
     ],
     'license': 'OEEL-1',
     'cloc_exclude': [

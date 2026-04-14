@@ -2,6 +2,10 @@
 <odoo>
     <!-- channex mapping views -->
     <record id="x_channex_mapping_form_view" model="ir.ui.view">
+        <field name="model">x_channex_mapping</field>
+        <field name="name">Mapping Table Form</field>
+        <field name="active" eval="True"/>
+        <field name="type">form</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>
@@ -15,12 +19,23 @@
                 </sheet>
             </form>
         </field>
+    </record>
+    <record id="x_channex_mapping_search_view" model="ir.ui.view">
+        <field name="name">x.channex.mapping.search</field>
         <field name="model">x_channex_mapping</field>
-        <field name="name">Mapping Table Form</field>
         <field name="active" eval="True"/>
-        <field name="type">form</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter name="group_by_model_type" string="Model Type" context="{'group_by': 'x_model_type'}"/>
+            </search>
+        </field>
     </record>
     <record id="x_channex_mapping_list_view" model="ir.ui.view">
+        <field name="model">x_channex_mapping</field>
+        <field name="name">Mapping Table list</field>
+        <field name="active" eval="True"/>
+        <field name="type">list</field>
         <field name="arch" type="xml">
             <list>
                 <field name="x_model_type" />
@@ -28,11 +43,8 @@
                 <field name="x_id_remote" />
             </list>
         </field>
-        <field name="model">x_channex_mapping</field>
-        <field name="name">Mapping Table list</field>
-        <field name="active" eval="True"/>
-        <field name="type">list</field>
     </record>
+    
     <!-- cron data send lines views -->
      <record id="x_channex_datas_cron_lines_list_view" model="ir.ui.view">
         <field name="arch" type="xml">
@@ -91,5 +103,45 @@
         <field name="name">res.config.settings form view extension</field>
         <field name="active" eval="True"/>
         <field name="type">form</field>
+    </record>
+    <record id="res_config_settings_form_view_inherited_sync" model="ir.ui.view">
+        <field name="name">res.config.settings.form.view.inherited.booking.engine.sync</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="50"/>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="booking_engine.res_config_settings_form_view_inherited" />
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='booking_engine_channel_manager_setting']//div" position="replace">
+                <div class="content-group" invisible="not x_module_channel_manager">
+                    <div class="row mt16">
+                        <label for="x_channex_api_key" class="col-lg-3" invisible="not x_module_channel_manager"/>
+                        <field name="x_channex_api_key" required="x_module_channel_manager" invisible="not x_module_channel_manager"/>
+                    </div>
+                </div>
+                <div invisible="not x_module_channel_manager" class="oe_inline">
+                        <button
+                            type="action"
+                            name="%(action_button_sync)d"
+                            class="btn-primary"
+                        >
+                            Sync
+                        </button>
+                    </div>
+            </xpath>
+        </field>
+    </record>
+    <record id="product_form_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='group_standard_price']//field[@name='company_id']" position="attributes">
+                <attribute name="required">x_is_a_room_offer</attribute>
+            </xpath>
+        </field>
+        <field name="inherit_id" ref="sale_planning.product_template_form_view_invoice_policy_inherit_sale_planning"/>
+        <field name="mode">extension</field>
+        <field name="model">product.template</field>
+        <field name="name">product.template.product.form.inherit.booking_channex</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
     </record>
 </odoo>

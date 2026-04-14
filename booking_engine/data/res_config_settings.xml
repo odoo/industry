@@ -165,6 +165,64 @@ env['ir.config_parameter'].set_bool('booking_engine.x_approvers_setting', (True 
         <field name="trigger_field_ids" eval="[(6, 0, [ref('x_setting_field_approvers')])]"/>
     </record>
 
+    <!-- Channel Manager -->
+    <record id="x_module_channel_manager_field_res_company" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Channel Manager</field>
+        <field name="model_id" ref="base.model_res_company"/>
+        <field name="store" eval="True"/>
+        <field name="name">x_module_channel_manager</field>
+        <field name="groups" eval="[(4, ref('base.group_no_one'))]"/>
+    </record>
+    <record id="x_setting_field_channel_manager" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="related">company_id.x_module_channel_manager</field>
+        <field name="field_description">Channel Manager</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="name">x_module_channel_manager</field>
+        <field name="groups" eval="[(4, ref('base.group_no_one'))]"/>
+    </record>
+    <record id="x_action_activate_channel_manager" model="ir.actions.server">
+        <field name="code"><![CDATA[
+module = env['ir.module.module'].search([('name', '=', 'booking_channex')], limit=1)
+if module:
+    if record.x_module_channel_manager:
+        if module.state not in ('installed', 'to install'):
+            module.button_immediate_install()
+    else:
+        if module.state in ('installed'):
+            module.button_immediate_uninstall()
+]]></field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="state">code</field>
+        <field name="name">Install Channel Manager</field>
+    </record>
+    <record id="base_automation_on_channel_manager_setting_set" model="base.automation">
+        <field name="name">Activate Channel Manager</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('x_action_activate_channel_manager')])]"/>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_setting_field_channel_manager')])]"/>
+        <field name="trigger">on_create_or_write</field>
+    </record>
+    <record id="x_action_set_unset_channel_manager" model="ir.actions.server">
+        <field name="model_id" ref="base.model_ir_module_module"/>
+        <field name="state">code</field>
+        <field name="name">Set/Unset Channel Manager</field>
+        <field name="usage">base_automation</field>
+        <field name="code"><![CDATA[
+module = env['ir.module.module'].browse(env.ref('base.module_booking_channex').id)
+env.company['x_module_channel_manager'] = module.state in ['installed', 'to install']
+        ]]></field>
+    </record>
+    <record id="x_automation_set_unset_channel_manager" model="base.automation">
+        <field name="model_id" ref="base.model_ir_module_module"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('x_action_set_unset_channel_manager')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_pre_domain" eval="[('id', '=', ref('base.module_booking_channex'))]"/>
+        <field name="name">Set/Unset Channel Manager</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('base.field_ir_module_module__state')])]"/>
+    </record>
+
     <record id="res_config_settings_form_view_inherited" model="ir.ui.view">
         <field name="name">res.config.settings.form.view.inherited.booking.engine</field>
         <field name="model">res.config.settings</field>
@@ -187,6 +245,14 @@ env['ir.config_parameter'].set_bool('booking_engine.x_approvers_setting', (True 
                                         <field name="x_setting_related_approver_users_ids" class="oe_inline" widget="many2many_tags"/>
                                     </div>
                                 </div>
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Channel Manager" name="channel_manager_config_block" >
+                        <setting id="booking_engine_channel_manager_setting" help="Expose your stay offers on OTAs through channex.">
+                            <field name="x_module_channel_manager" groups="base.group_system"/>
+                            <div class="text-warning mb4" invisible="not x_module_channel_manager">
+                                Save this page and come back here to set up the feature.
                             </div>
                         </setting>
                     </block>

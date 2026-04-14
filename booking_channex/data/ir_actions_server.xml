@@ -202,4 +202,103 @@ if not sending_cron.active:
     sending_cron['active'] = True
 ]]></field>
     </record>
+    <record id="action_button_sync" model="ir.actions.server">
+        <field name="name">Channex: Sync Data</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+BASE_URL = "https://staging.channex.io/api/v1"
+if not env.company.x_channex_api_key:
+    raise UserError("Channex API key is missing in company settings.")
+header = {
+    'Content-Type': 'application/json',
+    'user-api-key': env.company.x_channex_api_key
+}
+
+def channex_post(endpoint, payload):
+    try:
+        response = requests.post(f"{BASE_URL}/{endpoint}", headers=header, data=json.dumps(payload), timeout=20)
+        response.raise_for_status()
+        return response.json()
+
+    except Exception as e:
+        raise UserError(f"Channex API error: {str(e)}")
+
+def get_mapping(model, local_id):
+    mapping = env['x_channex_mapping'].search([
+        ('x_model_type', '=', model),
+        ('x_id_local', '=', local_id)
+    ], limit=1)
+
+    if not mapping:
+        mapping = env['x_channex_mapping'].create({
+            "x_model_type": model,
+            "x_id_local": local_id,
+        })
+    return mapping
+
+def create_on_channex(endpoint, payload, mapping, error_msg):
+    try:
+        data = channex_post(endpoint, payload)
+        remote_id = data.get('data', {}).get('attributes', {}).get('id')
+
+        if not remote_id:
+            raise UserError(f"{error_msg}: Invalid response from Channex")
+
+        mapping.write({'x_id_remote': remote_id})
+
+    except Exception as e:
+        raise UserError(f"{error_msg}: {str(e)}")
+
+# webhook
+try:
+    resp = requests.get(f"{BASE_URL}/webhooks", headers={'user-api-key': env.company.x_channex_api_key, "Accept":'application/json',}, timeout=20)
+    resp.raise_for_status()
+    data = resp.json()
+except Exception as e:
+    raise UserError(f"Error fetching webhooks: {str(e)}")
+
+channex_webhooks = data.get('data', [])
+odoo_webhook = env.ref('booking_channex.webhook_get_booking_create_change_or_delete')
+existing_webhook = False
+for w in channex_webhooks:
+    if w.get('attributes', {}).get('callback_url') == odoo_webhook.url:
+        existing_webhook = w
+        break
+webhook_mapping = get_mapping('webhook', odoo_webhook.id)
+
+if existing_webhook:
+    webhook_mapping.write({
+        'x_id_remote': existing_webhook.get('attributes', {}).get('id')
+    })
+else:
+    payload = {
+        "webhook": {
+            "callback_url": odoo_webhook.url,
+            "event_mask": "booking_new;booking_modification;booking_cancellation",
+            "request_params": {},
+            "headers": {},
+            "is_active": True,
+            "is_global": True,
+            "send_data": True
+        }
+    }
+    create_on_channex(
+        'webhooks',
+        payload,
+        webhook_mapping,
+        "Error creating webhook"
+    )
+
+action = {
+    'type': 'ir.actions.client',
+    'tag': 'display_notification',
+    'params': {
+        'message': 'WIP: No seeding, No ARI push',
+        'type': 'warning',
+        'sticky': False,
+    }
+}
+        ]]></field>
+    </record>
 </odoo>
