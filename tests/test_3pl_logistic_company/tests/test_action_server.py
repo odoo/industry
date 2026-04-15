@@ -4,10 +4,9 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import Command, fields
 from odoo.tests.common import TransactionCase
-from odoo.tests import Form, tagged
+from odoo.tests import Form
 
 
-@tagged('post_install', '-at_install')
 class AutomationsTestCase(TransactionCase):
     @classmethod
     def setUpClass(cls):
@@ -63,7 +62,6 @@ class AutomationsTestCase(TransactionCase):
         self.assertFalse(stock_picking_1.owner_id, "Owner should NOT be updated if products have different owners.")
 
 
-@tagged('post_install', '-at_install')
 class ServerActionTestCase(TransactionCase):
     @classmethod
     def setUpClass(cls):

@@ -1,11 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import Command
-from odoo.tests import Form, tagged
+from odoo.tests import Form
 from odoo.tests.common import TransactionCase
 
 
-@tagged('post_install', '-at_install')
 class LibraryAutomationsTestCase(TransactionCase):
     @classmethod
     def setUpClass(cls):

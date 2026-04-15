@@ -6,7 +6,6 @@ from pathlib import Path
 import re
 import io
 
-from odoo.tests import tagged
 from odoo.tools.translate import trans_export
 
 from .industry_case import IndustryCase, get_industry_path
@@ -14,7 +13,6 @@ from .industry_case import IndustryCase, get_industry_path
 _logger = logging.getLogger(__name__)
 
 
-@tagged('post_install', '-at_install')
 class FileTest(IndustryCase):
 
     def test_required_files(self):

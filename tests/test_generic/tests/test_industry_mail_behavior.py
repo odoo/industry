@@ -2,8 +2,6 @@
 
 import logging
 
-
-from odoo.tests import tagged
 from .industry_case import IndustryCase
 
 _logger = logging.getLogger(__name__)
@@ -38,7 +36,6 @@ EXCEPTION_MODELS = [
 ]
 
 
-@tagged('post_install', '-at_install')
 class IndustryMailBehaviorTestCase(IndustryCase):
 
     def test_generic_mail_message_generated(self):

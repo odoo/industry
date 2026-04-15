@@ -1,8 +1,7 @@
 from odoo.tests.common import TransactionCase
-from odoo.tests import Form, tagged
+from odoo.tests import Form
 
 
-@tagged('post_install', '-at_install')
 class ActionServerTestCase(TransactionCase):
 
     @classmethod

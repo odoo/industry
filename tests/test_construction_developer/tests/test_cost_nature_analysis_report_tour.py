@@ -1,7 +1,6 @@
-from odoo.tests import HttpCase, tagged
+from odoo.tests import HttpCase
 
 
-@tagged('post_install', '-at_install')
 class TestCostNatureAnalysisReportTour(HttpCase):
     def test_cost_nature_tour(self):
         if not self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1):

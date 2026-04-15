@@ -3,7 +3,6 @@
 import logging
 import re
 
-from odoo.tests import tagged
 from odoo.tools import cloc
 
 from .industry_case import IndustryCase
@@ -11,7 +10,6 @@ from .industry_case import IndustryCase
 _logger = logging.getLogger(__name__)
 
 
-@tagged('post_install', '-at_install')
 class TestEnv(IndustryCase):
 
     def test_payment_demo(self):
