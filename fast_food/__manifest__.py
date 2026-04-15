@@ -28,7 +28,6 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
-        'demo/res_users.xml',
         'demo/pos_payment_method.xml',
         'demo/res_partner.xml',
         'demo/hr_employee.xml',

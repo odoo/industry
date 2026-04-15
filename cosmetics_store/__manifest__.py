@@ -37,7 +37,6 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
-        'demo/res_users.xml',
         'demo/payment_provider_demo.xml',
         'demo/stock_quant.xml',
         'demo/product_template.xml',

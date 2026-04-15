@@ -40,7 +40,6 @@
         'data/product_pricelist_item.xml',
     ],
     'demo': [
-        'demo/res_users.xml',
         'demo/website_menu.xml',
         'demo/payment_provider_demo.xml',
     ],
