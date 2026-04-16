@@ -2,3 +2,4 @@
 
 from . import test_action_server
 from . import test_computed_fields
+from . import test_overbooking
