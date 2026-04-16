@@ -9,4 +9,14 @@
         <field name="state">code</field>
         <field name="ir_actions_server_id" ref="server_action_update_rooms"/>
     </record>
+    <!-- Availability/Occupancy-->
+    <record id="ir_cron_create_500_days_availability" model="ir.cron">
+        <field name="name">Booking Engine: Daily availability creation</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="model_id" ref="x_model_availability"/>
+        <field name="state">code</field>
+        <field name="ir_actions_server_id" ref="server_action_create_500_days_availability"/>
+        <field name="nextcall" model="ir.cron" eval="(datetime.now(pytz.timezone(obj().env.user.tz or 'UTC')).replace(hour=1, minute=0, second=0) + timedelta(days=1)).astimezone(pytz.utc).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
 </odoo>

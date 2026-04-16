@@ -467,7 +467,7 @@
         <xpath expr="/gantt" position="attributes">
           <attribute name="form_view_id">%(booking_engine_schedule_form)d</attribute>
           <attribute name="multi_create_view"/>
-          <attribute name="color">partner_id</attribute>
+          <attribute name="color">sale_order_id</attribute>
         </xpath>
     </field>
     <field name="inherit_id" ref="planning.planning_view_gantt"/>
@@ -823,4 +823,170 @@
         <field name="type">form</field>
         <field name="active" eval="True"/>
     </record>
+  <!-- Availability / Occupancy -->
+  <record id="view_x_availability_list" model="ir.ui.view">
+    <field name="model">x_availability</field>
+    <field name="name">x_availability.view.list</field>
+    <field name="type">list</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <list default_group_by="x_date:day" edit="0" open_form_view="0">
+        <field name="x_sequence" readonly="1" widget="handle"/>
+        <field name="x_date" readonly="1" optional="show"/>
+        <field name="x_stay_offer_id" readonly="1" optional="show"/>
+        <field name="x_total_units" readonly="1" optional="show"/>
+        <field name="x_booked" readonly="1" optional="show"/>
+        <field name="x_available" readonly="1" optional="show"/>
+        <field name="x_occupancy" readonly="1" optional="show" widget="percentage"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_x_availability_form" model="ir.ui.view">
+    <field name="model">x_availability</field>
+    <field name="name">x_availability.view.form</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Availability">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <group>
+            <group>
+              <field name="x_date"/>
+              <field name="x_stay_offer_id"/>
+              <field name="x_total_units"/>
+              <field name="x_booked"/>
+              <field name="x_available"/>
+              <field name="x_availability" widget="percentage"/>
+              <field name="x_availability_color"/>
+              <field name="x_occupancy" widget="percentage"/>
+              <field name="x_occupancy_color"/>
+            </group>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_x_availability_search" model="ir.ui.view">
+    <field name="model">x_availability</field>
+    <field name="name">x_availability.view.search</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <search>
+        <filter string="Archived" name="archived_x_availability" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+  </record>
+
+  <record id="view_x_availability_availability_gantt" model="ir.ui.view">
+    <field name="name">x_availability.view.gantt.base</field>
+    <field name="model">x_availability</field>
+    <field name="type">gantt</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <gantt string="Availability" class="o_booking_occupancy_gantt" date_start="x_date" date_stop="x_date" default_range="month" display_mode="dense" default_group_by="x_stay_offer_id" color="x_availability_color" precision="{'month':'day:full','week':'day:full'}" cell_create="0" edit="0" create="0" pill_label="1">
+        <!-- load fields so they exist for the template -->
+        <field name="x_availability"/>
+        <field name="x_availability_color"/>
+        <field name="x_available"/>
+        <field name="x_occupancy_color"/>
+        <field name="x_occupancy"/>
+        <field name="x_booked"/>
+        <field name="x_date"/>
+        <field name="x_total_units"/>
+        <templates>
+          <div t-name="gantt-popover">
+            <t t-set="bar_color" t-value="x_availability_color"/>
+            <t t-set="bar_pct" t-value="x_availability"/>
+            <t t-set="main_title" t-value="'Availability:'"/>
+            
+            <t t-set="heat_scale" t-value="['#ffdc00', '#fbc904', '#f6b609', '#f2a30d', '#ed9011', '#e97d16', '#e4691a', '#e0561e', '#db4323', '#d73027']"/>
+
+            <div class="oe_kanban_global_click p-2">
+              <style>
+                .o_gantt_popover_footer, .o_popover_footer, .o_kanban_record_footer, footer, .o_gantt_popover button.btn, .o_popover button { display: none !important; }
+                .o_booking_occupancy_gantt .o_gantt_pill_title { max-width: 100% !important; text-align: center; overflow: hidden; text-overflow: clip; }
+              </style>
+              
+              <div class="o_kanban_record_top mb-1">
+                <div class="o_kanban_record_title fw-bold">
+                  <span t-esc="new Date(x_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })"/>
+                </div>
+              </div>
+              
+              <div class="o_kanban_record_body" style="min-width: 160px;">
+                <div class="progress mt-1" style="height: 8px; background-color: #e9ecef;">
+                    <div
+                        role="progressbar"
+                        t-attf-style="width: {{bar_pct * 100}}%; background-color: {{heat_scale[bar_color]}} !important;"
+                        t-att-aria-valuenow="bar_pct * 100" aria-valuemin="0" aria-valuemax="100"/>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
+                    <strong><t t-esc="main_title"/></strong>
+                    <span class="ms-1"><strong><span t-esc="Math.round(bar_pct * 100) + '%'"/></strong></span>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center gap-2">
+                  <span>Total Units:</span>
+                  <span class="ms-1" t-esc="x_total_units"/>
+                </div>
+                <div class="d-flex justify-content-between align-items-center gap-2">
+                  <span>Booked:</span>
+                  <span class="ms-1" t-esc="x_booked"/>
+                </div>
+                <div class="d-flex justify-content-between align-items-center gap-2">
+                  <span>Available:</span>
+                  <span class="ms-1" t-esc="x_available"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </templates>
+      </gantt>
+    </field>
+  </record>
+
+  <record id="action_window_availability_availability" model="ir.actions.act_window">
+    <field name="name">Availability</field>
+    <field name="res_model">x_availability</field>
+    <field name="view_mode">gantt,list</field>
+    <field name="view_ids" eval="[
+        (5, 0, 0),
+        (0, 0, {'view_mode': 'gantt', 'view_id': ref('view_x_availability_availability_gantt')}),
+    ]"/>
+  </record>
+
+  <record id="view_x_availability_occupancy_gantt" model="ir.ui.view">
+    <field name="name">x_availability.view.gantt.occupancy</field>
+    <field name="model">x_availability</field>
+    <field name="inherit_id" ref="view_x_availability_availability_gantt"/>
+    <field name="mode">primary</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <xpath expr="//gantt" position="attributes">
+        <attribute name="string">Occupancy</attribute>
+        <attribute name="color">x_occupancy_color</attribute>
+      </xpath>
+      <xpath expr="//t[@t-set='bar_color']" position="attributes"><attribute name="t-value">x_occupancy_color</attribute></xpath>
+      <xpath expr="//t[@t-set='bar_pct']" position="attributes"><attribute name="t-value">x_occupancy</attribute></xpath>
+      <xpath expr="//t[@t-set='main_title']" position="attributes"><attribute name="t-value">'Occupancy:'</attribute></xpath>
+    </field>
+  </record>
+
+  <record id="action_window_availability_occupancy" model="ir.actions.act_window">
+    <field name="name">Occupancy</field>
+    <field name="res_model">x_availability</field>
+    <field name="view_mode">gantt,list</field>
+    <field name="view_ids" eval="[
+        (5, 0, 0),
+        (0, 0, {'view_mode': 'gantt', 'view_id': ref('view_x_availability_occupancy_gantt')}),
+    ]"/>
+  </record>
 </odoo>
