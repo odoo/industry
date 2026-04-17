@@ -2,7 +2,7 @@
 <odoo>
     <record id="account_pos_settle_due_settle_pos_orders" model="ir.actions.server">
         <field name="code"><![CDATA[
-pos_orders = env['pos.order'].search([('partner_id', '=', record.partner_id.id), ('state', '=', 'paid'), ('customer_due_total', '>', 0), ('id', 'not in', record.invoice_line_ids.x_pos_order_id.ids)])
+pos_orders = env['pos.order'].search([('partner_id', '=', record.partner_id.id), ('state', '=', 'done'), ('customer_due_total', '>', 0), ('id', 'not in', record.invoice_line_ids.x_pos_order_id.ids)])
 balance_account_section_name = "Customer account balance"
 if pos_orders and not any(line.name == balance_account_section_name and line.display_type == 'line_section' for line in record.invoice_line_ids):
     env['account.move.line'].create({'move_id': record.id, 'name': balance_account_section_name, 'display_type': 'line_section'})
