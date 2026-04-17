@@ -10,4 +10,4 @@ class IrActions(models.Model):
 
     # Adds the requests model to the eval context of server actions, so we can use it from here
     def _get_eval_context(self, action=None):
-        return {**super()._get_eval_context(), **{'requests': wrap_module(__import__('requests'), ['get', 'post', 'put', 'delete', 'request'])}}
+        return {**super()._get_eval_context(), 'requests': wrap_module(__import__('requests'), ['get', 'post', 'put', 'delete', 'request'])}
