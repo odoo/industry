@@ -54,6 +54,7 @@
         'demo/stock_warehouse_orderpoint.xml',
         'demo/stock_lot.xml',
         'demo/stock_quant.xml',
+        'demo/stock_scrap_reason_tag.xml',
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
         'demo/purchase_order_confirm.xml',
