@@ -358,3 +358,348 @@ class BookingEngineAutomationsTestCase(TransactionCase):
                          "City Tax action should search on the current sale order")
         self.assertEqual(action['context'].get('default_x_sale_order_id'), order.id,
                          "City Tax action should default to the current sale order")
+
+    ### Availability / Occupancy
+    def test_automation_availability_product(self):
+        """Test the lifecycle of x_availability records tied to a room offer (create, update, delete)."""
+
+        # Setup
+        tmpl = self.product.product_tmpl_id
+
+        order, order_line = self._create_sale_line(self.product)
+        tmpl.write({'x_is_a_room_offer': True})
+        order.action_confirm()
+
+        slot = order_line.planning_slot_ids[0]
+        slot.write({
+            'resource_id': self.resource.id,
+            'start_datetime': self.today.replace(hour=9),
+            'end_datetime': (self.today + timedelta(days=1)).replace(hour=10),
+        })
+
+        # Assert availabilities exist after creating the product
+        avails = self.env['x_availability'].search([('x_stay_offer_id', '=', tmpl.id)])
+        self.assertTrue(avails, "Availabilities should be created when a room offer is created.")
+        self.assertEqual(len(avails), 500, "Exactly 500 days of availability should be generated.")
+
+        # --- TEST 1: Change the room offer status changes the availabilities ---
+
+        tmpl.write({'x_is_a_room_offer': False})
+
+        avails = self.env['x_availability'].search([('x_stay_offer_id', '=', tmpl.id)])
+        self.assertFalse(avails, "Availabilities should be removed when product is no longer a room offer.")
+
+        tmpl.write({'x_is_a_room_offer': True})
+
+        avails = self.env['x_availability'].search([('x_stay_offer_id', '=', tmpl.id)])
+        self.assertEqual(len(avails), 500, "Availabilities should be recreated when toggled back.")
+
+        # --- TEST 2: Archiving changes the availabilities ---
+
+        tmpl.write({'active': False})
+
+        avails = self.env['x_availability'].with_context(active_test=False).search([('x_stay_offer_id', '=', tmpl.id)])
+        self.assertFalse(avails, "Availabilities should be unlinked when the product is archived.")
+
+        tmpl.write({'active': True})
+
+        avails = self.env['x_availability'].search([('x_stay_offer_id', '=', tmpl.id)])
+        self.assertEqual(len(avails), 500, "Availabilities should be restored when the product is unarchived.")
+
+        # --- TEST 3: Deleting the product changes the availabilities ---
+
+        slot.unlink()
+        order.action_cancel()
+        order.unlink()
+        tmpl.unlink()
+
+        avails = self.env['x_availability'].search([('x_stay_offer_id', '=', tmpl.id)])
+        self.assertFalse(avails, "Availabilities should be completely deleted when the product is deleted.")
+
+    def test_automation_availability_resource_change(self):
+        """Test that changing a room's active state or calendar marks its availabilities for recomputation."""
+
+        # Setup
+        self.room_offer_template.write({
+            'x_resource_ids': [Command.link(self.resource.id)],
+        })
+
+        avails = self.env['x_availability'].search([('x_stay_offer_id', '=', self.room_offer_template.id)])
+        self.assertTrue(avails, "Availabilities should exist for the room offer after linking the resource.")
+
+        # --- CRITICAL ISOLATION STEP ---
+        # Disable the master computation action so it doesn't instantly reset our flags to False
+        master_action = self.env.ref('booking_engine.server_action_update_availabilities')
+        master_action.write({'code': '# Master action disabled for flag testing'})
+
+        # --- TEST 1: Changing the calendar_id flags the correct availabilities ---
+
+        # Reset the dirty flags to False so we can detect the change
+        avails.write({'x_to_recompute': False})
+
+        new_calendar = self.env['resource.calendar'].create({'name': 'New Test Calendar'})
+        self.resource.write({'calendar_id': new_calendar.id})
+
+        avails = self.env['x_availability'].search([('x_stay_offer_id', '=', self.room_offer_template.id)])
+        self.assertTrue(
+            all(a.x_to_recompute for a in avails),
+            "Changing calendar_id on the resource should flag its linked availabilities to recompute.",
+        )
+
+        # --- TEST 2: Archiving the resource flags the correct availabilities ---
+
+        avails.write({'x_to_recompute': False})
+        self.resource.write({'active': False})
+
+        avails = self.env['x_availability'].search([('x_stay_offer_id', '=', self.room_offer_template.id)])
+        self.assertTrue(
+            all(a.x_to_recompute for a in avails),
+            "Archiving the resource should flag its linked availabilities to recompute.",
+        )
+
+        # --- TEST 3: Test a non-triggering field ---
+
+        avails.write({'x_to_recompute': False})
+
+        # Change the name (which is NOT in the automation's trigger_field_ids)
+        self.resource.write({'name': 'Test Room Due Out Renamed'})
+
+        avails = self.env['x_availability'].search([('x_stay_offer_id', '=', self.room_offer_template.id)])
+        self.assertFalse(
+            any(a.x_to_recompute for a in avails),
+            "Changing an untriggered field (like name) should NOT flag availabilities to recompute.",
+        )
+
+    def test_automation_availability_leave_change(self):
+        """Test that creating or modifying a resource leave correctly links and flags availabilities."""
+
+        # Setup
+        calendar = self.env.company.resource_calendar_id
+        self.resource.write({'calendar_id': calendar.id})
+
+        self.room_offer_template.write({
+            'x_resource_ids': [Command.link(self.resource.id)],
+        })
+
+        # --- CRITICAL ISOLATION STEP ---
+        # Disable the master computation action so it doesn't instantly reset our flags to False.
+        master_action = self.env.ref('booking_engine.server_action_update_availabilities')
+        master_action.write({'code': '# Master action disabled for flag testing'})
+
+        # --- TEST 1: Creating a direct resource leave ---
+
+        leave_start = self.today
+        leave_end = self.today + timedelta(days=2)
+
+        leave = self.env['resource.calendar.leaves'].create({
+            'name': 'Test Room Maintenance',
+            'resource_id': self.resource.id,
+            'calendar_id': calendar.id,
+            'date_from': leave_start,
+            'date_to': leave_end,
+        })
+
+        self.assertTrue(leave.x_availability_ids, "Creating a leave should link it to the corresponding daily availabilities.")
+        self.assertTrue(
+            all(a.x_to_recompute for a in leave.x_availability_ids),
+            "Newly linked availabilities from the leave should be flagged to recompute.",
+        )
+
+        # --- TEST 2: Modify the dates ---
+
+        leave.x_availability_ids.write({'x_to_recompute': False})
+
+        leave.write({'date_to': leave_end + timedelta(days=1)})
+
+        # Because the dates changed, the helper should have re-evaluated the links and flagged them
+        self.assertTrue(
+            all(a.x_to_recompute for a in leave.x_availability_ids),
+            "Changing the leave dates should flag the updated availabilities to recompute.",
+        )
+
+        # --- TEST 3: Modify to a Global Leave (Remove resource_id) ---
+
+        leave.x_availability_ids.write({'x_to_recompute': False})
+
+        # Changing from a specific resource leave to a global calendar leave
+        leave.write({'resource_id': False})
+
+        # The automation should catch the change, evaluate the calendar_id, find our resource, and flag it
+        self.assertTrue(
+            all(a.x_to_recompute for a in leave.x_availability_ids),
+            "Changing to a global calendar leave should flag the affected resource availabilities.",
+        )
+
+        # --- TEST 4: Change a non-triggering field ---
+
+        leave.x_availability_ids.write({'x_to_recompute': False})
+
+        # Change the name (NOT in the automation's trigger_field_ids)
+        leave.write({'name': 'Test Room Maintenance Updated'})
+
+        self.assertFalse(
+            any(a.x_to_recompute for a in leave.x_availability_ids),
+            "Changing an untriggered field (like name) should NOT flag availabilities to recompute.",
+        )
+
+    def test_automation_availability_slot_change(self):
+        """Test that creating or modifying a planning slot correctly links and flags availabilities."""
+
+        # Setup
+        self.room_offer_template.write({
+            'x_resource_ids': [Command.link(self.resource.id)],
+        })
+
+        # --- CRITICAL ISOLATION STEP ---
+        # Disable the master computation action so it doesn't instantly reset our flags to False.
+        master_action = self.env.ref('booking_engine.server_action_update_availabilities')
+        master_action.write({'code': '# Master action disabled for flag testing'})
+
+        # --- TEST 1: Create a Slot ---
+
+        # We use the sale order to generate the slot
+        order, order_line = self._create_sale_line(self.product)
+        order.action_confirm()
+
+        slot = order_line.planning_slot_ids[0]
+
+        # Trigger the automation by setting the resource and dates
+        slot.write({
+            'resource_id': self.resource.id,
+            'start_datetime': self.today.replace(hour=9),
+            'end_datetime': (self.today + timedelta(days=2)).replace(hour=10),
+        })
+
+        self.assertTrue(slot.x_availability_ids, "Setting a resource and dates on a slot should link it to daily availabilities.")
+        self.assertTrue(
+            all(a.x_to_recompute for a in slot.x_availability_ids),
+            "Newly linked availabilities from the slot should be flagged to recompute.",
+        )
+
+        # --- TEST 2: Modify the Dates ---
+
+        # Reset the flags on the currently linked availabilities
+        slot.x_availability_ids.write({'x_to_recompute': False})
+
+        # Extend the slot by 1 day
+        slot.write({'end_datetime': (self.today + timedelta(days=3)).replace(hour=10)})
+
+        self.assertTrue(
+            all(a.x_to_recompute for a in slot.x_availability_ids),
+            "Changing the slot dates should flag the updated availabilities to recompute.",
+        )
+
+        # --- TEST 3: Modify the Resource (Drag & Drop behavior) ---
+
+        # Create a second physical room and link it to the offer
+        resource_2 = self.env['resource.resource'].create({
+            'name': 'Test Room 2',
+            'resource_type': 'material',
+        })
+        self.room_offer_template.write({
+            'x_resource_ids': [Command.link(resource_2.id)],
+        })
+
+        old_avails = slot.x_availability_ids
+        old_avails.write({'x_to_recompute': False})
+
+        slot.write({'resource_id': resource_2.id})
+
+        # 1. Did the old availabilities get flagged before unlinking? (Freeing up Room 1)
+        self.assertTrue(
+            all(a.x_to_recompute for a in old_avails),
+            "The previously linked availabilities should be flagged so the old room is freed up.",
+        )
+
+        # 2. Did the new availabilities get linked and flagged? (Occupying Room 2)
+        self.assertTrue(
+            all(a.x_to_recompute for a in slot.x_availability_ids),
+            "The newly linked availabilities should be flagged when the slot moves to a new resource.",
+        )
+
+        # --- TEST 4: Change a non-triggering field ---
+
+        # Reset the flags
+        slot.x_availability_ids.write({'x_to_recompute': False})
+
+        # Change allocated percentage (NOT in the automation's trigger_field_ids)
+        slot.write({'allocated_percentage': 50})
+
+        self.assertFalse(
+            any(a.x_to_recompute for a in slot.x_availability_ids),
+            "Changing an untriggered field (like allocated_percentage) should NOT flag availabilities.",
+        )
+
+    def test_availability_flow_double_book_then_cancel(self):
+        """Integration test to verify the actual math of availability computations during a booking flow."""
+
+        # Setup
+        resource_1 = self.resource
+        resource_2 = self.env['resource.resource'].create({
+            'name': 'Test Room 2',
+            'resource_type': 'material',
+            'calendar_id': False,
+        })
+
+        tmpl = self.product.product_tmpl_id
+        tmpl.write({
+            'x_is_a_room_offer': True,
+            'x_resource_ids': [Command.link(resource_1.id), Command.link(resource_2.id)],
+        })
+
+        # Helper to force the master computation action (in case any triggers use async crons)
+        def force_computation():
+            self.env.ref('booking_engine.server_action_update_availabilities').run()
+
+        force_computation()
+
+        target_date = self.today.date()
+        avail = self.env['x_availability'].search([
+            ('x_stay_offer_id', '=', tmpl.id),
+            ('x_date', '=', target_date),
+        ])
+
+        # --- INITIAL STATE CHECK ---
+        self.assertEqual(avail.x_total_units, 2, "There are 2 physical rooms linked to the offer.")
+        self.assertEqual(avail.x_booked, 0, "No bookings yet, booked count should be 0.")
+
+        # --- FLOW 1: First Reservation ---
+        order1, order_line1 = self._create_sale_line(self.product)
+        order1.action_confirm()
+        slot1 = order_line1.planning_slot_ids[0]
+        slot1.write({
+            'resource_id': resource_1.id,
+            'start_datetime': self.today.replace(hour=15),
+            'end_datetime': (self.today + timedelta(days=1)).replace(hour=11),
+        })
+
+        force_computation()
+        avail.invalidate_recordset()  # Clear ORM cache so we pull the fresh computed values from the DB
+
+        self.assertEqual(avail.x_booked, 1, "First booking should increase x_booked to 1.")
+
+        # --- FLOW 2: Second Reservation (Overlapping on the same day) ---
+        order2, order_line2 = self._create_sale_line(self.product)
+        order2.action_confirm()
+        slot2 = order_line2.planning_slot_ids[0]
+        slot2.write({
+            'resource_id': resource_2.id,
+            'start_datetime': self.today.replace(hour=15),
+            'end_datetime': (self.today + timedelta(days=1)).replace(hour=11),
+        })
+
+        force_computation()
+        avail.invalidate_recordset()
+
+        self.assertEqual(avail.x_booked, 2, "Second booking should increase x_booked to 2.")
+
+        # --- FLOW 3: Cancellation ---
+        # Unlinking the slot simulates the user freeing up the resource on the Gantt chart
+        slot1.unlink()
+        order1.action_cancel()
+
+        force_computation()
+        avail.invalidate_recordset()
+
+        self.assertEqual(avail.x_booked, 1, "Canceling the first booking should reduce x_booked back to 1.")
+        self.assertEqual(avail.x_total_units, 2, "Total units should remain unaffected by bookings/cancellations.")
