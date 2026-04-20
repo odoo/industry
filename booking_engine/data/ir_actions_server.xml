@@ -5,8 +5,7 @@
         <field name="model_id" ref="x_model_city_tax"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-stay_tax_line = False
-sequence = 0
+sequence, stay_tax_line = 0, False
 for so_line in record.x_sale_order_id.order_line:
     if so_line.product_id.x_is_stay_tax: stay_tax_line = so_line
     sequence = max(sequence, so_line.sequence)
@@ -14,7 +13,7 @@ if stay_tax_line: stay_tax_line.write({'product_uom_qty': record.x_total, 'qty_d
 elif record.x_total > 0:
     product = env['product.product'].search([('x_is_stay_tax', '=', True)], limit=1)
     env['sale.order.line'].create({'order_id': record.x_sale_order_id.id, 'product_id': product.id, 'product_uom_qty': record.x_total, 'qty_delivered': record.x_total})
-        ]]></field>
+]]></field>
     </record>
     <record id="open_x_city_tax_action" model="ir.actions.act_window">
         <field name="name">City Tax</field>
@@ -182,6 +181,332 @@ if (project := env['project.project'].search([('x_is_house_keeping_project', '='
                 'user_ids': [(5,0)],
             })
     env['project.task'].create(newtasks)
+]]></field>
+    </record>
+
+    <!-- 
+        Availabilities: create & update logic
+    -->
+    <record id="server_action_update_availabilities" model="ir.actions.server">
+        <field name="name">Booking Engine: Update Availabilities</field>
+        <field name="model_id" ref="x_model_availability"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if (records := env['x_availability'].search([('x_to_recompute', '=', True)])):
+    all_offers = records.x_stay_offer_id
+    all_resources = all_offers.x_resource_ids
+
+    # Convert dates to datetimes for slot/leave domains
+    dt_min = datetime.datetime.combine(min(dates := records.mapped('x_date')), datetime.time.min)
+    dt_max = datetime.datetime.combine(max(dates), datetime.time.max)
+
+    # Fetch slots in the time frame
+    slots = env['planning.slot'].search([('resource_id', 'in', all_resources.ids), ('end_datetime', '>=', dt_min), ('start_datetime', '<=', dt_max)])
+
+    # Fetch leaves in the time frame (Resource specific OR Calendar specific)
+    leaves = env['resource.calendar.leaves'].search([
+        '|', ('resource_id', 'in', all_resources.ids), 
+            '&', ('calendar_id', 'in', all_resources.calendar_id.ids), ('resource_id', '=', False),
+        ('date_to', '>=', dt_min), ('date_from', '<=', dt_max)])
+
+    res_bookings, res_leaves, updates = {}, {}, {}
+
+    # resource: date mapping (/!\ nightly stays)
+    for slot in slots:
+        if (r_id := slot.resource_id.id) not in res_bookings: res_bookings[r_id] = set()
+
+        start_d, end_d = slot.start_datetime.date(), slot.end_datetime.date()
+
+        # If it spans multiple days, block the nights (exclusive of checkout day)
+        if (nights := (end_d - start_d).days) > 0:
+            res_bookings[r_id].update(start_d + datetime.timedelta(days=i) for i in range(nights))
+        # Fallback for a same-day booking (check-in and check-out on the same date, shouldn't be possible?)
+        else: res_bookings[r_id].add(start_d)
+
+    # resource: leave mapping
+    for leave in leaves:
+        # Handle global leaves by finding all resources sharing the calendar
+        target_res_ids = [leave.resource_id.id] if leave.resource_id else [r.id for r in all_resources if r.calendar_id.id == leave.calendar_id.id]
+        for r_id in target_res_ids:
+            if r_id not in res_leaves: res_leaves[r_id] = set()
+            curr = leave.date_from.date()
+            while curr <= leave.date_to.date():
+                res_leaves[r_id].add(curr)
+                curr += datetime.timedelta(days=1)
+
+    # Group records that share the same resulting (total, booked) values to save DB write calls
+    for avail in records:
+        offer, date = avail.x_stay_offer_id, avail.x_date
+
+        # Find all resources for this offer that are NOT on leave today
+        active_res_ids = [r.id for r in offer.x_resource_ids if date not in res_leaves.get(r.id, set())]
+
+        # Count how many of those active rooms ARE booked today
+        booked_count = sum(1 for r_id in active_res_ids if date in res_bookings.get(r_id, set()))
+
+        # Group by the result
+        if (val_tuple := (len(active_res_ids), booked_count)) not in updates: updates[val_tuple] = env['x_availability']
+        updates[val_tuple] |= avail
+
+    # Apply the bulk writes
+    for (total, booked), avail_batch in updates.items():
+        avail_batch.write({'x_total_units': total, 'x_booked': booked, 'x_to_recompute': False})
+]]></field>
+    </record>
+
+    <record id="server_action_create_500_days_availability" model="ir.actions.server">
+        <field name="name">Booking Engine: Update and create Availabilities</field>
+        <field name="model_id" ref="x_model_availability"/>
+        <field name="state">code</field>
+        <field name="usage">ir_cron</field>
+        <field name="code"><![CDATA[
+# This server action is called in a cron once a day and does 3 things:
+# 1. Archive the availabilities <= today
+#   (it's not informative to see them and clutters the view)
+# 2. Create new ones at the start of the day
+#   (so that we always have the right window of availabilities for Channex)
+# 3. Trigger a recomputation of all the availabilities 
+#   (to make sure we don't have a bugged/false state that does not reflect reality,
+#    because unavoidable race conditions)
+
+today, target_dates = datetime.date.today(), set(datetime.date.today() + datetime.timedelta(days=i) for i in range(500))
+
+env['x_availability'].search([('x_date', '<', today), ('x_active', '=', True)]).write({'x_active': False})
+
+if (offers := env['product.template'].search([('x_is_a_room_offer', '=', True)])):
+    existing_dates_by_offer = env['x_availability']._read_group(
+        [('x_stay_offer_id', 'in', offers.ids), ('x_date', '>=', today), ('x_date', '<', today + datetime.timedelta(days=500))],
+        groupby=['x_stay_offer_id'], aggregates=['x_date:array_agg']
+    )
+
+    # Create availabilities only for dates that don't exist
+    to_create = [{'x_stay_offer_id': offer_id, 'x_date': d, 'x_to_recompute': True}
+                 for offer_id in offers.ids
+                 for d in (target_dates - existing_dates_by_offer.get(offer_id, set()))]
+
+    if to_create: env['x_availability'].create(to_create)
+    # Recompute all availabilities (that are not archived) to make sure we have the correct information
+    env['x_availability'].search([('x_date', '>=', today)]).write({'x_to_recompute': True})
+
+env.ref('booking_engine.server_action_update_availabilities').run()
+]]></field>
+    </record>
+
+    <record id="server_action_helper_compute_new_avails_to_recompute" model="ir.actions.server">
+        <field name="name">Booking Engine: Availability Helper - Compute New Availabilities M2M</field>
+        <field name="model_id" ref="base.model_ir_actions_server"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+# records: leaves OR slots
+# Required context arguments
+records, resources, start_f, end_f = [env.context.get(a) for a in ['records', 'resources', 'field_start', 'field_end']]
+
+# An availability is the number of rooms available for a given DAY for a given OFFER.
+# Therefore, to compute availabilities, we need 2 things:
+# 1. The dates,
+# 2. The offer (and its resources)
+# So, in this server action, we fetch all these for the leaves/slots we were given as a parameter,
+# then 3. we fetch all the corresponding availabilities
+# 4. Assign these new abilities to the leaves/slots to match their updated values (resources/dates) 
+
+# We also perform the optimization of fetching all records in one query for performance optimization,
+# which makes the code harder to understand, which is the reason for these lengthy comments.
+
+# 1. Find all the dates of the leaves/slots to know which days' availabilities we
+# need to recompute, and keep track of them per record, so we can find them back easily when
+# we have to assign them to the records.
+# This is an optimization to only do 1 availabilities search instead of 1 per record in a 'for'
+dates, unique_dates = {}, set()
+for rec in records:
+    if not rec[start_f] or not rec[end_f]: continue        # skip this record if it has no date (unusable)
+    
+    # find the start and end date of this leave/slot and find all dates in between
+    d_min, d_max = rec[start_f].date(), rec[end_f].date()
+    dates[rec.id] = [d_min + datetime.timedelta(days=i) for i in range((d_max - d_min).days + 1)]
+
+    # add these dates for this record in the dict
+    unique_dates.update(dates[rec.id])
+
+# 2. Fetch all the offers for all the records
+offers = env['product.template'].search([('x_resource_ids', 'in', resources.ids)]) if resources else []
+
+# 3. Fetch all availabilities for all the records
+avails = env['x_availability'].search([('x_date', 'in', list(unique_dates)), ('x_stay_offer_id', 'in', offers.ids)]) if unique_dates and offers else env['x_availability']
+
+# 4. For all records, find the availabilities they impact, and link them together
+new_avails_to_recompute = env['x_availability']
+
+for rec in records.filtered(lambda r: r.id in dates):
+    # To get the right availabilities for a slot/leave, we need 1. its resources, 2. its dates
+
+    # Filter the resources for this specific record
+    if records._name == 'planning.slot':
+        target_res_ids = [rec.resource_id.id]
+    else: # resource.calendar.leaves
+        # If it has no resources, it means the record (leave) is global, and applies to all the resources.
+        # Conversely, if the record (leave) has a resource, it means that the record (leave) is only for this resource. 
+        target_res_ids = [rec.resource_id.id] if rec.resource_id else resources.filtered(lambda r: r.calendar_id.id == rec.calendar_id.id).ids
+
+    if (target_offers := offers.filtered(lambda o: set(target_res_ids) & set(o.x_resource_ids.ids))):
+        # Since we had to cram everything into one query to get all availabilities,
+        # We now have to find back the resources and dates specific to this changed record
+        new_avails = avails.filtered(lambda a: a.x_stay_offer_id.id in target_offers.ids and a.x_date in dates[rec.id])
+        rec.write({'x_availability_ids': [(6, 0, new_avails.ids)]})
+        new_avails_to_recompute |= new_avails
+
+new_avails_to_recompute.write({'x_to_recompute': True})
+
+env.ref('booking_engine.server_action_update_availabilities').run()
+]]></field>
+    </record>
+
+    <!--
+        Availability dependencies: Delete
+
+        For the on_delete, since it's an operation that does not happen that often,
+        We allow ourselves to use the cron to be able to recompute the availabilities after
+        the slots have actually been deleted, which we cannot do with a simple server action.
+        We don't do this in the on_create_or_write because the cron trigger can take up to 1 min,
+        which is something we don't want in regular on_create_or_write.
+        Therefore, for those, we use the server action and not the cron, but this can lead to
+        race conditions. To try to mitigate this, we recompute all availabilities in the cron
+        once a day.
+    -->
+    <record id="server_action_update_availability_for_planning_slot_delete" model="ir.actions.server">
+        <field name="name">Booking Engine: Slot Delete Availability Logic</field>
+        <field name="model_id" ref="planning.model_planning_slot"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+# Since the records don't exist anymore, it has to be reflected in the availabilities,
+# so we need to recompute them
+records.x_availability_ids.write({'x_to_recompute': True})
+
+# Use the cron so that the current records (to delete) aren't taken into account for the recomputation
+env.ref('booking_engine.ir_cron_create_500_days_availability')._trigger()
+]]></field>
+    </record>
+
+    <record id="server_action_update_availability_for_resource_calendar_leaves_delete" model="ir.actions.server">
+        <field name="name">Booking Engine: Leave Delete Availability Logic</field>
+        <field name="model_id" ref="resource.model_resource_calendar_leaves"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+# Since the records don't exist anymore, it has to be reflected in the availabilities,
+# so we need to recompute them
+records.x_availability_ids.write({'x_to_recompute': True})
+
+# Use the cron so that the current records (to delete) aren't taken into account for the recomputation
+env.ref('booking_engine.ir_cron_create_500_days_availability')._trigger()
+]]></field>
+    </record>
+
+    <record id="server_action_update_availability_for_resource_resource_delete" model="ir.actions.server">
+        <field name="name">Booking Engine: Room Delete Availability Logic</field>
+        <field name="model_id" ref="resource.model_resource_resource"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+# Since the records don't exist anymore, it has to be reflected in the availabilities,
+# so we need to recompute them
+env['x_availability'].search([('x_stay_offer_id.x_resource_ids', 'in', records.ids)]).write({'x_to_recompute': True})
+
+# Use the cron so that the current records (to delete) aren't taken into account for the recomputation
+env.ref('booking_engine.ir_cron_create_500_days_availability')._trigger()
+]]></field>
+    </record>
+
+    <record id="server_action_update_availability_for_product_template_delete" model="ir.actions.server">
+        <field name="name">Booking Engine: Stay Offer Delete Availability Logic</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+# If a stay offer is deleted, we can delete the entirety of its availabilities because
+# we can't see that line in the Gantt chart anymore
+env['x_availability'].search([('x_stay_offer_id', 'in', records.ids)]).unlink()
+
+# No need to launch the cron since the whole row was removed, and there is no interaction with other rows
+]]></field>
+    </record>
+
+    <!-- 
+        Availability dependencies: Update
+    -->
+    <record id="server_action_update_availability_for_planning_slot" model="ir.actions.server">
+        <field name="name">Booking Engine: Availability Slot Modify Logic</field>
+        <field name="model_id" ref="planning.model_planning_slot"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+# Mark all currently linked availabilities as to recompute
+# This catches the old dates AND the old resource if the user dragged it to a different resource
+records.x_availability_ids.write({'x_to_recompute': True})
+
+# Now that the resource/dates have changed, we need to propagate the info to the corresponding availabilities
+if (valid_slots := records.filtered('resource_id')):
+    env.ref('booking_engine.server_action_helper_compute_new_avails_to_recompute').with_context(
+        records=valid_slots, field_start='start_datetime', field_end='end_datetime', 
+        resources=valid_slots.resource_id).run()
+]]></field>
+    </record>
+
+    <record id="server_action_update_availability_for_resource_calendar_leaves" model="ir.actions.server">
+        <field name="name">Booking Engine: Availability Leave Modify Logic</field>
+        <field name="model_id" ref="resource.model_resource_calendar_leaves"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+# Mark all currently linked availabilities as to recompute
+# This catches the old dates AND the old resources if the user changed them
+records.x_availability_ids.write({'x_to_recompute': True})
+
+global_leaves = records - (resource_leaves := records.filtered('resource_id'))
+
+# Now that the resource/dates have changed, we need to propagate the info to the corresponding availabilities
+if (resources := env['resource.resource'].search(['|', ('calendar_id', 'in', global_leaves.calendar_id.ids), ('id', 'in', resource_leaves.resource_id.ids)])):
+    env.ref('booking_engine.server_action_helper_compute_new_avails_to_recompute').with_context(
+        records=records, field_start='date_from', field_end='date_to', resources=resources).run()
+]]></field>
+    </record>
+
+    <record id="server_action_update_availability_for_resource_resource" model="ir.actions.server">
+        <field name="name">Booking Engine: Availability Room Modify Logic</field>
+        <field name="model_id" ref="resource.model_resource_resource"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+# Mark all currently linked availabilities as to recompute
+env['x_availability'].search([('x_stay_offer_id.x_resource_ids', 'in', records.ids), ('x_date', '>=', datetime.date.today())
+    ]).write({'x_to_recompute': True})
+
+env.ref('booking_engine.server_action_update_availabilities').run()
+]]></field>
+    </record>
+
+    <record id="server_action_update_availability_for_product_template" model="ir.actions.server">
+        <field name="name">Booking Engine: Availability Offer Modify Logic</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+# Impacting field changes: x_is_a_room_offer, x_resource_ids, active
+# We cannot filter on the domain because we need to catch 
+# x_is_a_room_offer True -> False and False -> True 
+# but don't want to execute the availabilities code on not room offers
+
+domain = [('x_date', '>=', (today := datetime.date.today())), ('x_stay_offer_id', 'in', records.ids)]
+
+# We need a new search every time to not operate on records that don't exist anymore
+
+# active logic
+env['x_availability'].search(domain + [('x_stay_offer_id.active', '=', False)]).unlink()
+# x_is_a_room_offer logic
+env['x_availability'].search(domain + [('x_stay_offer_id.x_is_a_room_offer', '=', False)]).unlink()
+# x_resource_ids logic
+(existing_avails := env['x_availability'].search(domain)).write({'x_to_recompute': True})
+
+# Find the new ROOM offers (ones that have 0 records in existing_avails, are active, and a room offer)
+# and create 500 days ONLY for them
+if (new_offers := records.filtered(lambda r: r.x_is_a_room_offer and r.active) - existing_avails.x_stay_offer_id):
+    env['x_availability'].create([
+        {'x_stay_offer_id': offer.id, 'x_date': today + datetime.timedelta(days=i), 'x_to_recompute': True} 
+        for i in range(500) for offer in new_offers])
+
+env.ref('booking_engine.server_action_update_availabilities').run()
 ]]></field>
     </record>
 </odoo>
