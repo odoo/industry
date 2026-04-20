@@ -1,6 +1,6 @@
 {
     'name': 'Construction Builder',
-    'version': '1.3',
+    'version': '1.4',
     'category': 'Construction',
     'depends': [
         'base_industry_data',
@@ -8,11 +8,11 @@
         'documents',
         'helpdesk',
         'knowledge',
-        'planning_field_service_sale_stock',
         'purchase_stock',
         'sale_crm',
         'sale_margin',
         'sale_project_forecast',
+        'sale_timesheet',
     ],
     'data': [
         'data/documents_folder.xml',
@@ -37,7 +37,7 @@
         'data/sale_order_template_line.xml',
     ],
     'demo': [
-        'demo/documents_folder.xml',
+        'demo/crm_tag.xml',
         'demo/hr_department.xml',
         'demo/hr_employee.xml',
         'demo/resource_resource.xml',
@@ -50,6 +50,7 @@
         'demo/project_tags.xml',
         'demo/sale_order_confirm.xml',
         'demo/project_project.xml',
+        'demo/documents_folder.xml',
         'demo/project_task_post.xml',
         'demo/project_tags_post.xml',
         'demo/documents_document.xml',
