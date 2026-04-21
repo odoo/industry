@@ -9,11 +9,11 @@
         'knowledge',
         'planning_hr_skills',
         'sale_project',
-        'sale_renting_planning',
         'web_gantt',
         'web_studio',
         'website_appointment',
-        'website_sale_renting',
+        'website_sale_renting_planning',
+        'website_sale_stock_renting',
     ],
     'data': [
         'data/product_pricelist.xml',
