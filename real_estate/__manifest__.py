@@ -1,6 +1,6 @@
 {
     'name': 'Real Estate Agency',
-    'version': '1.3',
+    'version': '1.4',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
@@ -73,6 +73,7 @@
         'demo/product_product.xml',
         'demo/x_product_template_line.xml',
         'demo/create_link.xml',
+        'demo/appointment_type.xml',
         'demo/calendar_event.xml',
         'demo/crm_lead.xml',
         'demo/mail_activity.xml',
