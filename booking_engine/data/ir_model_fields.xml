@@ -594,8 +594,7 @@ for record in self: record['x_is_in_stage_clean'] = record.x_house_keeping_stage
         <field name="store" eval="False"/>
         <field name="depends">x_cleaning</field>
         <field name="compute"><![CDATA[
-for record in self:
-    record['x_cleaning_color'] = 1 if record.x_cleaning == 'checkout' else 3        
+for record in self: record['x_cleaning_color'] = 1 if record.x_cleaning == 'checkout' else 3        
 ]]></field>
     </record>
     <record id="x_occupancy_color_field_resource_resource" model="ir.model.fields">
@@ -605,8 +604,7 @@ for record in self:
         <field name="name">x_occupancy_color</field>
         <field name="depends">x_occupancy</field>
         <field name="compute"><![CDATA[
-for record in self:
-    record['x_occupancy_color'] = 13 if record.x_occupancy == 'vacant' else 3
+for record in self: record['x_occupancy_color'] = 13 if record.x_occupancy == 'vacant' else 3
 ]]></field>
     </record>
     <record id="x_task_stage_color_field_project_task" model="ir.model.fields">
@@ -632,4 +630,139 @@ for record in self:
         <field name="field_description">Pricelist Item Name</field>
         <field name="required" eval="True"/>
     </record>
+  <record id="x_name_field_x_availability" model="ir.model.fields">
+    <field name="ttype">char</field>
+    <field name="field_description">Description</field>
+    <field name="model_id" ref="x_model_availability"/>
+    <field name="name">x_name</field>
+  </record>
+  <record id="x_active_field_x_availability" model="ir.model.fields">
+    <field name="ttype">boolean</field>
+    <field name="field_description">Active</field>
+    <field name="model_id" ref="x_model_availability"/>
+    <field name="name">x_active</field>
+    <field name="readonly" eval="True"/>
+  </record>
+  <record id="x_to_recompute_field_x_availability" model="ir.model.fields">
+    <field name="ttype">boolean</field>
+    <field name="field_description">To Recompute</field>
+    <field name="model_id" ref="x_model_availability"/>
+    <field name="name">x_to_recompute</field>
+  </record>
+  <record id="x_sequence_field_x_availability" model="ir.model.fields">
+    <field name="ttype">integer</field>
+    <field name="field_description">Sequence</field>
+    <field name="model_id" ref="x_model_availability"/>
+    <field name="name">x_sequence</field>
+    <field name="readonly" eval="True"/>
+  </record>
+  <record id="x_stay_offer_field_x_availability" model="ir.model.fields">
+    <field name="ttype">many2one</field>
+    <field name="domain">[("x_is_a_room_offer", "!=", False)]</field>
+    <field name="field_description">Stay Offer</field>
+    <field name="model_id" ref="x_model_availability"/>
+    <field name="name">x_stay_offer_id</field>
+    <field name="relation">product.template</field>
+    <field name="readonly" eval="True"/>
+  </record>
+  <record id="x_date_field_x_availability" model="ir.model.fields">
+    <field name="ttype">date</field>
+    <field name="field_description">Date</field>
+    <field name="model_id" ref="x_model_availability"/>
+    <field name="name">x_date</field>
+    <field name="readonly" eval="True"/>
+  </record>
+  <record id="x_total_units_field_x_availability" model="ir.model.fields">
+    <field name="ttype">integer</field>
+    <field name="field_description">Total Units</field>
+    <field name="model_id" ref="x_model_availability"/>
+    <field name="name">x_total_units</field>
+    <field name="readonly" eval="True"/>
+  </record>
+  <record id="x_booked_field_x_availability" model="ir.model.fields">
+    <field name="ttype">integer</field>
+    <field name="field_description">Booked</field>
+    <field name="model_id" ref="x_model_availability"/>
+    <field name="name">x_booked</field>
+    <field name="readonly" eval="True"/>
+  </record>
+  <record id="x_available_field_x_availability" model="ir.model.fields">
+    <field name="compute"><![CDATA[for record in self: record['x_available'] = record.x_total_units - record.x_booked]]></field>
+    <field name="ttype">integer</field>
+    <field name="depends">x_total_units,x_booked</field>
+    <field name="field_description">Available</field>
+    <field name="model_id" ref="x_model_availability"/>
+    <field name="name">x_available</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="x_availability_field_x_availability" model="ir.model.fields">
+    <field name="compute"><![CDATA[for record in self:
+      record['x_availability'] = record.x_available / record.x_total_units if record.x_total_units > 0 else 0]]></field>
+    <field name="ttype">float</field>
+    <field name="depends">x_available,x_total_units</field>
+    <field name="field_description">Availability</field>
+    <field name="model_id" ref="x_model_availability"/>
+    <field name="name">x_availability</field>
+    <field name="readonly" eval="True"/>
+    <field name="selectable" eval="False"/>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="x_occupancy_field_x_availability" model="ir.model.fields">
+    <field name="compute"><![CDATA[for record in self:
+      record['x_occupancy'] = 0 if not record.x_total_units else 1 - record.x_available / record.x_total_units ]]></field>
+    <field name="ttype">float</field>
+    <field name="depends">x_available,x_total_units</field>
+    <field name="field_description">Occupancy</field>
+    <field name="model_id" ref="x_model_availability"/>
+    <field name="name">x_occupancy</field>
+    <field name="readonly" eval="True"/>
+    <field name="selectable" eval="False"/>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="x_occupancy_color_field_x_availability" model="ir.model.fields">
+    <field name="ttype">integer</field>
+    <field name="depends">x_availability,x_total_units</field>
+    <field name="field_description">Occupancy Color</field>
+    <field name="model_id" ref="x_model_availability"/>
+    <field name="name">x_occupancy_color</field>
+    <field name="readonly" eval="True"/>
+    <field name="selectable" eval="False"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[
+for r in self:
+    # Directly return the integer index (0-9)
+    r['x_occupancy_color'] = 0 if r.x_total_units == 0 else min(9, max(0, int(r.x_availability * 10)))
+]]></field>
+  </record>
+  <record id="x_availability_color_field_x_availability" model="ir.model.fields">
+    <field name="ttype">integer</field>
+    <field name="depends">x_total_units,x_availability</field>
+    <field name="field_description">Availability Color</field>
+    <field name="model_id" ref="x_model_availability"/>
+    <field name="name">x_availability_color</field>
+    <field name="readonly" eval="True"/>
+    <field name="selectable" eval="False"/>
+    <field name="store" eval="False"/>
+    <field name="compute"><![CDATA[
+for r in self:
+    # Directly return the integer index (0-9)
+    r['x_availability_color'] = 0 if r.x_total_units == 0 else min(9, max(0, int((1 - r.x_availability) * 10)))]]></field>
+  </record>
+  <record id="x_availability_ids_field_planning_slot" model="ir.model.fields">
+    <field name="ttype">many2many</field>
+    <field name="field_description">Availabilities</field>
+    <field name="model_id" ref="planning.model_planning_slot"/>
+    <field name="name">x_availability_ids</field>
+    <field name="relation">x_availability</field>
+    <field name="readonly" eval="True"/>
+  </record>
+  <record id="x_availability_ids_field_resource_calendar_leaves" model="ir.model.fields">
+    <field name="ttype">many2many</field>
+    <field name="field_description">Availabilities</field>
+    <field name="model_id" ref="resource.model_resource_calendar_leaves"/>
+    <field name="name">x_availability_ids</field>
+    <field name="relation">x_availability</field>
+    <field name="readonly" eval="True"/>
+  </record>
 </odoo>

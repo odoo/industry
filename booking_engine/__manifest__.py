@@ -1,6 +1,6 @@
 {
     'name': 'Booking Engine',
-    'version': '1.11',
+    'version': '1.12',
     'category': 'Hidden/Tools',
     'author': 'Odoo S.A.',
     'depends': [
@@ -9,10 +9,11 @@
         'knowledge',
         'planning_hr_skills',
         'sale_project',
-        'sale_renting_planning',
+        'web_gantt',
         'web_studio',
         'website_appointment',
-        'website_sale_renting',
+        'website_sale_renting_planning',
+        'website_sale_stock_renting',
     ],
     'data': [
         'data/product_pricelist.xml',
@@ -21,6 +22,7 @@
         'data/ir_model.xml',
         'data/ir_model_access.xml',
         'data/ir_model_fields.xml',
+        'data/ir_default.xml',
         'data/project_project.xml',
         'data/account_tax.xml',
         'data/product_template.xml',
@@ -44,9 +46,18 @@
         'demo/website_menu.xml',
         'demo/payment_provider_demo.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'booking_engine/static/src/scss/gantt.scss',
+        ],
+        'web.assets_backend_lazy': [
+            'booking_engine/static/src/js/patch.js',  # web_gantt/gantt_renderer is lazy so this needs to be lazy too
+        ],
+    },
     'license': 'OEEL-1',
     'cloc_exclude': [
         'data/website_view.xml',
+        'static/src/scss/gantt.scss',
     ],
     'images': ['images/main.png'],
 }
