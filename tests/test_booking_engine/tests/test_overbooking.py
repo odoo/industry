@@ -117,13 +117,19 @@ class TestOverbooking(PaymentHttpCommon):
         with self.assertRaises(ValidationError, msg="This Sales Order can't be confirmed. No resources are available for the shifts in: %s." % self.product.name):
             sale_order.action_confirm()
 
-    def _test_user_cant_book_stay_offer_unavailable_leaves_without_resource(self):
+    def test_user_cant_book_stay_offer_unavailable_leaves_without_resource(self):
         """
         Scenario: User can't book a stay offer when resources are not available due to leaves without a resource
         """
-        """
-        TODO: add after task-5798796 is merged
-        """
+        self.env['resource.calendar.leaves'].create([{
+            'name': 'Maintenance',
+            'date_from': self.start_date,
+            'date_to': self.end_date,
+            'time_type': 'leave',
+        }])
+        sale_order = self.create_sale_order()
+        with self.assertRaises(ValidationError, msg="This Sales Order can't be confirmed. No resources are available for the shifts in: %s." % self.product.name):
+            sale_order.action_confirm()
 
     def test_ecommerce_book_stay_offer_available(self):
         """
