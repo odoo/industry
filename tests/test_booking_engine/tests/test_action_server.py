@@ -655,6 +655,10 @@ class BookingEngineAutomationsTestCase(TransactionCase):
             ('x_date', '=', target_date),
         ])
 
+        # test from a bugfix: cron has to work twice
+        self.env.ref('booking_engine.server_action_create_500_days_availability').run()
+        self.env.ref('booking_engine.server_action_create_500_days_availability').run()
+
         # --- INITIAL STATE CHECK ---
         self.assertEqual(avail.x_total_units, 2, "There are 2 physical rooms linked to the offer.")
         self.assertEqual(avail.x_booked, 0, "No bookings yet, booked count should be 0.")

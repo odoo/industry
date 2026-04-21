@@ -277,10 +277,13 @@ today, target_dates = datetime.date.today(), set(datetime.date.today() + datetim
 env['x_availability'].search([('x_date', '<', today), ('x_active', '=', True)]).write({'x_active': False})
 
 if (offers := env['product.template'].search([('x_is_a_room_offer', '=', True)])):
-    existing_dates_by_offer = env['x_availability']._read_group(
-        [('x_stay_offer_id', 'in', offers.ids), ('x_date', '>=', today), ('x_date', '<', today + datetime.timedelta(days=500))],
-        groupby=['x_stay_offer_id'], aggregates=['x_date:array_agg']
-    )
+
+    existing_dates_by_offer = {
+        offer.id: set(dates)
+        for offer, dates in env['x_availability']._read_group(
+            [('x_stay_offer_id', 'in', offers.ids), ('x_date', '>=', today), ('x_date', '<', today + datetime.timedelta(days=500))],
+            ['x_stay_offer_id'], ['x_date:array_agg']
+    )}
 
     # Create availabilities only for dates that don't exist
     to_create = [{'x_stay_offer_id': offer_id, 'x_date': d, 'x_to_recompute': True}
