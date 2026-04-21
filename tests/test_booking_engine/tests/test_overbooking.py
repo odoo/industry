@@ -107,7 +107,7 @@ class TestOverbooking(PaymentHttpCommon):
         with self.assertRaises(ValidationError, msg="This Sales Order can't be confirmed. No resources are available for the shifts in: %s." % self.product.name):
             sale_order.action_confirm()
 
-    def _test_user_cant_book_stay_offer_unavailable_leaves_without_resource(self):
+    def test_user_cant_book_stay_offer_unavailable_leaves_without_resource(self):
         """
         Scenario: User can't book a stay offer when resources are not available due to leaves without a resource
         """
