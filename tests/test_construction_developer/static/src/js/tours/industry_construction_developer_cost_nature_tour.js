@@ -1,7 +1,6 @@
 import { registry } from '@web/core/registry';
 
 registry.category("web_tour.tours").add("industry_construction_developer_cost_nature_analysis_report_tour", {
-    url: "/odoo",
     steps: () => [
     {
         "trigger": ".o_app[data-menu-xmlid='sale\\.sale_menu_root']",
