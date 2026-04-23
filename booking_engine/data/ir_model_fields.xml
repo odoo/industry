@@ -789,4 +789,52 @@ Note that saving a new survey with this set will archive previous survey with th
       <field name="model_id" ref="sale.model_sale_order"/>
       <field name="ttype">boolean</field>
   </record>
+  <record id="x_booking_color_field" model="ir.model.fields">
+    <field name="name">x_booking_color</field>
+    <field name="field_description">Booking Color</field>
+    <field name="model_id" ref="planning.model_planning_slot"/>
+    <field name="ttype">integer</field>
+    <field name="store" eval="False"/>
+    <field name="depends">sale_order_id.rental_status,sale_order_id.rental_start_date,sale_order_id.rental_return_date,sale_order_id.is_late</field>
+    <field name="compute"><![CDATA[
+today_start = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+today_end = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
+
+for slot in self:
+    order = slot.sale_order_id
+    if not order:
+        slot['x_booking_color'] = 5   # purple - internal
+    elif order.rental_status == 'pickup' and order.rental_start_date and today_start <= order.rental_start_date <= today_end:
+        slot['x_booking_color'] = 3   # yellow - check in due
+    elif order.rental_status == 'return' and order.rental_return_date and order.rental_return_date > today_end:
+        slot['x_booking_color'] = 10  # green - ongoing
+    elif order.rental_status == 'return' and order.rental_return_date and today_start <= order.rental_return_date <= today_end:
+        slot['x_booking_color'] = 4   # blue - check out due
+    elif (order.rental_status == 'pickup' and order.is_late) or (order.rental_status == 'return' and order.is_late):
+        slot['x_booking_color'] = 1   # red - attention
+    else:
+        slot['x_booking_color'] = False # grey - no focus
+      ]]></field>
+  </record>
+  <record id="x_rental_status_field" model="ir.model.fields">
+    <field name="ttype">selection</field>
+    <field name="field_description">Rental Status</field>
+    <field name="model_id" ref="planning.model_planning_slot"/>
+    <field name="name">x_rental_status</field>
+    <field name="related">sale_order_id.rental_status</field>
+    <field name="store">False</field>
+    <field name="readonly" eval="True"/>
+  </record>
+  <record id="x_has_room_offer_role_field" model="ir.model.fields">
+      <field name="name">x_has_room_offer_role</field>
+      <field name="field_description">Has Room Offer Role</field>
+      <field name="model_id" ref="resource.model_resource_resource"/>
+      <field name="ttype">boolean</field>
+      <field name="store" eval="False"/>
+      <field name="depends">role_ids.x_is_a_room_offer</field>
+      <field name="compute"><![CDATA[
+for record in self:
+    record['x_has_room_offer_role'] = any(role.x_is_a_room_offer for role in record.role_ids)
+  ]]></field>
+  </record>
 </odoo>
