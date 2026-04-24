@@ -57,6 +57,17 @@ for sol in self: sol['x_delivered_progress'] = 100 * (sol.qty_delivered / sol.pr
 for sol in self: sol['x_cumulated_progress'] = sol.x_delivered_progress + 100 * sol.x_progress_increment
         ]]></field>
     </record>
+    <record id="field_sale_order_line_invoice_increment" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="field_description">Invoice Increment</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_invoice_increment</field>
+        <field name="depends">price_subtotal, x_progress_increment</field>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+for sol in self: sol['x_invoice_increment'] = sol.price_subtotal * sol.x_progress_increment
+        ]]></field>
+    </record>
     <record id="field_sale_order_line_x_service_policy" model="ir.model.fields">
         <field name="name">x_service_policy</field>
         <field name="field_description">Product Service Policy</field>
@@ -639,6 +650,13 @@ for record in self: record['x_date'] = record['x_date'] or datetime.datetime.tod
         <field name="relation">x_remark_stage</field>
         <field name="relation_field">x_project_ids</field>
     </record>
+    <record id="field_x_progress_approver" model="ir.model.fields">
+        <field name="name">x_progress_approver</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.partner</field>
+        <field name="field_description">Progress Approver</field>
+    </record>
 <!-- project.update -->
     <record id="field_project_update_x_remark_ids" model="ir.model.fields">
         <field name="model_id" ref="project.model_project_update"/>
@@ -825,7 +843,6 @@ for record in self:
         <field name="relation">product.category</field>
         <field name="store" eval="True"/>
     </record>
-<<<<<<< HEAD
 
     <!-- shopping list -->
     <record id="field_x_work_item_line_x_demand" model="ir.model.fields">
@@ -873,14 +890,4 @@ for r in self: r['x_consumed'] = r.x_demand if (r.x_work_item_id.x_sale_order_li
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
     </record>
-
-=======
-    <record id="field_x_progress_approver" model="ir.model.fields">
-        <field name="name">x_progress_approver</field>
-        <field name="model_id" ref="project.model_project_project"/>
-        <field name="ttype">many2one</field>
-        <field name="relation">res.partner</field>
-        <field name="field_description">Progress Approver</field>
-    </record>
->>>>>>> e26fc9fff ([ADD] construction_developer: add project progress report)
 </odoo>
