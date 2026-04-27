@@ -24,7 +24,7 @@ if event == 'booking_new':
     })
     for room in full_booking.get('rooms', []):
         room_mapping = env['x_channex_mapping'].search(
-            [("x_model_type", "=", "product.product"), ('x_id_remote', '=', room.get('room_type_id', ''))], limit=1
+            [("x_model_type", "=", "room_type"), ('x_id_remote', '=', room.get('room_type_id', ''))], limit=1
         )
         env['sale.order.line'].create({
             'product_id': env['product.product'].browse(room_mapping.x_id_local).id,
@@ -34,7 +34,7 @@ if event == 'booking_new':
     so['rental_start_date'] = full_booking.get('arrival_date')
     so['rental_return_date'] = full_booking.get('departure_date')
     env["x_channex_mapping"].create({
-        "x_model_type": "sale.order",
+        "x_model_type": "booking",
         "x_id_local": so.id,
         "x_id_remote": payload_infos.get('booking_id', ''),
     })
@@ -42,19 +42,16 @@ if event == 'booking_new':
         so.action_confirm()
     except Exception as exc:
         pass #Create activity to say there's an error and it should be replaned by someone
-elif event == 'booking_modification' and payload_infos.get('booking_id'):
+elif booking_id := payload_infos.get('booking_id'):
     mapped_so = env["x_channex_mapping"].search([
-        ("x_model_type", "=", "sale.order"),
-        ("x_id_remote", "=", payload_infos.get('booking_id')),
+        ("x_model_type", "=", "booking"),
+        ("x_id_remote", "=", booking_id),
     ], limit=1)
-    pass #Here we should modify the booking, can we do that extensively and automatically ? or should we simply create a task to
-    #take into account new reservation (could create overlapping issues later)
-elif event == 'booking_cancellation' and payload_infos.get('booking_id'):
-    mapped_so = env["x_channex_mapping"].search([
-        ("x_model_type", "=", "sale.order"),
-        ("x_id_remote", "=", payload_infos.get('booking_id')),
-    ], limit=1)
-    env['sale.order'].browse(mapped_so.x_id_local).action_cancel()
+    if event == 'booking_modification':
+        pass #Here we should modify the booking, can we do that extensively and automatically ? or should we simply create a task to
+        #take into account new reservation (could create overlapping issues later)
+    elif event == 'booking_cancellation':
+        env['sale.order'].browse(mapped_so.x_id_local).action_cancel()
 ]]></field>
     </record>
     <record id="cron_action_send_data_to_channex" model="ir.actions.server">
@@ -62,6 +59,13 @@ elif event == 'booking_cancellation' and payload_infos.get('booking_id'):
         <field name="model_id" ref="base.model_ir_cron" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
+BASE_URL = "https://staging.channex.io/api/v1"
+header = {'Content-Type': 'application/json', 'user-api-key': env.company.x_channex_api_key}
+def channex_post(endpoint, payload):
+    response = requests.post(f"{BASE_URL}/{endpoint}", headers=header, data=json.dumps(payload), timeout=20)
+    if err := result.json().get("errors"):
+        raise UserError("Error sending restrictions to channex: " + err.get("title", "Unknown error"))
+
 result = ""
 sending_cron = env.ref('booking_channex.ir_cron_data_channex_sender')
 restrictions_payload = []
@@ -72,33 +76,13 @@ for line in sending_cron.x_datas_to_send:
     elif line.x_operation == 'availability':
         availability_payload.append(line.x_payload)
 if not restrictions_payload.is_empty():
-    result = requests.post('https://staging.channex.io/api/v1/restrictions',
-        headers={'Content-Type': 'application/json', 'user-api-key': env.company.x_channex_api_key},
-        data=json.dumps({
-            "values": restrictions_payload
-        })
-    )
-    sending_cron.message_post(
-        body="Here is answer from last channex restrictions update attempt: " + result
-    )
-    if err := result.json().get("errors"):
-        raise UserError("Error sending restrictions to channex: " + err.get("title", "Unknown error"))
+    channex_post("restrictions", {"values": restrictions_payload})
 if not availability_payload.is_empty():
-    result = requests.post('https://staging.channex.io/api/v1/availability',
-        headers={'Content-Type': 'application/json', 'user-api-key': env.company.x_channex_api_key},
-        data=json.dumps({
-            "values": availability_payload
-        })
-    )
-    sending_cron.message_post(
-        body="Here is answer from last channex availability update attempt: " + result
-    )
-    if err := result.json().get("errors"):
-        raise UserError("Error sending availability to channex: " + err.get("title", "Unknown error"))
+    channex_post("availability", {"values": availability_payload})
 model.env['ir.cron']._commit_progress(processed=1, remaining=0, deactivate=True)
 for line in sending_cron.x_datas_to_send:
     line.unlink()
-]]></field>
+        ]]></field>
     </record>
     <record id="create_or_modify_room_type" model="ir.actions.server">
         <field name="name">Channex: Create/modify Room Type</field>
@@ -106,64 +90,50 @@ for line in sending_cron.x_datas_to_send:
         <field name="state">code</field>
         <field name="code"><![CDATA[
 mapped_product = env["x_channex_mapping"].search([
-    ("x_model_type", "=", "product.product"),
+    ("x_model_type", "=", "room_type"),
     ("x_id_local", "=", record.id),
 ], limit=1)
+room_url = 'https://staging.channex.io/api/v1/room_types'
+headers={'Content-Type': 'application/json', 'user-api-key': env.company.x_channex_api_key}
+room_type = {
+    "title": record.name,
+    "count_of_rooms": len(record.planning_role_id.resource_ids) or 1,
+    "occ_adults": 1, "occ_children": 0, "occ_infants": 0,
+    "default_occupancy": 1
+}
 if mapped_product: #Modify
-    room_type_result = requests.post('https://staging.channex.io/api/v1/room_types/%s' % mapped_product.x_id_remote,
-        headers={'Content-Type': 'application/json', 'user-api-key': env.company.x_channex_api_key},
-        data=json.dumps({
-            "room_type": {
-                "title": record.name,
-                "count_of_rooms": len(record.planning_role_id.resource_ids) or 1,
-                "occ_adults": 1, "occ_children": 0, "occ_infants": 0,
-                "default_occupancy": 1
-            }
-        })
-    )
+    room_url += '/' + mapped_product.x_id_remote
 else: #Create
-    room_type_result = requests.post('https://staging.channex.io/api/v1/room_types',
-        headers={'Content-Type': 'application/json', 'user-api-key': env.company.x_channex_api_key},
-        data=json.dumps({
-            "room_type": {
-                "property_id": "38149695-d95b-4c80-a7c3-34ce96efc7ba",
-                "title": record.name,
-                "count_of_rooms": len(record.planning_role_id.resource_ids) or 1,
-                "occ_adults": 1, "occ_children": 0, "occ_infants": 0,
-                "default_occupancy": 1
-            }
-        })
-    )
-    if err := room_type_result.json().get("errors"):
-        raise UserError(err.get("title", "Unknown error from the request"))
+    room_type["property_id"] = "38149695-d95b-4c80-a7c3-34ce96efc7ba"
+room_type_result = requests.post(room_url, headers, data=json.dumps({"room_type": room_type}))
+if err := room_type_result.json().get("errors"):
+    raise UserError(err.get("title", "Unknown error from the request"))
+if not mapped_product:
     new_mapping = env["x_channex_mapping"].create({
-        "x_model_type": "product.product",
+        "x_model_type": "room_type",
         "x_id_local": record.id,
         "x_id_remote": room_type_result.json().get('data').get('attributes').get('id'),
     })
     rate_plan_result = requests.post('https://staging.channex.io/api/v1/rate_plans',
-        headers={'Content-Type': 'application/json', 'user-api-key': env.company.x_channex_api_key},
-        data=json.dumps({
+        headers, data=json.dumps({
             "rate_plan": {
                 "property_id": "38149695-d95b-4c80-a7c3-34ce96efc7ba",
                 "title": "Default plan",
                 "room_type_id": new_mapping.x_id_remote,
-                "options": [
-                    {
-                        "occupancy": 1,
-                        "is_primary": True,
-                        "rate": 50
-                    }
-                ]
+                "options": [{
+                    "occupancy": 1,
+                    "is_primary": True,
+                    "rate": 50
+                }]
             }
         })
     )
     env["x_channex_mapping"].create({
-        "x_model_type": "product.template",
+        "x_model_type": "rate_plan",
         "x_id_local": record.product_tmpl_id.id,
         "x_id_remote": rate_plan_result.json().get('data').get('attributes').get('id'),
     })
-]]></field>
+        ]]></field>
     </record>
     <record id="update_ari" model="ir.actions.server">
         <field name="name">Channex: Update ARIs</field>
@@ -179,7 +149,7 @@ for product in env['product.product'].search([('x_is_a_room_offer', '=', True)])
         main_dates.append(price_rule.date_start.date())
     main_dates.sort()
     mapped_rate_plan = env["x_channex_mapping"].search([
-        ("x_model_type", "=", "product.template"),
+        ("x_model_type", "=", "rate_plan"),
         ("x_id_local", "=", product.product_tmpl_id.id),
     ], limit=1)
     if mapped_rate_plan:
@@ -196,11 +166,10 @@ for product in env['product.product'].search([('x_is_a_room_offer', '=', True)])
                 },
             })
 #Update availability - same as rate but using the incoming new model that gives values directly
-pass
 if not sending_cron.active:
     sending_cron['nextcall'] = datetime.datetime.now() + datetime.timedelta(minutes=1)
     sending_cron['active'] = True
-]]></field>
+        ]]></field>
     </record>
     <record id="action_button_sync" model="ir.actions.server">
         <field name="name">Channex: Sync Data</field>
