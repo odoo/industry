@@ -13,8 +13,10 @@
     ],
     'data': [
         'data/ir_model.xml',
+        'data/ir_default.xml',
         'data/ir_model_access.xml',
         'data/ir_model_fields.xml',
+        'data/fleet_vehicle_state.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
         'data/ir_actions_act_window.xml',
