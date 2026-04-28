@@ -72,7 +72,7 @@
     <record id="sale_order_form_view_inherit" model="ir.ui.view">
         <field name="arch" type="xml">
             <xpath expr="//list//field[@name='sequence']" position="after">
-                <field name="sequence" optional="show" column_invisible="not parent.id" decoration-muted="1" width="30" options="{'hide_trailing_zeros': true}" string="#"/>
+                <field name="x_item_number" optional="show" column_invisible="not parent.id" decoration-muted="1" width="30" options="{'hide_trailing_zeros': true}" string="#"/>
             </xpath>
             <xpath expr="//form" position="attributes">
                 <attribute name="class" add="o_so_form" separator=" "/>
@@ -277,6 +277,40 @@
         </field>
     </record>
 
+    <record id="open_view_all_tasks_list_view_inherit" model="ir.ui.view">
+        <field name="inherit_id" ref="project.open_view_all_tasks_list_view"/>
+        <field name="mode">extension</field>
+        <field name="model">project.task</field>
+        <field name="name">open.view.all.tasks.list.view.inherit</field>
+        <field name="priority">1600</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='project_id']" position="attributes">
+                <attribute name="readonly">0</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_project_inherit" model="ir.ui.view">
+        <field name="inherit_id" ref="project.view_project"/>
+        <field name="mode">extension</field>
+        <field name="model">project.project</field>
+        <field name="name">project.project.list.view.inherit</field>
+        <field name="priority">1600</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <header>
+                    <button
+                        name="%(server_action_transfer_wbs)d"
+                        string="Transfer WBS"
+                        type="action"
+                    />
+                </header>
+            </xpath>
+        </field>
+    </record>
+
     <record id="sale_order_form_view_extension" model="ir.ui.view">
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_line']/list//field[@name='route_ids']" position="after">
@@ -300,6 +334,19 @@
                 >
                     <div class="o_field_widget o_stat_info">
                         <span class="o_stat_text">Procurement</span>
+                    </div>
+                </button>
+                <button
+                    name="%(server_action_show_wbs)d"
+                    type="action"
+                    class="oe_stat_button"
+                    icon="fa-puzzle-piece"
+                    invisible="not x_wbs_project"
+                    groups="project.group_project_user"
+                    context="{'active_id': id}"
+                >
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Work Breakdown Structure</span>
                     </div>
                 </button>
             </xpath>
@@ -747,4 +794,114 @@
             </list>
         </field>
     </record>
+    <!-- <record id="edit_project_inherit" model="ir.ui.view">
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="mode">extension</field>
+        <field name="model">project.project</field>
+        <field name="name">project.project.view.form.inherit</field>
+        <field name="priority">330</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+        <data>
+            <xpath expr="/form//field[@name='has_any_so_with_nothing_to_invoice']" position="after">
+                <button string="Generate WBS" type="action"/>
+            </xpath>
+        </data>
+        </field>
+    </record> -->
+    <record id="view_task_form2_inherit" model="ir.ui.view">
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="mode">extension</field>
+        <field name="model">project.task</field>
+        <field name="name">project.task.view.form.inherit</field>
+        <field name="priority">9990</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="/form/sheet/group/group[2]/div[@id='allocated_hours_container']" position="after">
+                    <field name="x_full_time_equivalent"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="view_sale_project_inherit_form_inherit" model="ir.ui.view">
+    <field name="inherit_id" ref="sale_project.view_sale_project_inherit_form"/>
+    <field name="mode">extension</field>
+    <field name="model">project.task</field>
+    <field name="name">project.task.view.form.inherit</field>
+    <field name="priority">9990</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+        <data>
+            <xpath expr="//field[@name='sale_line_id'][1]" position="attributes">
+                <attribute name="invisible" add="x_sale_line_id" separator=" or "/>
+            </xpath>
+            <xpath expr="//field[@name='sale_line_id'][2]" position="attributes">
+                <attribute name="invisible" add="x_sale_line_id" separator=" or "/>
+            </xpath>
+            <xpath expr="//field[@name='sale_line_id']" position="before">
+                <field name="x_sale_line_id"
+                    string="Sales Order Item"
+                    options='{"no_open": True}'
+                    readonly="1"
+                    invisible="not x_sale_line_id"/>
+            </xpath>
+        </data>
+    </field>
+  </record>
+  <record id="view_task_tree2_inherit" model="ir.ui.view">
+    <field name="inherit_id" ref="project.view_task_tree2"/>
+    <field name="mode">extension</field>
+    <field name="model">project.task</field>
+    <field name="name">project.task.view.list.inherit</field>
+    <field name="priority">160</field>
+    <field name="type">list</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/list//field[@name='user_ids']" position="after">
+          <field name="x_full_time_equivalent" optional="show"/>
+        </xpath>
+      </data>
+    </field>
+  </record>
+  <record id="project_task_dependency_view_gantt_inherit" model="ir.ui.view">
+    <field name="inherit_id" ref="project_enterprise.project_task_dependency_view_gantt"/>
+    <field name="mode">extension</field>
+    <field name="model">project.task</field>
+    <field name="name">project.task.view.gantt.inherit</field>
+    <field name="priority">99</field>
+    <field name="type">gantt</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/gantt" position="attributes">
+          <attribute name="default_group_by">parent_id</attribute>
+          <attribute name="display_mode">dense</attribute>
+          <attribute name="precision">{"day":"hour:quarter","week":"day:half","month":"day:full"}</attribute>
+        </xpath>
+      </data>
+    </field>
+  </record>
+  <record id="sale_order_list_view_inherit" model="ir.ui.view">
+    <field name="inherit_id" ref="sale_order_list_view"/>
+    <field name="mode">extension</field>
+    <field name="model">sale.order.line</field>
+    <field name="name">sale.order.line.view.list.inherit</field>
+    <field name="priority">99</field>
+    <field name="type">list</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/list//field[@name='x_current_progress']" position="after">
+          <field optional="show" name="x_work_progress" widget="project_task_progressbar"/>
+        </xpath>
+        <xpath expr="/list//field[@name='x_progress_increment']" position="attributes">
+          <attribute name="string">Progress Increment</attribute>
+        </xpath>
+      </data>
+    </field>
+  </record>
 </odoo>

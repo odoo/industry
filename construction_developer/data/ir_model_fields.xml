@@ -1,5 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+    <record id="field_sale_order_line_x_item_number" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="field_description">Line Number</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_item_number</field>
+        <field name="store" eval="True"/>
+        <field name="readonly" eval="True"/>
+    </record>
     <record id="field_sale_order_line_x_reference" model="ir.model.fields">
         <field name="ttype">char</field>
         <field name="field_description">Line Reference</field>
@@ -7,9 +15,9 @@
         <field name="name">x_reference</field>
         <field name="store" eval="False"/>
         <field name="readonly" eval="True"/>
-        <field name="depends">sequence,order_id.name</field>
+        <field name="depends">order_id,order_id.name,x_item_number</field>
         <field name="compute"><![CDATA[
-for sol in self: sol['x_reference'] = f"{sol.order_id.name}.{sol.sequence}"
+for sol in self: sol['x_reference'] = f"{sol.order_id.name}.{sol.x_item_number}" if sol.x_item_number else False
         ]]></field>
     </record>
     <record id="field_account_move_line_x_reference" model="ir.model.fields">
@@ -843,6 +851,72 @@ for record in self:
         <field name="relation">product.category</field>
         <field name="store" eval="True"/>
     </record>
+  <record id="field_project_task_x_full_time_equivalent" model="ir.model.fields">
+    <field name="ttype">float</field>
+    <field name="depends">planned_date_begin,date_deadline,allocated_hours</field>
+    <field name="field_description">Full Time Equivalent</field>
+    <field name="model_id" ref="project.model_project_task"/>
+    <field name="name">x_full_time_equivalent</field>
+    <field name="readonly" eval="True"/>
+    <field name="compute"><![CDATA[for record in self:
+        if record.planned_date_begin and record.date_deadline and record.allocated_hours > 0:
+            duration_seconds = (record.date_deadline - record.planned_date_begin).total_seconds()
+            if duration_seconds > 0:
+                days_in_period = duration_seconds / (24.0 * 3600.0)
+                theoretical_capacity = days_in_period * 8
+                record['x_full_time_equivalent'] = record.allocated_hours / theoretical_capacity
+            else: record['x_full_time_equivalent'] = 0.0
+        else: record['x_full_time_equivalent'] = 0.0]]></field>
+  </record>
+  <record id="field_sale_order_line_x_wbs_ready" model="ir.model.fields">
+    <field name="ttype">boolean</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">WBS Ready</field>
+    <field name="model_id" ref="sale.model_sale_order_line"/>
+    <field name="name">x_wbs_ready</field>
+  </record>
+  <record id="field_sale_order_line_x_task_progress" model="ir.model.fields">
+    <field name="ttype">float</field>
+    <field name="related">task_id.progress</field>
+    <field name="field_description">Progress</field>
+    <field name="model_id" ref="sale.model_sale_order_line"/>
+    <field name="name">x_task_progress</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+  </record>
+  <record id="field_sale_order_line_x_sale_order_line_ids" model="ir.model.fields">
+    <field name="ttype">one2many</field>
+    <field name="field_description">Sale Order Line Ids</field>
+    <field name="model_id" ref="sale.model_sale_order_line"/>
+    <field name="name">x_sale_order_line_ids</field>
+    <field name="relation">project.task</field>
+    <field name="relation_field">sale_line_id</field>
+  </record>
+  <record id="field_sale_order_line_x_work_progress" model="ir.model.fields">
+    <field name="ttype">float</field>
+    <field name="related">x_sale_order_line_ids.progress</field>
+    <field name="field_description">Work Progress</field>
+    <field name="model_id" ref="sale.model_sale_order_line"/>
+    <field name="name">x_work_progress</field>
+    <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
+  </record>
+
+  <!-- WBS -->
+  <record id="field_sale_order_line_x_wbs_project" model="ir.model.fields">
+    <field name="ttype">many2one</field>
+    <field name="field_description">WBS Project</field>
+    <field name="model_id" ref="sale.model_sale_order"/>
+    <field name="name">x_wbs_project</field>
+    <field name="relation">project.project</field>
+  </record>
+  <record id="field_task_x_sale_line_id" model="ir.model.fields">
+    <field name="ttype">many2one</field>
+    <field name="field_description">(WBS) Sale Line</field>
+    <field name="model_id" ref="project.model_project_task"/>
+    <field name="name">x_sale_line_id</field>
+    <field name="relation">sale.order.line</field>
+  </record>
 
     <!-- shopping list -->
     <record id="field_x_work_item_line_x_demand" model="ir.model.fields">

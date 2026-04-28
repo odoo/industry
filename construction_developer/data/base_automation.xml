@@ -10,10 +10,25 @@
     </record>
     <record id="automation_initialize_sales_order_line_sequence_on_sales_order_create" model="base.automation">
         <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="action_server_ids" eval="[(6, 0, [ref('action_initialize_sales_order_line_sequence_on_sales_order_create')])]"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_setup_sol_numbering'), ref('action_initialize_sales_order_line_sequence_on_sales_order_create')])]"/>
         <field name="trigger">on_create_or_write</field>
         <field name="name">Construction Developer: Initialize Sales Order Line Sequence on Sales Order create or write</field>
         <field name="trigger_field_ids" eval="[(6, 0, [ref('sale.field_sale_order__order_line')])]"/>
+    </record>
+    <record id="automation_update_and_remove_wbs_project_on_task_project_change" model="base.automation">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_update_and_remove_wbs_project_on_task_project_change')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">['|', ('sale_line_id', '!=', False), ('x_sale_line_id', '!=', False), '|', ('sale_line_id.order_id.x_wbs_project', '!=', False), ('x_sale_line_id.order_id.x_wbs_project', '!=', False)]</field>
+        <field name="name">Construction Developer: Update Analytic Account and Delete WBS Project on Task Project change</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('project.field_project_task__project_id')])]"/>
+    </record>
+    <record id="automation_sale_order_update_wbs_on_confirm" model="base.automation">
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_sale_order_update_wbs_on_confirm')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Construction Developer: Update WBS on Sale Order create or write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale.field_sale_order__state')])]"/>
     </record>
     <record id="automation_update_progress_increment_on_change" model="base.automation">
         <field name="name">Construction Developer: Update Sale Order Line Progress Increment on Quantity Increment change</field>
@@ -156,5 +171,12 @@
         <field name="filter_pre_domain">[("move_type", "=", "in_invoice")]</field>
         <field name="filter_domain">[('state', '=', 'posted')]</field>
         <field name="trigger_field_ids" eval="[(6, 0, [ref('account.field_account_move__state')])]"/>
+    </record>
+    <record id="automation_project_task_on_create_or_write" model="base.automation">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_update_parent_task_dates_and_time')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Construction Developer: Task - On task date &amp; time update</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('project.field_project_task__allocated_hours'), ref('project.field_project_task__date_deadline'), ref('project.field_project_task__parent_id'), ref('project_enterprise.field_project_task__planned_date_begin')])]"/>
     </record>
 </odoo>

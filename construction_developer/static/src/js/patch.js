@@ -2,6 +2,7 @@ import { patch } from "@web/core/utils/patch";
 import { ORM } from "@web/core/orm_service";
 import { RelationalModel } from "@web/model/relational_model/relational_model";
 import { ListRenderer } from "@web/views/list/list_renderer";
+import { SaleOrderLineListRenderer } from '@sale/js/sale_order_line_field/sale_order_line_field';
 
 // In the Remarks search/kanban views, displays only project-specific remark stages when grouping by x_stage_id
 patch(RelationalModel.prototype, { async _postprocessReadGroup(config, { groups, length }) {
@@ -30,3 +31,13 @@ patch(ListRenderer.prototype, { formatGroupAggregate(group, column) {
             aggregates["x_margin_percent"].rawValue = aggregates["x_total_price"].rawValue ? 100 * (aggregates["x_margin"].rawValue) / aggregates["x_total_price"].rawValue : 0;
             aggregates["x_margin_percent"].value = Math.round(aggregates["x_margin_percent"].rawValue).toString() + " %";}
         return aggregates;}})
+
+// In the Sale Order form view, in the SOL list view
+// Adds the Item number column to sections & subsections
+patch(SaleOrderLineListRenderer.prototype, { getSectionColumns(columns, record) {
+    const res = super.getSectionColumns(columns, record);
+    const xCol = columns.find(c => c.name === 'x_item_number');
+    
+    if (xCol) res.splice(1, 0, xCol);
+
+    return res.map(col => col.name === this.titleField ? { ...col, colspan: columns.length - res.length + 1 } : { ...col });}});
