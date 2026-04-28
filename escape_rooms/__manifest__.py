@@ -1,12 +1,13 @@
 {
     'name': 'Escape Rooms',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
         'base_industry_data',
         'knowledge',
         'pos_loyalty',
+        'pos_stock',
         'sale_crm',
         'sale_planning',
         'website_appointment',

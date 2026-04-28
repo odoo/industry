@@ -1,13 +1,13 @@
 {
     'name': 'Bowling Alley',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Hospitality',
     'depends': [
         'base_industry_data',
         'knowledge',
         'planning',
-        'pos_enterprise',
         'pos_restaurant',
+        'pos_stock',
         'website_appointment',
     ],
     'data': [

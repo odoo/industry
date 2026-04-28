@@ -1,6 +1,6 @@
 {
     'name': 'Bar & Pub',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Hospitality',
     'depends': [
         'base_industry_data',
@@ -10,6 +10,7 @@
         'planning',
         'pos_restaurant',
         'pos_self_order',
+        'pos_stock',
         'project_enterprise',
         'purchase',
     ],
