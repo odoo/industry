@@ -410,6 +410,11 @@ if so_ids != [0]:
         <field name="code"><![CDATA[
 action = env['ir.actions.actions'].with_context(active_id=(p_id := record.x_wbs_project.id))._for_xml_id('project.act_project_project_2_project_task_all')
 action['context'] = {'active_id': p_id, 'default_project_id': p_id, 'default_user_ids': [env.uid]}
+# By default it fetches the default gantt view, so we have to specify this one
+gantt_view = env.ref('project_enterprise.project_task_dependency_view_gantt', raise_if_not_found=False)
+
+# Select the gantt view by default
+action['views'] = [(gantt_view.id if gantt_view else False, 'gantt')] + [v for v in action.get('views', []) if v[1] != 'gantt']
 ]]></field>
     </record>
 
@@ -480,7 +485,7 @@ for record in records:
         project = env['project.project'].search([('sale_order_id', '=', record.id)], limit=1)
     if not project:
         project = env['project.project'].create({
-            'name': f"{record.name} WBS - {record.partner_id.name}",
+            'name': env._(f"{record.name} WBS - {record.partner_id.name}"),
             'partner_id': record.partner_id.id,
             'company_id': record.company_id.id,
             'allow_timesheets': True,
@@ -506,8 +511,7 @@ for record in records:
                     (env._('In Progress'), 10, False),
                     (env._('Done'), 20, True),
                     (env._('Cancelled'), 25, True),
-                ]
-            ])
+            ]])
         project['type_ids'] = default_stages.ids
 
     parent_lvl1, parent_lvl2 = False, False
@@ -516,11 +520,12 @@ for record in records:
         clean_name = (line.name or '').split('\n')[0].strip()
         item_num = line.x_reference or ''
         task_values = {
-            'name': f"{item_num} {clean_name}",
+            'name': env._(f"{item_num} {clean_name}"),
             'project_id': project.id,
             'company_id': record.company_id.id,
             'stage_id': project.type_ids[0].id,
             line_field: line.id,
+            'user_ids': False,
         }
 
         if not line.x_wbs_ready:
