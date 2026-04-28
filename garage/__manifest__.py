@@ -17,6 +17,7 @@
         'data/ir_default.xml',
         'data/ir_model_access.xml',
         'data/ir_model_fields.xml',
+        'data/project_task_type.xml',
         'data/fleet_vehicle_state.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',

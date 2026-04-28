@@ -10,10 +10,11 @@ if record.x_appointment_type_id:
         "type": "ir.actions.act_window",
         "res_model": "calendar.event",
         "view_mode": "gantt",
-        "view_id": env.ref("appointment.calendar_event_view_gantt_booking_user").id,
+        "view_id": env.ref("appointment.calendar_event_view_gantt_booking_resource").id,
         "context": {
             "default_appointment_type_id": record.x_appointment_type_id.id,
             "default_name": record.name,
+            "default_x_task_id": record.id,
         },
     }
 ]]></field>
@@ -91,6 +92,30 @@ record['partner_id'] = record.x_vehicle_id.x_owner_id.id or record.partner_id.id
         <field name="state">code</field>
         <field name="code"><![CDATA[
 record['partner_id'] = record.x_vehicle_id.x_owner_id.id or record.partner_id.id
+    ]]></field>
+    </record>
+    <record id="server_action_task_stage_booking_confirm" model="ir.actions.server">
+        <field name="name">Generate Shared Link on Booking Confirm</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for task in records:
+    if not task.partner_id:
+        raise UserError("You must set a Customer before moving to Booking Confirm.")
+    if not task.x_vehicle_id:
+        raise UserError("You must set a Vehicle before moving to Booking Confirm.")
+    if not task.x_appointment_type_id:
+        raise UserError("You must set an Appointment Type before moving to Booking Confirm.")
+    # Try to reuse existing invite
+    invite = env['appointment.invite'].search([('appointment_type_ids', 'in', [task.x_appointment_type_id.id]), ('x_task_id', '=', task.id),], limit=1)
+
+    # Create if none found
+    if not invite:
+        invite = env['appointment.invite'].create({'appointment_type_ids': [(6, 0, [task.x_appointment_type_id.id])],'x_task_id': task.id})
+
+    # Always update the task with the invite’s link
+    booking_url = invite.book_url or ''
+    task.write({'x_booking_url': booking_url})
     ]]></field>
     </record>
 </odoo>
