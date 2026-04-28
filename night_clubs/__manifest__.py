@@ -1,6 +1,6 @@
 {
     'name': 'Night Clubs',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -9,6 +9,7 @@
         'event_sale',
         'knowledge',
         'pos_restaurant',
+        'pos_stock',
         'purchase',
         'sale',
         'social',
