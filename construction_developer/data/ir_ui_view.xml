@@ -26,7 +26,7 @@
                 <field name="x_quantity_increment" width="130px"
                     invisible="x_is_undeliverable or display_type"
                 />
-                <field name="x_progress_increment" widget="percentage" width="130px"
+                <field name="x_progress_increment" widget="percentage" string="Progress Increment" width="130px"
                     invisible="not x_display_button and not x_is_deliverable"
                 />
                 <field name="id" column_invisible="True"/> <!-- this invisible field is necessary to pass the id field to the widget -->
@@ -34,6 +34,7 @@
                 <field name="x_current_progress" widget="progressbar" readonly="True"
                     invisible="display_type or x_is_undeliverable or x_current_progress == 0"
                 />
+                <field optional="show" name="x_work_progress" widget="project_task_progressbar"/>
             </list>
         </field>
     </record>
@@ -72,7 +73,7 @@
     <record id="sale_order_form_view_inherit" model="ir.ui.view">
         <field name="arch" type="xml">
             <xpath expr="//list//field[@name='sequence']" position="after">
-                <field name="sequence" optional="show" column_invisible="not parent.id" decoration-muted="1" width="30" options="{'hide_trailing_zeros': true}" string="#"/>
+                <field name="x_item_number" optional="show" column_invisible="not parent.id" decoration-muted="1" width="30" options="{'hide_trailing_zeros': true}" string="#"/>
             </xpath>
             <xpath expr="//form" position="attributes">
                 <attribute name="class" add="o_so_form" separator=" "/>
@@ -203,6 +204,7 @@
             <list open_form_view="false" create="0">
                 <field name="x_sale_order_id" widget="many2one" optional="show"/>
                 <field name="x_line_reference" optional="show"/>
+                <field name="x_task_start" optional="show" widget="remaining_days"/>
                 <field name="x_product_id" widget="many2one" optional="show"/>
                 <field name="x_work_item_id" widget="many2one" optional="show"/>
                 <field name="x_unit_id" widget="many2one" optional="show"/>
@@ -226,10 +228,13 @@
             <field name="x_demand"/>
             <field name="x_consumed"/>
             <separator/>
+            <filter string="Task Start" name="x_task_start_filter" date="x_task_start"/>
+            <separator/>
             <group>
                 <filter string="Product" name="group_by_product" context="{'group_by':'x_product_id'}"/>
                 <filter string="Order" name="group_by_order" context="{'group_by':'x_sale_order_id'}"/>
                 <filter string="Work Item" name="group_by_work_item" context="{'group_by':'x_work_item_id'}"/>
+                <filter string="Task Date" name="group_by_task_month" context="{'group_by': 'x_task_start'}"/>
             </group>
         </search>
         </field>
@@ -277,6 +282,40 @@
         </field>
     </record>
 
+    <record id="open_view_all_tasks_list_view_inherit" model="ir.ui.view">
+        <field name="inherit_id" ref="project.open_view_all_tasks_list_view"/>
+        <field name="mode">extension</field>
+        <field name="model">project.task</field>
+        <field name="name">open.view.all.tasks.list.view.inherit</field>
+        <field name="priority">1600</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='project_id']" position="attributes">
+                <attribute name="readonly">0</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_project_inherit" model="ir.ui.view">
+        <field name="inherit_id" ref="project.view_project"/>
+        <field name="mode">extension</field>
+        <field name="model">project.project</field>
+        <field name="name">project.project.list.view.inherit</field>
+        <field name="priority">1600</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <header>
+                    <button
+                        name="%(server_action_transfer_wbs)d"
+                        string="Transfer WBS"
+                        type="action"
+                    />
+                </header>
+            </xpath>
+        </field>
+    </record>
+
     <record id="sale_order_form_view_extension" model="ir.ui.view">
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_line']/list//field[@name='route_ids']" position="after">
@@ -300,6 +339,18 @@
                 >
                     <div class="o_field_widget o_stat_info">
                         <span class="o_stat_text">Procurement</span>
+                    </div>
+                </button>
+                <button
+                    name="%(server_action_show_wbs)d"
+                    type="action"
+                    class="oe_stat_button"
+                    icon="fa-tasks"
+                    invisible="not x_wbs_project"
+                    groups="project.group_project_user"
+                >
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">WBS</span>
                     </div>
                 </button>
             </xpath>
@@ -747,4 +798,79 @@
             </list>
         </field>
     </record>
+<!-- WBS-->
+    <record id="view_task_form2_inherit" model="ir.ui.view">
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="mode">extension</field>
+        <field name="model">project.task</field>
+        <field name="name">project.task.view.form.inherit</field>
+        <field name="priority">9990</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+                <xpath expr="//div[@id='allocated_hours_container']" position="after">
+                    <field name="x_full_time_equivalent"/>
+                </xpath>
+        </field>
+    </record>
+    <record id="view_sale_project_inherit_form_inherit" model="ir.ui.view">
+    <field name="inherit_id" ref="sale_project.view_sale_project_inherit_form"/>
+    <field name="mode">extension</field>
+    <field name="model">project.task</field>
+    <field name="name">project.task.view.form.inherit</field>
+    <field name="priority">9990</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+        <data>
+            <xpath expr="//field[@name='sale_line_id'][1]" position="attributes">
+                <attribute name="invisible" add="x_sale_line_id" separator=" or "/>
+            </xpath>
+            <xpath expr="//field[@name='sale_line_id'][2]" position="attributes">
+                <attribute name="invisible" add="x_sale_line_id" separator=" or "/>
+            </xpath>
+            <xpath expr="//field[@name='sale_line_id']" position="before">
+                <field name="x_sale_line_id"
+                    string="Sales Order Item"
+                    options='{"no_open": True}'
+                    readonly="1"
+                    invisible="not x_sale_line_id"/>
+            </xpath>
+        </data>
+    </field>
+  </record>
+  <record id="view_task_tree2_inherit" model="ir.ui.view">
+    <field name="inherit_id" ref="project.view_task_tree2"/>
+    <field name="mode">extension</field>
+    <field name="model">project.task</field>
+    <field name="name">project.task.view.list.inherit</field>
+    <field name="priority">160</field>
+    <field name="type">list</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/list//field[@name='user_ids']" position="after">
+          <field name="x_full_time_equivalent" optional="show"/>
+        </xpath>
+      </data>
+    </field>
+  </record>
+  <record id="project_task_dependency_view_gantt_inherit" model="ir.ui.view">
+    <field name="inherit_id" ref="project_enterprise.project_task_dependency_view_gantt"/>
+    <field name="mode">primary</field>
+    <field name="model">project.task</field>
+    <field name="name">project.task.view.gantt.inherit</field>
+    <field name="priority">99</field>
+    <field name="type">gantt</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/gantt" position="attributes">
+          <attribute name="default_group_by">parent_id</attribute>
+          <attribute name="display_mode">sparse</attribute>
+          <attribute name="precision">{"day":"hour:quarter","week":"day:half","month":"day:full"}</attribute>
+        </xpath>
+      </data>
+    </field>
+  </record>
 </odoo>
