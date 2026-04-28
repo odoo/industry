@@ -1,6 +1,6 @@
 {
     'name': 'Fitness Center',
-    'version': '1.3',
+    'version': '1.4',
     'category': 'Health and Fitness',
     'depends': [
         'base_industry_data',
@@ -12,6 +12,7 @@
         'partnership',
         'planning',
         'pos_sale',
+        'pos_stock',
         'purchase',
         'sale_project',
         'sale_subscription',

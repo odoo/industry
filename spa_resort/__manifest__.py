@@ -1,6 +1,6 @@
 {
     'name': 'Spa Resort',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -9,6 +9,7 @@
         'contacts',
         'knowledge',
         'pos_loyalty',
+        'pos_stock',
         'sale_planning',
         'website_sale',
     ],

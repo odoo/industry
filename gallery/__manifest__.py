@@ -1,12 +1,13 @@
 {
     'name': 'Gallery',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Retail',
     'depends': [
         'base_industry_data',
         'knowledge',
         'partner_commission',
         'pos_sale',
+        'pos_stock',
         'sale_purchase_project',
         'sign',
         'website_event_sale'
