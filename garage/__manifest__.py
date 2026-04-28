@@ -5,6 +5,7 @@
     'depends': [
         'appointment',
         'base_industry_data',
+        'calendar',
         'contacts',
         'hr_fleet',
         'knowledge',

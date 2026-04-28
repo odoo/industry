@@ -6,25 +6,16 @@
         <field name="state">code</field>
         <field name="code"><![CDATA[
 if record.x_appointment_type_id:
-    event = env["calendar.event"].search(
-        [
-            ("appointment_type_id", "=", record.x_appointment_type_id.id),
-            ("appointment_status", "=", "booked"),
-        ],
-        limit=1
-    )
     action = {
         "type": "ir.actions.act_window",
         "res_model": "calendar.event",
-        "view_mode": "form",
-    }
-    if event:
-        action["res_id"] = event.id
-    else:
-        action["context"] = {
+        "view_mode": "gantt",
+        "view_id": env.ref("appointment.calendar_event_view_gantt_booking_user").id,
+        "context": {
             "default_appointment_type_id": record.x_appointment_type_id.id,
             "default_name": record.name,
-        }
+        },
+    }
 ]]></field>
     </record>
     <record id="server_action_create_sale_order" model="ir.actions.server">
