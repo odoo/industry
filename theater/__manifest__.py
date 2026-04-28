@@ -1,6 +1,6 @@
 {
     'name': 'Theater',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -10,6 +10,7 @@
         'partnership',
         'pos_event',
         'pos_self_order',
+        'pos_stock',
         'project',
         'website_event_sale',
         'website_sale_loyalty',
