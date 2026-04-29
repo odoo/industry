@@ -134,12 +134,8 @@
             <xpath expr="//field[@name='location']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-            <xpath expr="//label[@for='plan_to_change_car']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-            <xpath expr="//field[@name='plan_to_change_car']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
+            <xpath expr="//label[@for='plan_to_change_car']" position="replace"/>
+            <xpath expr="//field[@name='plan_to_change_car']" position="replace"/>
         </field>
     </record>
     <record id="account_move_form_view" model="ir.ui.view">
@@ -157,6 +153,9 @@
             </xpath>
             <xpath expr="//div[@name='due_date']" position="after">
                 <field name="x_task_id" invisible="invoice_origin or not x_task_id"/>
+            </xpath>
+            <xpath expr="//list[@name='journal_items']//field[@name='product_id']" position="after">
+                <field name="x_in_report" optional="show" widget="boolean_toggle"/>
             </xpath>
         </field>
     </record>
@@ -203,6 +202,27 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='book_url']" position="after">
                 <field name="x_task_id"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_task_kanban_inherit_appointment_date_garage" model="ir.ui.view">
+        <field name="name">project.task.kanban.inherit.appointment.date.garage</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_kanban"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="inside">
+                <field name="x_appointment_date"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <div t-if="record.x_appointment_date.raw_value">
+                    <strong>Appointment Date - </strong>
+                    <span t-out="record.x_appointment_date.value"/>
+                </div>
+            </xpath>
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="default_order">priority desc, x_appointment_date asc, sequence, state, date_deadline asc, id desc</attribute>
             </xpath>
         </field>
     </record>

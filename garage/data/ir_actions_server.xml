@@ -14,7 +14,6 @@ if record.x_appointment_type_id:
         "context": {
             "default_appointment_type_id": record.x_appointment_type_id.id,
             "default_name": record.name,
-            "default_x_task_id": record.id,
         },
     }
 ]]></field>
@@ -102,20 +101,31 @@ record['partner_id'] = record.x_vehicle_id.x_owner_id.id or record.partner_id.id
 for task in records:
     if not task.partner_id:
         raise UserError("You must set a Customer before moving to Booking Confirm.")
+    if not task.partner_id.email:
+        raise UserError("You must set an Email for the Customer.")
     if not task.x_vehicle_id:
         raise UserError("You must set a Vehicle before moving to Booking Confirm.")
     if not task.x_appointment_type_id:
         raise UserError("You must set an Appointment Type before moving to Booking Confirm.")
-    # Try to reuse existing invite
-    invite = env['appointment.invite'].search([('appointment_type_ids', 'in', [task.x_appointment_type_id.id]), ('x_task_id', '=', task.id),], limit=1)
 
-    # Create if none found
+    invite = env['appointment.invite'].search([('appointment_type_ids', 'in', [task.x_appointment_type_id.id]), ('x_task_id', '=', task.id),], limit=1)
     if not invite:
         invite = env['appointment.invite'].create({'appointment_type_ids': [(6, 0, [task.x_appointment_type_id.id])],'x_task_id': task.id})
-
-    # Always update the task with the invite’s link
     booking_url = invite.book_url or ''
     task.write({'x_booking_url': booking_url})
+    # Send appointment booking email
+    env.ref('garage.mail_template_task_appointment_booking').send_mail(task.id, force_send=True)
     ]]></field>
+    </record>
+    <record id="ir_actions_server_update_to_approve_state" model="ir.actions.server">
+        <field name="name">Update Task when appointment is booked</field>
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for event in records:
+    env['appointment.invite'].search([
+        ('appointment_type_ids', 'in', [event.appointment_type_id.id]),
+    ], limit=1).x_task_id['state'] = '03_approved'
+]]></field>
     </record>
 </odoo>

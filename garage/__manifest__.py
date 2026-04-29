@@ -19,6 +19,7 @@
         'data/ir_model_fields.xml',
         'data/project_task_type.xml',
         'data/fleet_vehicle_state.xml',
+        'data/mail_template.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
         'data/ir_actions_act_window.xml',
