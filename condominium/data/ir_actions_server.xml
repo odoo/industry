@@ -12,7 +12,7 @@ for owner in env['res.partner'].search([('x_companies', '=', record.company_id.i
     for sol in record.order_line: # The lines are re-created using the distribution key and the analytic account corresponding to the property is set
         for distribution_ratio_line in record.x_distribution_key.x_ratio_ids:
             if distribution_ratio_line.x_owner.id == owner.id:
-                account = env['account.analytic.account'].search([('partner_id', '=', distribution_ratio_line.x_owner), ('x_property', '=', distribution_ratio_line.x_property_ratios), ('x_end_date', '=', False)], limit=1)
+                account = env['account.analytic.account'].search([('partner_id', '=', distribution_ratio_line.x_owner.id), ('x_property', '=', distribution_ratio_line.x_property_ratios.id), ('x_end_date', '=', False)], limit=1)
                 new_so_lines.append((0, 0, {'order_id': record.id, 'product_id': sol.product_id.id, 'name': sol.name, 'product_uom_qty': sol.product_uom_qty, 'product_uom_id': sol.product_uom_id.id, 'price_unit': sol.price_unit * distribution_ratio_line.x_ratio / total_ratio, 'tax_ids': sol.tax_ids, 'discount': sol.discount, 'analytic_distribution': {account.id: 100} }))
     new_so.write({'order_line': new_so_lines})
 record.write({'state': 'cancel'})
