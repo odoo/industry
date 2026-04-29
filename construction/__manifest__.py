@@ -13,6 +13,7 @@
         'sale_margin',
         'sale_project_forecast',
         'sale_timesheet',
+        'sale_timesheet_enterprise',
     ],
     'data': [
         'data/documents_folder.xml',
