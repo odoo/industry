@@ -15,7 +15,7 @@ registry.category("web_tour.tours").add('shop_booking_flow', {
         },
         {
             content: "Check if product recurrence is displayed",
-            trigger: '.o_renting_unit:contains("day")',
+            trigger: '.o_renting_unit:contains("day"):not(:visible)',
         },
         {
             content: "Check if rental date is displayed",

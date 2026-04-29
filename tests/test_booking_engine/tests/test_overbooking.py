@@ -55,7 +55,7 @@ class TestOverbooking(PaymentHttpCommon):
                 'rental_return_date': cls.end_date,
                 'order_line': [
                     Command.create({
-                        'product_id': cls.product.id,
+                        'product_id': cls.product.product_variant_id.id,
                         'product_uom_qty': 1,
                     }),
                 ],
@@ -133,10 +133,10 @@ class TestOverbooking(PaymentHttpCommon):
             'start_date': self.start_date.strftime(self.date_format),
             'end_date': self.end_date.strftime(self.date_format),
         })
-        self.assertEqual(response['tracking_info'][0]['item_id'], self.product.id, "No item found in shopping cart.")
+        self.assertEqual(response['tracking_info'][0]['item_id'], self.product.product_variant_id.id, "No item found in shopping cart.")
         sale_order = self.env['sale.order'].search([], limit=1)
         self.assertTrue(sale_order, "No sale order was created from ecommerce.")
-        self.assertEqual(sale_order.order_line.product_id.id, self.product.id, "product doesn't exist in sale order.")
+        self.assertEqual(sale_order.order_line.product_id.id, self.product.product_variant_id.id, "product doesn't exist in sale order.")
         self.assertEqual(sale_order.state, 'draft', "The order should be in 'draft' state.")
         self.assertTrue(self.payment_method, "No payment method.")
         self.assertTrue(self.provider, "No provider.")
@@ -187,10 +187,10 @@ class TestOverbooking(PaymentHttpCommon):
             'start_date': self.start_date.strftime(self.date_format),
             'end_date': self.end_date.strftime(self.date_format),
         })
-        self.assertEqual(response['tracking_info'][0]['item_id'], self.product.id, "No item found in shopping cart.")
+        self.assertEqual(response['tracking_info'][0]['item_id'], self.product.product_variant_id.id, "No item found in shopping cart.")
         sale_order = self.env['sale.order'].search([], limit=1)
         self.assertTrue(sale_order, "No sale order was created from ecommerce.")
-        self.assertEqual(sale_order.order_line.product_id.id, self.product.id, "product doesn't exist in sale order.")
+        self.assertEqual(sale_order.order_line.product_id.id, self.product.product_variant_id.id, "product doesn't exist in sale order.")
         self.assertEqual(sale_order.state, 'draft', "The order should be in 'draft' state.")
         self.make_jsonrpc_request("/shop/express_checkout", {
             'billing_address': self.express_checkout_billing_values,
