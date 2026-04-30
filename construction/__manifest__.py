@@ -1,6 +1,6 @@
 {
     'name': 'Construction Builder',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Construction',
     'depends': [
         'base_industry_data',
@@ -13,6 +13,7 @@
         'sale_crm',
         'sale_margin',
         'sale_project_forecast',
+        'sale_timesheet_enterprise',
     ],
     'data': [
         'data/documents_folder.xml',
