@@ -46,7 +46,7 @@ USELESS_FIELDS = {
     'purchase.order.line': ['date_planned', 'move_dest_ids', 'company_id'],
     'res.partner': ['tz'],
     'sale.order': [
-        'access_token', 'date_order', 'health', 'origin', 'partner_invoice_id', 'partner_shipping_id',
+        'access_token', 'date_order', 'health', 'origin', 'partner_invoice_id',
         'validity_date', 'warehouse_id', 'company_id'
     ],
     'sale.order.line': ['qty_delivered', 'company_id'],
