@@ -128,20 +128,31 @@ for record in self:
         <field name="on_delete" eval="False"/>
         <field name="readonly" eval="True"/>
     </record>
-    <record id="x_job_position_field" model="ir.model.fields">
-        <field name="name">x_job_position_id</field>
-        <field name="field_description">Job Position</field>
-        <field name="model_id" ref="account.model_account_move"/>
-        <field name="ttype">many2one</field>
-        <field name="relation">hr.job</field>
-    </record>
     <record id="x_invoices_job_position_field" model="ir.model.fields">
         <field name="name">x_invoices_ids</field>
         <field name="field_description">Invoices</field>
         <field name="model_id" ref="hr.model_hr_job"/>
-        <field name="ttype">one2many</field>
+        <field name="ttype">many2many</field>
         <field name="relation">account.move</field>
-        <field name="relation_field">x_job_position_id</field>
+        <field name="relation_table">x_account_move_hr_job_rel</field>
+        <field name="depends">x_quotation_sales_order_id.invoice_ids</field>
+        <field name="compute"><![CDATA[
+for job in self:
+    job['x_invoices_ids'] = job.x_quotation_sales_order_id.invoice_ids.ids
+]]></field>
+    </record>
+    <record id="x_job_position_field" model="ir.model.fields">
+        <field name="name">x_invoices_count</field>
+        <field name="field_description">Invoice Count</field>
+        <field name="model_id" ref="hr.model_hr_job"/>
+        <field name="ttype">integer</field>
+        <field name="depends">x_invoices_ids</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="compute"><![CDATA[
+for job in self:
+    job['x_invoices_count'] = len(job.x_invoices_ids)
+]]></field>
     </record>
     <record id="x_job_id_field" model="ir.model.fields">
         <field name="name">x_job_id</field>
