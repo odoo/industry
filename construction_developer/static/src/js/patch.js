@@ -10,8 +10,9 @@ patch(RelationalModel.prototype, { async _postprocessReadGroup(config, { groups,
     if (config.resModel == "x_remark" && groups.length > 0  && res_groups.length > 0 && (config.groupBy.includes("x_stage_id")) && groups[0].x_stage_id) {
         const stageIdsProjectsList = (await this.env.services.orm.searchRead("x_remark_stage", [], ['id', 'x_project_ids', 'x_sequence']));
         res_groups = res_groups.filter((group) => stageIdsProjectsList.some((stage) => stage.id === group.rawValue[0] && stage.x_project_ids.includes(config.context.default_x_project_id)))
-                               .map((group) => { group.x_sequence = stageIdsProjectsList.find((stage) => stage.id === group.rawValue[0]).x_sequence; return group; }).sort((group_a, group_b) => group_a.x_sequence - group_b.x_sequence);}
-    return { groups: res_groups, length: res_groups.length };}});
+                               .map((group) => { group.x_sequence = stageIdsProjectsList.find((stage) => stage.id === group.rawValue[0]).x_sequence; return group; }).sort((group_a, group_b) => group_a.x_sequence - group_b.x_sequence);
+        return { groups: res_groups, length: res_groups.length };}
+    return { groups: res_groups, length };}});
 
 // In the Remarks kanban view, allow the user to drag and drop remark stages to reorder them like project stages, and save the new order in the x_sequence field
 patch(ORM.prototype, { webResequence(model, ids, kwargs = {}) { return super.webResequence(model, ids, model === "x_remark_stage" ? { ...kwargs, 'specification': {'x_sequence': {}}, 'field_name': "x_sequence" } : kwargs); }});
