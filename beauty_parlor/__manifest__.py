@@ -14,7 +14,6 @@
         'website_appointment_crm',
     ],
     'data': [
-        'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/crm_stage.xml',
         'data/knowledge_cover.xml',
@@ -24,6 +23,7 @@
         'data/product_product.xml',
         'data/product_pricelist.xml',
         'data/product_pricelist_item.xml',
+        'data/res_config_settings.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
         'data/knowledge_tour.xml',
