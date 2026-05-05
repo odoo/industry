@@ -61,7 +61,9 @@ class ManifestTest(ManifestLinter, IndustryCase):
             expected_type = type(expected_value)
             self.assertIsInstance(value, expected_type, f"Wrong type for '{key}', expected {expected_type}")
             if expected_value:
-                if key == 'license' and not any(mod in manifest_data.get('depends', []) for mod in ['base_industry_data', 'knowledge', 'web_studio']):
+                if key == 'license' \
+                    and not any(mod in manifest_data.get('depends', []) for mod in ['knowledge', 'web_studio']) \
+                    and not any(self._load_manifest(mod) and self._load_manifest(mod).get('license', '') == 'OEEL-1' for mod in manifest_data.get('depends', [])):
                     expected_value = 'LGPL-3'
                 self.assertEqual(value, expected_value, f"Wrong {key} '{value}' in manifest, it should be {expected_value}")
             if key in ['data', 'demo']:

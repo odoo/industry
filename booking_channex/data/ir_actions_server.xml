@@ -1,5 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <record id="requests_to_channex" model="ir.actions.server">
+        <field name="name">Send HTTP request to channex</field>
+        <field name="code"><![CDATA[
+BASE_URL = "https://staging.channex.io/api/v1"
+if not env.company.x_channex_api_key:
+    raise UserError("Channex API key is missing in company settings.")
+try:
+    method, endpoint = env.context.get('method'), env.context.get('endpoint')
+    if not method or method not in ["GET", "POST", "PUT", "DELETE"]:
+        raise UserError("Http request to channex cannot be sent because method is invalid")
+    if not endpoint:
+        raise UserError("Http request to channex cannot be sent because endpoint is empty")
+    response = requests.request(
+        method=method,
+        url=f"{BASE_URL}/{endpoint}",
+        data=json.dumps(env.context.get('payload', {})),
+        timeout=20, headers={
+            'Content-Type': 'application/json',
+            'user-api-key': env.company.x_channex_api_key
+        }
+    )
+    response.raise_for_status()
+    action = response.json()
+except Exception as e:
+    raise UserError(f"Channex API error: {str(e)}")
+]]></field>
+        <field name="model_id" ref="base.model_ir_actions_server"/>
+        <field name="state">code</field>
+    </record>
+    <record id="get_or_create_mapping" model="ir.actions.server">
+        <field name="name">Get Or Create Mapping To Channex</field>
+        <field name="code"><![CDATA[
+local_id = env.context.get('local_id')
+if not local_id or not env.context.get('model_type'):
+    raise UserError("Could not get the mapping to channex because the searched record or type is not mentionned.")
+mapping = env['x_channex_mapping'].search([
+    ('x_model_type', '=', env.context.get('model_type')),
+    ('x_local_id', '=', local_id)
+], limit=1)
+if not mapping:
+    mapping = env['x_channex_mapping'].create({
+        "x_model_type": env.context.get('model_type'),
+        "x_local_id": local_id,
+    })
+action = mapping
+]]></field>
+        <field name="model_id" ref="base.model_ir_actions_server"/>
+        <field name="state">code</field>
+    </record>
+
     <record id="webhook_action_manage_booking_create_change_or_delete" model="ir.actions.server">
         <field name="name">Channex: Webhook action - manage booking create/change/delete</field>
         <field name="model_id" ref="sale.model_sale_order" />
@@ -8,11 +58,13 @@
 #Récupérer la demande de booking
 event = payload.get('event')
 payload_infos = payload.get('payload', {})
-requests.post("https://staging.channex.io/api/v1/booking_revisions/%s/ack" % payload_infos.get('booking_revision_id', ''),
-    headers={'Content-Type': 'application/json', 'user-api-key': env.company.x_channex_api_key}) #Whether valid or not, it should be acknowledged.
+env.ref('booking_channex.requests_to_channex').with_context(
+    method="POST", endpoint="booking_revisions/%s/ack" % payload_infos.get('booking_revision_id', '')
+).run()#Whether valid or not, it should be acknowledged.
 if event == 'booking_new':
-    full_booking = requests.get("https://staging.channex.io/api/v1/bookings/%s" % payload_infos.get('booking_id', ''),
-        headers={'Content-Type': 'application/json', 'user-api-key': env.company.x_channex_api_key}).json().get('data', {}).get('attributes', {})
+    full_booking = env.ref('booking_channex.requests_to_channex').with_context(
+        method="GET", endpoint="bookings/%s" % payload_infos.get('booking_id', '')
+    ).run().json().get('data', {}).get('attributes', {})
 
     #To remove after development, display the booking received to have it easier to debug
     records.env.ref('booking_channex.webhook_get_booking_create_change_or_delete').message_post(body=str(full_booking))
@@ -40,10 +92,10 @@ if event == 'booking_new':
     })
     for room in full_booking.get('rooms', []):
         room_mapping = env['x_channex_mapping'].search(
-            [("x_model_type", "=", "room_type"), ('x_id_remote', '=', room.get('room_type_id', ''))], limit=1
+            [("x_model_type", "=", "room_type"), ('x_remote_id', '=', room.get('room_type_id', ''))], limit=1
         )
         env['sale.order.line'].create({
-            'product_id': env['product.product'].browse(room_mapping.x_id_local).id,
+            'product_id': env['product.product'].browse(room_mapping.x_local_id).id,
             'is_rental': True,
             'order_id': so.id,
             'price_unit': room.get('amount', 0),
@@ -61,8 +113,8 @@ if event == 'booking_new':
     # assert float_compare(so['total_amount'], payload_infos.get('amount'), precision_digits=2) == 0
     env["x_channex_mapping"].create({
         "x_model_type": "booking",
-        "x_id_local": so.id,
-        "x_id_remote": payload_infos.get('booking_id', ''),
+        "x_local_id": so.id,
+        "x_remote_id": payload_infos.get('booking_id', ''),
     })
     try:
         so.action_confirm()
@@ -77,13 +129,13 @@ if event == 'booking_new':
 elif booking_id := payload_infos.get('booking_id'):
     mapped_so = env["x_channex_mapping"].search([
         ("x_model_type", "=", "booking"),
-        ("x_id_remote", "=", booking_id),
+        ("x_remote_id", "=", booking_id),
     ], limit=1)
     if event == 'booking_modification':
         pass #Here we should modify the booking, can we do that extensively and automatically ? or should we simply create a task to
         #take into account new reservation (could create overlapping issues later)
     elif event == 'booking_cancellation':
-        env['sale.order'].browse(mapped_so.x_id_local).action_cancel()
+        env['sale.order'].browse(mapped_so.x_local_id).action_cancel()
 
 # Not used keys in booking_new
 
@@ -108,14 +160,6 @@ elif booking_id := payload_infos.get('booking_id'):
         <field name="model_id" ref="base.model_ir_cron" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
-BASE_URL = "https://staging.channex.io/api/v1"
-header = {'Content-Type': 'application/json', 'user-api-key': env.company.x_channex_api_key}
-def channex_post(endpoint, payload):
-    response = requests.post(f"{BASE_URL}/{endpoint}", headers=header, data=json.dumps(payload), timeout=20)
-    if err := result.json().get("errors"):
-        raise UserError("Error sending restrictions to channex: " + err.get("title", "Unknown error"))
-
-result = ""
 sending_cron = env.ref('booking_channex.ir_cron_data_channex_sender')
 restrictions_payload = []
 availability_payload = []
@@ -125,9 +169,9 @@ for line in sending_cron.x_datas_to_send:
     elif line.x_operation == 'availability':
         availability_payload.append(line.x_payload)
 if not restrictions_payload.is_empty():
-    channex_post("restrictions", {"values": restrictions_payload})
+    env.ref('booking_channex.requests_to_channex').with_context(method="POST", endpoint="restrictions", payload={"values": restrictions_payload}).run()
 if not availability_payload.is_empty():
-    channex_post("availability", {"values": availability_payload})
+    env.ref('booking_channex.requests_to_channex').with_context(method="POST", endpoint="availability", payload={"values": availability_payload}).run()
 model.env['ir.cron']._commit_progress(processed=1, remaining=0, deactivate=True)
 for line in sending_cron.x_datas_to_send:
     line.unlink()
@@ -140,47 +184,47 @@ for line in sending_cron.x_datas_to_send:
         <field name="code"><![CDATA[
 mapped_product = env["x_channex_mapping"].search([
     ("x_model_type", "=", "room_type"),
-    ("x_id_local", "=", record.id),
+    ("x_local_id", "=", record.id),
 ], limit=1)
-room_url = 'https://staging.channex.io/api/v1/room_types'
-headers={'Content-Type': 'application/json', 'user-api-key': env.company.x_channex_api_key}
+room_endpoint = 'room_types'
 room_type = {
     "title": record.name,
     "count_of_rooms": len(record.planning_role_id.resource_ids) or 1,
     "occ_adults": 1, "occ_children": 0, "occ_infants": 0,
     "default_occupancy": 1
 }
+property_mapping = env.ref('booking_channex.get_or_create_mapping').with_context(model_type="property", local_id=env.company.id).run()
+if not property_mapping.x_remote_id:
+    raise UserError('The current company is not related to a property on channex, sending data to channex to create room type is impossible')
 if mapped_product: #Modify
-    room_url += '/' + mapped_product.x_id_remote
+    room_endpoint += '/' + mapped_product.x_remote_id
 else: #Create
-    room_type["property_id"] = "38149695-d95b-4c80-a7c3-34ce96efc7ba"
-room_type_result = requests.post(room_url, headers, data=json.dumps({"room_type": room_type}))
+    room_type["property_id"] = property_mapping.x_remote_id
+room_type_result = env.ref('booking_channex.requests_to_channex').with_context(method="POST", endpoint=room_endpoint, payload={"room_type": room_type}).run()
 if err := room_type_result.json().get("errors"):
     raise UserError(err.get("title", "Unknown error from the request"))
 if not mapped_product:
     new_mapping = env["x_channex_mapping"].create({
         "x_model_type": "room_type",
-        "x_id_local": record.id,
-        "x_id_remote": room_type_result.json().get('data').get('attributes').get('id'),
+        "x_local_id": record.id,
+        "x_remote_id": room_type_result.json().get('data').get('attributes').get('id'),
     })
-    rate_plan_result = requests.post('https://staging.channex.io/api/v1/rate_plans',
-        headers, data=json.dumps({
-            "rate_plan": {
-                "property_id": "38149695-d95b-4c80-a7c3-34ce96efc7ba",
-                "title": "Default plan",
-                "room_type_id": new_mapping.x_id_remote,
-                "options": [{
-                    "occupancy": 1,
-                    "is_primary": True,
-                    "rate": 50
-                }]
-            }
-        })
-    )
+    rate_plan_result = env.ref('booking_channex.requests_to_channex').with_context(method="POST", endpoint="rate_plans", payload={
+        "rate_plan": {
+            "property_id": property_mapping.x_remote_id,
+            "title": "Default plan",
+            "room_type_id": new_mapping.x_remote_id,
+            "options": [{
+                "occupancy": 1,
+                "is_primary": True,
+                "rate": 50
+            }]
+        }
+    }).run()
     env["x_channex_mapping"].create({
         "x_model_type": "rate_plan",
-        "x_id_local": record.product_tmpl_id.id,
-        "x_id_remote": rate_plan_result.json().get('data').get('attributes').get('id'),
+        "x_local_id": record.product_tmpl_id.id,
+        "x_remote_id": rate_plan_result.json().get('data').get('attributes').get('id'),
     })
         ]]></field>
     </record>
@@ -199,7 +243,7 @@ for product in env['product.product'].search([('x_is_a_room_offer', '=', True)])
     main_dates.sort()
     mapped_rate_plan = env["x_channex_mapping"].search([
         ("x_model_type", "=", "rate_plan"),
-        ("x_id_local", "=", product.product_tmpl_id.id),
+        ("x_local_id", "=", product.product_tmpl_id.id),
     ], limit=1)
     if mapped_rate_plan:
         for i in range(len(main_dates)-1):
@@ -208,7 +252,7 @@ for product in env['product.product'].search([('x_is_a_room_offer', '=', True)])
                 'x_operation': 'restrictions',
                 'x_payload': {
                     "property_id": "38149695-d95b-4c80-a7c3-34ce96efc7ba",
-                    "rate_plan_id": mapped_rate_plan.x_id_remote,
+                    "rate_plan_id": mapped_rate_plan.x_remote_id,
                     "date_from": datetime.datetime.strftime(main_dates[i],'%Y-%m-%d'),
                     "date_to": datetime.datetime.strftime(main_dates[i+1],'%Y-%m-%d'),
                     "rate": int(product.list_price*100), #To change so it takes into account every price rules
@@ -225,52 +269,23 @@ if not sending_cron.active:
         <field name="model_id" ref="base_setup.model_res_config_settings" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
-BASE_URL = "https://staging.channex.io/api/v1"
-if not env.company.x_channex_api_key:
-    raise UserError("Channex API key is missing in company settings.")
-header = {
-    'Content-Type': 'application/json',
-    'user-api-key': env.company.x_channex_api_key
-}
-
-def channex_post(endpoint, payload):
-    try:
-        response = requests.post(f"{BASE_URL}/{endpoint}", headers=header, data=json.dumps(payload), timeout=20)
-        response.raise_for_status()
-        return response.json()
-
-    except Exception as e:
-        raise UserError(f"Channex API error: {str(e)}")
-
-def get_mapping(model, local_id):
-    mapping = env['x_channex_mapping'].search([
-        ('x_model_type', '=', model),
-        ('x_id_local', '=', local_id)
-    ], limit=1)
-
-    if not mapping:
-        mapping = env['x_channex_mapping'].create({
-            "x_model_type": model,
-            "x_id_local": local_id,
-        })
-    return mapping
-
 def create_on_channex(endpoint, payload, mapping, error_msg):
     try:
-        data = channex_post(endpoint, payload)
+        data = env.ref('booking_channex.requests_to_channex').with_context(method="POST", endpoint=endpoint, payload=payload).run()
         remote_id = data.get('data', {}).get('attributes', {}).get('id')
 
         if not remote_id:
             raise UserError(f"{error_msg}: Invalid response from Channex")
 
-        mapping.write({'x_id_remote': remote_id})
+        mapping.write({'x_remote_id': remote_id})
 
     except Exception as e:
         raise UserError(f"{error_msg}: {str(e)}")
 
 # webhook
+#ERROR if localhost is used as an url, we cannot test it if we are in local
 try:
-    resp = requests.get(f"{BASE_URL}/webhooks", headers={'user-api-key': env.company.x_channex_api_key, "Accept":'application/json',}, timeout=20)
+    resp = env.ref('booking_channex.requests_to_channex').with_context(method="GET", endpoint="webhooks").run()
     resp.raise_for_status()
     data = resp.json()
 except Exception as e:
@@ -283,110 +298,11 @@ for w in channex_webhooks:
     if w.get('attributes', {}).get('callback_url') == odoo_webhook.url:
         existing_webhook = w
         break
-webhook_mapping = get_mapping('webhook', odoo_webhook.id)
+webhook_mapping = env.ref('booking_channex.get_or_create_mapping').with_context(model_type="webhook", local_id=odoo_webhook.id).run()
 
 if existing_webhook:
     webhook_mapping.write({
-        'x_id_remote': existing_webhook.get('attributes', {}).get('id')
-    })
-else:
-    payload = {
-        "webhook": {
-            "callback_url": odoo_webhook.url,
-            "event_mask": "booking_new;booking_modification;booking_cancellation",
-            "request_params": {},
-            "headers": {},
-            "is_active": True,
-            "is_global": True,
-            "send_data": True
-        }
-    }
-    create_on_channex(
-        'webhooks',
-        payload,
-        webhook_mapping,
-        "Error creating webhook"
-    )
-
-action = {
-    'type': 'ir.actions.client',
-    'tag': 'display_notification',
-    'params': {
-        'message': 'WIP: No seeding, No ARI push',
-        'type': 'warning',
-        'sticky': False,
-    }
-}
-        ]]></field>
-    </record>
-    <record id="action_button_sync" model="ir.actions.server">
-        <field name="name">Channex: Sync Data</field>
-        <field name="model_id" ref="base_setup.model_res_config_settings" />
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-BASE_URL = "https://staging.channex.io/api/v1"
-if not env.company.x_channex_api_key:
-    raise UserError("Channex API key is missing in company settings.")
-header = {
-    'Content-Type': 'application/json',
-    'user-api-key': env.company.x_channex_api_key
-}
-
-def channex_post(endpoint, payload):
-    try:
-        resp = requests.post(f"{BASE_URL}/{endpoint}", headers=header, data=json.dumps(payload), timeout=20)
-        resp.raise_for_status()
-        return resp.json()
-
-    except Exception as e:
-        raise UserError(f"Channex API error: {str(e)}")
-
-def get_mapping(model, local_id):
-    mapping = env['x_channex_mapping'].search([
-        ('x_model_type', '=', model),
-        ('x_id_local', '=', local_id)
-    ], limit=1)
-
-    if not mapping:
-        mapping = env['x_channex_mapping'].create({
-            "x_model_type": model,
-            "x_id_local": local_id,
-        })
-    return mapping
-
-def create_on_channex(endpoint, payload, mapping, error_msg):
-    try:
-        data = channex_post(endpoint, payload)
-        remote_id = data.get('data', {}).get('attributes', {}).get('id')
-
-        if not remote_id:
-            raise UserError(f"{error_msg}: Invalid response from Channex")
-
-        mapping.write({'x_id_remote': remote_id})
-
-    except Exception as e:
-        raise UserError(f"{error_msg}: {str(e)}")
-
-# webhook
-try:
-    resp = requests.get(f"{BASE_URL}/webhooks", headers={'user-api-key': env.company.x_channex_api_key, "Accept":"*/*"}, timeout=20)
-    resp.raise_for_status()
-    data = resp.json()
-except Exception as e:
-    raise UserError(f"Error fetching webhooks: {str(e)}")
-
-channex_webhooks = data.get('data', [])
-odoo_webhook = env.ref('booking_channex.webhook_get_booking_create_change_or_delete')
-existing_webhook = False
-for w in channex_webhooks:
-    if w.get('attributes', {}).get('callback_url') == odoo_webhook.url:
-        existing_webhook = w
-        break
-webhook_mapping = get_mapping('webhook', odoo_webhook.id)
-
-if existing_webhook:
-    webhook_mapping.write({
-        'x_id_remote': existing_webhook.get('attributes', {}).get('id')
+        'x_remote_id': existing_webhook.get('attributes', {}).get('id')
     })
 else:
     payload = {
@@ -409,8 +325,8 @@ else:
 
 # GROUP (Parent Company -> Channex Group)
 company = env.company
-group_mapping = get_mapping('group', company.id)
-if not group_mapping.x_id_remote:
+group_mapping = env.ref('booking_channex.get_or_create_mapping').with_context(model_type="group", local_id=company.id).run()
+if not group_mapping.x_remote_id:
     payload = {
         "group": {
             "title": company.name
@@ -426,15 +342,15 @@ if not group_mapping.x_id_remote:
 # PROPERTIES (Child Companies -> Properties)
 companies = company.child_ids or company
 for property in companies:
-    property_mapping = get_mapping('property', property.id)
-    if not property_mapping.x_id_remote:
+    property_mapping = env.ref('booking_channex.get_or_create_mapping').with_context(model_type="property", local_id=property.id).run()
+    if not property_mapping.x_remote_id:
         payload = {
             "property": {
                 "title": property.name,
                 "currency": property.currency_id.name,
                 "email": property.email or '',
                 "phone": property.phone or '',
-                "group_id": group_mapping.x_id_remote
+                "group_id": group_mapping.x_remote_id
             }
         }
         create_on_channex(
@@ -446,21 +362,25 @@ for property in companies:
 
 # ROOM TYPES (Product Variants → Room Types)
 for property in companies:
-    property_mapping = env['x_channex_mapping'].search([('x_model_type', '=', 'property'),('x_id_local', '=', property.id)], limit=1)
-    if not property_mapping.x_id_remote:    continue
-    property_rooms = env['product.product'].search([('x_is_a_room_offer', '=', True)])
+    #make this a readgroup before the loop to avoid searching too much
+    property_mapping = env['x_channex_mapping'].search([('x_model_type', '=', 'property'),('x_local_id', '=', property.id)], limit=1)
+    if not property_mapping.x_remote_id:    continue
+    property_rooms = env['product.product'].search([('x_is_a_room_offer', '=', True), ('x_resource_ids', '!=', False)])
     if company.child_ids:
         property_rooms = property_rooms.filtered(lambda r: r.company_id == property)
     for room in property_rooms:
-        room_mapping = get_mapping('room_type', room.id)
-        if not room_mapping.x_id_remote:
+        guests_attribute_value = room.product_template_variant_value_ids.filtered(lambda a: a.product_attribute_value_id.attribute_id.x_accommodation_characteristic in ['guest']).mapped('product_attribute_value_id')
+        if len(guests_attribute_value) != 1:
+            continue
+        room_mapping = env.ref('booking_channex.get_or_create_mapping').with_context(model_type="room_type", local_id=room.id).run()
+        if not room_mapping.x_remote_id:
             payload = {
                 "room_type": {
-                    "property_id": property_mapping.x_id_remote,
+                    "property_id": property_mapping.x_remote_id,
                     "title": room.display_name,
-                    "count_of_rooms": 5,
-                    "occ_adults": 1, "occ_children": 0, "occ_infants": 0,
-                    "default_occupancy": 1
+                    "count_of_rooms": 5, #Adapt to the number of rooms available when we define how to do it
+                    "occ_adults": guests_attribute_value.x_adults, "occ_children": guests_attribute_value.x_children, "occ_infants": guests_attribute_value.x_infants,
+                    "default_occupancy": guests_attribute_value.x_adults + guests_attribute_value.x_children + guests_attribute_value.x_infants
                 }
             }
             create_on_channex(
@@ -472,41 +392,33 @@ for property in companies:
 
 # RATE PLANS (Pricelist → Channex Rate Plan)
 for property in companies:
-    property_mapping = env['x_channex_mapping'].search([('x_model_type', '=', 'property'),('x_id_local', '=', property.id)], limit=1)
-    if not property_mapping.x_id_remote:    continue
-    pricelists = env['product.pricelist'].search([('company_id', '=', property.id)])
-    if not pricelists:    continue
-    property_rooms = env['product.product'].search([('x_is_a_room_offer', '=', True)])
-    if company.child_ids:
-        property_rooms = property_rooms.filtered(lambda r: r.company_id == property)
-    for room in property_rooms:
-        room_mapping = get_mapping('room_type', room.id)
-        if not room_mapping.x_id_remote:    continue
-        for pricelist in pricelists:
+    #Remove this when the readgroup of the previous for loop is done to use it here too
+    property_mapping = env['x_channex_mapping'].search([('x_model_type', '=', 'property'),('x_local_id', '=', property.id)], limit=1)
+    if not property_mapping.x_remote_id:    continue
+    rate_plans = env['x_rate_plan'].search([('x_variant_id', '!=', False), ('x_pricelist_id', '!=', False)])
+    for rp in rate_plans:
+        room_mapping = env.ref('booking_channex.get_or_create_mapping').with_context(model_type="room_type", local_id=rp.x_variant_id.id).run()
+        if not room_mapping.x_remote_id:    continue
+        rate_plan_mapping = env.ref('booking_channex.get_or_create_mapping').with_context(model_type="rate_plan", local_id=rp.id).run()
+        if not rate_plan_mapping.x_remote_id:
             payload = {
                 "rate_plan": {
-                    "title": f"{room.display_name} - {pricelist.name}",
-                    "property_id": property_mapping.x_id_remote,
-                    "room_type_id": room_mapping.x_id_remote,
-                    "currency": pricelist.currency_id.name,
-                    "options": [
-                      {
-                        "occupancy": 3,
+                    "title": rp.x_name,
+                    "property_id": property_mapping.x_remote_id,
+                    "room_type_id": room_mapping.x_remote_id,
+                    "currency": rp.x_pricelist_id.currency_id.name,
+                    "options": [{
+                        "occupancy": rp.x_total_inventory,
                         "is_primary": True
-                      }
-                    ],
+                    }],
                 }
             }
-            try:
-                data = channex_post("rate_plans", payload)
-                rate_plan_id = data.get('data', {}).get('attributes', {}).get('id', '')
-                env['x_channex_mapping'].create({
-                    "x_model_type": "rate_plan",
-                    "x_id_local": pricelist.id,
-                    "x_id_remote": rate_plan_id,
-                })
-            except Exception as e:
-                raise UserError("Channex API error: %s" % str(e))
+            create_on_channex(
+                "rate_plans",
+                payload,
+                rate_plan_mapping,
+                "Error creating rate plan"
+            )
 
 action = {
     'type': 'ir.actions.client',
@@ -515,6 +427,7 @@ action = {
         'message': 'Data sync with Channex completed successfully.',
         'type': 'success',
         'sticky': False,
-        ]]></field>
+    }
+}]]></field>
     </record>
 </odoo>
