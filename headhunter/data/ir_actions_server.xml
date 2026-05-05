@@ -5,26 +5,18 @@
         <field name="model_id" ref="hr.model_hr_job"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-    action = {
-        'view_mode': 'form',
-        'res_model': 'sale.order',
-        'res_id': record.x_quotation_sales_order_id.id,
-        'type': 'ir.actions.act_window',
-    }
-    ]]></field>
+action = env.ref('headhunter.open_linked_sale_order_act_window').read()[0]
+action['res_id'] = record.x_quotation_sales_order_id.id
+]]></field>
     </record>
     <record id="ir_actions_server_view_opportunity" model="ir.actions.server">
         <field name="name">View Opportunity</field>
         <field name="model_id" ref="hr.model_hr_job"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-    action = {
-        'view_mode': 'form',
-        'res_model': 'crm.lead',
-        'res_id': record.x_opportunity_id.id,
-        'type': 'ir.actions.act_window',
-    }
-    ]]></field>
+action = env.ref('headhunter.open_linked_opportunity_act_window').read()[0]
+action['res_id'] = record.x_opportunity_id.id
+]]></field>
     </record>
     <record id="ir_actions_server_706" model="ir.actions.server">
         <field name="name">headhunter: Job Status Update</field>
@@ -46,36 +38,31 @@ for record in records:
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="base_automation_id" ref="base_automation_sale_linked_to_job_position"/>
         <field name="state">code</field>
-        <field name="code"><![CDATA[record.x_job_id.write({'x_quotation_sales_order_id': record.id})]]></field>
+        <field name="code"><![CDATA[
+for record in records: record.x_job_id.write({'x_quotation_sales_order_id': record.id})
+]]></field>
     </record>
     <record id="ir_actions_server_grant_portal_access" model="ir.actions.server">
         <field name="name">Grant Portal Access</field>
         <field name="model_id" ref="hr.model_hr_job"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-partner_ids = record.x_hiring_team_contact_ids.ids if record.x_hiring_team_contact_ids else []
-action = env['portal.wizard'].with_context(default_partner_ids=partner_ids).action_open_wizard()
+action = env['portal.wizard'].with_context(default_partner_ids=record.x_hiring_team_contact_ids.ids).action_open_wizard()
     ]]></field>
     </record>
   <!-- mail pop up server action -->
     <record id="ir_actions_server_for_email_pop_up" model="ir.actions.server">
         <field name="code"><![CDATA[
-action =  {
-    'type': 'ir.actions.act_window',
-    'res_model': 'mail.compose.message',
-    'view_mode': 'form',
-    'views': [(env.ref('mail.email_compose_message_wizard_form').id, 'form')],
-    'target': 'new',
-    'context': {
-        'default_model': 'hr.applicant',
-        'default_res_ids': [record.id],
-        'default_template_id': env.ref('headhunter.mail_template_60').id,
-        'default_composition_mode': 'comment',
-        'default_attachment_ids': [(6, 0, record.x_shared_cv_ids.ids)],
-        'force_email': True,
-        'x_from_cv_send': True,
-        'default_partner_ids': [(6, 0, [record.job_id.x_customer_id.id])] if record.job_id.x_customer_id else [],
-    }
+action = env.ref('headhunter.open_mail_compose_message_act_window').read()[0]
+action['context'] =  {
+    'default_model': 'hr.applicant',
+    'default_res_ids': [record.id],
+    'default_template_id': env.ref('headhunter.mail_template_60').id,
+    'default_composition_mode': 'comment',
+    'default_attachment_ids': [(6, 0, record.x_shared_cv_ids.ids)],
+    'force_email': True,
+    'x_from_cv_send': True,
+    'default_partner_ids': [(6, 0, record.job_id.x_hiring_team_contact_ids.ids)],
 }]]></field>
         <field name="model_id" ref="hr_recruitment.model_hr_applicant"/>
         <field name="state">code</field>
@@ -88,12 +75,9 @@ if env.context.get('x_from_cv_send'):
     applicant.x_shared_cv_ids.write({'public': True})
     env['x_cv_sent_application'].create({
         'x_applicant_id': applicant.id,
-        'x_job_id': applicant.job_id.id,
         'x_cv_ids': [(6, 0, record.attachment_ids.ids)],
-        'x_available': applicant.x_available,
-        'x_availability': applicant.availability,
         'x_cv_sent_date': datetime.date.today(),
-        })
+    })
     applicant['x_is_cv_sent'] = True,
     applicant['x_published'] = True,
         ]]></field>
@@ -129,9 +113,7 @@ records.write({'x_published': False})
         <field name="binding_type">action</field>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-for cv in records:
-    cv['x_is_published'] = False
-    cv.x_applicant_id.write({'x_published': False})
+records.x_applicant_id.write({'x_published': False})
 ]]></field>
     </record>
     <record id="action_clear_availability_date" model="ir.actions.server">
@@ -148,13 +130,12 @@ records['availability'] = False
         <field name="model_id" ref="crm.model_crm_lead"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-jobs = records.mapped('x_job_position_ids').filtered(lambda job: job.active)
-action = {
-    'res_model': 'hr.job',
-    'type': 'ir.actions.act_window',
-}
-if jobs:
-    action.update({'view_mode': 'form', 'res_id': jobs.id} if len(jobs) == 1 else {'view_mode': 'list,form', 'domain': [('id', 'in', jobs.ids)]})
+if (jobs := records.mapped('x_job_position_ids').filtered(lambda job: job.active)) and len(jobs) == 1:
+    action = env.ref('headhunter.open_form_job_act_window').read()[0]
+    action['res_id'] = jobs.id
+else:
+    action = env.ref('headhunter.open_list_job_act_window').read()[0]
+    action['domain'] = [('id', 'in', jobs.ids)]
 ]]></field>
     </record>
     <record id="ir_actions_server_view_applicants" model="ir.actions.server">
@@ -162,12 +143,11 @@ if jobs:
         <field name="model_id" ref="crm.model_crm_lead"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-applicants = env['hr.applicant'].search([('x_opportunities', 'in', records.ids)])
 action = {
     'res_model': 'hr.applicant',
     'type': 'ir.actions.act_window',
 }
-if applicants:
+if (applicants := env['hr.applicant'].search([('x_opportunities', 'in', records.ids)])):
     action.update({'view_mode': 'form', 'res_id': applicants.id} if len(applicants) == 1 else {'view_mode': 'list,form', 'domain': [('id', 'in', applicants.ids)]})
 ]]></field>
     </record>
@@ -176,30 +156,19 @@ if applicants:
         <field name="model_id" ref="crm.model_crm_lead"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-job_ids = records.x_job_position_ids.ids
-domain = [('job_id', 'in', job_ids), ('x_is_cv_sent', '=', True)]
-action = {
-    'type': 'ir.actions.act_window',
-    'name': 'Sent CVs',
-    'res_model': 'hr.applicant',
-    'view_mode': 'list,form',
-    'domain': domain,
-    'context': {'group_by': 'job_id'},
-}]]></field>
+action = env.ref('headhunter.open_sent_cvs_act_window').read()[0]
+action['domain'] = [('job_id', 'in', records.x_job_position_ids.ids), ('x_is_cv_sent', '=', True)]
+]]></field>
     </record>
     <record id="ir_actions_server_create_new_job_from_opportunity" model="ir.actions.server">
         <field name="name">Create New Job</field>
         <field name="model_id" ref="crm.model_crm_lead"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-action = {
-    'view_mode': 'form',
-    'type': 'ir.actions.act_window',
-    'res_model': 'hr.job',
-    'context': {
-        'default_x_opportunity_id': record.id,
-        'default_x_customer_id': record.partner_id.id if record.partner_id else False,
-    }
+action = env.ref('headhunter.open_form_job_act_window').read()[0]
+action['context'] = {
+    'default_x_opportunity_id': record.id,
+    'default_x_customer_id': record.partner_id.id if record.partner_id else False,
 }]]></field>
     </record>
     <record id="ir_actions_server_create_new_sale_order_from_job_position" model="ir.actions.server">
@@ -207,15 +176,11 @@ action = {
         <field name="model_id" ref="hr.model_hr_job"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-action = {
-    'view_mode': 'form',
-    'type': 'ir.actions.act_window',
-    'res_model': 'sale.order',
-    'context': {
-        'default_x_job_id': record.id,
-        'default_partner_id': record.x_customer_id.id if record.x_customer_id else False,
-        'default_opportunity_id': record.x_opportunity_id.id if record.x_opportunity_id else False,
-    }
+action = env.ref('headhunter.open_linked_sale_order_act_window').read()[0]
+action['context'] = {
+    'default_x_job_id': record.id,
+    'default_partner_id': record.x_customer_id.id if record.x_customer_id else False,
+    'default_opportunity_id': record.x_opportunity_id.id if record.x_opportunity_id else False,
 }]]></field>
     </record>
     <record id="ir_actions_server_fill_jobs_from_opportunity" model="ir.actions.server">
