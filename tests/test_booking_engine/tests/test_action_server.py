@@ -260,7 +260,7 @@ class BookingEngineAutomationsTestCase(TransactionCase):
     def _create_guest_product(self, adults=2, children=1):
         attribute = self.env['product.attribute'].create({
             'name': 'Guest Count',
-            'x_captures_guests': True,
+            'x_accommodation_characteristic': 'guest',
         })
         value = self.env['product.attribute.value'].create({
             'name': f'{adults}A{children}C',

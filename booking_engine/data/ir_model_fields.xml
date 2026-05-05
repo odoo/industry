@@ -169,12 +169,25 @@ for record in self: record['x_order_involves_room'] = any(line.product_id.x_is_a
 ]]></field>
     <field name="depends">order_line.qty_delivered</field>
   </record>
-  <record id="model_product_attribute_x_captures_guests" model="ir.model.fields">
-    <field name="ttype">boolean</field>
+  <record id="model_product_attribute_x_accommodation_characteristic" model="ir.model.fields">
+    <field name="ttype">selection</field>
     <field name="copied" eval="True"/>
-    <field name="field_description">Captures Guests</field>
+    <field name="field_description">Accommodation Characteristic</field>
     <field name="model_id" ref="product.model_product_attribute"/>
-    <field name="name">x_captures_guests</field>
+    <field name="name">x_accommodation_characteristic</field>
+    <field name="help"><![CDATA[Provides specific behavior related to accommodation needs:
+- Guest(s): Allows to define the number of guests (adults, children and infants) per attribute value;
+- Rate Plan(s): Specify to customers the different rate plan available.]]></field>
+  </record>
+  <record id="model_product_attribute_value_guest_x_accommodation_characteristic" model="ir.model.fields.selection">
+    <field name="name">Guest(s)</field>
+    <field name="field_id" ref="model_product_attribute_x_accommodation_characteristic" />
+    <field name="value">guest</field>
+  </record>
+  <record id="model_product_attribute_value_rate_plan_x_accommodation_characteristic" model="ir.model.fields.selection">
+    <field name="name">Rate Plan(s)</field>
+    <field name="field_id" ref="model_product_attribute_x_accommodation_characteristic" />
+    <field name="value">rate_plan</field>
   </record>
   <record id="model_product_attribute_value_x_adults" model="ir.model.fields">
     <field name="ttype">integer</field>
@@ -190,13 +203,20 @@ for record in self: record['x_order_involves_room'] = any(line.product_id.x_is_a
     <field name="model_id" ref="product.model_product_attribute_value"/>
     <field name="name">x_children</field>
   </record>
+  <record id="model_product_attribute_value_x_infants" model="ir.model.fields">
+    <field name="ttype">integer</field>
+    <field name="copied" eval="True"/>
+    <field name="field_description">Infants</field>
+    <field name="model_id" ref="product.model_product_attribute_value"/>
+    <field name="name">x_infants</field>
+  </record>
   <record id="model_sale_order_line_x_total_guests" model="ir.model.fields">
     <field name="compute"><![CDATA[for record in self:
     x_total_guests = 0
     for product_template_attribute_value in record.product_id.product_template_attribute_value_ids:
-        if product_template_attribute_value.attribute_id.x_captures_guests:
+        if product_template_attribute_value.attribute_id.x_accommodation_characteristic == 'guest':
             if product_attribute_value := product_template_attribute_value.attribute_id.value_ids.filtered(lambda v: v.id == product_template_attribute_value.product_attribute_value_id.id):
-                x_total_guests += product_attribute_value.x_adults + product_attribute_value.x_children
+                x_total_guests += product_attribute_value.x_adults + product_attribute_value.x_children + product_attribute_value.x_infants
     record['x_total_guests'] = x_total_guests
     ]]></field>
     <field name="ttype">integer</field>

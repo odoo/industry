@@ -17,4 +17,63 @@
         <field name="name">Product product Create or write</field>
         <field name="active" eval="False"/>
     </record>
+
+    <!-- Rate Plans -->
+    <record id="automation_on_room_product_variant_create" model="base.automation">
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_create_rate_plans_from_product')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[("x_is_a_room_offer", "!=", False)]</field>
+        <field name="name">Create Rate Plan on product room offer creation</field>
+    </record>
+    <record id="automation_on_room_product_template_write" model="base.automation">
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_actualize_rate_plans_from_product')])]"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[("x_is_a_room_offer", "!=", False)]</field>
+        <field name="name">Actualize Rate Plan on product room offer write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('product.field_product_template__attribute_line_ids'), ref('booking_engine.product_model_product_template_x_is_a_room_offer_field')])]"/>
+    </record> <!-- Possible issue, if we add an attribute line that creates products, isn't the server action called too many times ? One for the line and one for each product -->
+    <record id="automation_on_room_product_template_write_room_offer_unset" model="base.automation">
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_delete_rate_plans_on_product_template_delete')])]"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[("x_is_a_room_offer", "=", False)]</field>
+        <field name="name">Actualize Rate Plan on product room offer write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('booking_engine.product_model_product_template_x_is_a_room_offer_field')])]"/>
+    </record>
+    <record id="automation_on_room_attribute_line_write" model="base.automation">
+        <field name="model_id" ref="product.model_product_template_attribute_line"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_actualize_rate_plans_from_attribute_lines')])]"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain">[("product_tmpl_id.x_is_a_room_offer", "!=", False)]</field>
+        <field name="name">Actualize Rate Plan on values write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('product.field_product_template_attribute_line__value_ids')])]"/>
+    </record>
+    <record id="automation_on_pricelist_create" model="base.automation">
+        <field name="model_id" ref="product.model_product_pricelist"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_create_rate_plans_from_pricelist')])]"/>
+        <field name="trigger">on_create</field>
+        <field name="name">Create Rate Plan on pricelist creation</field>
+    </record>
+    <record id="automation_on_room_product_variant_delete" model="base.automation">
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_delete_rate_plans_from_product')])]"/>
+        <field name="trigger">on_unlink</field>
+        <field name="filter_domain">[("x_is_a_room_offer", "!=", False)]</field>
+        <field name="name">Delete rate plan on product room offer deletion</field>
+    </record>
+    <record id="automation_on_pricelist_delete" model="base.automation">
+        <field name="model_id" ref="product.model_product_pricelist"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_delete_rate_plans_from_pricelist')])]"/>
+        <field name="trigger">on_unlink</field>
+        <field name="name">Delete rate plan on pricelist deletion</field>
+    </record>
+    <record id="automation_on_room_offer_product_template_delete" model="base.automation">
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_delete_rate_plans_on_product_template_delete')])]"/>
+        <field name="trigger">on_unlink</field>
+        <field name="filter_domain">[("x_is_a_room_offer", "!=", False)]</field>
+        <field name="name">On room offer Product Template deleted</field>
+    </record>
 </odoo>

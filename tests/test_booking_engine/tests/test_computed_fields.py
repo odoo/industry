@@ -15,7 +15,7 @@ class ComputedFieldsTestCase(TransactionCase):
         cls.partner = cls.env['res.partner'].create({'name': 'Test Partner'})
         cls.product_attribute = cls.env['product.attribute'].create({
             'name': 'Guest Count',
-            'x_captures_guests': True,
+            'x_accommodation_characteristic': 'guest',
         })
         cls.value = cls.env['product.attribute.value'].create({
             'name': '2A1C',

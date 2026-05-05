@@ -49,6 +49,70 @@
         <field name="model_id" ref="x_channex_mapping_model"/>
         <field name="name">x_local_id</field>
     </record>
+    <!-- x_rate_plan fields -->
+    <record id="x_rate_plan_value_id_field_x_rate_plan" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="relation">product.attribute.value</field>
+        <field name="field_description">Rate Plan Value</field>
+        <field name="model_id" ref="x_rate_plan_model"/>
+        <field name="domain">[('attribute_id.x_accommodation_characteristic', 'in', ['rate_plan'])]</field>
+        <field name="name">x_rate_plan_value_id</field>
+    </record>
+    <record id="x_variant_id_field_x_rate_plan" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="relation">product.product</field>
+        <field name="field_description">Variant</field>
+        <field name="model_id" ref="x_rate_plan_model"/>
+        <field name="name">x_variant_id</field>
+    </record>
+    <record id="x_pricelist_id_field_x_rate_plan" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="relation">product.pricelist</field>
+        <field name="field_description">Pricelist</field>
+        <field name="model_id" ref="x_rate_plan_model"/>
+        <field name="name">x_pricelist_id</field>
+    </record>
+    <record id="x_name_field_x_rate_plan" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="depends">x_rate_plan_value_id.name, x_pricelist_id.name</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    name = ""
+    if record.x_rate_plan_value_id:
+        name += record.x_rate_plan_value_id.name
+    if record.x_rate_plan_value_id and record.x_pricelist_id:
+        name += " - "
+    if record.x_pricelist_id:
+        name += record.x_pricelist_id.name 
+    record['x_name'] = name
+]]></field>
+        <field name="field_description">Name</field>
+        <field name="readonly" eval="True"/>
+        <field name="model_id" ref="x_rate_plan_model"/>
+        <field name="name">x_name</field>
+    </record>
+    <record id="x_total_inventory_field_x_rate_plan" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="depends">x_variant_id.x_resource_ids</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_total_inventory'] = len(record.x_variant_id.x_resource_ids or [])
+]]></field>
+        <field name="field_description">Total Inventory</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="model_id" ref="x_rate_plan_model"/>
+        <field name="name">x_total_inventory</field>
+    </record>
+
+    <record id="x_rate_plans_ids_field_x_rate_plan" model="ir.model.fields">
+        <field name="ttype">one2many</field>
+        <field name="relation">x_rate_plan</field>
+        <field name="relation_field">x_variant_id</field>
+        <field name="field_description">Rate Plans</field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="name">x_rate_plans_ids</field>
+    </record>
     <!-- ir cron fields -->
     <!-- TODO remove before release -->
     <record id="x_debug_last_answer_field_ir_cron" model="ir.model.fields">
