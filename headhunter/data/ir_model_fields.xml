@@ -90,9 +90,7 @@
         <field name="relation">res.partner</field>
         <field name="depends">x_recruitment_type</field>
         <field name="compute"><![CDATA[
-for record in self:
-    if record.x_recruitment_type == 'Internal':
-        record['x_customer_id'] = False
+self.filtered(lambda j: j.x_recruitment_type == 'Internal')['x_customer_id'] = False
 ]]></field>
     </record>
     <record id="x_hiring_team_contact_field" model="ir.model.fields">
@@ -106,10 +104,7 @@ for record in self:
         <field name="depends">x_customer_id, x_recruitment_type</field>
         <field name="compute"><![CDATA[
 for record in self:
-    if record.x_recruitment_type == 'Internal':
-        record['x_hiring_team_contact_ids'] = False
-    else:
-        record['x_hiring_team_contact_ids'] = record.x_customer_id | record.x_customer_id.child_ids
+    record['x_hiring_team_contact_ids'] = record.x_recruitment_type != 'Internal' and (record.x_customer_id | record.x_customer_id.child_ids)
 ]]></field>
     </record>
     <record id="x_customer_children_ids_field" model="ir.model.fields">
@@ -119,13 +114,10 @@ for record in self:
         <field name="depends">x_customer_id, x_customer_id.child_ids</field>
         <field name="ttype">many2many</field>
         <field name="compute"><![CDATA[for record in self:
-        if record.x_customer_id:
-            record['x_customer_children_ids'] = record.x_customer_id | record.x_customer_id.child_ids
-        else:
-            record['x_customer_children_ids'] = False]]></field>
+    record['x_customer_children_ids'] = record.x_customer_id and (record.x_customer_id | record.x_customer_id.child_ids)
+]]></field>
         <field name="relation">res.partner</field>
         <field name="relation_table">x_hr_job_res_partner_rel_1</field>
-        <field name="on_delete" eval="False"/>
         <field name="readonly" eval="True"/>
     </record>
     <record id="x_invoices_job_position_field" model="ir.model.fields">
