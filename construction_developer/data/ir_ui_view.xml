@@ -26,7 +26,7 @@
                 <field name="x_quantity_increment" width="130px"
                     invisible="x_is_undeliverable or display_type"
                 />
-                <field name="x_progress_increment" widget="percentage" width="130px"
+                <field name="x_progress_increment" widget="percentage" string="Progress Increment" width="130px"
                     invisible="not x_display_button and not x_is_deliverable"
                 />
                 <field name="id" column_invisible="True"/> <!-- this invisible field is necessary to pass the id field to the widget -->
@@ -34,6 +34,7 @@
                 <field name="x_current_progress" widget="progressbar" readonly="True"
                     invisible="display_type or x_is_undeliverable or x_current_progress == 0"
                 />
+                <field optional="show" name="x_work_progress" widget="project_task_progressbar"/>
             </list>
         </field>
     </record>
@@ -203,6 +204,7 @@
             <list open_form_view="false" create="0">
                 <field name="x_sale_order_id" widget="many2one" optional="show"/>
                 <field name="x_line_reference" optional="show"/>
+                <field name="x_task_start" optional="show" widget="remaining_days"/>
                 <field name="x_product_id" widget="many2one" optional="show"/>
                 <field name="x_work_item_id" widget="many2one" optional="show"/>
                 <field name="x_unit_id" widget="many2one" optional="show"/>
@@ -226,10 +228,13 @@
             <field name="x_demand"/>
             <field name="x_consumed"/>
             <separator/>
+            <filter string="Task Start" name="x_task_start_filter" date="x_task_start"/>
+            <separator/>
             <group>
                 <filter string="Product" name="group_by_product" context="{'group_by':'x_product_id'}"/>
                 <filter string="Order" name="group_by_order" context="{'group_by':'x_sale_order_id'}"/>
                 <filter string="Work Item" name="group_by_work_item" context="{'group_by':'x_work_item_id'}"/>
+                <filter string="Task Date" name="group_by_task_month" context="{'group_by': 'x_task_start'}"/>
             </group>
         </search>
         </field>
@@ -794,21 +799,7 @@
             </list>
         </field>
     </record>
-    <!-- <record id="edit_project_inherit" model="ir.ui.view">
-        <field name="inherit_id" ref="project.edit_project"/>
-        <field name="mode">extension</field>
-        <field name="model">project.project</field>
-        <field name="name">project.project.view.form.inherit</field>
-        <field name="priority">330</field>
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-        <data>
-            <xpath expr="/form//field[@name='has_any_so_with_nothing_to_invoice']" position="after">
-                <button string="Generate WBS" type="action"/>
-            </xpath>
-        </data>
-        </field>
-    </record> -->
+<!-- WBS-->
     <record id="view_task_form2_inherit" model="ir.ui.view">
         <field name="inherit_id" ref="project.view_task_form2"/>
         <field name="mode">extension</field>
@@ -881,25 +872,6 @@
           <attribute name="default_group_by">parent_id</attribute>
           <attribute name="display_mode">dense</attribute>
           <attribute name="precision">{"day":"hour:quarter","week":"day:half","month":"day:full"}</attribute>
-        </xpath>
-      </data>
-    </field>
-  </record>
-  <record id="sale_order_list_view_inherit" model="ir.ui.view">
-    <field name="inherit_id" ref="sale_order_list_view"/>
-    <field name="mode">extension</field>
-    <field name="model">sale.order.line</field>
-    <field name="name">sale.order.line.view.list.inherit</field>
-    <field name="priority">99</field>
-    <field name="type">list</field>
-    <field name="active" eval="True"/>
-    <field name="arch" type="xml">
-      <data>
-        <xpath expr="/list//field[@name='x_current_progress']" position="after">
-          <field optional="show" name="x_work_progress" widget="project_task_progressbar"/>
-        </xpath>
-        <xpath expr="/list//field[@name='x_progress_increment']" position="attributes">
-          <attribute name="string">Progress Increment</attribute>
         </xpath>
       </data>
     </field>

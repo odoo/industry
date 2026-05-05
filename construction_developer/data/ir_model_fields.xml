@@ -816,6 +816,22 @@ for record in self:
         <field name="field_description">Cost Share</field>
         <field name="readonly" eval="True"/>
     </record>
+    <record id="field_x_work_item_x_task_id" model="ir.model.fields">
+        <field name="name">x_task_id</field>
+        <field name="field_description">Task</field>
+        <field name="ttype">many2one</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="relation">project.task</field>
+        <field name="store" eval="True"/>
+    </record>
+    <record id="field_x_work_item_line_x_task_start" model="ir.model.fields">
+        <field name="name">x_task_start</field>
+        <field name="field_description">Task Start Date</field>
+        <field name="ttype">datetime</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="store" eval="True"/>
+        <field name="related">x_work_item_id.x_task_id.planned_date_begin</field>
+    </record>
 <!-- simplify computation of SQL query -->
     <record id="field_sale_order_line_x_cost_nature" model="ir.model.fields">
         <field name="name">x_cost_nature</field>
@@ -858,15 +874,27 @@ for record in self:
     <field name="model_id" ref="project.model_project_task"/>
     <field name="name">x_full_time_equivalent</field>
     <field name="readonly" eval="True"/>
-    <field name="compute"><![CDATA[for record in self:
-        if record.planned_date_begin and record.date_deadline and record.allocated_hours > 0:
-            duration_seconds = (record.date_deadline - record.planned_date_begin).total_seconds()
-            if duration_seconds > 0:
-                days_in_period = duration_seconds / (24.0 * 3600.0)
-                theoretical_capacity = days_in_period * 8
+    <field name="compute"><![CDATA[
+for record in self:
+    if record.planned_date_begin and record.date_deadline and record.allocated_hours > 0:
+        duration_seconds = (record.date_deadline - record.planned_date_begin).total_seconds()
+        if duration_seconds > 0:
+            days_in_period = int(duration_seconds // (24 * 3600))
+            
+            # Get the remaining seconds after extracting full days, convert to hours
+            remaining_hours = (duration_seconds % (24 * 3600)) / 3600.0
+            
+            theoretical_capacity = (days_in_period * 8.0) + min(8.0, remaining_hours)
+            
+            if theoretical_capacity > 0:
                 record['x_full_time_equivalent'] = record.allocated_hours / theoretical_capacity
-            else: record['x_full_time_equivalent'] = 0.0
-        else: record['x_full_time_equivalent'] = 0.0]]></field>
+            else:
+                record['x_full_time_equivalent'] = 0.0
+        else:
+            record['x_full_time_equivalent'] = 0.0
+    else: 
+        record['x_full_time_equivalent'] = 0.0
+]]></field>
   </record>
   <record id="field_sale_order_line_x_wbs_ready" model="ir.model.fields">
     <field name="ttype">boolean</field>
