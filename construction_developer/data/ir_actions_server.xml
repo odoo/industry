@@ -472,6 +472,7 @@ for record in records:
         <field name="name">Construction Developer: Create WBS</field>
         <field name="code"><![CDATA[
 uom_hour = env['uom.uom'].browse(4)
+
 for record in records:
     # when a SO is confirmed: use the default field sale_line_id
     # when a SO is NOT confirmed, use x_sale_line_id otherwise the SO is automatically confirmed
@@ -500,10 +501,11 @@ for record in records:
     if not project.type_ids:
         # By default: takes the default stages defined in the construction module
         default_stage_ids = [env.ref(f'construction.planning_project_stage_{id}', raise_if_not_found=False).id for id in [0,1,2,3,4]]
-        default_stages = env['project.task.type'].search([('id', 'in', default_stage_ids)])
+        default_stages = env['project.task.type'].search([('id', 'in', default_stage_ids)]) if default_stage_ids else False
+
         # If they don't exist, create a new default stage
         if not default_stages:
-            default_stage_ids = env['project.task.type'].create([
+            default_stages = env['project.task.type'].create([
                 {'name': name, 'sequence': sequence, 'fold': fold, 'project_ids': False, 'color': color}
                 for name, sequence, fold, color in [
                     (env._('New'), 1, False, 2),
@@ -514,56 +516,78 @@ for record in records:
             ]])
         project['type_ids'] = default_stages.ids
 
+    # WBS CREATION & UPDATE LOOP
     parent_lvl1, parent_lvl2 = False, False
     current_day_offset = 0
+    
     for line in record.order_line:
+        # If the line is already processed, update parents & offset then skip
+        if line.x_wbs_ready:
+            if line.display_type == 'line_section':
+                # Fetch the existing section task to act as parent for upcoming lines
+                parent_lvl1 = env['project.task'].search([('project_id', '=', project.id), (line_field, '=', line.id)], limit=1)
+                parent_lvl2 = False
+            elif line.display_type == 'line_subsection':
+                # Fetch the existing subsection task to act as parent
+                parent_lvl2 = env['project.task'].search([('project_id', '=', project.id), (line_field, '=', line.id)], limit=1)
+            elif line.product_id and line.x_line_work_item_id:
+                # Increment the offset so new tasks are appended after
+                current_day_offset += 1
+            continue
+
+        # --- PROCESS NEW LINES ---
         clean_name = (line.name or '').split('\n')[0].strip()
         item_num = line.x_reference or ''
+        
         task_values = {
             'name': env._(f"{item_num} {clean_name}"),
             'project_id': project.id,
             'company_id': record.company_id.id,
-            'stage_id': project.type_ids[0].id,
+            'stage_id': project.type_ids[0].id if project.type_ids else False,
             line_field: line.id,
             'user_ids': False,
         }
 
-        if not line.x_wbs_ready:
-            # SECTIONS
-            if line.display_type == 'line_section':
-                line['is_service'] = True
-                parent_lvl1 = env['project.task'].create(task_values)
-                parent_lvl2 = False 
-            # SUBSECTIONS
-            elif line.display_type == 'line_subsection':
-                line['is_service'] = True
-                parent_lvl2 = env['project.task'].create(task_values | {'parent_id': parent_lvl1.id})
-            # PRODUCTS
-            elif line.product_id:
-                allocated_hours = 0
-                if not line.x_line_work_item_id:  # Ignore everything except work items
-                    continue
+        # SECTIONS
+        if line.display_type == 'line_section':
+            line['is_service'] = True
+            parent_lvl1 = env['project.task'].create(task_values)
+            parent_lvl2 = False 
+            
+        # SUBSECTIONS
+        elif line.display_type == 'line_subsection':
+            line['is_service'] = True
+            task_values['parent_id'] = parent_lvl1.id if parent_lvl1 else False
+            parent_lvl2 = env['project.task'].create(task_values)
+            
+        # PRODUCTS
+        elif line.product_id:
+            if not line.x_line_work_item_id:  # Ignore everything except work items
+                continue
 
-                wils = line.x_line_work_item_id.x_work_item_line_ids
-                for comp in wils.filtered(lambda wil: wil.x_cost_nature == 'labour'):
-                    if comp.x_unit_id == uom_hour or comp.x_unit_id.relative_uom_id == uom_hour: 
-                        allocated_hours += comp.x_unit_id._compute_quantity(comp.x_quantity, uom_hour)
-                allocated_hours = line.product_uom_qty * allocated_hours
+            allocated_hours = 0
+            wils = line.x_line_work_item_id.x_work_item_line_ids
+            for comp in wils.filtered(lambda wil: wil.x_cost_nature == 'labour'):
+                if comp.x_unit_id == uom_hour or comp.x_unit_id.relative_uom_id == uom_hour: 
+                    allocated_hours += comp.x_unit_id._compute_quantity(comp.x_quantity, uom_hour)
+            allocated_hours = line.product_uom_qty * allocated_hours
 
-                planned_start = datetime.date.today() + datetime.timedelta(days=current_day_offset)
-                vals = {
-                    'allocated_hours': allocated_hours,
-                    'planned_date_begin': planned_start,
-                    'date_deadline': planned_start + datetime.timedelta(hours=1),
-                }
-                if parent_lvl1 or parent_lvl2:
-                    vals['parent_id'] = parent_lvl2.id if parent_lvl2 else parent_lvl1.id
+            planned_start = datetime.date.today() + datetime.timedelta(days=current_day_offset)
+            vals = {
+                'allocated_hours': allocated_hours,
+                'planned_date_begin': planned_start,
+                'date_deadline': planned_start + datetime.timedelta(hours=1),
+            }
+            if parent_lvl1 or parent_lvl2:
+                vals['parent_id'] = parent_lvl2.id if parent_lvl2 else parent_lvl1.id
 
-                task = env['project.task'].create(task_values | vals)
-                line.x_line_work_item_id['x_task_id'] = task.id
+            task = env['project.task'].create(task_values | vals)
+            line.x_line_work_item_id['x_task_id'] = task.id
 
-                current_day_offset += 1
-            line['x_wbs_ready'] = True
+            current_day_offset += 1
+            
+        line['x_wbs_ready'] = True
+        
     record.message_post(body=f"WBS setup in project.")
 ]]></field>
     </record>
