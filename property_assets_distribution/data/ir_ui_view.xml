@@ -1,0 +1,296 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="x_property_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Property">
+          <div name="button_box" class="oe_button_box">
+            <button class="oe_stat_button" icon="fa-bar-chart-o" type="action" name="%(analytic_accounts_act_window)d" invisible="x_account_ids_count == 0">
+              <field widget="statinfo" name="x_account_ids_count" string="Analytics"/>
+            </button>
+          </div>
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="property_group_detail">
+            <group name="property_group_detailleft">
+              <field name="x_type" options="{'create_name_field': 'x_name'}"/>
+              <field name="x_building" options="{'create_name_field': 'x_name'}"/>
+              <field name="x_floor"/>
+              <field name="x_area"/>
+            </group>
+            <group name="property_group_detailright">
+              <field name="x_tags" widget="many2many_tags"/>
+              <field name="x_current_owner" force_save="1"/>
+            </group>
+          </group>
+          <notebook name="meter_readings_notebook">
+            <page string="Meter Readings" name="meter_readings_page">
+              <field name="x_meter_reading_ids" default_order="x_start_date DESC">
+                <list string="Meter Reading" editable="bottom" default_order="x_date desc">
+                  <field name="x_meter_id" optional="show"/>
+                  <field name="x_date" optional="show"/>
+                  <field name="x_quantity" optional="show"/>
+                  <field name="x_usage" optional="show"/>
+                  <field name="x_description" optional="show"/>
+                  <field name="x_image" optional="show" widget="binary" filename="x_image_filename"/>
+                </list>
+                <form>
+                  <sheet string="Meter Reading" name="meter_readings_sheet">
+                    <group name="meter_readings_group_detail">
+                      <group name="meter_readings_group_detail_left">
+                        <field name="x_meter_id"/>
+                        <field name="x_quantity"/>
+                        <field name="x_description"/>
+                      </group>
+                      <group name="meter_readings_group_detail_right">
+                        <field name="x_date"/>
+                        <field name="x_usage"/>
+                        <field name="x_image"/>
+                        <field name="x_property"/>
+                      </group>
+                    </group>
+                  </sheet>
+                </form>
+              </field>
+            </page>
+            <page string="Tenants" name="tenants_page">
+              <field name="x_tenant_ids" context="{'default_x_type': 'tenant'}">
+                <list editable="top" default_order="x_start_date DESC">
+                  <field name="x_start_date" required="True"/>
+                  <field name="x_end_date" optional="show"/>
+                  <field name="x_stake_holder" required="True" widget="many2one_avatar_user" string="Tenant"/>
+                  <field name="x_account" readonly="True"/>
+                  <field name="x_type" column_invisible="True"/>
+                </list>
+              </field>
+            </page>
+          </notebook>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+    <field name="model">x_property</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+  </record>
+  <record id="default_list_view_building" model="ir.ui.view">
+    <field name="model">x_buildings</field>
+    <field name="type">list</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <list editable="bottom">
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+        <field name="x_tag_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+      </list>
+    </field>
+  </record>
+  <record id="default_form_view_building" model="ir.ui.view">
+    <field name="model">x_buildings</field>
+    <field name="priority">99</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Buildings">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name or reference..."/>
+            </h1>
+          </div>
+          <group>
+            <group>
+              <field name="x_active" invisible="1"/>
+              <span class="fw-bold">Address</span>
+              <div class="o_address_format">
+                <field name="x_street" placeholder="Street..." class="o_address_street"/>
+                <field name="x_street2" placeholder="Street 2..." class="o_address_street"/>
+                <field name="x_city" placeholder="City" class="o_address_city"/>
+                <field name="x_state" class="o_address_state" placeholder="State" options="{'no_open': True, 'no_quick_create': True}"/>
+                <field name="x_zip" placeholder="ZIP" class="o_address_zip"/>
+                <field name="x_country" placeholder="Country" class="o_address_country" options="{'no_open': True, 'no_create': True}"/>
+              </div>
+            </group>
+            <group>
+              <field name="x_tag_ids" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
+            </group>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+  <record id="default_search_view_building" model="ir.ui.view">
+    <field name="model">x_buildings</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <field name="x_tag_ids"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_buildings" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+  </record>
+  <record id="default_list_view_building_tags" model="ir.ui.view">
+    <field name="model">x_buildings_tag</field>
+    <field name="type">list</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <list editable="bottom">
+        <field name="x_name"/>
+        <field name="x_color" widget="color_picker"/>
+      </list>
+    </field>
+  </record>
+  <record id="default_kanban_view_building" model="ir.ui.view">
+    <field name="model">x_buildings</field>
+    <field name="active" eval="True"/>
+    <field name="priority">99</field>
+    <field name="type">kanban</field>
+    <field name="arch" type="xml">
+      <kanban>
+        <templates>
+          <t t-name="card">
+            <field name="x_name" />
+            <field name="x_tag_ids" display="full"/>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+  <record id="default_list_view_properties_type" model="ir.ui.view">
+    <field name="model">x_properties_types</field>
+    <field name="type">list</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <list editable="bottom">
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+  </record>
+  <record id="default_form_view_property_type" model="ir.ui.view">
+    <field name="model">x_properties_types</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="Properties Types">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+  <record id="default_search_view_property_type" model="ir.ui.view">
+    <field name="model">x_properties_types</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_properties_types" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+  </record>
+  <record id="x_property_search_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_property" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="model">x_property</field>
+    <field name="active" eval="True"/>
+    <field name="name">x_property.search</field>
+    <field name="type">search</field>
+  </record>
+  <record id="x_property_kanban_view" model="ir.ui.view">
+    <field name="mode">primary</field>
+    <field name="active" eval="True"/>
+    <field name="model">x_property</field>
+    <field name="priority">99</field>
+    <field name="type">kanban</field>
+    <field name="arch" type="xml">
+      <kanban default_group_by="x_building">
+        <templates>
+          <t t-name="card">
+            <field name="x_name" class="fw-bold"/>
+            <field name="x_type" display="full"/>
+            <field name="x_current_owner" display="full" widget="many2one_avatar"/>
+            <field name="x_tags" display="full"/>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+  <record id="meters_list_view" model="ir.ui.view">
+    <field name="model">x_meters</field>
+    <field name="active" eval="True"/>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <list editable="bottom">
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+  </record>
+  <record id="account_analytic_plan_form_view_inherit" model="ir.ui.view">
+    <field name="model">account.analytic.plan</field>
+    <field name="active" eval="True"/>
+    <field name="inherit_id" ref="analytic.account_analytic_plan_form_view"/>
+    <field name="arch" type="xml">
+      <field name="color" position="after">
+        <field name="x_is_a_property_plan"/>
+      </field>
+    </field>
+  </record>
+  <record id="view_account_analytic_account_search_inherit" model="ir.ui.view">
+    <field name="name">account.analytic.account.search.inherit.property</field>
+    <field name="model">account.analytic.account</field>
+    <field name="active" eval="True"/>
+    <field name="inherit_id" ref="analytic.view_account_analytic_account_search"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='partner_id']" position="after">
+        <field name="x_property"/>
+      </xpath>
+    </field>
+  </record>
+  <record id="res_partner_form_view_inherit" model="ir.ui.view">
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="mode">extension</field>
+    <field name="model">res.partner</field>
+    <field name="active" eval="True"/>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <xpath expr="//div[@name='button_box']" position="inside">
+        <button class="oe_stat_button" icon="fa-home" type="action" name="%(owner_properties_contact_smart_button)d" invisible="not x_x_current_owner_x_property_count">
+          <field widget="statinfo" name="x_x_current_owner_x_property_count" string="Properties"/>
+        </button>
+      </xpath>
+    </field>
+  </record>
+</odoo>
