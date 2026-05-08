@@ -86,17 +86,6 @@ else:
 records.action_confirm()
 ]]>        </field>
     </record>
-    <record id="action_server_set_usage_meter_reading" model="ir.actions.server">
-        <field name="name">Condominium: Compute Meter Reading Consumption</field>
-        <field name="model_id" ref="model_meter_reading"/>
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-previous_mr = False
-for mr in env['x_meter_reading'].search([('id', 'in', record.x_property.x_meter_reading_ids.ids), ('x_meter_id', '=', record.x_meter_id.id)], order='x_date'):
-    mr['x_usage'] = mr.x_quantity - previous_mr.x_quantity if previous_mr else 0
-    previous_mr = mr
-]]></field>
-    </record>
     <record id="confirm_analytic_account_item_split_action" model="ir.actions.server">
         <field name="name">Confirm Account Analytic Line</field>
         <field name="state">code</field>
@@ -104,25 +93,22 @@ for mr in env['x_meter_reading'].search([('id', 'in', record.x_property.x_meter_
         <field name="binding_model_id" ref="model_x_split_analytic_items_wizard"/>
         <field name="code"><![CDATA[
 if round(sum(records.x_line_ids.mapped('x_share'))) != 100: raise UserError("The Share sum shall equal 100% to confirm the split.")
-note_details = {}
-split_account_analytic_lines = {}
-account_plan_column_name = records.env.ref('condominium.account_analytic_plan_2')._column_name()
+note_details = dict()
+split_account_analytic_lines = dict()
+account_plan_column_name = records.env.ref('property_assets_distribution.account_analytic_plan_2')._column_name()
 for line in records.x_line_ids:
     original_analytic_line = line.x_analytic_line_id
     analytic_id = line.x_analytic_account_id
     if original_analytic_line:
         new_split_analytic_line_id = original_analytic_line.copy({account_plan_column_name: analytic_id.id, "amount": line.x_amount})
-        if original_analytic_line.id in split_account_analytic_lines:
-            split_account_analytic_lines[original_analytic_line.id].update(new_split_analytic_line_id)
-        else:
-            split_account_analytic_lines.update({original_analytic_line.id: set(new_split_analytic_line_id)})
+        if original_analytic_line.id not in split_account_analytic_lines:
+            split_account_analytic_lines.update({original_analytic_line.id: records.env['account.analytic.line']})
+        split_account_analytic_lines[original_analytic_line.id] += new_split_analytic_line_id
     analytic_url = f"/odoo/analytic-items/{new_split_analytic_line_id.id}"
-    if original_analytic_line.id in note_details:
-        note_line = f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{analytic_id.name}</a>"
-        note_details[original_analytic_line.id].add(note_line)
-    else:
-        note_line = {f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{analytic_id.name}</a>"}
-        note_details.update({original_analytic_line.id: set(note_line)})
+    if original_analytic_line.id not in note_details:
+        note_details.update({original_analytic_line.id: set()})
+    note_line = f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{analytic_id.name}</a>"
+    note_details[original_analytic_line.id].add(note_line)
 today_date_display = datetime.date.today().strftime("%d %B %Y")
 for original_analytic_id, new_account_analytic_lines in split_account_analytic_lines.items():
     notes = note_details.get(original_analytic_id)
@@ -151,7 +137,7 @@ amount_total = 0
 for analytic_line in records:
     amount_total += analytic_line.amount
     analytic_amount_split = analytic_line.amount / 2
-    account_plan_column_name = analytic_line.env.ref('condominium.account_analytic_plan_2')._column_name()
+    account_plan_column_name = analytic_line.env.ref('property_assets_distribution.account_analytic_plan_2')._column_name()
     # add two split lines
     plan_id = analytic_line[account_plan_column_name].id if analytic_line[account_plan_column_name] else False
     split_line_vals.extend([
@@ -186,51 +172,13 @@ else:
         <field name="name">Condomnium: Create Condominium</field>
     </record>
     <record id="action_update_property_current_owner" model="ir.actions.server">
-        <field name="code"><![CDATA[property_id = record.x_property_id
-for line in property_id.x_owner_ids:
-    if not (owner_id := line.x_owner): continue
-    if not line.x_end_date: property_id.write({'x_current_owner': owner_id.id})
-    if not env['account.analytic.account'].search_count([('x_property', '=', property_id.id), ('partner_id', '=', owner_id.id)], limit=1):
-        line['x_account'] = env['account.analytic.account'].create({'name': property_id.x_name, 'x_property': property_id.id, 'partner_id': owner_id.id, 'x_owner_line': line.id, 'company_id': property_id.x_company_id.id}).id
-]]></field>
-        <field name="model_id" ref="model_x_property_owner"/>
+        <field name="code">
+for line in record.x_property_id.x_owner_ids:
+    if not line.x_end_date: record.x_property_id.write({'x_current_owner': line.x_stake_holder.id})
+        </field>
+        <field name="model_id" ref="property_assets_distribution.model_x_stake_holder"/>
         <field name="state">code</field>
         <field name="name">Condominium: Update Property Current Owner</field>
-        <field name="usage">base_automation</field>
-    </record>
-    <record id="action_validate_property_owner_dates" model="ir.actions.server">
-        <field name="code"><![CDATA[
-for line in record:
-    if line.x_end_date and line.x_end_date < line.x_start_date: raise UserError("End Date must be empty or after Start Date.")
-    domain = [('id', '!=', line.id), ('x_property_id', '=', line.x_property_id.id), ('x_start_date', '!=', False), '|', ('x_end_date', '=', False), ('x_end_date', '>=', line.x_start_date)]
-    if line.x_end_date: domain.append(('x_start_date', '<=', line.x_end_date))
-    if env['x_property_owner'].search_count(domain, limit=1): raise UserError("Owner dates cannot overlap for the same property. Ensure that ownership periods do not overlap.")
-]]></field>
-        <field name="model_id" ref="model_x_property_owner"/>
-        <field name="state">code</field>
-        <field name="name">Condominium: Validate Owner Dates</field>
-        <field name="usage">base_automation</field>
-    </record>
-    <record id="action_validate_property_tenant_dates" model="ir.actions.server">
-        <field name="code"><![CDATA[
-for line in record:
-    if line.x_end_date and line.x_end_date < line.x_start_date: raise UserError("End Date must be empty or after Start Date.")
-    domain = [('id', '!=', line.id), ('x_property_id', '=', line.x_property_id.id), ('x_start_date', '!=', False), '|', ('x_end_date', '=', False), ('x_end_date', '>=', line.x_start_date)]
-    if line.x_end_date: domain.append(('x_start_date', '<=', line.x_end_date))
-    if env['x_property_tenant'].search_count(domain, limit=1): raise UserError("Tenant dates cannot overlap for the same property. Ensure that tenancy periods do not overlap.")
-]]></field>
-        <field name="model_id" ref="model_x_property_tenant"/>
-        <field name="state">code</field>
-        <field name="name">Condominium: Validate Tenant Dates</field>
-        <field name="usage">base_automation</field>
-    </record>
-    <record id="action_archive_related_accounts" model="ir.actions.server">
-        <field name="code"><![CDATA[
-record.x_owner_ids.x_account.write({'active': False})
-]]></field>
-        <field name="model_id" ref="model_x_property"/>
-        <field name="state">code</field>
-        <field name="name">Condominium: Archive related accounts</field>
         <field name="usage">base_automation</field>
     </record>
     <record id="action_populate_voters" model="ir.actions.server">

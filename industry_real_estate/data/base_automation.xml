@@ -1,9 +1,12 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <record id="automation_set_usage_meter_reading" model="base.automation">
-        <field name="name">Set Usage in Meter Readings</field>
-        <field name="model_id" ref="model_meter_reading"/>
-        <field name="trigger">on_create_or_write</field>
-        <field name="trigger_field_ids" eval="[(6, 0, [ref('field_meter_reading_date'), ref('field_meter_reading_quantity'), ref('field_meter_reading_meter_id')])]"/>
+    <record id="automation_confirm_subscription_order" model="base.automation">
+        <field name="name">Confirm subscription order</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_add_tenant')])]"/>
+        <field name="trigger">on_state_set</field>
+        <field name="trg_selection_field_id" ref="sale.selection__sale_order__state__sale"/>
+        <field name="filter_pre_domain" eval="[('state', 'in', ['draft', 'sent'])]"/>
+        <field name="filter_domain" eval="[('state', '=', 'sale'), ('x_property_id', '!=', False), ('plan_id', '!=', False)]"/>
     </record>
 </odoo>
