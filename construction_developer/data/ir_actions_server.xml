@@ -391,4 +391,64 @@ if so_ids != [0]:
     action['context']['active_ids'] = so_ids
 ]]></field>
     </record>
+    <record id="action_create_delivery_location_on_sales_order_confirm" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Create Delivery Location</field>
+        <field name="code"><![CDATA[
+for so in records.filtered(lambda so: so.state != 'draft' and not so.partner_shipping_id.x_ws_location_id):
+    wh = env['ir.model.data']._xmlid_to_res_id('construction_developer.stock_location_1')
+    so.partner_shipping_id['x_ws_location_id'] = env['stock.location'].create({'name': f"{so.name} - {so.partner_id.name}", 'usage': 'internal', 'company_id': env.company.id, 'location_id': wh})
+]]></field>
+    </record>
+    <record id="action_wil_create_picking" model="ir.actions.server">
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Create Picking from Procurement</field>
+        <field name="code"><![CDATA[
+# For all selected work item lines: find the SO's address.
+# If the delivery address has a location, use it, otherwise create and link one
+pickings_per_so = {}
+created_pickings_per_so = {}
+
+for so in records.x_work_item_id.x_sale_order_line_id.order_id:
+    worksite_loc = so.partner_shipping_id.x_ws_location_id
+
+    pickings_per_so[so.id] = {
+        'picking_type_id': env.ref('stock.picking_type_internal').id,
+        'location_id': env.ref('stock.stock_location_stock').id,
+        'location_dest_id': worksite_loc.id,
+    }
+
+moves_vals = []
+for wil in records:
+    so_id = wil.x_work_item_id.x_sale_order_line_id.order_id.id
+    
+    picking_vals = pickings_per_so[so_id]
+    
+    if float_compare((delta := wil.x_demand - wil.x_consumed), 0, precision_digits=2) == 1:
+        # 3. Create the picking if we haven't yet for this SO
+        if so_id not in created_pickings_per_so:
+            created_pickings_per_so[so_id] = env['stock.picking'].create(picking_vals)
+            
+        created_pickings_per_so[so_id]['x_work_item_line_ids'] = [Command.link(wil.id)]
+        moves_vals.append({
+            'product_id': wil.x_product_id.id,
+            'product_uom_qty': delta,
+            'product_uom': wil.x_unit_id.id,
+            'picking_id': created_pickings_per_so[so_id].id,
+        })
+
+moves = env['stock.move'].create(moves_vals)
+
+if (pickings := [p.id for p in created_pickings_per_so.values()]):
+    action = {
+        'type': 'ir.actions.act_window', 'res_model': 'stock.picking', 'name': 'Created Internal Transfer(s)',
+        'view_mode': ('list,' * (len(pickings) > 1)) + 'form',
+    } | ({'res_id': pickings[0]} if len(pickings) == 1 else {'domain': [('id', 'in', pickings)]})
+else:
+    # no pickings created (delta was 0 for all lines)
+    action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'message': 'No transfers needed (demand already fulfilled).', 'type': 'warning', 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'}}}
+]]></field>
+    </record>
 </odoo>

@@ -1,6 +1,6 @@
 {
     'name': 'Construction Developer',
-    'version': '1.12',
+    'version': '1.13',
     'category': 'Construction',
     'depends': [
         'base_industry_data',
@@ -9,6 +9,7 @@
     ],
     'data': [
         'data/res_config_settings.xml',
+        'data/stock_location.xml',
         'data/ir_model.xml',
         'data/ir_model_access.xml',
         'data/ir_model_fields.xml',
