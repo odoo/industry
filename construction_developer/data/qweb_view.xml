@@ -107,22 +107,43 @@
             </attribute>
         </xpath>
     </template>
-
     <template id="prgress_report_document">
         <t t-set="partner" t-value="doc.partner_id"/>
         <t t-set="account_fiscal_country_id_vat_label" t-value="doc.company_id.account_fiscal_country_id.vat_label"/>
-        <t t-set="address">
-            <div t-out="partner" class="mb-0"
-                t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}' />
-            <p t-if="partner.vat" class="mb-0">
-                <t t-if="account_fiscal_country_id_vat_label" t-out="account_fiscal_country_id_vat_label"/>
-                <t t-else="">Tax ID</t>: <span t-field="partner.vat"/>
-            </p>
-        </t>
-        <t t-set="layout_document_title">
-            <span>Progress Report</span>
-        </t>
-        <t t-call="web.external_layout" address="address" layout_document_title="layout_document_title">
+        <t t-call="web.basic_layout">
+            <div class="d-flex justify-content-between mb-4">
+                <!-- Left Side Header -->
+                <div class="d-flex align-items-start">
+                    <div class="me-3">
+                        <img t-if="doc.company_id.logo" t-att-src="image_data_uri(doc.company_id.logo)"/>
+                    </div>
+                    <div style="font-size: 14px;">
+                        <div t-field="doc.company_id.partner_id"
+                            t-options='{
+                                "widget": "contact",
+                                "fields": ["address"],
+                                "no_marker": True
+                            }'/>
+
+                        <div t-if="doc.company_id.vat">
+                            <span>TIN:</span>
+                            <span t-field="doc.company_id.vat"/>
+                        </div>
+                    </div>
+                </div>
+                <!-- Right Side Header -->
+                <div style="width: 45%; text-align: right;">
+                    <div t-field="doc.partner_id"
+                        t-options='{
+                            "widget": "contact",
+                            "fields": ["name", "address"],
+                            "no_marker": True
+                        }'/>
+                </div>
+            </div>
+            <h3 class="mt-4">
+                <span>Progress Report</span>
+            </h3>
             <div class="page">
                 <div class="oe_structure"/>
                 <t t-set="orders" t-value="env['sale.order'].search([('project_id', '=', doc.id)], order='id')"/>
@@ -144,7 +165,7 @@
                         </div>
                         <div t-if="doc.x_progress_approver">
                             <strong>Progress Approver</strong>
-                            <div t-field="doc.x_progress_approver.name">Progress Approver</div>
+                            <div t-field="doc.x_progress_approver.display_name">Progress Approver</div>
                         </div>
                     </div>
                     <div class="col-4" name="report_date">
@@ -158,14 +179,14 @@
                         </div>
                     </div>
                 </div>
-
                 <t t-foreach="orders" t-as="order">
                     <t t-set="lines_to_report" t-value="order._get_order_lines_to_report()"/>
                     <t t-set="display_discount" t-value="any(line.discount for line in lines_to_report)"/>
                     <!-- Hide taxes AND show taxed amounts on lines (currently always False)-->
+                    <!-- TODO: Remove `hide_taxes_details` and related conditions if this industry report is never intended to be inherited -->
                     <t t-set="hide_taxes_details" t-value="False"/>
                     <t t-set="display_taxes" t-value="not hide_taxes_details and any(l._has_taxes() for l in lines_to_report)"/>
-
+                    <t t-set="extra_columns" t-value="(1 if display_discount else 0) + (1 if display_taxes else 0)"/>
                     <h3 class="mt-2">
                         Order # <span t-field="order.name"/>
                     </h3>
@@ -196,16 +217,12 @@
                                     <span>Progress Increment</span>
                                 </th>
                                 <th name="quantity_increment" class="text-start">
-                                    <!-- In inheritance, set quantity_increment_colspan instead of editing this <td> to adjust the column span-->
-                                    <t t-set="quantity_increment_colspan" t-value="4"/>
                                     <span>Quantity Increment</span>
                                 </th>
                                 <th name="invoice_increment" class="text-start">
                                     <span>Invoice Increment</span>
                                 </th>
                                 <th name="cumulated_progress" class="text-start">
-                                    <!-- In inheritance, set cumulated_progress_colspan instead of editing this <td> to adjust the column span-->
-                                    <t t-set="cumulated_progress_colspan" t-value="2"/>
                                     <span>Cumulated Progress</span>
                                 </th>
                                 <th name="cumulated_quantity" class="text-start">
@@ -213,14 +230,13 @@
                                 </th>
                             </tr>
                         </thead>
-
-                        <!-- tbody start from here -->
                         <tbody class="sale_tbody">
                             <t t-set="current_section" t-value="None"/>
                             <t t-set="current_subsection" t-value="None"/>
                             <t t-set="price_field" t-value="'price_total' if hide_taxes_details else 'price_subtotal'"/>
 
                             <t t-foreach="lines_to_report" t-as="line">
+                                <t t-set="product_uom" t-value="line.product_uom_id.name"/>
                                 <t t-set="is_note" t-value="line.display_type == 'line_note'"/>
                                 <t t-set="is_section" t-value="line.display_type == 'line_section'"/>
                                 <t t-set="is_subsection" t-value="line.display_type == 'line_subsection'"/>
@@ -246,7 +262,6 @@
                                 <t t-set="padding_style" t-value="line_padding and ('padding-left:' + str(line_padding * 8) + 'px') or ''"/>
                                 <t t-set="show_section_total" t-value="is_section or not line.parent_id.collapse_prices"/>
 
-                                <!-- start here -->
                                 <t t-if="not line.collapse_composition">
                                     <tr
                                         t-if="is_section or is_subsection"
@@ -254,11 +269,10 @@
                                         t-attf-class="fw-bold {{'o_line_section' if is_section else 'o_line_subsection'}}"
                                     >
                                         <t t-set="section_name_colspan"
-                                            t-value="99 if not show_section_total else 4 + (1 if display_discount else 0) + (1 if display_taxes else 0)"/>
+                                            t-value="99 if not show_section_total else 4 + extra_columns"/>
                                         <td
                                             name="td_section_name"
                                             t-att-colspan="section_name_colspan"
-                                            class="border-end-3"
                                             t-att-style="padding_style"
                                         >
                                             <span t-field="line.name">A section title</span>
@@ -273,9 +287,9 @@
                                                     27.00
                                                 </span>
                                             </td>
-                                            <!-- added an extra <td> here to adjust with child invoice_increment values -->
-                                            <td name="td_quantity_increment_column" t-att-colspan="quantity_increment_colspan"/>
-                                            <td name="td_invoice_increment" class="text-center">
+                                            <!-- added an extra <td> here to align with invoice_increment values. -->
+                                            <td name="td_quantity_increment_column" t-att-colspan="4"/>
+                                            <td name="td_invoice_increment" class="text-nowrap text-end">
                                                 <span
                                                     t-out="line._get_section_totals('x_invoice_increment')"
                                                     class="text-nowrap"
@@ -284,17 +298,16 @@
                                                     27.00
                                                 </span>
                                             </td>
-                                            <td name="td_cumulated_progress_column" t-att-colspan="cumulated_progress_colspan"></td>
+                                            <td name="td_cumulated_progress_column" t-att-colspan="2"></td>
                                         </t>
                                     </tr>
-                                    <!-- another SO line type -->
                                     <tr t-elif="is_note" name="tr_note" class="fst-italic o_line_note">
                                         <td name="td_note_name" colspan="99" t-att-style="padding_style">
                                             <span t-field="line.name">A note, whose content usually applies to the section or product above.</span>
                                         </td>
                                     </tr>
                                     <tr t-elif="is_combo" name="tr_combo" class="o_line_combo fw-bold">
-                                        <td class="text-muted" name="td_product_sequence">
+                                        <td class="text-muted" name="td_combo_product_sequence">
                                             <span t-field="line.x_reference"></span>
                                         </td>
                                         <td name="td_combo_name" t-att-style="padding_style">
@@ -302,13 +315,9 @@
                                         </td>
                                         <td name="td_combo_quantity" class="text-end">
                                             <span t-field="line.product_uom_qty"/>
-                                            <span t-field="line.product_uom_id"/>
+                                            <span t-out="product_uom"/>
                                         </td>
-                                        <td
-                                            name="td_combo_price"
-                                            t-att-colspan="2 + (1 if display_discount else 0) + (1 if display_taxes else 0)"
-                                            class="text-end o_price_total"
-                                        >
+                                        <td name="td_combo_price" t-att-colspan="2 + extra_columns" class="text-end o_price_total">
                                             <span
                                                 t-if="not collapse_prices"
                                                 name="price_subtotal_combo"
@@ -320,24 +329,16 @@
                                             </span>
                                         </td>
                                     </tr>
-
-                                    <!-- main from here -->
                                     <tr t-else="" name="tr_product">
                                         <td style="color: rgb(128, 128, 128);" name="td_product_sequence">
                                             <span t-field="line.x_reference"></span>
                                         </td>
-                                        <!--class="w-100" means width = 100%, take a full cell -->
                                         <td name="td_product_name" class="w-100" t-att-style="padding_style">
                                             <span t-out="line.name">Foundation Footing</span>
                                         </td>
                                         <td name="td_product_quantity" class="o_td_quantity text-end">
                                             <span t-field="line.product_uom_qty" class="text-nowrap">3</span>
-                                            <span t-field="line.product_uom_id">units</span>
-                                            <!-- need to rd here -->
-                                            <!-- <span t-if="line.product_uom_id != line.product_id.uom_id" class="text-muted small">
-                                                <t t-set="quantity_in_product_uom" t-value="line.product_uom_id._compute_quantity(line.product_uom_qty, line.product_id.uom_id)"/>
-                                                <br/><span t-out="quantity_in_product_uom" t-options="{'widget': 'float', 'decimal_precision': 'Product Unit'}"/> <span t-field="line.product_id.uom_id"/>
-                                            </span> -->
+                                            <span t-out="product_uom">units</span>
                                         </td>
                                         <td name="td_product_priceunit" class="text-end text-nowrap">
                                             <span t-if="not collapse_prices" t-field="line.price_unit">
@@ -353,7 +354,6 @@
                                         <td t-if="display_taxes" name="td_product_taxes" t-attf-class="text-end {{'text-nowrap' if len(taxes) &lt; 12 else '' }}">
                                             <span t-out="taxes">Tax 15%</span>
                                         </td>
-                                        <!-- need to optimized here  -->
                                         <td t-if="not line.is_downpayment and not collapse_prices" name="td_product_subtotal" class="text-end o_price_total">
                                             <span t-if="price_field == 'price_subtotal'" t-field="line.price_subtotal">
                                                 27.00
@@ -362,40 +362,36 @@
                                                 27.00
                                             </span>
                                         </td>
-                                        <td class="text-center">
-                                            <span name="td_delivered_progress" t-out="(str(line.x_delivered_progress).rstrip('0').strip('.')) + '%'"/>
+                                        <td class="text-end">
+                                            <span name="td_delivered_progress" t-out="'{:.2f}%'.format(line.x_delivered_progress)"/>
                                         </td>
-                                        <td class="text-nowrap text-center">
+                                        <td class="text-nowrap text-end">
                                             <span t-field="line.qty_delivered">3</span>
-                                            <span t-field="line.product_uom_id">units</span>
+                                            <span t-out="product_uom">units</span>
                                         </td>
-                                        <td class="text-center">
+                                        <td class="text-end">
                                             <t t-set="line_progress_increment" t-value="line.x_progress_increment"/>
-                                            <span
-                                                name="td_progress_increment"
-                                                t-out="(str(line_progress_increment * 100).rstrip('0').rstrip('.')) + '%'"
-                                            />
+                                            <span name="td_cumulated_progress" t-out="'{:.2f}%'.format(line_progress_increment * 100)"/>
                                         </td>
-                                        <td class="text-center">
+                                        <td class="text-nowrap text-end">
                                             <t t-set="line_quantity_increment" t-value="line.x_quantity_increment"/>
                                             <span name="td_quantity_increment" t-out="'{:.2f}'.format(line_quantity_increment)"/>
+                                            <span t-out="product_uom">units</span>
                                         </td>
-                                        <td class="text-center">
+                                        <td class="text-nowrap text-end">
                                             <span name="td_invoice_increment" t-out="line.x_invoice_increment"
                                                 t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
                                         </td>
-                                        <td class="text-center">
-                                            <span name="td_cumulated_progress" t-out="(str(line.x_cumulated_progress).rstrip('0').rstrip('.')) + '%'"/>
+                                        <td class="text-nowrap text-end">
+                                            <span name="td_cumulated_progress" t-out="'{:.2f}%'.format(line.x_cumulated_progress)"/>
                                         </td>
-                                        <td class="text-center">
+                                        <td class="text-nowrap text-end">
                                             <span name="td_cumulated_quantity" t-out="'{:.2f}'.format(line.qty_delivered + line_quantity_increment)"/>
+                                            <span t-out="product_uom">units</span>
                                         </td>
                                     </tr>
                                 </t>
-
-                                <!-- need to print else condition coloumn -->
                                 <t t-else="">
-                                    <!-- Displaying the section inner content, grouped by taxes -->
                                     <tr
                                         t-foreach="line._get_grouped_section_summary(display_taxes)"
                                         t-as="section_line"
@@ -441,9 +437,9 @@
                                                 30.00
                                             </span>
                                         </td>
-                                        <!-- added an extra <td> here to adjust with child invoice_increment values -->
-                                        <td name="td_delivered_progress_column" t-att-colspan="quantity_increment_colspan"/>
-                                        <td name="td_section_invoice_increment_total" class="text-center o_price_total">
+                                        <!-- added an extra <td> here to align with invoice_increment values. -->
+                                        <td name="td_delivered_progress_column" t-att-colspan="4"/>
+                                        <td name="td_section_invoice_increment_total" class="o_price_total text-end text-nowrap">
                                             <span
                                                 t-if="show_section_total"
                                                 t-out="line._get_section_totals('x_invoice_increment')"
@@ -471,12 +467,10 @@
                 <t t-set="delivered_vat_free_amount" t-value="price_subtotal_total * delivered_ratio"/>
                 <t t-set="delivered_vat_amount" t-value="price_tax_total * delivered_ratio"/>
                 <t t-set="delivered_amount" t-value="price_total_total * delivered_ratio"/>
-
                 <t t-set="cumulated_vat_free_amount" t-value="price_subtotal_total * cumulated_ratio"/>
                 <t t-set="cumulated_vat_amount" t-value="price_tax_total * cumulated_ratio"/>
                 <t t-set="cumulated_amount" t-value="price_total_total * cumulated_ratio"/>
                 <t t-set="due_amount" t-value="cumulated_amount - delivered_amount"/>
-
                 <div id="current_standing" class="mt-4">
                     <h4 class="mt-2 mb-2">
                         <span>Current Standing</span>
@@ -547,7 +541,7 @@
                             <td style="width: 4%;"></td>
                             <td style="width: 48%;">
                                 <div><strong>Approver</strong></div>
-                                <div t-out="doc.x_progress_approver.name or partner.name">Project Manager Name</div>
+                                <div t-out="doc.x_progress_approver.display_name or partner.name">Project Approver Name</div>
                                 <div class="text-muted">Date:</div>
                                 <div class="text-muted">Signature</div>
                             </td>
@@ -557,21 +551,14 @@
             </div>
         </t>
     </template>
-
     <template id="report_saleorder_progress">
-        <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="doc">
-                <t t-call="construction_developer.prgress_report_document" t-lang="doc.partner_id.lang"/>
-            </t>
-        </t>
-    </template>
-
-
-
-
-
-
-
+       <t t-set="data_report_margin_top" t-value="5"/>
+       <t t-call="web.html_container">
+           <t t-foreach="docs" t-as="doc">
+               <t t-call="construction_developer.prgress_report_document" t-lang="doc.partner_id.lang"/>
+           </t>
+       </t>
+   </template>
     <template id="account_move_portal_content_inherit" inherit_id="account.bill_preview">
         <xpath expr="//th[@name='th_description']" position="before">
             <th class="text-start" id="invoice_sequence_header">#</th>
