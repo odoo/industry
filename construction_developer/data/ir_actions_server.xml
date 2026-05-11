@@ -286,8 +286,9 @@ for record in records:
         <field name="code"><![CDATA[
 for record in records:
     partner_id = record.partner_id.id if not record.partner_id.parent_id else record.partner_id.parent_id.id
+    server_action = env.ref('construction_developer.action_update_product_cost_and_vendor_list')
     for line in record.invoice_line_ids:
-        server_action = env['ir.actions.server'].browse(env.ref('construction_developer.action_update_product_cost_and_vendor_list').id)
+        if not line.product_id: continue
         server_action.with_context(active_id=line.product_id.id, active_model="product.product", partner_id=partner_id, qty=line.quantity, price=line.price_unit).sudo().run()
         ]]></field>
         <field name="model_id" ref="account.model_account_move"/>
