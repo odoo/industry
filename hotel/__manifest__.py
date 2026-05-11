@@ -23,6 +23,7 @@
         'data/mail_message.xml',
         'data/views.xml',
         'data/res_config_settings.xml',
+        'data/spreadsheet_dashboard.xml',
     ],
     'demo': [
         'demo/product_template_post.xml',
