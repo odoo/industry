@@ -420,6 +420,33 @@ for record in self:
         <field name="relation">x_work_item</field>
         <field name="store" eval="False"/>
     </record>
+    <record id="field_res_partner_x_ws_location_id" model="ir.model.fields">
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.location</field>
+        <field name="name">x_ws_location_id</field>
+        <field name="field_description">Worksite Location</field>
+    </record>
+
+    <record id="field_stock_picking_x_work_item_line_ids" model="ir.model.fields">
+        <field name="name">x_work_item_line_ids</field>
+        <field name="ttype">many2many</field>
+        <field name="field_description">Work Item Line</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="relation">x_work_item_line</field>
+        <field name="readonly" eval="True"/>
+        <field name="copied" eval="True"/>
+    </record>
+
+    <record id="field_x_work_item_line_x_picking_ids" model="ir.model.fields">
+        <field name="name">x_picking_ids</field>
+        <field name="ttype">many2many</field>
+        <field name="field_description">Stock Pickings</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="readonly" eval="True"/>
+        <field name="relation">stock.picking</field>
+        <field name="relation_field">x_work_item_line_ids</field>
+    </record>
 
 <!-- 
     Remarks: New Models
@@ -844,10 +871,9 @@ for r in self: r['x_demand'] = (r.x_quantity * (line.product_uom_qty if (line :=
         <field name="field_description">Consumed</field>
         <field name="model_id" ref="x_work_item_line_model"/>
         <field name="readonly" eval="True"/>
-        <field name="store" eval="False"/>
         <field name="depends">x_demand,x_work_item_id,x_work_item_id.x_sale_order_line_id,x_work_item_id.x_sale_order_line_id.x_cost_nature,x_work_item_id.x_sale_order_line_id.x_delivered_progress</field>
         <field name="compute"><![CDATA[
-for r in self: r['x_consumed'] = r.x_demand if (r.x_work_item_id.x_sale_order_line_id.x_cost_nature == 'material' and r.x_work_item_id.x_sale_order_line_id.x_delivered_progress == 100) else 0
+for r in self: r['x_consumed'] = 0.01 * r.x_demand * r.x_work_item_id.x_sale_order_line_id.x_delivered_progress
 ]]></field>
     </record>
 

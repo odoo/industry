@@ -9,6 +9,7 @@
     ],
     'data': [
         'data/res_config_settings.xml',
+        'data/stock_location.xml',
         'data/ir_model.xml',
         'data/ir_model_access.xml',
         'data/ir_model_fields.xml',
