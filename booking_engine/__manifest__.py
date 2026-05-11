@@ -46,6 +46,7 @@
         'data/survey_survey.xml',
         'data/survey_question.xml',
         'data/survey_question_answer.xml',
+        'data/spreadsheet_dashboard.xml',
     ],
     'demo': [
         'demo/hr_employee.xml',
