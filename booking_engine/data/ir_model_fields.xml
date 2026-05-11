@@ -785,4 +785,98 @@ Note that saving a new survey with this set will archive previous survey with th
       <field name="model_id" ref="sale.model_sale_order"/>
       <field name="ttype">boolean</field>
   </record>
+
+    <!-- Daily Lines -->
+    <record id="_field_daily_line" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="field_description">Sequence</field>
+        <field name="model_id" ref="x_model_so_daily_line"/>
+        <field name="name">x_sequence</field>
+    </record>
+    <record id="x_sale_order_id_field_daily_line" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">X Sale Order</field>
+        <field name="model_id" ref="x_model_so_daily_line"/>
+        <field name="name">x_sale_order_id</field>
+        <field name="relation">sale.order</field>
+    </record>
+    <record id="x_sale_order_line_id_field_daily_line" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Sale Order Line</field>
+        <field name="model_id" ref="x_model_so_daily_line"/>
+        <field name="name">x_sale_order_line_id</field>
+        <field name="relation">sale.order.line</field>
+    </record>
+    <record id="x_date_field_daily_line" model="ir.model.fields">
+        <field name="ttype">date</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Date</field>
+        <field name="model_id" ref="x_model_so_daily_line"/>
+        <field name="name">x_date</field>
+    </record>
+    <record id="x_currency_id_field_daily_line" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">Currency</field>
+        <field name="model_id" ref="x_model_so_daily_line"/>
+        <field name="name">x_currency_id</field>
+        <field name="relation">res.currency</field>
+        <field name="related">x_sale_order_id.currency_id</field>
+    </record>
+    <record id="x_price_field_daily_line" model="ir.model.fields">
+        <field name="ttype">monetary</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Price</field>
+        <field name="model_id" ref="x_model_so_daily_line"/>
+        <field name="name">x_price</field>
+        <field name="currency_field">x_currency_id</field>
+    </record>
+    <record id="x_state_field_daily_line" model="ir.model.fields">
+        <field name="ttype">selection</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">State</field>
+        <field name="model_id" ref="x_model_so_daily_line"/>
+        <field name="name">x_state</field>
+        <field name="selection">[('planned', 'Planned'), ('done', 'Done'), ('cancel', 'Cancel')]</field>
+    </record>
+    <record id="x_quantity_field_daily_line" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="related">x_sale_order_line_id.product_uom_qty</field>
+        <field name="field_description">Quantity</field>
+        <field name="model_id" ref="x_model_so_daily_line"/>
+        <field name="name">x_quantity</field>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="x_amount_field_daily_line" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_amount'] = record.x_price * record.x_quantity  * (1 - record.x_sale_order_line_id.discount/100)]]></field>
+        <field name="ttype">monetary</field>
+        <field name="depends">x_price, x_quantity, x_sale_order_line_id.discount</field>
+        <field name="field_description">Amount</field>
+        <field name="model_id" ref="x_model_so_daily_line"/>
+        <field name="name">x_amount</field>
+        <field name="readonly" eval="True"/>
+        <field name="currency_field">x_currency_id</field>
+    </record>
+
+    <record id="x_daily_lines_ids_field_sale_order" model="ir.model.fields">
+        <field name="ttype">one2many</field>
+        <field name="field_description">Daily Lines</field>
+        <field name="model">sale.order</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="name">x_daily_lines_ids</field>
+        <field name="relation">x_so_daily_line</field>
+        <field name="relation_field">x_sale_order_id</field>
+    </record>
+    <record id="x_daily_line_ids_field_sale_order_line" model="ir.model.fields">
+        <field name="ttype">one2many</field>
+        <field name="field_description">Daily Line</field>
+        <field name="model">sale.order.line</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_daily_line_ids</field>
+        <field name="relation">x_so_daily_line</field>
+        <field name="relation_field">x_sale_order_line_id</field>
+    </record>
 </odoo>
