@@ -6,11 +6,15 @@ import logging
 import os
 import pathlib
 import re
-from lxml import etree
+import sys
 from collections import defaultdict
+from lxml import etree
 
 from odoo.tools.mail import single_email_re
 from .industry_case import IndustryCase, get_industry_path
+
+sys.path.append(pathlib.Path(__file__).parent.parent.parent.parent.as_posix())
+from utils import IndustryUtils
 
 _logger = logging.getLogger(__name__)
 
@@ -146,6 +150,7 @@ class TestEnv(IndustryCase):
         static_files = set()
         in_use_files = set()
         checked_records_with_user = {}
+        manifest_content = None
         for root, dirs, files in os.walk(path):
             # sort the directory by alphabetical order so static directory is read first.
             dirs.sort(reverse=True)
@@ -202,7 +207,13 @@ class TestEnv(IndustryCase):
                     self._check_base_records_update(tree, file_name, module)
                     if not is_studio_required:
                         is_studio_required = self._check_studio(tree, file_name)
-        self._check_manifest(manifest_content, is_studio_required, escape_studio_test=module in ESCAPE_STUDIO_TEST)
+
+        if manifest_content is None:
+            _logger.warning("No __manifest__.py found for module %s.", module)
+            return
+        all_dependencies = IndustryUtils().get_dependencies(module)[1]
+
+        self._check_module_dependencies(manifest_content, is_studio_required, all_dependencies, escape_studio_test=module in ESCAPE_STUDIO_TEST)
         self._check_records_without_user_id(checked_records_with_user)
         if self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1):
             in_use_files = {file.lstrip('/') for file in in_use_files}
@@ -243,7 +254,7 @@ class TestEnv(IndustryCase):
                     src,
                 )
 
-    def _check_manifest(self, s, need_studio, escape_studio_test):
+    def _check_module_dependencies(self, s, need_studio, all_dependencies_list, escape_studio_test):
         if (first_line := s.split('\n')[0]) != '{':
             message = "First line of the manifest should be the sole symbol '{'. "
             if not first_line:
@@ -265,15 +276,14 @@ class TestEnv(IndustryCase):
             return
 
         base_automation = (
-            'base_automation' in dependency_list and 'sale_subscription' not in dependency_list
+            'base_automation' in all_dependencies_list and 'sale_subscription' not in all_dependencies_list
         )
         studio_required = need_studio or base_automation
-        studio_dependency = any(
-            studio in dependency_list for studio in ['web_studio', 'website_studio']
-        )
+        studio_dependency = any(studio in all_dependencies_list for studio in ['web_studio', 'website_studio'])
+        direct_studio_dependency = any(studio in dependency_list for studio in ['web_studio', 'website_studio'])
         if studio_required and not studio_dependency:
             _logger.warning("'web_studio' is missing in the dependencies.")
-        elif not studio_required and studio_dependency:
+        elif not studio_required and direct_studio_dependency:
             _logger.warning("'web_studio' should not be in the dependencies.")
 
     def _check_studio(self, root, file_name):
