@@ -561,4 +561,72 @@ if survey:
             invite.action_invite()
         orders_to_survey.write({'x_is_survey_sent': True})]]></field>
     </record>
+
+    <!-- Daily Lines -->
+    <record id="server_action_create_daily_lines_from_so" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for line in record.order_line:
+    if line.product_id.product_tmpl_id.x_is_a_room_offer:
+        current_date = record.rental_start_date
+        while current_date < record.rental_return_date:
+            price_for_day = record.pricelist_id._get_product_price(line.product_id, 1.0, date=current_date)
+            env['x_so_daily_line'].create({
+                'x_sale_order_id': record.id,
+                'x_sale_order_line_id': line.id,
+                'x_date': current_date,
+                'x_price': price_for_day,
+                'x_state': 'planned',
+            })
+            current_date += datetime.timedelta(days=1)
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Dashboard: Create daily lines from so</field>
+    </record>
+    <record id="server_action_unlink_daily_lines_from_so_when_cancelled" model="ir.actions.server">
+        <field name="code"><![CDATA[
+records.x_daily_lines_ids.unlink()
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Dashboard: Delete daily lines from so when cancelled</field>
+    </record>
+    <record id="server_action_unlink_daily_lines_from_so" model="ir.actions.server">
+        <field name="code"><![CDATA[
+records.x_daily_lines_ids.unlink()
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Dashboard: Delete daily lines from so</field>
+    </record>
+    <record id="server_action_create_daily_lines_from_sol" model="ir.actions.server">
+        <field name="code"><![CDATA[
+current_date = record.order_id.rental_start_date
+while current_date < record.order_id.rental_return_date:
+    price_for_day = record.order_id.pricelist_id._get_product_price(record.product_id, 1.0, date=current_date)
+    env['x_so_daily_line'].create({
+        'x_sale_order_id': record.order_id.id,
+        'x_sale_order_line_id': record.id,
+        'x_date': current_date,
+        'x_price': price_for_day,
+        'x_state': 'planned',
+    })
+    current_date += datetime.timedelta(days=1)
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Dashboard: Create daily lines from sol</field>
+    </record>
+    <record id="server_action_modify_daily_lines_from_sol" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for record in records:
+    for daily_line in record.x_daily_line_ids:
+        daily_line.write({
+            'x_price': record.order_id.pricelist_id._get_product_price(record.product_id, 1.0, date=daily_line.x_date),
+        })
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Dashboard: Modify daily lines from sol</field>
+    </record>
 </odoo>
