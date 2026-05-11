@@ -20,6 +20,7 @@
         'data/ir_ui_view.xml',
         'data/website_view.xml',
         'data/res_config_settings.xml',
+        'data/spreadsheet_dashboard.xml',
     ],
     'demo': [
         'demo/res_company.xml',
