@@ -1,6 +1,6 @@
 {
     'name': 'Talent Acquisition',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Services',
     'depends': [
         'account',
@@ -60,13 +60,13 @@
         'demo/hr_job.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
+        'demo/hr_talent_pool.xml',
+        'demo/hr_applicant.xml',
         'demo/website_ir_attachment.xml',
         'demo/website_view.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',
         'demo/website_theme_apply.xml',
-        'demo/hr_talent_pool.xml',
-        'demo/hr_applicant.xml',
         'demo/x_cv_sent_application.xml',
         'demo/mail_activity.xml',
         'demo/website.xml',
