@@ -53,11 +53,12 @@ action = env['portal.wizard'].with_context(default_partner_ids=record.x_hiring_t
   <!-- mail pop up server action -->
     <record id="ir_actions_server_for_email_pop_up" model="ir.actions.server">
         <field name="code"><![CDATA[
+template = env['mail.template'].search([('x_is_template_to_send_cv', '=', True)], limit=1)
 action = env.ref('headhunter.open_mail_compose_message_act_window').read()[0]
 action['context'] =  {
     'default_model': 'hr.applicant',
     'default_res_ids': [record.id],
-    'default_template_id': (env.ref('headhunter.mail_template_60', raise_if_not_found=False) or env['mail.compose.message']).id,
+    'default_template_id': template.id if template else False,
     'default_composition_mode': 'comment',
     'default_attachment_ids': [(6, 0, record.x_shared_cv_ids.ids)],
     'force_email': True,
