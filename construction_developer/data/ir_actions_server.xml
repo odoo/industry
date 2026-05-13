@@ -402,82 +402,18 @@ for so in records.filtered(lambda so: (so.state != 'draft' or env.context.get('f
     so.partner_shipping_id['x_ws_location_id'] = action
 </field>
     </record>
-    <record id="action_wil_create_picking" model="ir.actions.server">
+    <record id="action_wil_procurement_shopping_list" model="ir.actions.server">
         <field name="model_id" ref="x_work_item_line_model"/>
         <field name="state">code</field>
-        <field name="name">Construction Developer: Create Picking from Procurement</field>
-        <field name="code">
-pickings_by_so = {}
-picking_ids = set()
-moves_vals = []
-
-internal_type = env.ref('stock.picking_type_internal')
-stock_loc = env.ref('stock.stock_location_stock')
-
-for wil in records:
-    # 1. Check demand
-    if float_compare((delta := wil.x_demand - wil.x_consumed), 0, precision_digits=2) != 1:
-        continue
-
-    so = wil.x_work_item_id.x_sale_order_line_id.order_id
-
-    # The SO's worksite is the picking destination
-    if not (worksite_loc := so.partner_shipping_id.x_ws_location_id):
-        worksite_loc = env.ref('construction_developer.action_create_delivery_location_on_sales_order_confirm') \
-                        .with_context(force_loc=True, active_model='sale.order', active_ids=[so.id]) \
-                        .run()
-
-    # Find an open picking for this SO or create a new one
-    # We need one picking per SO because the destination is the SO's worksite
-    if so.id not in pickings_by_so:
-        existing_picking = env['stock.picking'].search([
-            ('picking_type_id', '=', internal_type.id),
-            ('location_dest_id', '=', worksite_loc.id),
-            ('origin', '=', so.name), # Ensure it belongs to this specific SO
-            ('state', 'in', ['draft', 'waiting', 'confirmed']) # Do not add to 'assigned' (Ready) or 'done'/'cancelled'
-        ], limit=1)
-
-        pickings_by_so[so.id] = existing_picking or env['stock.picking'].create({
-            'picking_type_id': internal_type.id,
-            'location_id': stock_loc.id,
-            'location_dest_id': worksite_loc.id,
-            'origin': so.name,
-        })
-        pickings_by_so[so.id]['x_work_item_line_ids'] = [Command.link(wil.id)]
-    
-        picking_ids.add(pickings_by_so[so.id].id)
-
-    # 4. Prepare the Stock Move
-    moves_vals.append({
-        'product_id': wil.x_product_id.id,
-        'product_uom_qty': delta,
-        'product_uom': wil.x_unit_id.id,
-        'sale_line_id': wil.x_work_item_id.x_sale_order_line_id.id,
-        'picking_id': pickings_by_so[so.id].id,
-        'location_id': stock_loc.id,
-        'location_dest_id': worksite_loc.id,
-    })
-
-if moves_vals: env['stock.move'].create(moves_vals)
-
-if (picking_list := list(picking_ids)):
-    action = {'type': 'ir.actions.act_window', 'res_model': 'stock.picking', 'name': 'Procurement Internal Transfer(s)',
-              'view_mode': 'list,form' if len(picking_list) > 1 else 'form',
-             } | ({'res_id': picking_list[0]} if len(picking_list) == 1 else {'domain': [('id', 'in', picking_list)]})
-else:
-    action = {'type': 'ir.actions.client', 'tag': 'display_notification', 
-              'params': {'message': 'No transfers needed (demand already fulfilled).', 'type': 'warning', 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'}}}
-</field>
-    </record>
-    <record id="action_wil_create_purchase" model="ir.actions.server">
-        <field name="model_id" ref="x_work_item_line_model"/>
-        <field name="state">code</field>
-        <field name="name">Construction Developer: Create Purchase Order from Procurement</field>
+        <field name="name">Construction Developer: Procurement shopping list</field>
         <field name="code">
 dropship = env.context.get('dropship')
-pos_by_group = {}
-po_ids = set()
-po_lines_vals = []
+picking = env.context.get('picking')  # if not picking: dropship or PO
+pickings_or_po_by_group = {}
+pickings_or_po_ids = set()
+pickings_or_po_vals = []
+
+stock_loc = env.ref('stock.stock_location_stock')
 
 for wil in records:
     # Skip if no demand
@@ -485,70 +421,92 @@ for wil in records:
         continue
 
     product = wil.x_product_id
-
     vendor = product.seller_ids[0].partner_id if product.seller_ids else False
-    if not vendor:
+
+    if not picking and not vendor:  # can't process a PO without a vendor
         continue
 
     so = wil.x_work_item_id.x_sale_order_line_id.order_id
 
-    # If not dropship: picking type = 'Receipts'
-    picking_type = env['stock.picking.type'].search([
-        ('code', '=', 'dropship' if dropship else 'incoming'),
-        ('company_id', '=', so.company_id.id),
-    ], limit=1)
+    if picking:
+        picking_type = env.ref('stock.picking_type_internal')
+        group_key = so.id
 
-    # For dropshipping: grouped by Vendor + Specific Sale Order (for the unique address)
-    # For standard: grouped by Vendor + Company (to safely combine SOs in the same company)
-    group_key = (vendor.id, so.id) if dropship else (vendor.id, so.company_id.id)
+        # The SO's worksite is the picking destination
+        if not (worksite_loc := so.partner_shipping_id.x_ws_location_id):
+            worksite_loc = env.ref('construction_developer.action_create_delivery_location_on_sales_order_confirm') \
+                            .with_context(force_loc=True, active_model='sale.order', active_ids=[so.id]) \
+                            .run()
 
-    if group_key not in pos_by_group:
-        # Search for an open PO
-        domain = [('partner_id', '=', vendor.id), ('state', 'in', ['draft', 'sent'])]
-        if dropship:
-            # Check for an open PO for this Vendor AND this specific Delivery Address
-            domain += [('dest_address_id', '=', so.partner_shipping_id.id)]
+    else:
+        # If not dropship: picking type = 'Receipts'
+        picking_type = env['stock.picking.type'].search([
+            ('code', '=', 'dropship' if dropship else 'incoming'),
+            ('company_id', '=', so.company_id.id),
+        ], limit=1)
+        # For dropshipping: grouped by Vendor + Specific Sale Order (for the unique address)
+        # For standard: grouped by Vendor + Company (to safely combine SOs in the same company)
+        # Don't group different company products in the same PO
+        group_key = (vendor.id, so.id) if dropship else (vendor.id, so.company_id.id)
+
+    if group_key not in pickings_or_po_by_group:
+        domain = [('state', 'in', ['draft', 'waiting', 'confirmed'] if picking else ['draft', 'sent'])]
+        picking_or_po_vals = {'origin': so.name}
         if picking_type:
             domain += [('picking_type_id', '=', picking_type.id)]
-
-        existing_po = env['purchase.order'].search(domain, limit=1)
-
-        if not (po := existing_po):
-            po_vals = {'partner_id': vendor.id}
+            picking_or_po_vals |= {'picking_type_id': picking_type.id}
+        if picking:
+            domain += [('location_dest_id', '=', worksite_loc.id), ('origin', '=', so.name)]
+            picking_or_po_vals |= {
+                'location_id': stock_loc.id,
+                'location_dest_id': worksite_loc.id,
+            }
+        else:
+            domain += [('partner_id', '=', vendor.id)]
+            picking_or_po_vals |= {'partner_id': vendor.id}
             if dropship:
-                # Standard Odoo dropshipping maps the delivery to the Partner Address
-                po_vals |= {'origin': so.name, 'dest_address_id': so.partner_shipping_id.id}
-            if picking_type:
-                po_vals |= {'picking_type_id': picking_type.id}
-            po = env['purchase.order'].create(po_vals)
+                # Check for an open PO for this Vendor AND this specific Delivery Address
+                domain += [('dest_address_id', '=', so.partner_shipping_id.id)]
+                picking_or_po_vals |= {'dest_address_id': so.partner_shipping_id.id}
 
-        # Link existing or new PO
-        pos_by_group[group_key] = po
-        po_ids.add(po.id)
+        # Search for an open PO/picking
+        existing_picking_or_po = env['stock.picking' if picking else 'purchase.order'].search(domain, limit=1)
 
-    pos_by_group[group_key]['x_work_item_line_ids'] = [Command.link(wil.id)]
+        if not (picking_or_po := existing_picking_or_po):
+            picking_or_po = env['stock.picking' if picking else 'purchase.order'].create(picking_or_po_vals)
 
-    po_lines_vals.append({
-        'order_id': pos_by_group[group_key].id,
+        # Link existing or new PO/picking
+        pickings_or_po_by_group[group_key] = picking_or_po
+        pickings_or_po_ids.add(picking_or_po.id)
+
+    pickings_or_po_by_group[group_key]['x_work_item_line_ids'] = [Command.link(wil.id)]
+
+    pickings_or_po_vals.append({
         'product_id': product.id,
-        'product_qty': delta,
-        'product_uom_id': wil.x_unit_id.id,
+        'sale_line_id': wil.x_work_item_id.x_sale_order_line_id.id,
+        ('product_uom_qty' if picking else 'product_qty'): delta,
+        ('product_uom' if picking else 'product_uom_id'): wil.x_unit_id.id,
+        ('picking_id' if picking else 'order_id'): pickings_or_po_by_group[group_key].id,
+    } | ({
+        'location_id': stock_loc.id,
+        'location_dest_id': worksite_loc.id,
+    } if picking else {
         'name': product.display_name,
         'sale_order_id': so.id,
-        'sale_line_id': wil.x_work_item_id.x_sale_order_line_id.id,
-    })
+    }))
 
-if po_lines_vals:
-    env['purchase.order.line'].create(po_lines_vals)
+if pickings_or_po_vals: env['stock.move' if picking else 'purchase.order.line'].create(pickings_or_po_vals)
 
-if (po_list := list(po_ids)):
-    action = {'type': 'ir.actions.act_window', 'res_model': 'purchase.order', 'name': 'Procurement Order(s)',
-              'view_mode': 'list,form' if len(po_list) > 1 else 'form',
-             } | ({'domain': [('id', 'in', po_list)]} if len(po_list) > 1 else {'res_id': po_list[0]})
+if (pickings_or_po_list := list(pickings_or_po_ids)):
+    action = {'type': 'ir.actions.act_window', 'res_model': 'stock.picking' if picking else 'purchase.order', 'name': f'Procurement {'Internal Transfer' if picking else 'Order'}(s)',
+              'view_mode': 'list,form' if len(pickings_or_po_list) > 1 else 'form',
+             } | ({'domain': [('id', 'in', pickings_or_po_list)]} if len(pickings_or_po_list) > 1 else {'res_id': pickings_or_po_list[0]})
 else:
-    # No POs created (delta was 0, or products had no vendors configured)
-    action = {'type': 'ir.actions.client', 'tag': 'display_notification', 
-              'params': {'message': 'No Purchase Orders created. Check demand or ensure products have vendors configured.', 'type': 'warning', 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'}}}
+    po_message = "No Purchase Orders created. Check demand or ensure products have vendors configured."
+    picking_message = "No Purchase Orders created. Check demand or ensure products have vendors configured."
+    # Nothing created (delta was 0, or products had no vendors configured)
+    action = {'type': 'ir.actions.client', 'tag': 'display_notification',
+              'params': {'message': picking_message if picking else po_message, 'type': 'warning', 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'}}}
 </field>
     </record>
 </odoo>
