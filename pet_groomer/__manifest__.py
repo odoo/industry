@@ -64,6 +64,7 @@
         'demo/website.xml',
     ],
     'license': 'OEEL-1',
+    'version': '1.1',
     'cloc_exclude': [
         'data/knowledge_article.xml',
         'demo/website_view.xml',
