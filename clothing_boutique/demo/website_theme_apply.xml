@@ -1,21 +1,117 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <function name="button_choose_theme"
-              model="ir.module.module"
-              eval="[ref('base.module_theme_orchid', raise_if_not_found=False) or ref('base.module_theme_default')]"
-              context="{'website_id': ref('base.default_website')}"
-    />
+  <function name="button_choose_theme"
+            model="ir.module.module"
+            eval="[ref('base.module_theme_paptic', raise_if_not_found=False) or ref('base.module_theme_default')]"
+            context="{'website_id': ref('base.default_website')}"/>
 
-    <function model="ir.ui.view" name="write">
-        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('base.default_website').id).viewref('website.homepage').id"/>
-        <value model="ir.ui.view" eval="{'arch': obj().env.ref('clothing_boutique.homepage').arch}"/>
+  <!-- homepage -->
+  <function model="ir.ui.view" name="write">
+    <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('base.default_website').id).viewref('website.homepage').id"/>
+    <value model="ir.ui.view" eval="{'arch': obj().env.ref('clothing_boutique.homepage').arch}"/>
+  </function>
+
+  <!-- find-us -->
+  <function model="ir.ui.view" name="write">
+    <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('base.default_website').id).viewref('clothing_boutique.find-us').id"/>
+    <value model="ir.ui.view" eval="{'arch': obj().env.ref('clothing_boutique.ir_ui_view_3792').arch}"/>
+  </function>
+
+  <!-- footer -->
+  <function model="ir.ui.view" name="write">
+    <value model="ir.ui.view" eval="obj().search([('key', '=', 'website.footer_custom')]).ids"/>
+    <value eval="{'active': False}"/>
+  </function>
+  <function model="theme.utils" name="enable_view" eval="['website_sale.template_footer_website_sale']"/>
+  <function model="theme.utils" name="enable_view" eval="['clothing_boutique.ir_ui_view_3681']"/>
+  <function model="theme.utils" name="enable_view" eval="['website.footer_copyright_content_width_fluid']"/>
+
+  <!-- header -->
+  <function model="ir.ui.view" name="write">
+    <value model="ir.ui.view" eval="obj().search([('key', '=', 'website.template_header_default')]).ids"/>
+    <value eval="{'active': False}"/>
+  </function>
+
+  <function model="ir.ui.view" name="write">
+    <value model="ir.ui.view" eval="obj().with_context(active_test=False).search([('key', '=', 'website.template_header_vertical')], limit=1).id"/>
+    <value eval="{'active': True}"/>
+  </function>
+
+  <function model="ir.ui.view" name="write">
+    <value model="ir.ui.view" eval="obj().with_context(active_test=False).search([('key', '=', 'website.header_width_full')], limit=1).id"/>
+    <value eval="{'active': True}"/>
+  </function>
+
+  <!-- website menu -->
+  <function model="ir.ui.view" name="write">
+    <value model="ir.ui.view" eval="obj().with_context(active_test=False).search([('key', '=', 'website.template_header_vertical_align_right')], limit=1).id"/>
+    <value eval="{'active': False}"/>
+  </function>
+
+  <function model="ir.ui.view" name="write">
+    <value model="ir.ui.view" eval="obj().with_context(active_test=False).search([('key', '=', 'website.template_header_vertical_align_center')], limit=1).id"/>
+    <value eval="{'active': True}"/>
+  </function>
+
+  <!-- products_categories -->
+  <function model="theme.utils" name="enable_view" eval="['website_sale.products_categories']"/>
+  <function model="theme.utils" name="disable_view" eval="['website_sale.products_categories_top']"/>
+
+  <function model="website.assets" name="make_scss_customization" context="{'website_id': ref('base.default_website')}">
+    <value eval="'/website/static/src/scss/options/user_values.scss'" />
+    <value eval="{
+          'menu-gradient': 'NULL',
+          'menu-secondary-gradient': 'null',
+          'footer-gradient': 'null',
+          'copyright-gradient': 'null',
+          'breadcrumb-gradient': 'null',
+          'o-cc1-bg-gradient': 'null',
+          'o-cc2-bg-gradient': 'null',
+          'o-cc3-bg-gradient': 'null',
+          'o-cc4-bg-gradient': 'null',
+          'o-cc5-bg-gradient': 'null',
+          'font': 'DM Sans',
+          'headings-font': 'Elsie',
+          'navbar-font': 'DM Sans',
+          'buttons-font': 'null',
+          'color-palettes-number': 'null',
+          'color-palettes-name': 'base-1',
+          'btn-ripple': 'null',
+          'header-template': 'vertical',
+          'footer-template': 'website_sale',
+          'footer-scrolltop': 'null',
+          'header-links-style': 'default',
+          'google-fonts': &quot;('DM Sans', 'Elsie')&quot;,
+          'google-local-fonts': 'null',
+          'uploaded-local-fonts': 'null',
+      }"/>
+  </function>
+
+  <function model="website.assets" name="make_scss_customization" context="{'website_id': ref('base.default_website')}">
+    <value eval="'/website/static/src/scss/options/colors/user_color_palette.scss'"/>
+    <value eval="{
+        'o-color-1': '#fb9e67',
+        'o-color-2': '#985183',
+        'o-color-3': '#F5EEF3',
+        'o-color-4': '#FFFFFF',
+        'o-color-5': '#1F140D',
+        'menu-custom': '#ffffff',
+      }"/>
+  </function>
+
+  <function model="website.assets" name="make_scss_customization" context="{'website_id': ref('base.default_website')}">
+    <value eval="'/website/static/src/scss/options/colors/user_theme_color_palette.scss'"/>
+    <value eval="{
+          'success': 'null',
+          'info': 'null',
+          'warning': 'null',
+          'danger': 'null',
+      }"/>
+  </function>
+
+  <data noupdate="1">
+    <function model="website.menu" name="unlink">
+      <value model="website.menu" eval="obj().search([('website_id', '=', ref('base.default_website')), ('url', '=', '/appointment')]).ids"/>
     </function>
-    <function model="ir.ui.view" name="write">
-        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('website_sale.products_categories').id).viewref('website_sale.products_categories').id"/>
-        <value model="ir.ui.view" eval="{'active': True}"/>
-    </function>
-    <function model="website.assets" name="make_scss_customization" context="{'website_id': ref('base.default_website')}">
-        <value eval="'/website/static/src/scss/options/colors/user_color_palette.scss'"/>
-        <value eval="{'o-color-1': '#D2A768', 'o-color-2': '#000000', 'o-color-3': '#E6E6E6', 'o-color-4': '#FFFFFF', 'o-color-5': '#9E7D4E', 'copyright-custom': 'rgba(0, 0, 0, 0.15)'}"/>
-    </function>
+  </data>
 </odoo>
