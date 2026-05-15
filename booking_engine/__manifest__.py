@@ -1,6 +1,6 @@
 {
     'name': 'Booking Engine',
-    'version': '1.16',
+    'version': '1.17',
     'category': 'Hidden/Tools',
     'author': 'Odoo S.A.',
     'depends': [
