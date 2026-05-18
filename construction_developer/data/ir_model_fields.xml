@@ -874,6 +874,7 @@ for record in self:
     <field name="model_id" ref="project.model_project_task"/>
     <field name="name">x_full_time_equivalent</field>
     <field name="readonly" eval="True"/>
+    <field name="store" eval="False"/>
     <field name="compute"><![CDATA[
 for record in self:
     if record.planned_date_begin and record.date_deadline and record.allocated_hours > 0:
@@ -898,36 +899,29 @@ for record in self:
   </record>
   <record id="field_sale_order_line_x_wbs_ready" model="ir.model.fields">
     <field name="ttype">boolean</field>
-    <field name="copied" eval="True"/>
     <field name="field_description">WBS Ready</field>
     <field name="model_id" ref="sale.model_sale_order_line"/>
     <field name="name">x_wbs_ready</field>
   </record>
-  <record id="field_sale_order_line_x_task_progress" model="ir.model.fields">
-    <field name="ttype">float</field>
-    <field name="related">task_id.progress</field>
-    <field name="field_description">Progress</field>
-    <field name="model_id" ref="sale.model_sale_order_line"/>
-    <field name="name">x_task_progress</field>
-    <field name="readonly" eval="True"/>
-    <field name="store" eval="False"/>
-  </record>
-  <record id="field_sale_order_line_x_sale_order_line_ids" model="ir.model.fields">
+  <record id="field_sale_order_line_x_task_ids" model="ir.model.fields">
     <field name="ttype">one2many</field>
     <field name="field_description">Sale Order Line Ids</field>
     <field name="model_id" ref="sale.model_sale_order_line"/>
-    <field name="name">x_sale_order_line_ids</field>
+    <field name="name">x_task_ids</field>
     <field name="relation">project.task</field>
     <field name="relation_field">sale_line_id</field>
   </record>
   <record id="field_sale_order_line_x_work_progress" model="ir.model.fields">
     <field name="ttype">float</field>
-    <field name="related">x_sale_order_line_ids.progress</field>
     <field name="field_description">Work Progress</field>
     <field name="model_id" ref="sale.model_sale_order_line"/>
     <field name="name">x_work_progress</field>
     <field name="readonly" eval="True"/>
     <field name="store" eval="False"/>
+    <field name="depends">x_task_ids,x_task_ids.progress</field>
+    <field name="compute">
+for sol in self: sol['x_work_progress'] = sum(sol.x_task_ids.mapped('progress')) / len(sol.x_task_ids)
+</field>
   </record>
 
   <!-- WBS -->

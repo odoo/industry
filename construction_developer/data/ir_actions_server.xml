@@ -28,6 +28,43 @@ for record in records:
     for sol in record.order_line: sol['sequence'] = seqs[sol.id] + 1
 ]]></field>
     </record>
+    <record id="server_action_update_sol_numbering" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Update SOL numbering</field>
+        <field name="code"><![CDATA[
+env.ref('construction_developer.server_action_setup_sol_numbering').with_context(active_ids = records.order_id.ids, active_model="sale.order").run()
+]]></field>
+    </record>
+    <record id="server_action_setup_sol_numbering" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Setup SOL numbering</field>
+        <field name="code"><![CDATA[
+for record in records:
+    l1, l2, l3 = 0, 0, 0
+    
+    for sol in (sols := list(record.order_line.filtered(lambda sol: sol.display_type in [False, 'line_section', 'line_subsection']).sorted('sequence'))):
+        # Cannot use parent_id: when changing a line to another nesting level, the parent_id field
+        # is not updated yet when this automation is called
+        # Note: if a subsection is dragged out of a section and placed at the very top, it becomes a section
+        above_section = list(filter(lambda sol: sol.display_type != False, sols[:sols.index(sol)]))[-1:]
+
+        # top-level row (section, or product above first section)
+        if sol.display_type == 'line_section' or (sol.display_type == False and not above_section):
+            l1 += 1
+        # middle-level row (subsection, or product under a section)
+        elif sol.display_type == 'line_subsection' or above_section[0].display_type == 'line_section':
+            l2 += 1
+        # bottom-level row (product)
+        else:
+            l3 += 1
+        l2 = l2 * (sol.display_type != 'line_section'); l3 = l3 * (sol.display_type == False)
+
+        new_item_number = "".join([f"{n}." for n in [l1, l2, l3] if n])
+        sol.write({'x_item_number': new_item_number} if sol.x_item_number != new_item_number else {})
+]]></field>
+    </record>
     <record id="action_sol_update_progress_increment_on_change" model="ir.actions.server">
         <field name="model_id" ref="sale.model_sale_order_line"/>
         <field name="state">code</field>
@@ -423,13 +460,13 @@ action['views'] = [(gantt_view.id if gantt_view else False, 'gantt')] + [v for v
         <field name="state">code</field>
         <field name="name">Construction Developer: Transfer WBS</field>
         <field name="code"><![CDATA[
-wbss = records.filtered(lambda p: any([(t.x_sale_line_id or t.sale_line_id).order_id.x_wbs_project.id == p.id for t in p.tasks]))[:1]
-projects = records.filtered(lambda p: any([(t.x_sale_line_id or t.sale_line_id).order_id.x_wbs_project.id != p.id for t in p.tasks]))[:1]
-if len(records) != 2 or not wbss or not projects:
-    action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'message': "Error: Can only Transfer one WBS project to one non-WBS project.", 'type': 'danger'}}
+wbss = records.filtered(lambda p: any([(t.x_sale_line_id or t.sale_line_id).order_id.x_wbs_project.id == p.id for t in p.tasks]))
+if len(records) != 2 or len(wbss) != 1:
+    action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'message': "Error: Please select exactly ONE WBS project and ONE target project.", 'type': 'danger'}}
 else:
-    wbs_name, project_name, n = wbss[0].name, projects[0].name, len(wbss[0].tasks)
-    wbss[0].tasks.write({'project_id': projects[0].id})
+    project = records - wbss
+    wbs_name, project_name, n = wbss.name, project.name, len(wbss.tasks)
+    wbss.tasks.write({'project_id': project.id})
     action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'message': f"Transferred {n} tasks from {wbs_name} to {project_name}", 'type': 'success', 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'}}}
 ]]></field>
     </record>
@@ -456,12 +493,9 @@ for record in records:
         <field name="name">Construction Developer: Update WBS on Sale Order confirm</field>
         <field name="code"><![CDATA[
 for record in records:
-    if record.state != 'draft' and (project := record.x_wbs_project):
-        if (wbs_tasks := project.tasks.filtered('x_sale_line_id')):
-            for task in wbs_tasks:
-                task.write({'x_sale_line_id': False, 'sale_line_id': task.x_sale_line_id.id})
-
-            so_id = wbs_tasks.filtered('sale_line_id')[0].sale_line_id.order_id.id
+    if (wbs_tasks := project.tasks.filtered('x_sale_line_id')):
+        for task in wbs_tasks:
+            task.write({'x_sale_line_id': False, 'sale_line_id': task.x_sale_line_id.id})
 ]]></field>
     </record>
 
@@ -471,7 +505,7 @@ for record in records:
         <field name="state">code</field>
         <field name="name">Construction Developer: Create WBS</field>
         <field name="code"><![CDATA[
-uom_hour = env['uom.uom'].browse(4)
+uom_hour = env.ref('uom.product_uom_hour')
 
 for record in records:
     # when a SO is confirmed: use the default field sale_line_id
@@ -500,8 +534,8 @@ for record in records:
     # Create default stages for new projects
     if not project.type_ids:
         # By default: takes the default stages defined in the construction module
-        default_stage_ids = [env.ref(f'construction.planning_project_stage_{id}', raise_if_not_found=False).id for id in [0,1,2,3,4]]
-        default_stages = env['project.task.type'].search([('id', 'in', default_stage_ids)]) if default_stage_ids else False
+        default_stage_ids = [env.ref(f'construction.planning_project_stage_{id}', raise_if_not_found=False) for id in [0,1,2,3,4]]
+        default_stages = env['project.task.type'].browse([t.id for t in default_stage_ids if t])
 
         # If they don't exist, create a new default stage
         if not default_stages:
@@ -646,43 +680,6 @@ for record in records:
         slide_children(record, new_start, new_end, old_start, old_end)
         if record.child_ids:  # recompute new start/end dates if the parent became smaller than a child and needs to extend to compensate
             update_parent_recursively(record.child_ids[0])
-]]></field>
-    </record>
-    <record id="server_action_update_sol_numbering" model="ir.actions.server">
-        <field name="model_id" ref="sale.model_sale_order_line"/>
-        <field name="state">code</field>
-        <field name="name">Construction Developer: Update SOL numbering</field>
-        <field name="code"><![CDATA[
-env.ref('construction_developer.server_action_setup_sol_numbering').with_context(active_ids = records.order_id.ids, active_model="sale.order").run()
-]]></field>
-    </record>
-    <record id="server_action_setup_sol_numbering" model="ir.actions.server">
-        <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="state">code</field>
-        <field name="name">Construction Developer: Setup SOL numbering</field>
-        <field name="code"><![CDATA[
-for record in records:
-    l1, l2, l3 = 0, 0, 0
-    
-    for sol in (sols := list(record.order_line.filtered(lambda sol: sol.display_type in [False, 'line_section', 'line_subsection']).sorted('sequence'))):
-        # Cannot use parent_id: when changing a line to another nesting level, the parent_id field
-        # is not updated yet when this automation is called
-        # Note: if a subsection is dragged out of a section and placed at the very top, it becomes a section
-        above_section = list(filter(lambda sol: sol.display_type != False, sols[:sols.index(sol)]))[-1:]
-
-        # top-level row (section, or product above first section)
-        if sol.display_type == 'line_section' or (sol.display_type == False and not above_section):
-            l1 += 1
-        # middle-level row (subsection, or product under a section)
-        elif sol.display_type == 'line_subsection' or above_section[0].display_type == 'line_section':
-            l2 += 1
-        # bottom-level row (product)
-        else:
-            l3 += 1
-        l2 = l2 * (sol.display_type != 'line_section'); l3 = l3 * (sol.display_type == False)
-
-        new_item_number = "".join([f"{n}." for n in [l1, l2, l3] if n])
-        sol.write({'x_item_number': new_item_number} if sol.x_item_number != new_item_number else {})
 ]]></field>
     </record>
 </odoo>
