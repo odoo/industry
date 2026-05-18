@@ -18,6 +18,7 @@ class TestOverbooking(PaymentHttpCommon):
         cls.resource = cls.env['resource.resource'].create({
             'name': 'Room 101',
             'resource_type': 'material',
+            'calendar_id': False,
         })
         cls.role = cls.env['planning.role'].create({
             'name': 'Stay Offer Role',
