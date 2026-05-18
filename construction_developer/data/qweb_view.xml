@@ -107,33 +107,34 @@
             </attribute>
         </xpath>
     </template>
-    <template id="prgress_report_document">
+    <template id="progress_report_document">
         <t t-set="partner" t-value="doc.partner_id"/>
-        <t t-set="account_fiscal_country_id_vat_label" t-value="doc.company_id.account_fiscal_country_id.vat_label"/>
+        <t t-set="company" t-value="doc.company_id"/>
+        <t t-set="progress_approver" t-value="doc.x_progress_approver"/>
         <t t-call="web.basic_layout">
             <div class="d-flex justify-content-between mb-4">
                 <!-- Left Side Header -->
                 <div class="d-flex align-items-start">
                     <div class="me-3">
-                        <img t-if="doc.company_id.logo" t-att-src="image_data_uri(doc.company_id.logo)"/>
+                        <img t-if="company.logo" t-att-src="image_data_uri(company.logo)"/>
                     </div>
                     <div style="font-size: 14px;">
-                        <div t-field="doc.company_id.partner_id"
+                        <div t-field="company.partner_id"
                             t-options='{
                                 "widget": "contact",
                                 "fields": ["address"],
                                 "no_marker": True
                             }'/>
 
-                        <div t-if="doc.company_id.vat">
+                        <div t-if="company.vat">
                             <span>TIN:</span>
-                            <span t-field="doc.company_id.vat"/>
+                            <span t-field="company.vat"/>
                         </div>
                     </div>
                 </div>
                 <!-- Right Side Header -->
                 <div style="width: 45%; text-align: right;">
-                    <div t-field="doc.partner_id"
+                    <div t-out="partner"
                         t-options='{
                             "widget": "contact",
                             "fields": ["name", "address"],
@@ -163,9 +164,9 @@
                             <strong>Order Date</strong>
                             <div t-field="orders[0].date_order" t-options="{'widget': 'date'}">04/08/2026</div>
                         </div>
-                        <div t-if="doc.x_progress_approver">
+                        <div t-if="progress_approver">
                             <strong>Progress Approver</strong>
-                            <div t-field="doc.x_progress_approver.display_name">Progress Approver</div>
+                            <div t-field="progress_approver.display_name">Progress Approver</div>
                         </div>
                     </div>
                     <div class="col-4" name="report_date">
@@ -454,7 +455,6 @@
                         </tbody>
                     </table>
                 </t>
-
                 <t t-set="all_sale_order_lines" t-value="orders.mapped('order_line')"/>
                 <t t-set="price_subtotal_total" t-value="sum(all_sale_order_lines.mapped('price_subtotal'))"/>
                 <t t-set="qty_delivered_total" t-value="sum(all_sale_order_lines.mapped('qty_delivered'))"/>
@@ -541,7 +541,7 @@
                             <td style="width: 4%;"></td>
                             <td style="width: 48%;">
                                 <div><strong>Approver</strong></div>
-                                <div t-out="doc.x_progress_approver.display_name or partner.name">Project Approver Name</div>
+                                <div t-out="progress_approver.display_name or partner.name">Project Approver Name</div>
                                 <div class="text-muted">Date:</div>
                                 <div class="text-muted">Signature</div>
                             </td>
@@ -551,11 +551,11 @@
             </div>
         </t>
     </template>
-    <template id="report_saleorder_progress">
+    <template id="report_project_progress">
        <t t-set="data_report_margin_top" t-value="5"/>
        <t t-call="web.html_container">
            <t t-foreach="docs" t-as="doc">
-               <t t-call="construction_developer.prgress_report_document" t-lang="doc.partner_id.lang"/>
+               <t t-call="construction_developer.progress_report_document" t-lang="doc.partner_id.lang"/>
            </t>
        </t>
    </template>
