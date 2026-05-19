@@ -15,6 +15,7 @@
     ],
     'data': [
         'data/ir_attachment_pre.xml',
+        'data/crm_team.xml',
         'data/crm_stage.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
@@ -29,7 +30,6 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
-        'demo/res_users.xml',
         'demo/pos_session.xml',
         'demo/loyalty_program.xml',
         'demo/website_view.xml',
