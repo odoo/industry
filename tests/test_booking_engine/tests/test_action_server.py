@@ -1,6 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 
 from odoo import Command
 from odoo.exceptions import UserError
@@ -65,30 +65,26 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         })
         return order, order.order_line
 
-    def _expected_rental_datetimes(self, start_datetime, end_datetime):
-        expected_start = start_datetime.replace(
+    def _expected_slot_datetimes(self, start_datetime, end_datetime):
+        expected_start = start_datetime
+        if start_datetime.astimezone(self.env.user.tz or UTC).hour < 5:
+            expected_start += timedelta(days=-1)
+        expected_start = expected_start.astimezone(self.env.user.tz or UTC).replace(
             hour=18,
             minute=0,
             second=0,
             microsecond=0,
-        )
-        expected_end = end_datetime.replace(
+        ).astimezone(UTC).replace(tzinfo=None)
+        expected_end = end_datetime
+        if end_datetime.astimezone(self.env.user.tz or UTC).hour > 19:
+            expected_end += timedelta(days=1)
+        expected_end = expected_end.astimezone(self.env.user.tz or UTC).replace(
             hour=9,
             minute=0,
             second=0,
             microsecond=0,
-        )
+        ).astimezone(UTC).replace(tzinfo=None)
         return expected_start, expected_end
-
-    def _expected_slot_datetimes(self, start_datetime, end_datetime):
-        expected_start, expected_end = self._expected_rental_datetimes(start_datetime, end_datetime)
-        expected_end += timedelta(
-            days=(end_datetime - start_datetime).days - (expected_end - expected_start).days
-        )
-        return expected_start, expected_end
-
-    def _expected_nights(self, start_datetime, end_datetime):
-        return int(((end_datetime - start_datetime).total_seconds() + 86399) // 86400)
 
     def test_automation_fix_slot_times_on_create_and_write(self):
         """Test for the industry_fix_slot_times automation."""
