@@ -153,12 +153,12 @@ registry.category('web_tour.tours').add('industry_library_tour', {
             tooltipPosition: 'left'
         },
         {
-            trigger: '.o-checkbox > input[name=\'location_final_id\']',
+            trigger: '.o-checkbox > input[name=\'forecasted_location_id\']',
             run: 'click',
             tooltipPosition: 'left'
         },
         {
-            trigger: '.o-checkbox > input[name=\'location_final_id\']',
+            trigger: '.o-checkbox > input[name=\'forecasted_location_id\']',
             run: 'click',
             tooltipPosition: 'left'
         },
