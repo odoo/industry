@@ -641,7 +641,7 @@ class BookingEngineAutomationsTestCase(TransactionCase):
             "Changing an untriggered field (like allocated_percentage) should NOT flag availabilities.",
         )
 
-    def _test_availability_flow_double_book_then_cancel(self):
+    def test_availability_flow_double_book_then_cancel(self):
         """Integration test to verify the actual math of availability computations during a booking flow."""
 
         # Setup
@@ -649,6 +649,7 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         resource_2 = self.env['resource.resource'].create({
             'name': 'Test Room 2',
             'resource_type': 'material',
+            'calendar_id': False,
         })
 
         tmpl = self.product.product_tmpl_id
