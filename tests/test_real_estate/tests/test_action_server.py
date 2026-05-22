@@ -63,7 +63,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
             'name': 'Test Property',
         })
 
-        create_appointment = self.env['ir.actions.server'].browse(self.env.ref('real_estate.create_appointment_link_server_action').id)
+        create_appointment = self.env.ref('real_estate.create_appointment_link_server_action')
         create_appointment.with_context(active_ids=product.id, active_model="product.template").run()
 
         # Tests the 'create_appointment_link' server action
@@ -144,7 +144,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
             'name': 'Test Property',
             'categ_id': self.env.ref('real_estate.product_category_5').id
         })
-        create_appointment = self.env['ir.actions.server'].browse(self.env.ref('real_estate.create_appointment_link_server_action').id)
+        create_appointment = self.env.ref('real_estate.create_appointment_link_server_action')
         create_appointment.with_context(active_ids=product.id, active_model="product.template").run()
 
         # create a lead and trigger visit action
@@ -154,7 +154,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
             'email_from': 'test@email.com',
             'x_interested_in_id': product.id,
         })
-        visit = self.env['ir.actions.server'].browse(self.env.ref('real_estate.book_your_visit_server_action').id)
+        visit = self.env.ref('real_estate.book_your_visit_server_action')
         visit.with_context(active_ids=lead.id, active_model="crm.lead").run()
 
         email = self.env['mail.mail'].search([('recipient_ids.id', '=', lead.partner_id.id)], limit=1)
@@ -219,13 +219,13 @@ class RealEstateAutomationsTestCase(TransactionCase):
                          "Property 3 should be matched with the client")
 
         # check for send_matches_from_contact_server_action
-        send_matches_action = self.env['ir.actions.server'].browse(self.env.ref('real_estate.send_matches_from_contact_server_action').id)
+        send_matches_action = self.env.ref('real_estate.send_matches_from_contact_server_action')
         send_matches_action.with_context(active_id=client.id, active_model="res.partner").run()
         email = self.env['mail.mail'].search_count([('recipient_ids.id', '=', client.id)])
         self.assertEqual(email, 1, "One email should be sent to the client with matched properties")
 
         # check for notify_contacts_for_matches_server_action (also tests the x_to_notify_property_ids field)
-        notify_action = self.env['ir.actions.server'].browse(self.env.ref('real_estate.notify_contacts_for_matches_server_action').id)
+        notify_action = self.env.ref('real_estate.notify_contacts_for_matches_server_action')
         notify_action.run()
         email_count = self.env['mail.mail'].search_count([('recipient_ids.id', '=', client.id)])
         self.assertEqual(email_count, 2, "One email should be sent to the client after notification by notify_contacts_for_matches action")
@@ -300,7 +300,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
             'x_criteria_ids': self.region_value_1,
         })
 
-        create_lead_action = self.env['ir.actions.server'].browse(self.env.ref('real_estate.create_lead_from_match_server_action').id)
+        create_lead_action = self.env.ref('real_estate.create_lead_from_match_server_action')
         create_lead_action.with_context(active_id=matching_client.id, active_model="res.partner", property_id=property.id).run()
 
         lead = self.env['crm.lead'].search([('partner_id', '=', matching_client.id)], limit=1)
