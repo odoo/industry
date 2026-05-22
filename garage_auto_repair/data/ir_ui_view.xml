@@ -1,0 +1,229 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="fleet_vehicle_model_tyre_type_view_list" model="ir.ui.view">
+        <field name="name">fleet.vehicle.model.tyre.type.view.list</field>
+        <field name="model">x_tyre_type</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list string="Tyre Type" editable="bottom">
+                <field name="x_sequence" widget="handle"/>
+                <field name="x_name"/>
+            </list>
+        </field>
+    </record>
+    <record id="project_task_form_garage_customization" model="ir.ui.view">
+        <field name="name">project.task.form.garage.customization</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="mode">extension</field>
+        <field name="priority">9990</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_view_so']" position="replace">
+                <button name="%(server_action_link_appointment_type)d" class="oe_stat_button" icon="fa-calendar" type="action" invisible="not x_appointment_type_id" string="Appointment"/>
+                <button name="%(ir_actions_act_window_open_linked_invoices)d" class="oe_stat_button" icon="fa-dollar" type="action" string="Invoices" invisible="sale_order_id or not x_is_invoice"/>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="%(server_action_create_sale_order)d" string="Create Quotation" type="action" class="btn-primary" invisible="sale_order_id or x_is_invoice"/>
+                <button name="%(server_action_create_invoice)d" string="Create Invoice" type="action" class="btn-primary" invisible="sale_order_id or x_is_invoice"/>
+            </xpath>
+            <xpath expr="//field[@name='user_ids']" position="after">
+                <field name="x_appointment_type_id"/>
+                <field name="x_appointment_date" invisible="not x_appointment_type_id"/>
+                <field name="x_vehicle_id" domain="['|', ('x_owner_id', '=', partner_id), ('x_owner_id', '!=', False)]"/>
+                <field name="x_chassis_number" invisible="not x_vehicle_id"/>
+                <field name="x_odometer"/>
+            </xpath>
+            <xpath expr="//field[@name='sale_order_id']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="invisible">has_template_ancestor or has_project_template</attribute>
+            </xpath>
+            <xpath expr="//page[@name='extra_info']//field[@name='date_last_stage_update']" position="after">
+                <label for="date_deadline"/>
+                <div id="date_deadline_and_recurring_task" class="d-inline-flex w-100">
+                    <field name="date_deadline" nolabel="1" decoration-danger="date_deadline and date_deadline &lt; current_date and state not in ['1_done', '1_canceled']"/>
+                    <field name="recurring_task" nolabel="1" class="ms-0" style="width: fit-content;" widget="boolean_icon" options="{'icon': 'fa-repeat'}" invisible="not active or parent_id or not allow_recurring_tasks" groups="project.group_project_recurring_tasks"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_sale_project_inherit_form_garage_customization" model="ir.ui.view">
+        <field name="name">view.sale.project.task.form.garage.customization</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="sale_project.view_sale_project_inherit_form"/>
+        <field name="mode">extension</field>
+        <field name="priority">9990</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//label[@for='sale_line_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//div[@name='sale_line_div']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_sale_order_form" model="ir.ui.view">
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="mode">extension</field>
+        <field name="model">sale.order</field>
+        <field name="name">sale.order.form.customization</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sale_order_template_id']" position="after">
+                <field name="x_vehicle_id" domain="['|', ('x_owner_id', '=', partner_id), ('x_owner_id', '!=', False)]"/>
+                <field name="x_chassis_number" invisible="not x_vehicle_id"/>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="x_task_id" invisible="not x_task_id"/>
+            </xpath>
+            <xpath expr="//page[@name='order_lines']//list//field[@name='product_template_id']" position="after">
+                <field name="x_in_report" widget="boolean_toggle"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="res_partner_custom_form_view" model="ir.ui.view">
+        <field name="name">res.partner.form.customization</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="mode">extension</field>
+        <field name="model">res.partner</field>
+        <field name="active" eval="True"/>
+        <field name="priority">200</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//button[@name='action_open_employees']" position="after">
+                    <button name="%(ir_actions_act_window_open_linked_vehicles)d" class="oe_stat_button" icon="fa-automobile" type="action">
+                        <field widget="statinfo" name="x_vehicle_count" string="Vehicles"/>
+                    </button>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="fleet_vehicle_view_form_inherit" model="ir.ui.view">
+        <field name="name">fleet.vehicle.form.inherit.customization</field>
+        <field name="model">fleet.vehicle</field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='category_id']" position="before">
+                <field name="x_owner_id"/>
+            </xpath>
+            <xpath expr="//field[@name='fuel_type']" position="before">
+                <field name="x_tyre_id"/>
+                <field name="x_motor_block"/>
+            </xpath>
+            <xpath expr="//page[@name='note']" position="after">
+                <xpath expr="//page[@name='page_tax_info']" position="move"/>
+            </xpath>
+            <xpath expr="//button[@name='return_action_to_open']" position="attributes">
+                <attribute name="invisible">contract_count == 0</attribute>
+            </xpath>
+            <xpath expr="//group[@col='2']/group[1]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='manager_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='location']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//label[@for='plan_to_change_vehicle']" position="replace"/>
+            <xpath expr="//field[@name='plan_to_change_vehicle']" position="replace"/>
+        </field>
+    </record>
+    <record id="account_move_form_view" model="ir.ui.view">
+        <field name="name">account.move.form.customization</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="mode">extension</field>
+        <field name="model">account.move</field>
+        <field name="active" eval="True"/>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@id='header_left_group']/div" position="after">
+                <field name="x_vehicle_id" domain="['|', ('x_owner_id', '=', partner_id), ('x_owner_id', '!=', False)]" invisible="move_type == 'in_invoice' or not x_task_id"/>
+                <field name="x_chassis_number" invisible="not x_vehicle_id"/>
+            </xpath>
+            <xpath expr="//div[@name='due_date']" position="after">
+                <field name="x_task_id" invisible="invoice_origin or not x_task_id"/>
+            </xpath>
+            <xpath expr="//list[@name='journal_items']//field[@name='product_id']" position="after">
+                <field name="x_in_report" optional="show" widget="boolean_toggle"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="product_product_form_view" model="ir.ui.view">
+        <field name="name">product.template.product.form.customization</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="mode">extension</field>
+        <field name="model">product.template</field>
+        <field name="active" eval="True"/>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_policy']" position="after">
+                <field name="x_need_in_intervention_report" widget="boolean_toggle"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="sale_order_view_custom_list" model="ir.ui.view">
+        <field name="name">sale.order.view.list.customization</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="priority">160</field>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="replace">
+                <list string="Intervention Report">
+                    <field name="x_task_id"/>
+                    <field name="partner_id"/>
+                    <field name="x_vehicle_id"/>
+                    <field name="x_chassis_number"/>
+                    <field name="x_odometer"/>
+                </list>
+            </xpath>
+        </field>
+    </record>
+    <record id="appointment_invite_view_list_inherit" model="ir.ui.view">
+        <field name="name">appointment.invite.view.list.inherit</field>
+        <field name="model">appointment.invite</field>
+        <field name="inherit_id" ref="appointment.appointment_invite_view_tree"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="priority">160</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='book_url']" position="after">
+                <field name="x_task_id"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_task_kanban_inherit_appointment_date_garage" model="ir.ui.view">
+        <field name="name">project.task.kanban.inherit.appointment.date.garage</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_kanban"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="inside">
+                <field name="x_appointment_date"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <div t-if="record.x_appointment_date.raw_value">
+                    <strong>Appointment Date - </strong>
+                    <span t-out="record.x_appointment_date.value"/>
+                </div>
+            </xpath>
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="default_order">priority desc, x_appointment_date asc, sequence, state, date_deadline asc, id desc</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
