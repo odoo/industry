@@ -89,7 +89,7 @@ class ActionServerTestCase(TransactionCase):
             "Fiscal positions that are deposit contains the purchase no excises tax")
 
     def test_fiscal_deposit_move_computation(self):
-        server_action = self.env['ir.actions.server'].browse(self.env.ref('excise_management.ir_action_compute_excise_report_line')).id
+        server_action = self.env.ref('excise_management.ir_action_compute_excise_report_line')
         customers = self.env['stock.location'].create({'name': 'Customers', 'usage': 'customer'})
         license1, license2 = self.env['x_excise_license'].create([
             {'x_name': 'License 1', 'x_active': True},
