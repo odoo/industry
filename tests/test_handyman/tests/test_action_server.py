@@ -43,7 +43,7 @@ class ActionServerTestCase(TransactionCase):
         move_line.analytic_distribution = False
         # Check that the automation is not triggered when move_line changes
         self.assertEqual(move_line.analytic_distribution, False)
-        server_action = self.env['ir.actions.server'].browse(self.env.ref('handyman.action_add_default_analytic_account').id)
+        server_action = self.env.ref('handyman.action_add_default_analytic_account')
         server_action.with_context(active_id=move_line.id, active_model="account.move.line").run()
         self.assertEqual(move_line.analytic_distribution, {f'{move_line.move_id.x_task_id.project_id.account_id.id}': 100.0})
 
@@ -56,6 +56,6 @@ class ActionServerTestCase(TransactionCase):
             project_task.name = "project_task_1"
             # Check that the automation is not triggered when project task is changed
             self.assertEqual(project_task.name, "project_task_1")
-            server_action = self.env['ir.actions.server'].browse(self.env.ref('handyman.action_add_section_task_name').id)
+            server_action = self.env.ref('handyman.action_add_section_task_name')
             server_action.with_context(active_ids=[project_task.id], active_model="project.task").run()
             self.assertEqual(project_task.name, "project_task_1 - section_1")
