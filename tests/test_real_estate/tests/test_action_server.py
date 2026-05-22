@@ -61,6 +61,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
     def test_create_and_archive_appointment_types(self):
         product = self.env['product.template'].create({
             'name': 'Test Property',
+            'x_agent_id': self.env.ref('base.user_admin').id
         })
 
         create_appointment = self.env.ref('real_estate.create_appointment_link_server_action')
@@ -142,7 +143,8 @@ class RealEstateAutomationsTestCase(TransactionCase):
     def test_send_email_book_visit(self):
         product = self.env['product.template'].create({
             'name': 'Test Property',
-            'categ_id': self.env.ref('real_estate.product_category_5').id
+            'categ_id': self.env.ref('real_estate.product_category_5').id,
+            'x_agent_id': self.env.ref('base.user_admin').id
         })
         create_appointment = self.env.ref('real_estate.create_appointment_link_server_action')
         create_appointment.with_context(active_ids=product.id, active_model="product.template").run()

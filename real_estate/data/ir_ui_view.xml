@@ -24,7 +24,7 @@
         </xpath>
         <xpath expr="//sheet[@name='product_form']" position="before">
           <header>
-            <button string="Create Visit Link" name="%(create_appointment_link_server_action)d" type="action" invisible="not x_is_properties or x_appointment_ids or x_is_closed"/>
+            <button string="Create Visit Link" name="%(create_appointment_link_server_action)d" type="action" invisible="not x_is_properties or x_appointment_ids or x_is_closed" context="{'from_form_view': True}"/>
           </header>
         </xpath>
         <xpath expr="//button[@name='action_view_sales']" position="after">
@@ -36,6 +36,9 @@
           </button>
           <button class="oe_stat_button" icon="fa-heart" type="action" name="%(matches_contact_act_window)d" invisible="not x_is_properties" context="{'property_id': id}">
             <field widget="statinfo" name="x_x_property_matches_contacts_res_partner_count" string="Matches"/>
+          </button>
+          <button class="oe_stat_button" icon="fa-calendar" type="action" name="%(server_action_property_appointments)d" invisible="not x_appointment_count">
+              <field widget="statinfo" name="x_appointment_count" string="Appointments"/>
           </button>
         </xpath>
         <xpath expr="//field[@name='default_code']" position="after">
@@ -340,7 +343,7 @@
     <field name="priority">200</field>
     <field name="type">form</field>
     <field name="arch" type="xml">
-        <xpath expr="//group[@name='left_details']/div[1]" position="after">
+        <xpath expr="//group[@name='left_details']/span[1]" position="after">
           <field name="appointment_invite_ids" widget="many2many_tags" options="{'edit_tags':true}"/>
         </xpath>
         <xpath expr="//group[@name='left_details']" position="inside">
@@ -475,6 +478,17 @@
     <field name="arch" type="xml">
         <xpath expr="//field[@name='create_variant']" position="after">
           <field name="x_is_matchmaking"/>
+        </xpath>
+    </field>
+  </record>
+  <record id="product_template_list_view_inherit" model="ir.ui.view">
+    <field name="name">product.template.list.inherit.real_estate</field>
+    <field name="model">product.template</field>
+    <field name="inherit_id" ref="product.product_template_tree_view"/>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='default_code']" position="after">
+            <field name="x_agent_id" optional="hide"/>
         </xpath>
     </field>
   </record>
