@@ -10,6 +10,7 @@
         'knowledge',
         'sale_project',
         'web_studio',
+        'website',
     ],
     'data': [
         'data/ir_model.xml',
@@ -29,9 +30,16 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
     ],
+    'demo': [
+        'demo/ir_attachment_post.xml',
+        'demo/website_view.xml',
+        'demo/website_theme_apply.xml',
+        'demo/website.xml',
+    ],
     'cloc_exclude': [
         'data/knowledge_article.xml',
         "data/qweb_view.xml",
+        "demo/website_view.xml",
     ],
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
