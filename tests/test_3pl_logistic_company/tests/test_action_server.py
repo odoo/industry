@@ -19,7 +19,7 @@ class AutomationsTestCase(TransactionCase):
         product_form['x_owner_id'] = self.partner_1
         product_form.save()
         self.assertTrue(self.product_template_1.is_storable, "The is_storable field should be set to True when the owner is set.")
-        self.assertEqual(self.product_template_1.tracking, 'lot', "The tracking should be set to 'lot' when the owner is set.")
+        self.assertEqual(self.product_template_1.reckoning, 'lot', "The tracking should be set to 'lot' when the owner is set.")
 
     def test_base_automation_on_move_line_created(self):
         self.product_template_1.x_owner_id = self.partner_1
