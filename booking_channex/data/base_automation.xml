@@ -54,6 +54,7 @@
         <field name="model_id" ref="product.model_product_pricelist"/>
         <field name="action_server_ids" eval="[(6, 0, [ref('server_action_create_rate_plans_from_pricelist')])]"/>
         <field name="trigger">on_create</field>
+        <field name="filter_domain">[("x_published_on_channex", "=", True)]</field>
         <field name="name">Create Rate Plan on pricelist creation</field>
     </record>
     <record id="automation_on_room_product_variant_delete" model="base.automation">
@@ -68,6 +69,24 @@
         <field name="action_server_ids" eval="[(6, 0, [ref('server_action_delete_rate_plans_from_pricelist')])]"/>
         <field name="trigger">on_unlink</field>
         <field name="name">Delete rate plan on pricelist deletion</field>
+    </record>
+    <record id="automation_on_pricelist_x_published_on_channex_set" model="base.automation">
+        <field name="model_id" ref="product.model_product_pricelist"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_create_rate_plans_from_pricelist')])]"/>
+        <field name="trigger">on_write</field>
+        <field name="name">Create rate plan on pricelist published channex set</field>
+        <field name="filter_domain">[("x_published_on_channex", "=", True)]</field>
+        <field name="filter_pre_domain">[("x_published_on_channex", "=", False)]</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_published_on_channex_field_product_pricelist')])]"/>
+    </record>
+    <record id="automation_on_pricelist_x_published_on_channex_unset" model="base.automation">
+        <field name="model_id" ref="product.model_product_pricelist"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_delete_rate_plans_from_pricelist')])]"/>
+        <field name="trigger">on_write</field>
+        <field name="name">Delete rate plan on pricelist published channex unset</field>
+        <field name="filter_domain">[("x_published_on_channex", "=", False)]</field>
+        <field name="filter_pre_domain">[("x_published_on_channex", "=", True)]</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_published_on_channex_field_product_pricelist')])]"/>
     </record>
     <record id="automation_on_room_offer_product_template_delete" model="base.automation">
         <field name="model_id" ref="product.model_product_template"/>

@@ -11,6 +11,7 @@
         'data/ir_actions_act_window.xml',
         'data/ir_model_fields.xml',
         'data/ir_actions_server.xml',
+        'data/ir_default.xml',
         'data/base_automation.xml',
         'data/ir_cron.xml',
         'data/ir_ui_view.xml',
