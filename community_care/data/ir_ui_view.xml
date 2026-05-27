@@ -1,0 +1,236 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="res_partner_form_view_inherit" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="mode">extension</field>
+    <field name="model">res.partner</field>
+    <field name="name">res.partner form view community care customization</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="/form/sheet/group" position="replace">
+          <group name="group_partner_header">
+            <group name="group_partner_header_left">
+              <label for="x_date_of_birth"/>
+              <div class="d-flex justify-content-between align-items-center" name="x_date_of_birth">
+                <field name="x_date_of_birth" class="oe_inline w-50" force_save="1"/>
+                <span class="oe_inline" invisible="not x_date_of_birth">Age <field name="x_age" class="oe_inline" options="{'digits':[0,0]}"/>
+                </span>
+              </div>
+            </group>
+          </group>
+        </xpath>
+        <xpath expr="/form//button[@name='action_view_tasks']" position="replace"/>
+        <!-- <xpath expr="/form/sheet/div[2]/div/div/div/field[@name='parent_id']" position="replace"/> -->
+        <xpath expr="/form//page[@name='sales_purchases']" position="replace"/>
+        <xpath expr="/form//page[@name='contact_addresses']" position="after">
+          <page string="Placement" name="placement">
+            <group name="group_placement">
+              <group name="group_placement_left">
+                <field name="x_admission_date"/>
+                <field name="x_legal_status"/>
+                <field name="x_projected_exit_date"/>
+                <field name="x_effective_exit_date" help="To fill in on resident leave."/>
+              </group>
+              <group name="group_placement_right">
+                <field name="x_nicknames"/>
+                <field widget="many2many_tags" name="x_languages"/>
+                <field name="x_special_needs" help="e.g. IEP/Special Education status, speech therapy schedule"/>
+              </group>
+            </group>
+          </page>
+          <page string="Medical &amp; Safety" name="medical_safety">
+            <group name="group_medical_safety">
+              <group name="group_medical_safety_left">
+                <field name="x_allergies" widget="many2many_tags"/>
+                <field name="x_blood_type"/>
+                <field name="x_health_insurance"/>
+              </group>
+              <group name="group_medical_safety_right">
+                <field name="x_current_medications" help="Dosage, frequency, and administration instructions."/>
+              </group>
+            </group>
+          </page>
+        </xpath>
+        <xpath expr="/form//field[@name='child_ids']" position="replace">
+          <field name="x_contacts">
+            <list editable="bottom">
+              <field name="x_sequence" widget="handle"/>
+              <field optional="show" name="x_contact" required="True" widget="many2one_avatar" options="{&quot;no_open&quot;:false}" domain="[(&quot;x_is_resident&quot;, &quot;=&quot;, False)]"/>
+              <field widget="many2many_tags" optional="show" name="x_nature" required="True"/>
+              <field optional="show" name="x_notes"/>
+            </list>
+          </field>
+        </xpath>
+      </data>
+    </field>
+  </record>
+  <record id="res_partner_search_view_inherit" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="inherit_id" ref="base.view_res_partner_filter"/>
+    <field name="mode">extension</field>
+    <field name="model">res.partner</field>
+    <field name="name">res.partner search view community care customization</field>
+    <field name="priority">160</field>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+      <data>
+        <!-- <xpath expr="/search//filter[@name='employees']" position="replace"/> -->
+        <xpath expr="/search//field[@name='parent_id']" position="replace"/>
+        <xpath expr="/search//field[@name='user_id']" position="replace"/>
+        <xpath expr="/search/separator[2]" position="replace">
+          <separator name="separator_dob"/>
+          <filter name="filter_date_of_birth" string="Date of Birth" date="x_date_of_birth"/>
+        </xpath>
+        <xpath expr="/search//filter[@name='group_company']" position="replace"/>
+        <xpath expr="/search//filter[@name='salesperson']" position="replace"/>
+        <xpath expr="/search//filter[@name='group_country']" position="replace"/>
+        <!-- <xpath expr="/search//filter[@name='filter_vat_set']" position="attributes">
+          <attribute name="invisible">True</attribute>
+        </xpath> -->
+        <xpath expr="/search/group" position="inside">
+          <filter name="group_by_age" string="Age" context="{'group_by': 'x_age'}"/>
+        </xpath>
+      </data>
+    </field>
+  </record>
+  <record id="x_allergy_list_view" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="model">x_allergy</field>
+    <field name="name">Default list view for x_allergy</field>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <list editable="bottom" default_order="id desc">
+        <field name="x_name"/>
+        <field optional="show" name="x_residents" widget="many2many_tags" readonly="True"/>
+      </list>
+    </field>
+  </record>
+  <record id="x_res_partner_line_medical_professionals_list_view" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="model">x_res_partner_line_medical_professionals</field>
+    <field name="name">Default list view for x_res_partner_line_medical_professionals</field>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <list default_order="x_sequence asc,id desc">
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+  </record>
+  <record id="x_res_partner_line_medical_professionals_form_view" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="model">x_res_partner_line_medical_professionals</field>
+    <field name="name">Default form view for x_res_partner_line_medical_professionals</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="res_partner_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="group_details">
+            <group name="group_details_left"/>
+            <group name="group_details_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+  <record id="x_res_partner_line_medical_professionals_search_view" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="model">x_res_partner_line_medical_professionals</field>
+    <field name="name">Default search view for x_res_partner_line_medical_professionals</field>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+  </record>
+  <record id="x_medical_profession_list_view" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="model">x_medical_profession</field>
+    <field name="name">Default list view for x_medical_profession</field>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <list editable="bottom">
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+  </record>
+  <record id="x_languages_list_view" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="model">x_languages</field>
+    <field name="name">Default list view for x_languages</field>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <list editable="bottom" default_order="id desc">
+        <field name="x_name"/>
+        <field optional="show" name="x_residents" readonly="True" widget="many2many_tags"/>
+      </list>
+    </field>
+  </record>
+  <record id="x_res_partner_line_list_view" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="model">x_res_partner_line</field>
+    <field name="name">Default list view for x_res_partner_line</field>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <list default_order="x_sequence asc,id desc">
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+      </list>
+    </field>
+  </record>
+  <record id="x_res_partner_line_form_view" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="model">x_res_partner_line</field>
+    <field name="name">Default form view for x_res_partner_line</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <form>
+        <header/>
+        <sheet string="res_partner_line">
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="group_details">
+            <group name="group_details_left"/>
+            <group name="group_details_right"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
+  <record id="x_res_partner_line_search_view" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="model">x_res_partner_line</field>
+    <field name="name">Default search view for x_res_partner_line</field>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+      </search>
+    </field>
+  </record>
+  <record id="x_contact_nature_list_view" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="model">x_contact_nature</field>
+    <field name="name">Default list view for x_contact_nature</field>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <list editable="bottom" default_order="id desc">
+        <field name="x_name"/>
+      </list>
+    </field>
+  </record>
+</odoo>
