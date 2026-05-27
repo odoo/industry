@@ -48,14 +48,14 @@ class RealEstateAutomationsTestCase(TransactionCase):
     def test_publish_draft_product(self):
         product = self.env['product.template'].create({
             'name': 'Test Property',
-            'website_ribbon_id': self.env.ref('website_sale.sale_ribbon').id
+            'website_ribbon_id': self.env.ref('real_estate.draft_ribbon').id
         })
 
         product.is_published = True
         self.assertTrue(not product.is_published,
                         "The product should not be publishable when the ribbon is in draft state")
 
-        product.website_ribbon_id = self.env.ref('website_sale.sold_out_ribbon')
+        product.website_ribbon_id = self.env.ref('real_estate.pre_published_ribbon')
         product.is_published = True
         self.assertTrue(product.is_published,
                         "The product should be publishable when the ribbon is not in draft state")
@@ -83,7 +83,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
             'name': 'Test Property',
         })
 
-        product.website_ribbon_id = self.env.ref('website_sale.sold_out_ribbon')
+        product.website_ribbon_id = self.env.ref('real_estate.pre_published_ribbon')
         self.assertTrue(product.x_ribbon_stage_is_accounted,
                         "The product ribbon should be marked as accounted when it is updated")
         self.assertTrue(product.x_last_notification_update,
@@ -93,7 +93,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
         product = self.env['product.template'].create({
             'name': 'Test Property',
         })
-        product.website_ribbon_id = self.env.ref('website_sale.sold_out_ribbon')
+        product.website_ribbon_id = self.env.ref('real_estate.pre_published_ribbon')
         product.list_price = 100.0
         last_notification = product.x_last_notification_update
         product.list_price = 150.0
