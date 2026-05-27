@@ -50,26 +50,126 @@ record['x_quantity_increment'] = record.x_progress_increment * record.product_uo
         <field name="code"><![CDATA[
 lines = record.order_id.order_line.sorted(key=lambda sol: sol.sequence)
 i = [sol.sequence for sol in lines].index(record.sequence) + 1
+
 while (i < len(lines) and
       ((record.display_type == 'line_section' and lines[i].display_type != 'line_section')
       or (record.display_type == 'line_subsection' and (lines[i].display_type not in ['line_subsection', 'line_section'])))):
+
     if lines[i].x_is_deliverable:
         increment = min(lines[i].product_uom_qty - lines[i].qty_delivered, lines[i].product_uom_qty * record.x_progress_increment)  # ensures the total doesn't exceed lines[i].product_uom_qty
         percentage = increment / lines[i].product_uom_qty if lines[i].product_uom_qty else False
-        lines[i]['x_quantity_increment'], lines[i]['x_progress_increment'] = increment, percentage
+
+        lines[i].write({'x_quantity_increment': increment, 'x_progress_increment': percentage})
+
     i += 1
+
 record['x_progress_increment'] = 0
 action = {'type': 'ir.actions.client', 'tag': 'soft_reload'}
 ]]></field>
     </record>
     <record id="action_sol_update_qty_delivered" model="ir.actions.server">
-        <field name="code"><![CDATA[
-for sol in records: sol.write({'qty_delivered': sol.qty_delivered + sol.x_quantity_increment, 'x_quantity_increment': 0, 'x_progress_increment': 0})
-action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'message': "Delivered quantities updated.", 'type': 'success', 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'}}}
-]]></field>
         <field name="model_id" ref="sale.model_sale_order_line"/>
         <field name="state">code</field>
         <field name="name">Construction Developer: Update Quantity Delivered</field>
+        <field name="code">
+# Only run the action if the setting is activated
+moves_action = env.ref('construction_developer.action_sol_create_procurement_moves')
+is_moves_active = env['ir.config_parameter'].sudo().get_param('construction.procurement_active') == 'True'
+returned_action = moves_action.run() if is_moves_active else False
+
+for sol in records: 
+    sol.write({
+        'qty_delivered': sol.qty_delivered + sol.x_quantity_increment, 
+        'x_quantity_increment': 0, 
+        'x_progress_increment': 0
+    })
+
+if returned_action:
+    action = returned_action
+else:
+    action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'message': "Delivered quantities updated.", 'type': 'success', 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'}}}
+</field>
+    </record>
+
+    <record id="action_sol_create_procurement_moves" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Create Procurement Moves</field>
+        <field name="code">
+moves_vals = []
+pickings_by_so = {}
+
+out_type_id = env.ref('stock.picking_type_out').id
+dest_loc_id = env.ref('stock.stock_location_customers').id
+
+def add_moves_vals(moves_vals, line, increment, picking_id, source_loc_id, dest_loc_id, is_wil=False):
+    moves_vals.append({
+        'product_id':      (line.x_product_id if is_wil else line.product_id).id,
+        'product_uom_qty': (line.x_quantity if is_wil else 1) * increment,
+        'product_uom':     (line.x_unit_id if is_wil else line.product_uom).id,
+        'sale_line_id':    (line.x_work_item_id.x_sale_order_line_id if is_wil else line).id,
+        'picking_id': picking_id,
+        'location_id': source_loc_id,
+        'location_dest_id': dest_loc_id,
+    })
+
+# Pre-filter records to only those that actually need processing
+valid_sols = records.filtered(lambda sol: sol.x_quantity_increment > 0 and sol.order_id.partner_shipping_id.x_ws_location_id)
+
+# Map existing pickings to our SOs, or create them if missing
+if valid_sols:
+    valid_sos = valid_sols.order_id
+    source_loc_ids = valid_sos.mapped('partner_shipping_id.x_ws_location_id').ids
+    origins = [f"Progress Delivery: {so.name}" for so in valid_sos]
+
+    # ONE database query to find all draft pickings for these SOs
+    existing_pickings = env['stock.picking'].search([
+        ('picking_type_id', '=', out_type_id),
+        ('location_id', 'in', source_loc_ids),
+        ('location_dest_id', '=', dest_loc_id),
+        ('origin', 'in', origins),
+        ('state', '=', 'draft')
+    ])
+
+    draft_pickings_by_origin = {p.origin: p for p in existing_pickings}
+
+    for so in valid_sos:
+        origin = f"Progress Delivery: {so.name}"
+        if origin in draft_pickings_by_origin:
+            pickings_by_so[so.id] = draft_pickings_by_origin[origin]
+        else:
+            pickings_by_so[so.id] = env['stock.picking'].create({
+                'picking_type_id': out_type_id,
+                'location_id': so.partner_shipping_id.x_ws_location_id.id,
+                'location_dest_id': dest_loc_id,
+                'origin': origin,
+            })
+
+# Create the values for the moves
+for sol in records:
+    increment = sol.x_quantity_increment
+
+    if sol in valid_sols:
+        so = sol.order_id
+        picking = pickings_by_so[so.id]
+        source_loc_id = so.partner_shipping_id.x_ws_location_id.id
+
+        if sol.x_line_work_item_id:
+            for wil in sol.x_line_work_item_id.x_work_item_line_ids:
+                if wil.x_product_id and wil.x_product_id.is_storable:
+                    add_moves_vals(moves_vals, wil, increment, picking.id, source_loc_id, dest_loc_id, is_wil=True)
+        elif sol.product_id:
+            add_moves_vals(moves_vals, sol, increment, picking.id, source_loc_id, dest_loc_id, is_wil=False)
+
+moves = env['stock.move'].create(moves_vals) if moves_vals else False
+
+if moves and (pickings := moves.picking_id.ids):
+    action = {'type': 'ir.actions.act_window', 'res_model': 'stock.picking', 'name': "Transfers",
+              'view_mode': 'list,form' if len(pickings) > 1 else 'form',
+             } | ({'domain': [('id', 'in', pickings)]} if len(pickings) > 1 else {'res_id': pickings[0]})
+else:
+    action = False
+</field>
     </record>
     <!-- 
     server action and not compute because otherwise compute generates the same ID if
@@ -381,7 +481,7 @@ if so_ids != [0]:
 
             -- Individual Margin / Total Margin of all rows
             x_margin / NULLIF(SUM(x_margin) OVER (), 0) AS x_margin_share,
-            
+
             -- Individual Cost / Total Cost of all rows
             x_total_cost / NULLIF(SUM(x_total_cost) OVER (), 0) AS x_cost_share
 
@@ -391,6 +491,21 @@ if so_ids != [0]:
     action['context']['active_ids'] = so_ids
 ]]></field>
     </record>
+
+    <record id="action_check_stock_move_validity" model="ir.actions.server">
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Check Stock Move Validity</field>
+        <field name="code">
+for move in records:
+    if (will := move.picking_id.move_ids.filtered(lambda m: m.x_work_item_line_ids and m.product_id == move.product_id and m.id != move.id)):
+        raise UserError(f"""There already exists lines for the product(s) you're trying to add.
+To avoid losing the Work Item Procurement information because of line merging, please update the existing lines instead.
+
+Product(s): {", ".join(will.product_id.mapped('display_name'))}""")
+</field>
+    </record>
+
     <record id="action_create_delivery_location_on_sales_order_confirm" model="ir.actions.server">
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
@@ -398,115 +513,219 @@ if so_ids != [0]:
         <field name="code">
 for so in records.filtered(lambda so: (so.state != 'draft' or env.context.get('force_loc', False)) and not so.partner_shipping_id.x_ws_location_id):
     wh = env['ir.model.data']._xmlid_to_res_id('construction_developer.stock_location_1')
-    action = env['stock.location'].create({'name': f"{so.name} - {so.partner_id.name}", 'usage': 'internal', 'company_id': env.company.id, 'location_id': wh})
+    action = env['stock.location'].create({'name': f"{so.partner_shipping_id.name}", 'usage': 'internal', 'company_id': env.company.id, 'location_id': wh})
     so.partner_shipping_id['x_ws_location_id'] = action
 </field>
     </record>
-    <record id="action_wil_procurement_shopping_list" model="ir.actions.server">
+    <record id="action_wil_procurement_po" model="ir.actions.server">
         <field name="model_id" ref="x_work_item_line_model"/>
         <field name="state">code</field>
-        <field name="name">Construction Developer: Procurement shopping list</field>
+        <field name="name">Construction Developer: Procurement Purchase Orders</field>
         <field name="code">
 dropship = env.context.get('dropship')
-picking = env.context.get('picking')  # if not picking: dropship or PO
-pickings_or_po_by_group = {}
-pickings_or_po_ids = set()
-pickings_or_po_vals = []
+quantities = env.context.get('wi_quantities', {})
 
-stock_loc = env.ref('stock.stock_location_stock')
+pos_by_group = {}
+touched_po_ids = set()
+
+pols_by_key = {}
+existing_pols_by_key = {}
 
 for wil in records:
-    # Skip if no demand
-    if float_compare((delta := wil.x_demand - wil.x_consumed), 0, precision_digits=2) != 1:
+    delta = quantities.get(wil.x_work_item_id, wil.x_demand - wil.x_consumed)
+    if float_compare(delta, 0, precision_digits=2) != 1:
         continue
 
     product = wil.x_product_id
     vendor = product.seller_ids[0].partner_id if product.seller_ids else False
-
-    if not picking and not vendor:  # can't process a PO without a vendor
+    if not vendor:
         continue
 
     so = wil.x_work_item_id.x_sale_order_line_id.order_id
 
-    if picking:
-        picking_type = env.ref('stock.picking_type_internal')
-        group_key = so.id
+    # Resolve Analytic Account early for grouping
+    project = env['project.project'].search(['|', ('sale_order_id', '=', so.id), ('sale_line_id', 'in', so.order_line.ids), ('account_id', '!=', False)], limit=1)
+    account_id = project.account_id.id if project else False
 
-        # The SO's worksite is the picking destination
-        if not (worksite_loc := so.partner_shipping_id.x_ws_location_id):
-            worksite_loc = env.ref('construction_developer.action_create_delivery_location_on_sales_order_confirm') \
-                            .with_context(force_loc=True, active_model='sale.order', active_ids=[so.id]) \
-                            .run()
+    picking_type = env['stock.picking.type'].search([
+        ('code', '=', 'dropship' if dropship else 'incoming'),
+        ('company_id', '=', so.company_id.id),
+    ], limit=1)
 
-    else:
-        # If not dropship: picking type = 'Receipts'
-        picking_type = env['stock.picking.type'].search([
-            ('code', '=', 'dropship' if dropship else 'incoming'),
-            ('company_id', '=', so.company_id.id),
-        ], limit=1)
-        # For dropshipping: grouped by Vendor + Specific Sale Order (for the unique address)
-        # For standard: grouped by Vendor + Company (to safely combine SOs in the same company)
-        # Don't group different company products in the same PO
-        group_key = (vendor.id, so.id) if dropship else (vendor.id, so.company_id.id)
+    group_key = (vendor.id, so.id) if dropship else (vendor.id, so.company_id.id)
 
-    if group_key not in pickings_or_po_by_group:
-        domain = [('state', 'in', ['draft', 'waiting', 'confirmed'] if picking else ['draft', 'sent'])]
-        picking_or_po_vals = {'origin': so.name}
+    # Header Logic
+    if group_key not in pos_by_group:
+        domain = [('state', 'in', ['draft', 'sent']), ('partner_id', '=', vendor.id)]
+        po_vals = {'origin': so.name, 'partner_id': vendor.id}
+
         if picking_type:
             domain += [('picking_type_id', '=', picking_type.id)]
-            picking_or_po_vals |= {'picking_type_id': picking_type.id}
-        if picking:
-            domain += [('location_dest_id', '=', worksite_loc.id), ('origin', '=', so.name)]
-            picking_or_po_vals |= {
+            po_vals |= {'picking_type_id': picking_type.id}
+
+        if dropship:
+            domain += [('dest_address_id', '=', so.partner_shipping_id.id)]
+            po_vals |= {'dest_address_id': so.partner_shipping_id.id}
+
+        if not (po := env['purchase.order'].search(domain, limit=1)):
+            po = env['purchase.order'].create(po_vals)
+
+        pos_by_group[group_key] = po
+
+        # Map existing lines: JSON keys are strings, so we convert back to int safely
+        for pol in po.order_line:
+            dist = pol.analytic_distribution or {}
+            pol_account_id = int(list(dist.keys())[0]) if dist else False
+            existing_pols_by_key[(po.id, pol.product_id.id, pol_account_id)] = pol
+
+    po = pos_by_group[group_key]
+    line_key = (po.id, product.id, account_id)
+
+    # Line Logic
+    if line_key in existing_pols_by_key:
+        existing_pol = existing_pols_by_key[line_key]
+        existing_pol.write({
+            'product_qty': existing_pol.product_qty + delta,
+            'x_work_item_line_ids': [Command.link(wil.id)]
+        })
+        touched_po_ids.add(po.id)
+    else:
+        if line_key not in pols_by_key:
+            pols_by_key[line_key] = {
+                'order_id': po.id,
+                'name': product.display_name,
+                'product_id': product.id,
+                'product_qty': 0.0,
+                'product_uom_id': wil.x_unit_id.id,
+                'sale_order_id': so.id,
+                'sale_line_id': wil.x_work_item_id.x_sale_order_line_id.id,
+                'x_work_item_line_ids': [],
+                'analytic_distribution': {account_id: 100} if account_id else False
+            }
+        pols_by_key[line_key]['product_qty'] += delta
+        pols_by_key[line_key]['x_work_item_line_ids'].append(Command.link(wil.id))
+
+action = env.ref('construction_developer.action_display_form_or_list').with_context(
+    vals_list=list(pols_by_key.values()),
+    picking=False,
+    existing_header_ids=list(touched_po_ids)
+).run()
+</field>
+    </record>
+
+    <record id="action_wil_procurement_transfer" model="ir.actions.server">
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Procurement Internal Transfers</field>
+        <field name="code">
+quantities = env.context.get('wi_quantities', {})
+pickings_by_so = {}
+touched_picking_ids = set()
+
+moves_by_product_key = {}
+existing_moves_by_key = {}
+
+stock_loc = env.ref('stock.stock_location_stock')
+picking_type = env.ref('stock.picking_type_internal')
+
+for wil in records:
+    delta = quantities.get(wil.x_work_item_id, wil.x_demand - wil.x_consumed)
+    if float_compare(delta, 0, precision_digits=2) != 1:
+        continue
+
+    product = wil.x_product_id
+    so = wil.x_work_item_id.x_sale_order_line_id.order_id
+
+    # Create if no location (SO not confirmed or other edge case)
+    if not (worksite_loc := so.partner_shipping_id.x_ws_location_id):
+        worksite_loc = env.ref('construction_developer.action_create_delivery_location_on_sales_order_confirm') \
+                        .with_context(force_loc=True, active_model='sale.order', active_ids=[so.id]) \
+                        .run()
+
+    # Find existing picking to add to if exists
+    if so.id not in pickings_by_so:
+        existing_picking = env['stock.picking'].search([
+            ('state', 'in', ['draft', 'waiting', 'confirmed']),
+            ('picking_type_id', '=', picking_type.id),
+            ('location_dest_id', '=', worksite_loc.id),
+            ('origin', '=', so.name)
+        ], limit=1)
+
+        if not (picking := existing_picking):
+            picking = env['stock.picking'].create({
+                'origin': so.name,
+                'picking_type_id': picking_type.id,
                 'location_id': stock_loc.id,
                 'location_dest_id': worksite_loc.id,
+            })
+
+        pickings_by_so[so.id] = picking
+
+        # Map existing lines to prevent duplicates
+        for move in picking.move_ids:
+            existing_moves_by_key[(picking.id, move.product_id.id)] = move
+
+
+    picking = pickings_by_so[so.id]
+    line_key = (picking.id, product.id)
+
+    # Aggregate lines if already exist
+    if line_key in existing_moves_by_key:
+        existing_moves_by_key[line_key].write({
+            'product_uom_qty': existing_moves_by_key[line_key].product_uom_qty + delta,
+            'x_work_item_line_ids': [Command.link(wil.id)]
+        })
+        touched_picking_ids.add(picking.id)
+    else:
+        if line_key not in moves_by_product_key:
+            moves_by_product_key[line_key] = {
+                'product_id': product.id,
+                'product_uom_qty': 0.0,
+                'product_uom': wil.x_unit_id.id,
+                'picking_id': picking.id,
+                'location_id': stock_loc.id,
+                'location_dest_id': worksite_loc.id,
+                'x_work_item_line_ids': [],
             }
-        else:
-            domain += [('partner_id', '=', vendor.id)]
-            picking_or_po_vals |= {'partner_id': vendor.id}
-            if dropship:
-                # Check for an open PO for this Vendor AND this specific Delivery Address
-                domain += [('dest_address_id', '=', so.partner_shipping_id.id)]
-                picking_or_po_vals |= {'dest_address_id': so.partner_shipping_id.id}
+        moves_by_product_key[line_key]['product_uom_qty'] += delta
+        moves_by_product_key[line_key]['x_work_item_line_ids'].append(Command.link(wil.id))
 
-        # Search for an open PO/picking
-        existing_picking_or_po = env['stock.picking' if picking else 'purchase.order'].search(domain, limit=1)
+action = env.ref('construction_developer.action_display_form_or_list').with_context(
+    vals_list=list(moves_by_product_key.values()),
+    picking=True,
+    existing_header_ids=list(touched_picking_ids)
+).run()
+</field>
+    </record>
 
-        if not (picking_or_po := existing_picking_or_po):
-            picking_or_po = env['stock.picking' if picking else 'purchase.order'].create(picking_or_po_vals)
+    <record id="action_display_form_or_list" model="ir.actions.server">
+        <field name="model_id" ref="base.model_ir_actions_server"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Procurement Routing Helper</field>
+        <field name="code">
+vals_list = env.context.get('vals_list', [])
+picking = env.context.get('picking')
+header_ids = set(env.context.get('existing_header_ids', []))
 
-        # Link existing or new PO/picking
-        pickings_or_po_by_group[group_key] = picking_or_po
-        pickings_or_po_ids.add(picking_or_po.id)
+# Create new lines if any, and extract their parent PO/Picking IDs
+if vals_list:
+    new_lines = env['stock.move' if picking else 'purchase.order.line'].create(vals_list)
+    header_ids.update(new_lines.mapped('picking_id' if picking else 'order_id').ids)
 
-    pickings_or_po_by_group[group_key]['x_work_item_line_ids'] = [Command.link(wil.id)]
+header_ids = list(header_ids)
 
-    pickings_or_po_vals.append({
-        'product_id': product.id,
-        'sale_line_id': wil.x_work_item_id.x_sale_order_line_id.id,
-        ('product_uom_qty' if picking else 'product_qty'): delta,
-        ('product_uom' if picking else 'product_uom_id'): wil.x_unit_id.id,
-        ('picking_id' if picking else 'order_id'): pickings_or_po_by_group[group_key].id,
-    } | ({
-        'location_id': stock_loc.id,
-        'location_dest_id': worksite_loc.id,
-    } if picking else {
-        'name': product.display_name,
-        'sale_order_id': so.id,
-    }))
+empty_message = 'No transfers needed (demand already fulfilled).' if picking else 'No Purchase Orders created. Check demand and ensure products have vendors configured.'
 
-if pickings_or_po_vals: env['stock.move' if picking else 'purchase.order.line'].create(pickings_or_po_vals)
-
-if (pickings_or_po_list := list(pickings_or_po_ids)):
-    action = {'type': 'ir.actions.act_window', 'res_model': 'stock.picking' if picking else 'purchase.order', 'name': f'Procurement {'Internal Transfer' if picking else 'Order'}(s)',
-              'view_mode': 'list,form' if len(pickings_or_po_list) > 1 else 'form',
-             } | ({'domain': [('id', 'in', pickings_or_po_list)]} if len(pickings_or_po_list) > 1 else {'res_id': pickings_or_po_list[0]})
+if header_ids:
+    action = {
+        'type': 'ir.actions.act_window',
+        'name': 'Procurement ' + ('Transfers' if picking else 'Orders'),
+        'res_model': 'stock.picking' if picking else 'purchase.order',
+        'view_mode': 'list,form' if len(header_ids) > 1 else 'form',
+    } | ({'domain': [('id', 'in', header_ids)]} if len(header_ids) > 1 else {'res_id': header_ids[0]})
 else:
-    po_message = "No Purchase Orders created. Check demand or ensure products have vendors configured."
-    picking_message = "No Purchase Orders created. Check demand or ensure products have vendors configured."
-    # Nothing created (delta was 0, or products had no vendors configured)
     action = {'type': 'ir.actions.client', 'tag': 'display_notification',
-              'params': {'message': picking_message if picking else po_message, 'type': 'warning', 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'}}}
+              'params': {'message': empty_message, 'type': 'warning', 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'}}}
 </field>
     </record>
 </odoo>

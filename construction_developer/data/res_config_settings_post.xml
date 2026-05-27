@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <!-- procurement move setting -->
+    <record id="x_setting_field_procurement_move" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Procurement Move</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="name">x_module_procurement_move</field>
+        <field name="store" eval="True"/>
+        <field name="compute"><![CDATA[
+self['x_module_procurement_move'] = self.env.user.has_group('construction_developer.group_procurement_move')
+]]></field>
+    </record>
+
+    <record id="x_action_toggle_procurement_move" model="ir.actions.server">
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="state">code</field>
+        <field name="name">Toggle Procurement Move Features</field>
+        <field name="code">
+# 'record' represents the current res.config.settings instance being saved
+is_active = record.x_module_procurement_move
+# Save the state permanently to check in server action
+env['ir.config_parameter'].sudo().set_param('construction.procurement_active', str(is_active))
+
+# (De)activate Setting + Multi locations
+group_user = env.ref('base.group_user')
+procurement_group = env.ref('construction_developer.group_procurement_move')
+
+if is_active:
+    group_user._apply_group(procurement_group)
+    record['group_stock_multi_locations'] = True
+else:
+    group_user._remove_group(procurement_group)
+    record['group_stock_multi_locations'] = False
+
+
+records_to_toggle = [
+    'automation_on_stock_move_create_or_write',
+    'stock_picking_form_view_inherit',
+]
+
+for xml_id in records_to_toggle:
+    if (rec := env.ref(f'construction_developer.{xml_id}', raise_if_not_found=False)):
+        rec['active'] = is_active
+
+
+
+cloc_entries = [
+    'action_wil_procurement_transfer',
+    'action_check_stock_move_validity',
+    'action_sol_create_procurement_moves',
+]
+
+for cloc_entry in cloc_entries:
+    cloc_exclude_id = f'construction_developer_{cloc_entry}'
+    entry_model = 'ir.actions.server' if cloc_entry.startswith('server_action') else 'ir.model.fields'
+    pairs = lambda cloc_entry_id: [
+        ('name', cloc_exclude_id),
+        ('model', entry_model),
+        ('module', '__cloc_exclude__'),
+        ('res_id', cloc_entry_id.id),
+    ]
+
+    if is_active:
+        # Unlink/Remove from cloc exclusion when feature is turned ON
+        if (cloc_entry_id := env.ref(f'__cloc_exclude__.{cloc_exclude_id}', raise_if_not_found=False)):
+            env['ir.model.data'].search([(key, '=', value) for key, value in pairs(cloc_entry_id)], limit=1).unlink()
+    else:
+        # Create cloc exclusion when feature is turned OFF
+        if (cloc_entry_id := env.ref(f'construction_developer.{cloc_entry}', raise_if_not_found=False)) and not env.ref(f'__cloc_exclude__.{cloc_exclude_id}', raise_if_not_found=False):
+            env['ir.model.data'].create({key: val for key, val in pairs(cloc_entry_id)})
+</field>
+    </record>
+
+    <record id="base_automation_on_procurement_move_setting_changed" model="base.automation">
+        <field name="name">On Change: Procurement Move Setting</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="on_change_field_ids" eval="[(6, 0, [ref('x_setting_field_procurement_move')])]"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('x_action_toggle_procurement_move')])]"/>
+    </record>
+
+    <record id="res_config_settings_form_view_inherited" model="ir.ui.view">
+        <field name="name">res.config.settings.form.view.inherited.construction_developer</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="40"/>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Construction Developer" name="construction_developer">
+                    <block title="Transfers" name="transfers_block">
+                        <setting id="construction_developer_procurement_move_setting" help="Create client worksite locations and create transfers to them.">
+                            <field name="x_module_procurement_move"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

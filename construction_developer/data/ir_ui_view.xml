@@ -201,9 +201,9 @@
         <field name="arch" type="xml">
             <list open_form_view="false" create="0">
                 <header>
-                    <button string="Create Picking" name="%(action_wil_procurement_shopping_list)d" type="action" class="btn btn-primary" context="{'picking': True}"/>
-                    <button string="Purchase" name="%(action_wil_procurement_shopping_list)d" type="action" class="btn btn-primary"/>
-                    <button string="Dropship" name="%(action_wil_procurement_shopping_list)d" type="action" class="btn btn-primary" context="{'dropship': True}"/>
+                    <button string="Purchase" name="%(action_wil_procurement_po)d" type="action" class="btn btn-primary"/>
+                    <button string="Dropship" name="%(action_wil_procurement_po)d" type="action" class="btn btn-primary" context="{'dropship': True}"/>
+                    <button string="Transfer" name="%(action_wil_procurement_transfer)d" type="action" class="btn btn-primary" context="{'picking': True}" groups="construction_developer.group_procurement_move"/>
                 </header>
                 <field name="x_sale_order_id" widget="many2one" optional="show"/>
                 <field name="x_line_reference" optional="show"/>
@@ -211,8 +211,8 @@
                 <field name="x_work_item_id" widget="many2one" optional="show"/>
                 <field name="x_unit_id" widget="many2one" optional="show"/>
                 <field name="x_demand" optional="show"/>
-                <field name="x_picking_ids" widget="many2many_tags" optional="show"/>
                 <field name="x_purchase_order_ids" widget="many2many_tags" optional="show"/>
+                <field name="x_picking_ids" widget="many2many_tags" optional="show" groups="construction_developer.group_procurement_move"/>
                 <field name="x_consumed" optional="show"/>
             </list>
         </field>
@@ -399,6 +399,35 @@
         <field name="priority">1600</field>
         <field name="type">form</field>
         <field name="active" eval="True"/>
+    </record>
+
+    <record id="stock_picking_form_view_inherit" model="ir.ui.view">
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="mode">extension</field>
+        <field name="model">stock.picking</field>
+        <field name="name">stock.picking.form.inherit.construction_developer</field>
+        <field name="priority">1600</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='operations']/field[@name='move_ids']/list/button[@name='action_show_details']" position="before">
+                <field name="x_wil_so_ids" widget="many2many_tags" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="purchase_order_form_view_inherit" model="ir.ui.view">
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="mode">extension</field>
+        <field name="model">purchase.order</field>
+        <field name="name">purchase.order.form.inherit.construction_developer</field>
+        <field name="priority">1600</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='products']/field[@name='order_line']/list/field[@name='price_subtotal']" position="after">
+                <field name="x_wil_so_ids" widget="many2many_tags" optional="hide"/>
+            </xpath>
+        </field>
     </record>
 
 <!-- remark -->
