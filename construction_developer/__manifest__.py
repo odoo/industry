@@ -5,9 +5,11 @@
     'depends': [
         'base_industry_data',
         'construction',
+        'stock_dropshipping',
         'web_studio',
     ],
     'data': [
+        'data/res_groups.xml',
         'data/res_config_settings.xml',
         'data/stock_location.xml',
         'data/ir_model.xml',
@@ -31,6 +33,7 @@
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
         'data/x_remark_category.xml',
+        'data/res_config_settings_post.xml',
     ],
     'demo': [
         'demo/res_partner.xml',
@@ -42,6 +45,7 @@
         'demo/x_remark_stage.xml',
         'demo/x_remark.xml',
         'demo/sale_order_post.xml',
+        'demo/purchase_order.xml',
         'demo/ir_attachment.xml',
     ],
     'assets': {
