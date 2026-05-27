@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 from odoo.addons.payment.tests.http_common import PaymentHttpCommon
 from odoo import Command
@@ -32,6 +33,8 @@ class TestOverbooking(PaymentHttpCommon):
             'sale_ok': True,
             'list_price': 10,
             'rent_periodicity': 'days',
+            'pickup_time': 18,
+            'return_time': 9,
             'is_published': True,
         })
         cls.express_checkout_billing_values = {
@@ -122,7 +125,7 @@ class TestOverbooking(PaymentHttpCommon):
         with self.assertRaises(ValidationError, msg="This Sales Order can't be confirmed. No resources are available for the shifts in: %s." % self.product.name):
             sale_order.action_confirm()
 
-    def _test_ecommerce_book_stay_offer_available(self):
+    def test_ecommerce_book_stay_offer_available(self):
         """
         Scenario: Customer from ecommerce can book a stay offer when resources are available
         """
@@ -136,6 +139,11 @@ class TestOverbooking(PaymentHttpCommon):
         })
         self.assertEqual(response['tracking_info'][0]['item_id'], self.product.product_variant_id.id, "No item found in shopping cart.")
         sale_order = self.env['sale.order'].search([], limit=1)
+        website_tz = ZoneInfo(self.env.company.website_id.tz)
+        picking_time = self.start_date.astimezone(website_tz).replace(hour=int(self.product.pickup_time), minute=0, second=0, microsecond=0).astimezone(ZoneInfo("UTC")).replace(tzinfo=None)
+        return_time = self.end_date.astimezone(website_tz).replace(hour=int(self.product.return_time), minute=0, second=0, microsecond=0).astimezone(ZoneInfo("UTC")).replace(tzinfo=None)
+        self.assertEqual(sale_order.rental_start_date, picking_time, "The planning slot should begin at the same time as the picking time.")
+        self.assertEqual(sale_order.rental_return_date, return_time, "The planning slot should end at the same time as the return time.")
         self.assertTrue(sale_order, "No sale order was created from ecommerce.")
         self.assertEqual(sale_order.order_line.product_id.id, self.product.product_variant_id.id, "product doesn't exist in sale order.")
         self.assertEqual(sale_order.state, 'draft', "The order should be in 'draft' state.")
