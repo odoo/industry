@@ -1,18 +1,22 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<odoo noupdate="1">
+<odoo>
     <record id="create_purchase_orders_for_all_WILs_of_project_S00003" model="ir.actions.server">
         <field name="name">Industry HR demo data: Conditionally create admin user</field>
         <field name="model_id" ref="base.model_ir_actions_server"/>
         <field name="state">code</field>
-        <field name="code"><![CDATA[
-# because can't use search in context="" for a function record
+        <field name="code">
+demo_so = env.ref('construction_developer.sale_order_41', raise_if_not_found=False)
 
-action = env.ref('construction_developer.action_wil_procurement_po')
-active_ids = env['x_work_item_line'].search([
-    ('x_work_item_id.x_sale_order_line_id.order_id', '=', env.ref('construction_developer.sale_order_41').id)
-]).ids
-action.with_context(active_ids=active_ids, active_model='x_work_item_line').run()
-]]></field>
+# Only run if no Purchase Order Lines exist for this specific Demo SO
+if demo_so and not env['purchase.order.line'].search_count([('sale_order_id', '=', demo_so.id)]):
+    action = env.ref('construction_developer.action_wil_procurement_po')
+    active_ids = env['x_work_item_line'].search([
+        ('x_work_item_id.x_sale_order_line_id.order_id', '=', demo_so.id)
+    ]).ids
+    
+    if active_ids:
+        action.with_context(active_ids=active_ids, active_model='x_work_item_line').run()
+</field>
     </record>
     <function name="run" model="ir.actions.server" eval="[ref('create_purchase_orders_for_all_WILs_of_project_S00003')]"/>
     <function model="ir.actions.server" name="unlink">

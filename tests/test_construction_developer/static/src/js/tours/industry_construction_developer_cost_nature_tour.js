@@ -12,6 +12,10 @@ registry.category("web_tour.tours").add("industry_construction_developer_cost_na
         "run": "click",
     },
     {
+        "trigger": ".o_button_more",
+        "run": "click",
+    },
+    {
         "trigger": ".oe_stat_button:contains('Cost Nature')",
         "run": "click",
     },
