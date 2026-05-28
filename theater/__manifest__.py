@@ -16,6 +16,7 @@
         'website_sale_mass_mailing',
     ],
     'data': [
+        'data/pos_config.xml',
         'data/res_config_settings.xml',
         'data/knowledge_article.xml',
         'data/product_category.xml',
@@ -34,7 +35,6 @@
         'demo/event_slot.xml',
         'demo/event_event_ticket.xml',
         'demo/ir_attachment_post.xml',
-        'demo/pos_config.xml',
         'demo/website_view.xml',
         'demo/crm_lead.xml',
         'demo/mail_activity.xml',
