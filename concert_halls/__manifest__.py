@@ -8,6 +8,7 @@
         'event_sale',
         'knowledge',
         'pos_event',
+        'pos_restaurant',
         'pos_stock',
         'project_enterprise',
         'social',
