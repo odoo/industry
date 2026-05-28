@@ -1,5 +1,6 @@
 {
     'name': 'Automobile Spare Parts',
+    'version': '1.1',
     'category': 'Retail',
     'depends': [
         'account_check_printing',
@@ -17,6 +18,7 @@
         'web_studio',
         ],
     'data': [
+        'data/pos_config.xml',
         'data/ir_attachment_pre.xml',
         'data/ir_model.xml',
         'data/ir_model_fields.xml',

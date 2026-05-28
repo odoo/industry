@@ -30,7 +30,6 @@
         'data/project_task.xml',
         'data/res_partner_grade.xml',
         'data/product_product.xml',
-        'data/pos_payment_method.xml',
         'data/pos_config.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
