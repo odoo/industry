@@ -1,6 +1,6 @@
 {
     'name': 'Eyewear Shop',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Health and Fitness',
     'author': 'Odoo S.A.',
     'depends': [
@@ -33,7 +33,6 @@
         'data/appointment_resource.xml',
         'data/pos_config.xml',
         'data/pos_category.xml',
-        'data/pos_payment_method.xml',
         'data/product_category.xml',
         'data/product_public_category.xml',
         'data/product_tag.xml',

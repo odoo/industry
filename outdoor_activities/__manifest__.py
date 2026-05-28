@@ -1,6 +1,6 @@
 {
     'name': 'Outdoor Activities',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Health and Fitness',
     'depends': [
         'appointment_account_payment',

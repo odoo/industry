@@ -1,6 +1,6 @@
 {
     'name': 'Fast Food',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Hospitality',
     'depends': [
         'account_followup',
@@ -17,8 +17,8 @@
     ],
     'data': [
         'data/res_config_settings.xml',
+        'data/pos_config.xml',
         'data/ir_attachment_pre.xml',
-        'data/pos_payment_method.xml',
         'data/product_category.xml',
         'data/uom_uom.xml',
         'data/product_product.xml',
@@ -33,8 +33,6 @@
         'demo/pos_payment_method.xml',
         'demo/res_partner.xml',
         'demo/hr_employee.xml',
-        'demo/pos_config.xml',
-        'demo/res_config_settings.xml',
         'demo/loyalty_program.xml',
         'demo/kitchen_display.xml',
         'demo/stock_quant.xml',

@@ -1,6 +1,6 @@
 {
     'name': 'Clothing Store',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Retail',
     'depends': [
         'knowledge',
@@ -15,7 +15,6 @@
     ],
     'data': [
         'data/res_config_settings.xml',
-        'data/pos_payment_method.xml',
         'data/pos_config.xml',
         'data/product_public_category.xml',
         'data/product_category.xml',

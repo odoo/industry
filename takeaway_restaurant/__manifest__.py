@@ -1,6 +1,6 @@
 {
     'name': 'Takeaway Restaurant',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -26,7 +26,6 @@
         'data/product_template_attribute_value.xml',
         'data/product_product.xml',
         'data/product_combo_item.xml',
-        'data/pos_payment_method.xml',
         'data/pos_config.xml',
         'data/pos_prep_display.xml',
         'data/knowledge_cover.xml',

@@ -1,6 +1,6 @@
 {
     'name': 'Sports Club',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Health and Fitness',
     'depends': [
         'appointment_crm',
@@ -21,7 +21,6 @@
         'data/pos_category.xml',
         'data/restaurant_floor.xml',
         'data/restaurant_table.xml',
-        'data/pos_payment_method.xml',
         'data/pos_config.xml',
         'data/ir_attachment_pre.xml',
         'data/product_public_category.xml',
@@ -66,7 +65,7 @@
     'assets': {
         'web.assets_backend': [
             'sports_club/static/src/js/my_tour.js',
-        ]
+        ],
     },
     "cloc_exclude": [
         "data/knowledge_article.xml",
