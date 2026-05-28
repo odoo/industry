@@ -1,6 +1,6 @@
 {
     'name': 'Hardware Store',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Retail',
     'depends': [
         'barcodes',
@@ -24,7 +24,6 @@
         'data/product_attribute_value.xml',
         'data/product_pricelist.xml',
         'data/product_pricelist_item.xml',
-        'data/pos_payment_method.xml',
         'data/pos_config.xml',
         'data/product_template_attribute_line.xml',
         'data/product_template_attribute_value.xml',
@@ -50,7 +49,7 @@
     'assets': {
         'web.assets_backend': [
             'hardware_shop/static/src/js/my_tour.js',
-        ]
+        ],
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [

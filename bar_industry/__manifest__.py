@@ -1,6 +1,6 @@
 {
     'name': 'Bar & Pub',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Hospitality',
     'depends': [
         'hr_attendance',

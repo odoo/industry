@@ -1,6 +1,6 @@
 {
     'name': 'Food Trucks',
-    'version': '1.0',
+    'version': '1.1',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -12,12 +12,10 @@
         'sale_crm',
     ],
     'data': [
+        'data/pos_config.xml',
         'data/crm_tag.xml',
-        'data/pos_payment_method.xml',
         'data/uom_uom.xml',
         'data/product_product.xml',
-        'data/restaurant_floor.xml',
-        'data/restaurant_table.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
@@ -25,7 +23,6 @@
     ],
     'demo': [
         'demo/res_company.xml',
-        'demo/pos_config.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/hr_department.xml',
