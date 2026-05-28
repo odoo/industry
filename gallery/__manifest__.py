@@ -1,5 +1,6 @@
 {
     'name': 'Gallery',
+    'version': '1.1',
     'category': 'Retail',
     'depends': [
         'base_industry_data',
@@ -8,12 +9,11 @@
         'pos_sale',
         'sale_purchase_project',
         'sign',
-        'website_event_sale'
+        'website_event_sale',
     ],
     'data': [
         'data/crm_stage.xml',
         'data/pos_category.xml',
-        'data/pos_payment_method.xml',
         'data/pos_config.xml',
         'data/product_public_category.xml',
         'data/product_category.xml',
