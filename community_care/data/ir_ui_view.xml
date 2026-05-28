@@ -16,14 +16,19 @@
               <label for="x_date_of_birth"/>
               <div class="d-flex justify-content-between align-items-center" name="x_date_of_birth">
                 <field name="x_date_of_birth" class="oe_inline w-50" force_save="1"/>
-                <span class="oe_inline" invisible="not x_date_of_birth">Age <field name="x_age" class="oe_inline" options="{'digits':[0,0]}"/>
+                <span class="oe_inline" invisible="not x_date_of_birth">Age <field name="x_age" class="oe_inline"/>
                 </span>
               </div>
             </group>
           </group>
         </xpath>
+        <xpath expr="//div[@name='button_box']" position="inside">
+          <button class="oe_stat_button" type="action" name="%(community_care.action_partner_meeting_focus)d" icon="fa-calendar" invisible="not x_is_resident">
+            <field name="x_meeting_focus_count" widget="statinfo" string="Meeting Notes"/>
+          </button>
+        </xpath>
         <xpath expr="/form//button[@name='action_view_tasks']" position="replace"/>
-        <!-- <xpath expr="/form/sheet/div[2]/div/div/div/field[@name='parent_id']" position="replace"/> -->
+        <xpath expr="//field[@name='company_type'][@widget='radio']" position="replace"/>
         <xpath expr="/form//page[@name='sales_purchases']" position="replace"/>
         <xpath expr="/form//page[@name='contact_addresses']" position="after">
           <page string="Placement" name="placement">
@@ -36,7 +41,7 @@
               </group>
               <group name="group_placement_right">
                 <field name="x_nicknames"/>
-                <field widget="many2many_tags" name="x_languages"/>
+                <field widget="many2many_tags" name="x_languages" options="{'color_field': 'x_color'}"/>
                 <field name="x_special_needs" help="e.g. IEP/Special Education status, speech therapy schedule"/>
               </group>
             </group>
@@ -44,7 +49,7 @@
           <page string="Medical &amp; Safety" name="medical_safety">
             <group name="group_medical_safety">
               <group name="group_medical_safety_left">
-                <field name="x_allergies" widget="many2many_tags"/>
+                <field name="x_allergies" widget="many2many_tags" options="{'color_field': 'x_color'}"/>
                 <field name="x_blood_type"/>
                 <field name="x_health_insurance"/>
               </group>
@@ -58,8 +63,8 @@
           <field name="x_contacts">
             <list editable="bottom">
               <field name="x_sequence" widget="handle"/>
-              <field optional="show" name="x_contact" required="True" widget="many2one_avatar" options="{&quot;no_open&quot;:false}" domain="[(&quot;x_is_resident&quot;, &quot;=&quot;, False)]"/>
-              <field widget="many2many_tags" optional="show" name="x_nature" required="True"/>
+              <field optional="show" name="x_contact" required="True" widget="many2one_avatar" options="{'no_open': false}" domain="[('x_is_resident', '=', False)]"/>
+              <field widget="many2many_tags" optional="show" name="x_nature" required="True" options="{'color_field': 'x_color'}"/>
               <field optional="show" name="x_notes"/>
             </list>
           </field>
@@ -67,6 +72,7 @@
       </data>
     </field>
   </record>
+
   <record id="res_partner_search_view_inherit" model="ir.ui.view">
     <field name="active" eval="True"/>
     <field name="inherit_id" ref="base.view_res_partner_filter"/>
@@ -77,7 +83,6 @@
     <field name="type">search</field>
     <field name="arch" type="xml">
       <data>
-        <!-- <xpath expr="/search//filter[@name='employees']" position="replace"/> -->
         <xpath expr="/search//field[@name='parent_id']" position="replace"/>
         <xpath expr="/search//field[@name='user_id']" position="replace"/>
         <xpath expr="/search/separator[2]" position="replace">
@@ -87,15 +92,13 @@
         <xpath expr="/search//filter[@name='group_company']" position="replace"/>
         <xpath expr="/search//filter[@name='salesperson']" position="replace"/>
         <xpath expr="/search//filter[@name='group_country']" position="replace"/>
-        <!-- <xpath expr="/search//filter[@name='filter_vat_set']" position="attributes">
-          <attribute name="invisible">True</attribute>
-        </xpath> -->
         <xpath expr="/search/group" position="inside">
           <filter name="group_by_age" string="Age" context="{'group_by': 'x_age'}"/>
         </xpath>
       </data>
     </field>
   </record>
+  
   <record id="x_allergy_list_view" model="ir.ui.view">
     <field name="active" eval="True"/>
     <field name="model">x_allergy</field>
@@ -104,67 +107,12 @@
     <field name="arch" type="xml">
       <list editable="bottom" default_order="id desc">
         <field name="x_name"/>
+        <field name="x_color" widget="color_picker"/>
         <field optional="show" name="x_residents" widget="many2many_tags" readonly="True"/>
       </list>
     </field>
   </record>
-  <record id="x_res_partner_line_medical_professionals_list_view" model="ir.ui.view">
-    <field name="active" eval="True"/>
-    <field name="model">x_res_partner_line_medical_professionals</field>
-    <field name="name">Default list view for x_res_partner_line_medical_professionals</field>
-    <field name="type">list</field>
-    <field name="arch" type="xml">
-      <list default_order="x_sequence asc,id desc">
-        <field name="x_sequence" widget="handle"/>
-        <field name="x_name"/>
-      </list>
-    </field>
-  </record>
-  <record id="x_res_partner_line_medical_professionals_form_view" model="ir.ui.view">
-    <field name="active" eval="True"/>
-    <field name="model">x_res_partner_line_medical_professionals</field>
-    <field name="name">Default form view for x_res_partner_line_medical_professionals</field>
-    <field name="type">form</field>
-    <field name="arch" type="xml">
-      <form>
-        <header/>
-        <sheet string="res_partner_line">
-          <div class="oe_title">
-            <h1>
-              <field name="x_name" required="1" placeholder="Name..."/>
-            </h1>
-          </div>
-          <group name="group_details">
-            <group name="group_details_left"/>
-            <group name="group_details_right"/>
-          </group>
-        </sheet>
-      </form>
-    </field>
-  </record>
-  <record id="x_res_partner_line_medical_professionals_search_view" model="ir.ui.view">
-    <field name="active" eval="True"/>
-    <field name="model">x_res_partner_line_medical_professionals</field>
-    <field name="name">Default search view for x_res_partner_line_medical_professionals</field>
-    <field name="type">search</field>
-    <field name="arch" type="xml">
-      <search>
-        <field name="x_name"/>
-      </search>
-    </field>
-  </record>
-  <record id="x_medical_profession_list_view" model="ir.ui.view">
-    <field name="active" eval="True"/>
-    <field name="model">x_medical_profession</field>
-    <field name="name">Default list view for x_medical_profession</field>
-    <field name="type">list</field>
-    <field name="arch" type="xml">
-      <list editable="bottom">
-        <field name="x_sequence" widget="handle"/>
-        <field name="x_name"/>
-      </list>
-    </field>
-  </record>
+
   <record id="x_languages_list_view" model="ir.ui.view">
     <field name="active" eval="True"/>
     <field name="model">x_languages</field>
@@ -173,10 +121,12 @@
     <field name="arch" type="xml">
       <list editable="bottom" default_order="id desc">
         <field name="x_name"/>
+        <field name="x_color" widget="color_picker"/>
         <field optional="show" name="x_residents" readonly="True" widget="many2many_tags"/>
       </list>
     </field>
   </record>
+
   <record id="x_res_partner_line_list_view" model="ir.ui.view">
     <field name="active" eval="True"/>
     <field name="model">x_res_partner_line</field>
@@ -189,6 +139,7 @@
       </list>
     </field>
   </record>
+
   <record id="x_res_partner_line_form_view" model="ir.ui.view">
     <field name="active" eval="True"/>
     <field name="model">x_res_partner_line</field>
@@ -211,6 +162,7 @@
       </form>
     </field>
   </record>
+
   <record id="x_res_partner_line_search_view" model="ir.ui.view">
     <field name="active" eval="True"/>
     <field name="model">x_res_partner_line</field>
@@ -222,6 +174,7 @@
       </search>
     </field>
   </record>
+
   <record id="x_contact_nature_list_view" model="ir.ui.view">
     <field name="active" eval="True"/>
     <field name="model">x_contact_nature</field>
@@ -230,7 +183,57 @@
     <field name="arch" type="xml">
       <list editable="bottom" default_order="id desc">
         <field name="x_name"/>
+        <field name="x_color" widget="color_picker"/>
       </list>
+    </field>
+  </record>
+
+  <record id="document_view_search_inherit_community_care" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="name">documents.document.search.inherit.community.care</field>
+    <field name="model">documents.document</field>
+    <field name="inherit_id" ref="documents.document_view_search"/>
+    <field name="arch" type="xml">
+      <xpath expr="//group" position="inside">
+        <filter string="Folder" name="group_by_folder_id" domain="[]" context="{'group_by': 'folder_id'}"/>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="documents_view_list_inherit_community_care" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="name">documents.document.list.inherit.community.care</field>
+    <field name="model">documents.document</field>
+    <field name="inherit_id" ref="documents.documents_view_list"/>
+    <field name="arch" type="xml">
+      <xpath expr="//list" position="attributes">
+        <attribute name="default_group_by">folder_id</attribute>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="documents_view_list_main_inherit_community_care" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="name">documents.document.list.main.inherit.community.care</field>
+    <field name="model">documents.document</field>
+    <field name="inherit_id" ref="documents.documents_view_list_main"/>
+    <field name="arch" type="xml">
+      <xpath expr="//list" position="attributes">
+        <attribute name="default_group_by">folder_id</attribute>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="view_partner_list_inherit_community_care" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="name">res.partner.list.inherit.community.care</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_partner_tree"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='category_id']" position="after">
+        <field name="x_allergies" widget="many2many_tags" options="{'color_field': 'x_color'}" optional="show"/>
+        <field name="x_languages" widget="many2many_tags" options="{'color_field': 'x_color'}" optional="show"/>
+      </xpath>
     </field>
   </record>
 </odoo>

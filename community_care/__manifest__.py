@@ -2,6 +2,7 @@
     "name": "Community Care",
     "category": "Services",
     "author": "Odoo S.A.",
+    "version": "1.1",
     "depends": [
         "ai_documents",
         "ai_knowledge",
@@ -26,9 +27,9 @@
     "data": [
         "data/ir_model.xml",
         "data/ir_model_fields.xml",
-        "data/ir_ui_view.xml",
-        "data/ir_actions_act_window.xml",
         "data/ir_actions_server.xml",
+        "data/ir_actions_act_window.xml",
+        "data/ir_ui_view.xml",
         "data/ir_ui_menu.xml",
         "data/base_automation.xml",
         "data/ir_model_access.xml",
@@ -45,23 +46,31 @@
         "data/x_res_partner_line.xml",
         "data/mail_message.xml",
         "data/knowledge_article_favorite.xml",
+        "data/knowledge_tour.xml"
     ],
     "demo": [
-        "demo/knowledge_article.xml",
         "demo/res_partner.xml",
+        "demo/hr_employee.xml",
+        "demo/knowledge_article.xml",
         "demo/x_languages.xml",
         "demo/x_allergy.xml",
         "demo/calendar_event.xml",
         "demo/planning_slot_template.xml",
         "demo/planning_slot.xml",
         "demo/documents_document.xml",
-        "demo/hr_employee.xml",
         "demo/hr_leave.xml",
         "demo/x_res_partner_line.xml",
     ],
     "license": "OEEL-1",
+    "assets": {
+        'web.assets_backend': [
+            'community_care/static/src/js/my_tour.js', 
+        ]
+    },
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        "demo/knowledge_article.xml",
+        "static/src/js/my_tour.js"
     ],
     "images": ["images/main.png"],
     "url": "https://www.odoo.com/trial?industry&selected_app=community_care",
