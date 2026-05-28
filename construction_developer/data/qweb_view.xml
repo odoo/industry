@@ -107,6 +107,456 @@
             </attribute>
         </xpath>
     </template>
+    <template id="progress_report_document">
+        <t t-set="partner" t-value="doc.partner_id"/>
+        <t t-set="company" t-value="doc.company_id"/>
+        <t t-set="progress_approver" t-value="doc.x_progress_approver"/>
+        <t t-call="web.basic_layout">
+            <div class="d-flex justify-content-between mb-4">
+                <!-- Left Side Header -->
+                <div class="d-flex align-items-start">
+                    <div class="me-3">
+                        <img t-if="company.logo" t-att-src="image_data_uri(company.logo)"/>
+                    </div>
+                    <div style="font-size: 14px;">
+                        <div t-field="company.partner_id"
+                            t-options='{
+                                "widget": "contact",
+                                "fields": ["address"],
+                                "no_marker": True
+                            }'/>
+                        <div t-if="company.vat">
+                            <span>TIN:</span>
+                            <span t-field="company.vat"/>
+                        </div>
+                    </div>
+                </div>
+                <!-- Right Side Header -->
+                <div style="width: 45%; text-align: right;">
+                    <div t-out="partner"
+                        t-options='{
+                            "widget": "contact",
+                            "fields": ["name", "address"],
+                            "no_marker": True
+                        }'/>
+                </div>
+            </div>
+            <h3 class="mt-4">
+                <span>Progress Report</span>
+            </h3>
+            <div class="page">
+                <div class="oe_structure"/>
+                <t t-set="orders" t-value="env['sale.order'].search([('project_id', '=', doc.id)], order='id')"/>
+                <div class="row mb-4" id="informations">
+                    <div class="col-4" name="original_order">
+                        <div class="mb-2">
+                            <strong>Original Order</strong>
+                            <div t-if="orders" t-field="orders[0].name"/>
+                        </div>
+                        <div>
+                            <strong>Project Manager</strong>
+                            <div t-field="doc.user_id.name">Project Manager</div>
+                        </div>
+                    </div>
+                    <div class="col-4" name="order_date">
+                        <div class="mb-2">
+                            <strong>Order Date</strong>
+                            <div t-if="orders" t-field="orders[0].date_order" t-options="{'widget': 'date'}">04/08/2026</div>
+                        </div>
+                        <div t-if="progress_approver">
+                            <strong>Progress Approver</strong>
+                            <div t-field="progress_approver.display_name">Progress Approver</div>
+                        </div>
+                    </div>
+                    <div class="col-4" name="report_date">
+                        <div class="mb-2">
+                            <strong>Report Date</strong>
+                            <div t-field="doc.create_date" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy HH:mm'}">DD/MM/YYYY hh:mm</div>
+                        </div>
+                        <div>
+                            <strong>Customer</strong>
+                            <div t-field="partner.name"/>
+                        </div>
+                    </div>
+                </div>
+                <t t-foreach="orders" t-as="order">
+                    <t t-set="lines_to_report" t-value="order._get_order_lines_to_report()"/>
+                    <t t-set="display_discount" t-value="any(line.discount for line in lines_to_report)"/>
+                    <!-- Hide taxes AND show taxed amounts on lines -->
+                    <t t-set="hide_taxes_details" t-value="False"/>
+                    <t t-set="display_taxes" t-value="not hide_taxes_details and any(l._has_taxes() for l in lines_to_report)"/>
+                    <t t-set="extra_columns" t-value="(1 if display_discount else 0) + (1 if display_taxes else 0)"/>
+                    <h3 class="mt-2">
+                        Order # <span t-field="order.name"/>
+                    </h3>
+                    <div class="oe_structure"></div>
+                    <table class="table table-borderless">
+                        <thead>
+                            <tr>
+                                <th name="th_sequence" class="text-start">#</th>
+                                <th name="th_description" class="text-start">Description</th>
+                                <th name="th_quantity" class="text-end text-nowrap">Quantity</th>
+                                <th name="th_priceunit" class="text-end text-nowrap">Unit Price</th>
+                                <th name="th_discount" t-if="display_discount" class="text-end">
+                                    <span>Disc.%</span>
+                                </th>
+                                <th name="th_taxes" t-if="display_taxes" class="text-end">
+                                    <span>Taxes</span>
+                                </th>
+                                <th name="th_subtotal" class="text-end">
+                                    <span>Amount</span>
+                                </th>
+                                <th name="delivered_progress" class="text-start">
+                                    <span>Delivered Progress</span>
+                                </th>
+                                <th name="delivered_quantity" class="text-start">
+                                    <span>Delivered Quantity</span>
+                                </th>
+                                <th name="progress_increment" class="text-start">
+                                    <span>Progress Increment</span>
+                                </th>
+                                <th name="quantity_increment" class="text-start">
+                                    <span>Quantity Increment</span>
+                                </th>
+                                <th name="invoice_increment" class="text-start">
+                                    <span>Invoice Increment</span>
+                                </th>
+                                <th name="cumulated_progress" class="text-start">
+                                    <span>Cumulated Progress</span>
+                                </th>
+                                <th name="cumulated_quantity" class="text-start">
+                                    <span>Cumulated Quantity</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="sale_tbody">
+                            <t t-set="current_section" t-value="None"/>
+                            <t t-set="current_subsection" t-value="None"/>
+                            <t t-set="price_field" t-value="'price_total' if hide_taxes_details else 'price_subtotal'"/>
+
+                            <t t-foreach="lines_to_report" t-as="line">
+                                <t t-set="product_uom" t-value="line.product_uom_id.name"/>
+                                <t t-set="is_note" t-value="line.display_type == 'line_note'"/>
+                                <t t-set="is_section" t-value="line.display_type == 'line_section'"/>
+                                <t t-set="is_subsection" t-value="line.display_type == 'line_subsection'"/>
+                                <t t-set="is_combo" t-value="line.product_type == 'combo'"/>
+
+                                <t t-if="is_section">
+                                    <t t-set="current_section" t-value="line"/>
+                                    <t t-set="current_subsection" t-value="None"/>
+                                    <t t-set="line_padding" t-value="1"/>
+                                    <t t-set="collapse_prices" t-value="line.collapse_prices"/>
+                                </t>
+                                <t t-elif="is_subsection">
+                                    <t t-set="current_subsection" t-value="line"/>
+                                    <t t-set="line_padding" t-value="2"/>
+                                    <t t-set="collapse_prices" t-value="collapse_prices or line.collapse_prices"/>
+                                </t>
+                                <t t-else="">
+                                    <t t-set="line_padding" t-value="3 if current_subsection else (2 if current_section else 0)"/>
+                                </t>
+                                <t t-if="line.combo_item_id">
+                                    <t t-set="line_padding" t-value="line_padding + 1"/>
+                                </t>
+                                <t t-set="padding_style" t-value="line_padding and ('padding-left:' + str(line_padding * 8) + 'px') or ''"/>
+                                <t t-set="show_section_total" t-value="is_section or not line.parent_id.collapse_prices"/>
+
+                                <t t-if="not line.collapse_composition">
+                                    <tr
+                                        t-if="is_section or is_subsection"
+                                        name="tr_section"
+                                        t-attf-class="fw-bold {{'o_line_section' if is_section else 'o_line_subsection'}}"
+                                    >
+                                        <t t-set="section_name_colspan"
+                                            t-value="99 if not show_section_total else 4 + extra_columns"/>
+                                        <td
+                                            name="td_section_name"
+                                            t-att-colspan="section_name_colspan"
+                                            t-att-style="padding_style"
+                                        >
+                                            <span t-field="line.name">A section title</span>
+                                        </td>
+                                        <t t-if="show_section_total">
+                                            <td name="td_section_price" class="text-end o_price_total">
+                                                <span
+                                                    t-out="line._get_section_totals(price_field)"
+                                                    class="text-nowrap"
+                                                    t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"
+                                                >
+                                                    27.00
+                                                </span>
+                                            </td>
+                                            <!-- added an extra <td> here to align with invoice_increment values. -->
+                                            <td name="td_quantity_increment_column" t-att-colspan="4"/>
+                                            <td name="td_invoice_increment" class="text-nowrap text-end">
+                                                <span
+                                                    t-out="line._get_section_totals('x_invoice_increment')"
+                                                    class="text-nowrap"
+                                                    t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"
+                                                >
+                                                    27.00
+                                                </span>
+                                            </td>
+                                            <td name="td_cumulated_progress_column" t-att-colspan="2"></td>
+                                        </t>
+                                    </tr>
+                                    <tr t-elif="is_note" name="tr_note" class="fst-italic o_line_note">
+                                        <td name="td_note_name" colspan="99" t-att-style="padding_style">
+                                            <span t-field="line.name">A note, whose content usually applies to the section or product above.</span>
+                                        </td>
+                                    </tr>
+                                    <tr t-elif="is_combo" name="tr_combo" class="o_line_combo fw-bold">
+                                        <td class="text-muted" name="td_combo_product_sequence">
+                                            <span t-field="line.x_reference"></span>
+                                        </td>
+                                        <td name="td_combo_name" t-att-style="padding_style">
+                                            <span t-field="line.name">Combo Product</span>
+                                        </td>
+                                        <td name="td_combo_quantity" class="text-end">
+                                            <span t-field="line.product_uom_qty"/>
+                                            <span t-out="product_uom"/>
+                                        </td>
+                                        <td name="td_combo_price" t-att-colspan="2 + extra_columns" class="text-end o_price_total">
+                                            <span
+                                                t-if="not collapse_prices"
+                                                name="price_subtotal_combo"
+                                                t-out="line._get_combo_totals(price_field)"
+                                                class="text-nowrap"
+                                                t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"
+                                            >
+                                                27.00
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr t-else="" name="tr_product">
+                                        <td style="color: rgb(128, 128, 128);" name="td_product_sequence">
+                                            <span t-field="line.x_reference"></span>
+                                        </td>
+                                        <td name="td_product_name" class="w-100" t-att-style="padding_style">
+                                            <span t-out="line.name">Foundation Footing</span>
+                                        </td>
+                                        <td name="td_product_quantity" class="o_td_quantity text-end">
+                                            <span t-field="line.product_uom_qty" class="text-nowrap">3</span>
+                                            <span t-out="product_uom">units</span>
+                                        </td>
+                                        <td name="td_product_priceunit" class="text-end text-nowrap">
+                                            <span t-if="not collapse_prices" t-field="line.price_unit">
+                                                25.00
+                                            </span>
+                                        </td>
+                                        <td t-if="display_discount" name="td_product_discount" class="text-end">
+                                            <t t-if="not collapse_prices">
+                                                <span t-field="line.discount">-</span>
+                                            </t>
+                                        </td>
+                                        <t t-set="taxes" t-value="', '.join(line.tax_ids.mapped('tax_label'))"/>
+                                        <td t-if="display_taxes" name="td_product_taxes" t-attf-class="text-end {{'text-nowrap' if len(taxes) &lt; 12 else '' }}">
+                                            <span t-out="taxes">Tax 15%</span>
+                                        </td>
+                                        <td t-if="not line.is_downpayment and not collapse_prices" name="td_product_subtotal" class="text-end o_price_total">
+                                            <span t-if="price_field == 'price_subtotal'" t-field="line.price_subtotal">
+                                                27.00
+                                            </span>
+                                            <span t-else="" t-field="line.price_total">
+                                                27.00
+                                            </span>
+                                        </td>
+                                        <td class="text-end">
+                                            <span name="td_delivered_progress" t-out="'{:.2f}%'.format(line.x_delivered_progress)"/>
+                                        </td>
+                                        <td class="text-nowrap text-end">
+                                            <span t-field="line.qty_delivered">3</span>
+                                            <span t-out="product_uom">units</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-set="line_progress_increment" t-value="line.x_progress_increment"/>
+                                            <span name="td_cumulated_progress" t-out="'{:.2f}%'.format(line_progress_increment * 100)"/>
+                                        </td>
+                                        <td class="text-nowrap text-end">
+                                            <t t-set="line_quantity_increment" t-value="line.x_quantity_increment"/>
+                                            <span name="td_quantity_increment" t-out="'{:.2f}'.format(line_quantity_increment)"/>
+                                            <span t-out="product_uom">units</span>
+                                        </td>
+                                        <td class="text-nowrap text-end">
+                                            <span name="td_invoice_increment" t-out="line.x_invoice_increment"
+                                                t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                        </td>
+                                        <td class="text-nowrap text-end">
+                                            <span name="td_cumulated_progress" t-out="'{:.2f}%'.format(line.x_current_progress)"/>
+                                        </td>
+                                        <td class="text-nowrap text-end">
+                                            <span name="td_cumulated_quantity" t-out="'{:.2f}'.format(line.qty_delivered + line_quantity_increment)"/>
+                                            <span t-out="product_uom">units</span>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-else="">
+                                    <tr
+                                        t-foreach="line._get_grouped_section_summary(display_taxes)"
+                                        t-as="section_line"
+                                        name="tr_section_group"
+                                    >
+                                        <td name="td_section_group_name" t-att-colspan="2" t-att-style="padding_style">
+                                            <span t-out="line.name">
+                                                Section Summary
+                                            </span>
+                                        </td>
+                                        <td name="td_section_group_quantity" class="text-end text-nowrap">
+                                            <span>1.00 Units</span>
+                                        </td>
+                                        <td name="td_section_group_priceunit" class="text-end text-nowrap">
+                                            <span
+                                                t-if="show_section_total"
+                                                name="price_subtotal_section_grouped"
+                                                t-out="section_line['price_subtotal']"
+                                                t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"
+                                            >
+                                                25.00
+                                            </span>
+                                        </td>
+                                        <td t-if="display_discount" name="td_section_group_discount">
+                                            <t t-set="aggregated_discount" t-value="section_line.get('discount', 0)"/>
+                                            <span t-if="aggregated_discount" t-out="aggregated_discount">-</span>
+                                        </td>
+                                        <td
+                                            t-if="display_taxes"
+                                            name="td_section_group_taxes"
+                                            t-attf-class="text-end {{ 'text-nowrap' if len(section_line['tax_labels']) &lt; 10 else '' }}"
+                                        >
+                                            <span t-out="', '.join(section_line['tax_labels'])">
+                                                Tax 15%
+                                            </span>
+                                        </td>
+                                        <td name="td_section_group_total" class="text-end o_price_total">
+                                            <span
+                                                t-if="show_section_total"
+                                                t-out="section_line[price_field]"
+                                                t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"
+                                            >
+                                                30.00
+                                            </span>
+                                        </td>
+                                        <!-- added an extra <td> here to align with invoice_increment values. -->
+                                        <td name="td_delivered_progress_column" t-att-colspan="4"/>
+                                        <td name="td_section_invoice_increment_total" class="o_price_total text-end text-nowrap">
+                                            <span
+                                                t-if="show_section_total"
+                                                t-out="line._get_section_totals('x_invoice_increment')"
+                                                t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"
+                                            >
+                                                30.00
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </t>
+                        </tbody>
+                    </table>
+                </t>
+                <t t-set="all_sale_order_lines" t-value="orders.mapped('order_line')"/>
+                <t t-set="price_subtotal_total" t-value="sum(all_sale_order_lines.mapped('price_subtotal'))"/>
+                <t t-set="qty_delivered_total" t-value="sum(all_sale_order_lines.mapped('qty_delivered'))"/>
+                <t t-set="product_uom_qty_total" t-value="sum(all_sale_order_lines.mapped('product_uom_qty'))"/>
+                <t t-set="price_tax_total" t-value="sum(all_sale_order_lines.mapped('price_tax'))"/>
+                <t t-set="price_total_total" t-value="sum(all_sale_order_lines.mapped('price_total'))"/>
+                <t t-set="x_quantity_increment_total" t-value="sum(all_sale_order_lines.mapped('x_quantity_increment'))"/>
+                <t t-set="delivered_ratio" t-value="product_uom_qty_total and (qty_delivered_total / product_uom_qty_total) or 0.0"/>
+                <t t-set="cumulated_ratio" t-value="product_uom_qty_total and ((qty_delivered_total + x_quantity_increment_total) / product_uom_qty_total) or 0.0"/>
+                <t t-set="delivered_vat_free_amount" t-value="price_subtotal_total * delivered_ratio"/>
+                <t t-set="delivered_vat_amount" t-value="price_tax_total * delivered_ratio"/>
+                <t t-set="delivered_amount" t-value="price_total_total * delivered_ratio"/>
+                <t t-set="cumulated_vat_free_amount" t-value="price_subtotal_total * cumulated_ratio"/>
+                <t t-set="cumulated_vat_amount" t-value="price_tax_total * cumulated_ratio"/>
+                <t t-set="cumulated_amount" t-value="price_total_total * cumulated_ratio"/>
+                <t t-set="due_amount" t-value="cumulated_amount - delivered_amount"/>
+                <div id="current_standing" class="mt-4">
+                    <h4 class="mt-2 mb-2">
+                        <span>Current Standing</span>
+                    </h4>
+                    <table class="table table-borderless">
+                        <tr>
+                            <td style="width: 48%;">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td>Delivered VAT Free Amount</td>
+                                        <td>
+                                            <span t-out="delivered_vat_free_amount" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Delivered VAT Amount</td>
+                                        <td>
+                                            <span t-out="delivered_vat_amount" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Delivered Amount</strong></td>
+                                        <td>
+                                            <strong t-out="delivered_amount" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td style="width: 4%;"></td>
+                            <td style="width: 48%;">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td>Cumulated VAT Free Amount</td>
+                                        <td>
+                                            <span t-out="cumulated_vat_free_amount" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cumulated VAT Amount</td>
+                                        <td>
+                                            <span t-out="cumulated_vat_amount" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Cumulated Amount</strong></td>
+                                        <td>
+                                            <strong t-out="cumulated_amount" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Due Amount</strong></td>
+                                        <td>
+                                            <strong t-out="due_amount" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table table-borderless">
+                        <tr>
+                            <td style="width: 48%;">
+                                <div><strong>Project Manager</strong></div>
+                                <div t-field="doc.user_id.name">Project Manager Name</div>
+                                <div class="text-muted">Date:</div>
+                                <div class="text-muted">Signature</div>
+                            </td>
+                            <td style="width: 4%;"></td>
+                            <td style="width: 48%;">
+                                <div><strong>Approver</strong></div>
+                                <div t-out="progress_approver.display_name or partner.name">Project Approver Name</div>
+                                <div class="text-muted">Date:</div>
+                                <div class="text-muted">Signature</div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </t>
+    </template>
+    <template id="report_project_progress">
+       <t t-set="data_report_margin_top" t-value="5"/>
+       <t t-call="web.html_container">
+           <t t-foreach="docs" t-as="doc">
+               <t t-call="construction_developer.progress_report_document" t-lang="doc.partner_id.lang"/>
+           </t>
+       </t>
+   </template>
     <template id="account_move_portal_content_inherit" inherit_id="account.bill_preview">
         <xpath expr="//th[@name='th_description']" position="before">
             <th class="text-start" id="invoice_sequence_header">#</th>
