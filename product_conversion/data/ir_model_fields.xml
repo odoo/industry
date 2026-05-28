@@ -131,7 +131,7 @@ for wizard in self:
         <field name="depends">x_product_id</field>
         <field name="compute"><![CDATA[
 for wizard in self:
-    wizard['x_keep_lot_sn'] = wizard.x_product_id.tracking in ('lot', 'serial')
+    wizard['x_keep_lot_sn'] = wizard.x_product_id.reckoning in ('lot', 'serial')
         ]]></field>
     </record>
     <record id="field_convert_product_wizard_new_lot_id" model="ir.model.fields">
@@ -148,11 +148,11 @@ for wizard in self:
         <field name="relation">product.product</field>
     </record>
     <record id="field_convert_wizard_product_tracking" model="ir.model.fields">
-        <field name="name">x_source_tracking</field>
+        <field name="name">x_source_reckoning</field>
         <field name="field_description">Source Tracking</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
         <field name="ttype">selection</field>
-        <field name="related">x_product_id.tracking</field>
+        <field name="related">x_product_id.reckoning</field>
         <field name="store" eval="False"/>
         <field name="readonly" eval="True"/>
     </record>
@@ -194,9 +194,9 @@ for wizard in self:
             allowed |= product
     else:
         if wizard.x_keep_lot_sn or wizard.x_new_lot_sn:
-            domain.append(('tracking', '=', source.tracking))
+            domain.append(('reckoning', '=', source.reckoning))
         else:
-            domain.append(('tracking', 'not in', ('lot', 'serial')))
+            domain.append(('reckoning', 'not in', ('lot', 'serial')))
         products = wizard.env['product.product'].search(domain)
         allowed |= products
 
