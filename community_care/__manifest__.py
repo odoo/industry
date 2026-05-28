@@ -46,7 +46,7 @@
         "data/x_res_partner_line.xml",
         "data/mail_message.xml",
         "data/knowledge_article_favorite.xml",
-        "data/knowledge_tour.xml"
+        "data/knowledge_tour.xml",
     ],
     "demo": [
         "demo/res_partner.xml",
@@ -63,14 +63,14 @@
     ],
     "license": "OEEL-1",
     "assets": {
-        'web.assets_backend': [
-            'community_care/static/src/js/my_tour.js', 
+        "web.assets_backend": [
+            "community_care/static/src/js/my_tour.js",
         ]
     },
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "demo/knowledge_article.xml",
-        "static/src/js/my_tour.js"
+        "static/src/js/my_tour.js",
     ],
     "images": ["images/main.png"],
     "url": "https://www.odoo.com/trial?industry&selected_app=community_care",
