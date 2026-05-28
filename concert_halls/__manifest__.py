@@ -8,7 +8,12 @@
         'event_sale',
         'knowledge',
         'pos_event',
+<<<<<<< 562326dccc7eab17d40660bcd96523afb11d3a26
         'pos_stock',
+||||||| 7f02ea78d9ece533e1c892e7371d38a360dce5b4
+=======
+        'pos_restaurant',
+>>>>>>> d74387e7c75166c534e88659b99f116152cc2899
         'project_enterprise',
         'social',
         'website_crm',
