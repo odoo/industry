@@ -4,10 +4,11 @@
         <xpath expr="//t[@t-set='display_taxes']" position="after">
             <t t-set="display_excise_free_unit_price" t-value="any(l.x_excise_free_unit_price for l in lines_to_report)"/>
             <t t-set="display_total_excises" t-value="any(l.x_total_excises for l in lines_to_report)"/>
+            <t t-set="display_excise_columns" t-value="display_total_excises and display_excise_free_unit_price"/>
         </xpath>
 
         <xpath expr="//th[@name='th_taxes']" position="after">
-            <th name="th_excise_free_unit_price" t-if="display_excise_free_unit_price" class="text-end">
+            <th name="th_excise_free_unit_price" t-if="display_excise_columns" class="text-end">
                 <span>Excise Free Unit Price</span>
             </th>
             <th name="th_total_excises" t-if="display_total_excises" class="text-end">
@@ -15,9 +16,29 @@
             </th>
         </xpath>
 
+        <!-- Adjust section summary colspan (when composition is shown) -->
+        <xpath expr="//td[@name='td_section_name']" position="before">
+            <t
+                t-set="section_name_colspan"
+                t-value="section_name_colspan + (1 if display_excise_columns else 0) + (1 if display_total_excises else 0)"
+            />
+        </xpath>
+
+        <!-- Adjust combo line colspan -->
+        <xpath expr="//td[@name='td_combo_name']" position="after">
+            <td name="td_combo_excise_free_unit_price" t-if="display_excise_columns"/>
+            <td name="td_combo_total_excises" t-if="display_total_excises"/>
+        </xpath>
+
+        <!-- Add empty grouped section cells (when composition is hidden) -->
+        <xpath expr="//td[@name='td_section_group_taxes']" position="after">
+            <td name="td_section_group_excise_free_unit_price" t-if="display_excise_columns"/>
+            <td name="td_section_group_total_excises" t-if="display_total_excises"/>
+        </xpath>
+
         <xpath expr="//tr[@name='tr_product']/td[@name='td_product_taxes']" position="after">
-            <td name="td_excise_free_unit_price" t-if="display_excise_free_unit_price" class="text-end">
-                <span t-field="line.x_excise_free_unit_price" t-options="{'widget': 'float', 'precision': 2}" t-if="line.x_excise_free_unit_price"/>
+            <td name="td_excise_free_unit_price" t-if="display_excise_columns" class="text-end">
+                <span t-field="line.x_excise_free_unit_price" t-options="{'widget': 'float', 'precision': 2}" t-if="line.x_excise_free_unit_price and not collapse_prices"/>
             </td>
             <td name="td_display_total_excises" t-if="display_total_excises" class="text-end">
                 <span t-field="line.x_total_excises" t-options="{'widget': 'float', 'precision': 2}" t-if="line.x_total_excises"/>
@@ -29,10 +50,55 @@
         <xpath expr="//t[@t-set='display_taxes']" position="after">
             <t t-set="display_excise_free_unit_price" t-value="any(l.x_excise_free_unit_price_account_move for l in o.invoice_line_ids)"/>
             <t t-set="display_total_excises" t-value="any(l.x_total_excises_account_move for l in o.invoice_line_ids)"/>
+            <t t-set="display_excise_columns" t-value="display_total_excises and display_excise_free_unit_price"/>
+        </xpath>
+
+        <!--  Adjust section summary colspan (when composition and price are shown)  -->
+        <xpath expr="//td[@name='line_name_td']" position="before">
+            <t t-set="line_colspan"
+                t-value="line_colspan + (1 if display_excise_columns else 0) + (1 if display_total_excises else 0)"
+            />
+        </xpath>
+
+        <!--  Adjust section summary colspan (when composition and price hidden)  -->
+        <xpath expr="//td[@name='account_invoice_line_name_grouped_desktop']" position="before">
+            <t t-set="line_colspan"
+                t-value="line_colspan + ((1 if display_excise_columns else 0) + (1 if display_total_excises else 0) if hide_prices and grouped_line['display_type'] in ('line_section', 'line_subsection') else 0 )"
+            />
+        </xpath>
+        <xpath expr="//td[@name='td_taxes_grouped']" position="after">
+            <t t-if="grouped_line['display_type'] == 'product' or hide_details">
+                <t t-set="grouped_excise_lines"
+                    t-value="not hide_details and line._get_section_lines().filtered(
+                        lambda l: l.display_type == 'product' and (
+                            hide_details or (
+                                l.product_id == grouped_line.get('product')
+                                and l.price_subtotal == grouped_line.get('price_subtotal')
+                                and l.quantity == grouped_line.get('quantity')
+                            )
+                        )
+                    )"
+                />
+                <t t-set="cell_class"
+                    t-value="'text-end d-none d-md-table-cell' if report_type == 'html' else 'text-end'"
+                />
+                <td name="td_excise_free_unit_price_grouped" t-if="display_excise_columns" t-att-class="cell_class">
+                    <span t-if="grouped_excise_lines and not hide_prices"
+                        t-out="grouped_excise_lines[:1].x_excise_free_unit_price_account_move"
+                        t-options="{'widget': 'float', 'precision': 2}"
+                    />
+                </td>
+                <td name="td_total_excises_grouped" t-if="display_total_excises" t-att-class="cell_class">
+                    <span t-if="grouped_excise_lines"
+                        t-out="grouped_excise_lines[:1].x_total_excises_account_move"
+                        t-options="{'widget': 'float', 'precision': 2}"
+                    />
+                </td>
+            </t>
         </xpath>
 
         <xpath expr="//th[@name='th_taxes']" position="after">
-            <th name="th_excise_free_unit_price" t-if="display_excise_free_unit_price"
+            <th name="th_excise_free_unit_price" t-if="display_excise_columns"
                 t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
                 <span>Excise Free Unit Price</span>
             </th>
@@ -43,7 +109,7 @@
         </xpath>
 
         <xpath expr="//td[@name='td_taxes']" position="after">
-            <td name="td_excise_free_unit_price" t-if="display_excise_free_unit_price"
+            <td name="td_excise_free_unit_price" t-if="display_excise_columns"
                 t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
                 <span t-out="line.x_excise_free_unit_price_account_move"
                       id="line_x_excise_free_unit_price_account_move" t-options="{'widget': 'float', 'precision': 2}" t-if="line.x_excise_free_unit_price_account_move"/>
