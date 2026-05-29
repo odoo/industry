@@ -1,7 +1,15 @@
 {
     'name': 'Deposit Management',
+<<<<<<< 6d88a414f00bac1b48b11e4a9729ecb41a0d0e33
     'version': '1.1',
     'category': 'Supply Chain',
+||||||| c4fc6ae65b24d5b2a8f06f2321cf5526e557636d
+    'version': '1.1',
+    'category': 'Inventory/Inventory',
+=======
+    'version': '1.2',
+    'category': 'Inventory/Inventory',
+>>>>>>> ca9aa949c3e8b6efadf250a0a592a41fe22f035c
     'depends': [
         'base_automation',
         'mrp_workorder',
