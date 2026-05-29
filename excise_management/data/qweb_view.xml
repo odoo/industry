@@ -15,6 +15,31 @@
             </th>
         </xpath>
 
+        <!-- Adjust section summary colspan (when composition is shown) -->
+        <xpath expr="//td[@name='td_section_name']" position="attributes">
+            <attribute name="t-att-colspan">
+                section_name_colspan
+                + (1 if display_excise_free_unit_price else 0)
+                + (1 if display_total_excises else 0)
+            </attribute>
+        </xpath>
+
+        <!-- Adjust combo line colspan -->
+        <xpath expr="//td[@name='td_combo_name']" position="attributes">
+            <attribute name="t-att-colspan">
+                3 + (1 if display_discount else 0)
+                + (1 if display_taxes else 0)
+                + (1 if display_excise_free_unit_price else 0)
+                + (1 if display_total_excises else 0)
+            </attribute>
+        </xpath>
+
+        <!-- Add empty grouped section cells (when composition is hidden) -->
+        <xpath expr="//td[@name='td_section_group_taxes']" position="after">
+            <td name="td_section_group_excise_free_unit_price" t-if="display_excise_free_unit_price"/>
+            <td name="td_section_group_total_excises" t-if="display_total_excises"/>
+        </xpath>
+
         <xpath expr="//tr[@name='tr_product']/td[@name='td_product_taxes']" position="after">
             <td name="td_excise_free_unit_price" t-if="display_excise_free_unit_price" class="text-end">
                 <span t-field="line.x_excise_free_unit_price" t-options="{'widget': 'float', 'precision': 2}" t-if="line.x_excise_free_unit_price"/>
@@ -29,6 +54,24 @@
         <xpath expr="//t[@t-set='display_taxes']" position="after">
             <t t-set="display_excise_free_unit_price" t-value="any(l.x_excise_free_unit_price_account_move for l in o.invoice_line_ids)"/>
             <t t-set="display_total_excises" t-value="any(l.x_total_excises_account_move for l in o.invoice_line_ids)"/>
+        </xpath>
+
+        <!-- Adjust section summary colspan (when composition is shown) -->
+        <xpath expr="//td[@name='line_name_td']" position="attributes">
+            <attribute name="t-att-colspan">
+                (1 if is_product else line_colspan)
+                + (1 if display_excise_free_unit_price else 0)
+                + (1 if display_total_excises else 0)
+            </attribute>
+        </xpath>
+
+        <!-- Adjust grouped section summary colspan (when composition is hidden) -->
+        <xpath expr="//td[@name='account_invoice_line_name_grouped_desktop']" position="attributes">
+            <attribute name="t-att-colspan">
+               line_colspan
+               + (1 if display_excise_free_unit_price else 0)
+               + (1 if display_total_excises else 0)
+            </attribute>
         </xpath>
 
         <xpath expr="//th[@name='th_taxes']" position="after">
