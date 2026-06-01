@@ -58,6 +58,7 @@
         'data/knowledge_article_favorite.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/payment_provider_demo.xml',
         'demo/product_template.xml',
         'demo/appointment_type.xml',

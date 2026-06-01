@@ -34,6 +34,7 @@
         'data/mailing_mailing.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/res_partner.xml',
         'demo/website_view.xml',
         'demo/blog_post.xml',

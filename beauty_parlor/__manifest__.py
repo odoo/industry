@@ -30,6 +30,7 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/pos_session.xml',
         'demo/loyalty_program.xml',
         'demo/website_view.xml',

@@ -41,6 +41,7 @@
         'data/knowledge_article_favorite.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/crm_tag.xml',
         'demo/hr_job.xml',
         'demo/res_partner.xml',

@@ -54,6 +54,7 @@
         'data/website_view.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/ir_attachment_post.xml',
         'demo/event_event.xml',
         'demo/event_event_ticket.xml',
