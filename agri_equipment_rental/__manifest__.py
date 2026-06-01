@@ -27,6 +27,7 @@
         'data/quality_point.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/crm_lead.xml',
         'demo/stock_lot.xml',
         'demo/x_run_time_meter.xml',

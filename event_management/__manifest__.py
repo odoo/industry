@@ -54,6 +54,7 @@
     'demo': [
         'demo/quotation_document.xml',
         'demo/document_layout_view.xml',
+        'demo/res_company.xml',
         'demo/hr_job.xml',
         'demo/documents_document.xml',
         'demo/crm_lead.xml',

@@ -38,6 +38,7 @@
         'data/uninstall_hook.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/x_buildings.xml',
         'demo/x_property.xml',
         'demo/product_template.xml',
