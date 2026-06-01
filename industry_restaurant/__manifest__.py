@@ -36,6 +36,7 @@
         'data/pos_config.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/resource_calendar_data.xml',
         'demo/pos_payment_method.xml',
         'demo/payment_provider_demo_post.xml',

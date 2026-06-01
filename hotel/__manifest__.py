@@ -26,6 +26,7 @@
         'data/res_config_settings.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/hr_employee.xml',
         'demo/product_template_post.xml',
         'demo/pos_config.xml',

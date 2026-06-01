@@ -30,6 +30,7 @@
         'data/website_menu.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/event_type.xml',
         'demo/event_type_ticket.xml',
         'demo/event_event.xml',

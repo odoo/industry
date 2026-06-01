@@ -42,6 +42,7 @@
         'data/knowledge_article_favorite.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/delivery_carrier.xml',
         'demo/ir_attachment_post.xml',
         'demo/product_template.xml',
