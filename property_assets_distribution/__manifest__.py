@@ -1,5 +1,6 @@
 {
     'name': 'Property Assets & Distribution',
+    'version': '1.1',
     'category': 'Hidden/Tools',
     'depends': [
         'sale_subscription',
