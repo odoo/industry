@@ -263,25 +263,8 @@
   </record>
   <record id="base_model_res_partner_x_meeting_focus_count_field" model="ir.model.fields">
     <field name="compute"><![CDATA[
-for record in self:
-    parent_article = self.env.ref('community_care.knowledge_article_team_meetings', raise_if_not_found=False)
-    if not parent_article:
-        parent_article = self.env['knowledge.article'].search([('name', '=', 'Team meetings')], limit=1)
-    if not parent_article:
-        record['x_meeting_focus_count'] = 0
-        continue
-    prop_name = 'resident_focus'
-    for prop in (parent_article.article_properties_definition or []):
-        if prop.get('string') == 'Resident focus':
-            prop_name = prop.get('name')
-            break
-    count = self.env['knowledge.article'].search_count([
-        ('parent_id', '=', parent_article.id),
-        ('is_article_item', '=', True),
-        ('article_properties.%s' % prop_name, 'in', [record.id])
-    ])
-    record['x_meeting_focus_count'] = count
-]]>    </field>
+for record in self: record['x_meeting_focus_count'] = self.env['knowledge.article'].search_count([('parent_id', '=', self.env.ref('community_care.knowledge_article_team_meetings', raise_if_not_found=False).id), ('is_article_item', '=', True), ('article_properties.resident_focus', 'in', [record.id])])
+]]></field>
     <field name="ttype">integer</field>
     <field name="field_description">Meeting Focus Count</field>
     <field name="model_id" ref="base.model_res_partner"/>
