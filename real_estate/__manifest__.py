@@ -62,6 +62,7 @@
         'data/website.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/product_attribute_value.xml',
         'demo/res_partner.xml',
         'demo/hr_department.xml',

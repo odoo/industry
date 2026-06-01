@@ -50,6 +50,7 @@
         'data/sale_order_template_line.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/stock_warehouse_orderpoint.xml',
         'demo/stock_lot.xml',
         'demo/stock_quant.xml',

@@ -52,6 +52,7 @@
         'data/mail_message.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/quality_point.xml',
         'demo/stock_location.xml',
         'demo/res_partner.xml',

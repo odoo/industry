@@ -38,6 +38,7 @@
         'demo/knowledge_article_update.xml',
         'demo/knowledge_article_favorite.xml',
         'demo/res_partner.xml',
+        'demo/res_company.xml',
         'demo/resource_resource.xml',
         'demo/hr_employee.xml',
         'demo/crm_lead.xml',

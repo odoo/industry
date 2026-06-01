@@ -212,6 +212,8 @@ class TestEnv(IndustryCase):
                     self._check_base_records_update(tree, file_name, module)
                     if not is_studio_required:
                         is_studio_required = self._check_studio(tree, file_name)
+            if "/demo" in root:
+                self._check_main_company_inherit_is_present(root, files, module)
 
         if manifest_content is None:
             _logger.warning("No __manifest__.py found for module %s.", module)
@@ -832,3 +834,28 @@ class TestEnv(IndustryCase):
             cond2 = any((val := f.xpath('//value')) and val[0].get('eval', '') for f in session_functions)
             if not (cond1 or cond2):
                 error_message(u[0], u[1])
+
+    def _check_main_company_inherit_is_present(self, root, files, module):
+        if module not in self.installed_industries:
+            return
+        for file in files:
+            file_path = os.path.join(root, file)
+            encoded_content = pathlib.Path(file_path).read_bytes()
+            try:
+                tree = etree.fromstring(encoded_content)
+            except etree.XMLSyntaxError as e:
+                _logger.error("XML syntax error in file %s: %s", file, e)
+                return
+            for company in tree.xpath("//record[@model='res.company' and @id='base.main_company']"):
+                company_logo = company.xpath(".//field[@name='logo']")
+                if not company_logo or company_logo[0].get("file", "") != module + "/static/description/icon.png":
+                    _logger.warning(
+                        "The main company in the module %s is not using the industry logo as its logo.",
+                        module,
+                    )
+                return
+        _logger.warning(
+            "The module %s does not contain an extension of main_company. It should change the name \
+            and logo of the company to the industry ones.",
+            module,
+        )

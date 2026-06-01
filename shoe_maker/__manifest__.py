@@ -38,6 +38,7 @@
         'data/knowledge_article_favorite.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/res_partner.xml',
         'demo/hr_department.xml',
         'demo/hr_employee.xml',
