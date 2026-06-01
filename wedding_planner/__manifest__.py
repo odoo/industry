@@ -35,6 +35,7 @@
         'data/crm_tag.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/calendar_event.xml',

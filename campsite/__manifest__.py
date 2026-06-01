@@ -28,6 +28,7 @@
         'data/res_config_settings.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/pos_config.xml',
         'demo/product_attribute.xml',
         'demo/stock_quant.xml',

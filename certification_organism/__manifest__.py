@@ -33,6 +33,7 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/res_partner.xml',
         'demo/hr_leave.xml',
         'demo/crm_tag.xml',
