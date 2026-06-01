@@ -42,6 +42,7 @@
         'data/website_menu.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/appointment_type.xml',
         'demo/hr_department.xml',
         'demo/crm_tag.xml',

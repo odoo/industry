@@ -23,6 +23,7 @@
         'data/product_product.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/payment_provider_demo.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',

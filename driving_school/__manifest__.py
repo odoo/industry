@@ -42,6 +42,7 @@
         'data/knowledge_article_favorite.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/loyalty_program.xml',
         'demo/fleet_vehicle_log_services.xml',
         'demo/product_template.xml',

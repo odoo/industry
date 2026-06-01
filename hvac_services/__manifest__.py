@@ -45,6 +45,7 @@
         'data/base_automation.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/res_partner.xml',
         'demo/res_users.xml',
         'demo/hr_employee.xml',
