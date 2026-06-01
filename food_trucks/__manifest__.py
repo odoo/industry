@@ -24,6 +24,7 @@
         'data/res_config_settings.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/pos_config.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',

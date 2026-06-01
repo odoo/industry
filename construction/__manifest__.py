@@ -38,6 +38,7 @@
         'data/sale_order_template_line.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/documents_folder.xml',
         'demo/hr_department.xml',
         'demo/hr_employee.xml',

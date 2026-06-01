@@ -60,6 +60,7 @@
         'data/knowledge_tour.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/res_partner.xml',
         'demo/mrp_bom.xml',
         'demo/crm_lead.xml',

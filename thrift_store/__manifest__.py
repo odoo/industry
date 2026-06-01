@@ -23,6 +23,7 @@
         'data/res_config_settings.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/res_partner.xml',
         'demo/planning_role.xml',
         'demo/hr_employee.xml',

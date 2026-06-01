@@ -36,6 +36,7 @@
         'data/commission_plan.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/payment_provider_demo_post.xml',
         'demo/product_template.xml',
         'demo/website_view.xml',
