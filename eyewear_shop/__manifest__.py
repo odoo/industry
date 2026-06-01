@@ -48,6 +48,7 @@
         'data/crm_tag.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/res_partner.xml',
         'demo/appointment_type.xml',
         'demo/crm_lead.xml',

@@ -23,6 +23,7 @@
         'data/res_config_settings.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/product_template_post.xml',
         'demo/rating_rating.xml',
         'demo/ir_attachment_post.xml',

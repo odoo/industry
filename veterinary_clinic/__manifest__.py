@@ -57,6 +57,7 @@
         'data/crm_tag.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/appointment_type.xml',
         'demo/crm_team.xml',
         'demo/pos_session.xml',

@@ -24,6 +24,7 @@
         'data/pos_config.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
         'demo/res_partner.xml',

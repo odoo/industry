@@ -30,6 +30,7 @@
         'data/res_config_settings.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/payment_provider_demo_post.xml',
         'demo/res_partner.xml',
         'demo/delivery_carrier.xml',

@@ -32,6 +32,7 @@
         'data/website_theme_apply.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/product_product.xml',
         'demo/loyalty_program.xml',
         'demo/loyalty_rule.xml',
