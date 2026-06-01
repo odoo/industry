@@ -44,6 +44,7 @@
     ],
     'demo': [
         'demo/hr_department.xml',
+        'demo/res_company.xml',
         'demo/crm_team.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',

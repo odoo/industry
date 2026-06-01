@@ -34,6 +34,7 @@
         'data/ir_ui_menu.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/crm_tag.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',

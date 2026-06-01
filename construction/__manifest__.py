@@ -38,6 +38,7 @@
     ],
     'demo': [
         'demo/crm_tag.xml',
+        'demo/res_company.xml',
         'demo/hr_department.xml',
         'demo/hr_employee.xml',
         'demo/resource_resource.xml',
