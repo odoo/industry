@@ -30,6 +30,7 @@
         'data/ir_attachment.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/product_product.xml',
         'demo/event_event.xml',
         'demo/event_slot.xml',

@@ -27,6 +27,7 @@
         'data/knowledge_article_favorite.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/product_template.xml',
         'demo/res_partner.xml',
         'demo/website_view.xml',

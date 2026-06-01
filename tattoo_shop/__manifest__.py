@@ -34,6 +34,7 @@
         'data/ir_actions_server.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/appointement_type.xml',
         'demo/ir_attachment_post.xml',
         'demo/res_partner.xml',

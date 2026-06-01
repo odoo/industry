@@ -1,5 +1,5 @@
 {
-    'name': 'Nonprofit organization',
+    'name': 'Nonprofit Organization',
     'version': '2.0',
     'category': 'Services',
     'depends': [
@@ -57,6 +57,7 @@
         'data/product_pricelist_item.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/qweb_view.xml',
         'demo/website_page.xml',
         'demo/website_menu.xml',

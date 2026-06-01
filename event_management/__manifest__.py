@@ -47,6 +47,7 @@
         'data/website_theme_apply.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/hr_job.xml',
         'demo/documents_document.xml',
         'demo/crm_lead.xml',
