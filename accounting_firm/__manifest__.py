@@ -1,6 +1,6 @@
 {
-    'name': 'Accounting firm',
-    'version': '1.1',
+    'name': 'Accounting Firm',
+    'version': '1.2',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
@@ -50,6 +50,7 @@
         'data/sale_order_template_line.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/x_mandate.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',

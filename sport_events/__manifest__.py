@@ -45,6 +45,7 @@
         'data/knowledge_article_favorite.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/survey_survey.xml',
         'demo/website_view.xml',
         'demo/survey_question.xml',

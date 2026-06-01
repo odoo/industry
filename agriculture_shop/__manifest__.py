@@ -40,6 +40,7 @@
         'data/product_ribbon.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/res_partner.xml',
         'demo/product_product.xml',
         'demo/crm_tag.xml',
