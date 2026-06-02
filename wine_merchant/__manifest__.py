@@ -1,6 +1,6 @@
 {
     'name': 'Wine Shop',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Retail',
     'author': 'Odoo S.A.',
     'depends': [
