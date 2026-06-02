@@ -104,7 +104,12 @@ class ManifestTest(ManifestLinter, IndustryCase):
         data_folder = self.module_path / folder_name
         self.assertTrue(data_folder.exists(), f"No folder {folder_name} found")
 
-        data_files_list = [str(file.relative_to(data_folder.parent)) for file in data_folder.glob('*') if file.is_file()]
+        # Use rglob('*') instead of glob('*') to recursively find files in subfolders
+        data_files_list = [
+            str(file.relative_to(data_folder.parent))
+            for file in data_folder.rglob('*')
+            if file.is_file()
+        ]
         data_files = set(data_files_list)
 
         manifest_files_list = manifest_data.get(folder_name, [])

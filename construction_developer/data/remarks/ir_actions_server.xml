@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!-- 
+    server action and not compute because otherwise compute generates the same ID if
+    creating multiple remarks from a one2many list since they are not saved yet so
+    we cannot access the previous reference, resulting in duplicates
+    -->
+    <record id="action_x_remark_generate_x_reference_on_create" model="ir.actions.server">
+        <field name="model_id" ref="model_x_remark"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Generate Remark Reference on Create</field>
+        <field name="code"><![CDATA[
+for record in records:
+    # project already has remarks
+    if (project := record.x_project_id) and (last_ref := env['x_remark'].search([('x_project_id', '=', project.id), ('x_reference', '!=', False)], order='x_reference DESC', limit=1)): 
+        pid, rid = last_ref.x_reference.split('-')
+    # project has no remarks but has SO
+    elif so := project.sale_order_id:  
+        pid, rid = so.name[1:], 0
+    # no SO but made from SO
+    elif project and (soid := project.name.split('-')[0].strip()).startswith('S') and soid[1:].isnumeric(): 
+        pid, rid = soid[1:], 0
+    # no SO (fallback case, should ideally not be needed)
+    else:
+        pid, rid = last_rem[0].x_reference.split('-') if (last_rem := env['x_remark'].search([('x_reference', 'like', '00000-')], order='x_reference DESC')) else ("00000", 0)
+    record['x_reference'] = f"{pid}-{int(rid) + 1:05d}"
+]]></field>
+    </record>
+    <record model="ir.actions.server" id="action_x_remark_write_remark_stage_on_create_or_write">
+        <field name="name">Construction Developer: Write Remark Stages on Create or Write</field>
+        <field name="model_id" ref="model_x_remark"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[ 
+for record in records:
+    if not record.x_project_id.x_remark_stage_ids and (stage := env.ref('construction_developer.project_x_remark_stage_1', raise_if_not_found=False)): stage.update({'x_project_ids': [Command.link(record.x_project_id.id)]})
+    record['x_stage_id'] = env['x_remark_stage'].search([('x_project_ids', 'in', record.x_project_id)], order='x_sequence', limit=1)
+]]></field>
+    </record>
+</odoo>

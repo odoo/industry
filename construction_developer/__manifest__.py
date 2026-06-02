@@ -10,16 +10,57 @@
     'data': [
         'data/res_config_settings.xml',
 
-        'features/product_cost_nature.xml',
-        'features/purchase_cost_update_automation.xml',
-        'features/remarks.xml',
-        'features/sale_order_contract_type.xml',
-        'features/sale_order_delivery_progress_management.xml',
-        'features/sale_order_sequencing_and_references.xml',
-        'features/views_standard.xml',
-        'features/work_items.xml',
-        'features/work_item_lines_procurement.xml',
+        # models
+        'data/product_cost_nature/ir_model.xml',
+        'data/remarks/ir_model.xml',
+        'data/work_items/ir_model.xml',
+        # fields
+        'data/remarks/ir_model_fields.xml',
+        'data/sale_order_contract_type/ir_model_fields.xml',
+        'data/sale_order_sequencing_and_references/ir_model_fields.xml',
+        'data/sale_order_delivery_progress_management/ir_model_fields.xml',
+        'data/work_items/ir_model_fields.xml',
+        'data/product_cost_nature/ir_model_fields.xml',
+        'data/work_item_lines_procurement/ir_model_fields.xml',
+        # defaults
+        'data/remarks/ir_default.xml',
+        'data/sale_order_contract_type/ir_default.xml',
+        'data/work_items/ir_default.xml',
+        # server actions
+        'data/purchase_cost_update/ir_actions_server.xml',
+        'data/remarks/ir_actions_server.xml',
+        'data/sale_order_sequencing_and_references/ir_actions_server.xml',
+        'data/work_items/ir_actions_server.xml',
+        'data/sale_order_delivery_progress_management/ir_actions_server.xml',
+        'data/product_cost_nature/ir_actions_server.xml',
+        # views/act_windows
+        'data/work_items/ir_actions_act_window.xml',
+        'data/work_item_lines_procurement/ir_actions_act_window.xml',
 
+        'data/views_standard.xml',
+        'data/remarks/ir_ui_view.xml',
+        'data/work_items/ir_ui_view.xml',
+        'data/work_item_lines_procurement/ir_ui_view.xml',
+
+        'data/remarks/ir_actions_act_window.xml',
+        'data/sale_order_delivery_progress_management/ir_actions_act_window.xml',
+        # automations
+        'data/remarks/base_automation.xml',
+        'data/purchase_cost_update/base_automation.xml',
+        'data/work_items/base_automation.xml',
+        'data/sale_order_sequencing_and_references/base_automation.xml',
+        'data/sale_order_delivery_progress_management/base_automation.xml',
+        'data/product_cost_nature/base_automation.xml',
+        # embedded actions
+        'data/remarks/ir_embedded_actions.xml',
+        'data/sale_order_delivery_progress_management/ir_embedded_actions.xml',
+        'data/work_item_lines_procurement/ir_embedded_actions.xml',
+        # menus
+        'data/remarks/ir_ui_menu.xml',
+        'data/work_items/ir_ui_menu.xml',
+        'data/work_item_lines_procurement/ir_ui_menu.xml',
+
+        # records
         'data/ir_model_access.xml',
         'data/project_project.xml',
         'data/x_remark_stage.xml',

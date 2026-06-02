@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="field_sale_order_line_x_delivered_progress" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="field_description">Delivered Progress</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_delivered_progress</field>
+        <field name="depends">qty_delivered,product_uom_qty</field>
+        <field name="compute"><![CDATA[
+for sol in self: sol['x_delivered_progress'] = 100 * (sol.qty_delivered / sol.product_uom_qty) if sol.product_uom_qty else False
+        ]]></field>
+    </record>
+    <record id="field_sale_order_line_x_quantity_increment" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="field_description">Quantity Increment</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_quantity_increment</field>
+    </record>
+    <record id="field_sale_order_line_x_progress_increment" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="field_description">Progress Increment</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_progress_increment</field>
+    </record>
+    <record id="field_sale_order_line_x_current_progress" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="field_description">Current Progress</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_current_progress</field>
+        <field name="depends">x_delivered_progress,x_progress_increment</field>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+for sol in self: sol['x_current_progress'] = sol.x_delivered_progress + 100 * sol.x_progress_increment
+        ]]></field>
+    </record>
+    <record id="field_sale_order_line_x_service_policy" model="ir.model.fields">
+        <field name="name">x_service_policy</field>
+        <field name="field_description">Product Service Policy</field>
+        <field name="ttype">selection</field>
+        <field name="related">product_id.service_policy</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="field_sale_order_line_x_is_undeliverable" model="ir.model.fields">
+        <field name="name">x_is_undeliverable</field>
+        <field name="field_description">Is an undeliverable Product</field>
+        <field name="ttype">boolean</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="compute"><![CDATA[
+for sol in self: sol['x_is_undeliverable'] = not sol.display_type and not (sol.is_service and sol.x_service_policy == 'delivered_manual')
+        ]]></field>
+    </record>
+    <record id="field_sale_order_line_x_is_deliverable" model="ir.model.fields">
+        <field name="name">x_is_deliverable</field>
+        <field name="field_description">Is a deliverable Product</field>
+        <field name="ttype">boolean</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="compute"><![CDATA[
+for sol in self: sol['x_is_deliverable'] = not sol.display_type and sol.is_service and sol.x_service_policy == 'delivered_manual'
+        ]]></field>
+    </record>
+    <record id="field_sale_order_line_x_display_button" model="ir.model.fields">
+        <field name="name">x_display_button</field>
+        <field name="field_description">Display the section/subsection button</field>
+        <field name="ttype">boolean</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="compute"><![CDATA[
+for record in self: record['x_display_button'] = record.display_type in ['line_section', 'line_subsection'] and any(child.x_is_deliverable for child in record.order_id.order_line if record.id in [child.parent_id.id, child.parent_id.parent_id.id])
+]]></field>
+    </record>
+</odoo>

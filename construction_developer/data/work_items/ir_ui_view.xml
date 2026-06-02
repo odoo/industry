@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="x_work_item_list_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <list>
+            <field name="x_sequence" widget="handle"/>
+            <field name="x_name"/>
+            <field name="x_product_id" optional="show"/>
+            <field name="x_unit_id" optional="show"/>
+            <field name="x_unit_cost" optional="show" widget="monetary"/>
+            <field name="x_unit_price" optional="show" widget="monetary"/>
+            <field name="x_unit_margin" optional="show" widget="percentage"/>
+        </list>
+        </field>
+        <field name="model">x_work_item</field>
+        <field name="name">x_work_item.view.list</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+    </record>
+    <record id="x_work_item_form_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <form>
+            <header>
+                <button string="Set as Template" type="action" invisible="x_is_template or not id" name="%(server_action_set_work_item_as_template)d" title="Sets the current work item as new template (archives the current template if any)."/>
+            </header>
+            <div class="alert alert-info" role="alert" style="height: 40px; margin-bottom:0px;" invisible="not x_is_template or x_product_wi_template_id == False  or x_product_wi_template_id == id">
+                Saving this Work Item will archive the current one for this product.
+            </div>
+            <sheet string="Work Item">
+                <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+                <div class="oe_title">
+                    <h1>
+                        <field name="x_name" required="1" placeholder="Name..."/>
+                    </h1>
+                </div>
+                <group>
+                    <group>
+                        <field name="x_product_id" force_save="1" readonly="not x_is_template" invisible="x_targeted_so_id" context="{'default_type': 'service'}"/>
+                        <field name="x_reference" readonly="id and not x_is_template"/>
+                        <field name="x_unit_id" force_save="1" options="{'no_open': True}" placeholder="m²" invisible="not x_product_id"/>
+                        <field name="x_unit_custom_id" string="Unit" force_save="1" options="{'no_open': True}" placeholder="m²" invisible="x_product_id" required="not x_product_id"/>
+                    </group>
+                    <group>
+                        <field name="x_unit_cost" widget="monetary" force_save="1" readonly="True"/>
+                        <label for="x_unit_price"/>
+                        <div class="o_row">
+                            <field name="x_unit_price" class="oe_inline mw-50" widget="monetary" force_save="1" readonly="not x_is_margin_fixed"/>
+                            <button type="action" class="btn btn-secondary oe_inline" name="%(server_action_recompute_price_with_components_prices)d" invisible="not x_is_margin_fixed" string="Recompute" help="Recomputes the unit price based on components"/>
+                        </div>
+                        <label for="x_unit_margin"/>
+                        <div class="o_row">
+                            <field name="x_unit_margin" widget="percentage" class="oe_inline mw-50" force_save="1" readonly="not x_is_margin_fixed"/>
+                            <label for="x_is_margin_fixed"/>
+                            <field name="x_is_margin_fixed" class="oe_inline" force_save="1" help="When set, unit price is computed based on unit margin"/>
+                        </div>
+                    </group>
+                </group>
+                <notebook>
+                    <page string="Components" name="lines">
+                        <field name="x_work_item_line_ids">
+                            <list editable="bottom" open_form_view="false">
+                                <field name="x_sequence" widget="handle"/>
+                                <field optional="show" name="x_product_id"/>
+                                <field optional="show" name="x_unit_cost" widget="monetary"/>
+                                <field optional="show" name="x_unit_price" widget="monetary"/>
+                                <field optional="show" name="x_margin" widget="percentage"/>
+                                <field optional="show" name="x_quantity"/>
+                                <field optional="show" name="x_unit_id" readonly="True"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+            </sheet>
+            <chatter/>
+        </form>
+        </field>
+        <field name="model">x_work_item</field>
+        <field name="name">x_work_item.form.view</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="x_work_item_line_search_view" model="ir.ui.view">
+        <field name="model">x_work_item_line</field>
+        <field name="name">x_work_item_line.search.view</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+        <search>
+            <field name="x_product_id"/>
+            <field name="x_work_item_id"/>
+            <field name="x_sale_order_id"/>
+            <field name="x_unit_id"/>
+            <field name="x_demand"/>
+            <field name="x_consumed"/>
+            <separator/>
+            <group>
+                <filter string="Product" name="group_by_product" context="{'group_by':'x_product_id'}"/>
+                <filter string="Order" name="group_by_order" context="{'group_by':'x_sale_order_id'}"/>
+                <filter string="Work Item" name="group_by_work_item" context="{'group_by':'x_work_item_id'}"/>
+            </group>
+        </search>
+        </field>
+    </record>
+
+    <record id="x_work_item_search_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <search>
+            <field name="x_name"/>
+            <field name="x_product_id"/>
+            <field name="x_reference"/>
+            <separator/>
+            <filter string="Archived" name="archived_x_work_item" domain="[['x_active', '=', False]]"/>
+            <separator/>
+        </search>
+        </field>
+        <field name="model">x_work_item</field>
+        <field name="name">x_work_item.search.view</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>
