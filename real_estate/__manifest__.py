@@ -6,10 +6,10 @@
     'depends': [
         'appointment_crm',
         'base_automation',
+        'hr',
         'base_industry_data',
         'crm_enterprise',
         'documents',
-        'hr',
         'knowledge',
         'project_enterprise',
         'sale_commission',
@@ -21,7 +21,6 @@
         'website_sale',
     ],
     'data': [
-        'data/res_config_settings.xml',
         'data/ir_model.xml',
         'data/website_base_unit.xml',
         'data/ir_model_fields.xml',
@@ -44,6 +43,7 @@
         'data/ir_ui_menu.xml',
         'data/ir_model_access.xml',
         'data/ir_default.xml',
+        'data/res_config_settings.xml',
         'data/crm_stage.xml',
         'data/project_task_type.xml',
         'data/project_project.xml',
