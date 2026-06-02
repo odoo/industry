@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    
+    <record id="field_sale_order_line_x_reference" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="field_description">Line Reference</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_reference</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="depends">sequence,order_id.name</field>
+        <field name="compute"><![CDATA[
+for sol in self: sol['x_reference'] = f"{sol.order_id.name}.{sol.sequence}"
+        ]]></field>
+    </record>
+    <record id="field_account_move_line_x_reference" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="field_description">Line Reference</field>
+        <field name="model_id" ref="sale.model_account_move_line"/>
+        <field name="name">x_reference</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="depends">sale_line_ids,sale_line_ids.x_reference</field>
+        <field name="compute"><![CDATA[
+for aml in self: aml['x_reference'] = (aml.sale_line_ids.x_reference if len(aml.sale_line_ids) == 1 else "Multi") if aml.sale_line_ids else ""
+        ]]></field>
+    </record>
+
+    <record id="automation_initialize_sales_order_line_sequence_on_sales_order_create" model="base.automation">
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_initialize_sales_order_line_sequence_on_sales_order_create')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Construction Developer: Initialize Sales Order Line Sequence on Sales Order create or write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale.field_sale_order__order_line')])]"/>
+    </record>
+
+
+    <record id="action_initialize_sales_order_line_sequence_on_sales_order_create" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="name">Construction Developer: Initialize Sales Order Line Sequence on Sales Order create</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+sequences = record.order_line.mapped('sequence')
+if len(sequences) != len(set(sequences)):  # not all different: create order
+    new_sols = []
+    for sol_i, sol in enumerate(record.order_line):
+        previous_same_sequences = sum(seq == sequences[sol_i] for seq in sequences[:sol_i + 1])
+        # Handle duplicates by adding fractional offsets which will be used to order the list
+        new_sols.append((sol.id, sol.sequence + (previous_same_sequences / sequences.count(sol.sequence))))
+    seqs = {sid: i for (i, (sid, _)) in enumerate(sorted(new_sols, key=lambda soltup: soltup[1]))}         # Associate each sid with its sequence (order) when sorted
+else:  # all different: use existing order
+    seqs = {sol.id: i for (i, sol) in enumerate(sorted(record.order_line, key=lambda sol: sol.sequence))}  # Associate each sid with its sequence (order) when sorted
+for sol in record.order_line: sol['sequence'] = seqs[sol.id] + 1
+]]></field>
+    </record>
+</odoo>

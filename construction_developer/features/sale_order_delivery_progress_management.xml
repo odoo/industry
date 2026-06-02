@@ -1,0 +1,163 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="field_sale_order_line_x_delivered_progress" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="field_description">Delivered Progress</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_delivered_progress</field>
+        <field name="depends">qty_delivered,product_uom_qty</field>
+        <field name="compute"><![CDATA[
+for sol in self: sol['x_delivered_progress'] = 100 * (sol.qty_delivered / sol.product_uom_qty) if sol.product_uom_qty else False
+        ]]></field>
+    </record>
+    <record id="field_sale_order_line_x_quantity_increment" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="field_description">Quantity Increment</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_quantity_increment</field>
+    </record>
+    <record id="field_sale_order_line_x_progress_increment" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="field_description">Progress Increment</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_progress_increment</field>
+    </record>
+    <record id="field_sale_order_line_x_current_progress" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="field_description">Current Progress</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_current_progress</field>
+        <field name="depends">x_delivered_progress,x_progress_increment</field>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+for sol in self: sol['x_current_progress'] = sol.x_delivered_progress + 100 * sol.x_progress_increment
+        ]]></field>
+    </record>
+    <record id="field_sale_order_line_x_service_policy" model="ir.model.fields">
+        <field name="name">x_service_policy</field>
+        <field name="field_description">Product Service Policy</field>
+        <field name="ttype">selection</field>
+        <field name="related">product_id.service_policy</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="field_sale_order_line_x_is_undeliverable" model="ir.model.fields">
+        <field name="name">x_is_undeliverable</field>
+        <field name="field_description">Is an undeliverable Product</field>
+        <field name="ttype">boolean</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="compute"><![CDATA[
+for sol in self: sol['x_is_undeliverable'] = not sol.display_type and not (sol.is_service and sol.x_service_policy == 'delivered_manual')
+        ]]></field>
+    </record>
+    <record id="field_sale_order_line_x_is_deliverable" model="ir.model.fields">
+        <field name="name">x_is_deliverable</field>
+        <field name="field_description">Is a deliverable Product</field>
+        <field name="ttype">boolean</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="compute"><![CDATA[
+for sol in self: sol['x_is_deliverable'] = not sol.display_type and sol.is_service and sol.x_service_policy == 'delivered_manual'
+        ]]></field>
+    </record>
+    <record id="field_sale_order_line_x_display_button" model="ir.model.fields">
+        <field name="name">x_display_button</field>
+        <field name="field_description">Display the section/subsection button</field>
+        <field name="ttype">boolean</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="compute"><![CDATA[
+for record in self: record['x_display_button'] = record.display_type in ['line_section', 'line_subsection'] and any(child.x_is_deliverable for child in record.order_id.order_line if record.id in [child.parent_id.id, child.parent_id.parent_id.id])
+]]></field>
+    </record>
+
+    <record id="automation_update_progress_increment_on_change" model="base.automation">
+        <field name="name">Construction Developer: Update Sale Order Line Progress Increment on Quantity Increment change</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_sol_update_progress_increment_on_change')])]"/>
+        <field name="trigger">on_change</field>
+        <field name="on_change_field_ids" eval="[(6, 0, [ref('field_sale_order_line_x_quantity_increment')])]"/>
+    </record>
+    <record id="automation_update_quantity_increment_on_change" model="base.automation">
+        <field name="name">Construction Developer: Update Sale Order Line Quantity Increment on Progress Increment change</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_sol_update_quantity_increment_on_change')])]"/>
+        <field name="trigger">on_change</field>
+        <field name="on_change_field_ids" eval="[(6, 0, [ref('field_sale_order_line_x_progress_increment')])]"/>
+    </record>
+
+    <record id="action_progress_view" model="ir.actions.act_window">
+        <field name="name">Progress</field>
+        <field name="res_model">sale.order.line</field>
+        <field name="view_mode">list</field>
+        <field name="domain">[('order_id.project_id','=', active_id)]</field>
+        <field name="view_id" ref="sale_order_list_view"/>
+        <field name="search_view_id" ref="sale_order_filter"/>
+    </record>
+
+
+    <record id="action_sol_update_progress_increment_on_change" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Update Progress Increment on Quantity Increment change</field>
+        <field name="code"><![CDATA[
+record['x_progress_increment'] = record.x_quantity_increment / record.product_uom_qty if record.product_uom_qty > 0 else False
+]]></field>
+    </record>
+    <record id="action_sol_update_quantity_increment_on_change" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Update Quantity Increment on Progress Increment change</field>
+        <field name="code"><![CDATA[
+record['x_quantity_increment'] = record.x_progress_increment * record.product_uom_qty
+]]></field>
+    </record>
+    <record id="action_sol_update_section_progress" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Update Quantity Increment on section button click</field>
+        <field name="code"><![CDATA[
+lines = record.order_id.order_line.sorted(key=lambda sol: sol.sequence)
+i = [sol.sequence for sol in lines].index(record.sequence) + 1
+while (i < len(lines) and
+      ((record.display_type == 'line_section' and lines[i].display_type != 'line_section')
+      or (record.display_type == 'line_subsection' and (lines[i].display_type not in ['line_subsection', 'line_section'])))):
+    if lines[i].x_is_deliverable:
+        increment = min(lines[i].product_uom_qty - lines[i].qty_delivered, lines[i].product_uom_qty * record.x_progress_increment)  # ensures the total doesn't exceed lines[i].product_uom_qty
+        percentage = increment / lines[i].product_uom_qty if lines[i].product_uom_qty else False
+        lines[i]['x_quantity_increment'], lines[i]['x_progress_increment'] = increment, percentage
+    i += 1
+record['x_progress_increment'] = 0
+action = {'type': 'ir.actions.client', 'tag': 'soft_reload'}
+]]></field>
+    </record>
+    <record id="action_sol_update_qty_delivered" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for sol in records: sol.write({'qty_delivered': sol.qty_delivered + sol.x_quantity_increment, 'x_quantity_increment': 0, 'x_progress_increment': 0})
+action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'message': "Delivered quantities updated.", 'type': 'success', 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'}}}
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Update Quantity Delivered</field>
+    </record>
+
+    <record id="construction_embedded_action_sales_order_lines" model="ir.embedded.actions">
+        <field name="parent_res_model">project.project</field>
+        <field name="name">Progress</field>
+        <field name="sequence">55</field>
+        <field name="parent_action_id" ref="project.act_project_project_2_project_task_all"/>
+        <field name="action_id" eval="ref('construction_developer.action_progress_view')"/>
+    </record>
+    <record id="construction_embedded_action_sales_order_lines_dashboard" model="ir.embedded.actions">
+        <field name="parent_res_model">project.project</field>
+        <field name="name">Progress</field>
+        <field name="sequence">55</field>
+        <field name="parent_action_id" ref="project.project_update_all_action"/>
+        <field name="action_id" eval="ref('construction_developer.action_progress_view')"/>
+    </record>
+
+</odoo>

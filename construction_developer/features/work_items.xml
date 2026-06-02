@@ -1,0 +1,729 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+
+    <record id="x_work_item_model" model="ir.model">
+      <field name="is_mail_thread" eval="True"/>
+      <field name="is_mail_activity" eval="True"/>
+      <field name="model">x_work_item</field>
+      <field name="name">Work Item</field>
+    </record>
+    <record id="x_work_item_line_model" model="ir.model">
+      <field name="model">x_work_item_line</field>
+      <field name="name">Work Item Line</field>
+    </record>
+
+
+    <!-- x_work_item fields -->
+    <record id="x_name_field_x_work_item" model="ir.model.fields">
+        <field name="name">x_name</field>
+        <field name="ttype">char</field>
+        <field name="field_description">Description</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="required" eval="True"/>
+    </record>
+    <record id="x_active_field_x_work_item" model="ir.model.fields">
+        <field name="name">x_active</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">Active</field>
+        <field name="model_id" ref="x_work_item_model"/>
+    </record>
+    <record id="x_sequence_field_x_work_item" model="ir.model.fields">
+        <field name="name">x_sequence</field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Sequence</field>
+        <field name="model_id" ref="x_work_item_model"/>
+    </record>
+    <record id="x_is_template_field_x_work_item" model="ir.model.fields">
+        <field name="name">x_is_template</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">Is Template</field>
+        <field name="model_id" ref="x_work_item_model"/>
+    </record>
+    <record id="x_sale_order_line_id_field_x_work_item" model="ir.model.fields">
+        <field name="name">x_sale_order_line_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Sale Order Line</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="relation">sale.order.line</field>
+    </record>
+    <record id="x_product_id_field_x_work_item" model="ir.model.fields">
+        <field name="name">x_product_id</field>
+        <field name="ttype">many2one</field>
+        <field name="domain">[('type', '=', 'service')]</field>
+        <field name="field_description">Product</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="relation">product.product</field>
+        <field name="copied" eval="True"/>
+    </record>
+    <record id="x_unit_id_field_x_work_item" model="ir.model.fields">
+        <field name="name">x_unit_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Unit</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="relation">uom.uom</field>
+        <field name="related">x_product_id.uom_id</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="x_unit_custom_id_field_x_work_item" model="ir.model.fields">
+        <field name="name">x_unit_custom_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Custom Unit</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="relation">uom.uom</field>
+    </record>
+    <record id="x_reference_field_x_work_item" model="ir.model.fields">
+        <field name="name">x_reference</field>
+        <field name="ttype">char</field>
+        <field name="field_description">Reference</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="related">x_product_id.default_code</field>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="x_currency_id_field_x_work_item" model="ir.model.fields">
+        <field name="name">x_currency_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Currency</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="related">x_product_id.currency_id</field>
+        <field name="relation">res.currency</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="x_targeted_so_field_x_work_item" model="ir.model.fields">
+        <field name="name">x_targeted_so_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Targeted SO</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="relation">sale.order</field>
+    </record>
+
+    <record id="x_work_item_id_field_x_work_item_line" model="ir.model.fields">
+        <field name="name">x_work_item_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Work Item</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="relation">x_work_item</field>
+        <field name="required" eval="True"/>
+        <field name="on_delete">cascade</field>
+    </record>
+    <record id="x_sequence_field_x_work_item_line" model="ir.model.fields">
+        <field name="name">x_sequence</field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Sequence</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+    </record>
+    <record id="x_quantity_field_x_work_item_line" model="ir.model.fields">
+        <field name="name">x_quantity</field>
+        <field name="ttype">float</field>
+        <field name="field_description">Quantity</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+    </record>
+    <record id="x_product_id_field_x_work_item_line" model="ir.model.fields">
+        <field name="name">x_product_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Product</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="relation">product.product</field>
+    </record>
+    <record id="x_unit_id_field_x_work_item_line" model="ir.model.fields">
+        <field name="name">x_unit_id</field>
+        <field name="ttype">many2one</field>
+        <field name="related">x_product_id.uom_id</field>
+        <field name="field_description">Unit</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="readonly" eval="True"/>
+        <field name="relation">uom.uom</field>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="x_currency_id_field_x_work_item_line" model="ir.model.fields">
+        <field name="name">x_currency_id</field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Currency</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="related">x_product_id.currency_id</field>
+        <field name="relation">res.currency</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="x_unit_cost_field_x_work_item_line" model="ir.model.fields">
+        <field name="name">x_unit_cost</field>
+        <field name="ttype">monetary</field>
+        <field name="field_description">Unit Cost</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="currency_field">x_currency_id</field>
+    </record>
+    <record id="x_unit_price_field_x_work_item_line" model="ir.model.fields">
+        <field name="name">x_unit_price</field>
+        <field name="ttype">monetary</field>
+        <field name="field_description">Unit Price</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="currency_field">x_currency_id</field>
+    </record>
+    <record id="x_margin_field_x_work_item_line" model="ir.model.fields">
+        <field name="name">x_margin</field>
+        <field name="compute"><![CDATA[
+for record in self: record['x_margin'] = (record.x_unit_price - record.x_unit_cost) / record.x_unit_price if record.x_unit_price > 0 else False
+]]></field>
+        <field name="ttype">float</field>
+        <field name="depends">x_unit_price, x_unit_cost</field>
+        <field name="field_description">Margin</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
+
+    <record id="x_work_item_line_ids_field_x_work_item" model="ir.model.fields">
+        <field name="name">x_work_item_line_ids</field>
+        <field name="ttype">one2many</field>
+        <field name="field_description">Work Item Lines</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="relation">x_work_item_line</field>
+        <field name="relation_field">x_work_item_id</field>
+        <field name="copied" eval="True"/>
+    </record>
+    <record id="x_unit_cost_field_x_work_item" model="ir.model.fields">
+        <field name="name">x_unit_cost</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_unit_cost'] = sum(line.x_unit_cost * line.x_quantity for line in record.x_work_item_line_ids)
+]]></field>
+        <field name="ttype">monetary</field>
+        <field name="depends">x_work_item_line_ids.x_unit_cost,x_work_item_line_ids.x_quantity</field>
+        <field name="field_description">Unit Cost</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="readonly" eval="True"/>
+        <field name="currency_field">x_currency_id</field>
+    </record>
+    <record id="x_unit_price_field_x_work_item" model="ir.model.fields">
+        <field name="name">x_unit_price</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    if not record.x_is_margin_fixed:
+        record['x_unit_price'] = sum(line.x_unit_price * line.x_quantity for line in record.x_work_item_line_ids)
+]]></field>
+        <field name="ttype">monetary</field>
+        <field name="depends">x_work_item_line_ids.x_unit_price,x_work_item_line_ids.x_quantity</field>
+        <field name="field_description">Unit Price</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="currency_field">x_currency_id</field>
+    </record>
+    <record id="x_unit_margin_field_x_work_item" model="ir.model.fields">
+        <field name="name">x_unit_margin</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    if not record.x_is_margin_fixed:
+        record['x_unit_margin'] = (record.x_unit_price - record.x_unit_cost) / record.x_unit_cost if record.x_unit_cost > 0 else False
+]]></field>
+        <field name="ttype">float</field>
+        <field name="depends">x_unit_price,x_unit_cost</field>
+        <field name="field_description">Unit Margin</field>
+        <field name="model_id" ref="x_work_item_model"/>
+    </record>
+    <record id="x_is_margin_fixed_field_x_work_item" model="ir.model.fields">
+        <field name="name">x_is_margin_fixed</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">Fixed</field>
+        <field name="model_id" ref="x_work_item_model"/>
+    </record>
+
+    <record id="x_line_work_item_id_field_sale_order_line" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">Work Item</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_line_work_item_id</field>
+        <field name="relation">x_work_item</field>
+    </record>
+
+    <record id="x_work_item_template_id_field_product_product" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+work_items_data = self.env['x_work_item']._read_group(domain=[('x_product_id', 'in', self.ids), ('x_is_template', '=', True), ('x_active', '=', True)], groupby=['x_product_id'], aggregates=['id:min'])
+mapped_data = {x_product_id.id: id for x_product_id, id in work_items_data}
+for record in self:
+    record['x_work_item_template_id'] = mapped_data.get(record.id, False)
+]]></field>
+        <field name="ttype">many2one</field>
+        <field name="field_description">Work Item Template</field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="name">x_work_item_template_id</field>
+        <field name="readonly" eval="True"/>
+        <field name="relation">x_work_item</field>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="x_x_product_template_x_work_items_count_field_product_template" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_x_product_template_x_work_items_count'] = record.env['x_work_item'].search_count([('x_is_template', '=', True), ('x_work_item_line_ids.x_product_id.product_tmpl_id', '=', record.id)])
+]]>    </field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Template Work items count</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="name">x_x_product_template_x_work_items_count</field>
+        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="x_x_product_product_x_work_items_count_field_product_product" model="ir.model.fields">
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_x_product_product_x_work_items_count'] = record.env['x_work_item'].search_count([('x_is_template', '=', True), ('x_work_item_line_ids.x_product_id', '=', record.id)])
+]]>    </field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Product Work items count</field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="name">x_x_product_product_x_work_items_count</field>
+        <field name="selectable" eval="False"/>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="x_product_wi_template_id_field_x_work_item" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="related">x_product_id.x_work_item_template_id</field>
+        <field name="field_description">Product Work Item Template</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="name">x_product_wi_template_id</field>
+        <field name="readonly" eval="True"/>
+        <field name="relation">x_work_item</field>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="field_x_work_item_line_x_category_id" model="ir.model.fields">
+        <field name="name">x_category_id</field>
+        <field name="field_description">Category</field>
+        <field name="ttype">many2one</field>
+        <field name="related">x_product_id.product_tmpl_id.categ_id</field>
+        <field name="model_id" ref="x_work_item_line_model"/>
+        <field name="relation">product.category</field>
+        <field name="store" eval="True"/>
+    </record>
+
+
+    <record id="x_active_field_x_work_item_default" model="ir.default">
+        <field name="field_id" ref="x_active_field_x_work_item"/>
+        <field name="json_value">true</field>
+    </record>
+    <record id="x_quantity_field_x_work_item_line_default" model="ir.default">
+        <field name="field_id" ref="x_quantity_field_x_work_item_line"/>
+        <field name="json_value">"1"</field>
+    </record>
+    <record id="x_is_template_field_x_work_item_default" model="ir.default">
+        <field name="field_id" ref="x_is_template_field_x_work_item"/>
+        <field name="json_value">true</field>
+    </record>
+
+    <record id="base_automation_on_product_from_wi_line_change" model="base.automation">
+        <field name="model_id" ref="x_work_item_line_model" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_set_unit_cost_price_from_product')])]" />
+        <field name="trigger">on_change</field>
+        <field name="name">Construction: Work Item line - On product change</field>
+        <field name="on_change_field_ids"
+            eval="[(6, 0, [ref('x_product_id_field_x_work_item_line')])]" />
+    </record>
+    <record id="base_automation_on_product_from_wi_change" model="base.automation">
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_set_work_item_name')])]" />
+        <field name="trigger">on_change</field>
+        <field name="name">Construction: Work Item - On product change</field>
+        <field name="on_change_field_ids"
+            eval="[(6, 0, [ref('x_product_id_field_x_work_item')])]" />
+    </record>
+    <record id="base_automation_work_item_template_on_write" model="base.automation">
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_create_or_modify_wi_on_sol')])]" />
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[("x_is_template", "=", False)]</field>
+        <field name="name">Construction: Work Item - On save of non template</field>
+    </record>
+    <record id="base_automation_work_item_on_write_unit_cost_price_change" model="base.automation">
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_update_product_cost'), ref('server_action_update_product_price')])]" />
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Construction: Work Item - On save and unit cost/price change</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_unit_cost_field_x_work_item'), ref('x_unit_price_field_x_work_item')])]"/>
+    </record>
+    <record id="base_automation_product_product_on_write_unit_cost_price_change" model="base.automation">
+        <field name="model_id" ref="product.model_product_product" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_update_related_work_item_lines')])]" />
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Construction: Work Item - On save and cost/price change</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('product.field_product_product__lst_price'), ref('product.field_product_product__standard_price')])]"/>
+    </record>
+    <record id="base_automation_work_item_on_write_unit_price_when_margin_fixed" model="base.automation">
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_update_margin_if_margin_fixed')])]" />
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[("x_is_margin_fixed", "=", True)]</field>
+        <field name="name">Construction: Work Item - On save and unit price change</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_unit_price_field_x_work_item')])]"/>
+    </record>
+    <record id="base_automation_work_item_on_write_unit_margin_or_cost_when_margin_fixed" model="base.automation">
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_update_price_if_margin_fixed')])]" />
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[("x_is_margin_fixed", "=", True)]</field>
+        <field name="name">Construction: Work Item - On save and unit margin or cost change</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_unit_margin_field_x_work_item'), ref('x_unit_cost_field_x_work_item')])]"/>
+    </record>
+    <record id="base_automation_work_item_on_write" model="base.automation">
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_archive_old_wi_template')])]" />
+        <field name="filter_domain">[("x_is_template", "!=", False), ("x_product_id", "!=", False), ("x_active", "!=", False)]</field>
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Construction: Work Item - On save</field>
+    </record>
+    <record id="base_automation_sol_on_write" model="base.automation">
+        <field name="model_id" ref="sale.model_sale_order_line" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_create_associated_work_item')])]" />
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Construction: SOL - On save</field>
+        <field name="filter_domain">[('x_line_work_item_id', '=', False), ('product_id.x_work_item_template_id', '!=', False)]</field>
+    </record>
+    <record id="base_automation_wi_template_without_product_on_write" model="base.automation">
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_create_product_for_wi')])]" />
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[('x_is_template', '!=', False), ('x_product_id', '=', False)]</field>
+        <field name="name">Construction: Work Item - On save of work item template without product</field>
+    </record>
+    <record id="base_automation_on_write_wi_margin_fixed_to_false" model="base.automation">
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="action_server_ids"
+            eval="[(6, 0, [ref('server_action_recompute_price_with_components_prices')])]" />
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Construction: Work Item - On Margin Fixed write to False</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_is_margin_fixed_field_x_work_item')])]"/>
+        <field name="filter_domain">[('x_is_margin_fixed', '=', False)]</field>
+    </record>
+
+
+    <record id="action_window_work_items" model="ir.actions.act_window">
+        <field name="name">Work Items</field>
+        <field name="domain">[('x_is_template', '=', True)]</field>
+        <field name="res_model">x_work_item</field>
+        <field name="context">{'search_default_x_active': True}</field>
+    </record>
+    <record id="action_window_see_work_items_from_product_template" model="ir.actions.act_window">
+        <field name="name">Work Items</field>
+        <field name="domain">[('x_is_template', '=', True), ('x_work_item_line_ids.x_product_id.product_tmpl_id', '=', active_id)]</field>
+        <field name="res_model">x_work_item</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_x_active': True}</field>
+    </record>
+    <record id="action_window_see_work_items_from_product_product" model="ir.actions.act_window">
+        <field name="name">Work Items</field>
+        <field name="domain">[('x_is_template', '=', True), ('x_work_item_line_ids.x_product_id', '=', active_id)]</field>
+        <field name="res_model">x_work_item</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_x_active': True}</field>
+    </record>
+    <record id="action_window_add_work_item" model="ir.actions.act_window">
+        <field name="name">Add Work Item</field>
+        <field name="domain">[('x_active', '=', True),('x_is_template', '=', True)]</field>
+        <field name="res_model">x_work_item</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_x_is_template': False, 'default_x_targeted_so_id': context.get('so_id')}</field>
+    </record>
+
+
+
+    <record id="server_action_set_work_item_name" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Set Work Item name</field>
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record.write({'x_name': record.x_product_id.name})
+]]></field>
+    </record>
+    <record id="server_action_set_unit_cost_price_from_product" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Set unit cost and unit price from product</field>
+        <field name="model_id" ref="x_work_item_line_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record.write({'x_unit_price': record.x_product_id.lst_price, 'x_unit_cost': record.x_product_id.standard_price})
+]]></field>
+    </record>
+    <record id="server_action_update_related_work_item_lines" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Update related wi lines on product cost/price change</field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+wil = env['x_work_item_line'].search([('x_product_id', 'in', records.ids), ('x_work_item_id.x_is_template', '=', True)])
+for product in records:
+    wil.filtered(lambda line: line.x_product_id == product).write({'x_unit_price': product.list_price, 'x_unit_cost': product.standard_price})
+]]></field>
+    </record>
+    <record id="server_action_update_product_cost" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Update product cost</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="product.model_product_product"/>
+        <field name="update_path">x_product_id.standard_price</field>
+        <field name="update_field_id" ref="product.field_product_product__standard_price"/>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[record.x_unit_cost]]></field>
+    </record>
+    <record id="server_action_update_product_price" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Update product price</field>
+        <field name="model_id" ref="x_work_item_model"/>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="product.model_product_product"/>
+        <field name="update_path">x_product_id.lst_price</field>
+        <field name="update_field_id" ref="product.field_product_product__lst_price"/>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[record.x_unit_price]]></field>
+    </record>
+    <record id="server_action_update_margin_if_margin_fixed" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Update margin on price change if margin is fixed</field>
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for wi in records:
+    wi['x_unit_margin'] = (wi.x_unit_price - wi.x_unit_cost) / wi.x_unit_cost if wi.x_unit_cost > 0 else False
+]]></field>
+    </record>
+    <record id="server_action_update_price_if_margin_fixed" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Update price on margin/cost change if margin is fixed</field>
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for wi in records:
+    wi['x_unit_price'] = wi.x_unit_cost * (1 + wi.x_unit_margin)
+]]></field>
+    </record>
+    <record id="server_action_recompute_price_with_components_prices" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Recompute price</field>
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for wi in records:
+    wi['x_unit_price'] = sum(line.x_unit_price * line.x_quantity for line in wi.x_work_item_line_ids)
+]]></field>
+    </record>
+    <record id="server_action_set_work_item_as_template" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Set as template</field>
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for wi in records:
+    wi.copy(default={'x_sale_order_line_id': False, 'x_is_template': True, 'x_targeted_so_id': False})
+action = {
+    'type': 'ir.actions.client',
+    'tag': 'display_notification',
+    'params': {'message': ', '.join(wi.x_name for wi in records) + " template saved.", 'type': 'success'},
+}
+]]></field>
+    </record>
+    <record id="server_action_create_product_for_wi" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Create new product for work item</field>
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for wi in records:
+    new_product = env['product.product'].create({
+        'name': wi.x_name,
+        'default_code': wi.x_reference,
+        'type': 'service',
+        'service_policy': "delivered_manual",
+        'list_price': wi.x_unit_price,
+        'standard_price': wi.x_unit_cost,
+        'uom_id': wi.x_unit_custom_id.id,
+    })
+    wi.write({'x_product_id': new_product.id})
+]]></field>
+    </record>
+    <record id="server_action_create_or_modify_wi_on_sol" model="ir.actions.server">
+        <field name="name">Construction: Work Item - Create/modify work item on sale order line</field>
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if record.x_sale_order_line_id:
+    record.x_sale_order_line_id.write({
+        'price_unit': record.x_unit_price,
+        'purchase_price': record.x_unit_cost,
+    })
+elif record.x_targeted_so_id:
+    env['ir.actions.server'].browse(env.ref('construction_developer.server_action_create_product_for_wi').id).run()
+    sol = env['sale.order.line'].create({
+        'order_id': record.x_targeted_so_id.id,
+        'product_id': record.x_product_id.id,
+        'price_unit': record.x_unit_price,
+        'purchase_price': record.x_unit_cost,
+        'x_line_work_item_id': record.id,
+    })
+    record.write({'x_sale_order_line_id': sol.id})
+]]></field>
+    </record>
+    <record id="server_action_create_associated_work_item" model="ir.actions.server">
+        <field name="name">Construction: SOL - Create associated Work Item</field>
+        <field name="model_id" ref="sale.model_sale_order_line" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for sol in records:
+    wi = sol.product_id.x_work_item_template_id.copy({
+        'x_sale_order_line_id': record.id,
+        'x_is_template': False,
+    })
+    sol['x_line_work_item_id'] = wi.id
+]]></field>
+    </record>
+    <record id="server_action_open_sol_work_item" model="ir.actions.server">
+        <field name="name">Construction: SOL - Open SOL Work Item</field>
+        <field name="model_id" ref="sale.model_sale_order_line" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+action = {
+    "type": "ir.actions.act_window",
+    "res_model": "x_work_item",
+    "res_id": record.x_line_work_item_id.id,
+    "view_mode": "form",
+    "target": "new",
+}
+]]></field>
+    </record>
+    <record id="server_action_archive_old_wi_template" model="ir.actions.server">
+        <field name="name">Construction: Product - Archive Old Work Item Template</field>
+        <field name="model_id" ref="x_work_item_model" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+env['x_work_item'].search([("x_active", "!=", False), ("id", "not in", records.ids), ("x_product_id", "in", records.x_product_id.ids), ("x_is_template", "!=", False)]).write({'x_active': False})]]></field>
+    </record>
+
+
+    <record id="x_work_item_list_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <list>
+            <field name="x_sequence" widget="handle"/>
+            <field name="x_name"/>
+            <field name="x_product_id" optional="show"/>
+            <field name="x_unit_id" optional="show"/>
+            <field name="x_unit_cost" optional="show" widget="monetary"/>
+            <field name="x_unit_price" optional="show" widget="monetary"/>
+            <field name="x_unit_margin" optional="show" widget="percentage"/>
+        </list>
+        </field>
+        <field name="model">x_work_item</field>
+        <field name="name">x_work_item.view.list</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+    </record>
+    <record id="x_work_item_form_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <form>
+            <header>
+                <button string="Set as Template" type="action" invisible="x_is_template or not id" name="%(server_action_set_work_item_as_template)d" title="Sets the current work item as new template (archives the current template if any)."/>
+            </header>
+            <div class="alert alert-info" role="alert" style="height: 40px; margin-bottom:0px;" invisible="not x_is_template or x_product_wi_template_id == False  or x_product_wi_template_id == id">
+                Saving this Work Item will archive the current one for this product.
+            </div>
+            <sheet string="Work Item">
+                <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+                <div class="oe_title">
+                    <h1>
+                        <field name="x_name" required="1" placeholder="Name..."/>
+                    </h1>
+                </div>
+                <group>
+                    <group>
+                        <field name="x_product_id" force_save="1" readonly="not x_is_template" invisible="x_targeted_so_id" context="{'default_type': 'service'}"/>
+                        <field name="x_reference" readonly="id and not x_is_template"/>
+                        <field name="x_unit_id" force_save="1" options="{'no_open': True}" placeholder="m²" invisible="not x_product_id"/>
+                        <field name="x_unit_custom_id" string="Unit" force_save="1" options="{'no_open': True}" placeholder="m²" invisible="x_product_id" required="not x_product_id"/>
+                    </group>
+                    <group>
+                        <field name="x_unit_cost" widget="monetary" force_save="1" readonly="True"/>
+                        <label for="x_unit_price"/>
+                        <div class="o_row">
+                            <field name="x_unit_price" class="oe_inline mw-50" widget="monetary" force_save="1" readonly="not x_is_margin_fixed"/>
+                            <button type="action" class="btn btn-secondary oe_inline" name="%(server_action_recompute_price_with_components_prices)d" invisible="not x_is_margin_fixed" string="Recompute" help="Recomputes the unit price based on components"/>
+                        </div>
+                        <label for="x_unit_margin"/>
+                        <div class="o_row">
+                            <field name="x_unit_margin" widget="percentage" class="oe_inline mw-50" force_save="1" readonly="not x_is_margin_fixed"/>
+                            <label for="x_is_margin_fixed"/>
+                            <field name="x_is_margin_fixed" class="oe_inline" force_save="1" help="When set, unit price is computed based on unit margin"/>
+                        </div>
+                    </group>
+                </group>
+                <notebook>
+                    <page string="Components" name="lines">
+                        <field name="x_work_item_line_ids">
+                            <list editable="bottom" open_form_view="false">
+                                <field name="x_sequence" widget="handle"/>
+                                <field optional="show" name="x_product_id"/>
+                                <field optional="show" name="x_unit_cost" widget="monetary"/>
+                                <field optional="show" name="x_unit_price" widget="monetary"/>
+                                <field optional="show" name="x_margin" widget="percentage"/>
+                                <field optional="show" name="x_quantity"/>
+                                <field optional="show" name="x_unit_id" readonly="True"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+            </sheet>
+            <chatter/>
+        </form>
+        </field>
+        <field name="model">x_work_item</field>
+        <field name="name">x_work_item.form.view</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <record id="x_work_item_line_search_view" model="ir.ui.view">
+        <field name="model">x_work_item_line</field>
+        <field name="name">x_work_item_line.search.view</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+        <search>
+            <field name="x_product_id"/>
+            <field name="x_work_item_id"/>
+            <field name="x_sale_order_id"/>
+            <field name="x_unit_id"/>
+            <field name="x_demand"/>
+            <field name="x_consumed"/>
+            <separator/>
+            <group>
+                <filter string="Product" name="group_by_product" context="{'group_by':'x_product_id'}"/>
+                <filter string="Order" name="group_by_order" context="{'group_by':'x_sale_order_id'}"/>
+                <filter string="Work Item" name="group_by_work_item" context="{'group_by':'x_work_item_id'}"/>
+            </group>
+        </search>
+        </field>
+    </record>
+
+    <record id="x_work_item_search_view" model="ir.ui.view">
+        <field name="arch" type="xml">
+        <search>
+            <field name="x_name"/>
+            <field name="x_product_id"/>
+            <field name="x_reference"/>
+            <separator/>
+            <filter string="Archived" name="archived_x_work_item" domain="[['x_active', '=', False]]"/>
+            <separator/>
+        </search>
+        </field>
+        <field name="model">x_work_item</field>
+        <field name="name">x_work_item.search.view</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+    </record>
+
+
+
+    <record id="work_items_menu_sales" model="ir.ui.menu">
+        <field name="action" ref="action_window_work_items"/>
+        <field name="name">Work Items</field>
+        <field name="parent_id" ref="sale.product_menu_catalog"/>
+        <field name="sequence">22</field>
+    </record>
+</odoo>
