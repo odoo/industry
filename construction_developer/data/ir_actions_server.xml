@@ -492,17 +492,20 @@ if so_ids != [0]:
 ]]></field>
     </record>
 
-    <record id="action_check_stock_move_validity" model="ir.actions.server">
+<record id="action_check_stock_move_validity" model="ir.actions.server">
         <field name="model_id" ref="stock.model_stock_move"/>
         <field name="state">code</field>
         <field name="name">Construction Developer: Check Stock Move Validity</field>
         <field name="code">
-for move in records:
-    if (will := move.picking_id.move_ids.filtered(lambda m: m.x_work_item_line_ids and m.product_id == move.product_id and m.id != move.id)):
-        raise UserError(f"""There already exists lines for the product(s) you're trying to add.
+for move in records:        
+    will = move.picking_id.move_ids.filtered(lambda m: m.x_work_item_line_ids and m.product_id == move.product_id and m.id != move.id)
+
+    if will and not any(move.x_work_item_line_ids == w.x_work_item_line_ids for w in will):
+            raise UserError(f"""There already exist lines for the product you're trying to add.
 To avoid losing the Work Item Procurement information because of line merging, please update the existing lines instead.
 
-Product(s): {", ".join(will.product_id.mapped('display_name'))}""")
+Product: {will[0].product_id.display_name}
+""")
 </field>
     </record>
 
@@ -648,7 +651,7 @@ for wil in records:
             ('state', 'in', ['draft', 'waiting', 'confirmed']),
             ('picking_type_id', '=', picking_type.id),
             ('location_dest_id', '=', worksite_loc.id),
-            ('origin', '=', so.name)
+            ('sale_id', '=', so.id)
         ], limit=1)
 
         if not (picking := existing_picking):
@@ -657,6 +660,7 @@ for wil in records:
                 'picking_type_id': picking_type.id,
                 'location_id': stock_loc.id,
                 'location_dest_id': worksite_loc.id,
+                'sale_id': so.id,
             })
 
         pickings_by_so[so.id] = picking
@@ -686,6 +690,7 @@ for wil in records:
                 'location_id': stock_loc.id,
                 'location_dest_id': worksite_loc.id,
                 'x_work_item_line_ids': [],
+                'sale_line_id': wil.x_work_item_id.x_sale_order_line_id.id
             }
         moves_by_product_key[line_key]['product_uom_qty'] += delta
         moves_by_product_key[line_key]['x_work_item_line_ids'].append(Command.link(wil.id))
