@@ -36,8 +36,9 @@
         <field name="state">code</field>
         <field name="usage">ir_cron</field>
         <field name="code"><![CDATA[
+template = env.company.x_matchmaking_email_template_id
 for contact in model.search([('x_subscribe', '=', True), ('x_to_notify_property_ids', '!=', False)]):
-    if env.ref('real_estate.mail_template_42').send_mail(res_id=contact.id):
+    if template and template.send_mail(res_id=contact.id):
         contact['x_last_notification'] = datetime.datetime.now()
     ]]></field>
     </record>
@@ -144,7 +145,8 @@ if env.context.get('from_form_view') and len(records) == 1:
         <field name="binding_model_id" ref="base.model_res_partner"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-if env.ref('real_estate.mail_template_42').send_mail(res_id=record.id):
+template = env.company.x_matchmaking_email_template_id
+if template and template.send_mail(res_id=record.id):
     record['x_last_notification'] = datetime.datetime.now()
         ]]></field>
     </record>

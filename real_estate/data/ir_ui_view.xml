@@ -449,24 +449,6 @@
         (0, 0, {'view_mode': 'graph', 'view_id': ref('crm_opportunity_view_graph')}),
     ]"/>
   </record>
-  <record id="calendar_view_for_appointment_type" model="ir.ui.view">
-      <field name="name">calendar view for appointment.type</field>
-      <field name="model">appointment.type</field>
-      <field name="active" eval="True"/>
-      <field name="arch" type="xml">
-        <calendar date_start="start_datetime" date_stop="end_datetime" string="Calendar"/>
-      </field>
-  </record>
-  <record id="visits_appointment_act_window" model="ir.actions.act_window">
-    <field name="name">Visits</field>
-    <field name="res_model">appointment.type</field>
-    <field name="view_mode">calendar,kanban,list,form</field>
-    <field name="domain">[("x_property_id", "!=", False)]</field>
-    <field name="view_ids" eval="[
-        (5, 0, 0),
-        (0, 0, {'view_mode': 'calendar', 'view_id': ref('calendar_view_for_appointment_type')}),
-    ]"/>
-  </record>
   <record id="product_attribute_form_view_extended" model="ir.ui.view">
     <field name="name">product.attribute.form.inherit.real_estate</field>
     <field name="inherit_id" ref="product.product_attribute_view_form"/>
@@ -488,7 +470,25 @@
     <field name="active" eval="True"/>
     <field name="arch" type="xml">
         <xpath expr="//field[@name='default_code']" position="after">
-            <field name="x_agent_id" optional="hide"/>
+          <field name="x_agent_id" optional="hide"/>
+        </xpath>
+    </field>
+  </record>  
+  <record id="res_config_settings_form_view_inherited_real_estate" model="ir.ui.view">
+    <field name="name">res.config.settings.form.view.inherited.real.estate</field>
+    <field name="model">res.config.settings</field>
+    <field name="priority" eval="2"/>
+    <field name="active" eval="True"/>
+    <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//form" position="inside">
+            <app string="Properties" name="properties" logo="/real_estate/static/description/icon.png">
+                <block title="Emails" name="real_estate_email_block">
+                    <setting id="real_estate_matchmaking_email_setting" help="Select the email template used for sending property matches to contacts.">
+                        <field name="x_matchmaking_email_template_id" required="1"/>
+                    </setting>
+                </block>
+            </app>
         </xpath>
     </field>
   </record>
