@@ -31,7 +31,8 @@
             <xpath expr="//field[@name='user_ids']" position="after">
                 <field name="x_appointment_type_id"/>
                 <field name="x_appointment_date" invisible="not x_appointment_type_id"/>
-                <field name="x_vehicle_id" domain="['|', ('x_owner_id', '=', partner_id), ('x_owner_id', '!=', False)]"/>
+                <field name="x_vehicle_id" invisible="partner_id"/>
+                <field name="x_vehicle_id" domain="[('x_owner_id', '=', partner_id)]" invisible="not partner_id"/>
                 <field name="x_chassis_number" invisible="not x_vehicle_id"/>
                 <field name="x_odometer"/>
             </xpath>
@@ -77,14 +78,12 @@
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='sale_order_template_id']" position="after">
-                <field name="x_vehicle_id" domain="['|', ('x_owner_id', '=', partner_id), ('x_owner_id', '!=', False)]"/>
+                <field name="x_vehicle_id" invisible="partner_id"/>
+                <field name="x_vehicle_id" domain="[('x_owner_id', '=', partner_id)]" invisible="not partner_id"/>
                 <field name="x_chassis_number" invisible="not x_vehicle_id"/>
             </xpath>
             <xpath expr="//field[@name='payment_term_id']" position="after">
                 <field name="x_task_id" invisible="not x_task_id"/>
-            </xpath>
-            <xpath expr="//page[@name='order_lines']//list//field[@name='product_template_id']" position="after">
-                <field name="x_in_report" widget="boolean_toggle"/>
             </xpath>
         </field>
     </record>
@@ -148,14 +147,12 @@
         <field name="type">form</field>
         <field name="arch" type="xml">
             <xpath expr="//group[@id='header_left_group']/div" position="after">
-                <field name="x_vehicle_id" domain="['|', ('x_owner_id', '=', partner_id), ('x_owner_id', '!=', False)]" invisible="move_type == 'in_invoice' or not x_task_id"/>
+                <field name="x_vehicle_id" invisible="partner_id"/>
+                <field name="x_vehicle_id" domain="[('x_owner_id', '=', partner_id)]" invisible="move_type == 'in_invoice' or not x_task_id or not partner_id"/>
                 <field name="x_chassis_number" invisible="not x_vehicle_id"/>
             </xpath>
             <xpath expr="//div[@name='due_date']" position="after">
                 <field name="x_task_id" invisible="invoice_origin or not x_task_id"/>
-            </xpath>
-            <xpath expr="//list[@name='journal_items']//field[@name='product_id']" position="after">
-                <field name="x_in_report" optional="show" widget="boolean_toggle"/>
             </xpath>
         </field>
     </record>
