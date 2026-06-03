@@ -56,7 +56,10 @@
         <xpath expr="//field[@name='is_rental_order']" position="after">
           <button string="City Tax" type="action" name="%(open_x_city_tax_action)d" context="{'search_default_x_sale_order_id': id, 'default_x_sale_order_id': id}" invisible="not x_order_involves_room"/>
         </xpath>
-        <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+        <xpath expr="//group[@name='order_details']" postion="inside">
+          <field name="x_priority_flag_ids" widget="many2many_tags" invisible="not x_priority_flag_ids"/>
+        </xpath>
+        <xpath expr="//notebook" position="inside">
           <page string="Guests" invisible="not x_order_involves_room">
             <field name="x_guest_line_ids">
               <list default_order="x_sequence asc,id desc" editable="bottom">
@@ -168,16 +171,11 @@
   </record>
   <record id="product_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
-      <xpath expr="//group[@name='group_general']" position="inside">
-        <field name="x_is_a_room_offer" invisible="type != 'service'"/>
-        <field name="x_is_stay_tax" invisible="type != 'service'"/>
-      </xpath>
-      <xpath expr="//group[@name='group_general']" position="attributes">
-        <attribute name="invisible">x_is_a_room_offer</attribute>
+      <xpath expr="//group[@name='group_standard_price']" position="inside">
+        <field name="x_accommodation_product" invisible="type != 'service'"/>
       </xpath>
       <xpath expr="//group[@name='group_general']" position="before">
         <group invisible="not x_is_a_room_offer">
-          <field name="x_is_a_room_offer"/>
           <field name="x_has_city_tax" />
           <field name="x_offer_type" />
           <field name="x_related_has_stayover_cleaning" groups="booking_engine.group_house_keeping"/>
@@ -514,6 +512,10 @@
           <attribute name="multi_create_view"/>
           <attribute name="color">x_booking_color</attribute>
         </xpath>
+        <xpath expr="/gantt" position="inside">
+          <field name="x_has_early_checkin"/>
+          <field name="x_has_late_checkout"/>
+        </xpath>
     </field>
     <field name="inherit_id" ref="planning.planning_view_gantt"/>
     <field name="mode">primary</field>
@@ -737,6 +739,9 @@
     <!-- project.task views -->
     <record id="project_task_form_view_primary" model="ir.ui.view">
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='project_id']" position="replace">
+              <field name="x_priority_flag_ids" widget="many2many_tags"/>
+            </xpath>
             <xpath expr="//field[@name='stage_id']" position="attributes">
                 <attribute name="options">{'clickable': '1', 'fold_field': 'auto_validation_state'}</attribute>
             </xpath>
@@ -766,6 +771,7 @@
                 <xpath expr="/list//field[@name='priority']" position="move"/>
             </xpath>
             <xpath expr="/list//field[@name='name']" position="after">
+                <field name="x_priority_flag_ids" widget="many2many_tags"/>
                 <field name="x_task_occupancy_color" column_invisible="True"/>
                 <field name="x_cleaning_color" column_invisible="True"/>
                 <field name="x_task_occupancy" optional="show" widget="badge" options="{'color_field': 'x_task_occupancy_color'}"/>

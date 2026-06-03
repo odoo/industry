@@ -7,11 +7,11 @@
         <field name="code"><![CDATA[
 sequence, stay_tax_line = 0, False
 for so_line in record.x_sale_order_id.order_line:
-    if so_line.product_id.x_is_stay_tax: stay_tax_line = so_line
+    if so_line.product_id.x_accommodation_product == 'stay_tax': stay_tax_line = so_line
     sequence = max(sequence, so_line.sequence)
 if stay_tax_line: stay_tax_line.write({'product_uom_qty': record.x_total, 'qty_delivered': record.x_total, 'sequence': 1 + sequence})
 elif record.x_total > 0:
-    product = env['product.product'].search([('x_is_stay_tax', '=', True)], limit=1)
+    product = env['product.product'].search([('x_accommodation_product', '=', 'stay_tax')], limit=1)
     env['sale.order.line'].create({'order_id': record.x_sale_order_id.id, 'product_id': product.id, 'product_uom_qty': record.x_total, 'qty_delivered': record.x_total})
 ]]></field>
     </record>
@@ -185,6 +185,7 @@ if (project := env['project.project'].search([('x_is_house_keeping_project', '='
             if (end_today and not slot.role_id.x_has_checkout_cleaning) or (not end_today and not slot.role_id.x_has_stayover_cleaning):
                 continue
             slot.resource_id.write({'x_occupancy': 'due_out' if end_today else 'stayover'})
+            priority_flags = slot.sale_order_id.x_priority_flag_ids
             newtasks.append({
                 'name': "HK " + slot.resource_id.name,
                 'project_id': project.id,
@@ -193,6 +194,8 @@ if (project := env['project.project'].search([('x_is_house_keeping_project', '='
                 'date_deadline': (last_midnight + datetime.timedelta(hours=24)),
                 'x_resource_id': slot.resource_id.id,
                 'x_cleaning': 'checkout' if end_today else 'stayover',
+                'x_priority_flag_ids': end_today and [flag.id for flag in priority_flags if
+                    flag.x_accommodation_product in ['early_checkin', 'late_checkout']],
                 'user_ids': [(5,0)],
             })
     env['project.task'].create(newtasks)

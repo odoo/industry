@@ -53,11 +53,13 @@
         ],
         'web.assets_backend_lazy': [
             'booking_engine/static/src/js/patch.js',  # web_gantt/gantt_renderer is lazy so this needs to be lazy too
+            'booking_engine/static/src/xml/gantt_pill_flags.xml',
         ],
     },
     'license': 'OEEL-1',
     'cloc_exclude': [
         'data/website_view.xml',
         'static/src/scss/gantt.scss',
+        'static/src/xml/gantt_pill_flags.xml',
     ],
 }
