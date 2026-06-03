@@ -394,12 +394,18 @@ class TestEnv(IndustryCase):
                 )
 
     def _check_knowledge_article_is_locked(self, root, file_name):
+        all_ids, locked_ids = set(), set()
         for record in root.xpath("//record[@model='knowledge.article']"):
-            is_locked_fields = record.xpath(".//field[@name='is_locked']/@eval")
-            if not is_locked_fields:
-                _logger.warning(
-                    f"Knowledge article in {file_name} should have 'is_locked' set to True."
-                )
+            if record_id := record.get("id"):
+                all_ids.add(record_id)
+                if record.xpath(".//field[@name='is_locked']/@eval") in [["True"], ["1"]]:
+                    locked_ids.add(record_id)
+        for record_id in all_ids - locked_ids:
+            _logger.warning(
+                "Knowledge article %s in %s should have 'is_locked' set to True.",
+                record_id,
+                file_name,
+            )
 
     def _check_is_published_false(self, root, file_name):
         for record in root.xpath("//record"):
