@@ -444,22 +444,22 @@ if so_ids != [0]:
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
         <field name="name">Construction Developer: Create WBS</field>
-        <field name="code"><![CDATA[
+        <field name="code">
 action = env['ir.actions.actions'].with_context(active_id=(p_id := record.x_wbs_project.id))._for_xml_id('project.act_project_project_2_project_task_all')
 action['context'] = {'active_id': p_id, 'default_project_id': p_id, 'default_user_ids': [env.uid]}
 # By default it fetches the default gantt view, so we have to specify this one
-gantt_view = env.ref('project_enterprise.project_task_dependency_view_gantt', raise_if_not_found=False)
+gantt_view = env.ref('construction_developer.project_task_dependency_view_gantt_inherit', raise_if_not_found=False)
 
 # Select the gantt view by default
 action['views'] = [(gantt_view.id if gantt_view else False, 'gantt')] + [v for v in action.get('views', []) if v[1] != 'gantt']
-]]></field>
+</field>
     </record>
 
     <record id="server_action_transfer_wbs" model="ir.actions.server">
         <field name="model_id" ref="project.model_project_project"/>
         <field name="state">code</field>
         <field name="name">Construction Developer: Transfer WBS</field>
-        <field name="code"><![CDATA[
+        <field name="code">
 wbss = records.filtered(lambda p: any([(t.x_sale_line_id or t.sale_line_id).order_id.x_wbs_project.id == p.id for t in p.tasks]))
 if len(records) != 2 or len(wbss) != 1:
     action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'message': "Error: Please select exactly ONE WBS project and ONE target project.", 'type': 'danger'}}
@@ -468,35 +468,34 @@ else:
     wbs_name, project_name, n = wbss.name, project.name, len(wbss.tasks)
     wbss.tasks.write({'project_id': project.id})
     action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'message': f"Transferred {n} tasks from {wbs_name} to {project_name}", 'type': 'success', 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'}}}
-]]></field>
+</field>
     </record>
 
     <record id="server_action_update_and_remove_wbs_project_on_task_project_change" model="ir.actions.server">
         <field name="model_id" ref="project.model_project_task"/>
         <field name="state">code</field>
         <field name="name">Construction Developer: Update Analytic Account and Delete WBS Project on Task Project change</field>
-        <field name="code"><![CDATA[
+        <field name="code">
 for record in records:
     sol = record.sale_line_id or record.x_sale_line_id
     project = (so := sol.order_id).x_wbs_project
-    if project and not env['project.task'].search_count([('project_id', '=', project.id)]):
+    if project and not env['project.task'].search_count([('project_id', '=', project.id)], limit=1):
         project['account_id'] = False
-        so['x_wbs_project'] = False
         project.unlink()
         so.message_post(body=f"All WBS Tasks were moved out of the WBS project, so the WBS project was deleted.")
-]]></field>
+</field>
     </record>
 
     <record id="server_action_sale_order_update_wbs_on_confirm" model="ir.actions.server">
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
         <field name="name">Construction Developer: Update WBS on Sale Order confirm</field>
-        <field name="code"><![CDATA[
+        <field name="code">
 for record in records:
-    if (wbs_tasks := record.x_wbs_project.tasks.filtered('x_sale_line_id')):
-        for task in wbs_tasks:
+    for task in record.x_wbs_project.tasks:
+        if task.x_sale_line_id:
             task.write({'x_sale_line_id': False, 'sale_line_id': task.x_sale_line_id.id})
-]]></field>
+</field>
     </record>
 
     <record id="server_action_create_wbs" model="ir.actions.server">
@@ -504,13 +503,13 @@ for record in records:
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
         <field name="name">Construction Developer: Create WBS</field>
-        <field name="code"><![CDATA[
+        <field name="code">
 uom_hour = env.ref('uom.product_uom_hour')
 
-for record in records:
+for record in (records if all(records.filtered(lambda r: r.state != 'cancel')) else []):
     # when a SO is confirmed: use the default field sale_line_id
     # when a SO is NOT confirmed, use x_sale_line_id otherwise the SO is automatically confirmed
-    
+
     line_field = 'sale_line_id' if (confirmed := record.state != 'draft') else 'x_sale_line_id'
 
     # PROJECT
@@ -518,6 +517,7 @@ for record in records:
 
     if not (project := record.project_id):
         project = env['project.project'].search([('sale_order_id', '=', record.id)], limit=1)
+
     if not project:
         project = env['project.project'].create({
             'name': env._(f"{record.name} WBS - {record.partner_id.name}"),
@@ -525,7 +525,8 @@ for record in records:
             'company_id': record.company_id.id,
             'allow_timesheets': True,
             'allow_billable': True,
-        } | ({} if not confirmed else {'sale_order_id': record.id}))  # If SO already confirmed but no project exists, we need to link the SO
+            'sale_order_id': record.id,
+        })
     if not record.project_id:
         record['project_id'] = project.id
 
@@ -550,12 +551,12 @@ for record in records:
             ]])
         project['type_ids'] = default_stages.ids
 
-    # WBS CREATION & UPDATE LOOP
+    # WBS CREATION AND UPDATE LOOP
     parent_lvl1, parent_lvl2 = False, False
     current_day_offset = 0
-    
+
     for line in record.order_line:
-        # If the line is already processed, update parents & offset then skip
+        # If the line is already processed, update parents and offset then skip
         if line.x_wbs_ready:
             if line.display_type == 'line_section':
                 # Fetch the existing section task to act as parent for upcoming lines
@@ -569,12 +570,12 @@ for record in records:
                 current_day_offset += 1
             continue
 
-        # --- PROCESS NEW LINES ---
+        # PROCESS NEW LINES
         clean_name = (line.name or '').split('\n')[0].strip()
         item_num = line.x_reference or ''
-        
+
         task_values = {
-            'name': env._(f"{item_num} {clean_name}"),
+            'name': f"{item_num} {env._(clean_name)}",
             'project_id': project.id,
             'company_id': record.company_id.id,
             'stage_id': project.type_ids[0].id if project.type_ids else False,
@@ -587,13 +588,13 @@ for record in records:
             line['is_service'] = True
             parent_lvl1 = env['project.task'].create(task_values)
             parent_lvl2 = False 
-            
+
         # SUBSECTIONS
         elif line.display_type == 'line_subsection':
             line['is_service'] = True
             task_values['parent_id'] = parent_lvl1.id if parent_lvl1 else False
             parent_lvl2 = env['project.task'].create(task_values)
-            
+
         # PRODUCTS
         elif line.product_id:
             if not line.x_line_work_item_id:  # Ignore everything except work items
@@ -619,18 +620,20 @@ for record in records:
             line.x_line_work_item_id['x_task_id'] = task.id
 
             current_day_offset += 1
-            
+
         line['x_wbs_ready'] = True
-        
+
     record.message_post(body=f"WBS setup in project.")
-]]></field>
+if any(records.filtered(lambda r: r.state == 'cancel')):
+    action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'message': 'You cannot create a WBS for a cancelled order.', 'type': 'danger'}}
+</field>
     </record>
     <record id="server_action_update_parent_task_dates_and_time" model="ir.actions.server">
         <field name="model_id" ref="project.model_project_task"/>
         <field name="state">code</field>
         <field name="name">Construction Developer: Task - Update parent task dates &amp; time</field>
         <field name="usage">base_automation</field>
-        <field name="code"><![CDATA[
+        <field name="code">
 def update_parent_recursively(task):
     # defines the start/end dates for the parent tasks from their children
     if not (parent := task.parent_id):
@@ -680,6 +683,6 @@ for record in records:
         slide_children(record, new_start, new_end, old_start, old_end)
         if record.child_ids:  # recompute new start/end dates if the parent became smaller than a child and needs to extend to compensate
             update_parent_recursively(record.child_ids[0])
-]]></field>
+</field>
     </record>
 </odoo>

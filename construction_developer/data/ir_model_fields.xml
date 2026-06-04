@@ -867,16 +867,17 @@ for record in self:
         <field name="relation">product.category</field>
         <field name="store" eval="True"/>
     </record>
-  <record id="field_project_task_x_full_time_equivalent" model="ir.model.fields">
-    <field name="ttype">float</field>
-    <field name="depends">planned_date_begin,date_deadline,allocated_hours</field>
-    <field name="field_description">Full Time Equivalent</field>
-    <field name="model_id" ref="project.model_project_task"/>
-    <field name="name">x_full_time_equivalent</field>
-    <field name="readonly" eval="True"/>
-    <field name="store" eval="False"/>
-    <field name="compute"><![CDATA[
+    <record id="field_project_task_x_full_time_equivalent" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="depends">planned_date_begin,date_deadline,allocated_hours</field>
+        <field name="field_description">Full Time Equivalent</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="name">x_full_time_equivalent</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
 for record in self:
+    record['x_full_time_equivalent'] = 0.0
     if record.planned_date_begin and record.date_deadline and record.allocated_hours > 0:
         duration_seconds = (record.date_deadline - record.planned_date_begin).total_seconds()
         if duration_seconds > 0:
@@ -889,56 +890,48 @@ for record in self:
             
             if theoretical_capacity > 0:
                 record['x_full_time_equivalent'] = record.allocated_hours / theoretical_capacity
-            else:
-                record['x_full_time_equivalent'] = 0.0
-        else:
-            record['x_full_time_equivalent'] = 0.0
-    else: 
-        record['x_full_time_equivalent'] = 0.0
 ]]></field>
-  </record>
-  <record id="field_sale_order_line_x_wbs_ready" model="ir.model.fields">
-    <field name="ttype">boolean</field>
-    <field name="field_description">WBS Ready</field>
-    <field name="model_id" ref="sale.model_sale_order_line"/>
-    <field name="name">x_wbs_ready</field>
-  </record>
-  <record id="field_sale_order_line_x_task_ids" model="ir.model.fields">
-    <field name="ttype">one2many</field>
-    <field name="field_description">Sale Order Line Ids</field>
-    <field name="model_id" ref="sale.model_sale_order_line"/>
-    <field name="name">x_task_ids</field>
-    <field name="relation">project.task</field>
-    <field name="relation_field">sale_line_id</field>
-  </record>
-  <record id="field_sale_order_line_x_work_progress" model="ir.model.fields">
-    <field name="ttype">float</field>
-    <field name="field_description">Work Progress</field>
-    <field name="model_id" ref="sale.model_sale_order_line"/>
-    <field name="name">x_work_progress</field>
-    <field name="readonly" eval="True"/>
-    <field name="store" eval="False"/>
-    <field name="depends">x_task_ids,x_task_ids.progress</field>
-    <field name="compute">
-for sol in self: sol['x_work_progress'] = sum(sol.x_task_ids.mapped('progress')) / len(sol.x_task_ids)
-</field>
-  </record>
+    </record>
+    <record id="field_sale_order_line_x_wbs_ready" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">WBS Ready</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_wbs_ready</field>
+    </record>
+    <record id="field_sale_order_line_x_work_progress" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="field_description">Work Progress</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="name">x_work_progress</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+progress_by_sol = {}
+for task in self.env['project.task'].search([('sale_line_id', 'in', self.ids)]):
+    progress_by_sol.setdefault(task.sale_line_id.id, []).append(task.progress)
 
-  <!-- WBS -->
-  <record id="field_sale_order_line_x_wbs_project" model="ir.model.fields">
-    <field name="ttype">many2one</field>
-    <field name="field_description">WBS Project</field>
-    <field name="model_id" ref="sale.model_sale_order"/>
-    <field name="name">x_wbs_project</field>
-    <field name="relation">project.project</field>
-  </record>
-  <record id="field_task_x_sale_line_id" model="ir.model.fields">
-    <field name="ttype">many2one</field>
-    <field name="field_description">(WBS) Sale Line</field>
-    <field name="model_id" ref="project.model_project_task"/>
-    <field name="name">x_sale_line_id</field>
-    <field name="relation">sale.order.line</field>
-  </record>
+for sol in self:
+    if sol.display_type != False: continue
+    progress_list = progress_by_sol.get(sol.id, [])
+    sol['x_work_progress'] = sum(progress_list) / len(progress_list) if progress_list else 0.0
+]]></field>
+    </record>
+
+    <!-- WBS -->
+    <record id="field_sale_order_line_x_wbs_project" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">WBS Project</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="name">x_wbs_project</field>
+        <field name="relation">project.project</field>
+    </record>
+    <record id="field_task_x_sale_line_id" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="field_description">(WBS) Sale Line</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="name">x_sale_line_id</field>
+        <field name="relation">sale.order.line</field>
+    </record>
 
     <!-- shopping list -->
     <record id="field_x_work_item_line_x_demand" model="ir.model.fields">
