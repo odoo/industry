@@ -36,6 +36,18 @@
                 <field name="x_chassis_number" invisible="not x_vehicle_id"/>
                 <field name="x_odometer"/>
             </xpath>
+            <xpath expr="//div[@id='allocated_hours_container']" position="after">
+                <label for="x_is_vehicle_checked_in"/>
+                <div class="d-flex">
+                    <field name="x_is_vehicle_checked_in"/>
+                    <field name="x_checked_in_datetime" invisible="not x_is_vehicle_checked_in"/>
+                </div>
+                <label for="x_is_vehicle_checked_out" invisible="not x_is_vehicle_checked_in"/>
+                <div class="d-flex">
+                    <field name="x_is_vehicle_checked_out" invisible="not x_is_vehicle_checked_in"/>
+                    <field name="x_checked_out_datetime" invisible="not x_is_vehicle_checked_out"/>
+                </div>
+            </xpath>
             <xpath expr="//field[@name='sale_order_id']" position="attributes">
                 <attribute name="invisible">0</attribute>
             </xpath>
@@ -148,7 +160,7 @@
         <field name="arch" type="xml">
             <xpath expr="//group[@id='header_left_group']/div" position="after">
                 <field name="x_vehicle_id" invisible="partner_id"/>
-                <field name="x_vehicle_id" domain="[('x_owner_id', '=', partner_id)]" invisible="move_type == 'in_invoice' or not x_task_id or not partner_id"/>
+                <field name="x_vehicle_id" domain="[('x_owner_id', '=', partner_id)]" invisible="move_type == 'in_invoice'"/>
                 <field name="x_chassis_number" invisible="not x_vehicle_id"/>
             </xpath>
             <xpath expr="//div[@name='due_date']" position="after">
@@ -220,6 +232,47 @@
             </xpath>
             <xpath expr="//kanban" position="attributes">
                 <attribute name="default_order">priority desc, x_appointment_date asc, sequence, state, date_deadline asc, id desc</attribute>
+            </xpath>
+        </field>
+    </record>
+    <record id="appointment_type_form_view" model="ir.ui.view">
+        <field name="name">appointment.type.form.inherit.garage</field>
+        <field name="inherit_id" ref="appointment.appointment_type_view_form"/>
+        <field name="model">appointment.type</field>
+        <field name="mode">extension</field>
+        <field name="arch" type="xml">
+        <field name="active" eval="True"/>
+            <xpath expr="//field[@name='restrict_to_resource_ids']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+        </field>
+    </record>
+    <record id="project_all_list_view_inherit_garage" model="ir.ui.view">
+        <field name="name">project.list.view.inherit.garage</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.open_view_all_tasks_list_view"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_ids']" position="after">
+                <field name="x_vehicle_id" optional="show"/>
+                <field name="x_is_vehicle_checked_in" optional="show"/>
+                <field name="x_is_vehicle_checked_out" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="project_task_search_inherit_garage" model="ir.ui.view">
+        <field name="name">project.task.search.inherit.garage</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_search_form"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="x_vehicle_id"/>
+            </xpath>
+            <xpath expr="//filter[@name='private_tasks']" position="after">
+                <filter string="On Site Vehicle" name="on_site_vehicle" domain="[('x_checked_in_datetime','!=',False),('x_checked_out_datetime','=',False)]"/>
             </xpath>
         </field>
     </record>
