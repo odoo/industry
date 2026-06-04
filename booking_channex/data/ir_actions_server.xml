@@ -312,7 +312,7 @@ action = payload_values
     <record id="create_availability_on_channex" model="ir.actions.server">
         <field name="name">Create Availability On Channex</field>
         <field name="code"><![CDATA[
-def construct_availability_payload(property_id, room_type_id, records):
+def construct_availability_payload(property_id, room_type_id, records, ota_buffer):
     room_payload = []
 
     if not records:
@@ -329,7 +329,7 @@ def construct_availability_payload(property_id, room_type_id, records):
                 'room_type_id': room_type_id,
                 'date_from': current_start.strftime('%Y-%m-%d'),
                 'date_to': current_end.strftime('%Y-%m-%d'),
-                'availability': current_qty,
+                'availability': min(0, current_qty - ota_buffer),
             })
 
             current_start = current_end = rec.x_date
@@ -342,7 +342,7 @@ def construct_availability_payload(property_id, room_type_id, records):
         'room_type_id': room_type_id,
         'date_from': current_start.strftime('%Y-%m-%d'),
         'date_to': current_end.strftime('%Y-%m-%d'),
-        'availability': current_qty,
+        'availability': min(0, current_qty - ota_buffer),
     })
 
     return room_payload
@@ -358,7 +358,7 @@ for record in records:
         [('x_stay_offer_id', '=', record.product_tmpl_id.id)],
         order='x_date'
     )
-    payload_values.extend(construct_availability_payload(property_remote_id, room_type_remote_id, availability_records))
+    payload_values.extend(construct_availability_payload(property_remote_id, room_type_remote_id, availability_records, record.product_tmpl_id.x_ota_buffer))
 action = payload_values
 ]]></field>
         <field name="model_id" ref="product.model_product_product"/>
