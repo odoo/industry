@@ -18,6 +18,7 @@
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/product_public_category.xml',
+        'data/product_ribbon.xml',
         'data/product_template.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
@@ -29,6 +30,7 @@
         'data/project_task_type.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
+        'data/mailing_mailing.xml',
     ],
     'demo': [
         'demo/product_template.xml',
