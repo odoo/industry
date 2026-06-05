@@ -1,5 +1,5 @@
 {
-    'name': 'Clothing Boutique',
+    'name': 'Clothing Stores',
     'category': 'Retail',
     'author': 'Odoo S.A.',
     'depends': [
@@ -39,6 +39,7 @@
         'demo/resource_resource.xml',
         'demo/project_task.xml',
         'demo/res_partner.xml',
+        'demo/res_company.xml',
         'demo/website_view.xml',
         'demo/hr_employee.xml',
         'demo/pos_config.xml',
