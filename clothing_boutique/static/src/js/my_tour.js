@@ -3,9 +3,8 @@
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 
-registry.category("web_tour.tours").add("clothing_boutique_knowledge_tour", {
-    url: "/odoo",
-    
+registry.category("web_tour.tours").add("bar_industry_knowledge_tour", {
+
     steps: () => [
         {
             trigger: '.o_app[data-menu-xmlid="knowledge.knowledge_menu_root"]',
