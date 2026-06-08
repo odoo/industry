@@ -21,6 +21,13 @@
         <field name="trigger">on_change</field>
         <field name="on_change_field_ids" eval="[(6, 0, [ref('x_vehicle_id_field')])]" />
     </record>
+    <record id="base_automation_on_update_vehicle_partner_account_move" model="base.automation">
+        <field name="name">On Update vehicle to set the linked customer</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_update_vehicle_to_set_linked_customer_account_move')])]"/>
+        <field name="model_id" ref="account.model_account_move" />
+        <field name="trigger">on_change</field>
+        <field name="on_change_field_ids" eval="[(6, 0, [ref('x_vehicle_id_field')])]" />
+    </record>
     <record id="automation_task_stage_booking_confirm" model="base.automation">
         <field name="name">Generate shared link on stage update</field>
         <field name="model_id" ref="project.model_project_task"/>
@@ -43,5 +50,13 @@
         <field name="trigger">on_create_or_write</field>
         <field name="filter_domain">[("x_task_id","!=",False)]</field>
         <field name="action_server_ids" eval="[(6, 0, [ref('ir_actions_server_update_task_appointment_date')])]"/>
+    </record>
+    <record id="automation_auto_vehicle_checkout" model="base.automation">
+        <field name="name">Vehicle Auto Checkout on Stage Change to Done</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('ir_actions_server_730')])]"/>
+        <field name="trigger">on_write</field>
+        <field name="filter_domain" eval="[('stage_id', 'in', [ref('project_task_type_4')])]"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('project.field_project_task__stage_id')])]"/>
     </record>
 </odoo>
