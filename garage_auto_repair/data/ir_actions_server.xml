@@ -14,6 +14,7 @@ if record.x_appointment_type_id:
         "context": {
             "default_appointment_type_id": record.x_appointment_type_id.id,
             "default_name": record.x_appointment_type_id.name,
+            "default_duration": record.x_appointment_type_id.appointment_duration,
             "default_x_task_id": record.id,
             "default_partner_ids" : [(6, 0, [record.partner_id.id])] if record.partner_id else [],
         },
@@ -104,6 +105,14 @@ record['partner_id'] = record.x_vehicle_id.x_owner_id.id or record.partner_id.id
 record['partner_id'] = record.x_vehicle_id.x_owner_id.id or record.partner_id.id
     ]]></field>
     </record>
+    <record id="action_update_vehicle_to_set_linked_customer_account_move" model="ir.actions.server">
+        <field name="name">Update vehicle to set the linked customer on account move</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record['partner_id'] = record.x_vehicle_id.x_owner_id.id or record.partner_id.id
+    ]]></field>
+    </record>
     <record id="server_action_task_stage_booking_confirm" model="ir.actions.server">
         <field name="name">Generate Shared Link on Booking Confirm</field>
         <field name="model_id" ref="project.model_project_task"/>
@@ -138,5 +147,14 @@ for event in records:
         ('appointment_type_ids', 'in', [event.appointment_type_id.id]),
     ], limit=1).x_task_id['state'] = '03_approved'
 ]]></field>
+    </record>
+    <record id="ir_actions_server_730" model="ir.actions.server">
+        <field name="name">Auto Checkout Vehicle</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="project.model_project_task"/>
+        <field name="update_path">x_is_vehicle_checked_out</field>
+        <field name="update_field_id" ref="x_is_vehicle_checked_out_field"/>
+        <field name="usage">base_automation</field>
     </record>
 </odoo>
