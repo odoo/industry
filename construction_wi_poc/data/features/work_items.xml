@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!--create the custom route/picking type/rule  'Construction Replenishment'-->
+    <record model="stock.picking.type" id="stock_picking_type_construction_replenishment">
+        <field name="name">On site consumption</field>
+        <field name="code">mrp_operation</field>
+        <field name="sequence_code">OSC</field>
+        <field name="auto_confirm_production" eval="False"/>
+        <field name="default_location_src_id" ref="stock_location_worksites"/>
+        <field name="default_location_dest_id" ref="stock.stock_location_customers"/>
+    </record>
+
+    <record model="stock.route" id="stock_route_construction_replenishment">
+        <field name="name">Construction Replenishment</field>
+        <field name="product_categ_selectable" eval="True"/>
+        <field name="sale_selectable" eval="True"/>
+    </record>
+
+    <record model="stock.rule" id="stock_rule_construction_replenishment">
+        <field name="name">Pull from Location</field>
+        <field name="picking_type_id" ref="stock_picking_type_construction_replenishment"/>
+        <field name="location_src_id" ref="stock_location_worksites"/>
+        <field name="location_dest_id" ref="stock.stock_location_customers"/>
+        <field name="route_id" ref="stock_route_construction_replenishment"/>
+        <field name="action">manufacture</field>
+    </record>
+
+
+
+    <record model="ir.model.fields" id="field_sale_order_line_x_bom_id">
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">mrp.bom</field>
+        <field name="name">x_bom_id</field>
+        <field name="field_description">Bill of Materials</field>
+        <field name="depends">product_template_id,product_template_id.bom_ids,product_template_id.route_ids</field>
+        <field name="compute"><![CDATA[
+for sol in self:
+    if not sol.x_bom_id and sol.product_template_id.bom_ids and sol.product_template_id.route_ids: 
+        sol['x_bom_id'] = sol.product_template_id.bom_ids[0].id
+]]></field>
+    </record>
+
+
+
+    <record model="ir.actions.server" id="action_apply_locations_on_mo">
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: apply locations on Manufactoring Order</field>
+        <field name="code">
+copied_boms = {}
+
+for mo in records:
+    mo['location_src_id'] = (so := mo.sale_line_id.order_id).partner_shipping_id.x_ws_location_id
+
+    if (bom := mo.sale_line_id.x_bom_id):
+        cache_key = (so.id, bom.id)
+        
+        # Only copy if we haven't already done it for this specific SO + BOM combo
+        if cache_key not in copied_boms:
+            copied_boms[cache_key] = bom.copy({'code': f"{so.name} - {so.partner_id.name}"})
+
+        mo['bom_id'] = copied_boms[cache_key]
+        mo.sale_line_id['x_bom_id'] = copied_boms[cache_key]
+</field>
+    </record>
+
+    <record model="base.automation" id="automation_on_mo_creation">
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_apply_locations_on_mo')])]"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain" eval="[
+            ('location_src_id',  '=', ref('construction_wi_poc.stock_location_worksites')),
+            ('location_dest_id', '=', ref('stock.stock_location_customers')),
+            ('sale_line_id', '!=', False),
+        ]"/>
+        <field name="name">Construction Developer: On Procurement MO Created from SO</field>
+    </record>
+
+
+
+    <record model="ir.ui.view" id="sale_order_form_view_inherit">
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="mode">extension</field>
+        <field name="model">sale.order</field>
+        <field name="name">sale.order.form.inherit.construction_developer</field>
+        <field name="priority">1600</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook//page[@name='order_lines']//list//field[@name='product_template_id']" position="after">
+                <field name="x_bom_id"
+                       domain="[('product_tmpl_id', '=', product_template_id)]"
+                       optional="show"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

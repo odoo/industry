@@ -11,18 +11,12 @@
     'data': [
         'data/res_config_settings.xml',
         'data/stock_location.xml',
-        'data/stock_route.xml',
-        'data/ir_model_fields.xml',
-        'data/ir_actions_server.xml',
-        'data/ir_ui_view.xml',
-        'data/base_automation.xml',
+        'data/features/create_customer_loc_on_so_confirm.xml',
+        'data/features/work_items.xml',
+        'data/views_standard.xml',
     ],
     'demo': [
     ],
-    'assets': {
-        'web.assets_backend': [
-        ],
-    },
     'cloc_exclude': [
     ],
     'images': ['images/main.png'],
