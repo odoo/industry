@@ -1,6 +1,6 @@
 {
     'name': 'Cosmetics Store',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Retail',
     'author': 'Odoo S.A.',
     'depends': [
@@ -12,7 +12,7 @@
         'pos_enterprise',
         'purchase',
         'sale_service',
-        'website_sale_collect',
+        'website_sale',
     ],
     'data': [
         'data/res_config_settings.xml',
@@ -39,14 +39,12 @@
     'demo': [
         'demo/res_company.xml',
         'demo/payment_provider_demo.xml',
-        'demo/stock_quant.xml',
         'demo/product_template.xml',
         'demo/loyalty_program.xml',
         'demo/hr_job.xml',
         'demo/pos_session.xml',
         'demo/res_partner.xml',
         'demo/purchase_order.xml',
-        'demo/stock_warehouse_orderpoint.xml',
         'demo/purchase_order_line.xml',
         'demo/pos_order.xml',
         'demo/purchase_order_confirm.xml',
