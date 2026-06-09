@@ -26,6 +26,8 @@
         'data/ir_default.xml',
         'data/project_project.xml',
         'data/account_tax.xml',
+        'data/planning_role.xml',
+        'data/planning_slot_template.xml',
         'data/product_template.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
@@ -46,6 +48,7 @@
         'data/survey_question_answer.xml',
     ],
     'demo': [
+        'demo/hr_employee.xml',
         'demo/website_menu.xml',
         'demo/payment_provider_demo.xml',
     ],
@@ -59,6 +62,7 @@
     },
     'license': 'OEEL-1',
     'cloc_exclude': [
+        'data/res_config_settings.xml',
         'data/website_view.xml',
         'static/src/scss/gantt.scss',
     ],
