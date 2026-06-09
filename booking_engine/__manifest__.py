@@ -59,6 +59,7 @@
     },
     'license': 'OEEL-1',
     'cloc_exclude': [
+        'data/res_config_settings.xml',
         'data/website_view.xml',
         'static/src/scss/gantt.scss',
     ],
