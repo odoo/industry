@@ -1,6 +1,6 @@
 {
     'name': 'Property Management',
-    'version': '2.1',
+    'version': '2.2',
     'category': 'Services',
     'depends': [
         'base_automation',
@@ -18,6 +18,7 @@
         'data/crm_stages.xml',
         'data/res_config_setting.xml',
         'data/ir_attachment_pre.xml',
+        'data/product_public_category.xml',
         'data/product_product.xml',
         'data/sale_order_template.xml',
         'data/knowledge_cover.xml',
@@ -31,11 +32,13 @@
         'data/ir_actions_act_window.xml',
         'data/menu_item.xml',
         'data/website_view.xml',
+        'data/website_page.xml',
         'data/website_theme_apply.xml',
         'data/ir_filters.xml',
         'data/x_meters.xml',
         'data/knowledge_tour.xml',
         'data/uninstall_hook.xml',
+        'data/website.xml',
     ],
     'demo': [
         'demo/res_company.xml',
