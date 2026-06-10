@@ -13,14 +13,14 @@
                 </header>
                 <field name="x_reference" readonly="True"/>
                 <field name="name" readonly="True"/>
-                <field name="x_sol_contract_type" optional="hide"/>
+                <field name="x_sol_contract_type" invisible="display_type" optional="hide"/>
                 <field name="product_uom_qty" string="Qty" readonly="True"
                     invisible="display_type"
                 />
                 <field name="product_uom_id" widget="many2one_uom" readonly="True" groups="uom.group_uom"
                     invisible="display_type"
                 />
-                <field name="x_delivered_progress" widget="progressbar" readonly="True"
+                <field name="x_delivered_progress" decoration-warning="x_qty_delivered_state == 'warning'" decoration-danger="x_qty_delivered_state == 'danger'" widget="progressbar" options="{'overflow_class': 'bg-primary'}" readonly="True"
                     invisible="x_is_undeliverable or x_delivered_progress == 0"
                 />
                 <field name="x_quantity_increment" width="130px"
@@ -31,7 +31,7 @@
                 />
                 <field name="id" column_invisible="True"/> <!-- this invisible field is necessary to pass the id field to the widget -->
                 <widget name="apply_to_section_widget"/>
-                <field name="x_current_progress" widget="progressbar" readonly="True"
+                <field name="x_current_progress" decoration-warning="x_current_progress_state == 'warning'" decoration-danger="x_current_progress_state == 'danger'" widget="progressbar" options="{'overflow_class': 'bg-primary'}" readonly="True"
                     invisible="display_type or x_is_undeliverable or x_current_progress == 0"
                 />
             </list>
@@ -80,10 +80,14 @@
             <xpath expr="//notebook//page[@name='order_lines']//list//field[@name='tax_ids']" position="attributes">
                 <attribute name="width">150px</attribute>
             </xpath>
+            <xpath expr="//notebook//page[@name='order_lines']//list//field[@name='qty_delivered']" position="attributes">
+                <attribute name="decoration-warning">x_qty_delivered_state == 'warning'</attribute>
+                <attribute name="decoration-danger">x_qty_delivered_state == 'danger'</attribute>
+            </xpath>
             <xpath expr="//notebook//page[@name='other_information']//field[@name='team_id']" position="after">
                 <field name="x_so_contract_type" readonly="state == 'sale'"/>
             </xpath>
-            <xpath expr="//notebook//page[@name='order_lines']//list//field[@name='tax_ids']" position="after">
+            <xpath expr="//notebook//page[@name='order_lines']//list//field[@name='product_uom_qty']" position="after">
                 <field name="x_sol_contract_type" optional="show" readonly="parent.state == 'sale'" invisible="not product_id" column_invisible="parent.x_so_contract_type != 'per_line'" width="150px"/>
             </xpath>
         </field>
