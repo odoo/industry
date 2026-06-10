@@ -41,18 +41,19 @@
             <t t-set="display_total_deposits" t-value="any(l.x_total_deposits_account_move for l in o.invoice_line_ids)"/>
         </xpath>
 
-        <!--  Adjust section summary colspan (when composition and pricr are shown)  -->
+        <!--  Adjust section summary colspan (when composition and price are shown)  -->
         <xpath expr="//td[@name='line_name_td']" position="before">
             <t t-set="line_colspan"
                 t-value="line_colspan + (1 if display_total_deposits else 0)"
             />
         </xpath>
+
+        <!--  Adjust section summary colspan (when composition or price is hidden)  -->
         <xpath expr="//td[@name='account_invoice_line_name_grouped_desktop']" position="before">
             <t t-set="line_colspan"
-                t-value="line_colspan + (1 if hide_prices and not hide_details and grouped_line['display_type'] in ('line_section', 'line_subsection') and display_total_deposits else 0)"
+                t-value="line_colspan + (1 if hide_prices and grouped_line['display_type'] in ('line_section', 'line_subsection') and display_total_deposits else 0)"
             />
         </xpath>
-        <!--  Adjust grouped section summary colspan (when composition or price is hide)  -->
         <xpath expr="//td[@name='td_taxes_grouped']" position="after">
             <t t-if="display_total_deposits and (grouped_line['display_type'] == 'product' or hide_details)">
                 <t t-set="grouped_excise_lines"
@@ -60,7 +61,7 @@
                         lambda l: l.display_type == 'product' and (
                             hide_details or (
                                 l.product_id == grouped_line.get('product')
-                                and l.name == grouped_line['name']
+                                and l.price_subtotal == grouped_line.get('price_subtotal')
                                 and l.quantity == grouped_line.get('quantity')
                             )
                         )
@@ -68,7 +69,7 @@
                 />
                 <td name="td_total_excises_grouped" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
                     <span t-if="grouped_excise_lines and not hide_details"
-                        t-out="grouped_excise_lines[0].x_total_deposits_account_move"
+                        t-out="grouped_excise_lines[:1].x_total_deposits_account_move"
                         t-options="{'widget': 'float', 'precision': 2}"
                     />
                 </td>
