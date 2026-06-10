@@ -156,6 +156,30 @@ for record in self: record['x_display_button'] = record.display_type in ['line_s
         <field name="field_id" ref="field_sale_order_line_sol_contract_type"/>
         <field name="value">open_book</field>
     </record>
+    <record id="field_sale_order_line_qty_delivered_warning" model="ir.model.fields">
+        <field name="name">x_qty_delivered_warning</field>
+        <field name="field_description">Delivered Quantity Warning</field>
+        <field name="ttype">boolean</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="depends">qty_delivered, product_uom_qty, x_sol_contract_type</field>
+        <field name="compute"><![CDATA[
+for sol in self: sol['x_qty_delivered_warning'] = sol.product_template_id.service_policy == 'delivered_manual' and sol.x_sol_contract_type == 'open_book' and sol.qty_delivered > sol.product_uom_qty
+        ]]></field>
+    </record>
+    <record id="field_sale_order_line_qty_delivered_danger" model="ir.model.fields">
+        <field name="name">x_qty_delivered_danger</field>
+        <field name="field_description">Delivered Quantity Danger</field>
+        <field name="ttype">boolean</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="depends">qty_delivered, product_uom_qty, x_sol_contract_type</field>
+        <field name="compute"><![CDATA[
+for sol in self: sol['x_qty_delivered_danger'] = sol.product_template_id.service_policy == 'delivered_manual' and sol.x_sol_contract_type == 'fixed_price' and sol.qty_delivered > sol.product_uom_qty
+        ]]></field>
+    </record>
 
     <!-- x_work_item fields -->
     <record id="x_name_field_x_work_item" model="ir.model.fields">
