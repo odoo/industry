@@ -14,7 +14,7 @@ class BookingEngineAutomationsTestCase(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.website = cls.env.ref('website.default_website')
+        cls.website = cls.env.ref('base.default_website')
         cls.website.tz = 'UTC'
         cls.partner = cls.env['res.partner'].create({'name': 'Test partner'})
         cls.resource = cls.env['resource.resource'].create({
