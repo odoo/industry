@@ -30,11 +30,11 @@ elif record.x_total > 0:
         <field name="code"><![CDATA[
 for record in (records or []):
     if not (record.role_id.x_is_a_room_offer and record.start_datetime and record.end_datetime): continue
-    pickup_time = env.context.get('pickup_time', record.sale_line_id.product_id.pickup_time)
-    return_time = env.context.get('return_time', record.sale_line_id.product_id.return_time)
-    start_datetime = record.start_datetime.replace(hour=int(pickup_time), minute=int(pickup_time % 1 * 60)) if pickup_time else record.start_datetime
-    end_datetime = record.end_datetime.replace(hour=int(return_time), minute=int(return_time % 1 * 60)) if return_time else record.end_datetime
-    end_datetime += datetime.timedelta(days=(record.end_datetime - record.start_datetime).days - (end_datetime - start_datetime).days)
+    pickup_time = record.sale_line_id.product_id.pickup_time
+    return_time = record.sale_line_id.product_id.return_time
+    start_datetime = (record.start_datetime).astimezone(timezone(env.user.tz or 'UTC')).replace(hour=int(pickup_time), minute=int(pickup_time % 1 * 60)).astimezone(timezone('UTC')).replace(tzinfo=None) if pickup_time else record.start_datetime
+    end_day_offset = datetime.timedelta(days=1) if record.end_datetime.astimezone(timezone(env.user.tz or 'UTC')).hour > 19 else datetime.timedelta()
+    end_datetime = (record.end_datetime + end_day_offset).astimezone(timezone(env.user.tz or 'UTC')).replace(hour=int(return_time), minute=int(return_time % 1 * 60)).astimezone(timezone('UTC')).replace(tzinfo=None) if return_time else record.end_datetime
     if record.start_datetime != start_datetime or record.end_datetime != end_datetime:
         record.write({'start_datetime': start_datetime, 'end_datetime': end_datetime})
         ]]></field>
@@ -58,9 +58,7 @@ for slot in records:
         <field name="code"><![CDATA[
 server_action = record.env['ir.actions.server'].browse(record.env.ref('booking_engine.industry_fix_slot_times')).id
 for record in records:
-    pickup_time = record.order_line.filtered('product_id.rent_periodicity').mapped('product_id')[:1].pickup_time
-    return_time = record.order_line.filtered('product_id.rent_periodicity').mapped('product_id')[:1].return_time
-    server_action.with_context(active_ids=record.order_line.planning_slot_ids.ids, active_model='planning.slot', pickup_time=pickup_time, return_time=return_time).run()
+    server_action.with_context(active_ids=record.order_line.planning_slot_ids.ids, active_model='planning.slot').run()
     record.action_update_rental_prices()
 ]]></field>
     </record>
