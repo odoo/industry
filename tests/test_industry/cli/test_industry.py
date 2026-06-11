@@ -87,10 +87,8 @@ class Test_Industry(Command):
                         env = api.Environment(cr, api.SUPERUSER_ID, {})
                         with_demo = config.get('industry_demo') or config['with_demo']
                         _logger.info('Loading module %s into database %s %s', industry_module, target_db, with_demo and 'with demo data' or '')
-                        existing_module = env['ir.module.module'].search([])
                         zip_content = utils.IndustryUtils().get_zip(industry_module)
                         env['ir.module.module']._import_zipfile(zip_content, force=False, with_demo=with_demo)
-                        env['ir.module.module'].search([('id', 'not in', existing_module.ids)]).demo = with_demo
                         env.cr.commit()
                 if test_enable:
                     try:
