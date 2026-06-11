@@ -5,7 +5,6 @@
     'category': 'Hidden/Tools',
     'depends': [
         'base',
-        'digest',
         'knowledge',
     ],
     'data': [
