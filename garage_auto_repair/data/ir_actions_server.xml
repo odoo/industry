@@ -143,9 +143,19 @@ for task in records:
         <field name="state">code</field>
         <field name="code"><![CDATA[
 for event in records:
-    env['appointment.invite'].search([
+    task = env['appointment.invite'].search([
         ('appointment_type_ids', 'in', [event.appointment_type_id.id]),
-    ], limit=1).x_task_id['state'] = '03_approved'
+    ], limit=1).x_task_id
+    task.write({'state': '03_approved', 'x_appointment_date': event.start})
+    main_partner = task.partner_id
+    booking_partners = event.partner_ids.filtered(
+        lambda p: p.id != main_partner.id
+    )
+    if main_partner and booking_partners:
+        env['base.partner.merge.automatic.wizard']._merge(
+            booking_partners.ids + [main_partner.id],
+            main_partner
+        )
 ]]></field>
     </record>
     <record id="ir_actions_server_730" model="ir.actions.server">
