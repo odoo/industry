@@ -29,6 +29,7 @@
         'data/website_menu.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/appointment_type.xml',
         'demo/event_tag_category.xml',
         'demo/event_tag.xml',

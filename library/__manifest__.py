@@ -46,6 +46,7 @@
         'data/pos_config.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/delivery_carrier.xml',
         'demo/payment_provider_demo.xml',
         'demo/product_pricelist.xml',

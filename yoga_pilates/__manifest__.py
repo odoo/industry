@@ -36,6 +36,7 @@
         'data/sale_order_template_line.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/appointment_type.xml',
         'demo/event_event.xml',
         'demo/event_event_ticket.xml',

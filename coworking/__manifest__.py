@@ -41,6 +41,7 @@
         'data/knowledge_article_favorite.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/event_event.xml',
         'demo/event_event_ticket.xml',
         'demo/product_product.xml',
