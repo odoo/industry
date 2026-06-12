@@ -6,6 +6,7 @@
     'depends': [
         'base_industry_data',
         'crm_sale_subscription',
+        'delivery',
         'documents_hr',
         'knowledge',
         'product_expiry',

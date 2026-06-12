@@ -10,7 +10,7 @@
         'pos_stock',
         'sale_purchase_project',
         'sign',
-        'website_event_sale'
+        'website_event_sale',
     ],
     'data': [
         'data/crm_stage.xml',
