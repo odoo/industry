@@ -1,0 +1,216 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="field_x_name_tyre_type" model="ir.model.fields">
+        <field name="name">x_name</field>
+        <field name="field_description">Name</field>
+        <field name="model_id" ref="x_tyre_type_model"/>
+        <field name="ttype">char</field>
+    </record>
+    <record id="field_x_sequence_tyre_type" model="ir.model.fields">
+        <field name="name">x_sequence</field>
+        <field name="ttype">integer</field>
+        <field name="field_description">Sequence</field>
+        <field name="model_id" ref="x_tyre_type_model"/>
+    </record>
+    <record id="x_appointment_type_id_field" model="ir.model.fields">
+        <field name="name">x_appointment_type_id</field>
+        <field name="field_description">Appointment Type</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">appointment.type</field>
+    </record>
+    <record id="x_task_id_field_model_appointment_invite" model="ir.model.fields">
+        <field name="name">x_task_id</field>
+        <field name="field_description">Task</field>
+        <field name="model_id" ref="appointment.model_appointment_invite"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">project.task</field>
+    </record>
+    <record id="x_booking_url_field" model="ir.model.fields">
+        <field name="name">x_booking_url</field>
+        <field name="field_description">Booking URL</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">char</field>
+        <field name="readonly">True</field>
+    </record>
+    <record id="field_x_odometer" model="ir.model.fields">
+        <field name="name">x_odometer</field>
+        <field name="field_description">Odometer</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">char</field>
+    </record>
+    <record id="x_task_id_field_model_calendar_event" model="ir.model.fields">
+        <field name="name">x_task_id</field>
+        <field name="field_description">Task</field>
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">project.task</field>
+    </record>
+    <record id="x_appointment_date_field" model="ir.model.fields">
+        <field name="name">x_appointment_date</field>
+        <field name="field_description">Appointment Date</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">datetime</field>
+        <field name="readonly">True</field>
+    </record>
+    <record id="x_vehicle_id_field" model="ir.model.fields">
+        <field name="name">x_vehicle_id</field>
+        <field name="field_description">Vehicle</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">fleet.vehicle</field>
+    </record>
+    <record id="x_chassis_number_field" model="ir.model.fields">
+        <field name="name">x_chassis_number</field>
+        <field name="field_description">Chassis Number</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ttype">char</field>
+        <field name="related">x_vehicle_id.vin_sn</field>
+    </record>
+    <record id="x_vehicle_id_account_move_field" model="ir.model.fields">
+        <field name="name">x_vehicle_id</field>
+        <field name="field_description">Vehicle</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">fleet.vehicle</field>
+    </record>
+    <record id="x_chassis_number_account_move_field" model="ir.model.fields">
+        <field name="name">x_chassis_number</field>
+        <field name="field_description">Chassis Number</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="ttype">char</field>
+        <field name="related">x_vehicle_id.vin_sn</field>
+    </record>
+    <record id="x_task_id_field" model="ir.model.fields">
+        <field name="name">x_task_id</field>
+        <field name="field_description">Task</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">project.task</field>
+    </record>
+    <record id="x_task_id_account_move_field" model="ir.model.fields">
+        <field name="name">x_task_id</field>
+        <field name="field_description">Task</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">project.task</field>
+    </record>
+    <record id="x_invoice_count_field" model="ir.model.fields">
+        <field name="name">x_invoice_count</field>
+        <field name="field_description">Invoice Count</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">integer</field>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+for record in self: record['x_invoice_count'] = self.env['account.move'].search_count([('x_task_id', '=', record.id), ('move_type', '=', 'out_invoice')])]]></field>
+    </record>
+    <record id="x_owner_id_field" model="ir.model.fields">
+        <field name="name">x_owner_id</field>
+        <field name="field_description">Owner</field>
+        <field name="model_id" ref="fleet.model_fleet_vehicle"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.partner</field>
+    </record>
+    <record id="x_vehicle_ids_field" model="ir.model.fields">
+        <field name="name">x_vehicle_ids</field>
+        <field name="field_description">Vehicles</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="ttype">one2many</field>
+        <field name="relation">fleet.vehicle</field>
+        <field name="relation_field">x_owner_id</field>
+    </record>
+    <record id="x_vehicle_count_field" model="ir.model.fields">
+        <field name="name">x_vehicle_count</field>
+        <field name="field_description">Vehicle Count</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="ttype">integer</field>
+        <field name="depends">x_vehicle_ids</field>
+        <field name="compute"><![CDATA[for partner in self:
+    partner['x_vehicle_count'] = len(partner.x_vehicle_ids)]]></field>
+    </record>
+    <record id="x_vehicle_id_field_model_project_task" model="ir.model.fields">
+        <field name="name">x_vehicle_id</field>
+        <field name="field_description">Vehicle</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">fleet.vehicle</field>
+    </record>
+    <record id="x_chassis_number_field_model_project_task" model="ir.model.fields">
+        <field name="name">x_chassis_number</field>
+        <field name="field_description">Chassis Number</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">char</field>
+        <field name="related">x_vehicle_id.vin_sn</field>
+    </record>
+    <record id="x_is_invoice_field" model="ir.model.fields">
+        <field name="name">x_is_invoice</field>
+        <field name="field_description">Is Invoice</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">boolean</field>
+    </record>
+    <record id="x_need_in_intervention_report_field" model="ir.model.fields">
+        <field name="name">x_need_in_intervention_report</field>
+        <field name="field_description">Need in Intervention Report</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="ttype">boolean</field>
+    </record>
+    <record id="x_tyre_id_field" model="ir.model.fields">
+        <field name="name">x_tyre_id</field>
+        <field name="field_description">Tyres</field>
+        <field name="model_id" ref="fleet.model_fleet_vehicle"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">x_tyre_type</field>
+    </record>
+    <record id="x_motor_block_field" model="ir.model.fields">
+        <field name="name">x_motor_block</field>
+        <field name="field_description">Motor Block</field>
+        <field name="model_id" ref="fleet.model_fleet_vehicle"/>
+        <field name="ttype">char</field>
+    </record>
+    <record id="field_x_odometer_sale_order" model="ir.model.fields">
+        <field name="name">x_odometer</field>
+        <field name="field_description">Odometer</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ttype">char</field>
+        <field name="related">x_task_id.x_odometer</field>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="x_is_vehicle_checked_in_field" model="ir.model.fields">
+        <field name="name">x_is_vehicle_checked_in</field>
+        <field name="field_description">Vehicle Checked In</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">boolean</field>
+    </record>
+    <record id="x_is_vehicle_checked_out_field" model="ir.model.fields">
+        <field name="name">x_is_vehicle_checked_out</field>
+        <field name="field_description">Vehicle Checked Out</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">boolean</field>
+    </record>
+    <record id="x_checked_in_datetime_field" model="ir.model.fields">
+        <field name="name">x_checked_in_datetime</field>
+        <field name="field_description">Vehicle Checked In Date</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">datetime</field>
+        <field name="readonly">True</field>
+        <field name="depends">x_is_vehicle_checked_in</field>
+        <field name="compute"><![CDATA[
+for task in self:
+    if task.x_is_vehicle_checked_in:
+        task['x_checked_in_datetime'] = datetime.datetime.today()
+]]></field>
+    </record>
+    <record id="x_checked_out_datetime_field" model="ir.model.fields">
+        <field name="name">x_checked_out_datetime</field>
+        <field name="field_description">Vehicle Checked Out Date</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">datetime</field>
+        <field name="readonly">True</field>
+        <field name="depends">x_is_vehicle_checked_out</field>
+        <field name="compute"><![CDATA[
+for task in self:
+    if task.x_is_vehicle_checked_out:
+        task['x_checked_out_datetime'] = datetime.datetime.today()
+]]></field>
+    </record>
+</odoo>
