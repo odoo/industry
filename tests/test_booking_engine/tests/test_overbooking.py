@@ -22,7 +22,7 @@ class TestOverbooking(PaymentHttpCommon):
         cls.role = cls.env['planning.role'].create({
             'name': 'Stay Offer Role',
             'sync_shift_rental': True,
-            'x_is_a_room_offer': True,
+            'x_resource_category': 'stay_offer',
             'resource_ids': [Command.link(cls.resource.id)],
         })
         cls.product = cls.env['product.template'].create({
