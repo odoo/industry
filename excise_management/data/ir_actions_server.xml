@@ -90,51 +90,54 @@ action = {'view_mode': 'list', 'res_model': 'stock.move', 'type': 'ir.actions.ac
         <field name="name">Compute excise report line</field>
         <field name="state">code</field>
         <field name="code"><![CDATA[
+min_date, max_date = datetime.date.max, datetime.date.min
+licenses = env['x_excise_license']
 for record in records:
-    all_moves = env['stock.move'].search([
-        ('date', '>=', record.x_from_date),
-        ('date', '<', record.x_to_date),
-        '|', ('location_id.warehouse_id.x_excise_license_id', '=', record.x_excise_license_id.id), ('location_dest_id.warehouse_id.x_excise_license_id', '=', record.x_excise_license_id.id),
-        ('x_excise_category', '!=', False), ('state', '=', 'done'),
-    ])
+    min_date = min(min_date, record.x_from_date)
+    max_date = max(max_date, record.x_to_date)
+    licenses += record.x_excise_license_id
 
-    processed_moves_ids = {}
-    for move in all_moves:
-        if move.location_id.warehouse_id.x_is_fiscal_deposit and move.location_id.warehouse_id.x_excise_license_id == record.x_excise_license_id:
-            if move.location_dest_id.warehouse_id.x_is_fiscal_deposit:
-                if move.location_dest_id.warehouse_id.x_excise_license_id == record.x_excise_license_id:  m_type = "transfer"
-                else:   m_type = "exit fd"
-            else:
-                if move.partner_id.property_account_position_id.x_is_fiscal_deposit:    m_type = "exit fd"
-                else:   m_type = "exit"
-        elif move.location_dest_id.warehouse_id.x_is_fiscal_deposit and move.location_dest_id.warehouse_id.x_excise_license_id == record.x_excise_license_id:
-            if move.location_id.warehouse_id.x_is_fiscal_deposit:
-                if move.location_id.warehouse_id.x_excise_license_id == record.x_excise_license_id:  m_type = "transfer"
-                else:   m_type = "entry fd"
-            else:
-                if move.partner_id.property_account_position_id.x_is_fiscal_deposit:    m_type = "entry fd"
-                else:   m_type = "entry"
-        else: m_type = "none"
+all_moves = env['stock.move'].search([
+    ('date', '>=', min_date),
+    ('date', '<', max_date),
+    '|', ('location_id.warehouse_id.x_excise_license_id', 'in', licenses.ids), ('location_dest_id.warehouse_id.x_excise_license_id', '=', licenses.ids),
+    ('x_excise_category', '!=', False), ('state', '=', 'done'),
+])
+mrp_installed = env['ir.module.module'].search([('name', '=', 'mrp'), ('state', '=', 'installed')])
+processed_moves_ids = {}
+for move in all_moves:
+    src_is_fd = move.location_id.warehouse_id.x_is_fiscal_deposit and move.location_id.warehouse_id.x_excise_license_id == record.x_excise_license_id
+    dst_is_fd = move.location_dest_id.warehouse_id.x_is_fiscal_deposit and move.location_dest_id.warehouse_id.x_excise_license_id == record.x_excise_license_id
 
-        processed_moves_ids.setdefault(move.x_excise_category, {}).setdefault(m_type, {'qty': 0.0, 'amt': 0.0, 'pkg_unit': 0.0, 'pkg_amount': 0.0, 'move': [],})
+    if src_is_fd and dst_is_fd: m_type = "transfer"
+    elif src_is_fd:
+        if move.scrap_id:       m_type = "scrap"
+        elif move.location_dest_id.warehouse_id.x_is_fiscal_deposit or move.partner_id.property_account_position_id.x_is_fiscal_deposit:
+                                m_type = "exit fd"
+        else:                   m_type = "exit"
+    elif dst_is_fd:
+        if mrp_installed and (move.production_id or move.workorder_id):
+                                m_type = "production"
+        elif move.location_id.warehouse_id.x_is_fiscal_deposit or move.partner_id.property_account_position_id.x_is_fiscal_deposit:
+                                m_type = "entry fd"
+        else:                   m_type = "entry"
+    else:                       m_type = "none"
 
-        processed_moves_ids[move.x_excise_category][m_type]['qty'] += move.x_excise_quantity
-        processed_moves_ids[move.x_excise_category][m_type]['amt'] += move.x_excise_amount
-        processed_moves_ids[move.x_excise_category][m_type]['pkg_unit'] += move.x_packaging_units
-        processed_moves_ids[move.x_excise_category][m_type]['pkg_amount'] += move.x_packaging_amount
-        processed_moves_ids[move.x_excise_category][m_type]['move'].append(move.id)
+    res = processed_moves_ids.setdefault(move.x_excise_category, {}).setdefault(m_type, {'qty': 0.0, 'amt': 0.0, 'pkg_unit': 0.0, 'pkg_amount': 0.0, 'move': []})
+    res['qty'] += move.x_excise_quantity
+    res['amt'] += move.x_excise_amount
+    res['pkg_unit'] += move.x_packaging_units
+    res['pkg_amount'] += move.x_packaging_amount
+    res['move'].append(move.id)
 
-    processed_result = [
-        (cat, m_type, data['qty'], data['amt'], data['pkg_unit'], data['pkg_amount'], data['move'])
-        for cat, types in processed_moves_ids.items()   for m_type, data in types.items()
-        ]
-
-    record['x_line_ids'] = [
-        (5, 0, 0), *[(0, 0, {
-            'x_excise_category_id': cat.id, 'x_excise_move_type': m_type, 'x_excise_quantity': qty, 'x_excise_amount': amt, 'x_excise_packaging_units': pkg_unit, 'x_excise_packaging_amount': pkg_amount, 'x_move_ids': [(6, 0, moves)],
-        })
-        for cat, m_type, qty, amt, pkg_unit, pkg_amount, moves in processed_result ]
-    ]
+record['x_line_ids'] = [(5, 0, 0)] + [
+    (0, 0, {
+        'x_excise_category_id': cat.id, 'x_excise_move_type': m_type, 
+        'x_excise_quantity': data['qty'], 'x_excise_amount': data['amt'], 
+        'x_excise_packaging_units': data['pkg_unit'], 'x_excise_packaging_amount': data['pkg_amount'], 
+        'x_move_ids': [(6, 0, data['move'])],
+    }) for cat, types in processed_moves_ids.items() for m_type, data in types.items()
+]
         ]]></field>
     </record>
 </odoo>
