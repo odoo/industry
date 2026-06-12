@@ -571,6 +571,12 @@ class TestEnv(IndustryCase):
     def _check_res_config_setting(self, root):
         if root.xpath("//record[@model='res.config.settings']/field[@name='account_price_include']"):
             _logger.warning("This setting needs extra care, see examples on how to deal with account_price_include.")
+        for field in root.xpath("//record[@model='res.config.settings']/field[starts-with(@name, 'module_')]"):
+            if field.get('eval') in ('1', 'True'):
+                _logger.warning(
+                    "You should not install modules in res.config.settings data. "
+                    "Move %s installation to manifest instead", field.get('name')[7:]
+                )
 
     def _check_user_is_set(self, root, previous_records):
         records = previous_records
