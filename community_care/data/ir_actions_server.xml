@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="set_age_according_to_date_of_birth_server_action" model="ir.actions.server">
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="update_path">x_age</field>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="base.model_res_partner"/>
+        <field name="evaluation_type">equation</field>
+        <field name="name">Set Age according to Date of Birth</field>
+        <field name="update_field_id" ref="base_model_res_partner_x_age_field"/>
+        <field name="usage">base_automation</field>
+        <field name="value"><![CDATA[datetime.date.today().year - record.x_date_of_birth.year - ((datetime.date.today().month, datetime.date.today().day) < (record.x_date_of_birth.month, record.x_date_of_birth.day)) if record.x_date_of_birth else False]]></field>
+    </record>
+    <record id="action_partner_meeting_focus" model="ir.actions.server">
+        <field name="name">General Meeting Resident Focus</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+parent_article = env.ref('community_care.knowledge_article_team_meetings', raise_if_not_found=False)
+if not parent_article:
+    parent_article = env['knowledge.article'].search([('name', '=', 'Team meetings')], limit=1)
+prop_name = 'resident_focus'
+if parent_article and parent_article.article_properties_definition:
+    for prop in parent_article.article_properties_definition:
+        if prop.get('string') == 'Resident focus':
+            prop_name = prop.get('name')
+            break
+domain = [('is_article_item', '=', True)]
+if parent_article:
+    domain.append(('parent_id', '=', parent_article.id))
+domain.append(('article_properties.%s' % prop_name, 'in', [record.id]))
+action = {
+    'name': 'Meeting Focus',
+    'type': 'ir.actions.act_window',
+    'res_model': 'knowledge.article',
+    'view_mode': 'list,form',
+    'domain': domain,
+    'context': {
+        'default_is_article_item': True,
+    }
+}
+if parent_article:
+    action['context']['default_parent_id'] = parent_article.id
+]]></field>
+    </record>
+</odoo>
