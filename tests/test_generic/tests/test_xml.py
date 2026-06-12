@@ -40,6 +40,7 @@ USELESS_FIELDS = {
     'maintenance.request': ['maintenance_team_id', 'owner_user_id'],
     'planning.role': ['color'],
     'planning.slot': ['access_token', 'allocated_hours'],
+    'pos.config': ['module_pos_restaurant'],
     'pos.order': ['date_order', 'pos_reference', 'company_id', 'state', 'currency_id', 'last_order_preparation_change'],
     'pos.order.line': ['total_cost', 'company_id', 'full_product_name'],
     'product.attribute.value': ['color'],
@@ -150,7 +151,13 @@ class TestEnv(IndustryCase):
         static_files = set()
         in_use_files = set()
         checked_records_with_user = {}
+<<<<<<< 562326dccc7eab17d40660bcd96523afb11d3a26
         manifest_content = None
+||||||| 7f02ea78d9ece533e1c892e7371d38a360dce5b4
+=======
+        uninitialized_sessions = []
+        session_functions = []
+>>>>>>> d74387e7c75166c534e88659b99f116152cc2899
         for root, dirs, files in os.walk(path):
             # sort the directory by alphabetical order so static directory is read first.
             dirs.sort(reverse=True)
@@ -201,6 +208,8 @@ class TestEnv(IndustryCase):
                 self._check_context_to_stop_mail_sending(tree, file_name)
                 self._check_text_based_xpath(tree, file_name)
                 self._check_portal_login_is_email(tree, file_name)
+                self._check_pos_session(tree, file_name, uninitialized_sessions)
+                self._check_session_function(tree, session_functions)
                 if root.split('/')[-1] == 'data':
                     self._check_view_active(tree, file_name)
                     self._check_is_published_false(tree, file_name)
@@ -215,6 +224,7 @@ class TestEnv(IndustryCase):
 
         self._check_module_dependencies(manifest_content, is_studio_required, all_dependencies, escape_studio_test=module in ESCAPE_STUDIO_TEST)
         self._check_records_without_user_id(checked_records_with_user)
+        self._check_uninitialized_sessions(uninitialized_sessions, session_functions)
         if self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1):
             in_use_files = {file.lstrip('/') for file in in_use_files}
             for file in static_files - in_use_files:
@@ -450,7 +460,7 @@ class TestEnv(IndustryCase):
                     f"Duplicate field updates in record {record_id} of model {model} in {file_name}: {', '.join(field[0] for field in fields if fields_list.count(field) > 1)}"
                 )
             record_key = (record_id, model)
-            if fields & records[record_key]:
+            if fields & records[record_key] and model != 'pos.config':
                 _logger.warning(
                     f"Duplicate record updates in {file_name}: {record_id} in model {model}"
                 )
@@ -792,3 +802,31 @@ class TestEnv(IndustryCase):
                             file_name,
                             field_name,
                         )
+
+    def _check_pos_session(self, root, file_name, uninitialized_records):
+        for record in root.xpath("//record[@model='pos.session']"):
+            if not record.xpath("./field[@name='state']/text()"):
+                uninitialized_records.append((record.get('id'), file_name))
+
+    def _check_session_function(self, root, session_functions):
+        session_functions.extend(list(root.xpath("//function[@model='pos.session' and @name='action_pos_session_closing_control']")))
+
+    def _check_uninitialized_sessions(self, uninitialized_sessions, session_functions):
+        def error_message(record_id, file_name):
+            return _logger.warning(
+                            "pos.session record with id '%s' in file %s is not initialized. "
+                            "Please initialize the session properly by setting state='opened' or 'closed' or add a call to action_pos_session_closing_control.",
+                            record_id,
+                            file_name,
+                        )
+        if uninitialized_sessions and not session_functions:
+            for record_id, file_name in uninitialized_sessions:
+                error_message(record_id, file_name)
+            return
+        for u in uninitialized_sessions:
+            # <function eval="ref('id')"/>
+            cond1 = any(u[0] in f.get('eval', '') for f in session_functions)
+            # <function><value eval="ref('id')"></function>
+            cond2 = any((val := f.xpath('//value')) and val[0].get('eval', '') for f in session_functions)
+            if not (cond1 or cond2):
+                error_message(u[0], u[1])
