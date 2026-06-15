@@ -143,9 +143,10 @@ for task in records:
         <field name="state">code</field>
         <field name="code"><![CDATA[
 for event in records:
-    task = env['appointment.invite'].search([
-        ('appointment_type_ids', 'in', [event.appointment_type_id.id]),
-    ], limit=1).x_task_id
+    invite = event.appointment_invite_id
+    if not invite or not invite.x_task_id:
+        continue
+    task = invite.x_task_id
     task.write({'state': '03_approved', 'x_appointment_date': event.start})
     main_partner = task.partner_id
     booking_partners = event.partner_ids.filtered(
