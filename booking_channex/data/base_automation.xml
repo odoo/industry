@@ -17,6 +17,28 @@
         <field name="name">Product product Create or write</field>
         <field name="active" eval="False"/>
     </record>
+    <record id="automation_on_product_product_write_price" model="base.automation">
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_modify_room_price')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Product product Write Price</field>
+        <field name="filter_domain">[("x_is_a_room_offer", "!=", False)]</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('product.field_product_product__list_price')])]"/>
+    </record>
+    <record id="automation_on_write_availability" model="base.automation">
+        <field name="model_id" ref="booking_engine.x_model_availability"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_modify_room_availability')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Room Availability write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('booking_engine.x_total_units_field_x_availability'), ref('booking_engine.x_booked_field_x_availability')])]"/>
+    </record>
+    <record id="automation_on_write_pricelist_item" model="base.automation">
+        <field name="model_id" ref="product.model_product_pricelist_item"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_modify_pricelist_rules')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="name">Pricelist Item Rate write</field>
+        <field name="filter_domain">[("pricelist_id.x_published_on_channex", "!=", False)]</field>
+    </record>
 
     <!-- Rate Plans -->
     <record id="automation_on_room_product_variant_create" model="base.automation">

@@ -161,20 +161,20 @@ elif booking_id := payload_infos.get('booking_id'):
         <field name="state">code</field>
         <field name="code"><![CDATA[
 sending_cron = env.ref('booking_channex.ir_cron_data_channex_sender')
-restrictions_payload = []
-availability_payload = []
+payloads = {
+    'restrictions': [],
+    'availability': [],
+}
+
 for line in sending_cron.x_datas_to_send:
-    if line.x_operation == 'restrictions':
-        restrictions_payload.append(line.x_payload)
-    elif line.x_operation == 'availability':
-        availability_payload.append(line.x_payload)
-if not restrictions_payload.is_empty():
-    env.ref('booking_channex.requests_to_channex').with_context(method="POST", endpoint="restrictions", payload={"values": restrictions_payload}).run()
-if not availability_payload.is_empty():
-    env.ref('booking_channex.requests_to_channex').with_context(method="POST", endpoint="availability", payload={"values": availability_payload}).run()
+    payloads.setdefault(line.x_operation, []).append(line.x_payload)
+
+for endpoint in ('restrictions', 'availability'):
+    if payloads[endpoint]:
+        env.ref('booking_channex.requests_to_channex').with_context(method='POST', endpoint=endpoint, payload={'values': payloads[endpoint]}).run()
+
 model.env['ir.cron']._commit_progress(processed=1, remaining=0, deactivate=True)
-for line in sending_cron.x_datas_to_send:
-    line.unlink()
+sending_cron.x_datas_to_send.unlink()
         ]]></field>
     </record>
     <record id="create_or_modify_room_type" model="ir.actions.server">
@@ -228,6 +228,125 @@ if not mapped_product:
     })
         ]]></field>
     </record>
+    <record id="action_modify_room_price" model="ir.actions.server">
+        <field name="name">Channex: Modify Room Price</field>
+        <field name="model_id" ref="product.model_product_product" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+property_mapping = env["x_channex_mapping"].search([
+    ("x_model_type", "=", "property"),
+    ("x_local_id", "=", record.company_id.id or env.company.id),
+], limit=1)
+room_mapping = env["x_channex_mapping"].search([
+    ("x_model_type", "=", "room_type"),
+    ("x_local_id", "=", record.id),
+], limit=1)
+
+if property_mapping.x_remote_id and room_mapping.x_remote_id:
+    rate_plans = env["x_rate_plan"].search([('x_variant_id', '=', record.id)])
+    today = datetime.datetime.today().date()
+    date_list = [
+        today + datetime.timedelta(days=i)
+        for i in range(501)
+    ]
+    payload_values = env.ref('booking_channex.prepare_rate_payload').with_context(active_ids=rate_plans, property_remote_id=property_mapping.x_remote_id, date_list=date_list).run()
+    # payload_values is list of dict with property_id, rate_plan_id, date_from, date_to, rate
+
+    env['x_channex_datas_cron_lines'].create([
+        {
+            'x_cron_id': env.ref('booking_channex.ir_cron_data_channex_sender').id,
+            'x_operation': 'restrictions',
+            'x_payload': payload,
+        }
+        for payload in payload_values
+    ])
+        ]]></field>
+    </record>
+    <record id="action_modify_pricelist_rules" model="ir.actions.server">
+        <field name="name">Channex: Modify Pricelist Rules</field>
+        <field name="model_id" ref="product.model_product_pricelist_item" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+property_id = record.company_id.id or env.company.id
+property_mapping = env["x_channex_mapping"].search([("x_model_type", "=", "property"),("x_local_id", "=", property_id),], limit=1)
+
+if property_mapping.x_remote_id:
+    room_domain = [("x_is_a_room_offer", "!=", False),("x_resource_ids", "!=", False),'|',('company_id', '=', False),('company_id', '=', property_id),]
+
+    if record.applied_on == "1_product":
+        if record.product_id:
+            room_domain.append(("id", "=", record.product_id.id))
+        elif record.product_tmpl_id:
+            room_domain.append(("product_tmpl_id", "=", record.product_tmpl_id.id))
+
+    elif record.applied_on == "2_product_category":
+        room_domain.append(("categ_id", "=", record.categ_id.id))
+
+    property_rooms = env["product.product"].search(room_domain)
+
+    if property_rooms:
+        rate_plans = env["x_rate_plan"].search([('x_pricelist_id', '=', record.pricelist_id.id),('x_variant_id', 'in', property_rooms.ids)])
+        if rate_plans:
+            today = datetime.datetime.today()
+            start_date = (
+                record.date_start
+                if record.date_start and record.date_start >= today
+                else today
+            )
+            if not record.date_end:
+                end_date = today + datetime.timedelta(days=501)
+            elif record.date_end < today:
+                end_date = False
+            else:
+                end_date = record.date_end
+            if end_date:
+                date_list = [
+                    start_date + datetime.timedelta(days=i)
+                    for i in range((end_date - start_date).days + 1)
+                ]
+                payload_values = env.ref('booking_channex.prepare_rate_payload').with_context(active_ids=rate_plans.ids, active_model='x_rate_plan', property_remote_id=property_mapping.x_remote_id, date_list=date_list).run()
+
+                if payload_values:
+                    cron_id = env.ref('booking_channex.ir_cron_data_channex_sender').id
+                    env['x_channex_datas_cron_lines'].create([
+                        {
+                            'x_cron_id': cron_id,
+                            'x_operation': 'restrictions',
+                            'x_payload': payload,
+                        }
+                        for payload in payload_values
+                    ])
+        ]]></field>
+    </record>
+    <record id="action_modify_room_availability" model="ir.actions.server">
+        <field name="name">Channex: Modify Availability</field>
+        <field name="model_id" ref="booking_engine.x_model_availability" />
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+room_mappings_dict = dict(env['x_channex_mapping']._read_group(domain=[('x_model_type', '=', 'room_type'),('x_local_id', 'in', record.x_stay_offer_id.product_variant_ids.ids)], groupby=['x_local_id'], aggregates=['x_remote_id:max']))
+property_mapping = env["x_channex_mapping"].search([
+    ("x_model_type", "=", "property"),
+    ("x_local_id", "=", record.x_stay_offer_id.company_id.id or env.company.id),
+], limit=1)
+ota_buffer = record.x_stay_offer_id.x_ota_buffer
+if property_mapping.x_remote_id:
+    for room in record.x_stay_offer_id.product_variant_ids:
+        room_remote_id = room_mappings_dict.get(room.id)
+        if room_remote_id:
+            env['x_channex_datas_cron_lines'].create({
+                'x_cron_id': env.ref('booking_channex.ir_cron_data_channex_sender').id,
+                'x_operation': 'availability',
+                'x_payload': {
+                    'property_id': property_mapping.x_remote_id,
+                    'room_type_id': room_remote_id,
+                    'date_from': record.x_date.strftime('%Y-%m-%d'),
+                    'date_to': record.x_date.strftime('%Y-%m-%d'),
+                    'availability': min(0, record.x_available - ota_buffer),
+                },
+            })
+        ]]></field>
+    </record>
+
     <!-- Make the following create/update server actions usable by the daily sync AND the live update (on_create/write/unlink) -->
     <record id="create_property_on_channex" model="ir.actions.server">
         <field name="name">Create Property On Channex</field>
@@ -254,7 +373,7 @@ if not mapped_product:
         <field name="state">code</field>
     </record>
 
-    <record id="create_rate_on_channex" model="ir.actions.server">
+    <record id="prepare_rate_payload" model="ir.actions.server">
         <field name="name">Create Rate On Channex</field>
         <field name="code"><![CDATA[
 def construct_rate_payload(property_remote_id, rate_plan_remote_id, rate_plan, date_list):
@@ -294,11 +413,8 @@ def construct_rate_payload(property_remote_id, rate_plan_remote_id, rate_plan, d
 payload_values = []
 property_remote_id = env.context.get("property_remote_id")
 rate_plan_mappings_dict = dict(env['x_channex_mapping']._read_group(domain=[ ('x_model_type', '=', 'rate_plan')], groupby=['x_local_id'], aggregates=['x_remote_id:max']))
-today = datetime.datetime.today().date()
-date_list = [
-    today + datetime.timedelta(days=i)
-    for i in range(501)
-]
+date_list = env.context.get("date_list", [])
+
 for record in records:
     rate_plan_remote_id = rate_plan_mappings_dict.get(record.id)
     if not rate_plan_remote_id:
@@ -309,7 +425,7 @@ action = payload_values
         <field name="model_id" ref="x_rate_plan_model"/>
         <field name="state">code</field>
     </record>
-    <record id="create_availability_on_channex" model="ir.actions.server">
+    <record id="prepare_availability_payload" model="ir.actions.server">
         <field name="name">Create Availability On Channex</field>
         <field name="code"><![CDATA[
 def construct_availability_payload(property_id, room_type_id, records, ota_buffer):
@@ -608,7 +724,8 @@ for property in companies:
         rooms.filtered(lambda r: r.company_id == property.id)
         if company.child_ids else rooms
     )
-    payload_values.extend(env.ref('booking_channex.create_availability_on_channex').with_context(active_ids=property_rooms.ids, property_remote_id=property_remote_id).run())
+    if property_rooms:
+        payload_values.extend(env.ref('booking_channex.prepare_availability_payload').with_context(active_ids=property_rooms.ids, active_model="product.product", property_remote_id=property_remote_id).run())
 
 env.ref('booking_channex.requests_to_channex').with_context(method="POST", endpoint="availability", payload={'values': payload_values}).run()
 
@@ -619,6 +736,11 @@ rooms = env['product.product'].search([
     ('x_is_a_room_offer', '=', True),
     ('x_resource_ids', '!=', False)
 ])
+today = datetime.datetime.today().date()
+date_list = [
+    today + datetime.timedelta(days=i)
+    for i in range(501)
+]
 
 for property in companies:
     property_remote_id = property_mappings_dict.get(property.id)
@@ -631,7 +753,8 @@ for property in companies:
     rate_plans = env['x_rate_plan'].search([
         ('x_variant_id', 'in', property_rooms.ids)
     ])
-    payload_values.extend(env.ref('booking_channex.create_rate_on_channex').with_context(active_ids=rate_plans.ids, property_remote_id=property_remote_id).run())
+    if rate_plans:
+        payload_values.extend(env.ref('booking_channex.prepare_rate_payload').with_context(active_ids=rate_plans.ids, active_model="x_rate_plan", property_remote_id=property_remote_id, date_list=date_list).run())
 
 env.ref('booking_channex.requests_to_channex').with_context(method="POST", endpoint="restrictions", payload={'values': payload_values}).run()
 
