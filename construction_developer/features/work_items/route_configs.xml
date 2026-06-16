@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <!--create the custom route/picking type/rule  'Construction Replenishment'-->
+    <record model="stock.picking.type" id="stock_picking_type_construction_replenishment">
+        <field name="name">On site consumption</field>
+        <field name="code">mrp_operation</field>
+        <field name="sequence_code">OSC</field>
+        <field name="auto_confirm_production" eval="False"/>
+        <field name="default_location_src_id" ref="stock_location_worksites"/>
+        <field name="default_location_dest_id" ref="stock.stock_location_customers"/>
+    </record>
+
+    <record model="stock.route" id="stock_route_construction_replenishment">
+        <field name="name">Construction Replenishment</field>
+        <field name="product_categ_selectable" eval="True"/>
+        <field name="sale_selectable" eval="True"/>
+    </record>
+
+    <record model="stock.rule" id="stock_rule_construction_replenishment">
+        <field name="name">Pull from Location</field>
+        <field name="picking_type_id" ref="stock_picking_type_construction_replenishment"/>
+        <field name="location_src_id" ref="stock_location_worksites"/>
+        <field name="location_dest_id" ref="stock.stock_location_customers"/>
+        <field name="route_id" ref="stock_route_construction_replenishment"/>
+        <field name="action">manufacture</field>
+    </record>
+</odoo>
