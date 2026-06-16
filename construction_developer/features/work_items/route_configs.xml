@@ -1,27 +1,151 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<odoo noupdate="1">
-    <!--create the custom route/picking type/rule  'Construction Replenishment'-->
-    <record model="stock.picking.type" id="stock_picking_type_construction_replenishment">
-        <field name="name">On site consumption</field>
-        <field name="code">mrp_operation</field>
-        <field name="sequence_code">OSC</field>
-        <field name="auto_confirm_production" eval="False"/>
-        <field name="default_location_src_id" ref="stock_location_worksites"/>
-        <field name="default_location_dest_id" ref="stock.stock_location_customers"/>
+<odoo>
+    <!--
+        This feature sets up new routes from/to the custom locations we create from the delivery
+        address. This helps connecting it to the standard odoo procurement flows. 
+    -->
+
+    <record model="ir.model.fields" id="field_stock_picking_type_x_select_dest_on_po">
+        <field name="model_id" ref="stock.model_stock_picking_type"/>
+        <field name="ttype">boolean</field>
+        <field name="name">x_select_dest_on_po</field>
+        <field name="field_description">Destination Selection on PO</field>
+        <field name="help">Once enabled, you can choose from the destination's child locations when creating a manual PO.</field>
     </record>
 
-    <record model="stock.route" id="stock_route_construction_replenishment">
-        <field name="name">Construction Replenishment</field>
-        <field name="product_categ_selectable" eval="True"/>
-        <field name="sale_selectable" eval="True"/>
+    <record model="ir.model.fields" id="field_stock_picking_type_x_source_loc_from_so">
+        <field name="model_id" ref="stock.model_stock_picking_type"/>
+        <field name="ttype">boolean</field>
+        <field name="name">x_source_loc_from_so</field>
+        <field name="field_description">Source Location from SO</field>
+        <field name="help">Once enabled, the source location for the created delivery will be the one from the SO.</field>
     </record>
 
-    <record model="stock.rule" id="stock_rule_construction_replenishment">
-        <field name="name">Pull from Location</field>
-        <field name="picking_type_id" ref="stock_picking_type_construction_replenishment"/>
-        <field name="location_src_id" ref="stock_location_worksites"/>
-        <field name="location_dest_id" ref="stock.stock_location_customers"/>
-        <field name="route_id" ref="stock_route_construction_replenishment"/>
-        <field name="action">manufacture</field>
+    <record model="ir.model.fields" id="field_stock_route_x_allow_sol_preselect">
+        <field name="model_id" ref="stock.model_stock_route"/>
+        <field name="ttype">boolean</field>
+        <field name="name">x_allow_sol_preselect</field>
+        <field name="field_description">Allow Preselection on SOL</field>
+        <field name="help">Once enabled, allows the BOMs of products with this route to be preselected on Sale Order Lines.</field>
     </record>
+
+
+    <data noupdate="1">
+        <record model="stock.picking.type" id="stock_picking_type_on_site_consumption_bom">
+            <field name="name">On Site Consumption BOM</field>
+            <field name="code">mrp_operation</field>
+            <field name="sequence_code">OSC/BOM/</field>
+            <field name="auto_confirm_production" eval="False"/>
+            <field name="default_location_src_id" ref="stock_location_worksites"/>
+            <field name="default_location_dest_id" ref="stock.stock_location_customers"/>
+        </record>
+
+        <record model="stock.route" id="stock_route_on_site_consumption_bom">
+            <field name="name">Replenish on Order (MTO) BOM</field>
+            <field name="product_categ_selectable" eval="True"/>
+            <field name="sale_selectable" eval="True"/>
+            <field name="x_allow_sol_preselect" eval="True"/>
+        </record>
+
+        <record model="stock.rule" id="stock_rule_on_site_consumption_bom">
+            <field name="name">Pull from Location</field>
+            <field name="action">manufacture</field>
+            <field name="picking_type_id" ref="stock_picking_type_on_site_consumption_bom"/>
+            <field name="location_src_id" ref="stock_location_worksites"/>
+            <field name="location_dest_id" ref="stock.stock_location_customers"/>
+            <field name="route_id" ref="stock_route_on_site_consumption_bom"/>
+        </record>
+
+
+        <!-- update existing buy route with new rule -->
+        <record model="stock.picking.type" id="stock_picking_type_construction_vendor_on_site_delivery">
+            <field name="name">Vendor On Site Delivery</field>
+            <field name="code">incoming</field>
+            <field name="sequence_code">VD/OS/</field>
+            <field name="default_location_dest_id" ref="stock_location_worksites"/>
+            <field name="return_picking_type_id" ref="stock.picking_type_out"/>
+            <field name="x_select_dest_on_po" eval="True"/>
+        </record>
+
+        <record model="stock.route" id="purchase_stock.route_warehouse0_buy" forcecreate="0">
+            <field name="product_selectable" eval="True"/>
+        </record>
+
+        <record model="stock.rule" id="stock_rule_buy_vendor_on_site_delivery">
+            <field name="name">Buy</field>
+            <field name="action">buy</field>
+            <field name="picking_type_id" ref="stock_picking_type_construction_vendor_on_site_delivery"/>
+            <field name="location_dest_id" ref="stock_location_worksites"/>
+            <field name="route_id" ref="purchase_stock.route_warehouse0_buy"/>
+        </record>
+
+
+        <record model="stock.picking.type" id="stock_picking_type_warehouse_on_site_delivery">
+            <field name="name">Warehouse On Site Delivery</field>
+            <field name="code">internal</field>
+            <field name="sequence_code">WH/OS/</field>
+            <field name="default_location_dest_id" ref="stock_location_worksites"/>
+            <field name="return_picking_type_id" ref="stock.picking_type_internal"/>
+        </record>
+
+        <record model="stock.route" id="stock_route_warehouse_on_site_delivery">
+            <field name="name">Warehouse On Site Delivery</field>
+            <field name="product_selectable" eval="True"/>
+            <field name="warehouse_selectable" eval="True"/>
+        </record>
+
+        <record model="stock.rule" id="stock_rule_warehouse_on_site_delivery">
+            <field name="name">Warehouse On Site Delivery</field>
+            <field name="action">pull</field>
+            <field name="picking_type_id" ref="stock_picking_type_warehouse_on_site_delivery"/>
+            <field name="location_src_id" ref="stock.stock_location_stock"/>
+            <field name="location_dest_id" ref="stock_location_worksites"/>
+            <field name="route_id" ref="stock_route_warehouse_on_site_delivery"/>
+        </record>
+
+
+        <record model="stock.picking.type" id="stock_picking_type_on_site_consumption_goods">
+            <field name="name">On Site Consumption Goods</field>
+            <field name="code">outgoing</field>
+            <field name="sequence_code">OSC/GOD/</field>
+            <field name="default_location_src_id" ref="stock_location_worksites"/>
+            <field name="default_location_dest_id" ref="stock.stock_location_customers"/>
+            <field name="x_source_loc_from_so" eval="True"/>
+        </record>
+
+        <record model="stock.route" id="stock_route_on_site_consumption_goods">
+            <field name="name">Replenish on Order (MTO) Goods</field>
+            <field name="product_categ_selectable" eval="True"/>
+            <field name="product_selectable" eval="True"/>
+            <field name="sale_selectable" eval="True"/>
+        </record>
+
+        <record model="stock.rule" id="stock_rule_on_site_consumption_goods">
+            <field name="name">Pull from Worksite Goods</field>
+            <field name="action">pull</field>
+            <field name="picking_type_id" ref="stock_picking_type_on_site_consumption_goods"/>
+            <field name="location_src_id" ref="stock_location_worksites"/>
+            <field name="location_dest_id" ref="stock.stock_location_customers"/>
+            <field name="route_id" ref="stock_route_on_site_consumption_goods"/>
+        </record>
+
+
+
+        <!-- remove the classic MTO to not clutter the view -->
+        <record model="stock.route" id="stock.route_warehouse0_mto" forcecreate="0">
+            <field name="product_selectable" eval="False"/>
+        </record>
+
+
+
+        <record model="ir.default" id="default_product_routes">
+            <field name="field_id" ref="stock.field_product_template__route_ids"/>
+            <field name="json_value" model="stock.route" eval="[
+                obj().env.ref('purchase_stock.route_warehouse0_buy').id,
+                obj().env.ref('construction_developer.stock_route_warehouse_on_site_delivery').id,
+                obj().env.ref('construction_developer.stock_route_on_site_consumption_goods').id,
+            ]"/>
+        </record>
+    </data>
+
 </odoo>
