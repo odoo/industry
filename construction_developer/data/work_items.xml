@@ -50,20 +50,42 @@ for sol in self:
         <field name="state">code</field>
         <field name="name">Construction Developer: apply locations on Manufactoring Order</field>
         <field name="code">
-copied_boms = {}
+# gather expected reference codes and template IDs to find BOMs that already exist in this SO
+expected_codes, tmpl_ids = [], []
 
 for mo in records:
-
     if (bom := mo.sale_line_id.x_bom_id):
-        cache_key = ((so := mo.sale_line_id.order_id).id, bom.id)
-        
-        # Only copy if we haven't already done it for this specific SO + BOM combo
-        if cache_key not in copied_boms:
-            copied_boms[cache_key] = bom.copy({'code': f"{so.name} - {so.partner_id.name}"})
+        so = mo.sale_line_id.order_id
 
-        mo['bom_id'] = copied_boms[cache_key]
-        mo.sale_line_id['x_bom_id'] = copied_boms[cache_key]
-        mo['location_src_id'] = so.partner_shipping_id.x_ws_location_id
+        # if the code doesn't match, it's a template BOM that needs checking
+        if bom.code != (expected_code := f"{so.name} - {so.partner_id.name}" + f" - {bom.code}" * bool(bom.code)):
+            expected_codes.append(expected_code)
+            tmpl_ids.append(bom.product_tmpl_id.id)
+
+# find any existing customized BOMs (not templates)
+copied_boms = {}
+if expected_codes:
+    for b in env['mrp.bom'].search([('code', 'in', expected_codes), ('product_tmpl_id', 'in', tmpl_ids)]):
+        copied_boms[(b.code, b.product_tmpl_id.id)] = b
+
+for mo in records:
+    if (bom := mo.sale_line_id.x_bom_id):
+        so = mo.sale_line_id.order_id
+        expected_code = f"{so.name} - {so.partner_id.name}" + f" - {bom.code}" * bool(bom.code)
+
+        # case A: this SOL was already updated in a previous batch
+        if bom.code == expected_code:
+            custom_bom = bom
+
+        # case B: it's a template BOM. Check our cache or create a new one.
+        else:            
+            if (cache_key := (expected_code, bom.product_tmpl_id.id)) not in copied_boms:
+                copied_boms[cache_key] = bom.copy({'code': expected_code})
+
+            custom_bom = copied_boms[cache_key]
+            mo.sale_line_id['x_bom_id'] = custom_bom
+
+        mo.write({'bom_id': custom_bom.id, 'location_src_id': so.partner_shipping_id.x_ws_location_id.id})
         mo.action_confirm()
 </field>
     </record>

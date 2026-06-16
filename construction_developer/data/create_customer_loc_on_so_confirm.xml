@@ -15,10 +15,9 @@
         <field name="state">code</field>
         <field name="name">Construction Developer: Create Delivery Location</field>
         <field name="code">
-for so in records.filtered(lambda so: (so.state != 'draft' or env.context.get('force_loc', False)) and not so.partner_shipping_id.x_ws_location_id):
+for so in records:
     wh = env['ir.model.data']._xmlid_to_res_id('construction_developer.stock_location_worksites')
-    loc = env['stock.location'].create({'name': f"{so.partner_shipping_id.name}", 'usage': 'internal', 'location_id': wh, 'replenish_location': True, 'company_id': env.company.id})
-    so.partner_shipping_id['x_ws_location_id'] = loc
+    so.partner_shipping_id['x_ws_location_id'] = env['stock.location'].create({'name': f"{so.partner_shipping_id.name}", 'usage': 'internal', 'location_id': wh, 'replenish_location': True, 'company_id': env.company.id})
 </field>
     </record>
 
@@ -26,6 +25,7 @@ for so in records.filtered(lambda so: (so.state != 'draft' or env.context.get('f
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="action_server_ids" eval="[(6, 0, [ref('action_create_delivery_location_on_sales_order_confirm')])]"/>
         <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[('state', '!=', 'draft'), ('partner_shipping_id.x_ws_location_id', '=', False)]</field>
         <field name="name">Construction Developer: Create delivery location on Sales Order confirm</field>
         <field name="trigger_field_ids" eval="[(6, 0, [ref('sale.field_sale_order__state')])]"/>
     </record>
