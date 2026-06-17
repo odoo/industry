@@ -11,7 +11,7 @@
     'data': [
         'data/res_config_settings.xml',
         'data/stock_location.xml',
-        'features/create_customer_loc_on_so_confirm.xml',
+        'features/create_worksite_location_on_so_confirm.xml',
         'features/work_items/route_configs.xml',
         'features/work_items/mrp_mo_link_loc_bom_on_so_confirm.xml',
         'features/work_items/product_bom_template.xml',
