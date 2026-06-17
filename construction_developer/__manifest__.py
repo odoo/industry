@@ -14,6 +14,9 @@
         'features/work_items/create_worksite_loc_on_so_confirm.xml',
         'features/work_items/route_configs.xml',
         'features/work_items/link_mrp_loc_bom_on_so_confirm.xml',
+        'features/work_items/product_bom_template_and_routes.xml',
+        'features/work_items/bom_margin.xml',
+        'features/work_items/update_bom_price_on_sol.xml',
         'data/views_standard.xml',
     ],
     'demo': [

@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!--
+        This feature adds a cost, margin, and price on the BOM.
+        The cost is computed using a standard function totalling the price of the components.
+        The margin and price can both be altered and recomputed from one another. 
+    -->
+
+    <record model="ir.model.fields" id="field_mrp_bom_x_currency_id">
+        <field name="name">x_currency_id</field>
+        <field name="model_id" ref="mrp.model_mrp_bom"/>
+        <field name="field_description">Currency</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.currency</field>
+        <field name="related">product_tmpl_id.currency_id</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+
+    <record model="ir.model.fields" id="field_mrp_bom_x_unit_cost">
+        <field name="name">x_unit_cost</field>
+        <field name="model_id" ref="mrp.model_mrp_bom"/>
+        <field name="field_description">Unit Cost</field>
+        <field name="ttype">monetary</field>
+        <field name="currency_field">x_currency_id</field>
+    </record>
+
+    <record model="ir.model.fields" id="field_mrp_bom_x_margin_percent">
+        <field name="name">x_margin_percent</field>
+        <field name="model_id" ref="mrp.model_mrp_bom"/>
+        <field name="field_description">Unit Margin</field>
+        <field name="ttype">float</field>
+    </record>
+
+    <record model="ir.model.fields" id="field_mrp_bom_x_unit_price">
+        <field name="model_id" ref="mrp.model_mrp_bom"/>
+        <field name="name">x_unit_price</field>
+        <field name="field_description">Unit Sale Price</field>
+        <field name="ttype">monetary</field>
+        <field name="currency_field">x_currency_id</field>
+    </record>
+
+
+
+    <!-- recompute margin only when changing the price -->
+    <record model="ir.actions.server" id="action_update_bom_margin">
+        <field name="name">Construction Developer: Update BOM Margin</field>
+        <field name="model_id" ref="mrp.model_mrp_bom" />
+        <field name="state">code</field>
+        <field name="code">
+for bom in record or records or []:
+    cost = bom.x_unit_cost or 0.0
+    new_margin = ((bom.x_unit_price or 0.0) - cost) / cost if cost else 0.0
+    
+    # only write if the margin actually changed to avoid loops
+    if float_compare((bom.x_margin_percent or 0.0), new_margin, precision_digits=2) != 0:
+        bom['x_margin_percent'] = new_margin
+</field>
+    </record>
+    <record model="base.automation" id="automation_mrp_bom_on_write_x_unit_price">
+        <field name="name">Construction Developer: Update margin on change</field>
+        <field name="model_id" ref="mrp.model_mrp_bom" />
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_update_bom_margin')])]"/>
+        <field name="trigger">on_change</field>
+        <field name="on_change_field_ids" eval="[(6, 0, [ref('field_mrp_bom_x_unit_price')])]"/>
+    </record>
+
+    <!-- recompute price when changing the margin or the cost -->
+    <record model="ir.actions.server" id="action_update_bom_price">
+        <field name="name">Construction Developer: Update BOM Price</field>
+        <field name="model_id" ref="mrp.model_mrp_bom" />
+        <field name="state">code</field>
+        <field name="code">
+for bom in record or records or []:
+    new_price = (bom.x_unit_cost or 0.0) * (1.0 + (bom.x_margin_percent or 0.0))
+
+    # only write if the price actually changed to avoid loops
+    if float_compare((bom.x_unit_price or 0.0), new_price, precision_digits=2) != 0:
+        bom['x_unit_price'] = new_price
+</field>
+    </record>
+    <record model="base.automation" id="automation_mrp_bom_on_write_x_margin_cost">
+        <field name="name">Construction Developer: Update price on change</field>
+        <field name="model_id" ref="mrp.model_mrp_bom" />
+        <field name="trigger">on_change</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_update_bom_price')])]"/>
+        <field name="on_change_field_ids" eval="[(6, 0, [ref('field_mrp_bom_x_margin_percent'), ref('field_mrp_bom_x_unit_cost')])]"/>
+    </record>
+</odoo>
