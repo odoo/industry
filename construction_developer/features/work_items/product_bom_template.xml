@@ -1,0 +1,169 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record model="ir.model.fields" id="field_product_template_x_bom_template_id">
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">mrp.bom</field>
+        <field name="name">x_bom_template_id</field>
+        <field name="field_description">BOM Template</field>
+    </record>
+
+    <record model="ir.model.fields" id="field_mrp_bom_x_is_template">
+        <field name="model_id" ref="mrp.model_mrp_bom"/>
+        <field name="ttype">boolean</field>
+        <field name="name">x_is_template</field>
+        <field name="field_description">Is Template</field>
+        <field name="readonly" eval="True"/>
+        <field name="depends">product_tmpl_id,product_tmpl_id.x_bom_template_id,type</field>
+        <field name="compute"><![CDATA[
+for bom in self:
+    prod_bom = bom.product_tmpl_id.x_bom_template_id
+    
+    if prod_bom.id == bom.id and bom.type == 'normal':
+        bom.write({'x_is_template': True, 'code': "Template"})
+    else:
+        bom['x_is_template'] = False
+        if prod_bom.id == bom.id:  # Used to be the template for this product. Unlink it
+            bom.product_tmpl_id['x_bom_template_id'] = False
+        if bom.code == "Template":
+            bom['code'] = False
+]]></field>
+    </record>
+
+    <record model="ir.model.fields" id="field_product_template_x_bom_available">
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="ttype">boolean</field>
+        <field name="name">x_bom_available</field>
+        <field name="field_description">Is a BOM Available</field>
+        <field name="store" eval="False"/>
+        <field name="compute"><![CDATA[
+for p in self: p['x_bom_available'] = bool(self.env['mrp.bom'].search_count([('product_tmpl_id', '=', p.id), ('type', '=', 'normal')], limit=1))
+]]></field>
+    </record>
+
+
+    <!-- When creating a BOM, automatically set it as the default template on the product if none-->
+    <record model="ir.actions.server" id="action_set_template_bom_on_product">
+        <field name="name">Construction Developer: Set Template BOM On Product</field>
+        <field name="model_id" ref="mrp.model_mrp_bom"/>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="sale.model_product_template"/>
+        <field name="update_path">product_tmpl_id.x_bom_template_id</field>
+        <field name="update_field_id" ref="field_product_template_x_bom_template_id"/>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[record.id]]></field>
+    </record>
+
+    <record model="base.automation" id="automation_set_default_product_bom_on_bom_create">
+        <field name="model_id" ref="mrp.model_mrp_bom"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_set_template_bom_on_product')])]"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[('product_tmpl_id.x_bom_template_id', '=', False)]</field>
+        <field name="name">Construction Developer: Set Default Product Bom on Template BOM create</field>
+    </record>
+
+
+    <!-- Automation 1: when ADDING a BOM, sets the correct Purchase & route values-->
+    <record model="ir.actions.server" id="action_set_product_template_purchase_ok_false">
+        <field name="name">Construction Developer: Set Purchase On Product False</field>
+        <field name="model_id" ref="sale.model_product_template"/>
+        <field name="state">object_write</field>
+        <field name="update_path">purchase_ok</field>
+        <field name="update_field_id" ref="product.field_product_template__purchase_ok"/>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[False]]></field>
+    </record>
+
+    <record model="ir.actions.server" id="action_set_product_routes_on_add_bom_write">
+        <field name="name">Construction Developer: Set Product Routes on Add BOM Write</field>
+        <field name="model_id" ref="sale.model_product_template"/>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="stock.model_stock_route"/>
+        <field name="update_path">route_ids</field>
+        <field name="update_field_id" ref="stock.field_product_template__route_ids"/>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[[(6, 0, [record.env.ref('construction_developer.stock_route_on_site_consumption_bom').id])]]]></field>
+    </record>
+
+    <record model="base.automation" id="automation_set_product_routes_on_add_bom_write">
+        <field name="model_id" ref="sale.model_product_template"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('construction_developer.action_set_product_routes_on_add_bom_write'), ref('construction_developer.action_set_product_template_purchase_ok_false')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[('x_bom_template_id', '!=', False)]</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('construction_developer.field_product_template_x_bom_template_id')])]"/>
+        <field name="name">Construction Developer: Set Product Routes on Add BOM Write</field>
+    </record>
+
+
+    <!-- Automation 2: when REMOVING a BOM (e.g. changing the product on the BOM, removing 'normal'), sets the correct Purchase & route values -->
+    <!-- NB: it's impossible to leave the field empty once a BOM exists so the case BOM -> no BOM cannot exist unless deleting it (Automation 3) -->
+    <record model="ir.actions.server" id="action_set_product_template_purchase_ok_true">
+        <field name="name">Construction Developer: Set Purchase On Product True</field>
+        <field name="model_id" ref="sale.model_product_template"/>
+        <field name="state">object_write</field>
+        <field name="update_path">purchase_ok</field>
+        <field name="update_field_id" ref="product.field_product_template__purchase_ok"/>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[True]]></field>
+    </record>
+
+    <record model="ir.actions.server" id="action_set_product_routes_on_remove_bom_write">
+        <field name="name">Construction Developer: Set Product Routes on Remove BOM Write</field>
+        <field name="model_id" ref="sale.model_product_template"/>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="stock.model_stock_route"/>
+        <field name="update_path">route_ids</field>
+        <field name="update_field_id" ref="stock.field_product_template__route_ids"/>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[[(6, 0, [
+            record.env.ref('purchase_stock.route_warehouse0_buy').id,
+            record.env.ref('construction_developer.stock_route_warehouse_on_site_delivery').id,
+            record.env.ref('construction_developer.stock_route_on_site_consumption_goods').id,
+        ])]]]></field>
+    </record>
+
+    <record model="base.automation" id="automation_set_product_routes_on_remove_bom_write">
+        <field name="model_id" ref="sale.model_product_template"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('construction_developer.action_set_product_routes_on_remove_bom_write'), ref('construction_developer.action_set_product_template_purchase_ok_true')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[('x_bom_template_id', '=', False)]</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('construction_developer.field_product_template_x_bom_template_id')])]"/>
+        <field name="name">Construction Developer: Set Product Routes on Remove BOM Write</field>
+    </record>
+    
+
+    <!-- Automation 3: when DELETING a BOM, sets the correct Purchase & route values on its product if it's a template -->
+    <record model="ir.actions.server" id="action_set_bom_product_template_purchase_ok_true">
+        <field name="name">Construction Developer: Remove BOM: Set Purchase On Product True</field>
+        <field name="model_id" ref="mrp.model_mrp_bom"/>
+        <field name="state">object_write</field>
+        <field name="update_path">product_tmpl_id.purchase_ok</field>
+        <field name="update_field_id" ref="product.field_product_template__purchase_ok"/>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[True]]></field>
+    </record>
+
+    <record model="ir.actions.server" id="action_set_bom_product_routes_on_remove_bom_write">
+        <field name="name">Construction Developer: Remove BOM: Set Product Routes on Remove BOM Write</field>
+        <field name="model_id" ref="mrp.model_mrp_bom"/>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="stock.model_stock_route"/>
+        <field name="update_path">product_tmpl_id.route_ids</field>
+        <field name="update_field_id" ref="stock.field_product_template__route_ids"/>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[[(6, 0, [
+            record.env.ref('purchase_stock.route_warehouse0_buy').id,
+            record.env.ref('construction_developer.stock_route_warehouse_on_site_delivery').id,
+            record.env.ref('construction_developer.stock_route_on_site_consumption_goods').id,
+        ])]]]></field>
+    </record>
+
+    <record model="base.automation" id="automation_set_product_routes_on_unlink_bom">
+        <field name="model_id" ref="mrp.model_mrp_bom"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('construction_developer.action_set_bom_product_routes_on_remove_bom_write'), ref('construction_developer.action_set_bom_product_template_purchase_ok_true')])]"/>
+        <field name="trigger">on_unlink</field>
+        <field name="filter_pre_domain">[('x_is_template', '=', True)]</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('construction_developer.field_product_template_x_bom_template_id')])]"/>
+        <field name="name">Construction Developer: Set Product Routes on Remove BOM Write</field>
+    </record>
+</odoo>
