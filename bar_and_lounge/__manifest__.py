@@ -82,5 +82,6 @@ This Services can be avail directly from the airport and individuals can also pu
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }

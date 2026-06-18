@@ -71,5 +71,6 @@ They maintain the stock lot wise and also manage the expiry of the lots.
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }

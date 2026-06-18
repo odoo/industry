@@ -62,5 +62,6 @@ Moreover, the business is legally regulated in lots of countries under different
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }

@@ -82,5 +82,6 @@ This module is for marketing companies selling and producing customized corporat
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }

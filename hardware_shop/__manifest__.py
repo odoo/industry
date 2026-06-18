@@ -64,5 +64,6 @@ Using Point of Sale, Inventory, Sales, Purchase, Accounting, Contact, Employee, 
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }

@@ -59,5 +59,6 @@ This industry caters to billboard rental businesses, specializing in managing ou
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }

@@ -84,5 +84,6 @@ This module is a setup specific to support the business activities of a microbre
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }

@@ -13,6 +13,7 @@ CATEGORIES = ('Services', 'Retail', 'Construction', 'Hospitality', 'Health and F
 
 MANDATORY_KEYS = {
     'author': 'Odoo S.A.',
+    'application': True,
     'category': '',
     'data': [],
     'demo': [],

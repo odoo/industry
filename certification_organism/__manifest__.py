@@ -54,6 +54,7 @@ This module setup your database to easily use odoo in a Audit & Certification co
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 
 }

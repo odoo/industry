@@ -49,5 +49,6 @@ The typical sale is a 1 year Oracle Database license that is purchased to Oracle
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }

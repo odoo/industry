@@ -62,5 +62,6 @@ This module sets up a furniture store for selling furniture like chairs, sofas, 
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }

@@ -63,5 +63,6 @@ This module is a complete solution for the bike leasing industry, simplifying le
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }
