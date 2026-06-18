@@ -78,6 +78,7 @@
     'images': [
         'images/main.png',
     ],
+    'application': True,
     'url': "https://www.odoo.com/trial?industry&selected_app=custom_industrial_equipment",
     'website': "https://www.odoo.com/all-industries",
 }
