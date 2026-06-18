@@ -59,5 +59,6 @@ schematic design, design development, worksite follow-up, energy efficiency asse
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }

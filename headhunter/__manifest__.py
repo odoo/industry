@@ -64,5 +64,6 @@ Those agencies work on two levels and with two different audiences, ...
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }

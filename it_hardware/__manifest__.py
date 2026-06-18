@@ -67,5 +67,6 @@ We offer IT sales, installation, and repair services for a wide range of product
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }

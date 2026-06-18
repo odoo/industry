@@ -43,5 +43,6 @@ This setup is for bakery store companies selling to consumers. Bakery are busine
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }

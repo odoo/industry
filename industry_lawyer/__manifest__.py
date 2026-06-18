@@ -47,5 +47,6 @@ This module installs a configuration that presets the modules and configure Odoo
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }

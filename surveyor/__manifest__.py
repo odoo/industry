@@ -53,5 +53,6 @@ It may include surveying of building properties and the measurement of completed
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }

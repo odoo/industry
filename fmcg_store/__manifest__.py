@@ -60,5 +60,6 @@ This module setup a Point of Sale (POS) system for a grocery store which is esse
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }

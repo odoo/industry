@@ -58,5 +58,6 @@ This setup if for Clothing Store companies selling female clothing.""",
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }

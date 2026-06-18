@@ -77,5 +77,6 @@ The sales process involves creating sale orders, managing deliveries and invoici
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
 }
