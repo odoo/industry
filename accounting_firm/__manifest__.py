@@ -71,6 +71,7 @@
     'cloc_exclude': [
         'data/knowledge_article.xml',
     ],
+    'application': True,
     'images': [
         'images/main.png'
     ],
