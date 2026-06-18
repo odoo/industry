@@ -70,6 +70,7 @@
       "static/src/js/my_tour.js",
       "demo/website_view.xml",
   ],
+  'application': True,
   'images': ['images/main.png'],
   'license': 'OEEL-1',
 }
