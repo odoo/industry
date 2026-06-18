@@ -64,6 +64,7 @@
     ],
     'images': ['images/main.png'],
     'license': 'OEEL-1',
+    'application': True,
     'author': 'Odoo S.A.',
     'url': "https://www.odoo.com/trial?industry&selected_app=construction_developer",
     'website': "https://www.odoo.com/all-industries",

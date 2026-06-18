@@ -55,6 +55,7 @@
         ]
     },
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
     "cloc_exclude": [
         "data/knowledge_article.xml",

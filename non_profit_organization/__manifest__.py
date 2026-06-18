@@ -98,6 +98,7 @@
         "data/qweb_view.xml",
         "demo/qweb_view.xml",
     ],
+    'application': True,
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=non_profit_organization",
     'website': "https://www.odoo.com/industries/nonprofit-organization",

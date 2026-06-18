@@ -73,6 +73,7 @@
         'data/website_event_templates.xml',
         "demo/website_view.xml",
     ],
+    'application': True,
     'images': [
         'images/main.png',
     ],
