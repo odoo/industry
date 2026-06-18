@@ -57,7 +57,7 @@ class Test_Industry(Command):
         if test_tags == "+standard" and test_enable:
             test_tags = None
         config['test_tags'] = ''
-        config["registry_lru_size"] = 1  # don't keep all registry in memory, and ensure a single registry when running tests
+        os.environ['ODOO_REGISTRY_LRU_SIZE'] = str(1)  # don't keep all registry in memory, and ensure a single registry when running tests
 
         init_db = config["db_name"]
         registry = None
