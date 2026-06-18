@@ -78,6 +78,7 @@
         "data/website_view.xml",
         "demo/website_view.xml",
     ],
+    'application': True,
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=agriculture_shop",
     'website': "https://www.odoo.com/industries/agriculture-store",
