@@ -78,6 +78,7 @@
         'data/portal_templates.xml',
         'demo/qweb_view.xml',
     ],
+    'application': True,
     'license': 'OEEL-1',
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=3pl_logistic_company",

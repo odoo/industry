@@ -56,6 +56,7 @@
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=fast_food",
     'website': "https://www.odoo.com/industries/fast-food",

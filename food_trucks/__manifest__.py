@@ -37,6 +37,7 @@
     "cloc_exclude": [
         "data/knowledge_article.xml",
     ],
+    'application': True,
     'images': ['images/main.png'],
     'license': 'OEEL-1',
     'url': "https://www.odoo.com/trial?industry&selected_app=food_trucks",
