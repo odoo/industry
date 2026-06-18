@@ -74,6 +74,7 @@
         'demo/website_view.xml',
         'static/src/js/my_tour.js',
     ],
+    'application': True,
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=cosmetics_store",
     'website': "https://www.odoo.com/all-industries",

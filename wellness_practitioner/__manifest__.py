@@ -35,6 +35,7 @@
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
     ],
+    'application': True,
     'license': 'OEEL-1',
     'url': "https://www.odoo.com/trial?industry&selected_app=wellness_practitioner",
     'website': "https://www.odoo.com/industries/wellness-practitioners",

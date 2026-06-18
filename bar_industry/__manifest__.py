@@ -62,6 +62,7 @@
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
     ],
+    'application': True,
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=bar_industry",
     'website': "https://www.odoo.com/industries/bar-pub",

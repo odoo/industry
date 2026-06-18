@@ -58,6 +58,7 @@
         "demo/website_view.xml",
     ],
     'images': ['images/main.png'],
+    'application': True,
     'license': 'OEEL-1',
     'url': "https://www.odoo.com/trial?industry&selected_app=dropshipping",
     'website': "https://www.odoo.com/all-industries",
