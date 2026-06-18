@@ -57,6 +57,7 @@
         'data/knowledge_article.xml',
         'static/src/js/my_tour.js',
     ],
+    'application': True,
     'images': [
         'images/main.png'
     ],
