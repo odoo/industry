@@ -46,5 +46,6 @@
       "static/src/js/my_tour.js",
   ],
   'images': ['images/main.png'],
+  'application': True,
   'license': 'OEEL-1',
 }
