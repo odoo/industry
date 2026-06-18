@@ -55,5 +55,6 @@
         "data/knowledge_article.xml",
     ],
     'images': ['images/main.png'],
+    'application': True,
     'license': 'OEEL-1',
 }
