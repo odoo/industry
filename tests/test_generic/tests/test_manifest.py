@@ -8,10 +8,11 @@ from pathlib import Path
 from odoo.addons.test_lint.tests.test_manifests import ManifestLinter
 from odoo.modules.module import MANIFEST_NAMES, Manifest
 
-from .industry_case import CATEGORIES, IndustryCase, get_industry_path
+from .industry_case import IndustryCase, get_industry_path
 
 _logger = logging.getLogger(__name__)
 
+CATEGORIES = {'Services', 'Retail', 'Construction', 'Hospitality', 'Health and Fitness', 'Supply Chain'}
 
 MANDATORY_KEYS = {
     'author': 'Odoo S.A.',
@@ -23,6 +24,7 @@ MANDATORY_KEYS = {
 }
 
 MANDATORY_KEYS_INDUSTRIES = {
+    'application': True,
     'cloc_exclude': [],
     'demo': [],
     'images': ['images/main.png'],

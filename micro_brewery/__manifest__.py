@@ -96,6 +96,7 @@
         "data/website_view.xml",
         "demo/website_view.xml",
     ],
+    'application': True,
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=micro_brewery",
     'website': "https://www.odoo.com/industries/micro-brewery",

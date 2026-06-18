@@ -66,6 +66,7 @@
         "data/website_view.xml",
         "static/src/js/my_tour.js",
     ],
+    'application': True,
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=certification_organism",
     'website': "https://www.odoo.com/industries/audit-certification",

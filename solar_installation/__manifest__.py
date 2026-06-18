@@ -97,6 +97,7 @@
         "static/src/js/my_tour.js",
         "demo/website_view.xml",
     ],
+    'application': True,
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=solar_installation",
     'website': "https://www.odoo.com/industries/solar-energy",

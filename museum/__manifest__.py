@@ -85,6 +85,7 @@
         'demo/website_view.xml',
         'static/src/js/my_tour.js',
     ],
+    'application': True,
     'images': [
         'images/main.png',
     ],
