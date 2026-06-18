@@ -74,6 +74,7 @@
         "data/knowledge_article.xml",
         "demo/website_view.xml",
     ],
+    'application': True,
     'images': ['images/main.png'],
     'license': 'OEEL-1',
     'url': "https://www.odoo.com/trial?industry&selected_app=eyewear_shop",

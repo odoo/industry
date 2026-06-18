@@ -76,6 +76,7 @@
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
+    'application': True,
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=beverage_distributor",
     'website': "https://www.odoo.com/industries/beverage-distributor",

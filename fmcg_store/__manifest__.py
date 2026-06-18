@@ -68,6 +68,7 @@
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
     ],
+    'application': True,
     'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=fmcg_store",
     'website': "https://www.odoo.com/industries/grocery-store",
