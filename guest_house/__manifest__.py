@@ -21,7 +21,7 @@
         'data/resource_calendar_data.xml',
         'data/resource_resource.xml',
         'data/account_tax.xml',
-        'data/product_category.xml',   
+        'data/product_category.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
         'data/knowledge_tour.xml',
@@ -61,6 +61,7 @@
         'demo/website_view.xml',
         'data/website_view.xml',
     ],
+    'application': True,
     'images': [
         'images/main.png',
     ],

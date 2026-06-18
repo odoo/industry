@@ -56,5 +56,6 @@
         'demo/website_views.xml',
     ],
     'images': ['images/main.png'],
+    'application': True,
     'license': 'OEEL-1',
 }

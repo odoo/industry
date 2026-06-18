@@ -62,5 +62,6 @@
         "data/knowledge_article.xml",
         "data/qweb_view.xml",
     ],
+    'application': True,
     'images': ['images/main.png'],
 }
