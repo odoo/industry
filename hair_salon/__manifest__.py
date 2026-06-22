@@ -1,7 +1,23 @@
 {
     'name': 'Hair Salon',
+<<<<<<< 963a469a5cd46e1f01cc10a2bf188f2eeeee46a4
     'version': '1.1',
     'category': 'Services',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'version': '1.0',
+    'category': 'Services',
+    'description': """
+        This module is for hair salons providing hair-related services such as hair cutting, brushing, coloring, hair and
+        scalp treatments, beard and mustache shaping.
+    """,
+=======
+    'version': '1.0',
+    'category': 'Health, Wellness and Personal Care',
+    'description': """
+        This module is for hair salons providing hair-related services such as hair cutting, brushing, coloring, hair and
+        scalp treatments, beard and mustache shaping.
+    """,
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'base_automation',
         'base_geolocalize',
