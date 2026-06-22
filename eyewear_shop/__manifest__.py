@@ -1,7 +1,21 @@
 {
     'name': 'Eyewear Store',
     'version': '1.0',
+<<<<<<< 98b59479dbd6d4bdf66cd9f7ecaf90bf01df2adc
     'category': 'Health and Fitness',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'category': 'Health and Fitness',
+    'description': """
+This module is for stylish and affordable eyewear. It will deal with various types of eyewear like Sunglasses, Contact Lenses, Specialty eyewear, etc.
+The sales process involves creating sale orders, managing deliveries and invoicing. Additionally, they operate an eCommerce shop for online sales in the eyewear industry.
+""",
+=======
+    'category': 'Health, Wellness and Personal Care',
+    'description': """
+This module is for stylish and affordable eyewear. It will deal with various types of eyewear like Sunglasses, Contact Lenses, Specialty eyewear, etc.
+The sales process involves creating sale orders, managing deliveries and invoicing. Additionally, they operate an eCommerce shop for online sales in the eyewear industry.
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'appointment_crm',
         'knowledge',
