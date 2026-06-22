@@ -9,7 +9,19 @@ from odoo.tests.common import tagged
 
 from .industry_case import IndustryCase, get_industry_path
 
-CATEGORIES = ('Services', 'Retail', 'Construction', 'Hospitality', 'Health and Fitness', 'Supply Chain')
+CATEGORIES = (
+    'Business Services',
+    'Culture and Arts',
+    'Education and Training',
+    'Events, Community and Nonprofits',
+    'Food and Beverage',
+    'Health, Wellness and Personal Care',
+    'Hospitality, Tourism and Leisure',
+    'Manufacturing and Supply Chain',
+    'Real Estate, Construction and Maintenance',
+    'Retail and eCommerce',
+    'Trades and Home Services',
+)
 
 MANDATORY_KEYS = {
     'author': 'Odoo S.A.',

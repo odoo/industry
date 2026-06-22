@@ -1,7 +1,7 @@
 {
     'name': 'Nonprofit Organization',
     'version': '1.0',
-    'category': 'Services',
+    'category': 'Events, Community and Nonprofits',
     'description': """
     Non Profit Organization
 

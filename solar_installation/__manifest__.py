@@ -1,7 +1,7 @@
 {
     'name': 'Solar Energy Systems',
     'version': '1.0',
-    'category': 'Construction',
+    'category': 'Real Estate, Construction and Maintenance',
     'description': """
 This configuration is designed for companies specializing in solar equipment and installation services.
 They cater to both residential and commercial customers,

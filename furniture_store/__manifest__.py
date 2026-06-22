@@ -1,7 +1,7 @@
 {
     'name': 'Furniture Store',
     'version': '1.0',
-    'category': 'Retail',
+    'category': 'Retail and eCommerce',
     'description': """
 This module sets up a furniture store for selling furniture like chairs, sofas, dining tables, ...
 """,

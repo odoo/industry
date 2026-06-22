@@ -1,7 +1,7 @@
 {
     'name': 'Sports Club',
     'version': '1.0',
-    'category': 'Health and Fitness',
+    'category': 'Events, Community and Nonprofits',
     'description': """
         This setup is for sports clubs that rent courts to their players, handle some basic gears and have a cafeteria.
         As a small company, The Club still has quite a lot of activities to manage and does all this with Odoo.

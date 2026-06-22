@@ -1,7 +1,7 @@
 {
     'name': 'Photography',
     'version': '1.0',
-    'category': 'Services',
+    'category': 'Culture and Arts',
     'description': """
         The Odoo app for photography professionals provides a preconfigured database with all the
         necessary features to manage their business. The app includes pre-configured products and
