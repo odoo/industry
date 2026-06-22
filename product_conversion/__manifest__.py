@@ -1,6 +1,6 @@
 {
     'name': 'Product Conversion & Grading Management',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Supply Chain',
     'depends': [
         'mrp',
@@ -17,7 +17,7 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'product_conversion/static/src/js/barcode_picking_model.js',
+            'product_conversion/static/src/js/patch.js',
             'product_conversion/static/src/xml/main.xml',
         ]
     },
