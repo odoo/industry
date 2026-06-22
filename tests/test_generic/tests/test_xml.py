@@ -5,10 +5,13 @@ import html
 import logging
 import os
 import pathlib
+import polib
 import re
 from lxml import etree
 from collections import defaultdict
+from pathlib import Path
 
+from odoo.modules import get_module_path
 from odoo.tests import tagged
 from odoo.tools.mail import single_email_re
 from .industry_case import IndustryCase, get_industry_path
@@ -109,6 +112,23 @@ RISKY_FIELDS = {
     "filter_pre_domain",
 }
 
+MODELS_WITH_NON_TRANSLATABLE_NAME_FIELD = {
+    'account.analytic.line',
+    'crm.lead',
+    'fleet.vehicle',
+    'fleet.vehicle.model',
+    'hr.employee',
+    'hr.employee.category',
+    'ir.ui.view',
+    'planning.slot.template',
+    'pos.config',
+    'product.category',
+    'quality.point',
+    'resource.calendar',
+    'stock.location',
+    'worksheet.template',
+}
+
 
 def _has_valid_search(eval_string):
     clean_eval = html.unescape(eval_string).strip()
@@ -135,6 +155,26 @@ def _has_valid_search(eval_string):
                     )
                     return has_limit_1
     return True
+
+
+def get_original_name_from_pot(module_name, model_name, xmlid, is_industry):
+    if is_industry:
+        module_path = Path(get_industry_path() + module_name)
+    else:
+        module_path = get_module_path(module_name)
+    if not module_path:
+        return None
+    pot_file_path = os.path.join(module_path, "i18n", f"{module_name}.pot")
+
+    if not os.path.exists(pot_file_path):
+        return None
+    pot = polib.pofile(pot_file_path)
+    occurrence_target = f"model:{model_name},name:{xmlid}"
+
+    return next(
+        (entry.msgid for entry in pot if any(occ[0] == occurrence_target for occ in entry.occurrences)),
+        None,
+    )
 
 
 @tagged('post_install', '-at_install')
@@ -208,6 +248,7 @@ class TestEnv(IndustryCase):
                     self._check_view_active(tree, file_name)
                     self._check_is_published_false(tree, file_name)
                     self._check_base_records_update(tree, file_name, module)
+                    self._check_name_override_on_external_record(tree, file_name, module)
                     if not is_studio_required:
                         is_studio_required = self._check_studio(tree, file_name)
             if "/demo" in root:
@@ -852,3 +893,35 @@ class TestEnv(IndustryCase):
             cond2 = any((val := f.xpath('//value')) and val[0].get('eval', '') for f in session_functions)
             if not (cond1 or cond2):
                 error_message(u[0], u[1])
+
+    def _check_name_override_on_external_record(self, root, file_name, module):
+        for record in root.xpath(".//record"):
+            record_id = record.get('id')
+            record_model = record.get('model')
+            record_module = record_id.split('.')[0] if "." in record_id else module
+
+            if record_module == module or record_model in MODELS_WITH_NON_TRANSLATABLE_NAME_FIELD:
+                continue
+
+            if name_fields := record.xpath(".//field[@name='name']"):
+                try:
+                    context = ast.literal_eval(record.get('context', '{}'))
+                except (ValueError, SyntaxError):
+                    context = {}
+
+                if context.get("skip_override_name_test", False):
+                    continue
+
+                overriding_name = name_fields[0].text
+                standard_name = get_original_name_from_pot(record_module, record_model, record_id, (record_module in self.installed_modules))
+
+                if overriding_name and standard_name and overriding_name.lower() != standard_name.lower():
+                    _logger.warning(
+                        "External record '%s' (model '%s', file '%s') overrides the 'name' field. "
+                        "Translations for the overridden value will not be exported. Create a new record, "
+                        "keep the original name, or acknowledge the override with "
+                        "context=\"{'skip_override_name_test': True}\".",
+                        record_id,
+                        record_model,
+                        file_name,
+                    )
