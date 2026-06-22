@@ -8,8 +8,8 @@
 for wizard in records:
     move = wizard.x_move_id
 
-    if wizard.x_quantity <= 0 or wizard.x_quantity > wizard.x_quant_id.quantity:
-        raise UserError(f"Quantity to convert must be positive and less than or equal to available quantity (available quantity is {wizard.x_quant_id.quantity}).")
+    if wizard.x_quantity <= 0 or wizard.x_quantity > (wizard.x_quant_id.inventory_quantity or wizard.x_quant_id.quantity):
+        raise UserError(f"Quantity to convert must be positive and less than or equal to available quantity (available quantity is {wizard.x_quant_id.inventory_quantity or wizard.x_quant_id.quantity}).")
 
     mo = env['mrp.production'].create({
         'product_id': wizard.x_product_convert_into.id,
@@ -99,7 +99,7 @@ action = env['ir.actions.act_window']._for_xml_id('product_conversion.action_con
 action['context'] = {
     'default_x_product_id': quant.product_id.id,
     'default_x_quant_id': quant.id,
-    'default_x_quantity': quant.quantity,
+    'default_x_quantity': quant.inventory_quantity or quant.quantity,
 }
         ]]></field>
     </record>
