@@ -46,7 +46,7 @@ class ComputedFieldsTestCase(TransactionCase):
         cls.role = cls.env['planning.role'].create({
             'name': 'Role',
             'sync_shift_rental': True,
-            'x_is_a_room_offer': True
+            'x_resource_category': 'stay_offer',
         })
         cls.project = cls.env['project.project'].create({
             'name': 'Housekeeping Project',

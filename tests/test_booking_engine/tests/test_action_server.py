@@ -25,7 +25,7 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         cls.role = cls.env['planning.role'].create({
             'name': 'Role',
             'sync_shift_rental': True,
-            'x_is_a_room_offer': True,
+            'x_resource_category': 'stay_offer',
             'resource_ids': [Command.link(cls.resource.id)],
         })
         cls.product = cls.env['product.product'].create({
@@ -124,7 +124,7 @@ class BookingEngineAutomationsTestCase(TransactionCase):
                          "The planning role should be created with the product name")
         self.assertTrue(role.sync_shift_rental,
                         "The planning role should sync shifts and rentals by default")
-        self.assertTrue(role.x_is_a_room_offer,
+        self.assertEqual(role.x_resource_category, 'stay_offer',
                         "The planning role should be marked as a room offer")
         self.assertIn(room_offer_product_template, role.product_ids,
                       "The planning role should be linked to the product")
@@ -174,14 +174,27 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         order, sale_line = self._create_sale_line(self.product)
         role_has_checkout_cleaning = self.env['planning.role'].create({
             'name': 'Role Has Checkout Cleaning',
-            'x_is_a_room_offer': True,
-            'x_has_checkout_cleaning': True,
+            'x_resource_category': 'stay_offer',
         })
         resource_due_out = self.env['resource.resource'].create({
             'name': 'Room Resource Due Out',
             'resource_type': 'material',
             'role_ids': [Command.link(role_has_checkout_cleaning.id)],
         })
+        self.product.planning_role_id = role_has_checkout_cleaning.id
+        self.product.x_checkout_cleaning = 1.0
+
+        house_keeping_role = self.env['planning.role'].create({
+            'name': 'House Keeping',
+            'x_resource_category': 'house_keeping',
+            'resource_ids': [Command.link(self.resource.id)],
+        })
+        self.env['resource.resource'].create({
+            'name': 'Clea Noir',
+            'resource_type': 'user',
+            'role_ids': [Command.link(house_keeping_role.id)],
+        })
+        self.product.x_house_keeping_role_id = house_keeping_role.id
 
         with freeze_time('2026-03-02 00:00:00'):
             last_midnight = datetime(2026, 3, 2, 0, 0)

@@ -63,7 +63,7 @@
                 <field name="x_sequence" widget="handle"/>
                 <field optional="show" name="x_guest_partner_id" widget="many2one_avatar" required="1"/>
                 <field optional="show" name="x_guest_identity_check" widget="badge" readonly="True" decoration-success="x_guest_identity_check == 'ok'" decoration-warning="x_guest_identity_check == 'na'" decoration-danger="x_guest_identity_check == 'invalid'"/>
-                <field optional="show" name="x_room_resource_id" domain="[('default_role_id.x_is_a_room_offer', '!=', False), ('id', 'in', x_sol_resource_ids)]" options="{'no_create': True, 'no_create_edit': True}"/>
+                <field optional="show" name="x_room_resource_id" domain="[('default_role_id.x_resource_category', '=', 'stay_offer'), ('id', 'in', x_sol_resource_ids)]" options="{'no_create': True, 'no_create_edit': True}"/>
               </list>
             </field>
           </page>
@@ -163,76 +163,10 @@
     <field name="type">form</field>
     <field name="active" eval="True"/>
   </record>
-  <record id="product_form_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <xpath expr="//group[@name='group_general']" position="inside">
-        <field name="x_is_a_room_offer" invisible="type != 'service'"/>
-        <field name="x_is_stay_tax" invisible="type != 'service'"/>
-      </xpath>
-      <xpath expr="//group[@name='group_general']" position="attributes">
-        <attribute name="invisible">x_is_a_room_offer</attribute>
-      </xpath>
-      <xpath expr="//group[@name='group_general']" position="before">
-        <group invisible="not x_is_a_room_offer">
-          <field name="x_is_a_room_offer"/>
-          <field name="x_has_city_tax" />
-          <field name="x_offer_type" />
-          <field name="x_related_has_stayover_cleaning" groups="booking_engine.group_house_keeping"/>
-          <field name="x_related_has_checkout_cleaning" groups="booking_engine.group_house_keeping"/>
-        </group>
-      </xpath>
-      <xpath expr="//label[@for='standard_price']" position="attributes">
-        <attribute name="invisible">x_is_a_room_offer</attribute>
-      </xpath>
-      <xpath expr="//div[@name='standard_price_uom']" position="attributes">
-        <attribute name="invisible">x_is_a_room_offer</attribute>
-      </xpath>
-      <xpath expr="//field[@name='tax_string']" position="attributes">
-        <attribute name="invisible">x_is_a_room_offer</attribute>
-      </xpath>
-      <xpath expr="//field[@name='planning_role_id']" position="attributes">
-        <attribute name="required">planning_enabled and not x_is_a_room_offer</attribute>
-      </xpath>
-      <xpath expr="//group[@name='internal_notes']" position="before">
-        <group string="Resource" invisible="not x_is_a_room_offer">
-          <span invisible="id" class="text-nowrap">Please save this product to edit the resources.</span>
-          <field name="x_resource_ids" nolabel="1" colspan="4"
-              domain="[('x_is_stay_resource', '=', True)]"
-              invisible="not id"
-              context="{
-              'default_x_is_stay_resource': 1,
-              'default_resource_type': 'material',
-              'default_role_ids': [planning_role_id],
-              'list_view_ref': 'booking_engine.booking_engine_resource_list',
-              'form_view_ref': 'booking_engine.booking_engine_resource_form',
-              'has_product': 1,
-              }"
-          >
-            <list editable="bottom" multi_edit="1" open_form_view="True">
-              <control>
-                <create name="add_new_resource" string="Add a resource"/>
-              </control>
-              <field name="name"/>
-              <field name="role_ids" string="Stay offers" widget="many2many_tags" options="{'color_field': 'color'}"/>
-              <field name="calendar_id" optional="hide"/>
-              <field name="company_id" optional="hide"/>
-            </list>
-          </field>
-        </group>
-      </xpath>
-    </field>
-    <field name="inherit_id" ref="sale_planning.product_template_form_view_invoice_policy_inherit_sale_planning"/>
-    <field name="mode">extension</field>
-    <field name="model">product.template</field>
-    <field name="name">product.template.product.form.inherit.booking_engine</field>
-    <field name="priority">160</field>
-    <field name="type">form</field>
-    <field name="active" eval="True"/>
-  </record>
   <record id="product_product_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <xpath expr="//label[@for='lst_price']" position="attributes">
-        <attribute name="invisible">x_is_a_room_offer</attribute>
+        <attribute name="invisible">planning_role_id.x_resource_category</attribute>
       </xpath>
       <xpath expr="//div[@name='list_price_per_uom_id']" position="attributes">
         <attribute name="invisible">x_is_a_room_offer</attribute>
@@ -255,7 +189,7 @@
         <field name="sale_order_id" widget="many2one" context="{'form_view_ref': 'booking_engine.rental_order_view', 'in_rental_app': 1}"/>
       </xpath>
     </field>
-    <field name="inherit_id" ref="sale_planning.planning_slot_view_kanban_inherit_sale_planning"/>
+    <field name="inherit_id" ref="sale_planning.planning_slot_view_card_inherit_sale_planning"/>
     <field name="model">planning.slot</field>
     <field name="priority">200</field>
   </record>
@@ -289,15 +223,20 @@
   </record>
   <record id="planning_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
-        <xpath expr="//field[@name='sync_shift_rental']" position="after">
-          <field name="x_is_a_room_offer" invisible="not sync_shift_rental" groups="booking_engine.group_house_keeping"/>
+        <xpath expr="//field[@name='resource_ids']" position="attributes">
+          <attribute name="domain">[("x_category", "=?", x_resource_category)]</attribute>
         </xpath>
-        <xpath expr="/form/sheet/group" position="after">
-          <group string="House Keeping" groups="booking_engine.group_house_keeping" invisible="not x_is_a_room_offer">
-            <group>
-              <field name="x_has_stayover_cleaning"/>
-              <field name="x_has_checkout_cleaning"/>
-            </group>
+        <xpath expr="//sheet" position="inside">
+          <group string="House Keeping"
+                 invisible="x_resource_category != 'house_keeping'"
+                 groups="booking_engine.group_house_keeping">
+            <field name="x_stay_offer_ids" nolabel="1" colspan="4">
+              <list editable="bottom" create="False" open_form_view="True">
+                <field name="name" readonly="True"/>
+                <field name="x_stayover_cleaning" width="200"/>
+                <field name="x_checkout_cleaning" width="200"/>
+              </list>
+            </field>
           </group>
         </xpath>
     </field>
@@ -388,13 +327,38 @@
           </group>
         </group>
         <group>
-          <group string="Channel Manager">
+          <group name="channel_manager" string="Channel Manager">
             <field name="x_offer_type"/>
           </group>
-          <group string="House Keeping" groups="booking_engine.group_house_keeping">
-            <field name="x_related_has_stayover_cleaning"/>
-            <field name="x_related_has_checkout_cleaning"/>
+          <group name="house_keeping" string="House Keeping" groups="booking_engine.group_house_keeping">
+            <field name="x_house_keeping_role_id" widget="many2one" label="Role" string="Role" domain="[('x_resource_category', '=', 'house_keeping')]"/>
+            <field name="x_stayover_cleaning" invisible="not x_house_keeping_role_id" string="Stayover Points"/>
+            <field name="x_checkout_cleaning" invisible="not x_house_keeping_role_id" string="Checkout Points"/>
           </group>
+        </group>
+        <group string="Resource" invisible="not x_is_a_room_offer">
+          <span invisible="id" class="text-nowrap">Please save this product to edit the resources.</span>
+          <field name="x_resource_ids" nolabel="1" colspan="4"
+                 domain="[('x_category', '=', 'stay_offer')]"
+                 invisible="not id"
+                 context="{
+                  'default_resource_type': 'material',
+                  'default_role_ids': [planning_role_id],
+                  'list_view_ref': 'booking_engine.booking_engine_resource_list',
+                  'form_view_ref': 'booking_engine.booking_engine_resource_form',
+                  'has_product': 1,
+                 }"
+          >
+            <list editable="bottom" multi_edit="1" open_form_view="True">
+              <control>
+                <create name="add_new_resource" string="Add a resource"/>
+              </control>
+              <field name="name"/>
+              <field name="role_ids" string="Stay offers" widget="many2many_tags" options="{'color_field': 'color'}" readonly="True"/>
+              <field name="calendar_id" optional="hide"/>
+              <field name="company_id" optional="hide"/>
+            </list>
+          </field>
         </group>
       </xpath>
     </field>
@@ -481,10 +445,10 @@
   <record id="booking_engine_schedule_form" model="ir.ui.view">
     <field name="arch" type="xml">
         <xpath expr="//field[@name='resource_ids']" position="attributes">
-          <attribute name="domain">[("role_ids.x_is_a_room_offer", "=", True)]</attribute>
+          <attribute name="domain">[("role_ids.x_resource_category", "=", "stay_offer")]</attribute>
         </xpath>
         <xpath expr="//field[@name='role_id']" position="attributes">
-          <attribute name="domain">[("x_is_a_room_offer", "=", True)]</attribute>
+          <attribute name="domain">[("x_resource_category", "=", "stay_offer")]</attribute>
         </xpath>
     </field>
     <field name="inherit_id" ref="planning.planning_view_form_in_gantt"/>
@@ -538,10 +502,15 @@
         <xpath expr="//field[@name='role_ids']" position="attributes">
           <attribute name="string">Stay Offers</attribute>
           <attribute name="invisible">context.get('has_product')</attribute>
+          <attribute name="options">{"no_create": True}</attribute> 
+          <attribute name="domain">[("x_resource_category", "=", "stay_offer")]</attribute>
         </xpath>
         <xpath expr="//field[@name='default_role_id']" position="attributes">
           <attribute name="string">Default Stay Offer</attribute>
           <attribute name="invisible">context.get('has_product')</attribute>
+          <attribute name="options">{"no_create": True}</attribute>
+          <attribute name="domain">[("x_resource_category", "=", "stay_offer")]</attribute>
+          <attribute name="required">True</attribute>
         </xpath>
         <xpath expr="//field[@name='tz']" position="after">
           <field name="x_occupant_ids" widget="many2many_tags" invisible="context.get('has_product') or not x_occupant_ids"/>
@@ -563,17 +532,23 @@
         <xpath expr="//field[@name='default_role_id']" position="after">
           <field name="x_occupant_ids" optional="show" widget="many2many_tags"/>
         </xpath>
+        <xpath expr="//field[@name='default_role_id']" position="attributes">
+          <attribute name="string">Default Stay Offer</attribute>
+          <attribute name="options">{"no_create": True}</attribute>
+          <attribute name="domain">[("x_resource_category", "=", "stay_offer")]</attribute>
+          <attribute name="required">True</attribute>
+        </xpath>
         <xpath expr="//field[@name='color']" position="after">
           <field name="company_id" groups="base.group_multi_company"/>
         </xpath>
         <xpath expr="//field[@name='calendar_id']" position="attributes">
+          <attribute name="string">Working Schedule</attribute>
           <attribute name="domain">[('company_id', 'in', (False, company_id))]</attribute>
         </xpath>
         <xpath expr="//field[@name='role_ids']" position="attributes">
           <attribute name="string">Stay Offers</attribute>
-        </xpath>
-        <xpath expr="//field[@name='calendar_id']" position="attributes">
-          <attribute name="string">Working Schedule</attribute>
+          <attribute name="options">{"no_create": True}</attribute>
+          <attribute name="domain">[("x_resource_category", "=", "stay_offer")]</attribute>
         </xpath>
     </field>
     <field name="inherit_id" ref="planning.resource_resource_tree_view_inherit"/>
@@ -654,8 +629,8 @@
     <record id="resource_resource_form_view_extension" model="ir.ui.view">
         <field name="arch" type="xml">
             <xpath expr="/form/sheet/group" position="after">
-                <group>
-                    <group string="House Keeping" groups="booking_engine.group_house_keeping" invisible="not x_has_room_offer_role">
+                <group invisible="x_category != 'stay_offer'">
+                    <group string="House Keeping" groups="booking_engine.group_house_keeping">
                         <field name="x_occupancy" options="{}"/>
                         <field name="x_house_keeping_stage_id" domain="[('project_ids.x_is_house_keeping_project', '!=', False)]"/>
                         <field name="x_ongoing_task_id" context="{'form_view_ref': 'booking_engine.project_task_form_view_primary'}"/>
@@ -732,9 +707,12 @@
             </xpath>
             <xpath expr="/form/sheet/group/group/field[@name='user_ids']" position="replace">
                 <field name="x_employee_id" widget="many2one_avatar_employee"/>
-                <field name="x_resource_id"/>
+                <field name="x_resource_id" readonly="True"/>
                 <field name="x_task_occupancy"/>
-                <field name="x_cleaning" widget="selection" options="{}"/>
+                <field name="x_cleaning" widget="selection" readonly="True"/>
+            </xpath>
+            <xpath expr="//field[@name='personal_stage_type_id']" position="after">
+              <button string="Assign Employee" type="action" class="btn-primary" name="%(server_action_assign_house_keeping_tasks)d" invisible="x_employee_id"/>
             </xpath>
         </field>
         <field name="inherit_id" ref="project.view_task_form2"/>
@@ -749,7 +727,7 @@
         <field name="arch" type="xml">
             <xpath expr="/list//field[@name='sequence']" position="before">
                 <header>
-                    <button string="Assign Employee" type="action" class="btn-primary"/>
+                    <button string="Assign Employee" type="action" class="btn-primary" name="%(server_action_assign_house_keeping_tasks)d"/>
                 </header>
             </xpath>
             <xpath expr="/list//field[@name='id']" position="after">
@@ -1116,5 +1094,38 @@
           <separator/>
         </xpath>
     </field>
+  </record>
+  <record id="view_inherit_planning_role_kanban" model="ir.ui.view">
+    <field name="inherit_id" ref="planning.planning_role_view_kanban"/>
+    <field name="mode">extension</field>
+    <field name="model">planning.role</field>
+    <field name="type">kanban</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//field[@name='name']" position="after">
+          <field name="x_stay_offer_ids" display="full" widget="many2many_tags"/>
+        </xpath>
+      </data>
+    </field>
+  </record>
+  <record id="house_keeping_planning_gantt_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+        <xpath expr="//gantt[1]" position="attributes">
+          <attribute name="precision">{"day":"hour:full","week":"day:half","month":"day:half","year":"day:full"}</attribute>
+        </xpath>
+    </field>
+    <field name="inherit_id" ref="planning.planning_view_gantt"/>
+    <field name="mode">primary</field>
+    <field name="model">planning.slot</field>
+    <field name="name">planning.slot.gantt.inherit.booking_engine</field>
+    <field name="type">gantt</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="act_window_house_keeping_planning" model="ir.actions.act_window">
+    <field name="view_ids" eval="[
+        (5, 0, 0),
+        (0, 0, {'view_mode': 'gantt', 'view_id': ref('house_keeping_planning_gantt_view')}),
+    ]"/>
   </record>
 </odoo>

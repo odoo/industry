@@ -1,11 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-  <record id="planning_model_planning_role_x_is_a_room_offer_field" model="ir.model.fields">
-    <field name="ttype">boolean</field>
-    <field name="copied" eval="True"/>
-    <field name="field_description">Is Stay Offer</field>
+  <record id="planning_model_planning_role_resource_category_field" model="ir.model.fields">
+    <field name="ttype">selection</field>
+    <field name="field_description">Resource Category</field>
     <field name="model_id" ref="planning.model_planning_role"/>
-    <field name="name">x_is_a_room_offer</field>
+    <field name="name">x_resource_category</field>
+  </record>
+  <record id="planning_model_planning_role_resource_category_field_selection_stay_offer" model="ir.model.fields.selection">
+    <field name="name">Stay Offer</field>
+    <field name="field_id" ref="planning_model_planning_role_resource_category_field" />
+    <field name="value">stay_offer</field>
   </record>
   <record id="base_model_res_partner_x_nationality_field" model="ir.model.fields">
     <field name="ttype">many2one</field>
@@ -221,11 +225,13 @@ for record in self: record['x_order_involves_room'] = any(line.product_id.x_is_a
     <field name="relation">resource.resource</field>
     <field name="store" eval="False"/>
   </record>
-  <record id="resource_x_is_stay_resource" model="ir.model.fields">
-    <field name="ttype">boolean</field>
-    <field name="field_description">Is Stay Resource</field>
+  <record id="resource_model_resource_resource_category_field" model="ir.model.fields">
+    <field name="ttype">selection</field>
+    <field name="field_description">Category</field>
     <field name="model_id" ref="resource.model_resource_resource"/>
-    <field name="name">x_is_stay_resource</field>
+    <field name="name">x_category</field>
+    <field name="related">default_role_id.x_resource_category</field>
+    <field name="store" eval="False"/>
   </record>
   <record id="model_planning_slot_x_nights" model="ir.model.fields">
     <field name="ttype">integer</field>
@@ -418,39 +424,40 @@ for record in self: record['x_guests_count'] = self.env['x_guests_line'].search_
 
   <!-- House Keeping -->
     <!-- Planning.role fields -->
-    <record id="_x_has_stayover_cleaning_field_planning_role" model="ir.model.fields">
-        <field name="ttype">boolean</field>
-        <field name="field_description">Stayover Cleaning</field>
-        <field name="model_id" ref="planning.model_planning_role"/>
-        <field name="name">x_has_stayover_cleaning</field>
-        <field name="help">When set, on a daily basis, stay-over house keeping tasks are created for resources in stay-over occupancy.</field>
+    <record id="planning_model_planning_role_resource_category_field_selection_house_keeping" model="ir.model.fields.selection">
+      <field name="name">House Keeping</field>
+      <field name="field_id" ref="planning_model_planning_role_resource_category_field" />
+      <field name="value">house_keeping</field>
     </record>
-    <record id="x_has_checkout_cleaning_field_planning_role" model="ir.model.fields">
-        <field name="ttype">boolean</field>
-        <field name="field_description">Checkout Cleaning</field>
-        <field name="model_id" ref="planning.model_planning_role"/>
-        <field name="name">x_has_checkout_cleaning</field>
-        <field name="help">When set, on a daily basis, check-out house keeping tasks are created for resources in due out occupancy.</field>
-    </record>
-
-    <!-- Product.product fields -->
-    <record id="_x_has_stayover_cleaning_field_product_template" model="ir.model.fields">
-        <field name="ttype">boolean</field>
-        <field name="field_description">Stayover Cleaning</field>
+    <record id="x_house_keeping_role_product_field_product_template" model="ir.model.fields">
+      <field name="ttype">many2one</field>
+      <field name="field_description">Role</field>
+      <field name="help">When set, house keeping tasks will be assigned to resources with this role.</field>
         <field name="model_id" ref="product.model_product_template"/>
-        <field name="related">planning_role_id.x_has_stayover_cleaning</field>
-        <field name="store" eval="False"/>
-        <field name="name">x_related_has_stayover_cleaning</field>
-        <field name="help">When set, on a daily basis, stay-over house keeping tasks are created for resources in stay-over occupancy.</field>
-    </record>
-    <record id="x_has_checkout_cleaning_field_product_template" model="ir.model.fields">
-        <field name="ttype">boolean</field>
-        <field name="field_description">Checkout Cleaning</field>
+        <field name="name">x_house_keeping_role_id</field>
+        <field name="relation">planning.role</field>
+      </record>
+    <record id="x_stayover_cleaning_product_field_product_template" model="ir.model.fields">
+      <field name="ttype">float</field>
+        <field name="field_description">Stayover Points</field>
+        <field name="help">When not null, on a daily basis, stay-over house keeping tasks are created for resources in stay-over occupancy.</field>
         <field name="model_id" ref="product.model_product_template"/>
-        <field name="related">planning_role_id.x_has_checkout_cleaning</field>
-        <field name="store" eval="False"/>
-        <field name="name">x_related_has_checkout_cleaning</field>
-        <field name="help">When set, on a daily basis, check-out house keeping tasks are created for resources in due out occupancy.</field>
+        <field name="name">x_stayover_cleaning</field>
+      </record>
+    <record id="x_checkout_cleaning_product_field_product_template" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="field_description">Checkout Points</field>
+        <field name="help">When not null, on a daily basis, check-out house keeping tasks are created for resources in due out occupancy.</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="name">x_checkout_cleaning</field>
+      </record>
+    <record id="x_house_keeping_role_planning_field_planning_role" model="ir.model.fields">
+        <field name="ttype">one2many</field>
+        <field name="field_description">Stay Offers</field>
+        <field name="model_id" ref="planning.model_planning_role"/>
+        <field name="name">x_stay_offer_ids</field>
+        <field name="relation">product.template</field>
+        <field name="relation_field">x_house_keeping_role_id</field>
     </record>
 
     <!-- Project.project fields -->
@@ -471,12 +478,20 @@ for record in self: record['x_guests_count'] = self.env['x_guests_line'].search_
         <field name="model_id" ref="project.model_project_task" />
         <field name="relation">resource.resource</field>
     </record>
-    <record id="x_employee_id_field_project_task" model="ir.model.fields">
+    <record id="x_employee_id_field__project_task" model="ir.model.fields">
         <field name="name">x_employee_id</field>
         <field name="ttype">many2one</field>
         <field name="field_description">Employee</field>
         <field name="model_id" ref="project.model_project_task" />
-        <field name="relation">hr.employee</field>
+        <field name="relation">resource.resource</field>
+    </record>
+    <record id="x_cleaning_task_ids_field_resource_resource" model="ir.model.fields">
+        <field name="name">x_cleaning_task_ids</field>
+        <field name="ttype">one2many</field>
+        <field name="field_description">Cleaning Tasks</field>
+        <field name="model_id" ref="resource.model_resource_resource" />
+        <field name="relation">project.task</field>
+        <field name="relation_field">x_employee_id</field>
     </record>
     <record id="x_cleaning_field_project_task" model="ir.model.fields">
         <field name="name">x_cleaning</field>
@@ -493,6 +508,42 @@ for record in self: record['x_guests_count'] = self.env['x_guests_line'].search_
         <field name="name">Checkout</field>
         <field name="field_id" ref="x_cleaning_field_project_task" />
         <field name="value">checkout</field>
+    </record>
+    <record id="x_cleaning_points_field_project_task" model="ir.model.fields">
+        <field name="name">x_cleaning_points</field>
+        <field name="ttype">float</field>
+        <field name="field_description">Cleaning Points</field>
+        <field name="model_id" ref="project.model_project_task" />
+    </record>
+    <record id="x_cleaning_points_field_resource_resource" model="ir.model.fields">
+        <field name="name">x_cleaning_points</field>
+        <field name="ttype">float</field>
+        <field name="field_description">Cleaning Points</field>
+        <field name="model_id" ref="resource.model_resource_resource" />
+        <field name="depends">x_cleaning_task_ids, x_cleaning_task_ids.is_closed</field>
+        <field name="compute"><![CDATA[ 
+for record in self:
+  record['x_cleaning_points'] = 0
+  for task in record.x_cleaning_task_ids:
+    if not task.is_closed:
+      record['x_cleaning_points'] += task.x_cleaning_points
+        ]]></field>
+    </record>
+    <record id="x_time_allocated_today_field_resource_resource" model="ir.model.fields">
+        <field name="name">x_time_allocated_today</field>
+        <field name="ttype">float</field>
+        <field name="field_description">Time Allocated Today</field>
+        <field name="model_id" ref="resource.model_resource_resource" />
+        <field name="store">False</field>
+        <field name="compute"><![CDATA[
+today = datetime.datetime.today()
+resource_slots = self.env['planning.slot']._read_group([('resource_ids', 'in', self), ('resource_ids.x_category', '=', 'house_keeping'), ('end_datetime', '>=', today)], ['resource_ids'], ['id:recordset'])
+for slots, resource in resource_slots:
+  resource['x_time_allocated_today'] = 0
+  for slot in slots:
+    if slot.start_datetime.date() <= today.date():
+      resource['x_time_allocated_today'] += max((min(slot.end_datetime, today.replace(hour=23, minute=59, second=59)) - max(today, slot.start_datetime)).total_seconds(), 0)
+        ]]></field>
     </record>
 
     <!-- resource.resource fields -->
@@ -564,14 +615,14 @@ for record in self:
 for record in self: record['x_is_in_stage_clean'] = record.x_house_keeping_stage_id and record.x_house_keeping_stage_id == record.env.ref('booking_engine.project_task_type_17', raise_if_not_found=False)
 ]]></field>
     </record>
-    <record id="x_resource_employee_id_field_resource_resource" model="ir.model.fields">
+    <record id="x_resource_employee_id_field__resource_resource" model="ir.model.fields">
         <field name="name">x_resource_employee_id</field>
         <field name="ttype">many2one</field>
         <field name="related">x_ongoing_task_id.x_employee_id</field>
         <field name="field_description">Task Employee</field>
         <field name="model_id" ref="resource.model_resource_resource" />
         <field name="readonly" eval="True" />
-        <field name="relation">hr.employee</field>
+        <field name="relation">resource.resource</field>
         <field name="store" eval="False" />
     </record>
 
@@ -812,17 +863,5 @@ for slot in self:
     <field name="related">sale_order_id.rental_status</field>
     <field name="store">False</field>
     <field name="readonly" eval="True"/>
-  </record>
-  <record id="x_has_room_offer_role_field" model="ir.model.fields">
-      <field name="name">x_has_room_offer_role</field>
-      <field name="field_description">Has Room Offer Role</field>
-      <field name="model_id" ref="resource.model_resource_resource"/>
-      <field name="ttype">boolean</field>
-      <field name="store" eval="False"/>
-      <field name="depends">role_ids.x_is_a_room_offer</field>
-      <field name="compute"><![CDATA[
-for record in self:
-    record['x_has_room_offer_role'] = any(role.x_is_a_room_offer for role in record.role_ids)
-  ]]></field>
   </record>
 </odoo>
