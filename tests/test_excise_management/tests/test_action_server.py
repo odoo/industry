@@ -258,3 +258,104 @@ class ActionServerTestCase(TransactionCase):
         server_action.with_context(active_ids=[excise_report_2.id], active_model="x_excise_report").sudo().run()
         line_2 = self.env['x_excise_report_line'].search([('x_excise_report_id', '=', excise_report_2.id)])
         self.assertEqual(line_2.filtered(lambda x: diff_license_diff_warehouse_move in x.x_move_ids).x_excise_move_type, 'entry fd')
+
+    def test_sale_order_customer_without_fiscal_deposit(self):
+        customer = self.env['res.partner'].create({
+            'name': 'Customer Without Deposit',
+        })
+        template = self.env['product.template'].create({
+            'name': 'Product With Excise',
+            'list_price': 100,
+        })
+
+        with Form(template) as form:
+            form.x_excise_category = self.env.ref(
+                'excise_management.x_excise_category_S001'
+            )
+
+        product = template.product_variant_id
+        order = self.env['sale.order'].create({
+            'partner_id': customer.id,
+        })
+
+        with Form(order) as order_form:
+            with order_form.order_line.new() as line_form:
+                line_form.product_id = product
+                line_form.product_uom_qty = 1
+
+        order_form.save()
+        line = order.order_line
+        excise_taxes = line.tax_ids.filtered(lambda t: t.tax_group_id.x_is_excise)
+        vat_taxes = line.tax_ids - excise_taxes
+        tax_result = vat_taxes.compute_all(
+            line.price_unit,
+            quantity=line.product_uom_qty,
+            product=line.product_id,
+            partner=line.order_id.partner_id,
+        )
+        vat_amount = sum(tax['amount'] for tax in tax_result['taxes'])
+
+        self.assertTrue(excise_taxes,
+            "Customer without fiscal deposit should have excise taxes applied")
+        self.assertEqual(line.price_subtotal, line.price_unit * line.product_uom_qty,
+            "The sale order line amount should equal the unit product price times the quantity")
+        self.assertEqual(line.price_total, line.price_subtotal + vat_amount,
+            "The sale order line tax included amount should equal the amount plus the VAT taxes")
+
+    def test_sale_order_customer_with_fiscal_deposit(self):
+        self.fiscal_position.x_is_fiscal_deposit = True
+        customer = self.env['res.partner'].create({
+            'name': 'Customer With Deposit',
+            'property_account_position_id': self.fiscal_position.id,
+        })
+        template = self.env['product.template'].create({
+            'name': 'Product With Excise',
+            'list_price': 100,
+            'x_excise_amount': 25
+        })
+        with Form(template) as form:
+            form.x_excise_category = self.env.ref(
+                'excise_management.x_excise_category_S001'
+            )
+
+        product = template.product_variant_id
+        order = self.env['sale.order'].create({
+            'partner_id': customer.id,
+        })
+
+        with Form(order) as order_form:
+            with order_form.order_line.new() as line_form:
+                line_form.product_id = product
+                line_form.product_uom_qty = 1
+
+        order_form.save()
+        line = order.order_line
+
+        excise_taxes = line.tax_ids.filtered(
+            lambda t: t.tax_group_id.x_is_excise
+        )
+        vat_taxes = line.tax_ids - excise_taxes
+        excise_amount = sum(
+            tax['amount']
+            for tax in excise_taxes.compute_all(
+                line.price_unit,
+                quantity=line.product_uom_qty,
+                product=line.product_id,
+                partner=line.order_id.partner_id,
+            )['taxes']
+        )
+        expected_subtotal = line.price_unit * line.product_uom_qty - excise_amount
+        tax_result = vat_taxes.compute_all(
+            line.price_subtotal,
+            quantity=1,
+            product=line.product_id,
+            partner=line.order_id.partner_id,
+        )
+        vat_amount = sum(tax['amount'] for tax in tax_result['taxes'])
+
+        self.assertEqual(excise_amount, 0,
+            "Customer with fiscal deposit should not have excise taxes applied")
+        self.assertEqual(line.price_subtotal, expected_subtotal,
+            "Amount should equal unit price times quantity minus excise taxes")
+        self.assertEqual(line.price_total, line.price_subtotal + vat_amount,
+            "Tax included amount should equal amount plus VAT taxes")
