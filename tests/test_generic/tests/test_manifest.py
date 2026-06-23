@@ -79,6 +79,7 @@ class ManifestTest(ManifestLinter, IndustryCase):
         if manifest_data.get('demo'):
             self._test_files_in_manifest(manifest_data, 'demo')
         self._test_no_orphaned_files(manifest_data)
+        self._test_website_xml_order(manifest_data)
         self._validate_assets(module, manifest_data)
         self._test_cloc_exclude_files(manifest_data)
         self._test_dependencies(manifest_data)
@@ -107,12 +108,6 @@ class ManifestTest(ManifestLinter, IndustryCase):
         if (not_found := {file_path for file_path in manifest_files if not (self.module_path / file_path).is_file()}):
             _logger.error("Files listed in manifest %s not found: %s", manifest_key, ', '.join(not_found))
 
-        # Flexible website.xml check (path-agnostic)
-        website_xml_files = [f for f in manifest_files_list if f.endswith('website.xml')]
-        if website_xml_files:
-            if not manifest_files_list[-1].endswith('website.xml'):
-                _logger.error("A website.xml file must be the last entry in the '%s' list of the manifest", manifest_key)
-
     def _test_no_orphaned_files(self, manifest_data):
         listed_files = set()
         for key in ['data', 'demo']:
@@ -127,6 +122,35 @@ class ManifestTest(ManifestLinter, IndustryCase):
 
         if (unlisted := actual_files - listed_files):
             _logger.warning("Files found in module but not listed in manifest: %s", ', '.join(unlisted))
+
+    def _test_website_xml_order(self, manifest_data):
+        """Ensure website.xml is loaded last if a theme is loaded in the module."""
+        theme_loaded = False
+
+        # rglob('*website_*') finds any file containing 'website_' in its name, anywhere in the module
+        for file_path in self.module_path.rglob('*website_*'):
+            if file_path.is_file():
+                try:
+                    if 'button_choose_theme' in file_path.read_text(encoding='utf-8'):
+                        theme_loaded = True
+                        break
+                except UnicodeDecodeError:
+                    pass  # skip any binary/compiled files that might get caught in the glob
+
+        if not theme_loaded:
+            return
+
+        # Enforce website.xml is the last entry in the manifest lists where it appears
+        for manifest_key in ['data', 'demo']:
+            manifest_files_list = manifest_data.get(manifest_key, [])
+            website_xml_files = [f for f in manifest_files_list if f.endswith('website.xml')]
+
+            if website_xml_files:
+                if not manifest_files_list[-1].endswith('website.xml'):
+                    _logger.error(
+                        "A website.xml file must be the last entry in the '%s' list of the manifest because a theme is loaded.",
+                        manifest_key,
+                    )
 
     def _test_dependencies(self, manifest_data):
         dependencies = manifest_data.get('depends', [])
