@@ -21,24 +21,6 @@ elif record.x_total > 0:
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>
-    <record id="industry_fix_slot_times" model="ir.actions.server">
-        <field name="binding_model_id" ref="planning.model_planning_slot"/>
-        <field name="model_id" ref="planning.model_planning_slot"/>
-        <field name="usage">base_automation</field>
-        <field name="state">code</field>
-        <field name="name">Fix Slot Times</field>
-        <field name="code"><![CDATA[
-for record in (records or []):
-    if not (record.role_id.x_is_a_room_offer and record.start_datetime and record.end_datetime): continue
-    pickup_time = env.context.get('pickup_time', record.sale_line_id.product_id.pickup_time)
-    return_time = env.context.get('return_time', record.sale_line_id.product_id.return_time)
-    start_datetime = record.start_datetime.replace(hour=int(pickup_time), minute=int(pickup_time % 1 * 60)) if pickup_time else record.start_datetime
-    end_datetime = record.end_datetime.replace(hour=int(return_time), minute=int(return_time % 1 * 60)) if return_time else record.end_datetime
-    end_datetime += datetime.timedelta(days=(record.end_datetime - record.start_datetime).days - (end_datetime - start_datetime).days)
-    if record.start_datetime != start_datetime or record.end_datetime != end_datetime:
-        record.write({'start_datetime': start_datetime, 'end_datetime': end_datetime})
-        ]]></field>
-    </record>
     <record id="industry_limit_slot_resources" model="ir.actions.server">
         <field name="model_id" ref="planning.model_planning_slot"/>
         <field name="usage">base_automation</field>
@@ -49,20 +31,6 @@ for slot in records:
     if len(slot.resource_ids) > 1 and any(role.x_is_a_room_offer for role in slot.resource_ids.mapped('role_ids')):
         raise UserError("Only one room can be assigned to a planning slot")
         ]]></field>
-    </record>
-    <record id="industry_set_rental_hours" model="ir.actions.server">
-        <field name="name">Set Rental Start/Return Hours</field>
-        <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="usage">base_automation</field>
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-server_action = record.env['ir.actions.server'].browse(record.env.ref('booking_engine.industry_fix_slot_times')).id
-for record in records:
-    pickup_time = record.order_line.filtered('product_id.rent_periodicity').mapped('product_id')[:1].pickup_time
-    return_time = record.order_line.filtered('product_id.rent_periodicity').mapped('product_id')[:1].return_time
-    server_action.with_context(active_ids=record.order_line.planning_slot_ids.ids, active_model='planning.slot', pickup_time=pickup_time, return_time=return_time).run()
-    record.action_update_rental_prices()
-]]></field>
     </record>
     <record id="apply_rental_check_out" model="ir.actions.server">
         <field name="name">Apply Rental Checkout</field>
