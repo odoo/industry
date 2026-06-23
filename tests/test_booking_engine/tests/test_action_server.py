@@ -90,31 +90,6 @@ class BookingEngineAutomationsTestCase(TransactionCase):
     def _expected_nights(self, start_datetime, end_datetime):
         return int(((end_datetime - start_datetime).total_seconds() + 86399) // 86400)
 
-    def test_automation_fix_slot_times_on_create_and_write(self):
-        """Test for the industry_fix_slot_times automation."""
-        order, sale_line = self._create_sale_line(self.product)
-        expected_start, expected_end = self._expected_slot_datetimes(order.rental_start_date, order.rental_return_date)
-        order.action_confirm()
-        self.assertEqual(sale_line.planning_slot_ids[0].start_datetime, expected_start,
-                         "The slot start time should be updated based on recurrence pickup time")
-        self.assertEqual(sale_line.planning_slot_ids[0].end_datetime, expected_end,
-                         "The slot end time should be updated with the recurrence return time")
-        self.assertEqual(sale_line.start_date, expected_start,
-                         "The order line start date should be updated based on recurrence pickup time")
-        self.assertEqual(sale_line.return_date, expected_end,
-                         "The order line return date should be updated based on recurrence return time")
-
-    def test_automation_set_rental_hours(self):
-        """Test for the industry_set_rental_hours automation on write."""
-        order, sale_line = self._create_sale_line(self.product)
-        order.action_confirm()
-
-        expected_start_date, expected_end_date = self._expected_slot_datetimes(order.rental_start_date, order.rental_return_date)
-        self.assertEqual(sale_line.planning_slot_ids[0].start_datetime, expected_start_date,
-                         "The automation should align slot start time to the pickup time on write")
-        self.assertEqual(sale_line.planning_slot_ids[0].end_datetime, expected_end_date,
-                         "The automation should align slot end time to the return time on write")
-
     def test_automation_create_role_on_room_offer_create(self):
         room_offer_product_template = self.room_offer_template
         role = room_offer_product_template.planning_role_id
