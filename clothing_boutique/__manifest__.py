@@ -1,16 +1,17 @@
 {
     'name': 'Clothing Stores',
+    'version': '1.2',
     'category': 'Retail',
     'author': 'Odoo S.A.',
     'depends': [
+        'hr',
         'knowledge',
         'loyalty',
         'mass_mailing',
-        'planning',
         'pos_enterprise',
         'purchase',
-        'sign',
-        'website_appointment_sale_project',
+        'sale_project',
+        'website_sale',
     ],
     'data': [
         'data/res_config_settings.xml',
@@ -27,7 +28,6 @@
         'data/product_product.xml',
         'data/pos_config.xml',
         'data/product_image.xml',
-        'data/project_task_type.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
         'data/mailing_mailing.xml',
@@ -36,8 +36,6 @@
         'demo/product_template.xml',
         'demo/loyalty_program.xml',
         'demo/sale_order.xml',
-        'demo/resource_resource.xml',
-        'demo/project_task.xml',
         'demo/res_partner.xml',
         'demo/res_company.xml',
         'demo/website_view.xml',
@@ -64,9 +62,7 @@
         "static/src/js/my_tour.js",
         "demo/website_view.xml",
     ],
-    'images': [
-        'images/main.png',
-    ],
+    'images': ['images/main.png'],
     'url': "https://www.odoo.com/trial?industry&selected_app=clothing_boutique",
     'website': "https://www.odoo.com/industries/clothing-store",
 }
