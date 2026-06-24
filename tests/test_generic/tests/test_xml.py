@@ -66,7 +66,7 @@ MODELS_TO_UPDATE = {
     "ir.cron",
     "ir.embedded.actions",
     "ir.model",
-    "ir.model.access",
+    "ir.access",
     "ir.model.fields",
     "ir.model.fields.selection",
     "ir.module.module",

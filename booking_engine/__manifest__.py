@@ -21,7 +21,7 @@
         'data/res_groups.xml',
         'data/project_task_type.xml',
         'data/ir_model.xml',
-        'data/ir_model_access.xml',
+        'data/ir_access.xml',
         'data/ir_model_fields.xml',
         'data/ir_default.xml',
         'data/project_project.xml',

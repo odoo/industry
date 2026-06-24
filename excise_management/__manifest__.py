@@ -20,7 +20,7 @@
         'data/account_tax_group.xml',
         'data/ir_ui_menu.xml',
         'data/base_automation.xml',
-        'data/ir_model_access.xml',
+        'data/ir_access.xml',
         'data/ir_default.xml',
         'data/stock_warehouse.xml',
         'data/uom_uom.xml',

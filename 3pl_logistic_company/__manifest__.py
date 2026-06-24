@@ -22,7 +22,7 @@
     ],
     'data': [
         'data/ir_model.xml',
-        'data/ir_model_access.xml',
+        'data/ir_access.xml',
         'data/ir_attachment_pre.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',

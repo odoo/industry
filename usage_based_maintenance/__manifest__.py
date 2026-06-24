@@ -18,7 +18,7 @@
         'data/ir_actions_server.xml',
         'data/ir_ui_view.xml',
         'data/ir_ui_menu.xml',
-        'data/ir_model_access.xml',
+        'data/ir_access.xml',
         'data/ir_default.xml',
         'data/base_automation.xml',
     ],
