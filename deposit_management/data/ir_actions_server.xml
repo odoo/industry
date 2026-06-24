@@ -2,48 +2,56 @@
 <odoo>
     <record id="bom_server_action" model="ir.actions.server">
         <field name="code"><![CDATA[
-if (quant := record.x_quantity_by_deposit_product) == 1 and record.x_unit_sale_product.id:
+if (quant := record.x_quantity_by_deposit_product) == 1:
     raise UserError("Unit sale product should be undefined if this product can not be sold in a smaller unit.")
-if quant <= 0 and record.x_unit_sale_product: raise UserError("The auto-BOM should contain a positive amount of units.")
-if record.x_unit_sale_product:
-    existing_bom = env['mrp.bom'].search([('product_tmpl_id', '=',record.x_unit_sale_product.id)], limit=1)
-    reordering_rule = env['stock.warehouse.orderpoint'].search_count([('product_id', '=', record.x_unit_sale_product.product_variant_id.id)], limit=1)
-    bom_vals = {
-        'product_qty': quant,
-        'uom_id': record.x_unit_sale_product.uom_id.id,
-        'type': 'normal',
-        'x_parent_product': record.id,
-        'x_auto_production': True,
-        'company_id': False,
-        'bom_line_ids': [(5, 0), (0, 0, {'product_id': record.product_variant_id.id, 'product_qty': 1})],
-    }
-    if record.x_deposit_product:
-        bom_vals['byproduct_ids'] = [(5, 0), (0, 0, {'product_id': record.x_deposit_product.product_variant_id.id, 'product_qty': 1.0})]
-
-    if existing_bom: existing_bom.write(bom_vals)
-    else:
-        bom_vals['product_tmpl_id'] = record.x_unit_sale_product.id
-        env['mrp.bom'].create(bom_vals)
-    if not reordering_rule:
-        uom_id = env['uom.uom'].search([('relative_factor', '=', quant), ('relative_uom_id', '=', record.x_unit_sale_product.uom_id.id)], limit=1)
-        if not uom_id:
-            uom_id = env['uom.uom'].create({'relative_factor': quant, 'relative_uom_id': record.x_unit_sale_product.uom_id.id, 'name': f"Pack of {quant} x {record.x_unit_sale_product.uom_id.name}"})
-        orderpoints_to_create = []
-        for wh in env['stock.warehouse'].search([('lot_stock_id', '!=', False)]):
-            orderpoints_to_create.append({
-                'product_id': record.x_unit_sale_product.product_variant_id.id,
-                'x_parent_product': record.id,
-                'replenishment_uom_id': uom_id.id,
-                'company_id': wh.company_id.id,
-                'route_id': env.ref('mrp.route_warehouse0_manufacture').id,
-                'location_id': wh.lot_stock_id.id,
-            })
-        env['stock.warehouse.orderpoint'].create(orderpoints_to_create)
+if quant <= 0: raise UserError("The auto-BOM should contain a positive amount of units.")
+if record.company_id.id != record.x_unit_sale_product.company_id.id:
+    raise UserError("Contained and container products should be associated to none or the same company to generate the associated auto-BoM.")
+selected_company = record.company_id
+companies = selected_company or env['res.company'].search([])
+existing_bom = env['mrp.bom'].search([('x_parent_product', '=', record.id), ('product_tmpl_id', '=', record.x_unit_sale_product.id)], limit=1)
+bom_vals = {
+    'product_qty': quant,
+    'uom_id': record.x_unit_sale_product.uom_id.id,
+    'type': 'normal',
+    'x_parent_product': record.id,
+    'x_auto_production': True,
+    'company_id': selected_company.id,
+    'bom_line_ids': [(5, 0), (0, 0, {'product_id': record.product_variant_id.id, 'product_qty': 1})],
+    'enable_batch_size': True,
+    'batch_size': quant,
+}
+if record.x_deposit_product:
+    bom_vals['byproduct_ids'] = [(5, 0), (0, 0, {'product_id': record.x_deposit_product.product_variant_id.id, 'product_qty': 1.0})]
+if existing_bom:
+    existing_bom.write(bom_vals)
 else:
-    existing_bom = env['mrp.bom'].search([('x_parent_product', '=',record.id)], limit=1)
-    reordering_rule = env['stock.warehouse.orderpoint'].search([('x_parent_product', '=', record.id)], limit=1)
-    if existing_bom: existing_bom.unlink()
-    if reordering_rule: reordering_rule.unlink()
+    bom_vals['product_tmpl_id'] = record.x_unit_sale_product.id
+    env['mrp.bom'].create(bom_vals)
+
+uom_id = env['uom.uom'].search([('relative_factor', '=', quant), ('relative_uom_id', '=', record.x_unit_sale_product.uom_id.id)], limit=1)
+if not uom_id:
+    uom_id = env['uom.uom'].create({'relative_factor': quant, 'relative_uom_id': record.x_unit_sale_product.uom_id.id, 'name': f"Pack of {quant} x {record.x_unit_sale_product.uom_id.name}"})
+
+reordering_rules = env['stock.warehouse.orderpoint'].search([('product_tmpl_id', '=', record.x_unit_sale_product.id)])
+existing_reordering_locations = reordering_rules.mapped('location_id')
+warehouses = env['stock.warehouse'].search([('company_id', 'in', companies.ids), ('lot_stock_id', '!=', False)])
+orderpoints_to_create = []
+
+for wh in warehouses:
+    if wh.lot_stock_id not in existing_reordering_locations:
+        manufacture_route_id = wh.manufacture_pull_id.route_id.id
+        if not manufacture_route_id:
+            continue
+        orderpoints_to_create.append({
+            'product_id': record.x_unit_sale_product.product_variant_id.id,
+            'x_parent_product': record.id,
+            'replenishment_uom_id': uom_id.id,
+            'company_id': wh.company_id.id,
+            'route_id': manufacture_route_id,
+            'location_id': wh.lot_stock_id.id,
+        })
+env['stock.warehouse.orderpoint'].create(orderpoints_to_create)
 ]]></field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="state">code</field>
