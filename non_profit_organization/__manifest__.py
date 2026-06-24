@@ -41,7 +41,7 @@
         'data/ir_ui_menu.xml',
         'data/base_automation.xml',
         'data/res_config_settings.xml',
-        'data/ir_model_access.xml',
+        'data/ir_access.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',

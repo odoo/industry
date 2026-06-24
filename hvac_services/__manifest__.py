@@ -27,7 +27,7 @@
         'data/product_category.xml',
         'data/hr_job.xml',
         'data/ir_models.xml',
-        'data/ir_model_access.xml',
+        'data/ir_access.xml',
         'data/ir_model_fields.xml',
         'data/res_config_settings.xml',
         'data/sale_order_template.xml',

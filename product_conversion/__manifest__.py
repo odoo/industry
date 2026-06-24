@@ -9,7 +9,7 @@
     'data': [
         'data/res_config_settings.xml',
         'data/ir_model.xml',
-        'data/ir_model_access.xml',
+        'data/ir_access.xml',
         'data/ir_actions_server.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',

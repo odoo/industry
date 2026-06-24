@@ -27,7 +27,7 @@
         'data/ir_ui_view.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
-        'data/ir_model_access.xml',
+        'data/ir_access.xml',
         'data/ir_default.xml',
         'data/appointment_type.xml',
         'data/appointment_resource.xml',
