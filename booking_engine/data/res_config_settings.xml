@@ -258,7 +258,7 @@ else:
     <record id="server_action_set_x_setting_approvers" model="ir.actions.server">
         <field name="name">HouseKeeping: Set approvers setting</field>
         <field name="code"><![CDATA[
-env['ir.config_parameter'].set_bool('booking_engine.x_approvers_setting', (True if record.x_setting_approvers else False))
+env['ir.config_parameter'].set_bool('booking_engine.x_approvers_setting', bool(record.x_setting_approvers))
 ]]></field>
         <field name="model_id" ref="base_setup.model_res_config_settings"/>
         <field name="state">code</field>
@@ -269,6 +269,61 @@ env['ir.config_parameter'].set_bool('booking_engine.x_approvers_setting', (True 
         <field name="action_server_ids" eval="[(6, 0, [ref('server_action_set_x_setting_approvers')])]"/>
         <field name="trigger">on_create_or_write</field>
         <field name="trigger_field_ids" eval="[(6, 0, [ref('x_setting_field_approvers')])]"/>
+    </record>
+
+    <!-- Automated Assignement Setting -->
+    <record id="x_setting_field_automated_assignment" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Automated Assignement</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="name">x_setting_automated_assignment</field>
+        <field name="store" eval="True"/>
+        <field name="compute"><![CDATA[
+self['x_setting_automated_assignment'] = self.env['ir.config_parameter'].get_bool('booking_engine.x_automated_assignment_setting', False)
+]]></field>
+    </record>
+    <record id="server_action_set_x_setting_automated_assignment" model="ir.actions.server">
+        <field name="name">Set Automated Assignement setting</field>
+        <field name="code"><![CDATA[
+cloc_entries = [
+    'x_time_allocated_today_field_resource_resource',
+    'x_cleaning_points_field_resource_resource',
+    'server_action_assign_house_keeping_tasks',
+]
+env['ir.config_parameter'].set_bool('booking_engine.x_automated_assignment_setting', bool(record.x_setting_automated_assignment))
+if record.x_setting_approvers:
+    env.ref('base.group_user')._apply_group(env.ref('booking_engine.group_automate_housekeeping'))
+    for cloc_entry in cloc_entries:
+        if (cloc_entry_id := env.ref(f'__cloc_exclude__.booking_engine_{cloc_entry}', raise_if_not_found=False)):
+            entry_model = 'ir.actions.server' if cloc_entry.startswith('server_action') else 'ir.model.fields'
+            env['ir.model.data'].search([
+                ('name', '=', f'booking_engine_{cloc_entry}'),
+                ('model', '=', entry_model),
+                ('module', '=', '__cloc_exclude__'),
+                ('res_id', '=', cloc_entry_id.id),
+            ], limit=1).unlink()
+else:
+    env.ref('base.group_user')._remove_group(env.ref('booking_engine.group_automate_housekeeping'))
+    for cloc_entry in cloc_entries:
+        cloc_exclude_id = f'booking_engine_{cloc_entry}'
+        entry_model = 'ir.actions.server' if cloc_entry.startswith('server_action') else 'ir.model.fields'
+        if (cloc_entry_id := env.ref(f'booking_engine.{cloc_entry}', raise_if_not_found=False)) and not env.ref(f'__cloc_exclude__.{cloc_exclude_id}', raise_if_not_found=False):
+            env['ir.model.data'].create({
+                'name': cloc_exclude_id,
+                'model': entry_model,
+                'module': '__cloc_exclude__',
+                'res_id': cloc_entry_id.id,
+            })
+]]></field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="state">code</field>
+    </record>
+    <record id="automation_on_x_setting_automated_assignment_set" model="base.automation">
+        <field name="name">On Automated Assignement setting set</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_set_x_setting_automated_assignment')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_setting_field_automated_assignment')])]"/>
     </record>
 
     <record id="res_config_settings_form_view_inherited" model="ir.ui.view">
@@ -292,6 +347,13 @@ env['ir.config_parameter'].set_bool('booking_engine.x_approvers_setting', (True 
                                         <label for="x_setting_related_approver_users_ids" class="o_light_label mr16"/>
                                         <field name="x_setting_related_approver_users_ids" class="oe_inline" widget="many2many_tags"/>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2" invisible="not x_module_house_keeping">
+                                <field name="x_setting_automated_assignment" class="col flex-grow-0 ml16 mr0 pe-2"/>
+                                <div class="col ps-0">
+                                    <label for="x_setting_automated_assignment"/>
+                                    <div class="text-muted">Automate housekeeping task assignment based on employee housekeeping shifts.</div>
                                 </div>
                             </div>
                         </setting>
