@@ -1,6 +1,12 @@
 {
     'name': 'Property Management',
+<<<<<<< 472002db88aa8343e261e662bae74fcb603f256c
     'version': '2.2',
+||||||| 6531432753bd297efab396d7c9f850330bd19f24
+    'version': '1.3',
+=======
+    'version': '1.4',
+>>>>>>> 8b03a5290ceae533812308e7676e22b725997fdd
     'category': 'Services',
     'depends': [
         'base_automation',
