@@ -52,6 +52,10 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         cls.stage_clean = cls.env.ref('booking_engine.project_task_type_17')
         cls.stage_ready = cls.env.ref('booking_engine.project_task_type_18')
         cls.today = Datetime.today()
+        cls.env["res.config.settings"].create({
+            'x_module_house_keeping': True,
+            'x_setting_steering': True,
+        }).execute()
 
     def _create_sale_line(self, product):
         order = self.env['sale.order'].with_context(in_rental_app=True).create({
