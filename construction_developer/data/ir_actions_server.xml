@@ -520,6 +520,23 @@ for so in records.filtered(lambda so: (so.state != 'draft' or env.context.get('f
     so.partner_shipping_id['x_ws_location_id'] = action
 </field>
     </record>
+
+    <record id="action_link_orphan_po_account" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Link Orphan POL Account</field>
+        <field name="code">
+if (valid_sos := records.filtered(lambda so: so.state != 'draft' and so.project_account_id)):
+    orphan_pol = env['purchase.order.line'].search([
+        ('x_wil_so_ids', 'in', valid_sos.ids),
+        ('analytic_distribution', '=', False),
+    ])
+
+    for pol in orphan_pol:
+        pol['analytic_distribution'] = {pol.sale_line_id.order_id.project_account_id.id: 100}
+</field>
+    </record>
+
     <record id="action_wil_procurement_po" model="ir.actions.server">
         <field name="model_id" ref="x_work_item_line_model"/>
         <field name="state">code</field>
@@ -603,7 +620,7 @@ for wil in records:
                 'sale_order_id': so.id,
                 'sale_line_id': wil.x_work_item_id.x_sale_order_line_id.id,
                 'x_work_item_line_ids': [],
-                'analytic_distribution': {account_id: 100} if account_id else False
+                'analytic_distribution': {project.account_id.id: 100} if account_id else False
             }
         pols_by_key[line_key]['product_qty'] += delta
         pols_by_key[line_key]['x_work_item_line_ids'].append(Command.link(wil.id))
