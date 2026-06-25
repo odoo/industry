@@ -12,6 +12,8 @@
     'data': [
         'data/pos_category.xml',
         'data/pos_config.xml',
+        'data/ir_actions_server.xml',
+        'data/base_automation.xml',
         'data/product_category.xml',
         'data/product_public_category.xml',
         'data/product_template.xml',
