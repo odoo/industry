@@ -23,6 +23,7 @@
         <field name="field_description">Unit Cost</field>
         <field name="ttype">monetary</field>
         <field name="currency_field">x_currency_id</field>
+        <field name="readonly" eval="True"/>
     </record>
 
     <record model="ir.model.fields" id="field_mrp_bom_x_margin_percent">
@@ -42,6 +43,20 @@
 
 
 
+    <record model="ir.actions.server" id="action_compute_bom_cost_from_components">
+        <field name="name">Construction Developer: Compute BOM Cost from Components</field>
+        <field name="model_id" ref="mrp.model_mrp_bom" />
+        <field name="state">code</field>
+        <field name="code">
+for bom in records:
+    product = bom.product_id or bom.product_tmpl_id.product_variant_id
+
+    bom['x_unit_cost'] = product._compute_bom_price(bom) if product else 0.0
+env.ref('construction_developer.action_update_bom_price').with_context(records=records).run()
+</field>
+    </record>
+
+
     <!-- recompute margin only when changing the price -->
     <record model="ir.actions.server" id="action_update_bom_margin">
         <field name="name">Construction Developer: Update BOM Margin</field>
@@ -51,12 +66,13 @@
 for bom in record or records or []:
     cost = bom.x_unit_cost or 0.0
     new_margin = ((bom.x_unit_price or 0.0) - cost) / cost if cost else 0.0
-    
+
     # only write if the margin actually changed to avoid loops
     if float_compare((bom.x_margin_percent or 0.0), new_margin, precision_digits=2) != 0:
         bom['x_margin_percent'] = new_margin
 </field>
     </record>
+
     <record model="base.automation" id="automation_mrp_bom_on_write_x_unit_price">
         <field name="name">Construction Developer: Update margin on change</field>
         <field name="model_id" ref="mrp.model_mrp_bom" />
@@ -64,6 +80,7 @@ for bom in record or records or []:
         <field name="trigger">on_change</field>
         <field name="on_change_field_ids" eval="[(6, 0, [ref('field_mrp_bom_x_unit_price')])]"/>
     </record>
+
 
     <!-- recompute price when changing the margin or the cost -->
     <record model="ir.actions.server" id="action_update_bom_price">
@@ -79,6 +96,7 @@ for bom in record or records or []:
         bom['x_unit_price'] = new_price
 </field>
     </record>
+
     <record model="base.automation" id="automation_mrp_bom_on_write_x_margin_cost">
         <field name="name">Construction Developer: Update price on change</field>
         <field name="model_id" ref="mrp.model_mrp_bom" />
