@@ -9,16 +9,34 @@
         <field name="type">form</field>
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
+            <xpath expr="//form//header" position="inside">
+                <button string="Check Price Changes"
+                        name="%(action_sale_order_line_bom_list_view)d"
+                        type="action"
+                        invisible="not x_any_sol_bom"
+                        />
+            </xpath>
             <xpath expr="//notebook//page[@name='order_lines']//list//field[@name='product_template_id']" position="after">
                 <field name="x_bom_id"
                        domain="[('product_tmpl_id', '=', product_template_id)]"
                        optional="show"
                 />
             </xpath>
+            <xpath expr="//field[@name='order_line']/list//field[@name='route_ids']" position="after">
+                <field name="x_product_bom_template_id" column_invisible="True"/>
+                <button name="%(action_open_bom)d"
+                        type="action"
+                        class="btn btn-link"
+                        icon="fa-magic"
+                        width="1"
+                        invisible="not x_product_bom_template_id"
+                        string=" "
+                />
+            </xpath>
         </field>
     </record>
 
-    
+
     <record model="ir.ui.view" id="view_picking_type_form_inherit">
         <field name="inherit_id" ref="stock.view_picking_type_form"/>
         <field name="mode">extension</field>
@@ -88,7 +106,19 @@
                 <field name="x_currency_id" invisible="True"/>
                 <field name="x_price_different_from_so" invisible="True"/>
 
-                <field name="x_unit_cost" widget="monetary" options="{'currency_field': 'x_currency_id'}"/>
+                <label
+                    for="x_unit_cost"
+                    string="Unit Cost"
+                />
+                <div name="x_unit_cost">
+                    <field name="x_unit_cost" widget="monetary" options="{'currency_field': 'x_currency_id'}"/>
+                    <button
+                        name="%(action_compute_bom_cost_from_components)d"
+                        type="action"
+                        string="Compute Cost from Components"
+                        class="btn btn-link px-0"
+                    />
+                </div>
                 <field name="x_margin_percent" widget="percentage"/>
                 <label
                     for="x_unit_price"

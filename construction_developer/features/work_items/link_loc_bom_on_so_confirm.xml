@@ -20,13 +20,7 @@ for sol in self:
     </record>
 
 
-    <!-- <record model="ir.model.fields" id="field_mrp_bom_x_sale_order_id">
-        <field name="model_id" ref="mrp.model_mrp_bom"/>
-        <field name="ttype">many2one</field>
-        <field name="relation">sale.order</field>
-        <field name="name">x_sale_order_id</field>
-        <field name="field_description">Sale Order</field>
-    </record> -->
+
     <record model="ir.model.fields" id="field_mrp_bom_x_original_sol_id">
         <field name="model_id" ref="mrp.model_mrp_bom"/>
         <field name="ttype">many2one</field>
@@ -80,5 +74,30 @@ for mo in records:
             ('sale_line_id.x_bom_id', '!=', False),
         ]"/>
         <field name="name">Construction Developer: On Procurement MO Created from SO</field>
+    </record>
+
+
+    <record model="ir.actions.server" id="action_apply_locations_on_pickings">
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="name">Construction Developer: Apply Locations on Pickings Created from SO</field>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="stock.model_stock_picking"/>
+        <field name="update_path">location_id</field>
+        <field name="update_field_id" ref="stock.field_stock_picking__location_id"/>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[record.sale_id.partner_shipping_id.x_ws_location_id.id if record.sale_id else False]]></field>
+    </record>
+
+
+    <record model="base.automation" id="automation_on_picking_creation">
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_apply_locations_on_pickings')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain" eval="[
+            ('picking_type_id.x_source_loc_from_so', '=', True),
+            ('sale_id', '!=', False),
+        ]"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale_stock.field_stock_picking__sale_id')])]"/>
+        <field name="name">Construction Developer: On Picking Created from SO</field>
     </record>
 </odoo>

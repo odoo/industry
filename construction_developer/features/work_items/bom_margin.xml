@@ -26,6 +26,7 @@
         <field name="field_description">Unit Cost</field>
         <field name="model_id" ref="mrp.model_mrp_bom"/>
         <field name="currency_field">x_currency_id</field>
+        <field name="readonly" eval="True"/>
     </record>
 
     <record model="ir.model.fields" id="field_mrp_bom_x_margin_percent">
@@ -41,6 +42,21 @@
         <field name="field_description">Unit Sale Price</field>
         <field name="model_id" ref="mrp.model_mrp_bom"/>
         <field name="currency_field">x_currency_id</field>
+    </record>
+
+
+
+    <record model="ir.actions.server" id="action_compute_bom_cost_from_components">
+        <field name="name">Construction Developer: Compute BOM Cost from Components</field>
+        <field name="model_id" ref="mrp.model_mrp_bom" />
+        <field name="state">code</field>
+        <field name="code">
+for bom in records:
+    product = bom.product_id or bom.product_tmpl_id.product_variant_id
+
+    bom['x_unit_cost'] = product._compute_bom_price(bom) if product else 0.0
+env.ref('construction_developer.action_update_bom_price').with_context(records=records).run()
+</field>
     </record>
 
 

@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record model="ir.model.fields" id="field_sale_order_line_x_bom_price">
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="ttype">monetary</field>
+        <field name="name">x_bom_price</field>
+        <field name="field_description">BOM Price</field>
+        <field name="store" eval="False"/>
+        <field name="related">x_bom_id.x_unit_price</field>
+    </record>
+
+    <record model="ir.model.fields" id="field_sale_order_x_any_sol_bom">
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ttype">boolean</field>
+        <field name="name">x_any_sol_bom</field>
+        <field name="field_description">Any SOL Bom</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="depends">order_line,order_line.x_bom_id</field>
+        <field name="compute"><![CDATA[
+for so in self: so['x_any_sol_bom'] = bool(so.order_line.x_bom_id)
+]]></field>
+    </record>
+
+
+
+    <record model="ir.actions.server" id="action_apply_bom_price_to_sol">
+            <field name="name">Apply BOM Price</field>
+            <field name="model_id" ref="sale.model_sale_order_line"/>
+            <field name="state">code</field>
+            <field name="code">
+for sol in records:
+    if sol.x_bom_id:
+        sol.write({'price_unit': sol.x_bom_id.x_unit_price})
+action = {'type': 'ir.actions.client', 'tag': 'soft_reload'}
+</field>
+    </record>
+
+
+
+    <record model="ir.ui.view" id="sale_order_line_bom_list_view">
+        <field name="mode">primary</field>
+        <field name="model">sale.order.line</field>
+        <field name="name">sale.order.line.list.construction_developer</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list create="0" delete="0" editable="bottom">
+                <header>
+                    <button name="%(action_apply_bom_price_to_sol)d" 
+                            type="action" 
+                            string="Apply to Selected" 
+                            class="btn-primary"/>
+                </header>
+
+                <field name="sequence"/>
+                <field name="product_id" readonly="1"/>
+                <field name="price_unit"/>
+                <field name="x_bom_price" readonly="1"/>
+
+                <button name="%(action_apply_bom_price_to_sol)d" 
+                        type="action" 
+                        icon="fa-arrow-left" 
+                        title="Apply BOM Price" 
+                        string="Apply"
+                        invisible="price_unit == x_bom_price"/>
+            </list>
+        </field>
+    </record>
+
+
+
+    <record model="ir.actions.act_window" id="action_sale_order_line_bom_list_view">
+        <field name="name">Sale Order BOM Prices</field>
+        <field name="res_model">sale.order.line</field>
+        <field name="view_mode">list</field>
+        <field name="domain">[('order_id', '=', active_id), ('x_bom_id', '!=', False)]</field>
+        <field name="view_id" ref="sale_order_line_bom_list_view"/>
+        <field name="target">new</field>
+    </record>
+</odoo>
