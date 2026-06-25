@@ -1,10 +1,9 @@
 {
     'name': 'Campsite',
-    'version': '1.7',
+    'version': '1.8',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
-        'account_pos_settle_due',
         'base_industry_data',
         'booking_engine',
         'pos_restaurant',
