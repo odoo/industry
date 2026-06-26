@@ -14,6 +14,8 @@ _logger = logging.getLogger(__name__)
 
 CATEGORIES = {'Services', 'Retail', 'Construction', 'Hospitality', 'Health and Fitness', 'Supply Chain'}
 
+HIDDEN_TECHNICAL_MODULE = {'base_industry_data'}
+
 MANDATORY_KEYS = {
     'author': 'Odoo S.A.',
     'category': '',
@@ -66,17 +68,18 @@ class ManifestTest(ManifestLinter, IndustryCase):
                 if key == 'license' and not any(mod in manifest_data.get('depends', []) for mod in ['base_industry_data', 'knowledge', 'web_studio']):
                     expected_value = 'LGPL-3'
                 self.assertEqual(value, expected_value, f"Wrong {key} '{value}' in manifest, it should be {expected_value}")
-            if is_industry:
-                if key == 'category':
+            if key == 'category':
+                if module not in HIDDEN_TECHNICAL_MODULE:
                     self.assertIn(value, CATEGORIES, f"Invalid category '{value}' not in {CATEGORIES}")
-                elif key == 'url':
+                else:
+                    self.assertNotIn(value, CATEGORIES, f"Module category '{value}' should not be an industry category: {CATEGORIES}")
+            if is_industry:
+                if key == 'url':
                     self.assertEqual(value, f"https://www.odoo.com/trial?industry&selected_app={module}", f"The url should link to the trial page: https://www.odoo.com/trial?industry&selected_app={module}")
                 elif key == 'website':
                     self.assertTrue(
                         value.startswith("https://www.odoo.com/industries/") or value == "https://www.odoo.com/all-industries", "The url should link to the odoo.com page."
                     )
-            elif key == 'category':
-                self.assertNotIn(value, CATEGORIES, f"Module category '{value}' should not be an industry category: {CATEGORIES}")
         self._test_files_in_manifest(manifest_data, 'data')
         if manifest_data.get('demo'):
             self._test_files_in_manifest(manifest_data, 'demo')
