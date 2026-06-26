@@ -1,7 +1,7 @@
 {
     'name': 'Usage Based Maintenance',
     'version': '1.1',
-    'category': 'Hidden/Tools',
+    'category': 'Construction',
     'author': 'Odoo S.A.',
     'depends': [
         'industry_fsm_sale_report',
