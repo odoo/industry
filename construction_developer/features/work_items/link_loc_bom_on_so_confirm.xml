@@ -15,8 +15,8 @@
         <field name="depends">product_template_id,product_template_id.bom_ids,product_template_id.route_ids</field>
         <field name="compute"><![CDATA[
 for sol in self:
-    if not sol.x_bom_id and sol.product_template_id.bom_ids and sol.product_template_id.route_ids: 
-        sol['x_bom_id'] = sol.product_template_id.bom_ids.filtered(lambda b: b.x_is_template)[0].id
+    if not sol.x_bom_id and (boms := sol.product_template_id.bom_ids) and sol.product_template_id.route_ids: 
+        sol['x_bom_id'] = fboms[0].id if (fboms := boms.filtered(lambda b: b.x_is_template)) else boms[0]
 ]]></field>
     </record>
 
