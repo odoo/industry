@@ -1,7 +1,7 @@
 {
     'name': 'Recurring Rental Billing',
     'version': '1.0',
-    'category': 'Hidden/Tools',
+    'category': 'Construction',
     'author': 'Odoo S.A.',
     'depends': [
         'base_industry_data',
