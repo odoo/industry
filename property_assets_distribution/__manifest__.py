@@ -1,7 +1,7 @@
 {
     'name': 'Property Assets & Distribution',
     'version': '1.1',
-    'category': 'Hidden/Tools',
+    'category': 'Services',
     'depends': [
         'sale_subscription',
         'web_studio',
