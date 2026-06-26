@@ -85,3 +85,39 @@ class ActionServerTestCase(TransactionCase):
         self.assertEqual(self.test_template_work_item.x_unit_margin, 0.5, "When margin is fixed, the margin of work item should stay the same when the cost of a component changes")
         self.assertEqual(self.test_template_work_item.x_unit_cost, 90.0, "When margin is fixed, the cost of work item should be recomputed when the cost of a component changes")
         self.assertEqual(self.test_template_work_item.x_unit_price, 135.0, "When margin is fixed, the price of work item should be recomputed when the cost of a component changes")
+
+    def test_product_price_update_when_work_item_template_price_updated(self):
+        self.test_template_work_item.x_is_margin_fixed = True
+        self.test_template_work_item.x_unit_price = 200
+        self.assertEqual(self.test_product.lst_price, 200, "The product price should be updated when the work item price is updated")
+        self.test_template_work_item.x_unit_price = 300
+        self.assertEqual(self.test_product.lst_price, 300, "The product price should be updated when the work item price is updated")
+
+        self.test_template_work_item.x_unit_cost = 100
+        self.assertEqual(self.test_product.standard_price, 100, "The product price should be updated when the work item cost is updated")
+        self.test_template_work_item.x_unit_cost = 150
+        self.assertEqual(self.test_product.standard_price, 150, "The product price should be updated when the work item cost is updated")
+
+    def test_sale_order_line_price_update_when_work_item_price_updated(self):
+        new_work_item = self.test_template_work_item.copy({
+            'x_is_template': False,
+            'x_unit_price': 200,
+            'x_unit_cost': 100,
+        })
+        test_sale_order_1 = self.env['sale.order'].create({
+            'partner_id': self.partner_1.id,
+        })
+        test_sale_order_line_1 = self.env['sale.order.line'].create({
+            'order_id': test_sale_order_1.id,
+            'product_id': new_work_item.x_product_id.id,
+            'product_uom_qty': 1,
+        })
+        new_work_item.write({'x_sale_order_line_id': test_sale_order_line_1.id})
+
+        self.assertEqual(test_sale_order_line_1.price_unit, new_work_item.x_unit_price, "The sale order line price should be equal to the work item price when the sale order line is created")
+        new_work_item.x_unit_price = 300
+        self.assertEqual(test_sale_order_line_1.price_unit, new_work_item.x_unit_price, "The sale order line price should be updated when the work item price is updated")
+
+        self.assertEqual(test_sale_order_line_1.purchase_price, new_work_item.x_unit_cost, "The sale order line cost should be equal to the work item cost when the sale order line is created")
+        new_work_item.x_unit_cost = 150
+        self.assertEqual(test_sale_order_line_1.purchase_price, new_work_item.x_unit_cost, "The sale order line cost should be equal to the work item cost when the sale order line is created")
