@@ -1,7 +1,7 @@
 {
-    'name': 'Booking Engine',
+    'name': 'Booking',
     'version': '1.20',
-    'category': 'Hidden/Tools',
+    'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
         'base_automation',

@@ -1,7 +1,7 @@
 {
     'name': 'Product Conversion & Grading Management',
     'version': '1.1',
-    'category': 'Inventory',
+    'category': 'Supply Chain',
     'depends': [
         'mrp',
         'web_studio',

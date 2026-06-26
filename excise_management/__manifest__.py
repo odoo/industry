@@ -1,7 +1,7 @@
 {
     'name': 'Excise Management',
     'version': '2.8',
-    'category': 'Inventory/Inventory',
+    'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
         'account_tax_python',
