@@ -1,7 +1,7 @@
 {
     'name': 'Account - Point of Sale Settle Due',
     'version': '1.2',
-    'category': 'Point of Sale',
+    'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
         'pos_settle_due',
