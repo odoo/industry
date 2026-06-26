@@ -68,14 +68,23 @@ class ActionServerTestCase(TransactionCase):
         self.assertEqual(self.test_template_work_item.x_unit_cost, 50.0, "The cost of work item is not computed correctly: it should be the sum of the product of components costs by quantity")
         self.assertEqual(self.test_template_work_item.x_unit_price, 100.0, "The price of work item is not computed correctly: it should be the sum of the product of components prices by quantity")
         self.assertEqual(self.test_template_work_item.x_unit_margin, 1.0, "The margin of work item is not computed correctly: it should be equal to 1.0 at this point")
+        self.assertEqual(self.test_product.standard_price, 50.0, "The product cost should be updated when the work item cost is updated")
+        self.assertEqual(self.test_product.lst_price, 100.0, "The product price should be updated when the work item price is updated")
+
         test_template_work_item_lines[0].x_unit_cost = 20
         self.assertEqual(self.test_template_work_item.x_unit_cost, 100.0, "The cost of work item is not recomputed correctly when the cost of a component changes")
         self.assertEqual(self.test_template_work_item.x_unit_price, 100.0, "The price of work item changes when the cost of a component changes but it should not happen")
         self.assertEqual(self.test_template_work_item.x_unit_margin, 0.0, "The margin of work item is not correct after the cost of a component changes: it should be recomputed to represent the new value")
+        self.assertEqual(self.test_product.standard_price, 100.0, "The product cost should be updated when the work item cost is updated")
+        self.assertEqual(self.test_product.lst_price, 100.0, "The product price should be updated when the work item price is updated")
+
         test_template_work_item_lines[1].x_unit_price = 240
         self.assertEqual(self.test_template_work_item.x_unit_cost, 100.0, "The cost of work item changes after the price of a component changes while it should not happen")
         self.assertEqual(self.test_template_work_item.x_unit_price, 300.0, "The price of work item is not recomputed correctly when the price of a component changes")
         self.assertEqual(self.test_template_work_item.x_unit_margin, 2.0, "The margin of work item is not correct after the price of a component changes: it should be recomputed to represent the new value")
+        self.assertEqual(self.test_product.standard_price, 100.0, "The product cost should be updated when the work item cost is updated")
+        self.assertEqual(self.test_product.lst_price, 300.0, "The product price should be updated when the work item price is updated")
+
         self.test_template_work_item.x_is_margin_fixed = True
         self.test_template_work_item.x_unit_price = 200
         self.assertEqual(self.test_template_work_item.x_unit_margin, 1.0, "When margin is fixed, the margin should be recomputed if we change manually the price of work item")
@@ -85,3 +94,59 @@ class ActionServerTestCase(TransactionCase):
         self.assertEqual(self.test_template_work_item.x_unit_margin, 0.5, "When margin is fixed, the margin of work item should stay the same when the cost of a component changes")
         self.assertEqual(self.test_template_work_item.x_unit_cost, 90.0, "When margin is fixed, the cost of work item should be recomputed when the cost of a component changes")
         self.assertEqual(self.test_template_work_item.x_unit_price, 135.0, "When margin is fixed, the price of work item should be recomputed when the cost of a component changes")
+        self.assertEqual(self.test_product.standard_price, 90.0, "The product cost should be updated when the work item cost is updated")
+        self.assertEqual(self.test_product.lst_price, 135.0, "The product price should be updated when the work item price is updated")
+
+    def test_sale_order_line_price_update_when_work_item_price_updated(self):
+
+        component_product_1 = self.env['product.product'].create({
+            'name': 'Component Product 1',
+            'lst_price': 15,
+            'standard_price': 10,
+        })
+        component_product_2 = self.env['product.product'].create({
+            'name': 'Component Product 2',
+            'lst_price': 40,
+            'standard_price': 10,
+        })
+        wi_form = Form(self.test_template_work_item)
+        with wi_form.x_work_item_line_ids.new() as wi_line:
+            wi_line.x_product_id = component_product_1
+            wi_line.x_quantity = 4
+        with wi_form.x_work_item_line_ids.new() as wi_line:
+            wi_line.x_product_id = component_product_2
+        wi_form.save()
+
+        new_work_item = self.test_template_work_item.copy({
+            'x_is_template': False,
+        })
+        test_sale_order_1 = self.env['sale.order'].create({
+            'partner_id': self.partner_1.id,
+        })
+        test_sale_order_line_1 = self.env['sale.order.line'].create({
+            'order_id': test_sale_order_1.id,
+            'product_id': new_work_item.x_product_id.id,
+            'product_uom_qty': 1,
+        })
+        new_work_item.write({'x_sale_order_line_id': test_sale_order_line_1.id})
+
+        new_work_item_lines = new_work_item.x_work_item_line_ids
+        self.assertEqual(new_work_item.x_unit_cost, 50.0, "The cost of work item is not computed correctly: it should be the sum of the product of components costs by quantity")
+        self.assertEqual(new_work_item.x_unit_price, 100.0, "The price of work item is not computed correctly: it should be the sum of the product of components prices by quantity")
+        self.assertEqual(new_work_item.x_unit_margin, 1.0, "The margin of work item is not computed correctly: it should be equal to 1.0 at this point")
+        self.assertEqual(test_sale_order_line_1.purchase_price, 50.0, "The sale order line cost should be equal to the work item cost when the sale order line is created")
+        self.assertEqual(test_sale_order_line_1.price_unit, 100.0, "The sale order line price should be equal to the work item price when the sale order line is created")
+        self.assertEqual(self.test_product.standard_price, 50.0, "The product cost should be equal to the work item (template) cost")
+        self.assertEqual(self.test_product.lst_price, 100.0, "The product price should be equal to the work item (template) price")
+
+        new_work_item_lines[0].x_unit_cost = 15
+        new_work_item_lines[0].x_unit_price = 35
+        new_work_item_lines[1].x_unit_cost = 40
+        new_work_item_lines[1].x_unit_price = 60
+        self.assertEqual(new_work_item.x_unit_cost, 100.0, "The cost of work item is not computed correctly: it should be the sum of the product of components costs by quantity")
+        self.assertEqual(new_work_item.x_unit_price, 200.0, "The price of work item is not computed correctly: it should be the sum of the product of components prices by quantity")
+        self.assertEqual(new_work_item.x_unit_margin, 1.0, "The margin of work item is not computed correctly: it should be equal to 1.0 at this point")
+        self.assertEqual(test_sale_order_line_1.purchase_price, 100.0, "The sale order line cost should be equal to the work item cost when work item cost is updated")
+        self.assertEqual(test_sale_order_line_1.price_unit, 200.0, "The sale order line price should be equal to the work item price when work item price is updated")
+        self.assertEqual(self.test_product.standard_price, 50.0, "The product cost should not be updated when the work item (not template) cost is updated")
+        self.assertEqual(self.test_product.lst_price, 100.0, "The product price should not be updated when the work item (not template) price is updated")
