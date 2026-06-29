@@ -1,6 +1,6 @@
 {
     'name': 'HVAC Services',
-    'version': '1.5',
+    'version': '1.6',
     'category': 'Services',
     'depends': [
         'appointment_account_payment',
@@ -34,6 +34,7 @@
         'data/ir_actions_act_window.xml',
         'data/ir_actions_server.xml',
         'data/ir_ui_view.xml',
+        'data/qweb_view.xml',
         'data/worksheet_template.xml',
         'data/project_project.xml',
         'data/product_template.xml',
@@ -62,6 +63,7 @@
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
+        'data/qweb_view.xml',
     ],
     'application': True,
     'images': ['images/main.png'],
