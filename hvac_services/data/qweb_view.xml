@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="report_invoice_document_serials" inherit_id="account.report_invoice_document">
+        <xpath expr="//t[@t-set='display_taxes']" position="after">
+            <t t-set="line_serials_map" t-value="{l.id: l.sale_line_ids.x_maintained_serials_ids for l in o.invoice_line_ids}"/>
+            <t t-set="display_serials" t-value="any(line_serials_map.values())"/>
+        </xpath>
+        <xpath expr="//th[@name='th_description']" position="after">
+            <th name="th_serials" t-if="display_serials" class="text-start" groups="stock_account.group_lot_on_invoice">
+                <span>Serial(s)</span>
+            </th>
+        </xpath>
+        <xpath expr="//td[@name='account_invoice_line_name']" position="after">
+            <t t-set="line_serials" t-value="line_serials_map.get(line.id)"/>
+            <td name="td_serials" t-if="display_serials" class="text-start" groups="stock_account.group_lot_on_invoice">
+                <span t-if="line_serials">
+                    <t t-foreach="line_serials" t-as="lot" t-key="lot.id">
+                        <t t-out="lot.name"/><br/>
+                    </t>
+                </span>
+            </td>
+        </xpath>
+    </template>
+</odoo>
