@@ -17,7 +17,6 @@
     'data': [
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
-        'data/qweb_view.xml',
         'data/product_public_category.xml',
         'data/product_category.xml',
         'data/pos_category.xml',
@@ -72,7 +71,6 @@
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
-        "data/qweb_view.xml",
         "static/src/js/my_tour.js",
         "data/website_view.xml",
         "demo/website_view.xml",
