@@ -164,6 +164,7 @@ for sol in records:
 moves = env['stock.move'].create(moves_vals) if moves_vals else False
 
 if moves and (pickings := moves.picking_id.ids):
+    moves.picking_id.button_validate()
     action = {'type': 'ir.actions.act_window', 'res_model': 'stock.picking', 'name': "Transfers",
               'view_mode': 'list,form' if len(pickings) > 1 else 'form',
              } | ({'domain': [('id', 'in', pickings)]} if len(pickings) > 1 else {'res_id': pickings[0]})
