@@ -47,6 +47,15 @@ base_domain = [('website_id', '=', website.id)]
 menus.search(base_domain + [('url', 'in', ['/appointment'])]).unlink()
 # Rename /shop menu to "Rooms"
 menus.search(base_domain + [('url', '=', '/shop')], limit=1).write({'name': 'Rooms'})
+# Add Contact Us menu item
+top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
+if not menus.search(base_domain + [('url', '=', '/contactus')]):
+    menus.create({
+        'name': 'Contact Us',
+        'url': '/contactus',
+        'website_id': website.id,
+        'parent_id': top_menu.id if top_menu else False,
+    })
         </field>
     </record>
 
