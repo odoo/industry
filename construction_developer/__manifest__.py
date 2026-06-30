@@ -11,10 +11,10 @@
     'data': [
         'data/res_config_settings.xml',
         'data/stock_location.xml',
-        'features/create_worksite_location_on_so_confirm.xml',
+        'features/work_items/create_worksite_location_on_so_confirm.xml',
         'features/work_items/route_configs.xml',
         'features/work_items/link_loc_bom_on_so_confirm.xml',
-        'features/work_items/product_bom_template.xml',
+        'features/work_items/product_bom_template_and_routes.xml',
         'features/work_items/bom_margin.xml',
         'features/work_items/update_sol_price_from_bom.xml',
         'features/work_items/access_bom_from_so.xml',

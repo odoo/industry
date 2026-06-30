@@ -54,6 +54,22 @@
     </record>
 
 
+    <record model="ir.ui.view" id="stock_location_route_form_view_inherit">
+        <field name="inherit_id" ref="stock.stock_location_route_form_view"/>
+        <field name="mode">extension</field>
+        <field name="model">stock.route</field>
+        <field name="name">stock.route.form.inherit.construction_developer</field>
+        <field name="priority">1600</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sale_selectable']" position="after">
+                <field name="x_allow_sol_preselect"/>
+            </xpath>
+        </field>
+    </record>
+
+
     <record model="ir.ui.view" id="product_template_form_view_inherit">
         <field name="name">product.template.form.inherit.construction_developer</field>
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
@@ -65,8 +81,12 @@
         <field name="arch" type="xml">
             <xpath expr="//group[@name='group_lots_and_weight']" position="inside">
                 <label for="x_bom_template_id"/>
-                <div invisible="False">
-                    <field name="x_bom_template_id" required="x_bom_available" domain="[('product_tmpl_id.id', '=', id), ('type', '=', 'normal')]"/>
+                <div>
+                    <field name="x_bom_template_id"
+                           required="x_bom_available"
+                           domain="[('product_tmpl_id.id', '=', id), ('type', '=', 'normal')]"
+                           context="{'default_product_tmpl_id': id, 'type': 'normal'}"
+                    />
                 </div>
             </xpath>
         </field>
@@ -81,10 +101,9 @@
         <field name="priority">1600</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
-            <xpath expr="//form[1]/sheet[1]/group[1]/group[1]" position="inside">
+            <xpath expr="//field[@name='product_tmpl_id']/.." position="inside">
                 <label
                     for="x_is_template"
-                    string="Is Template"
                     invisible="type != 'normal'"
                 />
                 <div
@@ -97,19 +116,14 @@
                         type="action"
                         string="Set as Template"
                         class="btn btn-link px-0"
-                        invisible="not (x_is_template == False and type == 'normal')"
+                        invisible="x_is_template"
                     />
                 </div>
             </xpath>
             <xpath expr="//form[1]/sheet[1]/group[1]/group[2]" position="inside">
-                <field name="x_original_sol_id" invisible="True"/>
                 <field name="x_currency_id" invisible="True"/>
-                <field name="x_price_different_from_so" invisible="True"/>
 
-                <label
-                    for="x_unit_cost"
-                    string="Unit Cost"
-                />
+                <label for="x_unit_cost"/>
                 <div name="x_unit_cost">
                     <field name="x_unit_cost" widget="monetary" options="{'currency_field': 'x_currency_id'}"/>
                     <button
@@ -119,11 +133,10 @@
                         class="btn btn-link px-0"
                     />
                 </div>
+
                 <field name="x_margin_percent" widget="percentage"/>
-                <label
-                    for="x_unit_price"
-                    string="Unit Price"
-                />
+
+                <label for="x_unit_price"/>
                 <div name="x_unit_price">
                     <field name="x_unit_price" widget="monetary" options="{'currency_field': 'x_currency_id'}"/>
                     <button

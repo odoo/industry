@@ -12,6 +12,7 @@
         <field name="related">product_id.product_tmpl_id.x_bom_template_id</field>
         <field name="name">x_product_bom_template_id</field>
         <field name="field_description">Product Bill of Materials</field>
+        <field name="store" eval="False"/>
     </record>
 
 
@@ -24,10 +25,7 @@
 if (bom := (custom_bom := record.x_bom_id)):
     # if it's not already done: immediately create a copy for this SOL
     if bom.x_original_sol_id.id != record.id:
-        expected_code = f"{record.order_id.name} - {record.order_id.partner_id.name}" + f" - {bom.code}" * bool(bom.code)
-
-        custom_bom = bom.copy({'code': expected_code, 'x_original_sol_id': record.id, 'x_parent_bom_id': bom.id})
-        record['x_bom_id'] = custom_bom.id
+        custom_bom = env.ref('construction_developer.action_duplicate_bom').with_context(bom=bom, bom_sol=record).run()
 
     action = {'type': 'ir.actions.act_window', 'name': f'Configure Order BOM: {custom_bom.code}', 'view_mode': 'form', 'target': 'new',
               'res_model': 'mrp.bom', 'res_id': custom_bom.id}

@@ -26,13 +26,11 @@ for bom in self:
     prod_bom = bom.product_tmpl_id.x_bom_template_id
     
     if prod_bom.id == bom.id and bom.type == 'normal':
-        bom.write({'x_is_template': True, 'code': "Template"})
+        bom.write({'x_is_template': True})
     else:
         bom['x_is_template'] = False
         if prod_bom.id == bom.id:  # Used to be the template for this product. Unlink it
             bom.product_tmpl_id['x_bom_template_id'] = False
-        if bom.code == "Template":
-            bom['code'] = False
 ]]></field>
     </record>
 
@@ -66,6 +64,26 @@ for p in self: p['x_bom_available'] = bool(self.env['mrp.bom'].search_count([('p
         <field name="trigger">on_create</field>
         <field name="filter_domain">[('product_tmpl_id.x_bom_template_id', '=', False)]</field>
         <field name="name">Construction Developer: Set Default Product Bom on Template BOM create</field>
+    </record>
+
+    <!-- change the code when x_is_template is toggled -->
+    <record model="ir.actions.server" id="action_set_bom_template_code">
+        <field name="name">Construction Developer: Set BOM Template Code</field>
+        <field name="model_id" ref="mrp.model_mrp_bom"/>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="mrp.model_mrp_bom"/>
+        <field name="update_path">code</field>
+        <field name="update_field_id" ref="mrp.field_mrp_bom__code"/>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA["Template" if record.x_is_template else (False if record.code == "Template" else record.code)]]></field>
+    </record>
+
+    <record model="base.automation" id="automation_set_bom_template_code_on_x_is_template_write">
+        <field name="model_id" ref="mrp.model_mrp_bom"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('construction_developer.action_set_bom_template_code')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('construction_developer.field_mrp_bom_x_is_template')])]"/>
+        <field name="name">Construction Developer: Update BOM code on template status change</field>
     </record>
 
 

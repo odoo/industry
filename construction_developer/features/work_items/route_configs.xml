@@ -19,6 +19,13 @@
         <field name="field_description">Source Location from SO</field>
         <field name="help">Once enabled, the source location for the created delivery will be the one from the SO.</field>
     </record>
+    <record model="ir.model.fields" id="field_stock_route_x_allow_sol_preselect">
+        <field name="model_id" ref="stock.model_stock_route"/>
+        <field name="ttype">boolean</field>
+        <field name="name">x_allow_sol_preselect</field>
+        <field name="field_description">Allow Preselection on SOL</field>
+        <field name="help">Once enabled, allows the BOMs of products with this route to be preselected on Sale Order Lines.</field>
+    </record>
 
     <data noupdate="1">
         <record model="stock.picking.type" id="stock_picking_type_on_site_consumption_bom">
@@ -33,6 +40,7 @@
             <field name="name">Replenish on Order (MTO) BOM</field>
             <field name="product_categ_selectable" eval="True"/>
             <field name="sale_selectable" eval="True"/>
+            <field name="x_allow_sol_preselect" eval="True"/>
         </record>
         <record model="stock.rule" id="stock_rule_on_site_consumption_bom">
             <field name="name">Pull from Location</field>
@@ -119,8 +127,9 @@
         <record id="default_product_routes" model="ir.default">
             <field name="field_id" ref="stock.field_product_template__route_ids"/>
             <field name="json_value" model="stock.route" eval="[
+                obj().env.ref('purchase_stock.route_warehouse0_buy').id,
                 obj().env.ref('construction_developer.stock_route_warehouse_on_site_delivery').id,
-                obj().env.ref('purchase_stock.route_warehouse0_buy').id
+                obj().env.ref('construction_developer.stock_route_on_site_consumption_goods').id,
             ]"/>
         </record>
     </data>
