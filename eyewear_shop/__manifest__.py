@@ -1,8 +1,26 @@
 {
+<<<<<<< 6d88a414f00bac1b48b11e4a9729ecb41a0d0e33
     'name': 'Eyewear Shop',
     'version': '1.3',
     'category': 'Health and Fitness',
     'author': 'Odoo S.A.',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'name': 'Eyewear Store',
+    'version': '1.0',
+    'category': 'Health and Fitness',
+    'description': """
+This module is for stylish and affordable eyewear. It will deal with various types of eyewear like Sunglasses, Contact Lenses, Specialty eyewear, etc.
+The sales process involves creating sale orders, managing deliveries and invoicing. Additionally, they operate an eCommerce shop for online sales in the eyewear industry.
+""",
+=======
+    'name': 'Eyewear Store',
+    'version': '1.0',
+    'category': 'Health, Wellness and Personal Care',
+    'description': """
+This module is for stylish and affordable eyewear. It will deal with various types of eyewear like Sunglasses, Contact Lenses, Specialty eyewear, etc.
+The sales process involves creating sale orders, managing deliveries and invoicing. Additionally, they operate an eCommerce shop for online sales in the eyewear industry.
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'appointment_crm',
         'base_industry_data',
