@@ -1,8 +1,9 @@
 {
     'name': 'Law Firm',
-    'version': '1.4',
+    'version': '1.5',
     'category': 'Services',
     'depends': [
+        'ai_app',
         'base_industry_data',
         'contacts',
         'crm',
@@ -37,6 +38,7 @@
         'data/hr_employee_category.xml',
         'data/sign_item_role.xml',
         'data/ir_attachment.xml',
+        'data/ai_agent.xml',
         'data/website_view.xml',
         'data/website_page.xml',
         'data/website_theme_apply.xml',
