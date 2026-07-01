@@ -43,7 +43,7 @@ fi
 
 INDUSTRY_PATH="industry/"
 PYTHON_BIN="python3"
-ODOO_BIN="odoo/odoo-bin"
+ODOO_BIN="community/odoo-bin"
 ADDONS_PATH="$INDUSTRY_PATH/tests,enterprise,odoo/addons,odoo/odoo/addons,design-themes"
 IFS=',' read -r -a MODULES <<< "$INDUSTRY_NAME"
 MODULES=($(printf '%s\n' "${MODULES[@]}" | sort))
