@@ -44,6 +44,7 @@
         'demo/x_remark_stage.xml',
         'demo/x_remark.xml',
         'demo/sale_order_post.xml',
+        'demo/project_task_post.xml',
         'demo/ir_attachment.xml',
     ],
     'assets': {

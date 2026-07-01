@@ -14,17 +14,55 @@ for record in records: record['x_cost_nature'] = record.x_cost_nature or record.
         <field name="name">Construction Developer: Initialize Sales Order Line Sequence on Sales Order create</field>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-sequences = record.order_line.mapped('sequence')
-if len(sequences) != len(set(sequences)):  # not all different: create order
-    new_sols = []
-    for sol_i, sol in enumerate(record.order_line):
-        previous_same_sequences = sum(seq == sequences[sol_i] for seq in sequences[:sol_i + 1])
-        # Handle duplicates by adding fractional offsets which will be used to order the list
-        new_sols.append((sol.id, sol.sequence + (previous_same_sequences / sequences.count(sol.sequence))))
-    seqs = {sid: i for (i, (sid, _)) in enumerate(sorted(new_sols, key=lambda soltup: soltup[1]))}         # Associate each sid with its sequence (order) when sorted
-else:  # all different: use existing order
-    seqs = {sol.id: i for (i, sol) in enumerate(sorted(record.order_line, key=lambda sol: sol.sequence))}  # Associate each sid with its sequence (order) when sorted
-for sol in record.order_line: sol['sequence'] = seqs[sol.id] + 1
+for record in records:
+    sequences = record.order_line.mapped('sequence')
+    if len(sequences) != len(set(sequences)):  # not all different: create order
+        new_sols = []
+        for sol_i, sol in enumerate(record.order_line):
+            previous_same_sequences = sum(seq == sequences[sol_i] for seq in sequences[:sol_i + 1])
+            # Handle duplicates by adding fractional offsets which will be used to order the list
+            new_sols.append((sol.id, sol.sequence + (previous_same_sequences / sequences.count(sol.sequence))))
+        seqs = {sid: i for (i, (sid, _)) in enumerate(sorted(new_sols, key=lambda soltup: soltup[1]))}         # Associate each sid with its sequence (order) when sorted
+    else:  # all different: use existing order
+        seqs = {sol.id: i for (i, sol) in enumerate(sorted(record.order_line, key=lambda sol: sol.sequence))}  # Associate each sid with its sequence (order) when sorted
+    for sol in record.order_line: sol['sequence'] = seqs[sol.id] + 1
+]]></field>
+    </record>
+    <record id="server_action_update_sol_numbering" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Update SOL numbering</field>
+        <field name="code"><![CDATA[
+env.ref('construction_developer.server_action_setup_sol_numbering').with_context(active_ids = records.order_id.ids, active_model="sale.order").run()
+]]></field>
+    </record>
+    <record id="server_action_setup_sol_numbering" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Setup SOL numbering</field>
+        <field name="code"><![CDATA[
+for record in records:
+    l1, l2, l3 = 0, 0, 0
+    
+    for sol in (sols := list(record.order_line.filtered(lambda sol: sol.display_type in [False, 'line_section', 'line_subsection']).sorted('sequence'))):
+        # Cannot use parent_id: when changing a line to another nesting level, the parent_id field
+        # is not updated yet when this automation is called
+        # Note: if a subsection is dragged out of a section and placed at the very top, it becomes a section
+        above_section = list(filter(lambda sol: sol.display_type != False, sols[:sols.index(sol)]))[-1:]
+
+        # top-level row (section, or product above first section)
+        if sol.display_type == 'line_section' or (sol.display_type == False and not above_section):
+            l1 += 1
+        # middle-level row (subsection, or product under a section)
+        elif sol.display_type == 'line_subsection' or above_section[0].display_type == 'line_section':
+            l2 += 1
+        # bottom-level row (product)
+        else:
+            l3 += 1
+        l2 = l2 * (sol.display_type != 'line_section'); l3 = l3 * (sol.display_type == False)
+
+        new_item_number = "".join([f"{n}." for n in [l1, l2, l3] if n])
+        sol.write({'x_item_number': new_item_number} if sol.x_item_number != new_item_number else {})
 ]]></field>
     </record>
     <record id="action_sol_update_progress_increment_on_change" model="ir.actions.server">
@@ -400,5 +438,232 @@ if so_ids != [0]:
     # add active_ids to the context of the action
     action['context']['active_ids'] = so_ids
 ]]></field>
+    </record>
+
+    <record id="server_action_show_wbs" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Create WBS</field>
+        <field name="code">
+action = env['ir.actions.actions'].with_context(active_id=(p_id := record.x_wbs_project.id))._for_xml_id('project.act_project_project_2_project_task_all')
+action['context'] = {'active_id': p_id, 'default_project_id': p_id, 'default_user_ids': [env.uid]}
+# By default it fetches the default gantt view, so we have to specify this one
+gantt_view = env.ref('construction_developer.project_task_dependency_view_gantt_inherit', raise_if_not_found=False)
+
+# Select the gantt view by default
+action['views'] = [(gantt_view.id if gantt_view else False, 'gantt')] + [v for v in action.get('views', []) if v[1] != 'gantt']
+</field>
+    </record>
+
+    <record id="server_action_transfer_wbs" model="ir.actions.server">
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Transfer WBS</field>
+        <field name="code">
+wbss = records.filtered(lambda p: any([(t.x_sale_line_id or t.sale_line_id).order_id.x_wbs_project.id == p.id for t in p.tasks]))
+if len(records) != 2 or len(wbss) != 1:
+    action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'message': "Error: Please select exactly ONE WBS project and ONE target project.", 'type': 'danger'}}
+else:
+    project = records - wbss
+    wbs_name, project_name, n = wbss.name, project.name, len(wbss.tasks)
+    wbss.tasks.write({'project_id': project.id})
+    action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'message': f"Transferred {n} tasks from {wbs_name} to {project_name}", 'type': 'success', 'next': {'type': 'ir.actions.client', 'tag': 'soft_reload'}}}
+</field>
+    </record>
+
+    <record id="server_action_update_and_remove_wbs_project_on_task_project_change" model="ir.actions.server">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Update Analytic Account and Delete WBS Project on Task Project change</field>
+        <field name="code">
+for record in records:
+    sol = record.sale_line_id or record.x_sale_line_id
+    project = (so := sol.order_id).x_wbs_project
+    if project and not env['project.task'].search_count([('project_id', '=', project.id)], limit=1):
+        project['account_id'] = False
+        project.unlink()
+        so.message_post(body=f"All WBS Tasks were moved out of the WBS project, so the WBS project was deleted.")
+</field>
+    </record>
+
+    <record id="server_action_sale_order_update_wbs_on_confirm" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Update WBS on Sale Order confirm</field>
+        <field name="code">
+for record in records:
+    for task in record.x_wbs_project.tasks:
+        if task.x_sale_line_id:
+            task.write({'x_sale_line_id': False, 'sale_line_id': task.x_sale_line_id.id})
+</field>
+    </record>
+
+    <record id="server_action_create_wbs" model="ir.actions.server">
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Create WBS</field>
+        <field name="code">
+uom_hour = env.ref('uom.product_uom_hour')
+
+for record in (records if all(records.filtered(lambda r: r.state != 'cancel')) else []):
+    # when a SO is confirmed: use the default field sale_line_id
+    # when a SO is NOT confirmed, use x_sale_line_id otherwise the SO is automatically confirmed
+
+    line_field = 'sale_line_id' if (confirmed := record.state != 'draft') else 'x_sale_line_id'
+
+    # PROJECT
+    # if SO already confirmed: potential projects already created
+
+    if not (project := record.project_id):
+        project = env['project.project'].search([('sale_order_id', '=', record.id)], limit=1)
+
+    if not project:
+        project = env['project.project'].create({
+            'name': f"{record.name} WBS - {record.partner_id.name}",
+            'partner_id': record.partner_id.id,
+            'company_id': record.company_id.id,
+            'allow_timesheets': True,
+            'allow_billable': True,
+            'sale_order_id': record.id,
+        })
+    if not record.project_id:
+        record['project_id'] = project.id
+
+    record['x_wbs_project'] = project.id
+
+    # WBS CREATION AND UPDATE LOOP
+    parent_lvl1, parent_lvl2 = False, False
+    current_day_offset = 0
+
+    for line in record.order_line:
+        # If the line is already processed, update parents and offset then skip
+        if line.x_wbs_ready:
+            if line.display_type == 'line_section':
+                # Fetch the existing section task to act as parent for upcoming lines
+                parent_lvl1 = env['project.task'].search([('project_id', '=', project.id), (line_field, '=', line.id)], limit=1)
+                parent_lvl2 = False
+            elif line.display_type == 'line_subsection':
+                # Fetch the existing subsection task to act as parent
+                parent_lvl2 = env['project.task'].search([('project_id', '=', project.id), (line_field, '=', line.id)], limit=1)
+            elif line.product_id and line.x_line_work_item_id:
+                # Increment the offset so new tasks are appended after
+                current_day_offset += 1
+            continue
+
+        # PROCESS NEW LINES
+        clean_name = (line.name or '').split('\n')[0].strip()
+        item_num = line.x_reference or ''
+
+        task_values = {
+            'name': f"{item_num} {clean_name}",
+            'project_id': project.id,
+            'company_id': record.company_id.id,
+            'stage_id': project.type_ids[0].id if project.type_ids else False,
+            line_field: line.id,
+            'user_ids': False,
+        }
+
+        # SECTIONS
+        if line.display_type == 'line_section':
+            line['is_service'] = True
+            parent_lvl1 = env['project.task'].create(task_values)
+            parent_lvl2 = False 
+
+        # SUBSECTIONS
+        elif line.display_type == 'line_subsection':
+            line['is_service'] = True
+            task_values['parent_id'] = parent_lvl1.id if parent_lvl1 else False
+            parent_lvl2 = env['project.task'].create(task_values)
+
+        # PRODUCTS
+        elif line.product_id:
+            if not line.x_line_work_item_id:  # Ignore everything except work items
+                continue
+
+            allocated_hours = 0
+            wils = line.x_line_work_item_id.x_work_item_line_ids
+            for comp in wils.filtered(lambda wil: wil.x_cost_nature == 'labour'):
+                if comp.x_unit_id == uom_hour or comp.x_unit_id.relative_uom_id == uom_hour: 
+                    allocated_hours += comp.x_unit_id._compute_quantity(comp.x_quantity, uom_hour)
+            allocated_hours = line.product_uom_qty * allocated_hours
+
+            planned_start = datetime.date.today() + datetime.timedelta(days=current_day_offset)
+            vals = {
+                'allocated_hours': allocated_hours,
+                'planned_date_begin': planned_start,
+                'date_deadline': planned_start + datetime.timedelta(hours=1),
+            }
+            if parent_lvl1 or parent_lvl2:
+                vals['parent_id'] = parent_lvl2.id if parent_lvl2 else parent_lvl1.id
+
+            task = env['project.task'].create(task_values | vals)
+            line.x_line_work_item_id['x_task_id'] = task.id
+
+            current_day_offset += 1
+
+        line['x_wbs_ready'] = True
+
+    record.message_post(body=f"WBS setup in project.")
+if any(records.filtered(lambda r: r.state == 'cancel')):
+    action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {'message': 'You cannot create a WBS for a cancelled order.', 'type': 'danger'}}
+</field>
+    </record>
+    <record id="server_action_update_parent_task_dates_and_time" model="ir.actions.server">
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="name">Construction Developer: Task - Update parent task dates &amp; time</field>
+        <field name="usage">base_automation</field>
+        <field name="code">
+def update_parent_recursively(task):
+    # defines the start/end dates for the parent tasks from their children
+    if not (parent := task.parent_id):
+        return
+    siblings = env['project.task'].search([('parent_id', '=', parent.id)])
+
+    # --- ROLL-UP TIME ---
+    vals = {'allocated_hours': sum(siblings.mapped('allocated_hours') or [0.0])}
+    # --- ROLL-UP DATES ---
+    if (starts := [c.planned_date_begin for c in (siblings or []) if c.planned_date_begin]):
+        vals['planned_date_begin'] = min(starts)
+    if (ends := [c.date_deadline for c in (siblings or []) if c.date_deadline]):
+        vals['date_deadline'] = max(ends)
+        
+    parent.with_context(skip_task_date_recomputation=True).write(vals)
+
+    update_parent_recursively(parent)
+
+def slide_children(task, new_start, new_end, old_start, old_end):
+    # catching a drag and drop/modification of the whole task
+    if new_start and old_start and new_end and old_end and (delta := new_start - old_start) == new_end - old_end:
+        for c in task.child_ids.filtered(lambda c: c.planned_date_begin and c.date_deadline):
+            c.with_context(skip_task_date_recomputation=True).write({'planned_date_begin': c.planned_date_begin + delta, 'date_deadline': c.date_deadline + delta})
+            slide_children(c, new_start, new_end, old_start, old_end)
+    # catching a drag and drop/modification of only the start or end
+    else:
+        for c in [c for c in task.child_ids if c.planned_date_begin == old_start]:
+            old_c_start, old_c_end, new_c_start, new_c_end = c.planned_date_begin, c.date_deadline, new_start, new_start + (c.date_deadline - c.planned_date_begin)
+            c.with_context(skip_task_date_recomputation=True).write({'planned_date_begin': new_start, 'date_deadline': new_start + (c.date_deadline - c.planned_date_begin)})
+            slide_children(c, new_c_start, new_c_end, old_c_start, old_c_end)
+        for c in [c for c in task.child_ids if c.date_deadline == old_end]:
+            old_c_start, old_c_end, new_c_start, new_c_end = c.planned_date_begin, c.date_deadline, new_end - (c.date_deadline - c.planned_date_begin), new_end
+            c.with_context(skip_task_date_recomputation=True).write({'date_deadline': new_end, 'planned_date_begin': new_end - (c.date_deadline - c.planned_date_begin)})
+            slide_children(c, new_c_start, new_c_end, old_c_start, old_c_end)
+
+if not env.context.get('skip_task_date_recomputation'):
+    for record in records:
+        # Query the DB directly to get the pre-changes values
+        env.cr.execute("SELECT planned_date_begin, date_deadline FROM project_task WHERE id = %s", (record.id,))
+        res = env.cr.fetchone()
+        old_start_raw, old_end_raw = res[0:2] if res else (False, False)
+        old_start = old_start_raw if isinstance(old_start_raw, datetime.datetime) else False
+        old_end = old_end_raw if isinstance(old_end_raw, datetime.datetime) else False
+        new_start, new_end = record.planned_date_begin, record.date_deadline
+
+        update_parent_recursively(record)
+        slide_children(record, new_start, new_end, old_start, old_end)
+        if record.child_ids:  # recompute new start/end dates if the parent became smaller than a child and needs to extend to compensate
+            update_parent_recursively(record.child_ids[0])
+</field>
     </record>
 </odoo>
