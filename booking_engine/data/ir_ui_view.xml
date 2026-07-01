@@ -56,7 +56,10 @@
         <xpath expr="//field[@name='is_rental_order']" position="after">
           <button string="City Tax" type="action" name="%(open_x_city_tax_action)d" context="{'search_default_x_sale_order_id': id, 'default_x_sale_order_id': id}" invisible="not x_order_involves_room"/>
         </xpath>
-        <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+        <xpath expr="//group[@name='order_details']" postion="inside">
+          <field name="x_priority_flag_ids" widget="many2many_tags" invisible="not x_priority_flag_ids"/>
+        </xpath>
+        <xpath expr="//notebook" position="inside">
           <page string="Guests" invisible="not x_order_involves_room">
             <field name="x_guest_line_ids">
               <list default_order="x_sequence asc,id desc" editable="bottom">
@@ -159,23 +162,6 @@
     <field name="mode">extension</field>
     <field name="model">sale.order</field>
     <field name="name">sale.order.form.inherit.booking_engine</field>
-    <field name="priority">160</field>
-    <field name="type">form</field>
-    <field name="active" eval="True"/>
-  </record>
-  <record id="product_product_form_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <xpath expr="//label[@for='lst_price']" position="attributes">
-        <attribute name="invisible">planning_role_id.x_resource_category</attribute>
-      </xpath>
-      <xpath expr="//div[@name='list_price_per_uom_id']" position="attributes">
-        <attribute name="invisible">x_is_a_room_offer</attribute>
-      </xpath>
-    </field>
-    <field name="inherit_id" ref="product.product_normal_form_view"/>
-    <field name="mode">extension</field>
-    <field name="model">product.product</field>
-    <field name="name">product.product.form.inherit.booking_engine</field>
     <field name="priority">160</field>
     <field name="type">form</field>
     <field name="active" eval="True"/>
@@ -407,41 +393,6 @@
     <field name="type">search</field>
     <field name="active" eval="True"/>
   </record>
-  <record id="booking_engine_order_search" model="ir.ui.view">
-    <field name="arch" type="xml">
-        <xpath expr="//filter[@name='my_sale_orders_filter']" position="before">
-          <filter domain="['|',
-            '&amp;', '&amp;', '&amp;',
-            ('rental_status', '=', 'return'),
-            ('rental_return_date', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0, 0, 0)).to_utc().strftime('%Y-%m-%d %H:%M:%S')),
-            ('rental_return_date', '&lt;', datetime.datetime.combine(context_today() + relativedelta(days = 1), datetime.time(0, 0, 0)).to_utc().strftime('%Y-%m-%d %H:%M:%S')),
-            ('state', '=', 'sale'),
-            '&amp;', '&amp;', '&amp;',
-            ('rental_status', '=', 'pickup'),
-            ('rental_start_date', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0, 0, 0)).to_utc().strftime('%Y-%m-%d %H:%M:%S')),
-            ('rental_start_date', '&lt;', datetime.datetime.combine(context_today() + relativedelta(days = 1), datetime.time(0, 0, 0)).to_utc().strftime('%Y-%m-%d %H:%M:%S')),
-            ('state', '=', 'sale')]"
-            name="filter_today" string="Today"/>
-          <separator/>
-        </xpath>
-        <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
-          <separator/>
-          <filter domain="[('rental_status', 'in', ['sent', 'draft'])]" name="filter_draft" string="Draft"/>
-          <filter domain="[('rental_status', '=', 'pickup'), ('state', '=', 'sale')]" name="filter_check_in" string="To Check In"/>
-          <filter domain="[('rental_status', '=', 'return'), ('state', '=', 'sale')]" name="filter_check_out" string="To Check Out"/>
-        </xpath>
-        <xpath expr="//filter[@name='salesperson']" position="before">
-          <filter string="Status" name="rental_status_group" context="{'group_by': 'rental_status'}"/>
-        </xpath>
-    </field>
-    <field name="inherit_id" ref="sale.view_sales_order_filter"/>
-    <field name="mode">primary</field>
-    <field name="model">sale.order</field>
-    <field name="name">sale.order.list.select.inherit.booking_engine</field>
-    <field name="priority">320</field>
-    <field name="type">search</field>
-    <field name="active" eval="True"/>
-  </record>
   <record id="booking_engine_schedule_form" model="ir.ui.view">
     <field name="arch" type="xml">
         <xpath expr="//field[@name='resource_ids']" position="attributes">
@@ -471,6 +422,10 @@
           <attribute name="form_view_id">%(booking_engine_schedule_form)d</attribute>
           <attribute name="multi_create_view"/>
           <attribute name="color">x_booking_color</attribute>
+        </xpath>
+        <xpath expr="/gantt" position="inside">
+          <field name="x_has_early_checkin"/>
+          <field name="x_has_late_checkout"/>
         </xpath>
     </field>
     <field name="inherit_id" ref="planning.planning_view_gantt"/>
@@ -591,7 +546,7 @@
     ]"/>
   </record>
   <record id="booking_engine_rooms_order_action" model="ir.actions.act_window">
-    <field name="search_view_id" ref="booking_engine_order_search"/>
+    <field name="search_view_id" ref="sale_renting.rental_order_view_search"/>
     <field name="view_ids" eval="[
       (5, 0, 0),
       (0, 0, {'view_mode': 'kanban', 'view_id': ref('booking_engine_orders_kanban')}),
@@ -702,6 +657,9 @@
     <!-- project.task views -->
     <record id="project_task_form_view_primary" model="ir.ui.view">
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='project_id']" position="replace">
+              <field name="x_priority_flag_ids" widget="many2many_tags"/>
+            </xpath>
             <xpath expr="//field[@name='stage_id']" position="attributes">
                 <attribute name="options">{'clickable': '1', 'fold_field': 'auto_validation_state'}</attribute>
             </xpath>
@@ -734,6 +692,7 @@
                 <xpath expr="/list//field[@name='priority']" position="move"/>
             </xpath>
             <xpath expr="/list//field[@name='name']" position="after">
+                <field name="x_priority_flag_ids" widget="many2many_tags"/>
                 <field name="x_task_occupancy_color" column_invisible="True"/>
                 <field name="x_cleaning_color" column_invisible="True"/>
                 <field name="x_task_occupancy" optional="show" widget="badge" options="{'color_field': 'x_task_occupancy_color'}"/>
