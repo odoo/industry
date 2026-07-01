@@ -9,11 +9,144 @@
         <field name="type">form</field>
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
+            <xpath expr="//form//header" position="inside">
+                <button string="Check Price Changes"
+                        name="%(action_sale_order_line_bom_list_view)d"
+                        type="action"
+                        invisible="not x_any_sol_bom"
+                        />
+            </xpath>
             <xpath expr="//notebook//page[@name='order_lines']//list//field[@name='product_template_id']" position="after">
                 <field name="x_bom_id"
                        domain="[('product_tmpl_id', '=', product_template_id)]"
                        optional="show"
                 />
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list//field[@name='route_ids']" position="after">
+                <field name="x_product_bom_template_id" column_invisible="True"/>
+                <button name="%(action_open_bom)d"
+                        type="action"
+                        class="btn btn-link"
+                        icon="fa-magic"
+                        width="1"
+                        invisible="not x_product_bom_template_id"
+                        string=" "
+                />
+            </xpath>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="view_picking_type_form_inherit">
+        <field name="inherit_id" ref="stock.view_picking_type_form"/>
+        <field name="mode">extension</field>
+        <field name="model">stock.picking.type</field>
+        <field name="name">stock.picking.type.form.inherit.construction_developer</field>
+        <field name="priority">1600</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook//page[@name='general']//group[@name='first']//group[2]" position="inside">
+                <field name="x_select_dest_on_po" invisible="code != 'incoming'"/>
+                <field name="x_source_loc_from_so" invisible="code != 'outgoing'"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="stock_location_route_form_view_inherit">
+        <field name="inherit_id" ref="stock.stock_location_route_form_view"/>
+        <field name="mode">extension</field>
+        <field name="model">stock.route</field>
+        <field name="name">stock.route.form.inherit.construction_developer</field>
+        <field name="priority">1600</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sale_selectable']" position="after">
+                <field name="x_allow_sol_preselect"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="product_template_form_view_inherit">
+        <field name="name">product.template.form.inherit.construction_developer</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="mode">extension</field>
+        <field name="model">product.template</field>
+        <field name="active" eval="True"/>
+        <field name="priority">1600</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='group_lots_and_weight']" position="inside">
+                <label for="x_bom_template_id"/>
+                <div>
+                    <field name="x_bom_template_id"
+                           required="x_bom_available"
+                           domain="[('product_tmpl_id.id', '=', id), ('type', '=', 'normal')]"
+                           context="{'default_product_tmpl_id': id, 'type': 'normal'}"
+                    />
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="mrp_bom_form_view_inherit">
+        <field name="name">mrp.bom.form.inherit.construction_developer</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="priority">1600</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_tmpl_id']/.." position="inside">
+                <label
+                    for="x_is_template"
+                    invisible="type != 'normal'"
+                />
+                <div
+                    name="is_template"
+                    invisible="type != 'normal'"
+                >
+                    <field name="x_is_template"/>
+                    <button
+                        name="%(action_set_template_bom_on_product)d"
+                        type="action"
+                        string="Set as Template"
+                        class="btn btn-link px-0"
+                        invisible="x_is_template"
+                    />
+                </div>
+            </xpath>
+            <xpath expr="//form[1]/sheet[1]/group[1]/group[2]" position="inside">
+                <field name="x_currency_id" invisible="True"/>
+
+                <label for="x_unit_cost"/>
+                <div name="x_unit_cost">
+                    <field name="x_unit_cost" widget="monetary" options="{'currency_field': 'x_currency_id'}"/>
+                    <button
+                        name="%(action_compute_bom_cost_from_components)d"
+                        type="action"
+                        string="Compute Cost from Components"
+                        class="btn btn-link px-0"
+                    />
+                </div>
+
+                <field name="x_margin_percent" widget="percentage"/>
+
+                <label for="x_unit_price"/>
+                <div name="x_unit_price">
+                    <field name="x_unit_price" widget="monetary" options="{'currency_field': 'x_currency_id'}"/>
+                    <button
+                        name="%(action_update_bom_price_on_sol)d"
+                        type="action"
+                        string="Update Price on Quotation Line"
+                        class="btn btn-link px-0"
+                        invisible="not x_original_sol_id or not x_price_different_from_so"
+                    />
+                </div>
             </xpath>
         </field>
     </record>

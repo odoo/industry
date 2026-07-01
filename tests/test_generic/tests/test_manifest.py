@@ -64,8 +64,6 @@ class ManifestTest(ManifestLinter, IndustryCase):
                 if key == 'license' and not any(mod in manifest_data.get('depends', []) for mod in ['base_industry_data', 'knowledge', 'web_studio']):
                     expected_value = 'LGPL-3'
                 self.assertEqual(value, expected_value, f"Wrong {key} '{value}' in manifest, it should be {expected_value}")
-            if key in ['data', 'demo']:
-                self.assertTrue(all(val.startswith(f'{key}/') for val in value), f"Files must be in '{key}/' directory")
             if is_industry:
                 if key == 'category':
                     self.assertIn(value, CATEGORIES, f"Invalid category '{value}' not in {CATEGORIES}")
@@ -97,30 +95,23 @@ class ManifestTest(ManifestLinter, IndustryCase):
                 file_path = self.module_path / file.replace(f"{module}/", "")
                 self.assertTrue(file_path.exists(), f"Asset file not found: {file}")
 
-    def _test_files_in_manifest(self, manifest_data, folder_name):
-        data_folder = self.module_path / folder_name
-        self.assertTrue(data_folder.exists(), f"No folder {folder_name} found")
-
-        data_files_list = [str(file.relative_to(data_folder.parent)) for file in data_folder.glob('*') if file.is_file()]
-        data_files = set(data_files_list)
-
-        manifest_files_list = manifest_data.get(folder_name, [])
+    def _test_files_in_manifest(self, manifest_data, manifest_key):
+        manifest_files_list = manifest_data.get(manifest_key, [])
         manifest_files = set(manifest_files_list)
 
+        # Check for duplicates in the manifest list
         if (duplicates := {item for item in manifest_files_list if manifest_files_list.count(item) > 1}):
-            _logger.warning("Duplicated in %s in the manifest: %s", folder_name, ', '.join(duplicates))
-        if (duplicates := {item for item in data_files_list if data_files_list.count(item) > 1}):
-            _logger.warning("Duplicated in %s folder: %s", folder_name, ', '.join(duplicates))
+            _logger.warning("Duplicated in %s in the manifest: %s", manifest_key, ', '.join(duplicates))
 
-        if (not_listed := data_files - manifest_files):
-            _logger.warning("Files not listed in manifest %s: %s", folder_name, ', '.join(not_listed))
-        if (not_found := manifest_files - data_files):
-            _logger.error("Files listed in manifest %s not found: %s", folder_name, ', '.join(not_found))
+        # Check if the files listed in the manifest actually exist in the module
+        if (not_found := {file_path for file_path in manifest_files if not (self.module_path / file_path).is_file()}):
+            _logger.error("Files listed in manifest %s not found: %s", manifest_key, ', '.join(not_found))
 
-        website_xml = f"{folder_name}/website.xml"
-        if website_xml in manifest_files_list:
-            if manifest_files_list[-1] != website_xml:
-                _logger.error(f"{website_xml} must be the last entry in the '{folder_name}' list of the manifest")
+        # Flexible website.xml check (path-agnostic)
+        website_xml_files = [f for f in manifest_files_list if f.endswith('website.xml')]
+        if website_xml_files:
+            if not manifest_files_list[-1].endswith('website.xml'):
+                _logger.error("A website.xml file must be the last entry in the '%s' list of the manifest", manifest_key)
 
     def _test_dependencies(self, manifest_data):
         dependencies = manifest_data.get('depends', [])

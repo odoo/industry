@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!--
+        This feature adds a button on the BOM form view to update the linked SOL's values
+        based on the BOM's cost and price.
+    -->
+
+    <record model="ir.model.fields" id="field_mrp_bom_x_price_different_from_so">
+        <field name="model_id" ref="mrp.model_mrp_bom"/>
+        <field name="ttype">boolean</field>
+        <field name="name">x_price_different_from_so</field>
+        <field name="field_description">Price Different from SO</field>
+        <field name="store" eval="False"/>
+        <field name="depends">x_unit_price,x_original_sol_id,x_original_sol_id.price_unit</field>
+        <field name="compute"><![CDATA[
+# float_compared not allowed in compute
+for bom in self: bom['x_price_different_from_so'] = round(bom.x_unit_price, 2) != round(bom.x_original_sol_id.price_unit, 2)
+]]></field>
+    </record>
+
+    <record model="ir.actions.server" id="action_update_bom_price_on_sol">
+        <field name="name">Construction Developer: Update BOM price on Sale Order Line</field>
+        <field name="model_id" ref="mrp.model_mrp_bom" />
+        <field name="state">code</field>
+        <field name="code">
+for bom in records:
+    bom.x_original_sol_id.write({'price_unit': bom.x_unit_price, 'purchase_price': bom.x_unit_cost})
+</field>
+    </record>
+</odoo>
