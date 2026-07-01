@@ -150,6 +150,111 @@ self['x_setting_approvers'] = self.env['ir.config_parameter'].get_bool('booking_
         <field name="name">x_setting_related_approver_users_ids</field>
     </record>
 
+    <!-- Steering Settings-->
+    <record id="x_setting_field_steering" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Steering</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="name">x_setting_steering</field>
+        <field name="store" eval="True"/>
+        <field name="compute"><![CDATA[
+self['x_setting_steering'] = self.env['ir.config_parameter'].get_bool('booking_engine.x_steering_setting', False)
+]]></field>
+    </record>
+    <record id="server_action_set_x_setting_steering" model="ir.actions.server">
+        <field name="name">Set Steering setting</field>
+        <field name="code"><![CDATA[
+records_archive = [
+    'ir_cron_create_500_days_availability',
+    'ir_cron_send_survey',
+    'automation_on_planning_slot_change',
+    'automation_on_planning_slot_delete',
+    'automation_on_resource_calendar_leaves_change',
+    'automation_on_resource_calendar_leaves_delete',
+    'automation_on_resource_resource_change',
+    'automation_on_resource_resource_delete',
+    'automation_on_product_template_change',
+    'automation_on_product_template_delete',
+    'automation_to_archive_existing_surveys',
+    'automation_daily_lines_on_so_create',
+    'automation_daily_lines_on_so_cancel',
+    'automation_daily_lines_on_so_delete',
+    'automation_daily_lines_on_sol_create',
+    'automation_daily_lines_on_sol_write',
+    'automation_daily_lines_on_so_rental_date_changed',
+]
+cloc_entries = [
+    'x_availability_color_field_x_availability',
+    'x_available_field_x_availability',
+    'x_availability_field_x_availability',
+    'x_occupancy_field_x_availability',
+    'x_occupancy_color_field_x_availability',
+    'x_availability_color_field_x_availability',
+    'x_amount_field_daily_line',
+    'server_action_update_availabilities',
+    'server_action_create_500_days_availability',
+    'server_action_helper_compute_new_avails_to_recompute',
+    'server_action_update_availability_for_planning_slot_delete',
+    'server_action_update_availability_for_resource_calendar_leaves_delete',
+    'server_action_update_availability_for_resource_resource_delete',
+    'server_action_update_availability_for_product_template_delete',
+    'server_action_update_availability_for_planning_slot',
+    'server_action_update_availability_for_resource_calendar_leaves',
+    'server_action_update_availability_for_resource_resource',
+    'server_action_update_availability_for_product_template',
+    'server_action_to_archive_surveys',
+    'ir_actions_server_send_survey',
+    'server_action_create_daily_lines_from_so',
+    'server_action_unlink_daily_lines_from_so',
+    'server_action_unlink_daily_lines_from_so_2',
+    'server_action_create_daily_lines_from_sol',
+    'server_action_method_create_daily_lines',
+    'server_action_modify_daily_lines_from_sol',
+    'server_action_modify_daily_lines_from_so_date_change',
+]
+env['ir.config_parameter'].set_bool('booking_engine.x_steering_setting', record.x_setting_steering)
+if record.x_setting_steering:
+    env.ref('base.group_user')._apply_group(env.ref('booking_engine.group_steering'))
+    for to_unarchive in records_archive:
+        env.ref(f'booking_engine.{to_unarchive}')['active'] = True
+    for cloc_entry in cloc_entries:
+        if (cloc_entry_id := env.ref(f'__cloc_exclude__.booking_engine_{cloc_entry}', raise_if_not_found=False)):
+            entry_model = 'ir.actions.server' if cloc_entry.startswith('server_action') else 'ir.model.fields'
+            env['ir.model.data'].search([
+                ('name', '=', f'booking_engine_{cloc_entry}'),
+                ('model', '=', entry_model),
+                ('module', '=', '__cloc_exclude__'),
+                ('res_id', '=', cloc_entry_id.id),
+            ], limit=1).unlink()
+    env.ref('booking_engine.spreadsheet_dashboard_1')['is_published'] = True
+else:
+    env.ref('base.group_user')._remove_group(env.ref('booking_engine.group_steering'))
+    for to_archive in records_archive:
+        env.ref(f'booking_engine.{to_archive}')['active'] = False
+    for cloc_entry in cloc_entries:
+        cloc_exclude_id = f'booking_engine_{cloc_entry}'
+        entry_model = 'ir.actions.server' if cloc_entry.startswith('server_action') else 'ir.model.fields'
+        if (cloc_entry_id := env.ref(f'booking_engine.{cloc_entry}', raise_if_not_found=False)) and not env.ref(f'__cloc_exclude__.{cloc_exclude_id}', raise_if_not_found=False):
+            env['ir.model.data'].create({
+                'name': cloc_exclude_id,
+                'model': entry_model,
+                'module': '__cloc_exclude__',
+                'res_id': cloc_entry_id.id,
+            })
+    env.ref('booking_engine.spreadsheet_dashboard_1')['is_published'] = False
+]]></field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="state">code</field>
+    </record>
+    <record id="automation_on_x_setting_steering_set" model="base.automation">
+        <field name="name">On Steering setting set</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_set_x_setting_steering')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_setting_field_steering')])]"/>
+    </record>
+
+
     <record id="server_action_set_x_setting_approvers" model="ir.actions.server">
         <field name="name">HouseKeeping: Set approvers setting</field>
         <field name="code"><![CDATA[
@@ -175,7 +280,7 @@ env['ir.config_parameter'].set_bool('booking_engine.x_approvers_setting', (True 
         <field name="arch" type="xml">
             <xpath expr="//form" position="inside">
                 <app string="Accomodation" name="accomodation">
-                    <block title="House Keeping" name="house_keeping_config_block">
+                    <block title="Operations" name="booking_operations_config_block">
                         <setting id="booking_engine_house_keeping_setting" help="Access cleanness state and manage tasks.">
                             <field name="x_module_house_keeping"/>
                             <div class="row mt-2" invisible="not x_module_house_keeping">
@@ -191,12 +296,13 @@ env['ir.config_parameter'].set_bool('booking_engine.x_approvers_setting', (True 
                             </div>
                         </setting>
                     </block>
+                    <block title="Management" name="booking_management_config_block">
+                        <setting id="booking_engine_steering_setting" help="Monitor availability, occupancy, average daily rate, revenue per available unit and pick-ups.">
+                            <field name="x_setting_steering"/>
+                        </setting>
+                    </block>
                 </app>
             </xpath>
         </field>
     </record>
-
-    <function name="run" model="ir.actions.server" context="{'active_model': 'res.config.settings', 'active_id': ref('res_config_settings_enable')}">
-        <value eval="[ref('x_action_activate_house_keeping')]"/>
-    </function>
 </odoo>
