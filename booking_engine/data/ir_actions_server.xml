@@ -548,4 +548,104 @@ if survey:
             invite.action_invite()
         orders_to_survey.write({'x_is_survey_sent': True})]]></field>
     </record>
+
+    <!-- Daily Lines -->
+    <record id="server_action_create_daily_lines_from_so" model="ir.actions.server">
+        <field name="code"><![CDATA[
+dates_covered = []
+current_date = record.rental_start_date
+while current_date < record.rental_return_date:
+    dates_covered.append(current_date.date())
+    current_date += datetime.timedelta(days=1)
+env.ref('booking_engine.server_action_method_create_daily_lines').with_context(
+    active_model='sale.order.line', active_ids=records.order_line.filtered(lambda l: l.product_id.product_tmpl_id.x_is_a_room_offer).ids, dates=dates_covered
+).run()
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Dashboard: Create daily lines from so</field>
+    </record>
+    <record id="server_action_unlink_daily_lines_from_so" model="ir.actions.server">
+        <field name="code"><![CDATA[
+records.x_daily_lines_ids.unlink()
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Dashboard: Delete daily lines from so</field>
+    </record>
+    <record id="server_action_unlink_daily_lines_from_so_2" model="ir.actions.server">
+        <field name="code"><![CDATA[
+records.x_daily_lines_ids.unlink()
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Dashboard: Delete daily lines from so 2</field>
+    </record>
+    <record id="server_action_create_daily_lines_from_sol" model="ir.actions.server">
+        <field name="code"><![CDATA[
+dates_covered = []
+current_date = record.order_id.rental_start_date
+while current_date < record.order_id.rental_return_date:
+    dates_covered.append(current_date.date())
+    current_date += datetime.timedelta(days=1)
+env.ref('booking_engine.server_action_method_create_daily_lines').with_context(
+    active_model='sale.order.line', active_ids=records.ids, dates=dates_covered
+).run()
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Dashboard: Create daily lines from sol</field>
+    </record>
+    <record id="server_action_method_create_daily_lines" model="ir.actions.server">
+        <field name="code"><![CDATA[
+dates_covered = env.context.get('dates') or []
+daily_lines_values = []
+for record in (records or []):
+    for current_date in dates_covered:
+        daily_lines_values.append({
+            'x_sale_order_id': record.order_id.id,
+            'x_sale_order_line_id': record.id,
+            'x_date': current_date,
+            'x_price': record.order_id.pricelist_id._get_product_price(record.product_id, 1.0, date=current_date),
+            'x_state': 'planned',
+        })
+env['x_so_daily_line'].create(daily_lines_values)
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Dashboard: Create daily lines, Method</field>
+    </record>
+    <record id="server_action_modify_daily_lines_from_sol" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for record in records:
+    for daily_line in record.x_daily_line_ids:
+        daily_line.write({
+            'x_price': record.order_id.pricelist_id._get_product_price(record.product_id, 1.0, date=daily_line.x_date),
+        })
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Dashboard: Modify daily lines from sol</field>
+    </record>
+    <record id="server_action_modify_daily_lines_from_so_date_change" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for record in records:
+    for daily_line in record.x_daily_lines_ids:
+        if daily_line.x_date < record.rental_start_date.date() or daily_line.x_date >= record.rental_return_date.date():
+            daily_line.unlink()
+    represented_dates = record.x_daily_lines_ids.mapped('x_date')
+    to_cover_dates = []
+    current_date = record.rental_start_date
+    while current_date < record.rental_return_date:
+        if current_date.date() not in represented_dates:
+            to_cover_dates.append(current_date.date())
+        current_date += datetime.timedelta(days=1)
+    record.env.ref('booking_engine.server_action_method_create_daily_lines').with_context(
+        active_model='sale.order.line', active_ids=record.order_line.filtered(lambda l: l.product_id.product_tmpl_id.x_is_a_room_offer).ids, dates=to_cover_dates
+    ).run()
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Dashboard: Modify daily lines from so rental dates change</field>
+    </record>
 </odoo>

@@ -1,6 +1,6 @@
 {
     'name': 'Booking',
-    'version': '1.20',
+    'version': '1.21',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -46,6 +46,7 @@
         'data/survey_survey.xml',
         'data/survey_question.xml',
         'data/survey_question_answer.xml',
+        'data/spreadsheet_dashboard.xml',
     ],
     'demo': [
         'demo/hr_employee.xml',
