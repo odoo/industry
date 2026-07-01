@@ -60,8 +60,6 @@
         'demo/sale_loyalty_wizard.xml',
         'demo/sale_order_post.xml',
         'demo/payment_provider_demo_post.xml',
-        'demo/payment_provider.xml',
-        'demo/payment_method.xml',
     ],
     'license': 'OEEL-1',
     'assets': {
