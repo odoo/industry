@@ -61,4 +61,5 @@
         'data/website_view.xml',
         'static/src/scss/gantt.scss',
     ],
+    'images': ['images/main.png'],
 }
