@@ -8,12 +8,34 @@
         <field name="name">Fiscal Attestation Authorities</field>
         <field name="subject">Fiscal Attestations for {{ object.partner_id.name }}</field>
     </record>
-    <record id="mail_template_50" model="mail.template">
-        <field name="body_html"><![CDATA[
-<div data-oe-version="2.0">Dear <t t-out="object.partner_id.name"/>,</div><br/><div>Thank you for your continued support in <t t-out="object.invoice_date.year if object.invoice_date else ''"/>.</div><br/><div>Please find attached your fiscal attestation for this year. </div><br/><div>If you have any questions, feel free to contact us at <t t-out="object.company_id.email"/>.</div><br/><div>Warm regards, </div><div>The <t t-out="object.company_id.name"/> team </div><div><t t-out="object.company_id.email"/> | <t t-out="object.company_id.phone"/></div>
-]]></field>
-        <field name="model_id" ref="account.model_account_move"/>
-        <field name="name">Fiscal Attestation Donor</field>
-        <field name="subject">Thank you for your support !</field>
+     <record id="email_template_donation_receipt" model="mail.template">
+        <field name="name">Donation Receipt</field>
+        <field name="model_id" ref="x_donation_receipt_model"/>
+        <field name="partner_to">{{ object.x_donor.id }}</field>
+        <field name="report_template_ids" eval="[(6, 0, [ref('action_report_donation_receipt')])]"/>
+        <field name="subject">{{ user.company_id.name }} Donation Receipt - {{ object.x_donation_receipt_no }}</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                <p style="margin: 0px; padding: 0px;">
+                    Dear <t t-out="object.x_donor.name or 'Donor'"/>,
+                    <br/>
+                    Thank you for your generous donation. Please find below the details
+                    of your donation receipt for the period
+                    <t t-out="object.x_donation_period.date_from or ''"/> to <t t-out="object.x_donation_period.date_to or ''"/>.
+                    <br/>
+                    <br/>
+                    Receipt No: <t t-out="object.x_donation_receipt_no or ''"/>
+                    <br/>
+                    <br/>
+                    We deeply appreciate your support in helping us continue our mission.
+                    <br/>
+                    Do not hesitate to contact us if you have any questions.
+                    <br/>
+                    Sincerely,
+                    <br/>
+                    <t t-out="user.name"/>
+                </p>
+            </div>
+        </field>
     </record>
 </odoo>

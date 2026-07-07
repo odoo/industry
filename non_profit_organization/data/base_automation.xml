@@ -1,20 +1,16 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="add_signatory_category_to_signing_partner" model="base.automation">
-        <field name="model_id" ref="x_signature_model"/>
-        <field name="action_server_ids"
-            eval="[(6, 0, [ref('action_server_add_signatory_category_to_contact')])]"/>
-        <field name="trigger">on_create_or_write</field>
-        <field name="name">Add signatory category to signing partner</field>
-        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_partner_id_field_x_signature')])]"/>
+    <record id="base_automation_to_generate_receipt_no" model="base.automation">
+        <field name="name">Generate Receipt No</field>
+        <field name="model_id" ref="x_donation_receipt_model"/>
+        <field name="trigger">on_create</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_server_donation_receipt_no')])]"/>
     </record>
-    <record id="base_automation_on_so_confirmation" model="base.automation">
-        <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="action_server_ids"
-            eval="[(6, 0, [ref('action_server_assign_invoicing_journal_to_so')])]"/>
-        <field name="trigger">on_create_or_write</field>
-        <field name="name">On Sale Order Confirmation</field>
-        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale.field_sale_order__state')])]"/>
-        <field name="filter_domain" eval="[('state', '=', 'sale')]"/>
+    <record id="base_automation_for_invoice_creation" model="base.automation">
+        <field name="name">Invoice creation from donation category product</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="trigger">on_create</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('ir_actions_server_update_journal_entry')])]"/>
+        <field name="filter_domain" eval="[('invoice_line_ids.product_id.categ_id', 'in', [ref('website_sale.product_category_donations')])]"/>
     </record>
 </odoo>
