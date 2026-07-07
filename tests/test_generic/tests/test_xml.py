@@ -190,6 +190,7 @@ class TestEnv(IndustryCase):
                 self._check_forcecreate_external_xmlid(tree, file_name, module)
                 self._check_update_status(tree, file_name)
                 self._check_knowledge_article_is_published(tree, file_name)
+                self._check_trigger_field_ids_is_set(tree, file_name)
                 self._check_knowledge_article_is_locked(tree, file_name)
                 checked_records_with_user = self._check_user_is_set(tree, checked_records_with_user)
                 self._check_duplicate_records(tree, file_name)
@@ -401,6 +402,18 @@ class TestEnv(IndustryCase):
             if is_published_fields:
                 _logger.warning(
                     f"Knowledge article in {file_name} should not have 'is_published' set to True."
+                )
+
+    def _check_trigger_field_ids_is_set(self, root, file_name):
+        for record in root.xpath("//record[@model='base.automation']"):
+            if (
+                record.xpath(".//field[@name='trigger' and (text()='on_create_or_write' or contains(@eval, 'on_create_or_write'))]")
+                and record.xpath(".//field[@name='filter_domain']")
+                and not record.xpath(".//field[@name='trigger_field_ids']")
+            ):
+                _logger.warning(
+                    "Automation %s is missing trigger_field_ids definition (otherwise fields from filter_domain are used).",
+                    record.get('id')
                 )
 
     def _check_knowledge_article_is_locked(self, root, file_name):
