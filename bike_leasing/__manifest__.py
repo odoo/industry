@@ -1,7 +1,19 @@
 {
     'name': 'Bike Leasing',
     'version': '1.0',
+<<<<<<< 963a469a5cd46e1f01cc10a2bf188f2eeeee46a4
     'category': 'Services',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'category': 'Services',
+    'description': """
+This module is a complete solution for the bike leasing industry, simplifying lease management, bike tracking, and customer service. It's perfect for businesses aiming to streamline operations and embrace the growing trend of sustainable mobility.
+""",
+=======
+    'category': 'Trades and Home Services',
+    'description': """
+This module is a complete solution for the bike leasing industry, simplifying lease management, bike tracking, and customer service. It's perfect for businesses aiming to streamline operations and embrace the growing trend of sustainable mobility.
+""",
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'base_automation',
         'calendar',
