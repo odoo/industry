@@ -14,6 +14,11 @@ registry.category("web_tour.tours").add("Condominium_Acquisition", {
         run: "click"
     },
     {
+        content: "Choose a blank quotation",
+        trigger: ".o-dropdown--menu .o-dropdown-item:contains('New Quotation')",
+        run: "click",
+    },
+    {
         trigger: ".o_field_widget[name='partner_id'] .o-autocomplete--input",
         content: "Create and edit a new condominium",
         run: "edit New condo",
