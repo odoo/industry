@@ -27,6 +27,7 @@
         'data/spreadsheet_dashboard.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/product_template_post.xml',
         'demo/pos_config.xml',
         'demo/product_attribute.xml',
