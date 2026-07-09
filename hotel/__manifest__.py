@@ -1,6 +1,6 @@
 {
     'name': 'Hotel',
-    'version': '1.8',
+    'version': '1.9',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -26,6 +26,7 @@
         'data/spreadsheet_dashboard.xml',
     ],
     'demo': [
+        'demo/res_company.xml',
         'demo/product_template_post.xml',
         'demo/pos_config.xml',
         'demo/product_attribute.xml',

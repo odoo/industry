@@ -1,6 +1,6 @@
 {
     'name': 'Vineyard',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
@@ -9,9 +9,9 @@
         'excise_management',
         'knowledge',
         'mrp_plm',
-        'planning_field_service_sale_worksheet',
         'pos_enterprise',
         'product_expiry',
+        'project_timesheet_forecast_field_service_sale',
         'purchase',
         'quality_mrp',
         'web_studio',
