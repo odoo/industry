@@ -1,5 +1,5 @@
 import { patch } from "@web/core/utils/patch";
-import { ORM } from "@web/core/orm_service";
+import { ORM } from "@web/core/orm_plugin";
 import { RelationalModel } from "@web/model/relational_model/relational_model";
 import { ListRenderer } from "@web/views/list/list_renderer";
 
