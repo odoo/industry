@@ -7,11 +7,11 @@
         <field name="code"><![CDATA[
 sequence, stay_tax_line = 0, False
 for so_line in record.x_sale_order_id.order_line:
-    if so_line.product_id.x_is_stay_tax: stay_tax_line = so_line
+    if so_line.product_id.x_accommodation_product == 'stay_tax': stay_tax_line = so_line
     sequence = max(sequence, so_line.sequence)
 if stay_tax_line: stay_tax_line.write({'product_uom_qty': record.x_total, 'qty_delivered': record.x_total, 'sequence': 1 + sequence})
 elif record.x_total > 0:
-    product = env['product.product'].search([('x_is_stay_tax', '=', True)], limit=1)
+    product = env['product.product'].search([('x_accommodation_product', '=', 'stay_tax')], limit=1)
     env['sale.order.line'].create({'order_id': record.x_sale_order_id.id, 'product_id': product.id, 'product_uom_qty': record.x_total, 'qty_delivered': record.x_total})
 ]]></field>
     </record>
@@ -130,8 +130,10 @@ if env['ir.config_parameter'].get_bool('booking_engine.x_approvers_setting', Fal
         <field name="code"><![CDATA[
 if (project := env['project.project'].search([('x_is_house_keeping_project', '=', True)], limit=1)):
     newtasks = []
-    last_midnight = datetime.datetime.today().replace(hour=0, minute=0)
-    for slot in env['planning.slot'].search([('start_datetime', '<', last_midnight),('end_datetime', '>=', last_midnight), ('resource_ids.x_category', '=', 'stay_offer')]):
+    last_midnight = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+    eci_product = env['product.product'].search([('x_accommodation_product', '=', 'early_checkin')], limit=1)
+    lco_product = env['product.product'].search([('x_accommodation_product', '=', 'late_checkout')], limit=1)
+    for slot in env['planning.slot'].search([('start_datetime', '<', last_midnight), ('end_datetime', '>=', last_midnight), ('resource_ids.x_category', '=', 'stay_offer')]):
         end_today = slot.end_datetime < last_midnight + datetime.timedelta(hours=24)
         cleaning_points = slot.sale_line_id.product_id.x_checkout_cleaning if end_today else slot.sale_line_id.product_id.x_stayover_cleaning
         if not cleaning_points: continue
@@ -145,6 +147,8 @@ if (project := env['project.project'].search([('x_is_house_keeping_project', '='
             'x_resource_id': slot.resource_ids[:1].id,
             'x_cleaning': 'checkout' if end_today else 'stayover',
             'x_cleaning_points': cleaning_points,
+            'x_priority_flag_ids': end_today and ([eci_product.id] if slot.x_has_eci_at_checkout else []) +
+                ([lco_product.id] if slot.x_has_late_checkout else []),
             'user_ids': [(5,0)],
         })
     env['project.task'].create(newtasks)
