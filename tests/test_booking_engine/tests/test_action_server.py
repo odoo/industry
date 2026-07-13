@@ -263,7 +263,7 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         product_template = self.env['product.template'].create({
             'name': 'Guest Product',
             'type': 'service',
-            'x_is_stay_tax': True,
+            'x_accommodation_product': 'stay_tax',
             'attribute_line_ids': [Command.create({
                 'attribute_id': attribute.id,
                 'value_ids': [Command.link(value.id)],
@@ -304,7 +304,7 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         # ----------- Case 1: Stay tax line should be created -----------
         _, order_line, order_line_sequence, city_tax = _create_order_with_slot(product)
 
-        stay_tax_lines = order_line.filtered(lambda l: l.product_id.x_is_stay_tax)
+        stay_tax_lines = order_line.filtered(lambda l: l.product_id.x_accommodation_product == 'stay_tax')
         self.assertEqual(len(stay_tax_lines), 1,
                          "Server action should create a stay tax line if missing")
         self.assertEqual(stay_tax_lines.sequence, order_line_sequence + 1,
@@ -314,14 +314,14 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         self.assertEqual(stay_tax_lines.qty_delivered, city_tax.x_total,
                          "Stay tax line delivered quantity should match city tax total")
 
-        # ----------- Case 2: Existing order line should be updated -----------
-        product.write({'x_is_stay_tax': False})
+        # ---------- Case 2: Existing order line should be updated ----------
+        product.write({'x_accommodation_product': False})
         order2, order_line2, _, city_tax2 = _create_order_with_slot(product)
         self.assertEqual(len(order2.order_line), 2,
                         "Server action should update existing order line")
         city_tax_line = order2.order_line - order_line2
 
-        self.assertTrue(city_tax_line.product_id.x_is_stay_tax, "City tax order line product should have x_is_stay_tax True")
+        self.assertEqual(city_tax_line.product_id.x_accommodation_product, "stay_tax", "City tax order line product should have x_accommodation_product = 'stay_tax'")
         self.assertEqual(city_tax_line.product_uom_qty, city_tax2.x_total, "City tax order line quantity should match city tax total")
         self.assertEqual(city_tax_line.qty_delivered, city_tax2.x_total, "City tax order line delivered quantity should match city tax total")
 
