@@ -119,14 +119,6 @@
         <field name="model_id" ref="website_sale.model_product_ribbon"/>
         <field name="name">x_is_closed_ribbon</field>
     </record>
-    <record id="field_crm_lead_interested_in_id" model="ir.model.fields">
-        <field name="name">x_interested_in_id</field>
-        <field name="field_description">Interested in</field>
-        <field name="model_id" ref="crm.model_crm_lead"/>
-        <field name="ttype">many2one</field>
-        <field name="copied" eval="True"/>
-        <field name="relation">product.template</field>
-    </record>
     <record id="field_product_template_interested_in_count" model="ir.model.fields">
         <field name="name">x_x_interested_in_crm_lead_count</field>
         <field name="field_description">Interested in count</field>
@@ -135,7 +127,7 @@
         <field name="selectable" eval="False"/>
         <field name="store" eval="False"/>
         <field name="compute"><![CDATA[
-lead_data = self.env['crm.lead']._read_group(domain=[('x_interested_in_id', 'in', self.ids)], groupby=['x_interested_in_id'], aggregates=['__count'])
+lead_data = self.env['crm.lead']._read_group(domain=[('x_property_id', 'in', self.ids)], groupby=['x_property_id'], aggregates=['__count'])
 mapped_data = {product.id: count for product, count in lead_data}
 for product in self: product['x_x_interested_in_crm_lead_count'] = mapped_data.get(product.id, 0)
         ]]></field>
@@ -182,14 +174,6 @@ for product in self: product['x_x_interested_in_crm_lead_count'] = mapped_data.g
         <field name="field_description">Is Buyers Team</field>
         <field name="model_id" ref="sales_team.model_crm_team"/>
         <field name="name">x_is_a_buyer_team</field>
-    </record>
-    <record id="field_crm_lead_property_id" model="ir.model.fields">
-        <field name="ttype">many2one</field>
-        <field name="copied" eval="True"/>
-        <field name="field_description">Selling/Renting</field>
-        <field name="model_id" ref="crm.model_crm_lead"/>
-        <field name="name">x_property_id</field>
-        <field name="relation">product.template</field>
     </record>
     <record id="field_res_partner_owner_count" model="ir.model.fields">
         <field name="compute"><![CDATA[
@@ -375,7 +359,7 @@ for property in self: property['x_x_property_calendar_event_count'] = mapped_dat
     </record>
     <record id="field_crm_lead_appointments" model="ir.model.fields">
         <field name="ttype">one2many</field>
-        <field name="related">x_interested_in_id.x_appointment_ids</field>
+        <field name="related">x_property_id.x_appointment_ids</field>
         <field name="field_description">Appointments</field>
         <field name="model_id" ref="crm.model_crm_lead"/>
         <field name="name">x_appointment_ids</field>
@@ -509,7 +493,7 @@ for record in self: record['x_to_notify_property_ids'] = [(6, 0, record.x_proper
     </record>
     <record id="field_res_partner_interested_in_ids" model="ir.model.fields">
         <field name="compute"><![CDATA[
-all_leads = self.env['crm.lead']._read_group(domain=[('id', 'in', self.opportunity_ids.ids), ('x_interested_in_id', '!=', False)], groupby=['partner_id'], aggregates=['x_interested_in_id:array_agg'])
+all_leads = self.env['crm.lead']._read_group(domain=[('id', 'in', self.opportunity_ids.ids), ('x_property_id', '!=', False)], groupby=['partner_id'], aggregates=['x_property_id:array_agg'])
 data = {partner.id: properties for partner, properties in all_leads}
 for partner in self: partner['x_interested_in_ids'] = [(6, 0, data.get(partner.id, []))]
         ]]></field>
@@ -592,7 +576,7 @@ for lead in self:   lead['x_sign_request_count'] = lead.env['sign.request'].sear
         <field name="relation">product.template</field>
         <field name="depends">x_crm_lead_id</field>
         <field name="compute"><![CDATA[ 
-for request in self:    request['x_property_id'] = request.x_crm_lead_id.x_interested_in_id if request.x_crm_lead_id and request.x_crm_lead_id.x_interested_in_id else False
+for request in self:    request['x_property_id'] = request.x_crm_lead_id.x_property_id if request.x_crm_lead_id.x_property_id else False
         ]]></field>
     </record>
     <record id="x_sign_request_count_field_property" model="ir.model.fields">

@@ -83,7 +83,7 @@ reference_ids = env['x_product_template_line'].search_fetch(domain=[('x_product_
 for record in records:
     for reference in reference_ids:
         if not reference.x_name or reference.x_name not in message_data.get(record.id, ''): continue
-        record["x_interested_in_id"] = reference.x_product_template_id
+        record["x_property_id"] = reference.x_product_template_id
         break
         ]]></field>
     </record>
@@ -93,7 +93,7 @@ for record in records:
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-env['crm.lead'].create({'name': 'Matchmaking', 'partner_id': env.context.get('active_id'), 'x_interested_in_id': env.context.get('property_id'), 'team_id': env['crm.team'].search([('x_is_a_buyer_team', '=', True)], limit=1).id})
+env['crm.lead'].create({'name': 'Matchmaking', 'partner_id': env.context.get('active_id'), 'x_property_id': env.context.get('property_id'), 'team_id': env['crm.team'].search([('x_is_a_buyer_team', '=', True)], limit=1).id})
         ]]></field>
     </record>
 
@@ -181,7 +181,7 @@ for record in records:
         <field name="state">code</field>
         <field name="code"><![CDATA[
 for rec in records:
-    if not rec.partner_id or not rec.x_interested_in_id.x_owner_id:
+    if not rec.partner_id or not rec.x_property_id.x_owner_id:
         raise UserError("Missing signer: Customer or Owner is not set.")
     if not (offer_template := rec.env['sign.template'].search([('x_is_offer', '=', True)], limit=1)):
         raise UserError("No offer template found. Please configure a sign template with 'Is Offer' checked.")
@@ -193,10 +193,10 @@ for rec in records:
         "default_res_model": "crm.lead",
         "default_res_id": rec.id,
         'default_set_sign_order': True,
-        'default_property': rec.x_interested_in_id,
+        'default_property': rec.x_property_id,
         'default_signer_ids': [
             (0, 0, {'partner_id': rec.partner_id.id, 'role_id': env.ref('real_estate.sign_item_role_9').id}),
-            (0, 0, {'partner_id': rec.x_interested_in_id.x_owner_id.id, 'role_id': env.ref('real_estate.sign_item_role_10').id}),
+            (0, 0, {'partner_id': rec.x_property_id.x_owner_id.id, 'role_id': env.ref('real_estate.sign_item_role_10').id}),
         ],
         "default_reference_doc": f"crm.lead,{rec.id}",
     }
