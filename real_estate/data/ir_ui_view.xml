@@ -157,9 +157,8 @@
           <button string="Visit" name="%(book_your_visit_server_action)d" type="action" invisible="not x_appointment_ids"/>
           <button string="Offer" name="%(ir_actions_server_778)d" type="action"/>
         </xpath>
-        <xpath expr="//group[@name='lead_partner']" position="inside">
-          <field name="x_property_id" string="Selling/Renting"/>
-          <field name="x_interested_in_id" domain="[('x_is_properties', '=', True), ('active', '=', True)]" widget="many2one"/>
+        <xpath expr="//field[@name='x_property_id']" position="attributes">
+          <attribute name="domain">[('x_is_properties', '=', True), ('active', '=', True)]</attribute>
         </xpath>
     </field>
   </record>
@@ -286,7 +285,7 @@
     <field name="active" eval="True"/>
     <field name="arch" type="xml">
         <graph string="Opportunities" sample="1" stacked="1">
-            <field name="x_interested_in_id" type="col"/>
+            <field name="x_property_id" type="col"/>
             <field name="date_deadline" interval="month"/>
         </graph>
     </field>
@@ -297,7 +296,7 @@
     <field name="active" eval="True"/>
     <field name="arch" type="xml">
         <pivot string="Leads" display_quantity="1" sample="1">
-            <field name="x_interested_in_id" type="row"/>
+            <field name="x_property_id" type="row"/>
             <field name="stage_id" type="col"/>
         </pivot>
     </field>
@@ -330,7 +329,7 @@
           <filter domain="[('team_id.x_is_sellers_team', '=', True)]" name="sellers" string="Sellers"/>
         </xpath>
         <xpath expr="//filter[@name='salesperson']" position="before">
-          <filter name="property" string="Property" context="{'group_by': 'x_interested_in_id'}"/>
+          <filter name="property" string="Property" context="{'group_by': 'x_property_id'}"/>
         </xpath>
     </field>
   </record>
@@ -395,9 +394,6 @@
     <field name="priority">320</field>
     <field name="type">kanban</field>
     <field name="arch" type="xml">
-        <xpath expr="//field[@name='name']" position="after">
-          <field name="x_interested_in_id" display="full"/>
-        </xpath>
         <xpath expr="//field[@name='partner_id']" position="attributes">
           <attribute name="options">{"no_open":true}</attribute>
           <attribute name="widget">many2one</attribute>
@@ -442,7 +438,7 @@
     <field name="name">Reporting</field>
     <field name="res_model">crm.lead</field>
     <field name="view_mode">pivot,graph</field>
-    <field name="domain">[("x_interested_in_id", "!=", False)]</field>
+    <field name="domain">[("x_property_id", "!=", False)]</field>
     <field name="view_ids" eval="[
         (5, 0, 0),
         (0, 0, {'view_mode': 'pivot', 'view_id': ref('crm_lead_view_pivot')}),
