@@ -15,7 +15,7 @@ registry.category("web_tour.tours").add("Condominium_Acquisition", {
     },
     {
         content: "Choose a blank quotation",
-        trigger: ".o-dropdown--menu .o-dropdown-item:contains('New Quotation')",
+        trigger: ".o-dropdown--menu .o-dropdown-item:contains('Kick-Off Quote')",
         run: "click",
     },
     {
@@ -40,15 +40,6 @@ registry.category("web_tour.tours").add("Condominium_Acquisition", {
     {
         trigger: "footer > .o_form_button_save",
         run: "click",
-    },
-    {
-        trigger: ".o_field_widget[name='sale_order_template_id'] .o-autocomplete--input",
-        content: "Select the right quotation template",
-        run: "click"
-    },
-    {
-        trigger: ".o-autocomplete--dropdown-item:contains('Kick-Off Quote') > a",
-        run: "click"
     },
     {
         trigger: ".o_field_widget[name='plan_id'] .o-autocomplete--input",
