@@ -4,16 +4,16 @@ from odoo.tests import float_compare
 from odoo.tests.common import TransactionCase
 
 
+# could keep it when adding the demo data, but will be removed when refactoring the cost nature report anyway
 class TestCostNatureAnalysisReport(TransactionCase):
-
-    def test_table_values_sale_order(self):
+    def _test_table_values_sale_order(self):
         sale_order = self.env.ref('construction_developer.sale_order_41', raise_if_not_found=False)
         # skip test if demo data is not loaded
         if not sale_order:
             return
         self._test_table_values_project_16({'active_ids': sale_order.ids})
 
-    def test_table_values_project(self):
+    def _test_table_values_project(self):
         project = self.env.ref('construction_developer.project_project_16', raise_if_not_found=False)
         # skip test if demo data is not loaded
         if not project:

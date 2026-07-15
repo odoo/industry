@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!--
+        This feature adds the Work Breakdown Structure with a Gantt view for the MOs.
+    -->
+
+    <record model="ir.actions.server" id="server_action_show_wbs">
+        <field name="name">Construction Developer: Show WBS</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">
+action = env.ref('construction_developer.action_show_wbs').read()[0]
+action.update({'domain': [('location_src_id', '=', record.partner_shipping_id.x_ws_location_id.id), ('sale_line_id.order_id', '=', record.id)]})
+</field>
+    </record>
+
+
+
+    <record model="ir.ui.view" id="view_mrp_production_gantt">
+        <field name="name">mrp.production.view.gantt.construction_developer</field>
+        <field name="model">mrp.production</field>
+        <field name="type">gantt</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <gantt 
+                string="WBS" 
+                date_start="date_start"
+                date_stop="x_date_planned_end"
+                default_range="month"
+                default_group_by="x_parent_sol_id,sale_line_id"
+                precision="{'month':'day:full','week':'day:full'}"
+                display_mode="dense"
+                color="product_id"
+                cell_create="0"
+                edit="1"
+                create="0"
+                pill_label="1"
+            >
+                <field name="product_id"/>
+            </gantt>
+        </field>
+    </record>
+
+
+
+    <record model="ir.actions.act_window" id="action_show_wbs">
+        <field name="name">Work Breakdown Structure</field>
+        <field name="res_model">mrp.production</field>
+        <field name="context">{}</field>
+        <field name="view_mode">gantt,list,form</field>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'gantt', 'view_id': ref('construction_developer.view_mrp_production_gantt')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('mrp.mrp_production_tree_view')}),
+        ]"/>
+    </record>
+</odoo>

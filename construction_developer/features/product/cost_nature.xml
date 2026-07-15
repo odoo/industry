@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!--
+        This feature adds the cost nature field to product categories.
+    -->
+
+    <record model="ir.model.fields" id="field_product_category_x_cost_nature">
+        <field name="name">x_cost_nature</field>
+        <field name="model_id" ref="product.model_product_category"/>
+        <field name="field_description">Cost Nature</field>
+        <field name="ttype">selection</field>
+    </record>
+
+
+    <record model="ir.model.fields.selection" id="selection_field_product_category_x_cost_nature_labour">
+        <field name="name">Labour</field>
+        <field name="field_id" ref="field_product_category_x_cost_nature"/>
+        <field name="value">labour</field>
+    </record>
+
+    <record model="ir.model.fields.selection" id="selection_field_product_category_x_cost_nature_material">
+        <field name="name">Material</field>
+        <field name="field_id" ref="field_product_category_x_cost_nature"/>
+        <field name="value">material</field>
+    </record>
+
+    <record model="ir.model.fields.selection" id="selection_field_product_category_x_cost_nature_equipment">
+        <field name="name">Equipment</field>
+        <field name="field_id" ref="field_product_category_x_cost_nature"/>
+        <field name="value">equipment</field>
+    </record>
+
+    <record model="ir.model.fields" id="field_product_template_x_uom_matches_category">
+        <field name="name">x_uom_matches_category</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="field_description">UOM Matches Category</field>
+        <field name="ttype">boolean</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="copied" eval="False"/>
+        <field name="depends">categ_id,uom_id</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_uom_matches_category'] = record.categ_id.x_cost_nature not in ['equipment', 'labour'] or (record.uom_id and record.uom_id._has_common_reference(self.env.ref('uom.product_uom_hour')))
+]]></field>
+    </record>
+
+
+
+    <record model="ir.actions.server" id="server_action_update_x_cost_nature">
+        <field name="name">Construction Developer: Update Product Category Cost Nature</field>
+        <field name="model_id" ref="product.model_product_category"/>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="product.model_product_category"/>
+        <field name="update_field_id" ref="field_product_category_x_cost_nature"/>
+        <field name="update_path">x_cost_nature</field>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[record.x_cost_nature or record.parent_id.x_cost_nature]]></field>
+    </record>
+
+    <record model="base.automation" id="automation_update_cost_nature_on_write">
+        <field name="name">Construction Developer: Update Product Category Cost Nature on Parent Write</field>
+        <field name="model_id" ref="product.model_product_category"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[('parent_id', '!=', False)]</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_update_x_cost_nature')])]"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('product.field_product_category__parent_id')])]"/>
+    </record>
+</odoo>

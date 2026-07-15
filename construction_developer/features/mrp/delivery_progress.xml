@@ -1,0 +1,251 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!--
+        This feature adds a list view for MRP productions that allow the user to produce them
+        in increments and displays the cumulated changes on aggregated fields
+    -->
+    <record model="ir.model.fields" id="field_mrp_production_x_parent_sol_id">
+        <field name="name">x_parent_sol_id</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="field_description">Section</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">sale.order.line</field>
+        <field name="related">sale_line_id.parent_id</field>
+    </record>
+
+    <record model="ir.model.fields" id="field_mrp_production_x_reference">
+        <field name="name">x_reference</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="field_description">SOL Reference</field>
+        <field name="ttype">char</field>
+        <field name="related">sale_line_id.x_reference</field>
+    </record>
+
+    <record model="ir.model.fields" id="field_project_project_x_order_id">
+        <field name="name">x_order_id</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="field_description">Order</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">sale.order</field>
+        <field name="related">sale_line_id.order_id</field>
+        <field name="store" eval="False"/>
+    </record>
+
+    <record model="ir.model.fields" id="field_sale_order_line_x_production_ids">
+        <field name="name">x_production_ids</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="field_description">Manufacturing Orders</field>
+        <field name="ttype">one2many</field>
+        <field name="relation">mrp.production</field>
+        <field name="relation_field">sale_line_id</field>
+    </record>
+
+    <record model="ir.model.fields" id="field_mrp_production_x_increment_percent">
+        <field name="name">x_increment_percent</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="field_description">% Increment</field>
+        <field name="ttype">float</field>
+    </record>
+
+    <record model="ir.model.fields" id="field_mrp_production_x_total_qty">
+        <field name="name">x_total_qty</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="field_description">Total Qty</field>
+        <field name="ttype">float</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="depends">sale_line_id,sale_line_id.x_production_ids,sale_line_id.x_production_ids.product_qty</field>
+        <field name="compute"><![CDATA[
+for record in self: record['x_total_qty'] = sum(prod.product_qty for prod in record.sale_line_id.x_production_ids)
+]]></field>
+    </record>
+
+    <record model="ir.model.fields" id="field_mrp_production_x_delivered_qty">
+        <field name="name">x_delivered_qty</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="field_description">Delivered Qty</field>
+        <field name="ttype">float</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="depends">sale_line_id,sale_line_id.x_production_ids,sale_line_id.x_production_ids.qty_produced</field>
+        <field name="compute"><![CDATA[
+for record in self: record['x_delivered_qty'] = sum(prod.qty_produced for prod in record.sale_line_id.x_production_ids if prod.state == 'done')
+]]></field>
+    </record>
+
+    <record model="ir.model.fields" id="field_mrp_production_x_delivered_percent">
+        <field name="name">x_delivered_percent</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="field_description">% Delivered</field>
+        <field name="ttype">float</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="depends">x_total_qty,x_delivered_qty</field>
+        <field name="compute"><![CDATA[
+for record in self: record['x_delivered_percent'] = 100 * (record.x_delivered_qty / record.x_total_qty) if record.x_total_qty else 0.0
+]]></field>
+    </record>
+
+    <record model="ir.model.fields" id="field_mrp_production_x_cumulated_qty">
+        <field name="name">x_cumulated_qty</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="field_description">Cumulated Qty</field>
+        <field name="ttype">float</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="depends">x_delivered_qty,sale_line_id,sale_line_id.x_production_ids,sale_line_id.x_production_ids.qty_producing</field>
+        <field name="compute"><![CDATA[
+for record in self: record['x_cumulated_qty'] = record.x_delivered_qty + sum(prod.qty_producing for prod in record.sale_line_id.x_production_ids if prod.state != 'done')
+]]></field>
+    </record>
+
+    <record model="ir.model.fields" id="field_mrp_production_x_cumulated_percent">
+        <field name="name">x_cumulated_percent</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="field_description">% Cumulated</field>
+        <field name="ttype">float</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="depends">x_delivered_percent,sale_line_id,sale_line_id.x_production_ids,sale_line_id.x_production_ids.x_increment_percent</field>
+        <field name="compute"><![CDATA[
+for record in self: record['x_cumulated_percent'] = record.x_delivered_percent + 100 * sum(prod.x_increment_percent for prod in record.sale_line_id.x_production_ids if prod.state != 'done')
+]]></field>
+    </record>
+
+
+
+    <record model="ir.actions.server" id="action_mrp_production_update_progress_increment_percent_on_write">
+        <field name="name">Construction Developer: Update Progress Increment Percent</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for mrp in records:
+    # Avoid looping: only write if the percent actually changed
+    if float_compare(mrp.x_increment_percent or 0.0, (new_percent := (mrp.qty_producing or 0.0) / mrp.x_total_qty if mrp.x_total_qty else 0.0), precision_digits=2):
+        mrp['x_increment_percent'] = new_percent
+]]></field>
+    </record>
+
+    <record model="base.automation" id="automation_update_progress_increment_percent_on_write">
+        <field name="name">Construction Developer: Update Progress Increment Percent on Save</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[('product_qty', '&gt;', 0)]</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_mrp_production_update_progress_increment_percent_on_write')])]"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('mrp.field_mrp_production__qty_producing'), ref('field_mrp_production_x_total_qty')])]"/>
+    </record>
+
+
+    <record model="ir.actions.server" id="action_mrp_production_update_quantity_increment_on_change">
+        <field name="name">Construction Developer: Update Progress Increment Quantity</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for mrp in records:
+    # Avoid looping: only write if the quantity actually changed
+    if float_compare(mrp.qty_producing or 0.0, (new_qty := (mrp.x_increment_percent or 0.0) * mrp.x_total_qty), precision_digits=2):
+        mrp['qty_producing'] = new_qty
+]]></field>
+    </record>
+
+
+    <record model="base.automation" id="automation_update_quantity_increment_on_write">
+        <field name="name">Construction Developer: Update Progress Increment Quantity on Save</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_mrp_production_update_quantity_increment_on_change')])]"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('field_mrp_production_x_increment_percent')])]"/>
+    </record>
+
+
+    <!-- compute the move consumed changes from the list view since the onchange is not triggered from there -->
+    <!-- 
+        Has to be on_write and not on_create_or_write because otherwise it forces the move to be in progress,
+        even though it's ==0.
+    -->
+    <record model="ir.actions.server" id="action_mrp_force_component_recalculation">
+        <field name="name">Construction Developer: Force Component Recalculation</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for mo in records: mo._change_producing()
+]]></field>
+    </record>
+
+    <record model="base.automation" id="automation_force_recalculation_on_write">
+        <field name="name">Construction Developer: Recalculate Consumed on List View Edit</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="trigger">on_write</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_mrp_force_component_recalculation')])]"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('mrp.field_mrp_production__qty_producing')])]"/>
+    </record>
+
+
+
+    <record model="ir.ui.view" id="view_mrp_production_progress_list">
+        <field name="name">mrp.production.progress.view.list</field>
+        <field name="model">mrp.production</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list string="Delivery Progress" expand="1" create="0" editable="bottom" default_order="x_reference" duplicate="0" multi_edit="1" open_form_view="1">
+                <header>
+                    <button class="btn btn-primary" name="%(mrp.action_production_order_mark_done)d" type="action" string="Deliver"/>
+                </header>
+                <field name="x_reference" optional="show" width="100px"/>
+                <field name="date_start" optional="hide" width="100px"/>
+                <field name="date_deadline" optional="hide" width="100px"/>
+                <field name="sale_line_id" readonly="True" optional="hide"/>
+                <field name="product_id" readonly="True" optional="show"/>
+                <field name="uom_id" readonly="True" optional="show"/>
+                <field name="x_total_qty" string="Ordered Qty" optional="show"/>
+                <field name="product_qty" readonly="True" optional="show"/>
+                <field name="qty_produced" readonly="True" optional="hide"/>
+                <field name="x_delivered_qty" optional="show"/>
+                <field name="x_delivered_percent" optional="show" widget="progressbar" options="{'overflow_class': 'bg-primary'}" readonly="True"/>
+                <field name="qty_producing" string="Increment Qty" readonly="state == 'done'" optional="show" width="75px"/>
+                <field name="x_increment_percent" readonly="state == 'done'" optional="show" widget="percentage" width="75px"/>
+                <field name="x_cumulated_qty" optional="show"/>
+                <field name="x_cumulated_percent" optional="show" widget="progressbar" options="{'overflow_class': 'bg-primary'}"/>
+                <field name="state" optional="hide" widget="badge"
+                       decoration-danger="state == 'cancel'"
+                       decoration-info="state == 'assigned'"
+                       decoration-muted="state == 'draft'"
+                       decoration-success="state == 'done'"
+                       decoration-warning="state not in ('draft','cancel','done','assigned')"
+                />
+            </list>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="view_mrp_production_filter_inherit">
+        <field name="name">mrp.production.view.search.inherit.construction_developer</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.view_mrp_production_filter"/>
+        <field name="mode">primary</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='product']" position="before">
+                <filter string="Section" name="groupby_x_parent_sol_id" domain="[]" context="{'group_by': 'x_parent_sol_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+
+
+    <record model="ir.actions.act_window" id="action_show_delivery_progress">
+        <field name="name">Show Delivery Progress</field>
+        <field name="res_model">mrp.production</field>
+        <field name="search_view_id" ref="view_mrp_production_filter_inherit"/>
+        <field name="domain">[('sale_line_id.order_id', '=', context.get('so_id'))]</field>
+        <field name="context">{'search_default_todo': True, 'search_default_groupby_x_parent_sol_id': True}</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_ids" eval="[
+            (5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('construction_developer.view_mrp_production_progress_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('mrp.mrp_production_form_view')}),
+        ]"/>
+    </record>
+</odoo>

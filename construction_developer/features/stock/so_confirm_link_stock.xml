@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record model="ir.actions.server" id="action_apply_locations_on_source_from_so_pickings">
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="name">Construction Developer: Apply Locations on Pickings Created from SO</field>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="stock.model_stock_picking"/>
+        <field name="update_field_id" ref="stock.field_stock_picking__location_id"/>
+        <field name="update_path">location_id</field>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[record.sale_id.partner_shipping_id.x_ws_location_id.id]]></field>
+    </record>
+
+
+    <record model="base.automation" id="automation_on_picking_creation">
+        <field name="name">Construction Developer: On Picking Created from SO</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain" eval="[
+            ('picking_type_id.x_source_loc_from_so', '=', True),
+            ('sale_id', '!=', False),
+        ]"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_apply_locations_on_source_from_so_pickings')])]"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale_stock.field_stock_picking__sale_id')])]"/>
+    </record>
+</odoo>

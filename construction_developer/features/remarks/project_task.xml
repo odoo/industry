@@ -1,0 +1,168 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!--
+        This feature adds the remarks, which are tasks that can be created from the project updates
+        or from meetings, to allow users to create a pipeline of tickets to be reviewed.
+    -->
+
+    <record model="ir.model.fields" id="field_x_remark_x_is_remark">
+        <field name="name">x_is_remark</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">char</field>
+        <field name="field_description">Is Remark</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="compute"><![CDATA[
+for record in self: record['x_is_remark'] = bool(record.project_id.x_is_remark_project_of_ids)
+]]></field>
+    </record>
+
+    <record model="ir.model.fields" id="field_x_remark_x_reference">
+        <field name="name">x_reference</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">char</field>
+        <field name="field_description">Reference</field>
+        <field name="readonly" eval="True"/>
+    </record>
+
+    <record model="ir.model.fields" id="field_x_remark_x_location">
+        <field name="name">x_location</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="field_description">Location</field>
+        <field name="ttype">char</field>
+    </record>
+
+    <record model="ir.model.fields" id="field_x_remark_x_event_id">
+        <field name="name">x_event_id</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="field_description">Event</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">calendar.event</field>
+        <field name="readonly" eval="True"/>
+    </record>
+
+    <record model="ir.model.fields" id="field_x_remark_x_project_update_id">
+        <field name="name">x_update_id</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="field_description">Project Update</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">project.update</field>
+        <field name="readonly" eval="True"/>
+    </record>
+
+    <record model="ir.model.fields" id="field_x_remark_x_partner_id">
+        <field name="name">x_partner_id</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="field_description">Owner</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.partner</field>
+    </record>
+
+    <record model="ir.model.fields" id="field_event_x_remark_ids">
+        <field name="name">x_remark_ids</field>
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="field_description">Remarks</field>
+        <field name="ttype">one2many</field>
+        <field name="relation">project.task</field>
+        <field name="relation_field">x_event_id</field>
+    </record>
+
+
+    <record model="ir.model.fields" id="field_project_update_x_remark_ids">
+        <field name="name">x_remark_ids</field>
+        <field name="model_id" ref="project.model_project_update"/>
+        <field name="field_description">Remarks</field>
+        <field name="ttype">one2many</field>
+        <field name="relation">project.task</field>
+        <field name="relation_field">x_update_id</field>
+    </record>
+
+    <record model="ir.model.fields" id="field_project_update_x_remark_project_id">
+        <field name="name">x_remark_project_id</field>
+        <field name="model_id" ref="project.model_project_update"/>
+        <field name="field_description">Remark Project</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">project.project</field>
+        <field name="related">project_id.x_remark_project_id</field>
+    </record>
+
+
+
+    <!-- 
+        server action and not compute because otherwise compute generates the same ID if
+        creating multiple remarks from a one2many list since they are not saved yet so
+        we cannot access the previous reference, resulting in duplicates
+    -->
+    <record model="ir.actions.server" id="action_x_remark_generate_x_reference_on_create">
+        <field name="name">Construction Developer: Generate Remark Reference on Create</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code">
+for record in records:
+    # project already has remarks
+    if (project := record.project_id) and (last_ref := env['project.task'].search([('project_id', '=', project.id), ('x_reference', '!=', False)], order='x_reference DESC', limit=1)): 
+        pid, rid = last_ref.x_reference.split('-')
+    # project has no remarks but has SO
+    elif so := project.x_is_remark_project_of_ids[0].sale_order_id:  
+        pid, rid = so.name[1:], 0
+    # no SO but made from SO
+    elif soid := project.x_is_remark_project_of_ids[0].name.split('-')[0].strip().startswith('S') and soid[1:].isnumeric(): 
+        pid, rid = soid[1:], 0
+    # no SO (fallback case, should ideally not be needed)
+    else:
+        pid, rid = last_rem[0].x_reference.split('-') if (last_rem := env['project.task'].search([('x_reference', 'like', '00000-')], order='x_reference DESC')) else ("00000", 0)
+    record['x_reference'] = f"{pid}-{int(rid) + 1:05d}"
+</field>
+    </record>
+
+    <record model="base.automation" id="automation_x_remark_generate_x_reference_on_create">
+        <field name="name">Construction Developer: Generate Remark References on Create</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[('project_id.x_is_remark_project_of_ids', '!=', False)]</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_x_remark_generate_x_reference_on_create')])]"/>
+    </record>
+
+
+    <!-- 
+        This view is required in order for the custom fields to be saved.
+        By default, in the form view of model A, if there is a one2many list view for model B which
+        opens a form view for model B, only the fields listed in model B's list view are saved.
+    -->
+    <record model="ir.ui.view" id="view_x_remark_list_one2many">
+        <field name="name">project.task.view.list.one2many</field>
+        <field name="model">project.task</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list default_order="x_reference DESC" editable="bottom" open_form_view="True">
+                <field name="x_reference" optional="show"/>
+                <field name="create_date" optional="show"/>
+                <field name="name"/>
+                <field name="user_ids" optional="hide" widget="many2many_avatar_user"/>
+                <field name="x_partner_id" optional="hide"/>
+                <field name="x_location" optional="show"/>
+                <field name="tag_ids" optional="show" widget="many2many_tags"/>
+                <field name="priority" optional="show" widget="priority" options="{'is_toggle_mode': false}"/>
+                <field name="state" optional="hide"/>
+
+                <field name="project_id" column_invisible="True"/>
+                <field name="x_update_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+
+
+    <record id="action_view_remark_project_tasks" model="ir.actions.act_window">
+        <field name="name">Remark Tasks</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No remark tasks found. Let's create one!
+            </p>
+        </field>
+    </record>
+</odoo>

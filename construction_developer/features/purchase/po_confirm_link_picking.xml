@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!--
+        This feature adds a selectable location on the purchase order
+        if the option was toggled on the operation type. It changes the
+        location of the created pickings to match the selected location.
+    -->
+
+    <record model="ir.model.fields" id="field_purchase_order_line_x_delivery_site_name">
+        <field name="name">x_delivery_site_name</field>
+        <field name="model_id" ref="purchase.model_purchase_order_line"/>
+        <field name="field_description">Delivery Site</field>
+        <field name="ttype">char</field>
+        <field name="related">forecasted_location_id.display_name</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+
+    <record model="ir.model.fields" id="field_purchase_order_x_delivery_site_id">
+        <field name="name">x_delivery_site_id</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="field_description">Delivery Site</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.location</field>
+    </record>
+
+    <record model="ir.model.fields" id="field_purchase_order_x_show_delivery_site">
+        <field name="name">x_show_delivery_site</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="field_description">Show Delivery Site</field>
+        <field name="ttype">boolean</field>
+        <field name="related">picking_type_id.x_select_dest_on_po</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+
+
+
+    <record model="ir.actions.server" id="action_apply_locations_on_select_on_po_pickings">
+        <field name="name">Construction Developer: Apply Locations on Vendor Delivery Created from PO</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="state">code</field>
+        <field name="code">
+for p in records:
+    # does not work if only on_create because purchase_id does not exist yet
+    # does not work if purchase_id is set as trigger_field_ids
+    if p.location_dest_id == p.picking_type_id.default_location_dest_id:
+        p['location_dest_id'] = p.purchase_id.x_delivery_site_id
+</field>
+    </record>
+
+    <record model="base.automation" id="automation_on_delivery_from_po_creation">
+        <field name="name">Construction Developer: On Vendor Delivery Created from PO</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[('purchase_id.x_delivery_site_id', '!=', False)]</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('construction_developer.action_apply_locations_on_select_on_po_pickings')])]"/>
+        <field name="trigger_field_ids" eval="[(5, 0, 0)]"/>
+    </record>
+</odoo>

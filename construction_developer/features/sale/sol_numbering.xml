@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!--
+        This feature adds proper sequencing for the SOL and line numbers based on the sections.
+    -->
+    <record id="field_sale_order_line_x_item_number" model="ir.model.fields">
+        <field name="name">x_item_number</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="field_description">Line Number</field>
+        <field name="ttype">char</field>
+        <field name="store" eval="True"/>
+        <field name="readonly" eval="True"/>
+    </record>
+
+    <record id="field_sale_order_line_x_reference" model="ir.model.fields">
+        <field name="name">x_reference</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="field_description">Line Reference</field>
+        <field name="ttype">char</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="depends">order_id,order_id.name,x_item_number</field>
+        <field name="compute"><![CDATA[
+for sol in self: sol['x_reference'] = f"{sol.order_id.name}.{sol.x_item_number}" if sol.x_item_number else False
+]]></field>
+    </record>
+
+    <record id="field_account_move_line_x_reference" model="ir.model.fields">
+        <field name="ttype">char</field>
+        <field name="field_description">Line Reference</field>
+        <field name="model_id" ref="sale.model_account_move_line"/>
+        <field name="name">x_reference</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="depends">sale_line_ids,sale_line_ids.x_reference</field>
+        <field name="compute"><![CDATA[
+for aml in self: aml['x_reference'] = (aml.sale_line_ids.x_reference if len(aml.sale_line_ids) == 1 else "Multi") if aml.sale_line_ids else ""
+        ]]></field>
+    </record>
+
+
+
+    <record id="action_initialize_sales_order_line_sequence_on_sales_order_create" model="ir.actions.server">
+        <field name="name">Construction Developer: Initialize Sales Order Line Sequence on Sales Order create</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for record in records:
+    for i, line in enumerate(record.order_line.sorted(key=lambda l: l.sequence)):
+        line['sequence'] = i + 1
+]]></field>
+    </record>
+
+    <record id="server_action_update_sol_numbering" model="ir.actions.server">
+        <field name="name">Construction Developer: Update SOL numbering</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+env.ref('construction_developer.server_action_setup_sol_numbering').with_context(active_ids = records.order_id.ids, active_model="sale.order").run()
+]]></field>
+    </record>
+
+    <record id="server_action_setup_sol_numbering" model="ir.actions.server">
+        <field name="name">Construction Developer: Setup SOL numbering</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for record in records:
+    l1, l2, l3 = 0, 0, 0
+    
+    for sol in (sols := list(record.order_line.filtered(lambda sol: sol.display_type in [False, 'line_section', 'line_subsection']).sorted('sequence'))):
+        # Cannot use parent_id: when changing a line to another nesting level, the parent_id field
+        # is not updated yet when this automation is called
+        # Note: if a subsection is dragged out of a section and placed at the very top, it becomes a section
+        above_section = list(filter(lambda sol: sol.display_type != False, sols[:sols.index(sol)]))[-1:]
+
+        # top-level row (section, or product above first section)
+        if sol.display_type == 'line_section' or (sol.display_type == False and not above_section):
+            l1 += 1
+        # middle-level row (subsection, or product under a section)
+        elif sol.display_type == 'line_subsection' or above_section[0].display_type == 'line_section':
+            l2 += 1
+        # bottom-level row (product)
+        else:
+            l3 += 1
+        l2 = l2 * (sol.display_type != 'line_section'); l3 = l3 * (sol.display_type == False)
+
+        new_item_number = "".join([f"{n}." for n in [l1, l2, l3] if n])
+        sol.write({'x_item_number': new_item_number} if sol.x_item_number != new_item_number else {})
+]]></field>
+    </record>
+
+    <record id="automation_initialize_sales_order_line_sequence_on_sales_order_create" model="base.automation">
+        <field name="name">Construction Developer: Initialize Sales Order Line Sequence on Sales Order create or write</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale.field_sale_order__order_line')])]"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_setup_sol_numbering'), ref('action_initialize_sales_order_line_sequence_on_sales_order_create')])]"/>
+    </record>
+
+    <record id="automation_update_sol_numbering_on_sol_change" model="base.automation">
+        <field name="name">Construction Developer: Update Sales Order Line Number on SOL write</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale.field_sale_order_line__sequence'), ref('sale.field_sale_order_line__parent_id')])]"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_update_sol_numbering')])]"/>
+    </record>
+</odoo>

@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!-- 
+        This feature adds automations to modify the cost and vendor lists based on purchase orders. 
+    -->
+    
+    <record model="ir.model.fields" id="field_sale_order_so_contract_type">
+        <field name="name">x_so_contract_type</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="field_description">Contract Type</field>
+        <field name="ttype">selection</field>
+        <field name="help"><![CDATA[Precise on the quotation document the contract type:
+- Unspecified: No specific billing terms will be displayed on this document.
+- Fixed Price: A mention is displayed precising the contract type is fixed price.
+- Open Book: A mention is displayed precising the contract type is open book.
+- Per Line: Mixed billing logic where you define individually for each line item.]]></field>
+    </record>
+
+
+    <record model="ir.model.fields.selection" id="field_sale_order_so_contract_type_selection_unspecified">
+        <field name="name">Unspecified</field>
+        <field name="field_id" ref="field_sale_order_so_contract_type"/>
+        <field name="value">unspecified</field>
+    </record>
+
+    <record model="ir.model.fields.selection" id="field_sale_order_so_contract_type_selection_fixed_price">
+        <field name="name">Fixed Price</field>
+        <field name="field_id" ref="field_sale_order_so_contract_type"/>
+        <field name="value">fixed_price</field>
+    </record>
+
+    <record model="ir.model.fields.selection" id="field_sale_order_so_contract_type_selection_open_book">
+        <field name="name">Open Book</field>
+        <field name="field_id" ref="field_sale_order_so_contract_type"/>
+        <field name="value">open_book</field>
+    </record>
+
+    <record model="ir.model.fields.selection" id="field_sale_order_so_contract_type_selection_per_line">
+        <field name="name">Per Line</field>
+        <field name="field_id" ref="field_sale_order_so_contract_type"/>
+        <field name="value">per_line</field>
+    </record>
+
+
+    <record model="ir.model.fields" id="field_sale_order_line_sol_contract_type">
+        <field name="name">x_sol_contract_type</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="field_description">Contract Type</field>
+        <field name="ttype">selection</field>
+    </record>
+
+
+    <record model="ir.model.fields.selection" id="field_sale_order_line_sol_contract_type_selection_fixed_price">
+        <field name="name">Fixed Price</field>
+        <field name="field_id" ref="field_sale_order_line_sol_contract_type"/>
+        <field name="value">fixed_price</field>
+    </record>
+
+    <record model="ir.model.fields.selection" id="field_sale_order_line_sol_contract_type_selection_open_book">
+        <field name="name">Open Book</field>
+        <field name="field_id" ref="field_sale_order_line_sol_contract_type"/>
+        <field name="value">open_book</field>
+    </record>
+
+
+    <record model="ir.model.fields" id="field_mrp_production_x_sol_contract_type">
+        <field name="name">x_sol_contract_type</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="field_description">Contract Type</field>
+        <field name="ttype">selection</field>
+        <field name="related">sale_line_id.x_sol_contract_type</field>
+    </record>
+
+
+    <record model="ir.model.fields" id="field_sale_order_line_qty_delivered_state">
+        <field name="name">x_qty_delivered_state</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="field_description">Delivered Quantity State</field>
+        <field name="ttype">char</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="depends">qty_delivered, product_uom_qty, x_sol_contract_type, product_template_id</field>
+        <field name="compute"><![CDATA[
+contract_types = {'open_book': 'warning', 'fixed_price': 'danger'}
+for sol in self: sol['x_qty_delivered_state'] = contract_types.get(sol.x_sol_contract_type, False) if sol.product_template_id.service_policy == 'delivered_manual' and sol.qty_delivered > sol.product_uom_qty else False
+        ]]></field>
+    </record>
+
+    <record model="ir.model.fields" id="field_mrp_production_qty_delivered_state">
+        <field name="name">x_qty_delivered_state</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="field_description">Delivered Quantity State</field>
+        <field name="ttype">char</field>
+        <field name="related">sale_line_id.x_qty_delivered_state</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+
+    <record model="ir.model.fields" id="field_mrp_production_x_cumulated_percent_state">
+        <field name="name">x_cumulated_percent_state</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="field_description">Current Progress State</field>
+        <field name="ttype">char</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="depends">x_cumulated_percent, x_sol_contract_type</field>
+        <field name="compute"><![CDATA[
+contract_types = {'open_book': 'warning', 'fixed_price': 'danger'}
+for prod in self: prod['x_cumulated_percent_state'] = contract_types.get(prod.x_sol_contract_type, False) if prod.x_cumulated_percent > 100 else False
+        ]]></field>
+    </record>
+
+
+    <data noupdate="1">
+        <record model="ir.default" id="default_sale_order_line_x_sol_contract_type">
+            <field name="field_id" ref="field_sale_order_line_sol_contract_type"/>
+            <field name="json_value">"fixed_price"</field>
+        </record>
+    </data>
+
+
+    <record model="ir.ui.view" id="view_mrp_production_progress_list_inherit">
+        <field name="name">mrp.production.progress.view.list.inherit</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="view_mrp_production_progress_list"/>
+        <field name="mode">extension</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sale_line_id']" position="after">
+                <field name="x_sol_contract_type" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='x_delivered_percent']" position="attributes">
+                <attribute name="decoration-warning">x_qty_delivered_state == 'warning'</attribute>
+                <attribute name="decoration-danger">x_qty_delivered_state == 'danger'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='x_cumulated_percent']" position="attributes">
+                <attribute name="decoration-warning">x_cumulated_percent_state == 'warning'</attribute>
+                <attribute name="decoration-danger">x_cumulated_percent_state == 'danger'</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
