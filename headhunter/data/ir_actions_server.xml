@@ -73,12 +73,12 @@ action['context'] =  {
         <field name="code"><![CDATA[
 if env.context.get('x_from_cv_send'):
     applicant = env['hr.applicant'].browse(record.res_id)
-    applicant.x_shared_cv_ids.write({'public': True})
     env['x_cv_sent_application'].create({
         'x_applicant_id': applicant.id,
         'x_cv_ids': [(6, 0, record.attachment_ids.ids)],
         'x_cv_sent_date': datetime.date.today(),
     })
+    record.attachment_ids.generate_access_token()
     applicant['x_is_cv_sent'] = True,
     applicant['x_published'] = True,
         ]]></field>
