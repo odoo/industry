@@ -5,11 +5,16 @@
     'depends': [
         'base_industry_data',
         'construction',
+        'mrp',
         'web_studio',
     ],
     'data': [
         'data/res_config_settings.xml',
-
+        'data/stock_location.xml',
+        'features/work_items/create_worksite_loc_on_so_confirm.xml',
+        'features/work_items/route_configs.xml',
+        'features/work_items/link_mrp_loc_bom_on_so_confirm.xml',
+        'data/views_standard.xml',
     ],
     'demo': [
         'demo/dummy.xml',
