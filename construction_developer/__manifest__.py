@@ -19,10 +19,13 @@
         'features/work_items/update_sol_price_from_bom.xml',
         'features/work_items/access_bom_from_so.xml',
         'features/work_items/check_so_bom_price_updates.xml',
+        'features/work_items/open_stock_from_so.xml',
         'data/views_standard.xml',
     ],
     'demo': [
-        'demo/dummy.xml',
+        'demo/stock_location.xml',
+        'demo/res_company.xml',
+        'demo/res_partner.xml',
     ],
     'cloc_exclude': [
     ],
