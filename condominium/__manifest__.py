@@ -1,12 +1,13 @@
 {
     'name': 'Property Owner Association',
-    'version': '3.3',
+    'version': '3.4',
     'category': 'Services',
     'depends': [
         'account_check_printing',
         'accountant',
         'appointment',
         'contacts',
+        'crm',
         'documents_project_sale',
         'helpdesk',
         'hr_timesheet',
@@ -61,6 +62,8 @@
         'demo/account_move_post.xml',
         'demo/calendar_event.xml',
         'demo/calendar_attendee.xml',
+        'demo/crm_tag.xml',
+        'demo/crm_lead.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
