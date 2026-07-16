@@ -1,6 +1,6 @@
 {
     'name': 'Bakery',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Retail',
     'author': 'Odoo S.A.',
     'depends': [
@@ -9,8 +9,7 @@
         'knowledge',
         'pos_sale',
         'purchase',
-        'stock',
-        'website_sale_collect',
+        'website_sale',
     ],
     'data': [
         'data/product_product.xml',
@@ -23,11 +22,11 @@
         'data/knowledge_tour.xml',
         'data/hr_department.xml',
         'data/hr_job.xml',
+        'data/ir_ui_menu.xml',
     ],
     'demo': [
         'demo/res_company.xml',
         'demo/website_view.xml',
-        'demo/delivery_carrier.xml',
         'demo/crm_tag.xml',
         'demo/res_partner.xml',
         'demo/hr_employee.xml',
