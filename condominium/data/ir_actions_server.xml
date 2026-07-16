@@ -5,7 +5,7 @@
         <field name="state">code</field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="code"><![CDATA[# Get distribution ratios
-if (total_ratio := sum(record.x_distribution_key.x_ratio_ids.mapped('x_ratio'))) == 0: raise UserError("Cannot split the Sales Orders because there is no distribution key and total is null.")
+if (total_ratio := sum(r.x_ratio for r in record.x_distribution_key.x_ratio_ids)) == 0: raise UserError("Cannot split the Sales Orders because there is no distribution key or the total ratio is null.")
 for owner in env['res.partner'].search([('x_companies', '=', record.company_id.id)]):  # One SO per owner
     new_so = record.copy({'order_line': False, 'x_source_sales_order': record.id, 'partner_id': owner.id})
     new_so_lines = []
@@ -228,7 +228,7 @@ if voters: record['x_attendee_vote_ids'] = env['x_motion_vote'].create(voters).i
     if (properties := env['x_property'].search([('x_company_id', 'in', distribution_key.x_company_id.id)])):
         total_distribution = sum(properties.mapped('x_area'))
         for property in properties:
-            if property.id not in distribution_key.x_ratio_ids.mapped('x_property_ratios').ids: distribution_key.write({'x_ratio_ids': [(0, 0, {'x_distribution_key': distribution_key.id, 'x_property_ratios': property.id, 'x_ratio': property.x_area / total_distribution * 100, })]})
+            if property.id not in distribution_key.x_ratio_ids.mapped('x_property_ratios').ids: distribution_key.write({'x_ratio_ids': [(0, 0, {'x_distribution_key': distribution_key.id, 'x_property_ratios': property.id, 'x_ratio': property.x_area / total_distribution * 100 if total_distribution else 0., })]})
 ]]>        </field>
         <field name="model_id" ref="model_x_distribution_key"/>
         <field name="state">code</field>
@@ -237,7 +237,7 @@ if voters: record['x_attendee_vote_ids'] = env['x_motion_vote'].create(voters).i
     <record id="action_compute_distribution_key_ratios" model="ir.actions.server">
         <field name="binding_model_id" ref="model_x_distribution_key"/>
         <field name="code"><![CDATA[for distribution_key in records:
-    total_distribution = sum(distribution_key.x_ratio_ids.mapped('x_area'))
+    if (total_distribution := sum(r.x_area for r in distribution_key.x_ratio_ids)) == 0: raise UserError("Total is 0, impossible to compute ratios")
     for ratio in distribution_key.x_ratio_ids: ratio['x_ratio'] = ratio.x_area / total_distribution * 100]]></field>
         <field name="model_id" ref="model_x_distribution_key"/>
         <field name="state">code</field>

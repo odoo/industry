@@ -1,6 +1,6 @@
 {
     'name': 'Property Owner Association',
-    'version': '3.3',
+    'version': '3.4',
     'category': 'Services',
     'depends': [
         'account_check_printing',
