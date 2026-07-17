@@ -1,6 +1,6 @@
 {
     'name': 'Booking',
-    'version': '1.23',
+    'version': '1.24',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
