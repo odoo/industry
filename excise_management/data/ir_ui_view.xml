@@ -207,8 +207,9 @@
         <field name="active" eval="True"/>
         <field name="type">list</field>
         <field name="arch" type="xml">
-            <list name="excise_report" edit="0" default_group_by="x_excise_license_id" default_order="x_from_date desc" expand="1">
+            <list name="excise_report" edit="0" default_order="x_from_date desc" expand="1">
                 <field name="x_name" />
+                <field name="x_excise_license_id"/>
                 <field name="x_from_date" optional="show" widget="daterange" options="{'end_date_field': 'x_to_date','numeric': true, 'always_range': true}"/>
                 <field name="x_external_id" />
                 <field name="activity_ids" optional="show" widget="list_activity"/>
@@ -278,6 +279,7 @@
                 <filter domain="[('activity_state', '=', 'planned')]" name="to_do_filter" string="To do"/>
                 <filter domain="[('x_state', '=', 'done')]" name="done_state_filter" string="Done"/>
                 <filter name="group_by_state" string="State" context="{'group_by': 'x_state'}"/>
+                <filter name="group_by_license" string="License" context="{'group_by' : 'x_excise_license_id'}"/>
             </search>
         </field>
     </record>
@@ -312,6 +314,19 @@
                 <field name="x_name"/>
                 <field name="x_warehouse_ids" widget="many2many_tags" domain="[('x_is_fiscal_deposit','=',True)]"/>
             </list>
+        </field>
+    </record>
+    <record id="stock_vpicktree_inherit" model="ir.ui.view">
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="mode">extension</field>
+        <field name="model">stock.picking</field>
+        <field name="name">stock.picking.list.inherit.vineyard</field>
+        <field name="active" eval="True"/>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="default_order">create_date, name</attribute>
+            </xpath>
         </field>
     </record>
 </odoo>

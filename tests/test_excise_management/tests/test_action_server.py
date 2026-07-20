@@ -15,11 +15,14 @@ class ActionServerTestCase(TransactionCase):
             'name': 'Fiscal Position Test',
             'x_is_fiscal_deposit': False
         })
+        cls.excise_category = cls.env.ref("excise_management.x_excise_category_S001")
+        cls.product = cls.env['product.product'].create({
+            'name': 'product',
+            'x_excise_category': cls.excise_category.id,
+        })
 
     def test_add_excise_server_action(self):
-        product_template = self.env['product.template'].create({
-            'name': 'Product Test',
-        })
+        product_template = self.product.product_tmpl_id
         with Form(product_template) as product_form:
             product_form.x_excise_category = self.env.ref("excise_management.x_excise_category_S001")
         self.assertIn(product_form.x_excise_category.x_sales_tax_id, product_template.taxes_id,
@@ -132,8 +135,6 @@ class ActionServerTestCase(TransactionCase):
             {'name': 'FD', 'property_account_position_id': fiscal_position.id},
             {'name': 'Not FD', 'property_account_position_id': self.fiscal_position.id},
         ])
-        excise_category = self.env.ref("excise_management.x_excise_category_S001")
-        product = self.env['product.product'].create({'name': 'product', 'x_excise_category': excise_category.id})
         excise_report = self.env['x_excise_report'].create({
             'x_name': 'Report 1',
             'x_excise_license_id': license1.id,
@@ -141,91 +142,69 @@ class ActionServerTestCase(TransactionCase):
             'x_to_date': fields.Datetime.now() + relativedelta(days=7),
         })
 
-        same_license_diff_warehouse_move = self.env['stock.move'].create({
-            'location_id': internal_fd.lot_stock_id.id,
-            'location_dest_id': internal_fd2.lot_stock_id.id,
-            'product_id': product.id,
-            'inventory_name': 'move',
-            'state': 'done',
-        })
-        diff_license_diff_warehouse_move = self.env['stock.move'].create({
-            'location_id': internal_fd.lot_stock_id.id,
-            'location_dest_id': internal_fd3.lot_stock_id.id,
-            'product_id': product.id,
-            'inventory_name': 'move',
-            'state': 'done',
-        })
-        fd_warehouse_to_not_fd_warehouse_move = self.env['stock.move'].create({
-            'location_id': internal_fd.lot_stock_id.id,
-            'location_dest_id': internal_not_fd.lot_stock_id.id,
-            'product_id': product.id,
-            'inventory_name': 'move',
-            'state': 'done',
-        })
-        not_fd_warehouse_to_fd_warehouse_move = self.env['stock.move'].create({
-            'location_id': internal_not_fd.lot_stock_id.id,
-            'location_dest_id': internal_fd.lot_stock_id.id,
-            'product_id': product.id,
-            'inventory_name': 'move',
-            'state': 'done',
-        })
-        internal_not_fd.x_excise_license_id = license1.id
-        not_fd_warehouse_to_not_fd_warehouse_move = self.env['stock.move'].create({
-            'location_id': internal_not_fd.lot_stock_id.id,
-            'location_dest_id': internal_not_fd.lot_stock_id.id,
-            'product_id': product.id,
-            'inventory_name': 'move',
-            'state': 'done',
-        })
+        def create_stock_move(location_id, location_dest_id, partner_id=None):
+            args = {
+                'location_id': location_id,
+                'location_dest_id': location_dest_id,
+                'product_id': self.product.id,
+                'inventory_name': 'move',
+                'state': 'done',
+            }
+            if partner_id:
+                args['partner_id'] = partner_id
+            return self.env['stock.move'].create(args)
 
-        move_to_partner = self.env['stock.move'].create({
-            'location_id': internal_fd.lot_stock_id.id,
-            'location_dest_id': customers.id,
-            'product_id': product.id,
-            'inventory_name': 'move',
-            'partner_id': partner.id,
-            'state': 'done',
-        })
-        move_to_fd_partner = self.env['stock.move'].create({
-            'location_id': internal_fd.lot_stock_id.id,
-            'location_dest_id': customers.id,
-            'product_id': product.id,
-            'inventory_name': 'move',
-            'partner_id': partner_FD.id,
-            'state': 'done',
-        })
-        move_to_not_fd_partner = self.env['stock.move'].create({
-            'location_id': internal_fd.lot_stock_id.id,
-            'location_dest_id': customers.id,
-            'product_id': product.id,
-            'inventory_name': 'move',
-            'partner_id': partner_not_FD.id,
-            'state': 'done',
-        })
-        move_from_partner = self.env['stock.move'].create({
-            'location_dest_id': internal_fd.lot_stock_id.id,
-            'location_id': customers.id,
-            'product_id': product.id,
-            'inventory_name': 'move',
-            'partner_id': partner.id,
-            'state': 'done',
-        })
-        move_from_fd_partner = self.env['stock.move'].create({
-            'location_dest_id': internal_fd.lot_stock_id.id,
-            'location_id': customers.id,
-            'product_id': product.id,
-            'inventory_name': 'move',
-            'partner_id': partner_FD.id,
-            'state': 'done',
-        })
-        move_from_not_fd_partner = self.env['stock.move'].create({
-            'location_dest_id': internal_fd.lot_stock_id.id,
-            'location_id': customers.id,
-            'product_id': product.id,
-            'inventory_name': 'move',
-            'partner_id': partner_not_FD.id,
-            'state': 'done',
-        })
+        same_license_diff_warehouse_move = create_stock_move(
+            location_id=internal_fd.lot_stock_id.id,
+            location_dest_id=internal_fd2.lot_stock_id.id,
+        )
+        diff_license_diff_warehouse_move = create_stock_move(
+            location_id=internal_fd.lot_stock_id.id,
+            location_dest_id=internal_fd3.lot_stock_id.id
+        )
+        fd_warehouse_to_not_fd_warehouse_move = create_stock_move(
+            location_id=internal_fd.lot_stock_id.id,
+            location_dest_id=internal_not_fd.lot_stock_id.id,
+        )
+        not_fd_warehouse_to_fd_warehouse_move = create_stock_move(
+            location_id=internal_not_fd.lot_stock_id.id,
+            location_dest_id=internal_fd.lot_stock_id.id,
+        )
+        internal_not_fd.x_excise_license_id = license1.id
+        not_fd_warehouse_to_not_fd_warehouse_move = create_stock_move(
+            location_id=internal_not_fd.lot_stock_id.id,
+            location_dest_id=internal_not_fd.lot_stock_id.id,
+        )
+        move_to_partner = create_stock_move(
+            location_id=internal_fd.lot_stock_id.id,
+            location_dest_id=customers.id,
+            partner_id=partner.id,
+        )
+        move_to_fd_partner = create_stock_move(
+            location_id=internal_fd.lot_stock_id.id,
+            location_dest_id=customers.id,
+            partner_id=partner_FD.id,
+        )
+        move_to_not_fd_partner = create_stock_move(
+            location_id=internal_fd.lot_stock_id.id,
+            location_dest_id=customers.id,
+            partner_id=partner_not_FD.id,
+        )
+        move_from_partner = create_stock_move(
+            location_id=customers.id,
+            location_dest_id=internal_fd.lot_stock_id.id,
+            partner_id=partner.id,
+        )
+        move_from_fd_partner = create_stock_move(
+            location_id=customers.id,
+            location_dest_id=internal_fd.lot_stock_id.id,
+            partner_id=partner_FD.id,
+        )
+        move_from_not_fd_partner = create_stock_move(
+            location_id=customers.id,
+            location_dest_id=internal_fd.lot_stock_id.id,
+            partner_id=partner_not_FD.id,
+        )
         server_action.with_context(active_ids=[excise_report.id], active_model="x_excise_report").sudo().run()
         line = self.env['x_excise_report_line'].search([('x_excise_report_id', '=', excise_report.id)])
 
