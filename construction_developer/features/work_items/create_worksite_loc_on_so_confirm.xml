@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!--
+        This feature adds a stock location on the delivery address of every SO after confirmation
+        under the Worksites/ virtual location.
+    -->
+
+    <record model="ir.model.fields" id="field_res_partner_x_ws_location_id">
+        <field name="name">x_ws_location_id</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="field_description">Worksite Location</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.location</field>
+    </record>
+
+    <record model="ir.model.fields" id="field_sale_order_x_ws_location_id">
+        <field name="name">x_ws_location_id</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="field_description">Worksite Location</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.location</field>
+        <field name="related">partner_shipping_id.x_ws_location_id</field>
+    </record>
+
+
+
+    <record model="ir.actions.server" id="action_create_delivery_location_on_sales_order_confirm">
+        <field name="name">Construction Developer: Create Delivery Location</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">
+for so in records:
+    wh = env['ir.model.data']._xmlid_to_res_id('construction_developer.stock_location_worksites')
+    so.partner_shipping_id['x_ws_location_id'] = env['stock.location'].create({'name': f"{so.partner_shipping_id.name}", 'usage': 'internal', 'location_id': wh, 'replenish_location': True, 'company_id': env.company.id})
+</field>
+    </record>
+
+    <record model="base.automation" id="automation_create_delivery_location_on_so_confirm">
+        <field name="name">Construction Developer: Create delivery location on Sales Order confirm</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain">[('state', '!=', 'draft'), ('partner_shipping_id.x_ws_location_id', '=', False)]</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_create_delivery_location_on_sales_order_confirm')])]"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale.field_sale_order__state')])]"/>
+    </record>
+</odoo>

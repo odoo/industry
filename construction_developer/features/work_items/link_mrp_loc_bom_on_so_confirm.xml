@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!--
+        This feature adds a selectable BOM on the SOL to specify which BOM will be selected
+        on the MO used to represent the Work Items. It also modifies the locations to use
+        the Worksite locations we created. 
+    -->
+
+    <record model="ir.model.fields" id="field_sale_order_line_x_bom_id">
+        <field name="name">x_bom_id</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="field_description">Bill of Materials</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">mrp.bom</field>
+        <field name="depends">product_template_id,product_template_id.bom_ids,product_template_id.route_ids</field>
+        <field name="compute"><![CDATA[
+for sol in self:
+    if not sol.x_bom_id and (boms := sol.product_template_id.bom_ids) and any(r.x_allow_sol_preselect for r in sol.product_template_id.route_ids): 
+        sol['x_bom_id'] = fboms[0].id if (fboms := boms.filtered('x_is_template')) else boms[0]
+]]></field>
+    </record>
+
+    <record model="ir.model.fields" id="field_mrp_bom_x_original_sol_id">
+        <field name="name">x_original_sol_id</field>
+        <field name="model_id" ref="mrp.model_mrp_bom"/>
+        <field name="field_description">Sale Order Line</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">sale.order.line</field>
+    </record>
+
+    <record model="ir.model.fields" id="field_mrp_bom_x_parent_bom_id">
+        <field name="name">x_parent_bom_id</field>
+        <field name="model_id" ref="mrp.model_mrp_bom"/>
+        <field name="field_description">Template BOM</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">mrp.bom</field>
+    </record>
+
+
+
+    <!-- helper function -->
+    <record model="ir.actions.server" id="action_duplicate_bom">
+        <field name="name">Construction Developer: Duplicate BOM</field>
+        <field name="model_id" ref="mrp.model_mrp_bom"/>
+        <field name="state">code</field>
+        <field name="code">
+# required parameter
+sol, bom = env.context.get('bom_sol'), env.context.get('bom')
+code = f"{sol.order_id.name} - {sol.order_id.partner_id.name}" + f" - {bom.code}" * bool(bom.code and bom.code != "Template")
+
+action = bom.copy({'code': code, 'x_original_sol_id': sol.id, 'x_parent_bom_id': bom.id})
+sol['x_bom_id'] = action
+</field>
+    </record>
+
+
+    <record model="ir.actions.server" id="action_apply_locations_on_mo">
+        <field name="name">Construction Developer: Apply Locations and BOM on Manufactoring Order</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="state">code</field>
+        <field name="code">
+for mo in records:
+    so = (sol := mo.sale_line_id).order_id
+
+    # case A: this BOM was already duplicated
+    if (custom_bom := (bom := mo.sale_line_id.x_bom_id)).x_original_sol_id.id != sol.id:
+        # case B: it's a BOM that was reused and it not yet copied. Create a new one.
+        custom_bom = env.ref('construction_developer.action_duplicate_bom').with_context(bom=bom, bom_sol=sol).run()
+
+    mo.write({'bom_id': custom_bom.id, 'location_src_id': so.partner_shipping_id.x_ws_location_id.id})
+    mo.action_confirm()
+</field>
+    </record>
+
+    <record model="base.automation" id="automation_on_mo_creation">
+        <field name="name">Construction Developer: On Procurement MO Created from SO</field>
+        <field name="model_id" ref="mrp.model_mrp_production"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain" eval="[
+            ('location_src_id',  '=', ref('construction_developer.stock_location_worksites')),
+            ('location_dest_id', '=', ref('stock.stock_location_customers')),
+            ('sale_line_id', '!=', False),
+            ('sale_line_id.x_bom_id', '!=', False),
+        ]"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_apply_locations_on_mo')])]"/>
+    </record>
+
+
+    <record model="ir.actions.server" id="action_apply_locations_on_source_from_so_pickings">
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="name">Construction Developer: Apply Locations on Pickings Created from SO</field>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="stock.model_stock_picking"/>
+        <field name="update_field_id" ref="stock.field_stock_picking__location_id"/>
+        <field name="update_path">location_id</field>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[record.sale_id.partner_shipping_id.x_ws_location_id.id]]></field>
+    </record>
+
+
+    <record model="base.automation" id="automation_on_picking_creation">
+        <field name="name">Construction Developer: On Picking Created from SO</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="filter_domain" eval="[
+            ('picking_type_id.x_source_loc_from_so', '=', True),
+            ('sale_id', '!=', False),
+        ]"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_apply_locations_on_source_from_so_pickings')])]"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale_stock.field_stock_picking__sale_id')])]"/>
+    </record>
+</odoo>
