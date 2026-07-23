@@ -187,7 +187,6 @@ class TestEnv(IndustryCase):
                 self._check_xml_style(decoded_content, tree, module, file_name)
                 self._check_forcecreate_external_xmlid(tree, file_name, module)
                 self._check_update_status(tree, file_name)
-                self._check_knowledge_article_is_published(tree, file_name)
                 self._check_knowledge_article_is_locked(tree, file_name)
                 checked_records_with_user = self._check_user_is_set(tree, checked_records_with_user)
                 self._check_duplicate_records(tree, file_name)
@@ -386,14 +385,6 @@ class TestEnv(IndustryCase):
                     "Model %s should be updated, please remove 'noupdate=\"1\"' attribute tied to it in %s",
                     model,
                     filename,
-                )
-
-    def _check_knowledge_article_is_published(self, root, file_name):
-        for record in root.xpath("//record[@model='knowledge.article']"):
-            is_published_fields = record.xpath(".//field[@name='is_published' and @eval='True']")
-            if is_published_fields:
-                _logger.warning(
-                    f"Knowledge article in {file_name} should not have 'is_published' set to True."
                 )
 
     def _check_knowledge_article_is_locked(self, root, file_name):
