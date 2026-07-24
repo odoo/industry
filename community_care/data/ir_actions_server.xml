@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="set_age_according_to_date_of_birth_server_action" model="ir.actions.server">
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="update_path">x_age</field>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="base.model_res_partner"/>
+        <field name="evaluation_type">equation</field>
+        <field name="name">Set Age</field>
+        <field name="update_field_id" ref="base_model_res_partner_x_age_field"/>
+        <field name="usage">base_automation</field>
+        <field name="value"><![CDATA[datetime.date.today().year - record.x_date_of_birth.year - ((datetime.date.today().month, datetime.date.today().day) < (record.x_date_of_birth.month, record.x_date_of_birth.day)) if record.x_date_of_birth else False]]></field>
+    </record>
+    <record id="action_update_shortcut_url" model="ir.actions.server">
+        <field name="model_id" ref="model_x_res_partner_shortcut"/>
+        <field name="update_path">x_url</field>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="model_x_res_partner_shortcut"/>
+        <field name="evaluation_type">equation</field>
+        <field name="name">Update shortcut url</field>
+        <field name="update_field_id" ref="x_res_partner_shortcut_model_x_url_field"/>
+        <field name="usage">base_automation</field>
+        <field name="value"><![CDATA[record.x_shortcut.x_pattern.replace('VALUE', record.x_name) if record.x_shortcut and record.x_shortcut.x_pattern and record.x_name else False]]></field>
+    </record>
+    <record id="action_recompute_shortcut_urls" model="ir.actions.server">
+        <field name="model_id" ref="model_x_shortcut"/>
+        <field name="state">code</field>
+        <field name="name">Recompute Shortcut URLs on Pattern Change</field>
+        <field name="usage">base_automation</field>
+        <field name="code"><![CDATA[for line in env['x_res_partner_shortcut'].search([('x_shortcut', 'in', records.ids)]):
+    line.write({'x_url': line.x_shortcut.x_pattern.replace('VALUE', line.x_name) if line.x_name and line.x_shortcut.x_pattern else False})
+]]></field>
+    </record>
+</odoo>

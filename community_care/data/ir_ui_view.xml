@@ -1,0 +1,684 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="view_partner_form_resident" model="ir.ui.view">
+    <field name="active" eval="True" />
+    <field name="model">res.partner</field>
+    <field name="name">res.partner.form.resident</field>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <form string="Resident">
+        <header>
+          <field name="x_admission_stage" widget="statusbar"
+            statusbar_visible="pending,admitted,transitioning,discharged"
+            options="{'clickable': '1'}" />
+        </header>
+        <sheet>
+          <div class="oe_button_box" name="button_box">
+            <button class="oe_stat_button" type="object"
+              name="schedule_meeting"
+              icon="fa-calendar"
+              context="{'partner_id': id, 'partner_name': name}">
+              <field string="Meetings" name="meeting_count" widget="statinfo" />
+            </button>
+            <button groups="documents.group_documents_user" name="action_see_documents"
+              type="object" class="oe_stat_button" icon="fa-file-text-o">
+              <div class="o_field_widget o_stat_info">
+                <span class="o_stat_value">
+                  <field name="document_count" />
+                </span>
+                <span class="o_stat_text">Documents</span>
+              </div>
+            </button>
+            <button class="oe_stat_button" type="action"
+              name="%(community_care.action_partner_meeting_focus)d" icon="fa-sticky-note-o"
+              invisible="x_meeting_focus_count == 0">
+              <field name="x_meeting_focus_count" widget="statinfo" string="Meeting Notes" />
+            </button>
+            <button class="oe_stat_button" type="action"
+              name="%(community_care.action_partner_detailed_notes)d" icon="fa-align-left"
+              invisible="x_detailed_notes_count == 0"
+              context="{'search_default_name': name}">
+              <field name="x_detailed_notes_count" widget="statinfo" string="Detailed Notes" />
+            </button>
+            <button class="oe_stat_button" type="action"
+              name="%(community_care.action_partner_log_notes)d" icon="fa-pencil-square-o"
+              invisible="x_log_notes_count == 0">
+              <field name="x_log_notes_count" widget="statinfo" string="Log Notes" />
+            </button>
+          </div>
+          <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active" />
+          <field name="x_is_resident" invisible="1" />
+          <field name="active" invisible="1" />
+          <div class="d-flex flex-column flex-md-row align-items-center gap-3">
+            <field name="image_1920" widget="contact_image"
+              options="{'preview_image': 'avatar_128', 'size': [130,130], 'img_class': 'border rounded h-100 object-fit-contain'}" />
+            <field name="avatar_128" invisible="1" />
+            <group class="d-flex flex-column gap-md-0 w-100">
+              <label for="name" class="d-md-none" />
+              <h1>
+                <field options="{'line_breaks': False}" widget="text" class="text-break d-block"
+                  name="name" default_focus="1" placeholder="Resident Name"
+                  required="type == 'contact'" />
+              </h1>
+              <label for="email" class="d-md-none" />
+              <div class="d-flex align-items-baseline w-md-50 gap-2">
+                <i class="d-none d-md-inline-flex fa fa-envelope" title="Email" />
+                <field name="email" widget="email" placeholder="Email" />
+              </div>
+              <label for="phone" class="d-md-none" />
+              <div class="d-flex align-items-baseline w-md-50 gap-2">
+                <i class="d-none d-md-inline-flex fa fa-phone" title="Phone" />
+                <field name="phone" widget="phone" placeholder="Phone" />
+              </div>
+              <div class="d-flex align-items-baseline w-md-50 gap-2" invisible="x_is_resident">
+                <span class="o_form_label">Is Resident</span>
+                <field name="x_is_resident" widget="boolean_toggle" nolabel="1" />
+              </div>
+              <div class="d-flex align-items-baseline w-md-50 gap-2" invisible="not x_is_resident" groups="base.group_no_one">
+                <span class="o_form_label">Is Resident</span>
+                <field name="x_is_resident" widget="boolean_toggle" nolabel="1" />
+              </div>
+            </group>
+          </div>
+          <notebook colspan="4">
+            <page string="Profile" name="profile">
+              <group>
+                <group name="left_column" col="1">
+                  <group string="Identity" name="group_identity">
+                    <field name="x_date_of_birth" />
+                    <field name="x_gender_administrative" />
+                    <field name="x_nationality_id" options="{'no_open': True, 'no_create': True}" />
+                    <field name="x_nicknames" />
+                  </group>
+                  <group string="Family Unit" name="group_family_unit">
+                    <field name="x_family_unit_id" string="Family" />
+                    <field name="x_family_role" string="Role" invisible="not x_family_unit_id" />
+                    <field name="x_family_member_related_ids"
+                      invisible="not x_family_unit_id or not id"
+                      context="{'form_view_ref': 'community_care.view_partner_form_resident', 'form_view_initial_mode': 'edit'}">
+                      <list create="false" delete="false">
+                        <field name="avatar_128" widget="image"
+                          options="{'size': [24, 24], 'img_class': 'o_avatar rounded'}" width="30"
+                          nolabel="1" />
+                        <field name="display_name" string="Name" />
+                        <field name="x_family_role" string="Role" optional="show" />
+                      </list>
+                    </field>
+                  </group>
+                  <group string="Points of Attention" name="group_points_attention">
+                    <field name="x_youth_child_care" string="Youth / Child Care" />
+                    <field name="x_immigration_pathway" string="Immigration Pathway" />
+                    <field name="x_emergency_protection" string="Emergency Protection" />
+                  </group>
+                </group>
+                <group name="right_column" col="1">
+                  <group string="Communication" name="group_communication">
+                    <span class="o_form_label o_td_label o_address_type" name="address_name">
+                      <field name="type_address_label" readonly="1" class="fw-bold" />
+                    </span>
+                    <div class="o_address_format">
+                      <field name="street" placeholder="Street..." class="o_address_street" />
+                      <field name="street2" placeholder="Street 2..." class="o_address_street" />
+                      <field name="city" placeholder="City" class="o_address_city" />
+                      <field name="state_id" placeholder="State" class="o_address_state"
+                        options="{'no_open': True, 'no_quick_create': True}"
+                        context="{'country_id': country_id, 'default_country_id': country_id, 'zip': zip}" />
+                      <field name="zip" placeholder="ZIP" class="o_address_zip" />
+                      <div name="partner_address_country" class="d-flex justify-content-between">
+                        <field name="country_id" placeholder="Country" class="o_address_country"
+                          options='{"no_open": True, "no_create": True}' />
+                      </div>
+                    </div>
+                    <field name="x_languages" widget="many2many_tags"
+                      options="{'color_field': 'x_color'}" />
+                    <field name="x_special_needs" />
+                  </group>
+                  <group string="Medical &amp; Safety" name="group_medical_safety">
+                    <field name="x_health_insurance" />
+                    <field name="x_allergies" widget="many2many_tags"
+                      options="{'color_field': 'x_color'}" />
+                    <field name="x_blood_type" />
+                    <field name="x_general_practitioner_id" widget="many2one_avatar" />
+                    <field name="x_current_medications" />
+                  </group>
+                </group>
+              </group>
+            </page>
+            <page string="Stays" name="stays">
+              <field name="x_stay_ids">
+                <list editable="bottom">
+                  <field name="x_date_start" widget="datetime" options='{"show_time":false}' />
+                  <field name="x_admission_reason" />
+                  <field name="x_referral_source" />
+                  <field name="x_household_status_at_entry" />
+                  <field name="x_date_stop" widget="datetime" options='{"show_time":false}' />
+                  <field name="x_departure_reason" />
+                </list>
+              </field>
+            </page>
+            <page string="Education" name="education"
+              invisible="not x_youth_child_care">
+              <group>
+                <group>
+                  <field name="x_assigned_case_worker_id" widget="many2one_avatar" />
+                  <field name="x_school_institution_id" widget="many2one_avatar" />
+                  <field name="x_school_contact_person_id" widget="many2one_avatar" />
+                </group>
+                <group>
+                  <field name="x_grade_level" />
+                  <field name="x_educational_accommodations" string="Educational Accommodations" />
+                </group>
+              </group>
+            </page>
+            <page string="Immigration" name="immigration"
+              invisible="not x_immigration_pathway">
+              <group>
+                <group>
+                  <field name="x_foreigner_national_id" />
+                  <field name="x_legal_counsel_lawyer_id" />
+                  <field name="x_interpreter_required" widget="boolean_toggle" />
+                  <field name="x_preferred_language_id" invisible="not x_interpreter_required" />
+                </group>
+                <group>
+                  <field name="x_immigration_status" />
+                  <field name="x_administrative_deadline" />
+                  <field name="x_immigration_notes" />
+                </group>
+              </group>
+            </page>
+            <page string="Protection" name="protection"
+              invisible="not x_emergency_protection">
+              <group>
+                <group>
+                  <field name="x_vulnerability_tier" />
+                  <field name="x_emergency_contact_id" />
+                  <field name="x_banned_contact_ids" widget="many2many_tags" />
+                </group>
+                <group>
+                  <field name="x_entry_screening_protocol" />
+                  <field name="x_critical_safety_notes" />
+                </group>
+              </group>
+            </page>
+            <page string="Shortcuts" name="page_shortcuts">
+              <field name="x_shortcuts">
+                <list default_order="x_sequence asc,id desc" editable="bottom" open_form_view="false">
+                  <field name="x_sequence" widget="handle"/>
+                  <field optional="show" name="x_shortcut" options="{'create_name_field': 'x_name'}"/>
+                  <field name="x_name" string="Value"/>
+                  <field optional="show" name="x_url" widget="url"/>
+                </list>
+              </field>
+            </page>
+            <page name="internal_notes" string="Notes">
+              <field name="comment" placeholder="Internal notes..." />
+            </page>
+          </notebook>
+        </sheet>
+        <chatter />
+      </form>
+    </field>
+  </record>
+
+  <record id="view_partner_search_resident" model="ir.ui.view">
+    <field name="active" eval="True" />
+    <field name="model">res.partner</field>
+    <field name="name">res.partner.search.resident</field>
+    <field name="priority">160</field>
+    <field name="type">search</field>
+    <field name="arch" type="xml">
+      <search string="Search Residents">
+        <field name="name" filter_domain="[('display_name', 'ilike', self)]" />
+        <field name="email" filter_domain="[('email', 'ilike', self)]" />
+        <field name="phone" />
+        <separator />
+        <filter name="filter_admitting" string="Admitting"
+          domain="[('x_admission_stage', '=', 'pending')]" />
+        <filter name="filter_admitted" string="Admitted"
+          domain="[('x_admission_stage', '=', 'admitted')]" />
+        <filter name="filter_transitioning" string="Transitioning"
+          domain="[('x_admission_stage', '=', 'transitioning')]" />
+        <filter name="filter_discharged" string="Discharged"
+          domain="[('x_admission_stage', '=', 'discharged')]" />
+        <separator />
+        <filter string="Archived" name="inactive" domain="[('active', '=', False)]" />
+        <separator name="separator_dob" />
+        <field name="properties" />
+        <group>
+          <filter name="group_by_vulnerability_tier" string="Vulnerability Tier"
+            context="{'group_by': 'x_vulnerability_tier'}" />
+          <filter name="group_by_admission_stage" string="Admission Stage"
+            context="{'group_by': 'x_admission_stage'}" />
+          <filter string="Properties" name="group_by_properties"
+            context="{'group_by': 'properties'}" />
+        </group>
+      </search>
+    </field>
+  </record>
+
+  <record id="view_partner_kanban_resident" model="ir.ui.view">
+    <field name="active" eval="True" />
+    <field name="name">res.partner.kanban.resident</field>
+    <field name="model">res.partner</field>
+    <field name="priority">160</field>
+    <field name="type">kanban</field>
+    <field name="arch" type="xml">
+      <kanban sample="1">
+        <field name="avatar_128" />
+        <field name="image_128" />
+        <field name="is_company" />
+        <field name="active" />
+        <field name="type" />
+        <field name="name" />
+        <field name="parent_id" />
+        <field name="x_vulnerability_tier" />
+        <field name="activity_ids" />
+        <templates>
+          <t t-name="card" class="flex-row">
+            <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active" />
+            <aside class="o_kanban_aside_full ">
+              <t t-if="!record.is_company.raw_value">
+                <div class="position-relative w-100 h-auto m-0">
+                  <field name="avatar_128" alt="Contact image" class="h-100" widget="image" />
+                  <field t-if="record.parent_id.raw_value and record.parent_id.image_128"
+                    name="parent_id" class="position-absolute bottom-0 end-0 w-25 bg-light"
+                    widget="image"
+                    options="{'preview_image': 'image_128', 'img_class': 'object-fit-contain rounded'}" />
+                  <field t-elif="record.parent_id.raw_value and !record.parent_id.image_128"
+                    name="parent_id" class="position-absolute bottom-0 end-0 w-25 bg-light"
+                    widget="image"
+                    options="{'preview_image': 'avatar_128', 'img_class': 'object-fit-contain rounded'}" />
+                </div>
+              </t>
+              <t t-else="">
+                <field name="avatar_128" class="w-100 h-auto m-0" widget="image"
+                  options="{'img_class': 'object-fit-contain w-100 h-100 rounded'}" />
+              </t>
+            </aside>
+            <main class="ms-2">
+              <div class="mb-1">
+                <field class="fw-bold fs-5" name="name" />
+              </div>
+              <div>
+                <field name="x_vulnerability_tier" widget="badge"
+                  invisible="not x_vulnerability_tier" />
+              </div>
+              <footer class="mt-auto d-flex justify-content-end w-100">
+                <field name="activity_ids" widget="kanban_activity" />
+              </footer>
+            </main>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+
+  <record id="view_partner_list_resident" model="ir.ui.view">
+    <field name="active" eval="True" />
+    <field name="name">res.partner.list.resident</field>
+    <field name="model">res.partner</field>
+    <field name="priority">160</field>
+    <field name="type">list</field>
+    <field name="arch" type="xml">
+      <list string="Contacts" sample="1" multi_edit="1">
+        <field name="create_date" optional="hide" />
+        <field name="avatar_128" widget="image"
+          options="{'size': [24, 24], 'img_class': 'o_avatar rounded border object-fit-contain'}"
+          width="30" nolabel="1" />
+        <field name="complete_name" string="Name" column_invisible="true" />
+        <field name="display_name" string="Name" />
+        <field name="email" optional="show" />
+        <field name="phone" class="o_force_ltr" optional="show" />
+        <field name="street" optional="hide" />
+        <field name="city" optional="hide" />
+        <field name="state_id" optional="hide" readonly="1" />
+        <field name="country_id" optional="show" readonly="1" />
+        <field name="category_id" optional="hide" widget="many2many_tags"
+          options="{'color_field': 'color', 'on_tag_click': 'edit_color'}" />
+        <field name="x_allergies" widget="many2many_tags" options="{'color_field': 'x_color'}"
+          optional="show" />
+        <field name="x_languages" widget="many2many_tags" options="{'color_field': 'x_color'}"
+          optional="show" />
+        <field name="properties" optional="hide" />
+      </list>
+    </field>
+  </record>
+
+  <record id="view_x_allergy_list" model="ir.ui.view">
+    <field name="name">x.allergy.list</field>
+    <field name="model">x_allergy</field>
+    <field name="type">list</field>
+    <field name="active" eval="True" />
+    <field name="arch" type="xml">
+      <list editable="bottom" default_order="id desc">
+        <field name="x_name" />
+        <field name="x_color" widget="color_picker" />
+        <field optional="show" name="x_residents" widget="many2many_tags" readonly="True" />
+      </list>
+    </field>
+  </record>
+
+  <record id="view_x_languages_list" model="ir.ui.view">
+    <field name="name">x.languages.list</field>
+    <field name="model">x_languages</field>
+    <field name="type">list</field>
+    <field name="active" eval="True" />
+    <field name="arch" type="xml">
+      <list editable="bottom" default_order="id desc">
+        <field name="x_name" />
+        <field name="x_color" widget="color_picker" />
+        <field optional="show" name="x_residents" readonly="True" widget="many2many_tags" />
+      </list>
+    </field>
+  </record>
+
+  <record id="document_view_search_inherit_community_care" model="ir.ui.view">
+    <field name="active" eval="True" />
+    <field name="name">documents.document.search.inherit.community.care</field>
+    <field name="model">documents.document</field>
+    <field name="inherit_id" ref="documents.document_view_search" />
+    <field name="arch" type="xml">
+      <xpath expr="//group" position="inside">
+        <filter string="Folder" name="group_by_folder_id" domain="[]"
+          context="{'group_by': 'folder_id'}" />
+      </xpath>
+    </field>
+  </record>
+
+  <record id="documents_view_list_inherit_community_care" model="ir.ui.view">
+    <field name="active" eval="True" />
+    <field name="name">documents.document.list.inherit.community.care</field>
+    <field name="model">documents.document</field>
+    <field name="inherit_id" ref="documents.documents_view_list" />
+    <field name="arch" type="xml">
+      <xpath expr="//list" position="attributes">
+        <attribute name="default_group_by">folder_id</attribute>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="documents_view_list_main_inherit_community_care" model="ir.ui.view">
+    <field name="active" eval="True" />
+    <field name="name">documents.document.list.main.inherit.community.care</field>
+    <field name="model">documents.document</field>
+    <field name="inherit_id" ref="documents.documents_view_list_main" />
+    <field name="arch" type="xml">
+      <xpath expr="//list" position="attributes">
+        <attribute name="default_group_by">folder_id</attribute>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="resource_calendar_attendance_list_inherit_community_care" model="ir.ui.view">
+    <field name="active" eval="True" />
+    <field name="name">resource.calendar.attendance.list.inherit.community.care</field>
+    <field name="model">resource.calendar.attendance</field>
+    <field name="inherit_id" ref="resource.view_resource_calendar_attendance_tree" />
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='hour_from']" position="replace" />
+      <xpath expr="//field[@name='hour_to']" position="replace" />
+      <xpath expr="//field[@name='week_type']" position="replace" />
+    </field>
+  </record>
+
+  <record id="view_family_unit_kanban" model="ir.ui.view">
+    <field name="name">x.family.unit.kanban</field>
+    <field name="model">x_family_unit</field>
+    <field name="type">kanban</field>
+    <field name="active" eval="True" />
+    <field name="arch" type="xml">
+      <kanban>
+        <templates>
+          <t t-name="card" class="oe_kanban_global_click">
+            <field class="fw-bold fs-5" name="x_name" />
+            <field name="x_family_member_ids" widget="many2many_avatar_user"
+              context="{'form_view_ref': 'community_care.view_partner_form_resident', 'form_view_initial_mode': 'edit'}" />
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+
+  <record id="view_family_unit_list" model="ir.ui.view">
+    <field name="name">x.family.unit.list</field>
+    <field name="model">x_family_unit</field>
+    <field name="type">list</field>
+    <field name="active" eval="True" />
+    <field name="arch" type="xml">
+      <list default_order="x_sequence asc,id desc">
+        <field name="x_sequence" widget="handle" />
+        <field name="x_name" />
+        <field name="x_family_member_ids" optional="show" widget="many2many_tags" />
+      </list>
+    </field>
+  </record>
+
+  <record id="view_family_unit_form" model="ir.ui.view">
+    <field name="name">x.family.unit.form</field>
+    <field name="model">x_family_unit</field>
+    <field name="type">form</field>
+    <field name="active" eval="True" />
+    <field name="arch" type="xml">
+      <form>
+        <header />
+        <sheet string="Family Unit">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active" />
+          <field name="x_active" invisible="1" />
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..." />
+            </h1>
+          </div>
+          <group name="group_family_unit_details">
+            <group name="group_family_unit_left">
+              <field name="x_family_member_ids" widget="many2many" mode="kanban" class="w-100"
+                context="{'form_view_ref': 'community_care.view_partner_form_resident', 'form_view_initial_mode': 'edit'}">
+                <kanban>
+                  <templates>
+                    <t t-name="card" class="flex-row">
+                      <aside>
+                        <field name="avatar_128" widget="image" class="o_image_64_cover"
+                          alt="Avatar"
+                          options="{'size': [64, 64], 'img_class': 'border rounded h-100 object-fit-contain'}" />
+                      </aside>
+                      <main class="ms-3 flex-grow-1">
+                        <field name="display_name" class="fw-bold fs-5" />
+                        <div class="text-muted small" invisible="not x_family_role">
+                          <field name="x_family_role" />
+                        </div>
+                      </main>
+                      <a type="delete"
+                        class="btn btn-link text-danger p-0 ms-auto align-self-center" role="button" title="Delete">
+                        <i class="fa fa-trash fs-5" title="Delete" />
+                      </a>
+                    </t>
+                  </templates>
+                </kanban>
+              </field>
+            </group>
+          </group>
+        </sheet>
+        <chatter />
+      </form>
+    </field>
+  </record>
+
+  <record id="view_family_unit_search" model="ir.ui.view">
+    <field name="name">x.family.unit.search</field>
+    <field name="model">x_family_unit</field>
+    <field name="type">search</field>
+    <field name="active" eval="True" />
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name" />
+        <filter invisible="1" string="My Activities" name="filter_activities_my"
+          domain="[['activity_user_id', '=', uid]]" />
+        <separator />
+        <filter invisible="1" string="Late Activities" name="activities_overdue"
+          domain="[('my_activity_date_deadline', '&lt;', 'today')]" />
+        <filter invisible="1" string="Today Activities" name="activities_today"
+          domain="[('my_activity_date_deadline', '=', 'today')]" />
+        <filter invisible="1" string="Future Activities" name="activities_upcoming_all"
+          domain="[('my_activity_date_deadline', '&gt;', 'today')]" />
+        <separator />
+        <separator />
+        <filter string="Archived" name="archived_x_family_unit" domain="[['x_active', '=', False]]" />
+        <separator />
+      </search>
+    </field>
+  </record>
+
+  <record id="action_window_family_unit" model="ir.actions.act_window">
+    <field name="search_view_id" ref="view_family_unit_search" />
+  </record>
+
+  <record id="view_stay_list" model="ir.ui.view">
+    <field name="name">x.stay.list</field>
+    <field name="model">x_stay</field>
+    <field name="type">list</field>
+    <field name="active" eval="True" />
+    <field name="arch" type="xml">
+      <list default_order="x_date_start desc">
+        <field name="x_sequence" widget="handle" />
+        <field name="x_resident_id" optional="show" widget="many2one_avatar" />
+        <field name="x_date_start" optional="show" widget="datetime"
+          options='{"show_time":false}' />
+        <field name="x_admission_reason" optional="show" />
+        <field name="x_referral_source" optional="show" />
+        <field name="x_household_status_at_entry" optional="show" />
+        <field name="x_date_stop" optional="show" widget="datetime"
+          options='{"show_time":false}' />
+        <field name="x_departure_reason" optional="show" />
+      </list>
+    </field>
+  </record>
+
+  <record id="view_stay_form" model="ir.ui.view">
+    <field name="name">x.stay.form</field>
+    <field name="model">x_stay</field>
+    <field name="type">form</field>
+    <field name="active" eval="True" />
+    <field name="arch" type="xml">
+      <form>
+        <header />
+        <sheet string="Stay">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active" />
+          <field name="x_active" invisible="1" />
+          <div class="oe_title">
+            <h1>
+              <field name="x_resident_id" required="1" widget="many2one_avatar"
+                context="{'form_view_ref': 'community_care.view_partner_form_resident', 'form_view_initial_mode': 'edit'}" />
+            </h1>
+          </div>
+          <group name="group_stay_details">
+            <group name="group_stay_start" string="Start">
+              <field name="x_date_start" widget="datetime" options="{'show_time': false}" />
+              <field name="x_admission_reason" />
+              <field name="x_referral_source" />
+              <field name="x_household_status_at_entry" />
+            </group>
+            <group name="group_stay_end" string="End">
+              <field name="x_date_stop" widget="datetime" options="{'show_time': false}" />
+              <field name="x_departure_reason" />
+            </group>
+          </group>
+        </sheet>
+        <chatter />
+      </form>
+    </field>
+  </record>
+
+  <record id="view_stay_search" model="ir.ui.view">
+    <field name="name">x.stay.search</field>
+    <field name="model">x_stay</field>
+    <field name="type">search</field>
+    <field name="active" eval="True" />
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name" />
+        <filter invisible="1" string="My Activities" name="filter_activities_my"
+          domain="[['activity_user_id', '=', uid]]" />
+        <separator />
+        <filter invisible="1" string="Late Activities" name="activities_overdue"
+          domain="[('my_activity_date_deadline', '&lt;', 'today')]" />
+        <filter invisible="1" string="Today Activities" name="activities_today"
+          domain="[('my_activity_date_deadline', '=', 'today')]" />
+        <filter invisible="1" string="Future Activities" name="activities_upcoming_all"
+          domain="[('my_activity_date_deadline', '&gt;', 'today')]" />
+        <separator />
+        <filter string="Ongoing" name="filter_ongoing"
+          domain="[('x_date_start', '&lt;=', context_today().strftime('%Y-%m-%d')), '|', ('x_date_stop', '=', False), ('x_date_stop', '&gt;=', context_today().strftime('%Y-%m-%d'))]" />
+        <separator />
+        <filter date="x_date_start" name="filter_date_start" string="Start Date" />
+        <filter date="x_date_stop" name="filter_date_stop" string="End Date" />
+        <separator />
+        <filter string="Archived" name="archived_x_stay" domain="[['x_active', '=', False]]" />
+        <separator />
+        <filter string="Incomplete Data" name="filter_incomplete_data"
+          domain="['|', '&amp;', ('x_date_start', '!=', False), '|', '|', ('x_admission_reason', '=', False), ('x_referral_source', '=', False), ('x_household_status_at_entry', '=', False), '&amp;', ('x_date_stop', '!=', False), ('x_departure_reason', '=', False)]" />
+        <separator />
+        <group>
+          <filter name="group_by_admission_reason" string="Admission Reason"
+            context="{'group_by': 'x_admission_reason'}" />
+          <filter name="group_by_referral_source" string="Referral Source"
+            context="{'group_by': 'x_referral_source'}" />
+          <filter name="group_by_household_status" string="Household Status at Entry"
+            context="{'group_by': 'x_household_status_at_entry'}" />
+          <filter name="group_by_departure_reason" string="Departure Reason"
+            context="{'group_by': 'x_departure_reason'}" />
+          <filter name="group_by_resident" string="Resident" context="{'group_by': 'x_resident_id'}" />
+        </group>
+      </search>
+    </field>
+  </record>
+
+  <record id="view_stay_gantt" model="ir.ui.view">
+    <field name="name">x.stay.gantt</field>
+    <field name="model">x_stay</field>
+    <field name="type">gantt</field>
+    <field name="active" eval="True" />
+    <field name="arch" type="xml">
+      <gantt date_start="x_date_start" date_stop="x_date_stop" />
+    </field>
+  </record>
+
+  <record id="view_employee_form_inherit_community_care" model="ir.ui.view">
+    <field name="active" eval="True" />
+    <field name="name">hr.employee.form.inherit.community.care</field>
+    <field name="model">hr.employee</field>
+    <field name="inherit_id" ref="hr.view_employee_form" />
+    <field name="arch" type="xml">
+      <xpath expr="//form" position="attributes">
+        <attribute name="context">{'default_resource_calendar_id': False, 'default_hours_per_week':
+          40.0, 'default_hours_per_day': 0.0}</attribute>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="action_window_resident" model="ir.actions.act_window">
+    <field name="search_view_id" ref="view_partner_search_resident" />
+    <field name="view_ids"
+      eval="[(5, 0, 0),
+      (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_partner_kanban_resident')}),
+      (0, 0, {'view_mode': 'list', 'view_id': ref('view_partner_list_resident')}),
+      (0, 0, {'view_mode': 'form', 'view_id': ref('view_partner_form_resident')})]" />
+  </record>
+
+  <record id="action_window_stay" model="ir.actions.act_window">
+    <field name="search_view_id" ref="view_stay_search" />
+  </record>
+
+  <record id="view_x_shortcut_list" model="ir.ui.view">
+    <field name="name">x.shortcut.list</field>
+    <field name="model">x_shortcut</field>
+    <field name="type">list</field>
+    <field name="active" eval="True" />
+    <field name="arch" type="xml">
+      <list editable="bottom">
+        <field name="x_name" />
+        <field name="x_pattern" />
+      </list>
+    </field>
+  </record>
+</odoo>
