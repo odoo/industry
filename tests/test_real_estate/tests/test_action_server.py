@@ -154,7 +154,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
             'name': 'Test Lead',
             'partner_id': self.env['res.partner'].create({'name': 'Test Partner'}).id,
             'email_from': 'test@email.com',
-            'x_interested_in_id': product.id,
+            'x_property_id': product.id,
         })
         visit = self.env.ref('real_estate.book_your_visit_server_action')
         visit.with_context(active_ids=lead.id, active_model="crm.lead").run()
@@ -166,7 +166,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
         client = self.env['res.partner'].create({
             'name': 'Test Client',
             'email': 'client@test.com',
-            'x_categories_ids': self.env.ref('real_estate.product_public_category_1'),
+            'x_categories_ids': self.env.ref('property_listing.product_public_category_1'),
             'x_criteria_ids': [(6, 0, [self.region_value_1.id, self.condition_value_1.id])],
             'x_subscribe': True,
         })
@@ -175,7 +175,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
         property_1 = self.env['product.template'].create({
             'name': 'Property 1',
             'categ_id': self.env.ref('real_estate.product_category_5').id,
-            'public_categ_ids': self.env.ref('real_estate.product_public_category_1'),
+            'public_categ_ids': self.env.ref('property_listing.product_public_category_1'),
             'attribute_line_ids': [(0, 0, {
                 'attribute_id': self.env.ref('real_estate.product_attribute_10').id,
                 'value_ids': self.region_value_1,
@@ -184,7 +184,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
         property_2 = self.env['product.template'].create({
             'name': 'Property 2',
             'categ_id': self.env.ref('real_estate.product_category_5').id,
-            'public_categ_ids': self.env.ref('real_estate.product_public_category_1'),
+            'public_categ_ids': self.env.ref('property_listing.product_public_category_1'),
             'attribute_line_ids': [(0, 0, {
                 'attribute_id': self.env.ref('real_estate.product_attribute_10').id,
                 'value_ids': self.region_value_1,
@@ -193,7 +193,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
         property_3 = self.env['product.template'].create({
             'name': 'Property 3',
             'categ_id': self.env.ref('real_estate.product_category_5').id,
-            'public_categ_ids': self.env.ref('real_estate.product_public_category_1'),
+            'public_categ_ids': self.env.ref('property_listing.product_public_category_1'),
             'attribute_line_ids': [(0, 0, {
                 'attribute_id': self.env.ref('real_estate.product_attribute_12').id,
                 'value_ids': self.condition_value_1,
@@ -203,7 +203,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
         self.env['product.template'].create({
             'name': 'Property 4',
             'categ_id': self.env.ref('real_estate.product_category_5').id,
-            'public_categ_ids': self.env.ref('real_estate.product_public_category_2'),
+            'public_categ_ids': self.env.ref('property_listing.product_public_category_2'),
             'attribute_line_ids': [(0, 0, {
                 'attribute_id': self.env.ref('real_estate.product_attribute_10').id,
                 'value_ids': self.region_value_2,
@@ -236,7 +236,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
         property = self.env['product.template'].create({
             'name': 'Property',
             'categ_id': self.env.ref('real_estate.product_category_5').id,
-            'public_categ_ids': self.env.ref('real_estate.product_public_category_1'),
+            'public_categ_ids': self.env.ref('property_listing.product_public_category_1'),
             'attribute_line_ids': [(0, 0, {
                 'attribute_id': self.env.ref('real_estate.product_attribute_10').id,
                 'value_ids': self.region_value_1,
@@ -251,26 +251,26 @@ class RealEstateAutomationsTestCase(TransactionCase):
         client_1 = self.env['res.partner'].create({
             'name': 'Fred',
             'email': 'fred@test.com',
-            'x_categories_ids': self.env.ref('real_estate.product_public_category_1'),
+            'x_categories_ids': self.env.ref('property_listing.product_public_category_1'),
             'x_criteria_ids': self.region_value_1,
         })
         client_2 = self.env['res.partner'].create({
             'name': 'Fred2',
             'email': 'fred2@test.com',
-            'x_categories_ids': self.env.ref('real_estate.product_public_category_1'),
+            'x_categories_ids': self.env.ref('property_listing.product_public_category_1'),
             'x_criteria_ids': self.region_value_1,
         })
         client_3 = self.env['res.partner'].create({
             'name': 'Fred3',
             'email': 'fred3@test.com',
-            'x_categories_ids': self.env.ref('real_estate.product_public_category_1'),
+            'x_categories_ids': self.env.ref('property_listing.product_public_category_1'),
             'x_criteria_ids': self.condition_value_1,
         })
         # One non-matching user
         client_4 = self.env['res.partner'].create({
             'name': 'Fred4',
             'email': 'fred3@test.com',
-            'x_categories_ids': self.env.ref('real_estate.product_public_category_1'),
+            'x_categories_ids': self.env.ref('property_listing.product_public_category_1'),
             'x_criteria_ids': self.region_value_2,
         })
 
@@ -288,7 +288,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
         property = self.env['product.template'].create({
             'name': 'Property 1',
             'categ_id': self.env.ref('real_estate.product_category_5').id,
-            'public_categ_ids': self.env.ref('real_estate.product_public_category_1'),
+            'public_categ_ids': self.env.ref('property_listing.product_public_category_1'),
             'attribute_line_ids': [(0, 0, {
                 'attribute_id': self.env.ref('real_estate.product_attribute_10').id,
                 'value_ids': self.region_value_1,
@@ -298,7 +298,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
         matching_client = self.env['res.partner'].create({
             'name': 'Fred',
             'email': 'fred@test.com',
-            'x_categories_ids': self.env.ref('real_estate.product_public_category_1'),
+            'x_categories_ids': self.env.ref('property_listing.product_public_category_1'),
             'x_criteria_ids': self.region_value_1,
         })
 
@@ -307,7 +307,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
 
         lead = self.env['crm.lead'].search([('partner_id', '=', matching_client.id)], limit=1)
         self.assertTrue(lead, "A lead should be created for the matching client")
-        self.assertEqual(lead.x_interested_in_id.id, property.id,
-                         "The lead should be linked to the matched property by the x_interested_in_id field")
+        self.assertEqual(lead.x_property_id.id, property.id,
+                         "The lead should be linked to the matched property by the x_property_id field")
         self.assertEqual(lead.partner_id.id, matching_client.id,
                          "The lead should be linked to the matching client")
