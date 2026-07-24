@@ -1,10 +1,102 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<odoo noupdate="1">
-    <record id="res_config_setting_textile_manufacturing" model="res.config.settings">
-        <field name="group_mrp_routings" eval="1"/>
-        <field name="group_project_stages" eval="1"/>
+<odoo>
+    <data noupdate="1">
+        <record id="res_config_setting_textile_manufacturing" model="res.config.settings">
+            <field name="group_mrp_routings" eval="1"/>
+            <field name="group_project_stages" eval="1"/>
+            <field name="group_stock_production_lot" eval="1"/>
+        </record>
+        <function name="execute" model="res.config.settings">
+            <value eval="[ref('res_config_setting_textile_manufacturing')]"/>
+        </function>
+    </data>
+
+    <record id="x_res_company_field_module_product_conversion" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="field_description">Product Conversion</field>
+        <field name="name">x_module_product_conversion</field>
+        <field name="model_id" ref="base.model_res_company"/>
     </record>
-    <function name="execute" model="res.config.settings">
-        <value eval="[ref('res_config_setting_textile_manufacturing')]"/>
-    </function>
+    <record id="x_setting_field_module_product_conversion" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="related">company_id.x_module_product_conversion</field>
+        <field name="name">x_module_product_conversion</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+    </record>
+    <!-- Action Install Product Conversion Module From Settings -->
+    <record id="action_activate_product_conversion" model="ir.actions.server">
+        <field name="code"><![CDATA[
+if not env.context.get('prevent_product_conversion_install_recursion'):
+    module_ref = env['ir.module.module']
+    # First, import the Product Conversion industry module because it is not available in ir_module_module.
+    import_action = module_ref.with_context(module_name='product_conversion').button_immediate_install_app()
+    env['base.import.module'].browse(import_action['res_id']).with_context(prevent_product_conversion_install_recursion=True).import_module()
+    module = module_ref._get('product_conversion')
+    if module and module.state == 'uninstalled': module.button_immediate_install()
+]]>        </field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="state">code</field>
+        <field name="name">Install Product Conversion</field>
+    </record>
+    <!--Action Uninstall Product Conversion Module From Settings -->
+    <record id="action_deactivate_product_conversion" model="ir.actions.server">
+        <field name="code"><![CDATA[
+module = env['ir.module.module']._get('product_conversion')
+if module and module.state == 'installed': module.button_immediate_uninstall()
+]]>        </field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="state">code</field>
+        <field name="name">Uninstall Product Conversion</field>
+    </record>
+    <!-- Keep Product Conversion Setting Synced When The Industry Is Installed/Uninstalled From Apps -->
+    <record id="action_sync_product_conversion_setting_enabled" model="ir.actions.server">
+        <field name="code"><![CDATA[
+env['res.company'].search([]).write({'x_module_product_conversion': True})
+]]>        </field>
+        <field name="model_id" ref="base.model_ir_module_module"/>
+        <field name="state">code</field>
+        <field name="name">Sync Product Conversion Setting Enabled</field>
+    </record>
+    <record id="action_sync_product_conversion_setting_disabled" model="ir.actions.server">
+        <field name="code"><![CDATA[
+env['res.company'].search([]).write({'x_module_product_conversion': False})
+]]>        </field>
+        <field name="model_id" ref="base.model_ir_module_module"/>
+        <field name="state">code</field>
+        <field name="name">Sync Product Conversion Setting Disabled</field>
+    </record>
+    <!-- Automation For Sync Product Conversion Setting -->
+    <record id="base_automation_on_product_conversion_module_installed" model="base.automation">
+        <field name="name">Sync Product Conversion Setting Enabled</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_sync_product_conversion_setting_enabled')])]"/>
+        <field name="model_id" ref="base.model_ir_module_module"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('base.field_ir_module_module__state')])]"/>
+        <field name="filter_domain">[('name', '=', 'product_conversion'), ('state', '=', 'installed')]</field>
+        <field name="trigger">on_create_or_write</field>
+    </record>
+    <record id="base_automation_on_product_conversion_module_uninstalled" model="base.automation">
+        <field name="name">Sync Product Conversion Setting Disabled</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_sync_product_conversion_setting_disabled')])]"/>
+        <field name="model_id" ref="base.model_ir_module_module"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('base.field_ir_module_module__state')])]"/>
+        <field name="filter_domain">[('name', '=', 'product_conversion'), ('state', 'in', ['to remove', 'uninstalled'])]</field>
+        <field name="trigger">on_create_or_write</field>
+    </record>
+    <!-- Automation For Activate Product Conversion from settings -->
+    <record id="base_automation_on_product_conversion_setting_set" model="base.automation">
+        <field name="name">Activate Product Conversion</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_activate_product_conversion')])]"/>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_setting_field_module_product_conversion')])]"/>
+        <field name="filter_domain">[('x_module_product_conversion', '=', True)]</field>
+        <field name="trigger">on_create_or_write</field>
+    </record>
+    <record id="base_automation_on_product_conversion_setting_unset" model="base.automation">
+        <field name="name">Deactivate Product Conversion</field>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_deactivate_product_conversion')])]"/>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('x_setting_field_module_product_conversion')])]"/>
+        <field name="filter_domain">[('x_module_product_conversion', '=', False)]</field>
+        <field name="trigger">on_create_or_write</field>
+    </record>
 </odoo>
