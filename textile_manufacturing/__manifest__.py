@@ -1,6 +1,6 @@
 {
     'name': 'Textile Manufacturing',
-    'version': '1.8',
+    'version': '1.9',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
@@ -9,16 +9,17 @@
         'documents_project',
         'hr_timesheet',
         'mrp_subcontracting',
-        'product_conversion',
         'purchase_mrp',
         'quality_mrp_workorder',
         'sale_product_matrix',
         'sale_project',
+        'web_studio',
         'website_crm',
         'website_sale_stock',
     ],
     'data': [
         'data/res_config_settings.xml',
+        'data/res_config_settings_views.xml',
         'data/ir_ui_menu.xml',
         'data/ir_attachment_pre.xml',
         'data/documents_document.xml',
@@ -76,6 +77,7 @@
     ],
     'license': 'OEEL-1',
     'cloc_exclude': [
+        'data/res_config_settings.xml',
         'data/knowledge_article.xml',
         'demo/website_view.xml',
     ],
