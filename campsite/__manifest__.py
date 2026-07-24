@@ -1,6 +1,6 @@
 {
     'name': 'Campsite',
-    'version': '1.8',
+    'version': '1.9',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -27,6 +27,7 @@
         'data/views.xml',
         'data/res_config_settings.xml',
         'data/spreadsheet_dashboard.xml',
+        'data/ir_actions_client.xml',
     ],
     'demo': [
         'demo/res_company.xml',

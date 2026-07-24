@@ -1,6 +1,6 @@
 {
     'name': 'Holiday House',
-    'version': '1.6',
+    'version': '1.7',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -22,6 +22,7 @@
         'data/web_views.xml',
         'data/res_config_settings.xml',
         'data/spreadsheet_dashboard.xml',
+        'data/ir_actions_client.xml',
     ],
     'demo': [
         'demo/res_company.xml',
