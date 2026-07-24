@@ -1,6 +1,6 @@
 {
     'name': 'Arts & Crafts Store',
-    'version': '1.3',
+    'version': '1.4',
     'category': 'Retail',
     'depends': [
         'appointment',
@@ -11,6 +11,7 @@
         'purchase',
         'sale_service',
         'website_crm',
+        'website_event',
         'website_sale_loyalty',
     ],
     'data': [
