@@ -7,7 +7,6 @@
         'appointment_hr',
         'base_industry_data',
         'contacts',
-        'knowledge',
         'pos_loyalty',
         'pos_stock',
         'sale_planning',

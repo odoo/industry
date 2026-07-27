@@ -5,7 +5,6 @@
     'depends': [
         'base_industry_data',
         'hr_attendance',
-        'knowledge',
         'loyalty',
         'planning',
         'pos_restaurant',

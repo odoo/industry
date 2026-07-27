@@ -7,7 +7,6 @@
         'crm_enterprise',
         'documents',
         'helpdesk',
-        'knowledge',
         'purchase_stock',
         'sale_crm',
         'sale_margin',

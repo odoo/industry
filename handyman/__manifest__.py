@@ -7,7 +7,6 @@
         'appointment_account_payment',
         'base_industry_data',
         'hr',
-        'knowledge',
         'planning_field_service_sale_stock',
         'planning_field_service_sale_worksheet',
         'project_purchase',

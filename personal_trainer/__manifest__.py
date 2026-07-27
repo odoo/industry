@@ -6,7 +6,6 @@
         'appointment_hr',
         'base_industry_data',
         'calendar',
-        'knowledge',
         'sale_crm',
         'sale_project',
         'sale_timesheet',

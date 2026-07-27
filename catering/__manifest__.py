@@ -6,7 +6,6 @@
         'base_industry_data',
         'crm_enterprise',
         'hr',
-        'knowledge',
         'planning',
         'project_forecast',
         'purchase_stock',

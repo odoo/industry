@@ -5,7 +5,6 @@
     'depends': [
         'base_industry_data',
         'hr',
-        'knowledge',
         'planning',
         'pos_online_payment',
         'project',

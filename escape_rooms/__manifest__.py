@@ -5,7 +5,6 @@
     'author': 'Odoo S.A.',
     'depends': [
         'base_industry_data',
-        'knowledge',
         'pos_loyalty',
         'pos_stock',
         'sale_crm',
