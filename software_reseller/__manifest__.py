@@ -5,7 +5,6 @@
     'depends': [
         'base_industry_data',
         'contacts',
-        'knowledge',
         'project',
         'sale_planning',
         'sale_purchase',

@@ -6,7 +6,6 @@
     'depends': [
         'base_industry_data',
         'hr',
-        'knowledge',
         'pos_event',
         'pos_loyalty',
         'pos_online_payment',

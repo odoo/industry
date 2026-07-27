@@ -9,7 +9,6 @@
         'crm_enterprise',
         'documents_project',
         'esg',
-        'knowledge',
         'sale_timesheet_enterprise',
         'spreadsheet_sale_management',
         'website_appointment',

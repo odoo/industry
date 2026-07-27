@@ -6,7 +6,6 @@
         'base_industry_data',
         'crm_enterprise',
         'documents_hr',
-        'knowledge',
         'project_purchase',
         'sale_mrp',
         'sale_timesheet',

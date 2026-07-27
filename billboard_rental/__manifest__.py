@@ -5,7 +5,6 @@
     'depends': [
         'base_industry_data',
         'hr',
-        'knowledge',
         'planning_field_service_sale_timesheet',
         'project_sale_subscription',
         'web_studio',
