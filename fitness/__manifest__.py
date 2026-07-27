@@ -7,7 +7,6 @@
         'calendar',
         'contacts',
         'hr',
-        'knowledge',
         'maintenance',
         'partnership',
         'planning',

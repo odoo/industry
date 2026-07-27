@@ -8,7 +8,6 @@
         'calendar',
         'crm',
         'hr',
-        'knowledge',
         'mrp_workorder',
         'planning_field_service_sale_worksheet',
         'product_barcodelookup',

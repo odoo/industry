@@ -8,7 +8,6 @@
         'contacts',
         'documents',
         'hr',
-        'knowledge',
         'planning_field_service_sale_stock',
         'planning_field_service_sale_worksheet',
         'project_purchase',

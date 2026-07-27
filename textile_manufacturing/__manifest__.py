@@ -8,7 +8,6 @@
         'crm_enterprise',
         'documents_project',
         'hr_timesheet',
-        'knowledge',
         'mrp_subcontracting',
         'product_conversion',
         'purchase_mrp',

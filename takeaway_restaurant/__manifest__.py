@@ -5,7 +5,6 @@
     'author': 'Odoo S.A.',
     'depends': [
         'base_industry_data',
-        'knowledge',
         'pos_enterprise',
         'pos_online_payment_self_order',
         'pos_restaurant',

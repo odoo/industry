@@ -7,7 +7,6 @@
         'appointment_crm',
         'base_industry_data',
         'hr_skills_survey',
-        'knowledge',
         'partnership',
         'sale_planning',
         'website_appointment_sale',

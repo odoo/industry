@@ -7,7 +7,6 @@
         'base_industry_data',
         'contacts',
         'hr_attendance',
-        'knowledge',
         'planning',
         'pos_enterprise',
         'pos_loyalty',

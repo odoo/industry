@@ -4,7 +4,6 @@
     'category': 'Hospitality',
     'depends': [
         'base_industry_data',
-        'knowledge',
         'planning',
         'pos_restaurant',
         'pos_stock',
