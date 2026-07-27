@@ -8,7 +8,6 @@
         'documents',
         'helpdesk',
         'industry_fsm_stock',
-        'knowledge',
         'purchase_stock',
         'sale_crm',
         'sale_margin',

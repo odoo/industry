@@ -6,7 +6,6 @@
         'base_industry_data',
         'crm_enterprise',
         'hr_sign',
-        'knowledge',
         'mass_mailing',
         'partnership',
         'planning',

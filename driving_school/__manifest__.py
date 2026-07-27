@@ -6,7 +6,6 @@
         'base_industry_data',
         'contacts',
         'hr_fleet',
-        'knowledge',
         'sale_management',
         'sign',
         'website_appointment',

@@ -6,7 +6,6 @@
         'base_industry_data',
         'crm_enterprise',
         'hr_skills',
-        'knowledge',
         'pos_enterprise',
         'purchase_stock',
         'sale_management',

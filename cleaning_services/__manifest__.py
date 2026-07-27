@@ -7,7 +7,6 @@
         'crm_sale_subscription',
         'hr',
         'industry_fsm_sale',
-        'knowledge',
         'project_purchase',
         'project_sale_subscription',
     ],

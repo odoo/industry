@@ -7,7 +7,6 @@
         'base_industry_data',
         'crm_sale_subscription',
         'documents_hr',
-        'knowledge',
         'product_expiry',
         'purchase',
         'quality_control',

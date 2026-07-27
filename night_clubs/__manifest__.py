@@ -7,7 +7,6 @@
         'base_industry_data',
         'event_product',
         'event_sale',
-        'knowledge',
         'pos_restaurant',
         'purchase',
         'sale',
