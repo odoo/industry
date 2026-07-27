@@ -8,7 +8,6 @@
         'base_industry_data',
         'contacts',
         'event_sale',
-        'knowledge',
         'pos_enterprise',
         'website_appointment',
         'website_event',

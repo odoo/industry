@@ -10,7 +10,6 @@
         'event_crm',
         'event_sale',
         'hr',
-        'knowledge',
         'planning',
         'project_forecast',
         'project_sale_subscription',

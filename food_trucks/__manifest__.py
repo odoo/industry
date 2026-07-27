@@ -6,7 +6,6 @@
     'depends': [
         'base_industry_data',
         'industry_fsm_sale',
-        'knowledge',
         'planning',
         'pos_restaurant',
         'sale_crm',

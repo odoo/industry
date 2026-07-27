@@ -8,7 +8,6 @@
         'crm',
         'excise_management',
         'industry_fsm_sale_report',
-        'knowledge',
         'mrp_plm',
         'pos_enterprise',
         'product_expiry',
