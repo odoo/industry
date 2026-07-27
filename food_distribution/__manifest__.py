@@ -6,7 +6,6 @@
     'depends': [
         'appointment_account_payment',
         'base_industry_data',
-        'knowledge',
         'mrp_mps',
         'product_expiry',
         'project_mrp_workorder_account',

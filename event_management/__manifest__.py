@@ -8,7 +8,6 @@
         'crm_enterprise',
         'documents_project',
         'hr_recruitment_skills',
-        'knowledge',
         'project_forecast',
         'project_purchase',
         'purchase_alternative',

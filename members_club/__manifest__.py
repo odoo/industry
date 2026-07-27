@@ -8,7 +8,6 @@
         'crm_enterprise',
         'crm_sale_subscription',
         'event_crm',
-        'knowledge',
         'marketing_automation',
         'partnership',
         'project_sale_subscription',

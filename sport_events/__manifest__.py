@@ -8,7 +8,6 @@
         'documents_sign',
         'event_crm',
         'hr_expense',
-        'knowledge',
         'project_enterprise',
         'purchase_stock',
         'sale_planning',

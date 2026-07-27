@@ -7,7 +7,6 @@
         'base_industry_data',
         'crm_enterprise',
         'documents_sign',
-        'knowledge',
         'planning_field_service_worksheet',
         'pos_online_payment',
         'sale_planning',

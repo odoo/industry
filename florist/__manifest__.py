@@ -6,7 +6,6 @@
     'depends': [
         'base_industry_data',
         'crm_enterprise',
-        'knowledge',
         'pos_enterprise',
         'pos_hr',
         'pos_loyalty',
