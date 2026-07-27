@@ -7,7 +7,6 @@
         'base_industry_data',
         'crm_enterprise',
         'event_crm',
-        'knowledge',
         'pos_event',
         'pos_online_payment_self_order',
         'pos_self_order_preparation_display',

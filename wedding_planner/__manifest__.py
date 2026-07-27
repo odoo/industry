@@ -6,7 +6,6 @@
         'base_industry_data',
         'crm_enterprise',
         'hr_calendar',
-        'knowledge',
         'project_enterprise',
         'purchase_requisition',
         'sale_crm',

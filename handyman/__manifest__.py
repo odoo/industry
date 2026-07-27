@@ -9,7 +9,6 @@
         'hr',
         'industry_fsm_sale_report',
         'industry_fsm_stock',
-        'knowledge',
         'project_purchase',
         'project_timesheet_forecast_sale',
         'sale_crm',

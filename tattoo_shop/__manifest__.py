@@ -7,7 +7,6 @@
         'base_automation',
         'base_industry_data',
         'crm_enterprise',
-        'knowledge',
         'sale_planning',
         'sale_purchase',
         'sale_service',

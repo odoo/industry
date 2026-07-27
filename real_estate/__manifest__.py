@@ -10,7 +10,6 @@
         'crm_enterprise',
         'documents',
         'hr',
-        'knowledge',
         'project_enterprise',
         'sale_commission',
         'sale_crm',
