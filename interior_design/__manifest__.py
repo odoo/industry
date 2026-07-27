@@ -6,7 +6,6 @@
         'appointment',
         'base_industry_data',
         'documents_sign',
-        'knowledge',
         'planning_field_service_sale_timesheet',
         'project_purchase',
         'sale_crm',

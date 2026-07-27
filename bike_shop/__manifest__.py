@@ -8,7 +8,6 @@
         'base_industry_data',
         'contacts',
         'helpdesk',
-        'knowledge',
         'planning_field_service_sale_stock',
         'planning_field_service_sale_worksheet',
         'point_of_sale',

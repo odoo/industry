@@ -10,7 +10,6 @@
         'contacts',
         'documents_project_sign',
         'hr_sign',
-        'knowledge',
         'planning_holidays',
         'project_holidays',
         'sale',

@@ -10,7 +10,6 @@
         'documents_project',
         'hr_expense',
         'hr_timesheet',
-        'knowledge',
         'project_enterprise',
         'sale_management',
         'sale_timesheet_enterprise',

@@ -9,7 +9,6 @@
         'crm_enterprise',
         'event_crm',
         'hr',
-        'knowledge',
         'sale_crm',
         'sale_project',
         'sign',

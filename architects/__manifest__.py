@@ -11,7 +11,6 @@
         'documents_hr',
         'documents_project_sale',
         'documents_spreadsheet',
-        'knowledge',
         'sale_crm',
         'sale_expense',
         'sale_planning',

@@ -6,7 +6,6 @@
     'depends': [
         'base_industry_data',
         'crm_enterprise',
-        'knowledge',
         'partnership',
         'pos_event',
         'pos_self_order',

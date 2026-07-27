@@ -5,7 +5,6 @@
     'author': 'Odoo S.A.',
     'depends': [
         'base_industry_data',
-        'knowledge',
         'recurring_rental_billing',
         'sale_crm',
         'usage_based_maintenance',
