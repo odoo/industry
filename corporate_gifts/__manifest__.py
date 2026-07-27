@@ -12,7 +12,6 @@
         'documents_product',
         'documents_project_sale',
         'documents_spreadsheet',
-        'knowledge',
         'project_enterprise',
         'purchase_product_matrix',
         'purchase_stock',

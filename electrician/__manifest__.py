@@ -5,7 +5,6 @@
         'appointment',
         'base_industry_data',
         'crm_enterprise',
-        'knowledge',
         'planning_field_service_sale_timesheet',
         'project_forecast',
         'purchase',
