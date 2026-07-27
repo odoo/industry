@@ -8,7 +8,6 @@
         'crm_sale_subscription',
         'delivery',
         'documents_hr',
-        'knowledge',
         'product_expiry',
         'purchase',
         'quality_control',

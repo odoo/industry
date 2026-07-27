@@ -7,7 +7,6 @@
         'base_industry_data',
         'crm',
         'excise_management',
-        'knowledge',
         'mrp_plm',
         'pos_enterprise',
         'product_expiry',

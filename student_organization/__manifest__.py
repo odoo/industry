@@ -8,7 +8,6 @@
         'base_industry_data',
         'documents_sign',
         'hr_expense',
-        'knowledge',
         'partnership',
         'pos_stock',
         'project_enterprise',

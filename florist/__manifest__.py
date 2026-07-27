@@ -6,7 +6,6 @@
     'depends': [
         'base_industry_data',
         'crm_enterprise',
-        'knowledge',
         'pos_online_payment',
         'pos_stock',
         'project_enterprise',

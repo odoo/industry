@@ -4,7 +4,6 @@
     'category': 'Retail',
     'depends': [
         'base_industry_data',
-        'knowledge',
         'partner_commission',
         'pos_sale',
         'pos_stock',
