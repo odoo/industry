@@ -7,7 +7,6 @@
         'appointment',
         'base_industry_data',
         'hr',
-        'knowledge',
         'partnership',
         'pos_enterprise',
         'sale_service',

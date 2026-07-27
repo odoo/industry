@@ -7,7 +7,6 @@
         'documents_project',
         'hr_expense',
         'hr_sign',
-        'knowledge',
         'mass_mailing',
         'partnership',
         'sale_pdf_quote_builder',

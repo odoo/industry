@@ -8,7 +8,6 @@
         'crm_enterprise',
         'documents_sign',
         'industry_fsm_sale_report',
-        'knowledge',
         'pos_online_payment',
         'sale_crm',
         'sale_planning',

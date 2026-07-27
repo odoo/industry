@@ -6,7 +6,6 @@
     'depends': [
         'base_industry_data',
         'industry_fsm_stock',
-        'knowledge',
         'pos_sale',
         'purchase',
         'sale_management',

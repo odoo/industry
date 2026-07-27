@@ -6,7 +6,6 @@
         'base_industry_data',
         'calendar',
         'hr',
-        'knowledge',
         'marketing_automation',
         'sale_planning',
         'sale_purchase_project',

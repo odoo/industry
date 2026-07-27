@@ -7,7 +7,6 @@
         'base_industry_data',
         'crm_enterprise',
         'industry_fsm_sale',
-        'knowledge',
         'planning',
         'project_forecast',
         'purchase',
