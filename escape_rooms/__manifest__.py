@@ -6,7 +6,6 @@
     'depends': [
         'base_industry_data',
         'pos_loyalty',
-        'pos_stock',
         'sale_crm',
         'sale_planning',
         'website_appointment',
@@ -24,6 +23,7 @@
         'data/pos_category.xml',
         'data/product_public_category.xml',
         'data/product_category.xml',
+        'data/ir_ui_menu.xml',
         'data/product_product.xml',
         'data/pos_config.xml',
         'data/mail_message.xml',
