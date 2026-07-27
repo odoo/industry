@@ -8,7 +8,6 @@
         'calendar',
         'documents_sign',
         'hr',
-        'knowledge',
         'partnership',
         'pos_event',
         'purchase_stock',

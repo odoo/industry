@@ -5,7 +5,6 @@
     'depends': [
         'base_industry_data',
         'event_sale',
-        'knowledge',
         'partnership',
         'pos_event',
         'pos_loyalty',

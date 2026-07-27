@@ -8,7 +8,6 @@
         'base_industry_data',
         'crm_enterprise',
         'hr',
-        'knowledge',
         'point_of_sale',
         'pos_online_payment',
         'product_barcodelookup',

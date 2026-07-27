@@ -10,7 +10,6 @@
         'databases',
         'documents',
         'equity',
-        'knowledge',
         'project',
         'sale_planning',
         'sale_timesheet_enterprise',
