@@ -1,6 +1,6 @@
 {
     'name': 'Vineyard',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
@@ -69,7 +69,6 @@
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/stock_picking_post.xml',
-        'demo/spreadsheet_dashboard.xml',
         'demo/payment_provider_demo.xml',
         'demo/website_theme_apply.xml',
         'demo/website_view.xml',
