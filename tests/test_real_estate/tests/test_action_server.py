@@ -154,7 +154,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
             'name': 'Test Lead',
             'partner_id': self.env['res.partner'].create({'name': 'Test Partner'}).id,
             'email_from': 'test@email.com',
-            'x_property_id': product.id,
+            'x_interested_in_id': product.id,
         })
         visit = self.env.ref('real_estate.book_your_visit_server_action')
         visit.with_context(active_ids=lead.id, active_model="crm.lead").run()
@@ -307,7 +307,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
 
         lead = self.env['crm.lead'].search([('partner_id', '=', matching_client.id)], limit=1)
         self.assertTrue(lead, "A lead should be created for the matching client")
-        self.assertEqual(lead.x_property_id.id, property.id,
-                         "The lead should be linked to the matched property by the x_property_id field")
+        self.assertEqual(lead.x_interested_in_id.id, property.id,
+                         "The lead should be linked to the matched property by the x_interested_in_id field")
         self.assertEqual(lead.partner_id.id, matching_client.id,
                          "The lead should be linked to the matching client")

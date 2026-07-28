@@ -12,7 +12,6 @@
         'property_listing',
         'sale_commission',
         'sign',
-        'web_studio',
     ],
     'data': [
         'data/ir_model.xml',
