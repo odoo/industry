@@ -3,8 +3,9 @@
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
-        'crm_enterprise',
+        'sale_crm',
         'web_studio',
+        'website_crm',
         'website_sale',
     ],
     'data': [
