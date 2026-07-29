@@ -54,7 +54,7 @@ class IndustryUtils:
                 raise Exception("manifest (%s) does not exist", manifest_file)
             with open(manifest_file, encoding="utf-8") as f:
                 manifest = ast.literal_eval(f.read())
-            for dep in manifest.get('depends'):
+            for dep in manifest.get('depends', ['base']):
                 if not self.is_industry(dep) and dep not in other_dep:
                     other_dep.add(dep)
                     if full_standard_list:
