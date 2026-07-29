@@ -1,7 +1,7 @@
 {
     'name': 'Audit & Certification',
     'version': '1.0',
-    'category': 'Services',
+    'category': 'Business Services',
     'description': """
 This module setup your database to easily use odoo in a Audit & Certification company.
 """,

@@ -1,7 +1,7 @@
 {
     'name': 'Fitness Center',
     'version': '1.0',
-    'category': 'Health and Fitness',
+    'category': 'Health, Wellness and Personal Care',
     'description': "",
     'depends': [
         'calendar',

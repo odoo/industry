@@ -1,7 +1,7 @@
 {
     'name': 'Fossil Fuel Trading',
     'version': '1.0',
-    'category': 'Supply Chain',
+    'category': 'Business Services',
     'description': """
         The module specializes in trading coal and petroleum products, acquiring them from international
         suppliers or local vendors and reselling them to customers. They have a unique quality-checking

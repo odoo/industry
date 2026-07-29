@@ -1,7 +1,7 @@
 {
     'name': 'Clothing Store',
     'version': '1.0',
-    'category': 'Retail',
+    'category': 'Retail and eCommerce',
     'description': """
 This setup if for Clothing Store companies selling female clothing.""",
     'depends': [

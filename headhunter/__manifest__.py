@@ -1,7 +1,7 @@
 {
     'name': 'Talent Acquisition',
     'version': '1.0',
-    'category': 'Services',
+    'category': 'Business Services',
     'description': """
 This setup is for Talent Acquisition Agency / Recruitment Agency / Staffing Agency.
 Those agencies work on two levels and with two different audiences, ...

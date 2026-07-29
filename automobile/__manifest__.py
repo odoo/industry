@@ -1,7 +1,7 @@
 {
     'name': 'Automobile Spare Parts',
     'version': '1.0',
-    'category': 'Retail',
+    'category': 'Retail and eCommerce',
     'description': """
 This set-up is for the automobile trading companies selling to the customers.
 The Automobile spare parts business have the more number of items for the various car brands and the parts for the Engine,

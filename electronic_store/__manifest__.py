@@ -1,7 +1,7 @@
 {
     'name': 'Electronic Store',
     'version': '1.0',
-    'category': 'Retail',
+    'category': 'Retail and eCommerce',
     'description': """
         This module provides essential features to manage an electronic store.
         It includes product categories, products, sales orders, and more for electronic products.
