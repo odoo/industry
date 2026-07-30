@@ -63,6 +63,7 @@
         'demo/website.xml',
     ],
     'license': 'OEEL-1',
+    'application': True,
     'cloc_exclude': [
         'data/knowledge_article.xml',
         'demo/website_view.xml',
@@ -70,4 +71,6 @@
     'images': [
         'images/main.png',
     ],
+    'url': "https://www.odoo.com/trial?industry&selected_app=interior_design",
+    'website': "https://www.odoo.com/all-industries",
 }
