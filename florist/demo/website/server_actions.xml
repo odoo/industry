@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Florist - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code">
+website = env.ref('florist.website_industry')
+
+to_deactivate = [
+    'website.header_call_to_action',
+    'website.header_search_box',
+    'website.header_text_element',
+    'website.homepage',
+    'website.contactus',
+]
+to_activate = [
+    'website.footer_copyright_content_width_fluid',
+    'website.footer_no_copyright',
+    'website.template_header_default_align_center',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+
+# Rename/reorder the default menu items, create the missing ones
+top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
+menu_labels = [
+    ('/', 'Home', 10),
+    ('/contactus', 'Contact us', 60),
+]
+for url, name, sequence in menu_labels:
+    menu = menus.search(base_domain + [('url', '=', url)], limit=1)
+    if menu:
+        menu.write({'name': name, 'sequence': sequence})
+    else:
+        menus.create({
+            'name': name,
+            'url': url,
+            'sequence': sequence,
+            'website_id': website.id,
+            'parent_id': top_menu.id if top_menu else False,
+        })
+        </field>
+    </record>
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
