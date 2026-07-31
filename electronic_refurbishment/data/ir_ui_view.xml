@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="product_search_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="/search//filter[@name='goods']" position="before">
+        <filter domain="['|', ('taxes_id', '=', %(account_tax_1)d), ('supplier_taxes_id', '=', %(account_tax_2)d)]" name="filter_margin_scheme" string="Margin Scheme"/>
+        <separator name="separator_margin_scheme"/>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="product.product_search_form_view"/>
+    <field name="mode">extension</field>
+    <field name="model">product.product</field>
+    <field name="name">product.search.form.view.inherit.electronic.refurbishment</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="quant_search_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//filter[@name='negative']" position="before">
+        <filter domain="[('quantity', '>', 0)]" name="filter_in_stock" string="In Stock"/>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="stock.quant_search_view"/>
+    <field name="mode">extension</field>
+    <field name="model">stock.quant</field>
+    <field name="name">quant.search.view.inherit.electronic.refurbishment</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="view_product_search_convert" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//search" position="inside">
+        <field name="name"/>
+        <field name="product_template_attribute_value_ids"/>
+        <group>
+          <filter string="Product Template" name="filter_product_template" context="{'group_by': 'product_tmpl_id'}"/>
+        </group>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="product_conversion.view_product_search_convert"/>
+    <field name="mode">extension</field>
+    <field name="model">product.product</field>
+    <field name="name">view.product.search.convert.inherit.electronic.refurbishment</field>
+    <field name="type">search</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="purchase_order_form" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//header//button[1]" position="before">
+        <button name="%(generate_vendor_bill_action)d" invisible="not x_show_invoice_button" type="action" string="Create Vendor Bill" class="btn-primary"/>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="purchase.purchase_order_form"/>
+    <field name="mode">extension</field>
+    <field name="model">purchase.order</field>
+    <field name="name">purchase.order.form.inherit.electronic.refurbishment</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="view_move_form" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='product_id']" position="attributes">
+        <attribute name="optional">show</attribute>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="account.view_move_form"/>
+    <field name="mode">extension</field>
+    <field name="model">account.move</field>
+    <field name="name">view.move.form.inherit.electronic.refurbishment</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+  <record id="view_picking_form" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='lot_ids']" position="attributes">
+        <attribute name="optional">show</attribute>
+      </xpath>
+    </field>
+    <field name="name">view.picking.form.inherit.electronic.refurbishment</field>
+    <field name="model">stock.picking</field>
+    <field name="mode">extension</field>
+    <field name="inherit_id" ref="stock.view_picking_form" />
+    <field name="active" eval="True" />
+  </record>
+  <record id="product_margin_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//button[@name='action_open_window']" position="attributes">
+        <attribute name="context">{'search_default_group_by_product_tmpl_id': 1}</attribute>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="product_margin.product_margin_form_view"/>
+    <field name="mode">extension</field>
+    <field name="model">product.margin</field>
+    <field name="name">product.margin.form.view.inherit.electronic.refurbishment</field>
+    <field name="type">form</field>
+    <field name="active" eval="True"/>
+  </record>
+</odoo>
