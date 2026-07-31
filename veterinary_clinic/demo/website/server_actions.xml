@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Website Industry - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code">
+website = env.ref('veterinary_clinic.website_industry')
+
+to_deactivate = [
+    # Presets
+    'website.header_search_box',
+    'website.header_text_element',
+    # Default static pages
+    'website.homepage',
+    'website.contactus',
+]
+
+to_activate = [
+    # Presets
+    'website.template_header_search_align_center',
+    # Do NOT activate website.footer_custom nor website.header_call_to_action:
+    # core already ships both active, so activating them here only copy-on-writes
+    # a website-specific duplicate that fights the views declared in
+    # demo/website/views/website_templates.xml (same key, same website).
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
+
+# Default menu items to remove
+menus.search(base_domain + [('url', 'in', ['/service-requests'])]).unlink()
+
+# Create the menu items the design relies on, or rename/reorder them if the
+# website bootstrap already provided them. None of them can be assumed to
+# exist: modules ship their menu as a child of website.main_menu with no
+# website_id, so it only reaches this website through copy_menu_hierarchy at
+# creation time - which never happened if the module was installed after this
+# one (/appointment comes from website_appointment, an auto_install module).
+for name, url, sequence in [
+    ("Victoria's", '/', 0),
+    ('Appointments', '/appointment', 1),
+    ('Emergency', '/contactus', 2),
+]:
+    menu = menus.search(base_domain + [('url', '=', url)], limit=1)
+    if menu:
+        menu.write({'name': name, 'sequence': sequence})
+    else:
+        menus.create({
+            'name': name,
+            'url': url,
+            'sequence': sequence,
+            'website_id': website.id,
+            'parent_id': top_menu.id if top_menu else False,
+        })
+        </field>
+    </record>
+
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
