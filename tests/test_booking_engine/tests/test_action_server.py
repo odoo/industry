@@ -201,8 +201,8 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         self.assertEqual(task.x_cleaning, 'checkout',
             "Checkout tasks should be marked as checkout cleaning",
         )
-        self.assertEqual(task.date_deadline, last_midnight + timedelta(hours=24),
-            "Checkout task deadline should be end of the day",
+        self.assertEqual(task.date_deadline, last_midnight + timedelta(hours=sale_line.product_id.pickup_time),
+            "Checkout task deadline should match the product pickup time",
         )
 
     def test_automation_on_task_stage_clean(self):

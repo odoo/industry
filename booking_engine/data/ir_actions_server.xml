@@ -133,7 +133,7 @@ if (project := env['project.project'].search([('x_is_house_keeping_project', '='
     last_midnight = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
     eci_product = env['product.product'].search([('x_accommodation_product', '=', 'early_checkin')], limit=1)
     lco_product = env['product.product'].search([('x_accommodation_product', '=', 'late_checkout')], limit=1)
-    for slot in env['planning.slot'].search([('start_datetime', '<', last_midnight), ('end_datetime', '>=', last_midnight), ('resource_ids.x_category', '=', 'stay_offer')]):
+    for slot in env['planning.slot'].search([('start_datetime', '<', last_midnight), ('end_datetime', '>=', last_midnight), ('resource_ids.x_category', '=', 'stay_offer'), ('sale_line_id', '!=',False)]):
         end_today = slot.end_datetime < last_midnight + datetime.timedelta(hours=24)
         cleaning_points = slot.sale_line_id.product_id.x_checkout_cleaning if end_today else slot.sale_line_id.product_id.x_stayover_cleaning
         if not cleaning_points: continue
@@ -143,7 +143,7 @@ if (project := env['project.project'].search([('x_is_house_keeping_project', '='
             'project_id': project.id,
             'partner_id': slot.sale_line_id.order_id.partner_id.id,
             'description': "Automatically generated house keeping task.",
-            'date_deadline': (last_midnight + datetime.timedelta(hours=24)),
+            'date_deadline': (last_midnight + datetime.timedelta(hours=slot.sale_line_id.product_id.pickup_time)),
             'x_resource_id': slot.resource_ids[:1].id,
             'x_cleaning': 'checkout' if end_today else 'stayover',
             'x_cleaning_points': cleaning_points,
