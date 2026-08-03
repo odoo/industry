@@ -1,6 +1,6 @@
 {
     'name': 'Hair Salon',
-    'version': '1.4',
+    'version': '1.5',
     'category': 'Services',
     'depends': [
         'base_automation',
@@ -9,8 +9,9 @@
         'contacts',
         'hr',
         'knowledge',
+        'planning',
         'pos_loyalty',
-        'purchase_stock',
+        'purchase',
         'web_studio',
         'website_appointment',
     ],
@@ -36,6 +37,7 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/appointment_type.xml',
+        'data/ir_ui_menu.xml',
         'data/ir_actions_actions.xml',
         'data/knowledge_tour.xml',
         'data/uninstall_hook.xml',
@@ -61,7 +63,6 @@
         'demo/website/pages/contactus.xml',
         'demo/purchase_order_line.xml',
         'demo/purchase_order_confirm.xml',
-        'demo/delivery_confirm.xml',
     ],
     'license': 'OEEL-1',
     'assets': {
