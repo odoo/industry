@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+    <field name="name">Custom Website - Enable/disable views</field>
+    <field name="model_id" ref="website.model_website"/>
+    <field name="state">code</field>
+    <field name="code">
+website = env.ref('coworking.website_industry')
+
+to_deactivate = [
+    'website.header_search_box',
+    'website.header_text_element',
+    'website_sale.cta_separator',
+    'website_sale.product_tags',
+    'website_sale.product_terms_and_conditions',
+    'website_sale.products_attributes',
+    'website_sale.search',
+    'website_sale.sort',
+    'website_sale_wishlist.product_add_to_wishlist',
+    'website_sale_comparison.product_add_to_compare',
+    'website.homepage',
+    'website.contactus',
+    'portal.user_sign_in',
+]
+to_activate = [
+    'website.footer_custom',
+    'website.footer_no_copyright',
+    'website.header_call_to_action',
+    'website.template_header_default_align_center',
+    'website_event.opt_event_description_cover_top',
+    'website_sale.cta_wrapper_boxed',
+    'website_sale.header_hide_empty_cart_link',
+    'website_sale.products',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+
+# Default menu items to remove
+menus.search(base_domain + [('url', 'in', ['/', '/event', '/shop', '/appointment'])]).unlink()
+</field>
+  </record>
+  <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+  <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+  <record id="website_industry" model="website">
+    <field name="name">Daylight</field>
+    <field name="sequence">1</field>
+    <field name="configurator_done" eval="True"/>
+    <field name="user_id" ref="base.public_user"/>
+    <field name="salesperson_id" ref="base.user_admin"/>
+    <field name="logo" type="base64" file="coworking/static/src/img/content/website/logo.svg"/>
+    <field name="favicon" type="base64" file="coworking/static/src/img/content/website/favicon.png"/>
+  </record>
+  <function name="write" model="ir.model.data">
+    <value model="ir.model.data" search="[('name', '=', 'default_website'), ('module', '=', 'website'), ('model', '=', 'website')]"/>
+    <value eval="{'res_id': ref('website_industry')}"/>
+  </function>
+  <!-- `website_id` defaults to the first website of the company, so the Members pricelist was bound
+       to the pre-existing website instead of this one: members would not get their pricelist here. -->
+  <function name="write" model="product.pricelist">
+    <value eval="[ref('product_pricelist_2')]"/>
+    <value eval="{'website_id': ref('website_industry')}"/>
+  </function>
+</odoo>
