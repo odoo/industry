@@ -1,6 +1,6 @@
 {
     'name': 'Guided Tours',
-    'version': '1.5',
+    'version': '1.6',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -8,13 +8,14 @@
         'base_industry_data',
         'contacts',
         'event_sale',
-        'pos_stock',
+        'point_of_sale',
         'website_appointment',
         'website_event',
         'website_sale',
     ],
     'data': [
         'data/ir_attachment_pre.xml',
+        'data/ir_ui_menu.xml',
         'data/res_config_setting.xml',
         'data/appointment_resource.xml',
         'data/pos_category.xml',
