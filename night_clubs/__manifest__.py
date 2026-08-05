@@ -1,14 +1,14 @@
 {
     'name': 'Night Clubs',
-    'version': '1.4',
+    'version': '1.5',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
         'base_industry_data',
         'event_product',
         'event_sale',
+        'planning',
         'pos_restaurant',
-        'pos_stock',
         'purchase',
         'sale',
         'social',
@@ -17,6 +17,7 @@
     ],
     'data': [
         'data/ir_attachment_pre.xml',
+        'data/ir_ui_menu.xml',
         'data/pos_category.xml',
         'data/product_category.xml',
         'data/pos_config.xml',
