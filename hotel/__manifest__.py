@@ -1,6 +1,6 @@
 {
     'name': 'Hotel',
-    'version': '1.9',
+    'version': '1.10',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -37,7 +37,6 @@
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
         'demo/planning_slot_post.xml',
-
         'demo/website/website.xml',
         'demo/website/server_actions.xml',
         'demo/website/assets.xml',

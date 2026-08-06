@@ -142,6 +142,11 @@
         <xpath expr="//filter[@name='group_by_role']" position="after">
           <filter string="Customer" name="Customer" context="{'group_by':'partner_id'}"/>
         </xpath>
+        <xpath expr="//filter[@name='conflict_shifts']" position="before">
+          <filter string="Today's Check In" name="filter_checkin_today" domain="[('sale_order_id.rental_status', '=', 'pickup'), ('sale_order_id.rental_start_date', '&gt;=', 'today'), ('sale_order_id.rental_start_date', '&lt;', 'today +1d')]"/>
+          <filter string="Today's Check Out" name="filter_checkout_today" domain="[('sale_order_id.rental_status', '=', 'return'), ('sale_order_id.rental_return_date', '&gt;=', 'today'), ('sale_order_id.rental_return_date', '&lt;', 'today +1d')]"/>
+          <separator/>
+        </xpath>
     </field>
     <field name="inherit_id" ref="planning.planning_view_search"/>
     <field name="mode">primary</field>
@@ -194,10 +199,11 @@
     <field name="type">kanban</field>
     <field name="active" eval="True"/>
   </record>
-  <record id="sale_planning.planning_role_view_tree_inherit_sale_planning" model="ir.ui.view" forcecreate="1">
-    <field name="name">planning.role.list.inherit.sale.planning</field>
+  <record id="booking_engine_planning_role_view_tree" model="ir.ui.view">
+    <field name="name">planning.role.list.inherit.booking_engine</field>
     <field name="model">planning.role</field>
     <field name="inherit_id" ref="planning.planning_role_view_tree"/>
+    <field name="mode">primary</field>
     <field name="arch" type="xml">
         <xpath expr="//field[@name='resource_ids']" position="after">
             <field name="product_ids" widget="many2many_tags" placeholder="e.g. Cleaning Services" context="{'default_type': 'service', 'default_planning_enabled': True, 'default_planning_role_id': id}"/>
@@ -228,7 +234,7 @@
         </xpath>
     </field>
     <field name="inherit_id" ref="planning.planning_role_view_form"/>
-    <field name="mode">extension</field>
+    <field name="mode">primary</field>
     <field name="model">planning.role</field>
     <field name="name">planning.role.form.inherit.booking_engine</field>
     <field name="priority">160</field>
@@ -581,7 +587,8 @@
     <field name="search_view_id" ref="booking_engine_planning_role_view_search"/>
     <field name="view_ids" eval="[
       (5, 0, 0),
-      (0, 0, {'view_mode': 'list', 'view_id': ref('planning.planning_role_view_tree')}),
+      (0, 0, {'view_mode': 'list', 'view_id': ref('booking_engine_planning_role_view_tree')}),
+      (0, 0, {'view_mode': 'form', 'view_id': ref('planning_form_view')}),
     ]"/>
   </record>
   <record id="booking_engine_rooms_resources_action" model="ir.actions.act_window">
@@ -1054,23 +1061,10 @@
           </xpath>
       </field>
   </record>
-  <record id="planning_search_view_inherit_booking_engine" model="ir.ui.view">
-    <field name="name">planning.slot.search.inherit.booking_engine</field>
-    <field name="model">planning.slot</field>
-    <field name="inherit_id" ref="planning.planning_view_search_base"/>
-    <field name="mode">extension</field>
-    <field name="active" eval="True"/>
-    <field name="arch" type="xml">
-        <xpath expr="//filter[@name='conflict_shifts']" position="before">
-          <filter string="Today's Check In" name="filter_checkin_today" domain="[('sale_order_id.rental_status', '=', 'pickup'), ('sale_order_id.rental_start_date', '&gt;=', 'today'), ('sale_order_id.rental_start_date', '&lt;', 'today +1d')]"/>
-          <filter string="Today's Check Out" name="filter_checkout_today" domain="[('sale_order_id.rental_status', '=', 'return'), ('sale_order_id.rental_return_date', '&gt;=', 'today'), ('sale_order_id.rental_return_date', '&lt;', 'today +1d')]"/>
-          <separator/>
-        </xpath>
-    </field>
-  </record>
+
   <record id="view_inherit_planning_role_kanban" model="ir.ui.view">
     <field name="inherit_id" ref="planning.planning_role_view_kanban"/>
-    <field name="mode">extension</field>
+    <field name="mode">primary</field>
     <field name="model">planning.role</field>
     <field name="type">kanban</field>
     <field name="active" eval="True"/>
