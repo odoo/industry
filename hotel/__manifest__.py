@@ -1,6 +1,6 @@
 {
     'name': 'Hotel',
-    'version': '1.11',
+    'version': '1.12',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [

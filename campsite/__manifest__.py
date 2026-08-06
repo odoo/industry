@@ -1,6 +1,6 @@
 {
     'name': 'Campsite',
-    'version': '1.10',
+    'version': '1.11',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
