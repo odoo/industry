@@ -1,6 +1,6 @@
 {
     'name': 'Booking',
-    'version': '1.17',
+    'version': '1.18',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -30,6 +30,7 @@
         'data/base_automation.xml',
         'data/resource_calendar_data.xml',
         'data/ir_cron.xml',
+        'data/survey_survey.xml',
         'data/res_config_settings.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_ui_view.xml',
@@ -39,7 +40,6 @@
         'data/product_category.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
-        'data/survey_survey.xml',
         'data/survey_question.xml',
         'data/survey_question_answer.xml',
     ],
