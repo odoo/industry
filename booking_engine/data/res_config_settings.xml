@@ -166,7 +166,6 @@ self['x_setting_steering'] = (self.env['ir.config_parameter'].get_param('booking
         <field name="code"><![CDATA[
 records_archive = [
     'ir_cron_create_500_days_availability',
-    'ir_cron_send_survey',
     'automation_on_planning_slot_change',
     'automation_on_planning_slot_delete',
     'automation_on_resource_calendar_leaves_change',
@@ -175,7 +174,6 @@ records_archive = [
     'automation_on_resource_resource_delete',
     'automation_on_product_template_change',
     'automation_on_product_template_delete',
-    'automation_to_archive_existing_surveys',
 ]
 cloc_entries = [
     'x_availability_color_field_x_availability',
@@ -238,6 +236,65 @@ else:
         <field name="trigger_field_ids" eval="[(6, 0, [ref('x_setting_field_steering')])]"/>
     </record>
 
+    <!-- Automated Survey Settings-->
+    <record id="x_setting_field_automated_survey" model="ir.model.fields">
+        <field name="name">x_setting_automated_survey</field>
+        <field name="field_description">Automated Survey</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="ttype">boolean</field>
+        <field name="compute"><![CDATA[
+self['x_setting_automated_survey'] = (self.env['ir.config_parameter'].get_param('booking_engine.x_setting_automated_survey', '0') != '0')]]></field>
+    </record>
+    <record id="x_company_field_survey_id" model="ir.model.fields">
+        <field name="name">x_setting_survey_id</field>
+        <field name="field_description">Customer Satisfaction Survey</field>
+        <field name="model_id" ref="base.model_res_company"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">survey.survey</field>
+    </record>
+    <record id="x_setting_field_survey_id" model="ir.model.fields">
+        <field name="name">x_setting_survey_id</field>
+        <field name="field_description">Survey</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">survey.survey</field>
+        <field name="related">company_id.x_setting_survey_id</field>
+    </record>
+    <record id="x_setting_field_email_delay" model="ir.model.fields">
+        <field name="name">x_setting_email_delay</field>
+        <field name="field_description">Email Delay</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="ttype">integer</field>
+        <field name="compute"><![CDATA[
+self['x_setting_email_delay'] = int(self.env['ir.config_parameter'].get_param('booking_engine.x_setting_email_delay', 2))]]></field>
+    </record>
+    <record id="server_action_set_x_setting_automated_survey" model="ir.actions.server">
+        <field name="name">Set Automated Survey Setting</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+env['ir.config_parameter'].set_param('booking_engine.x_setting_automated_survey', record.x_setting_automated_survey)
+if record.x_setting_automated_survey:
+    if not record.x_setting_survey_id and (survey := env.ref('booking_engine.survey_survey_1', raise_if_not_found=False)):
+        record.write({'x_setting_survey_id': survey.id})
+    env['ir.config_parameter'].set_param('booking_engine.x_setting_email_delay', record.x_setting_email_delay)
+    env.ref('booking_engine.ir_cron_send_survey')['active'] = True
+else:
+    env.ref('booking_engine.ir_cron_send_survey')['active'] = False
+    ]]></field>
+    </record>
+
+    <record id="automation_on_x_setting_automated_survey_set" model="base.automation">
+        <field name="name">On Automated Survey setting set</field>
+        <field name="model_id" ref="base_setup.model_res_config_settings"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('server_action_set_x_setting_automated_survey')])]"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [
+            ref('x_setting_field_automated_survey'),
+            ref('x_setting_field_survey_id'),
+            ref('x_setting_field_email_delay'),
+        ])]"/>
+    </record>
 
     <record id="server_action_set_x_setting_approvers" model="ir.actions.server">
         <field name="name">HouseKeeping: Set approvers setting</field>
@@ -283,6 +340,20 @@ env['ir.config_parameter'].set_param('booking_engine.x_approvers_setting', ('1' 
                     <block title="Management" name="booking_management_config_block">
                         <setting id="booking_engine_steering_setting" help="Monitor availability, occupancy, average daily rate, revenue per available unit and pick-ups.">
                             <field name="x_setting_steering"/>
+                        </setting>
+                        <setting id="booking_engine_automated_survey_setting" help="Automatically send customer satisfaction survey after guest stay.">
+                            <field name="x_setting_automated_survey"/>
+                            <div class="mt-1" invisible="not x_setting_automated_survey">
+                                <div class="row align-items-center mb-2">
+                                    <label for="x_setting_survey_id" class="col-3 text-nowrap"/>
+                                    <field name="x_setting_survey_id" class="col-6 oe_inline" options="{'no_open': True}" required="x_setting_automated_survey"/>
+                                </div>
+                                <div class="row align-items-center">
+                                    <label for="x_setting_email_delay" class="col-3 text-nowrap"/>
+                                    <field name="x_setting_email_delay" class="col-3 oe_inline" required="x_setting_automated_survey"/>
+                                    <span class="text-muted col-3">Days</span>
+                                </div>
+                            </div>
                         </setting>
                     </block>
                 </app>
