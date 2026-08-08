@@ -1,5 +1,5 @@
 {
-    "name": "Industry",
+    "name": "Industry POC",
     "vars": {
         "module_filter": "-*,industry/*"
     },
@@ -12,10 +12,10 @@
             "install_modules": "base_import_module,website_sale,point_of_sale,sale_purchase_stock,hr,web_hierarchy,project,web_studio,knowledge,crm,calendar,hr_skills,project,pos_sale,sale_project,planning,appointment,hr_timesheet,sale_timesheet,timesheet_grid,industry_fsm,sale_subscription,documents_account,sign,documents,sale_planning,website_partner,link_tracker,loyalty,pos_loyalty,website_sale_loyalty,sale_loyalty_delivery,event,website_event,mrp,website_event_sale,mass_mailing,pos_self_order,industry/test_*"
         },
         {
-            "name": "Test all Industries",
-            "job_type": "command",
+            "name": "Test dynamic Industries",
+            "job_type": "python",
             "db_name": "industry",
-            "command": "odoo/odoo-bin --addons-path={{addons_path}} test_industry -d {{db_name}} --data-dir {{data_dir}} --all --test-enable --log-db runbot_logs --log-db-level=26 --industry-demo",
+            "python_code": "def run():\n    industry_commit_link = [commit_link for commit_link in build.params_id.commit_link_ids if commit_link.commit_id.repo_id.project_id.name==\"Industry\"][0]\n    bundle = build.params_id.create_batch_id.bundle_id\n    all_industry_modules = set(m.split('/')[0] for m in industry_commit_link.commit_id._list_files([f':(glob)*/*']) if m and not '.' in m.split('/')[0]) - {'tests'}\n\n    modules_to_test = all_industry_modules\n    industry_commit = industry_commit_link.commit_id\n\n    if industry_commit_link.merge_base_commit_id and not bundle.sticky:\n        modified = industry_commit.repo_id._git(['diff', '--name-only', '%s..%s' % (industry_commit_link.merge_base_commit_id.name, industry_commit.name)])\n        modified_directory = set()\n        if modified:\n            for file in modified.split('\\n'):\n                file = file.strip().strip('\"')\n                if file:\n                    directory = file.split('/')[0]\n                    if '.' in directory:\n                        continue\n                    if directory == 'tests':\n                        test_dir = file.split('/')[1].removeprefix('test_')\n                        if test_dir in all_industry_modules:\n                            directory = test_dir\n                    modified_directory.add(directory)\n            if 'tests' not in modified_directory:\n                modules_to_test = modified_directory\n\n    modules_to_test = modules_to_test - {'.tx'}\n\n    docker_params = self._run_install_odoo(build)\n    docker_params['cmd'].cmd.clear()\n\n    base_cmd = [\n        'odoo/odoo-bin', 'test_industry',\n        '-d', build.dest,\n        '--data-dir', '/data/build/datadir/',\n        '--test-enable',\n        '--log-db', 'runbot_logs',\n        '--log-db-level=26',\n        '--industry-demo'\n    ]\n\n    if modules_to_test == all_industry_modules or not modules_to_test:\n        build._log('run', 'Running ALL industries')\n        base_cmd.append('--all')\n    else:\n        industries_list = ','.join(sorted(modules_to_test))\n        build._log('run', f'Smart testing triggered for: {industries_list}')\n        base_cmd.extend(['--industries', industries_list])\n\n    [docker_params['cmd'].cmd.append(arg) for arg in base_cmd]\n    return docker_params\n",
             "check_logs": ["ERROR", "WARNING"],
             "expected_logs": ["Initiating shutdown", "Starting post tests"]
         }
