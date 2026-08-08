@@ -1,7 +1,21 @@
 {
     'name': 'Electronic Store',
     'version': '1.0',
+<<<<<<< 98b59479dbd6d4bdf66cd9f7ecaf90bf01df2adc
     'category': 'Retail',
+||||||| e5a1ba433a012ad0dcff740c631f8f97783d2861
+    'category': 'Retail',
+    'description': """
+        This module provides essential features to manage an electronic store.
+        It includes product categories, products, sales orders, and more for electronic products.
+    """,
+=======
+    'category': 'Retail and eCommerce',
+    'description': """
+        This module provides essential features to manage an electronic store.
+        It includes product categories, products, sales orders, and more for electronic products.
+    """,
+>>>>>>> 20014fd4a7f3eef3b4149c7cb00d24f3495f074a
     'depends': [
         'crm',
         'documents_fsm',
