@@ -1,0 +1,171 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="server_action_link_appointment_type" model="ir.actions.server">
+        <field name="name">Link Appointment Type</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if record.x_appointment_type_id:
+    action = {
+        "type": "ir.actions.act_window",
+        "res_model": "calendar.event",
+        "view_mode": "gantt",
+        "view_id": env.ref("appointment.calendar_event_view_gantt_booking_resource").id,
+        "context": {
+            "default_appointment_type_id": record.x_appointment_type_id.id,
+            "default_name": record.x_appointment_type_id.name,
+            "default_duration": record.x_appointment_type_id.appointment_duration,
+            "default_x_task_id": record.id,
+            "default_partner_ids" : [(6, 0, [record.partner_id.id])] if record.partner_id else [],
+        },
+    }
+]]></field>
+    </record>
+    <record id="ir_actions_server_update_task_appointment_date" model="ir.actions.server">
+        <field name="name">Link Appointment Date</field>
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if record.x_task_id and record.start:
+    record.x_task_id.write({"x_appointment_date": record.start})
+]]></field>
+    </record>
+    <record id="server_action_create_sale_order" model="ir.actions.server">
+        <field name="name">Create Sale Order</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for task in records:
+    if task.partner_id and task.x_vehicle_id:
+        sale_order = env['sale.order'].create({
+            'partner_id': task.partner_id.id,
+            'x_vehicle_id': task.x_vehicle_id.id,
+            'x_chassis_number': task.x_chassis_number,
+            'x_task_id': task.id,
+        })
+        task['sale_order_id'] = sale_order.id
+        action = {
+            'type': 'ir.actions.act_window',
+            'res_model': 'sale.order',
+            'view_mode': 'form',
+            'res_id': sale_order.id,
+        }
+    ]]></field>
+    </record>
+    <record id="server_action_create_invoice" model="ir.actions.server">
+        <field name="name">Create Invoice</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for task in records:
+    if task.partner_id and task.x_vehicle_id:
+        invoice = env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': task.partner_id.id,
+            'x_vehicle_id': task.x_vehicle_id.id,
+            'x_chassis_number': task.x_chassis_number,
+            'x_task_id': task.id,
+        })
+        task['x_is_invoice'] = True
+        action = {
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.move',
+            'view_mode': 'form',
+            'res_id': invoice.id,
+        }
+    ]]></field>
+    </record>
+    <record id="action_update_vehicle_odometer" model="ir.actions.server">
+        <field name="name">Update Vehicle Odometer</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for task in records:
+    if task.x_vehicle_id and task.x_odometer:
+        env['fleet.vehicle.odometer'].create({
+            'value': task.x_odometer,
+            'vehicle_id': task.x_vehicle_id.id,
+            'driver_id': task.x_vehicle_id.driver_id.id,
+        })
+    ]]></field>
+    </record>
+    <record id="action_update_vehicle_to_set_linked_customer" model="ir.actions.server">
+        <field name="name">Update vehicle to set the linked customer</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record['partner_id'] = record.x_vehicle_id.x_owner_id.id or record.partner_id.id
+    ]]></field>
+    </record>
+    <record id="action_update_vehicle_to_set_linked_customer_sale_order" model="ir.actions.server">
+        <field name="name">Update vehicle to set the linked customer on sale order</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record['partner_id'] = record.x_vehicle_id.x_owner_id.id or record.partner_id.id
+    ]]></field>
+    </record>
+    <record id="action_update_vehicle_to_set_linked_customer_account_move" model="ir.actions.server">
+        <field name="name">Update vehicle to set the linked customer on account move</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+record['partner_id'] = record.x_vehicle_id.x_owner_id.id or record.partner_id.id
+    ]]></field>
+    </record>
+    <record id="server_action_task_stage_booking_confirm" model="ir.actions.server">
+        <field name="name">Generate Shared Link on Booking Confirm</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for task in records:
+    if not task.partner_id:
+        raise UserError("You must set a Customer before moving to Booking Confirm.")
+    if not task.partner_id.email:
+        raise UserError("You must set an Email for the Customer.")
+    if not task.x_vehicle_id:
+        raise UserError("You must set a Vehicle before moving to Booking Confirm.")
+    if not task.x_appointment_type_id:
+        raise UserError("You must set an Appointment Type before moving to Booking Confirm.")
+
+    invite = env['appointment.invite'].search([('appointment_type_ids', 'in', [task.x_appointment_type_id.id]), ('x_task_id', '=', task.id),], limit=1)
+    if not invite:
+        invite = env['appointment.invite'].create({'appointment_type_ids': [(6, 0, [task.x_appointment_type_id.id])],'x_task_id': task.id})
+    booking_url = invite.book_url or ''
+    task.write({'x_booking_url': booking_url})
+    # Send appointment booking email
+    env.ref('garage_auto_repair.mail_template_task_appointment_booking').send_mail(task.id)
+    ]]></field>
+    </record>
+    <record id="ir_actions_server_update_to_approve_state" model="ir.actions.server">
+        <field name="name">Update Task when appointment is booked</field>
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for event in records:
+    invite = event.appointment_invite_id
+    if not invite or not invite.x_task_id:
+        continue
+    task = invite.x_task_id
+    task.write({'state': '03_approved', 'x_appointment_date': event.start})
+    main_partner = task.partner_id
+    booking_partners = event.partner_ids.filtered(
+        lambda p: p.id != main_partner.id
+    )
+    if main_partner and booking_partners:
+        env['base.partner.merge.automatic.wizard']._merge(
+            booking_partners.ids + [main_partner.id],
+            main_partner
+        )
+]]></field>
+    </record>
+    <record id="ir_actions_server_730" model="ir.actions.server">
+        <field name="name">Auto Checkout Vehicle</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="project.model_project_task"/>
+        <field name="update_path">x_is_vehicle_checked_out</field>
+        <field name="update_field_id" ref="x_is_vehicle_checked_out_field"/>
+        <field name="usage">base_automation</field>
+    </record>
+</odoo>
