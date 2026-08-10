@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Hair Salon - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code">
+website = env.ref('hair_salon.website_industry')
+
+to_deactivate = [
+    'website.footer_custom',
+    'website.header_search_box',
+    'website.header_text_element',
+    'website.template_footer_mega',
+    'website.homepage',
+    'website.contactus',
+]
+to_activate = [
+    'website.footer_no_copyright',
+    'website.header_call_to_action',
+    'website.template_footer_centered',
+    'website.template_footer_slideout',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+
+# Rename/reorder the default menu items
+menus.search(base_domain + [('url', '=', '/')], limit=1).write({'name': 'Home', 'sequence': 10})
+menus.search(base_domain + [('url', '=', '/appointment')], limit=1).write({'name': 'Appointment', 'sequence': 55})
+# Add Contact us menu item (no /contactus menu is created by default)
+top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
+if not menus.search(base_domain + [('url', '=', '/contactus')]):
+    menus.create({
+        'name': 'Contact us',
+        'url': '/contactus',
+        'sequence': 60,
+        'website_id': website.id,
+        'parent_id': top_menu.id if top_menu else False,
+    })
+        </field>
+    </record>
+
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
