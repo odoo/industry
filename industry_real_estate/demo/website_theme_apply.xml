@@ -4,22 +4,32 @@
     <function name="button_choose_theme"
               model="ir.module.module"
               eval="[ref('base.module_theme_treehouse', raise_if_not_found=False) or ref('base.module_theme_default')]"
-              context="{'website_id': ref('base.default_website')}"
+              context="{'website_id': ref('property_listing.website_industry')}"
     />
-    <function model="website.assets" name="make_scss_customization" context="{'website_id': ref('base.default_website')}">
+    <function model="website.assets" name="make_scss_customization" context="{'website_id': ref('property_listing.website_industry')}">
         <value eval="'/website/static/src/scss/options/colors/user_color_palette.scss'"/>
         <value eval="{'o-color-1': '#0A58CA','o-color-2': '#e0ccaf','o-color-3': '#f0f2f5','o-color-4': '#FFFFFF','o-color-5': '#141f2e', 'menu': 1, 'font': &quot;Poping&quot;}"/>
     </function>
 
     <function model="ir.ui.view" name="write">
-        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('base.default_website').id).viewref('website.homepage').id"/>
+        <value model="ir.ui.view" eval="obj().env['website'].with_context(website_id=obj().env.ref('property_listing.website_industry').id).viewref('website.homepage').id"/>
         <value model="ir.ui.view" eval="{'arch': obj().env.ref('industry_real_estate.homepage').arch}"/>
+    </function>
+
+    <function model="ir.ui.view" name="write">
+        <value model="ir.ui.view" eval="obj().with_context(website_id=obj().env.ref('property_listing.website_industry').id).search([('key', '=', 'website.template_header_vertical')], limit=1).id"/>
+        <value eval="{'active': False}"/>
+    </function>
+
+    <function model="ir.ui.view" name="write" context="{'website_id': ref('property_listing.website_industry')}">
+        <value model="ir.ui.view" eval="obj().with_context(active_test=False).search([('key', '=', 'website.template_header_default')], limit=1).id"/>
+        <value eval="{'active': True}"/>
     </function>
 
     <data noupdate="1">
         <function model="website" name="write">
-            <value model="website" eval="[ref('base.default_website')]"/>
-            <value model="website" eval="{'shop_opt_products_design_classes': obj().env.ref('base.default_website').shop_opt_products_design_classes.replace('o_wsale_products_opt_has_cta', '')}"/>
+            <value model="website" eval="[ref('property_listing.website_industry')]"/>
+            <value model="website" eval="{'shop_opt_products_design_classes': obj().env.ref('property_listing.website_industry').shop_opt_products_design_classes.replace('o_wsale_products_opt_has_cta', '')}"/>
         </function>
     </data>
 </odoo>
