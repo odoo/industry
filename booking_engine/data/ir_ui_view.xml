@@ -320,7 +320,7 @@
           </group>
         </group>
         <group>
-          <group name="channel_manager" string="Channel Manager">
+          <group name="channel_manager" string="Channel Manager" invisible="1">
             <field name="x_offer_type"/>
           </group>
           <group name="house_keeping" string="House Keeping" groups="booking_engine.group_house_keeping">
@@ -605,7 +605,7 @@
     <record id="resource_resource_form_view_extension" model="ir.ui.view">
         <field name="arch" type="xml">
             <xpath expr="/form/sheet/group" position="after">
-                <group invisible="x_category != 'stay_offer'">
+                <group invisible="x_category != 'stay_offer' or not x_occupancy">
                     <group string="House Keeping" groups="booking_engine.group_house_keeping">
                         <field name="x_occupancy" options="{}"/>
                         <field name="x_house_keeping_stage_id" domain="[('project_ids.x_is_house_keeping_project', '!=', False)]"/>
@@ -956,59 +956,61 @@
         <field name="x_date"/>
         <field name="x_total_units"/>
         <popover>
-          <templates>
-            <div t-name="gantt-popover">
-              <t t-set="bar_color" t-value="x_availability_color"/>
-              <t t-set="bar_pct" t-value="x_availability"/>
-              <t t-set="main_title" t-value="'Availability:'"/>
+        <templates>
+          <div t-name="gantt-popover">
+            <t t-set="bar_color" t-value="x_availability_color" />
+            <t t-set="bar_pct" t-value="x_availability" />
+            <t t-set="main_title" t-value="'Availability:'" />
+            <t t-set="heat_scale" t-value="['#ffdc00', '#fbc904', '#f6b609', '#f2a30d', '#ed9011', '#e97d16', '#e4691a', '#e0561e', '#db4323', '#d73027']" />
 
-              <t t-set="heat_scale" t-value="['#ffdc00', '#fbc904', '#f6b609', '#f2a30d', '#ed9011', '#e97d16', '#e4691a', '#e0561e', '#db4323', '#d73027']"/>
+            <div class="oe_kanban_global_click p-2">
+              <style>
+                .o_gantt_popover_footer, .o_popover_footer, .o_kanban_record_footer, footer, .o_gantt_popover button.btn, .o_popover button { display: none !important; }
+                .o_booking_occupancy_gantt .o_gantt_pill_title { max-width: 100% !important; text-align: center; overflow: hidden; text-overflow: clip; }
+              </style>
 
-              <div class="oe_kanban_global_click p-2">
-                <style>
-                  .o_gantt_popover_footer, .o_popover_footer, .o_kanban_record_footer, footer, .o_gantt_popover button.btn, .o_popover button { display: none !important; }
-                  .o_booking_occupancy_gantt .o_gantt_pill_title { max-width: 100% !important; text-align: center; overflow: hidden; text-overflow: clip; }
-                </style>
+              <div class="o_kanban_record_top mb-1">
+                <div class="o_kanban_record_title fw-bold">
+                  <span t-out="new Date(x_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })" />
+                </div>
+              </div>
 
-                <div class="o_kanban_record_top mb-1">
-                  <div class="o_kanban_record_title fw-bold">
-                    <span t-out="new Date(x_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })"/>
-                  </div>
+              <div class="o_kanban_record_body" style="min-width: 160px;">
+                <div class="progress mt-1" style="height: 8px; background-color: #e9ecef;">
+                  <div role="progressbar" t-attf-style="width: {{bar_pct * 100}}%; background-color: {{heat_scale[bar_color]}} !important;" t-att-aria-valuenow="bar_pct * 100" aria-valuemin="0" aria-valuemax="100" />
                 </div>
 
-                <div class="o_kanban_record_body" style="min-width: 160px;">
-                  <div class="progress mt-1" style="height: 8px; background-color: #e9ecef;">
-                      <div
-                          role="progressbar"
-                          t-attf-style="width: {{bar_pct * 100}}%; background-color: {{heat_scale[bar_color]}} !important;"
-                          t-att-aria-valuenow="bar_pct * 100" aria-valuemin="0" aria-valuemax="100"/>
-                  </div>
+                <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
+                  <strong>
+                    <t t-out="main_title" />
+                  </strong>
+                  <span class="ms-1">
+                    <strong>
+                      <span t-out="Math.round(bar_pct * 100) + '%'" />
+                    </strong>
+                  </span>
+                </div>
 
-                  <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
-                      <strong><t t-out="main_title"/></strong>
-                      <span class="ms-1"><strong><span t-out="Math.round(bar_pct * 100) + '%'"/></strong></span>
-                  </div>
-
-                  <div class="d-flex justify-content-between align-items-center gap-2">
-                    <span>Total Units:</span>
-                    <span class="ms-1" t-out="x_total_units"/>
-                  </div>
-                  <div class="d-flex justify-content-between align-items-center gap-2">
-                    <span>Booked:</span>
-                    <span class="ms-1" t-out="x_booked"/>
-                  </div>
-                  <div class="d-flex justify-content-between align-items-center gap-2">
-                    <span>Available:</span>
-                    <span class="ms-1" t-out="x_available"/>
-                  </div>
+                <div class="d-flex justify-content-between align-items-center gap-2">
+                  <span>Total Units:</span>
+                  <span class="ms-1" t-out="x_total_units" />
+                </div>
+                <div class="d-flex justify-content-between align-items-center gap-2">
+                  <span>Booked:</span>
+                  <span class="ms-1" t-out="x_booked" />
+                </div>
+                <div class="d-flex justify-content-between align-items-center gap-2">
+                  <span>Available:</span>
+                  <span class="ms-1" t-out="x_available" />
                 </div>
               </div>
             </div>
-          </templates>
-        </popover>
-      </gantt>
-    </field>
-  </record>
+          </div>
+        </templates>
+      </popover>
+    </gantt>
+  </field>
+</record>
 
   <record id="action_window_availability_availability" model="ir.actions.act_window">
     <field name="name">Availability</field>
