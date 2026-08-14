@@ -15,6 +15,19 @@ elif record.x_total > 0:
     env['sale.order.line'].create({'order_id': record.x_sale_order_id.id, 'product_id': product.id, 'product_uom_qty': record.x_total, 'qty_delivered': record.x_total})
 ]]></field>
     </record>
+    <record id="ir_actions_add_city_tax_line_on_so_creation" model="ir.actions.server">
+        <field name="name">Booking Engine: Add city tax line on SO creation</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="usage">base_automation</field>
+        <field name="code"><![CDATA[
+if city_tax_product := env['product.product'].search([('x_accommodation_product', '=', 'stay_tax')], limit=1):
+    for order in records.order_id:
+        if not any(line.product_id.id == city_tax_product.id for line in order.order_line):
+            max_seq = max((line.sequence for line in order.order_line), default=10)
+            env['sale.order.line'].create({'order_id': order.id, 'product_id': city_tax_product.id, 'product_uom_qty': 0, 'sequence': max_seq + 1})
+]]></field>
+    </record>
     <record id="open_x_city_tax_action" model="ir.actions.act_window">
         <field name="name">City Tax</field>
         <field name="res_model">x_city_tax</field>
@@ -94,7 +107,7 @@ for slot in records.order_line.planning_slot_ids:
     <record id="server_action_set_task_ready_if_no_approvers" model="ir.actions.server">
         <field name="name">HouseKeeping: Set task ready if no approvers required after cleaning</field>
         <field name="code"><![CDATA[
-if not env['ir.config_parameter'].get_bool('booking_engine.x_approvers_setting', False) and (stage := env.ref('booking_engine.project_task_type_18', raise_if_not_found=False)): 
+if not env['ir.config_parameter'].get_bool('booking_engine.x_approvers_setting', False) and (stage := env.ref('booking_engine.project_task_type_18', raise_if_not_found=False)):
     record.write({'stage_id': stage.id, 'state': '1_done'})
 ]]></field>
         <field name="model_id" ref="project.model_project_task"/>
@@ -179,7 +192,7 @@ if (tasks := records.filtered(lambda e: not e.x_employee_id) if records else env
         ]]></field>
     </record>
 
-    <!-- 
+    <!--
         Availabilities: create & update logic
     -->
     <record id="server_action_update_availabilities" model="ir.actions.server">
@@ -200,7 +213,7 @@ if (records := env['x_availability'].search([('x_to_recompute', '=', True)])):
 
     # Fetch leaves in the time frame (Resource specific OR Calendar specific)
     leaves = env['resource.calendar.leaves'].search([
-        '|', ('resource_id', 'in', all_resources.ids), 
+        '|', ('resource_id', 'in', all_resources.ids),
             '&', ('calendar_id', 'in', all_resources.calendar_id.ids), ('resource_id', '=', False),
         ('date_to', '>=', dt_min), ('date_from', '<=', dt_max)])
 
@@ -209,7 +222,7 @@ if (records := env['x_availability'].search([('x_to_recompute', '=', True)])):
     # resource: date mapping (/!\ nightly stays)
     for slot in slots:
         start_d, end_d = slot.start_datetime.date(), slot.end_datetime.date()
-        
+
         for r_id in slot.resource_ids.ids:
             if r_id not in res_bookings: res_bookings[r_id] = set()
 
@@ -261,7 +274,7 @@ if (records := env['x_availability'].search([('x_to_recompute', '=', True)])):
 #   (it's not informative to see them and clutters the view)
 # 2. Create new ones at the start of the day
 #   (so that we always have the right window of availabilities for Channex)
-# 3. Trigger a recomputation of all the availabilities 
+# 3. Trigger a recomputation of all the availabilities
 #   (to make sure we don't have a bugged/false state that does not reflect reality,
 #    because unavoidable race conditions)
 
@@ -306,7 +319,7 @@ records, resources, start_f, end_f = [env.context.get(a) for a in ['records', 'r
 # 2. The offer (and its resources)
 # So, in this server action, we fetch all these for the leaves/slots we were given as a parameter,
 # then 3. we fetch all the corresponding availabilities
-# 4. Assign these new abilities to the leaves/slots to match their updated values (resources/dates) 
+# 4. Assign these new abilities to the leaves/slots to match their updated values (resources/dates)
 
 # We also perform the optimization of fetching all records in one query for performance optimization,
 # which makes the code harder to understand, which is the reason for these lengthy comments.
@@ -318,7 +331,7 @@ records, resources, start_f, end_f = [env.context.get(a) for a in ['records', 'r
 dates, unique_dates = {}, set()
 for rec in records:
     if not rec[start_f] or not rec[end_f]: continue        # skip this record if it has no date (unusable)
-    
+
     # find the start and end date of this leave/slot and find all dates in between
     d_min, d_max = rec[start_f].date(), rec[end_f].date()
     dates[rec.id] = [d_min + datetime.timedelta(days=i) for i in range((d_max - d_min).days + 1)]
@@ -343,7 +356,7 @@ for rec in records.filtered(lambda r: r.id in dates):
         target_res_ids = rec.resource_ids.ids
     else: # resource.calendar.leaves
         # If it has no resources, it means the record (leave) is global, and applies to all the resources.
-        # Conversely, if the record (leave) has a resource, it means that the record (leave) is only for this resource. 
+        # Conversely, if the record (leave) has a resource, it means that the record (leave) is only for this resource.
         target_res_ids = [rec.resource_id.id] if rec.resource_id else resources.filtered(lambda r: r.calendar_id.id == rec.calendar_id.id).ids
 
     if (target_offers := offers.filtered(lambda o: set(target_res_ids) & set(o.x_resource_ids.ids))):
@@ -426,7 +439,7 @@ env['x_availability'].search([('x_stay_offer_id', 'in', records.ids)]).unlink()
 ]]></field>
     </record>
 
-    <!-- 
+    <!--
         Availability dependencies: Update
     -->
     <record id="server_action_update_availability_for_planning_slot" model="ir.actions.server">
@@ -441,7 +454,7 @@ records.x_availability_ids.write({'x_to_recompute': True})
 # Now that the resource/dates have changed, we need to propagate the info to the corresponding availabilities
 if (valid_slots := records.filtered('resource_ids')):
     env.ref('booking_engine.server_action_helper_compute_new_avails_to_recompute').with_context(
-        records=valid_slots, field_start='start_datetime', field_end='end_datetime', 
+        records=valid_slots, field_start='start_datetime', field_end='end_datetime',
         resources=valid_slots.resource_ids).run()
 ]]></field>
     </record>
@@ -483,8 +496,8 @@ env.ref('booking_engine.server_action_update_availabilities').run()
         <field name="state">code</field>
         <field name="code"><![CDATA[
 # Impacting field changes: x_is_a_room_offer, x_resource_ids, active
-# We cannot filter on the domain because we need to catch 
-# x_is_a_room_offer True -> False and False -> True 
+# We cannot filter on the domain because we need to catch
+# x_is_a_room_offer True -> False and False -> True
 # but don't want to execute the availabilities code on not room offers
 
 domain = [('x_date', '>=', (today := datetime.date.today())), ('x_stay_offer_id', 'in', records.ids)]
@@ -502,7 +515,7 @@ env['x_availability'].search(domain + [('x_stay_offer_id.x_is_a_room_offer', '='
 # and create 500 days ONLY for them
 if (new_offers := records.filtered(lambda r: r.x_is_a_room_offer and r.active) - existing_avails.x_stay_offer_id):
     env['x_availability'].create([
-        {'x_stay_offer_id': offer.id, 'x_date': today + datetime.timedelta(days=i), 'x_to_recompute': True} 
+        {'x_stay_offer_id': offer.id, 'x_date': today + datetime.timedelta(days=i), 'x_to_recompute': True}
         for i in range(500) for offer in new_offers])
 
 env.ref('booking_engine.server_action_update_availabilities').run()
