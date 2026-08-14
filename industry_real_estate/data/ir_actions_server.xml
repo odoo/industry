@@ -43,14 +43,27 @@ action['context'] = {'default_is_subscription': True}
         <field name="name">Add Tenant</field>
         <field name="usage">base_automation</field>
         <field name="code">
-for order in record:
+for order in records:
     stake_holder = env['x_stake_holder'].create({
         'x_stake_holder': order.partner_id.id,
         'x_property_id': order.x_property_id.id,
         'x_start_date': order.start_date,
         'x_end_date': order.end_date,
         'x_type': 'tenant',
+        'x_sale_order_id': record.id,
     })
         </field>
+    </record>
+    <record id="action_update_stake_holders_dates" model="ir.actions.server">
+        <field name="code"><![CDATA[
+stake_holders = env['x_stake_holder'].search([('x_sale_order_id', 'in', records.ids)])
+for record in records:
+    if stake_holder := stake_holders.filtered(lambda sh: sh.x_sale_order_id == record):
+        stake_holder.write({'x_start_date': record.start_date, 'x_end_date': record.end_date})
+        ]]></field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Property Management: Update stake holders dates</field>
+        <field name="usage">base_automation</field>
     </record>
 </odoo>
