@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <!--
+        Remarks are now project.task records living in a dedicated remarks project attached to
+        the main project via x_remark_project_id (see features/remarks/). Each main project gets
+        its own remarks project here, then the remarks themselves are plain tasks in it.
+    -->
+    <record model="project.project" id="project_remarks_jessica_martinez">
+        <field name="name">S00001 - Martinez / Remarks</field>
+        <field name="type_ids" eval="[(6, 0, [ref('construction.planning_project_stage_0'), ref('construction.planning_project_stage_2')])]"/>
+    </record>
+    <function model="project.project" name="write">
+        <value eval="[ref('construction.project_project_4')]"/>
+        <value eval="{'x_remark_project_id': ref('project_remarks_jessica_martinez')}"/>
+    </function>
+
+    <record model="project.project" id="project_remarks_sarah_davis">
+        <field name="name">S00002 - Davis / Remarks</field>
+        <field name="type_ids" eval="[(6, 0, [ref('construction.planning_project_stage_0'), ref('construction.planning_project_stage_2')])]"/>
+    </record>
+    <function model="project.project" name="write">
+        <value eval="[ref('construction.project_project_7')]"/>
+        <value eval="{'x_remark_project_id': ref('project_remarks_sarah_davis')}"/>
+    </function>
+
+
+    <record model="project.task" id="project_task_remark_1">
+        <field name="name">Replace the North corner pole (dent)</field>
+        <field name="project_id" ref="project_remarks_jessica_martinez"/>
+        <field name="stage_id" ref="construction.planning_project_stage_0"/>
+        <field name="x_partner_id" ref="base.partner_admin"/>
+        <field name="create_date" eval="DateTime.now() - relativedelta(days=7)"/>
+        <field name="date_deadline" eval="DateTime.now() + relativedelta(days=14)"/>
+        <field name="tag_ids" eval="[(6, 0, [ref('x_remark_tag_1')])]"/>
+    </record>
+    <record model="project.task" id="project_task_remark_2">
+        <field name="name">Replace the gutter elbow (ding)</field>
+        <field name="project_id" ref="project_remarks_jessica_martinez"/>
+        <field name="stage_id" ref="construction.planning_project_stage_0"/>
+        <field name="x_partner_id" ref="base.partner_admin"/>
+        <field name="create_date" eval="DateTime.now() - relativedelta(days=7)"/>
+        <field name="date_deadline" eval="DateTime.now() + relativedelta(days=14)"/>
+        <field name="tag_ids" eval="[(6, 0, [ref('x_remark_tag_1')])]"/>
+    </record>
+    <record model="project.task" id="project_task_remark_3">
+        <field name="name">Cracked Structural Glass Fin</field>
+        <field name="project_id" ref="project_remarks_sarah_davis"/>
+        <field name="stage_id" ref="construction.planning_project_stage_2"/>
+        <field name="description"><![CDATA[<div data-oe-version="2.0">During the pre-delivery walkthrough, stress cracking and a spiderweb fracture were identified on the narrow vertical glass fin (mullion) supporting the main facade window. The defect originates near the mounting point, likely caused by thermal expansion or over-torqued mechanical fittings.</div>]]></field>
+        <field name="create_date" eval="DateTime.now() - relativedelta(days=14)"/>
+        <field name="x_location">Interior Cafeteria – Main Panoramic Bay</field>
+        <field name="priority">2</field>
+        <field name="x_update_id" ref="construction.project_update_2"/>
+        <field name="tag_ids" eval="[(6, 0, [ref('x_remark_tag_1')])]"/>
+    </record>
+    <record model="project.task" id="project_task_remark_4">
+        <field name="name">Dented Pergola Support Pole</field>
+        <field name="project_id" ref="project_remarks_sarah_davis"/>
+        <field name="stage_id" ref="construction.planning_project_stage_0"/>
+        <field name="description"><![CDATA[<div data-oe-version="2.0">Localized impact dent and powder-coat surface damage observed on the white square metallic support pole holding the louvred terrace pergola. The damage appears to have been caused by equipment or scaffold movement during site operations.</div>]]></field>
+        <field name="create_date" eval="DateTime.now() - relativedelta(days=14)"/>
+        <field name="x_location">Outdoor Upper Terrace</field>
+        <field name="x_update_id" ref="construction.project_update_2"/>
+        <field name="tag_ids" eval="[(6, 0, [ref('x_remark_tag_1')])]"/>
+    </record>
+</odoo>
