@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
-        <field name="name">Guest House - Enable/disable views and set up menus</field>
+        <field name="name">Guest House - Enable/disable views, set up menus and resolve filter ids</field>
         <field name="model_id" ref="website.model_website"/>
         <field name="state">code</field>
         <field name="code">
@@ -10,6 +10,7 @@ website = env.ref('guest_house.website_industry')
 to_deactivate = [
     'website_sale.carousel_product_indicators_left',
     'website_sale.product_comment',
+    'website_sale.products_shop_title',
     'website.footer_custom',
     'website.header_search_box',
     'website.header_text_element',
@@ -46,14 +47,25 @@ menus.search(base_domain + [('url', '=', '/')], limit=1).write({'name': 'Home', 
 menus.search(base_domain + [('url', '=', '/shop')], limit=1).write({'name': 'Book', 'sequence': 20})
 # Add About menu item
 top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
-if not menus.search(base_domain + [('url', '=', '/about')]):
+if not menus.search(base_domain + [('url', '=', '/aboutus')]):
     menus.create({
         'name': 'About',
-        'url': '/about',
+        'url': '/aboutus',
         'website_id': website.id,
         'parent_id': top_menu.id if top_menu else False,
         'sequence': 55,
     })
+
+# Dynamic snippet filters are exported as an xml id wrapped in MARK, because
+# their database id is not stable across installs. Resolve them now that every
+# page is loaded. Odd split() parts are the wrapped xml ids.
+MARK = '__EXPORT_FILTER_XMLID__'
+for view in env['ir.ui.view'].sudo().search(base_domain + [('arch_db', 'like', MARK)]):
+    parts = (view.arch_db or '').split(MARK)
+    for i in range(1, len(parts), 2):
+        target = env.ref(parts[i], raise_if_not_found=False)
+        parts[i] = str(target.id if target else 0)
+    view.write({'arch_db': ''.join(parts)})
 </field>
     </record>
     <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
