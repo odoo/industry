@@ -55,6 +55,7 @@
         'demo/stock_location.xml',
         'demo/res_company.xml',
         'demo/sale_order_post.xml',
+        'demo/project_project.xml',
     ],
     'assets': {
         'web.assets_backend': [
