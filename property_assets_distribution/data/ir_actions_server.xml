@@ -24,24 +24,153 @@ for line in record:
     if env['x_stake_holder'].search_count(domain, limit=1): raise UserError("Stakeholder dates cannot overlap for the same property. Ensure that periods do not overlap.")
 ]]></field>
     </record>
+    <record id="action_meter_splitter" model="ir.actions.server">
+        <field name="name">Meter Splitter</field>
+        <field name="model_id" ref="model_x_stake_holder"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+accounts, readings = env.context.get('accounts', []), env.context.get('readings', [])
+period_start, period_end = env.context.get('period_start', False), env.context.get('period_end', False)
+result = env.context.get('result', {})
+
+def findClosestMeterReading(date, rds):
+    reading = rds[0]
+    if not date:
+        for mr in rds:
+            if mr.x_date > reading.x_date: reading = mr
+        return reading
+    min_diff = abs((date - reading.x_date).days)
+    for mr in rds:
+        diff = abs((date - mr.x_date).days)
+        if diff < min_diff:
+            reading = mr
+            min_diff = diff
+    return reading
+
+billstart = findClosestMeterReading(period_start, readings)
+billend = findClosestMeterReading(period_end, readings)
+result['billstart_date'] = billstart.x_date
+result['billend_date'] = billend.x_date
+
+for account in accounts:
+    acc_start, acc_end = account.x_start_date, account.x_end_date
+    if not acc_start: continue
+    if period_end and acc_start > period_end: continue
+    if acc_end and acc_end <= period_start: continue
+    mrostart = findClosestMeterReading(acc_start, readings)
+    if mrostart.x_date < billstart.x_date: mrostart = billstart
+    if acc_end:
+        mroend = findClosestMeterReading(acc_end, readings)
+        if billend.x_date < mroend.x_date: mroend = billend
+    else: mroend = billend
+    mrostart_date = mrostart.x_date
+    if mrostart_date != mroend.x_date and not (billend.x_date < mrostart_date):
+        result[account] = abs(mroend.x_quantity - mrostart.x_quantity)
+]]></field>
+    </record>
+    <record id="ir_actions_server_distribute_costs" model="ir.actions.server">
+        <field name="name">Distribute Costs</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+dist_key = record.x_distribution_key
+if not dist_key:
+    record.invoice_line_ids.write({'analytic_distribution': {}})
+else:
+    analytic_distribution = {}
+    period_start, period_end = record.x_period_start, record.x_period_end
+    periods_valid = bool(period_start) and bool(period_end)
+
+    if dist_key.x_based_on == "Shares" and periods_valid:
+        for ratio in dist_key.x_ratio_ids.filtered('x_ratio'):
+            for account in ratio.x_property_ratios.x_account_ids:
+                acc_start, acc_end = account.x_start_date, account.x_end_date
+                if acc_start <= period_end and (not acc_end or period_start <= acc_end):
+                    overlap_start, overlap_end = max(acc_start, period_start), acc_end if acc_end else period_end
+                    analytic_distribution[account.id] = analytic_distribution.get(account.id, 0) + ((overlap_end - overlap_start).days + 1) * ratio.x_ratio
+
+    elif dist_key.x_based_on == "Meter Readings" and periods_valid:
+        splitter = env.ref('property_assets_distribution.action_meter_splitter')
+        for property in env['x_property'].search([('x_company_id', '=', dist_key.x_company_id.id)]):
+            meter_id = dist_key.x_meter.id
+            readings = env['x_meter_reading'].browse([mr.id for mr in property.x_meter_reading_ids if mr.x_meter_id.id == meter_id])
+            if len(readings) < 2: continue
+            shares = {}
+            splitter.with_context(accounts=property.x_account_ids, readings=readings, period_start=period_start, period_end=period_end, result=shares).run()
+            analytic_distribution.update({p.id: qty for p, qty in shares.items() if not isinstance(p, str)})
+
+    # Outcome
+    if (total_ratio := sum(analytic_distribution.values())):
+        for key in analytic_distribution: analytic_distribution[key] *= 100 / total_ratio
+        record.invoice_line_ids.write({'analytic_distribution': analytic_distribution})
+    else:
+        record.invoice_line_ids.write({'analytic_distribution': {}})
+]]></field>
+    </record>
     <record id="action_create_stake_holder_account" model="ir.actions.server">
         <field name="model_id" ref="model_x_stake_holder"/>
         <field name="state">code</field>
         <field name="name">Create Stakeholder Account</field>
         <field name="usage">base_automation</field>
-        <field name="code">
+        <field name="code"><![CDATA[
 plan = env['account.analytic.plan'].search([('x_is_a_property_plan', '=', True)], limit=1) or env['account.analytic.plan'].create({'name': 'Accounts', 'x_is_a_property_plan': True})
+splitter = env.ref('property_assets_distribution.action_meter_splitter')
+
 for line in records:
-    if (partner := line.x_stake_holder) and not env['account.analytic.account'].search_count([('x_property', '=', line.x_property_id.id), ('partner_id', '=', partner.id), ('x_type', '=', line.x_type)]):
+    if not line.x_stake_holder: continue
+    if not env['account.analytic.account'].search_count([('x_property', '=', line.x_property_id.id), ('partner_id', '=', line.x_stake_holder.id), ('x_type', '=', line.x_type)]):
         line['x_account'] = env['account.analytic.account'].create({
             'name': line.x_property_id.x_name,
             'plan_id': plan.id,
             'x_property': line.x_property_id.id,
-            'partner_id': partner.id,
+            'partner_id': line.x_stake_holder.id,
             'x_stake_holder_line': line.id,
             'company_id': line.x_property_id.x_company_id.id,
             'x_type': line.x_type,
         }).id
+    if not line.x_start_date: continue
+    property = line.x_property_id
+    journal = env['account.journal'].search([('type', '=', 'sale'), ('company_id', '=', property.x_company_id.id)], limit=1)
+
+    for meter in property.x_meter_reading_ids.mapped('x_meter_id'):
+        meter_id = meter.id
+        readings = env['x_meter_reading'].browse([mr.id for mr in property.x_meter_reading_ids if mr.x_meter_id.id == meter_id])
+        if len(readings) < 2: continue
+        shares = {}
+        splitter.with_context(accounts=property.x_tenant_ids, readings=readings, period_start=line.x_start_date, period_end=line.x_end_date, result=shares).run()
+        billend_date, billstart_date = shares.pop('billend_date', False), shares.pop('billstart_date', False)
+        total = sum(shares.values())
+        if not total: continue
+
+        for tenant, qty in shares.items():
+            if not tenant.x_stake_holder: continue
+            env['account.move'].create({
+                'move_type': 'out_invoice',
+                'partner_id': tenant.x_stake_holder.id,
+                'journal_id': journal.id,
+                'company_id': property.x_company_id.id,
+                'invoice_line_ids': [(0, 0, {
+                    'name': f'{property.x_name} - {meter.x_name} ({billstart_date} - {billend_date})',
+                    'quantity': qty / total * 100,
+                    'price_unit': 0.0,
+                    'analytic_distribution': {str(tenant.x_account.id): 100} if tenant.x_account else {},
+                    'x_property_id': property.id,
+                })],
+            })
+]]></field>
+    </record>
+    <record id="action_server_add_analytic_distribution" model="ir.actions.server">
+        <field name="name">Add analytic distribution</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="code">
+for record in records:
+    for line in record.invoice_line_ids:
+        order = line.sale_line_ids.order_id
+        if order and order.is_subscription and order.x_property_id:
+            analytic_account = env['account.analytic.account'].search([('partner_id', '=', record.partner_id.id), ('x_property', '=', order.x_property_id.id)], limit=1)
+            line['analytic_distribution'] = {analytic_account.id: 100}
         </field>
     </record>
 </odoo>

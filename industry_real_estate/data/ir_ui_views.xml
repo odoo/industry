@@ -57,6 +57,19 @@
             </kanban>
         </field>
     </record>
+    <record id="search_property_list_view" model="ir.ui.view">
+        <field name="model">x_property</field>
+        <field name="type">list</field>
+        <field name="mode">primary</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="x_name"/>
+                <field name="x_building"/>
+                <field name="x_property_address"/>
+            </list>
+        </field>
+    </record>
     <record id="view_crm_lead_form_inherit" model="ir.ui.view">
         <field name="name">crm.leam.form.inherit.industry_real_estate</field>
         <field name="model">crm.lead</field>
@@ -124,7 +137,7 @@
                 <attribute name="string">Tenant</attribute>
             </field>
             <field name="partner_id" position="after">
-                <field name="x_property_id" readonly="state == 'sale'"/>
+                <field name="x_property_id" readonly="state == 'sale'" context="{'list_view_ref': 'industry_real_estate.search_property_list_view'}"/>
                 <field name="x_guarant_partner_id"/>
             </field>
             <xpath expr="//div[@name='plan_block']/div" position="replace"/>
@@ -180,6 +193,17 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='parent_id']" position="before">
                 <field name="x_is_property"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="account_move_line_list_view_inherit" model="ir.ui.view">
+        <field name="name">account.move.line.list.inherit</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_move_line_tree"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="x_property_id"/>
             </xpath>
         </field>
     </record>
