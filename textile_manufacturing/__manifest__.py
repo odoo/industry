@@ -1,6 +1,6 @@
 {
     'name': 'Textile Manufacturing',
-    'version': '1.5',
+    'version': '1.6',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
@@ -38,6 +38,7 @@
         'data/knowledge_article_favorite.xml',
     ],
     'demo': [
+        'demo/ir_attachment_post.xml',
         'demo/res_company.xml',
         'demo/documents_document.xml',
         'demo/res_partner.xml',
@@ -57,7 +58,6 @@
         'demo/purchase_order_line.xml',
         'demo/purchase_order_confirm.xml',
         'demo/sale_order.xml',
-        'demo/ir_attachment_post.xml',
         'demo/project_task.xml',
         'demo/mail_activity.xml',
         'demo/sale_order_line.xml',
@@ -66,9 +66,9 @@
         'demo/stock_quant.xml',
         'demo/hr_employee.xml',
         'demo/account_analytic_line.xml',
+        'demo/quality_point.xml',
         'demo/sale_order_confirm.xml',
         'demo/stock_warehouse_orderpoint.xml',
-        'demo/quality_point.xml',
         'demo/payment_provider_demo.xml',
         'demo/website_theme_apply.xml',
         'demo/website.xml',
