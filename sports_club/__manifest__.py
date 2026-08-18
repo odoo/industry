@@ -1,11 +1,12 @@
 {
     'name': 'Sports Facilities',
-    'version': '1.3',
+    'version': '1.4',
     'category': 'Health and Fitness',
     'depends': [
         'appointment_crm',
+        'frontdesk_partnership',
         'knowledge',
-        'partnership',
+        'loyalty',
         'planning',
         'pos_restaurant',
         'sale_subscription',
@@ -20,6 +21,7 @@
         'data/restaurant_floor.xml',
         'data/restaurant_table.xml',
         'data/pos_config.xml',
+        'data/pos_prep_display.xml',
         'data/ir_attachment_pre.xml',
         'data/product_public_category.xml',
         'data/planning_role.xml',
@@ -31,12 +33,14 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/resource_calendar.xml',
+        'data/frontdesk.xml',
         'data/appointment_type.xml',
         'data/appointment_resource.xml',
         'data/knowledge_tour.xml',
         'data/ir_ui_menu.xml'
     ],
     'demo': [
+        'demo/delivery_carrier.xml',
         'demo/res_company.xml',
         'demo/product_pricelist_item.xml',
         'demo/res_partner.xml',
