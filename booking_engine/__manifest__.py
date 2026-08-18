@@ -29,6 +29,7 @@
         'data/planning_slot_template.xml',
         'data/product_template.xml',
         'data/ir_actions_server.xml',
+        'data/ir_actions_client.xml',
         'data/base_automation.xml',
         'data/resource_calendar_data.xml',
         'data/ir_cron.xml',
@@ -53,7 +54,12 @@
         'demo/payment_provider_demo.xml',
     ],
     'assets': {
+        'spreadsheet.o_spreadsheet': [
+            'booking_engine/static/src/js/dashboard.js',
+            'booking_engine/static/src/xml/dashboard.xml',
+        ],
         'web.assets_backend': [
+            'booking_engine/static/src/js/dashboard_action_loader.js',
             'booking_engine/static/src/scss/gantt.scss',
         ],
         'web.assets_backend_lazy': [
@@ -67,6 +73,7 @@
         'data/website_view.xml',
         'static/src/scss/gantt.scss',
         'static/src/xml/gantt_pill_flags.xml',
+        'static/src/xml/dashboard.xml',
     ],
     'images': ['images/main.png'],
 }

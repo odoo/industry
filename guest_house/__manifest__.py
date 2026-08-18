@@ -1,6 +1,6 @@
 {
     'name': 'Guest House',
-    'version': '1.7',
+    'version': '1.8',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -21,6 +21,7 @@
         'data/website_view.xml',
         'data/res_config_settings.xml',
         'data/spreadsheet_dashboard.xml',
+        'data/ir_actions_client.xml',
     ],
     'demo': [
         'demo/res_company.xml',
