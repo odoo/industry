@@ -81,6 +81,7 @@
         'demo/website/images.xml',
         'demo/website/server_actions.xml',
     ],
+    'application': True,
     'license': 'OEEL-1',
     'cloc_exclude': [
         'static/src/scss/bootstrap_overridden.scss',
