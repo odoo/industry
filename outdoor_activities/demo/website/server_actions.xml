@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Custom Website - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+website = env.ref('outdoor_activities.website_industry')
+
+to_deactivate = [
+    'website_event.opt_events_list_cards',
+    'website_event.opt_events_list_columns',
+    'website_sale.carousel_product_indicators_left',
+    'website_sale.cta_separator',
+    'website_sale.product_quantity',
+    'website_sale.products_attributes',
+    'website_sale.products_shop_title',
+    'website_sale.search',
+    'website_sale.sort',
+    'website.footer_custom',
+    'website.header_call_to_action',
+    'website.header_search_box',
+    'website.header_text_element',
+    'website.homepage',
+    'website.contactus',
+]
+to_activate = [
+    'website_event.index_topbar',
+    'website_sale.carousel_product_indicators_bottom',
+    'website_sale.cta_wrapper',
+    'website_sale.header_hide_empty_cart_link',
+    'website_sale.products',
+    # centers the menu items; modifier of website.template_header_default,
+    # which stays active
+    'website.template_header_default_align_center',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+
+# Rename/reorder the menu items bootstrapped from the template menus of
+# website (/), website_event (/event) and website_appointment (/appointment).
+for url, name, sequence in [
+    ('/', 'Scubas', 1),
+    ('/event', 'Lessons', 2),
+    ('/appointment', 'Book an experience', 3),
+]:
+    menus.search(base_domain + [('url', '=', url)], limit=1).write({
+        'name': name,
+        'sequence': sequence,
+    })
+
+# Add the Contact us menu item: website only bootstraps the root menu and /,
+# so nothing creates a /contactus menu even though the page exists.
+top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
+if not menus.search(base_domain + [('url', '=', '/contactus')]):
+    menus.create({
+        'name': 'Contact us',
+        'url': '/contactus',
+        'sequence': 4,
+        'website_id': website.id,
+        'parent_id': top_menu.id if top_menu else False,
+    })
+
+# Default menu items to remove
+menus.search(base_domain + [('url', 'in', ['/shop'])]).unlink()
+
+# Disable the shop itself, not just its menu entry. A 404 rewrite is the
+# documented way to drop a controller on a single website (see the help of
+# website.rewrite's redirect_type). It is used instead of setting
+# website.ecommerce_access to 'logged_in', which would also close /shop/cart
+# to public visitors and so break the event ticket and paid appointment
+# checkouts this site relies on.
+rewrites = env['website.rewrite']
+shop_routes = [
+    '/shop',
+    '/shop/page/<int:page>',
+    '/shop/category/<model("product.public.category"):category>',
+    '/shop/category/<model("product.public.category"):category>/page/<int:page>',
+]
+for shop_route in shop_routes:
+    if not rewrites.search([('url_from', '=', shop_route), ('website_id', '=', website.id)]):
+        rewrites.create({
+            'name': 'Disable %s' % shop_route,
+            'redirect_type': '404',
+            'url_from': shop_route,
+            'website_id': website.id,
+        })
+]]>
+        </field>
+    </record>
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
