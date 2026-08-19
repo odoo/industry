@@ -20,6 +20,9 @@
         'data/website_theme_apply.xml',
         'data/website.xml',
     ],
+    'demo': [
+        'demo/website/website.xml',
+    ],
     'license': 'OEEL-1',
     'cloc_exclude': [
         'data/website_view.xml',
