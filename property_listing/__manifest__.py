@@ -1,5 +1,6 @@
 {
     'name': 'Property Listing',
+    'version': '1.1',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
@@ -17,6 +18,9 @@
         'data/website_page.xml',
         'data/website_theme_apply.xml',
         'data/website.xml',
+    ],
+    'demo': [
+        'demo/website/website.xml',
     ],
     'license': 'OEEL-1',
     'cloc_exclude': [
