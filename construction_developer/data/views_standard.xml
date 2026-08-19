@@ -1,0 +1,487 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record model="ir.ui.view" id="account_move_form_view_inherit">
+        <field name="name">account.move.form.inherit.construction_developer</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="sale.account_invoice_form"/>
+        <field name="mode">extension</field>
+        <field name="type">form</field>
+        <field name="priority">1600</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="before">
+                <field name="x_reference" optional="show" decoration-muted="1" width="79" options="{'hide_trailing_zeros': true}" string="#"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="view_calendar_event_form_inherit">
+        <field name="name">calendar.event.view.form.inherit.construction_developer</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
+        <field name="type">form</field>
+        <field name="mode">extension</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='page_invitations']" position="after">
+                <page name="remarks" string="Remarks">
+                    <group class="mb-0">
+                        <field
+                            name="x_remark_project_id"
+                            class="mb-0"
+                            domain="[('x_is_remark_project_of_ids', '!=', False)]"
+                            options="{'no_create': True, 'no_create_edit': True}"
+                            />
+                    </group>
+                    <field name="x_remark_ids" readonly="not x_remark_project_id" nolabel="1" context="{
+                        'default_project_id': x_remark_project_id,
+                        'default_x_event_id': id,
+                        'list_view_ref': 'construction_developer.view_x_remark_list_one2many',
+                    }"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="mrp_bom_form_view_inherit">
+        <field name="name">mrp.bom.view.form.inherit.construction_developer</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+        <field name="mode">extension</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="priority">1600</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_tmpl_id']/.." position="inside">
+                <label
+                    for="x_is_template"
+                    string="Is Template"
+                    invisible="type != 'normal' or context.get('from_sol', False)"
+                />
+                <div
+                    name="is_template"
+                    class="o_row" 
+                    invisible="type != 'normal' or context.get('from_sol', False)"
+                >
+                    <field name="x_is_template"/>
+                    <button
+                        name="%(action_set_template_bom_on_product)d"
+                        type="action"
+                        string="Set as Template"
+                        class="btn btn-link px-0"
+                        invisible="x_is_template"
+                    />
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="mrp_production_form_view_inherit">
+        <field name="name">mrp.production.view.form.inherit.construction_developer</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="mode">extension</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="priority">1600</field>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='date_start']" position="after">
+                <field name="x_date_planned_end"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="product_category_form_view_inherit">
+        <field name="name">product.category.view.form.inherit.construction_developer</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view"/>
+        <field name="mode">extension</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='first']" position="before">
+                <group name="outer">
+                    <group name="second">
+                        <field name="x_cost_nature" class="oe_inline"/>
+                    </group>
+                </group>
+            </xpath>
+            <xpath expr="//group[@name='second']" position="before">
+                <xpath expr="//group[@name='first']" position="move"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="product_template_only_form_view_inherit">
+        <field name="name">product.template.view.form.inherit.construction_developer</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="mode">extension</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="priority">1600</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/*[1]" position="before">
+                <div class="alert alert-warning text-center o_form_header" invisible="x_uom_matches_category" role="alert">
+                    <a class="close" data-bs-dismiss="alert" href="#">x</a>
+                    <div>
+                        <strong>Product Unit is not compatible with the Category Cost Nature</strong>
+                    </div>
+                    <div>
+                        Consider using a time related unit.
+                    </div>
+                </div>
+            </xpath>
+            <xpath expr="//group[@name='group_lots_and_weight']" position="inside">
+                <label for="x_bom_template_id"/>
+                <div>
+                    <field name="x_bom_template_id"
+                           required="x_bom_available"
+                           domain="[('product_tmpl_id.id', '=', id), ('type', '=', 'normal')]"
+                           context="{'default_product_tmpl_id': id, 'default_type': 'normal'}"
+                    />
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="edit_project_inherit">
+        <field name="name">project.project.view.form.inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="mode">extension</field>
+        <field name="type">form</field>
+        <field name="priority">1600</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button
+                    name="%(action_show_delivery_progress)d"
+                    type="action"
+                    class="oe_stat_button"
+                    icon="checklist"
+                    groups="project.group_project_user"
+                    invisible="not x_order_id"
+                    context="{'so_id': x_order_id}"
+                >
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Progress</span>
+                    </div>
+                </button>
+                <button
+                    name="%(action_view_remark_project_tasks)d"
+                    type="action"
+                    class="oe_stat_button"
+                    icon="assignment"
+                    groups="project.group_project_user"
+                    invisible="not x_remark_project_id"
+                    context="{
+                        'search_default_project_id': x_remark_project_id,
+                        'default_project_id': x_remark_project_id
+                    }"
+                >
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Remarks</span>
+                    </div>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="x_remark_project_id" 
+                    domain="[('x_is_remark_project_of_ids', '!=', False)]"
+                    invisible="x_is_remark_project_of_ids" 
+                    context="{'default_x_is_remark_project_of_ids': [id]}"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="view_task_form2_inherit">
+        <field name="name">project.task.view.form.inherit</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="mode">extension</field>
+        <field name="type">form</field>
+        <field name="priority">1600</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div/h1/field[@name='name']/../.." position="after">
+                <h3 class="o_outlined d-flex w-100" invisible="not x_is_remark">
+                    <field name="x_reference" 
+                        options="{'line_breaks': False}" 
+                        widget="text" 
+                        class="o_task_name text-truncate w-md-75 w-100 pe-2" 
+                    />
+                </h3>
+            </xpath>
+            <xpath expr="//label[@for='sale_line_id']" position="attributes">
+                <attribute
+                    name="invisible"
+                    separator=" or "
+                    add="x_is_remark"/>
+            </xpath>
+            <xpath expr="//div[@name='sale_line_div']" position="attributes">
+                <attribute
+                    name="invisible"
+                    separator=" or "
+                    add="x_is_remark"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute
+                    name="invisible"
+                    separator=" or "
+                    add="x_is_remark"/>
+            </xpath>
+            <xpath expr="//field[@name='project_id']" position="after">
+                 <field name="x_update_id" invisible="not x_update_id"/>
+                 <field name="x_event_id" invisible="not x_event_id"/>
+            </xpath>
+            <xpath expr="//field[@name='user_ids']" position="after">
+                 <field name="x_partner_id" invisible="not x_is_remark"/>
+            </xpath>
+            <xpath expr="//field[@name='tag_ids']" position="before">
+                 <field name="create_date" invisible="not x_is_remark"/>
+            </xpath>
+            <xpath expr="//field[@name='allocated_hours']" position="after">
+                 <field name="x_location" invisible="not x_is_remark"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="project_task_view_tree_main_base_inherit">
+        <field name="name">project.task.view.list.inherit</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.project_task_view_tree_main_base"/>
+        <field name="mode">extension</field>
+        <field name="type">list</field>
+        <field name="priority">1600</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="x_reference" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='user_ids']" position="after">
+                <field name="x_partner_id" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="view_task_search_form_inherit">
+        <field name="name">project.task.view.search.inherit</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_search_form"/>
+        <field name="mode">extension</field>
+        <field name="type">search</field>
+        <field name="priority">1600</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="x_partner_id" string="Owner" filter_domain="[('name', 'ilike', self)]"/>
+            </xpath>
+            <xpath expr="//group/filter[@name='customer']" position="after">
+                <filter string="Owner" name="owner" context="{'group_by': 'x_partner_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="project_update_view_form_inherit">
+        <field name="name">project.update.view.form.inherit.construction_developer</field>
+        <field name="model">project.update</field>
+        <field name="inherit_id" ref="project.project_update_view_form"/>
+        <field name="mode">extension</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='description']" position="after">
+                <page name="remarks" string="Remarks" invisible="not x_remark_project_id">
+                    <field name="x_remark_ids" nolabel="1" context="{
+                        'default_project_id': x_remark_project_id,
+                        'default_x_update_id': id,
+                        'list_view_ref': 'construction_developer.view_x_remark_list_one2many',
+                    }"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="purchase_order_form_inherit">
+        <field name="name">purchase.order.view.form.inherit.construction_developer</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="mode">extension</field>
+        <field name="type">form</field>
+        <field name="priority">160</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='picking_type_id']" position="after">
+                    <field name="x_delivery_site_id" invisible="not x_show_delivery_site" domain="[('location_id', 'child_of', %(stock_location_worksites)d)]"/>
+                </xpath>
+                <xpath expr="//field[@name='product_id']" position="after">
+                    <field name="x_delivery_site_name"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="view_order_form_inherit">
+        <field name="name">sale.order.view.form.inherit.construction_developer</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="mode">extension</field>
+        <field name="type">form</field>
+        <field name="priority">1600</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form//header" position="inside">
+                <button string="Check Cost Changes"
+                        name="%(action_view_sale_order_line_bom_list)d"
+                        type="action"
+                        invisible="not x_any_sol_bom"
+                        />
+            </xpath>
+            <xpath expr="//button[@name='action_view_mrp_production']" position="attributes">
+                <attribute name="context">{'search_default_todo': True}</attribute>
+            </xpath>
+            <xpath expr="//form/sheet/div[@name='button_box']" position="inside">
+                <button
+                    name="%(action_ws_product_location_open)d"
+                    type="action"
+                    class="oe_stat_button"
+                    icon="deployed_code"
+                    context="{'location': x_ws_location_id}"
+                    invisible="not x_any_sol_bom or not x_ws_location_id">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Inventory</span>
+                    </div>
+                </button>
+                <button
+                    name="%(server_action_show_wbs)d"
+                    type="action"
+                    class="oe_stat_button"
+                    icon="clear_all"
+                    groups="project.group_project_user"
+                    invisible="not x_any_sol_bom or state not in ['sale', 'cancel']"
+                >
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">WBS</span>
+                    </div>
+                </button>
+                <button
+                    name="%(action_show_delivery_progress)d"
+                    type="action"
+                    class="oe_stat_button"
+                    icon="checklist"
+                    groups="project.group_project_user"
+                    invisible="not x_any_sol_bom or state not in ['sale', 'cancel']"
+                    context="{'so_id': id}"
+                >
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Progress</span>
+                    </div>
+                </button>
+            </xpath>
+            <xpath expr="//notebook//page[@name='order_lines']//list//field[@name='product_id']" position="before">
+                <field name="x_item_number" string="#" column_invisible="parent.state != 'sale'" optional="show"/>
+            </xpath>
+            <xpath expr="//notebook//page[@name='order_lines']//list//field[@name='product_template_id']" position="after">
+                <field name="x_bom_id"
+                       domain="[('product_tmpl_id', '=', product_template_id)]"
+                       optional="hide"
+                />
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list//field[@name='purchase_price']" position="attributes">
+                <attribute name="readonly">x_bom_id</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list//field[@name='margin_percent']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list//field[@name='route_ids']" position="after">
+                <button name="%(action_open_bom)d"
+                        type="action"
+                        class="btn btn-link"
+                        icon="wand_stars"
+                        width="1"
+                        invisible="not x_product_bom_template_id"
+                        string=" "
+                />
+            </xpath>
+            <xpath expr="//notebook//page[@name='order_lines']//list//field[@name='tax_ids']" position="attributes">
+                <attribute name="width">150px</attribute>
+            </xpath>
+            <xpath expr="//notebook//page[@name='order_lines']//list//field[@name='qty_delivered']" position="attributes">
+                <attribute name="decoration-warning">x_qty_delivered_state == 'warning'</attribute>
+                <attribute name="decoration-danger">x_qty_delivered_state == 'danger'</attribute>
+            </xpath>
+            <xpath expr="//notebook//page[@name='other_information']//field[@name='team_id']" position="after">
+                <field name="x_so_contract_type" readonly="state == 'sale'"/>
+            </xpath>
+            <xpath expr="//notebook//page[@name='order_lines']//list//field[@name='product_uom_qty']" position="after">
+                <field name="x_sol_contract_type" optional="show" readonly="parent.state == 'sale'" invisible="not product_id" column_invisible="parent.x_so_contract_type != 'per_line'" width="150px"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="view_move_tree_inherit">
+        <field name="inherit_id" ref="stock.view_move_tree"/>
+        <field name="model">stock.move</field>
+        <field name="name">stock.move.view.list.inherit.construction_developer</field>
+        <field name="type">list</field>
+        <field name="mode">extension</field>
+        <field name="priority">160</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//list" position="attributes">
+                    <attribute name="multi_edit">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='reference']" position="after">
+                    <field name="sale_line_id" optional="show"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="view_picking_type_form_inherit">
+        <field name="name">stock.picking.type.view.form.inherit.construction_developer</field>
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.view_picking_type_form"/>
+        <field name="mode">extension</field>
+        <field name="type">form</field>
+        <field name="priority">1600</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='move_type']" position="after">
+                <field name="x_select_dest_on_po" invisible="code != 'incoming'"/>
+                <field name="x_source_loc_from_so" invisible="code != 'outgoing'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="stock_location_route_form_view_inherit">
+        <field name="name">stock.route.view.form.inherit.construction_developer</field>
+        <field name="model">stock.route</field>
+        <field name="inherit_id" ref="stock.stock_location_route_form_view"/>
+        <field name="mode">extension</field>
+        <field name="type">form</field>
+        <field name="priority">1600</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sale_selectable']" position="after">
+                <field name="x_allow_sol_preselect"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

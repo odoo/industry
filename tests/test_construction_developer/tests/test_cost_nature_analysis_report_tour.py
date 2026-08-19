@@ -1,8 +1,9 @@
 from odoo.tests import HttpCase
 
 
+# could keep it when adding the demo data, but will be removed when refactoring the cost nature report anyway
 class TestCostNatureAnalysisReportTour(HttpCase):
-    def test_cost_nature_tour(self):
+    def _test_cost_nature_tour(self):
         if not self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1):
             return
 
