@@ -1,6 +1,6 @@
 {
     'name': 'Microbrewery',
-    'version': '2.6',
+    'version': '2.7',
     'category': 'Supply Chain',
     'depends': [
         'account',
@@ -67,7 +67,6 @@
         'demo/product_supplierinfo.xml',
         'demo/product_template.xml',
         'demo/stock_lot.xml',
-        'demo/stock_quant.xml',
         'demo/stock_warehouse.xml',
         'demo/stock_warehouse_orderpoint.xml',
         'demo/mrp_orderpoint_post.xml',

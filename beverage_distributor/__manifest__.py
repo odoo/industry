@@ -1,6 +1,6 @@
 {
     'name': 'Beverage Distributor',
-    'version': '2.4',
+    'version': '2.5',
     'category': 'Supply Chain',
     'depends': [
         'base_automation',
@@ -47,7 +47,6 @@
         'demo/crm_lead.xml',
         'demo/product_template.xml',
         'demo/product_supplierinfo.xml',
-        'demo/stock_quant.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
