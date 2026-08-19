@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Real Estate Agency - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code">
+website = env.ref('property_listing.website_industry')
+
+to_deactivate = [
+    # Presets
+    'website_sale.carousel_product_indicators_left',
+    'website_sale.cta_separator',
+    'website_sale.products_shop_title',
+    'website.header_text_element',
+    'website_sale.product_quantity',
+    'website_sale.product_terms_and_conditions',
+    'website.header_search_box',
+    # Default static pages
+    'website.homepage',
+    'website.contactus',
+]
+
+to_activate = [
+    # Presets
+    'website_sale.carousel_product_indicators_bottom',
+    'website_sale.filmstrip_categories_pills',
+    'website_sale.header_hide_empty_cart_link',
+    'website.footer_custom',
+    'website.header_call_to_action',
+    'website.template_header_default_align_right',
+    'website_sale.product_picture_magnify_click',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+
+# Default menu items to remove: website_appointment is auto-installed and adds
+# an Appointment menu to every new website.
+menus.search(base_domain + [('url', 'in', ['/appointment'])]).unlink()
+# Rename /shop menu to "Properties"
+menus.search(base_domain + [('url', '=', '/shop')], limit=1).write({'name': 'Properties'})
+# Add Matchmaking after Home (10) and Properties (/shop, 20).
+top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
+for name, url, sequence in [('Matchmaking', '/matchmaking', 30)]:
+    if not menus.search(base_domain + [('url', '=', url)]):
+        menus.create({
+            'name': name,
+            'url': url,
+            'sequence': sequence,
+            'website_id': website.id,
+            'parent_id': top_menu.id if top_menu else False,
+        })
+        </field>
+    </record>
+
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
