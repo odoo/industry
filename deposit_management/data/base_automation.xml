@@ -11,7 +11,7 @@
     </record>
     <record id="bom_automation" model="base.automation">
         <field name="name">Automated BoM</field>
-        <field name="action_server_ids" eval="[(6, 0, [ref('bom_server_action')])]"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('bom_server_action'), ref('action_update_product_template_route_ids')])]"/>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="trigger_field_ids" eval="[(6, 0, [ref('field_empty_deposit'), ref('field_quantity_by_deposit_product'), ref('field_unit_sale_product')])]"/>
         <field name="trigger">on_create_or_write</field>
@@ -46,5 +46,14 @@
         <field name="action_server_ids" eval="[(6, 0, [ref('resequence_the_order_of_taxes')])]"/>
         <field name="trigger">on_create_or_write</field>
         <field name="trigger_field_ids" eval="[(6, 0, [ref('account.field_account_tax__tax_group_id')])]"/>
+    </record>
+    <record id="automation_update_procurement_scheduler_nextcall" model="base.automation">
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_update_procurement_scheduler_nextcall')])]"/>
+        <field name="trigger">on_state_set</field>
+        <field name="trg_selection_field_id" ref="stock.selection__stock_move__state__done"/>
+        <field name="filter_domain" eval="[('state', '=', 'done'), ('location_dest_id', 'in', [ref('stock.stock_location_customers')]), ('product_id.bom_ids.x_auto_production', '=', True)]"/>
+        <field name="name">Update procurement scheduler nextcall</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('stock.field_stock_move__state')])]"/>
     </record>
 </odoo>
