@@ -1,6 +1,6 @@
 {
     'name': 'Deposit Management',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Supply Chain',
     'depends': [
         'base_automation',
@@ -19,6 +19,7 @@
         'data/product_category.xml',
         'data/account_tax.xml',
         'data/res_config_settings.xml',
+        'data/stock_route.xml',
     ],
     'cloc_exclude': [
         'data/qweb_view.xml',
