@@ -1,6 +1,6 @@
 {
     'name': 'Law Firm',
-    'version': '1.5',
+    'version': '1.6',
     'category': 'Services',
     'depends': [
         'ai_app',
@@ -50,13 +50,14 @@
         'demo/hr_job.xml',
         'demo/hr_employee.xml',
         'demo/sign_template.xml',
+        'demo/documents_document.xml',
+        'demo/project_project.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
         'demo/account_analytic_line.xml',
         'demo/knowledge_article.xml',
         'demo/knowledge_article_favorite.xml',
-        'demo/documents_document.xml',
         'demo/hr_expense.xml',
         'demo/ir_attachment_post.xml',
         'demo/website_view.xml',
