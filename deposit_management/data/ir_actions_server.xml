@@ -11,6 +11,7 @@ selected_company = record.company_id
 companies = selected_company or env['res.company'].search([])
 existing_bom = env['mrp.bom'].search([('x_parent_product', '=', record.id), ('product_tmpl_id', '=', record.x_unit_sale_product.id)], limit=1)
 bom_vals = {
+    'code': "Auto-BOM for %s" % record.name,
     'product_qty': quant,
     'uom_id': record.x_unit_sale_product.uom_id.id,
     'type': 'normal',
@@ -50,12 +51,22 @@ for wh in warehouses:
             'company_id': wh.company_id.id,
             'route_id': manufacture_route_id,
             'location_id': wh.lot_stock_id.id,
+            'trigger': 'auto',
         })
 env['stock.warehouse.orderpoint'].create(orderpoints_to_create)
 ]]></field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="state">code</field>
         <field name="name">Execute Code</field>
+    </record>
+    <record id="action_update_product_template_route_ids" model="ir.actions.server">
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="update_path">route_ids</field>
+        <field name="state">object_write</field>
+        <field name="resource_ref" ref="mrp.route_warehouse0_manufacture"/>
+        <field name="name">Update product template route</field>
+        <field name="update_field_id" ref="stock.field_product_template__route_ids"/>
+        <field name="usage">base_automation</field>
     </record>
     <record id="update_sales_taxes_server_action" model="ir.actions.server">
         <field name="code"><![CDATA[
@@ -109,5 +120,16 @@ for idx, tax in enumerate(all_taxes, start=1):
         <field name="model_id" ref="account.model_account_tax"/>
         <field name="state">code</field>
         <field name="name">Sequence the deposit taxes</field>
+    </record>
+    <record id="action_update_procurement_scheduler_nextcall" model="ir.actions.server">
+        <field name="code"><![CDATA[
+nextcall_datetime = datetime.datetime.today()+dateutil.relativedelta.relativedelta(minutes=15)
+if cron := records.env.ref('stock.ir_cron_scheduler_action', raise_if_not_found=False):
+    if cron.nextcall > nextcall_datetime:   cron['nextcall'] = nextcall_datetime
+        ]]></field>
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="state">code</field>
+        <field name="name">Update procurement scheduler nextcall</field>
+        <field name="usage">base_automation</field>
     </record>
 </odoo>
