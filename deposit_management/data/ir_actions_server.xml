@@ -9,7 +9,10 @@ if record.x_unit_sale_product:
     existing_bom = env['mrp.bom'].search([('product_tmpl_id', '=',record.x_unit_sale_product.id)], limit=1)
     reordering_rule = env['stock.warehouse.orderpoint'].search_count([('product_id', '=', record.x_unit_sale_product.product_variant_id.id)], limit=1)
     bom_vals = {
+        'code': "Auto-BOM for %s" % record.name,
         'product_qty': quant,
+        'enable_batch_size': True,
+        'batch_size': quant,
         'uom_id': record.x_unit_sale_product.uom_id.id,
         'type': 'normal',
         'x_parent_product': record.id,
@@ -48,6 +51,15 @@ else:
         <field name="model_id" ref="product.model_product_template"/>
         <field name="state">code</field>
         <field name="name">Execute Code</field>
+    </record>
+    <record id="action_update_product_template_route_ids" model="ir.actions.server">
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="update_path">route_ids</field>
+        <field name="state">object_write</field>
+        <field name="resource_ref" ref="mrp.route_warehouse0_manufacture"/>
+        <field name="name">Update product template route</field>
+        <field name="update_field_id" ref="stock.field_product_template__route_ids"/>
+        <field name="usage">base_automation</field>
     </record>
     <record id="update_sales_taxes_server_action" model="ir.actions.server">
         <field name="code"><![CDATA[
