@@ -1,6 +1,6 @@
 {
     'name': 'Student Organization',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -9,7 +9,7 @@
         'documents_sign',
         'hr_expense',
         'partnership',
-        'pos_stock',
+        'point_of_sale',
         'project_enterprise',
         'purchase',
         'social',
@@ -40,6 +40,7 @@
         'data/knowledge_article.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
+        'data/ir_ui_menu.xml',
     ],
     'demo': [
         'demo/res_company.xml',
