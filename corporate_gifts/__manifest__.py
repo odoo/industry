@@ -1,6 +1,6 @@
 {
     'name': 'Corporate Gifts',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Supply Chain',
     'depends': [
         'base_automation',
@@ -14,14 +14,13 @@
         'documents_spreadsheet',
         'project_enterprise',
         'purchase_product_matrix',
-        'purchase_stock',
         'sale_crm',
         'sale_planning',
         'sale_product_matrix',
         'sale_purchase',
         'web_studio',
         'website_crm',
-        'website_sale_stock',
+        'website_sale',
     ],
     'data': [
         'data/res_config_settings.xml',
@@ -50,6 +49,7 @@
         'data/crm_tag.xml',
         'data/website_view.xml',
         'data/website_menu.xml',
+        'data/ir_ui_menu.xml',
         'data/knowledge_tour.xml',
     ],
     'demo': [
