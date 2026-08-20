@@ -1,9 +1,36 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
     <template id="sale_order_portal_content_inherit" inherit_id="sale.sale_order_portal_content">
+        
+        <!-- logic variable at the top -->
+        <xpath expr="./*[1]" position="before">
+            <t t-set="order_lines_with_product" t-value="sale_order.order_line.filtered('product_id')"/>
+            <t t-set="effective_contract_type"
+            t-value="sale_order.x_so_contract_type if sale_order.x_so_contract_type in ('fixed_price', 'open_book') else
+            'fixed_price' if order_lines_with_product and all(ol.x_sol_contract_type == 'fixed_price' for ol in order_lines_with_product) else
+            'open_book' if order_lines_with_product and all(ol.x_sol_contract_type == 'open_book' for ol in order_lines_with_product) else False"/>
+        </xpath>
+
+        <!-- Customer info -->
+        <xpath expr="//section[@id='customer_info']" position="inside">
+            <t t-if="effective_contract_type">
+                <p class="mt-1"><strong>Contract Type</strong>
+                    <t t-out="dict(sale_order._fields['x_so_contract_type'].selection).get(effective_contract_type)"/>
+                </p>
+            </t>
+        </xpath>
+
+        <!-- headers -->
         <xpath expr="//th[@id='product_name_header']" position="before">
             <th class="text-start" id="product_x_item_number_header">#</th>
         </xpath>
+        <xpath expr="//th[@id='product_name_header']" position="after">
+            <t t-if="sale_order.x_so_contract_type == 'per_line' and not effective_contract_type">
+                <th class="text-start" id="contract_type">Type</th>
+            </t>
+        </xpath>
+
+        <!-- Item number columns (All rows) -->
         <xpath expr="//td[@name='td_section_line_no']" position="after">
             <td name="td_section_x_item_number" t-att-class="padding_class">
                 <span name="span_section_x_item_number" t-field="line.x_item_number"/>
@@ -24,25 +51,8 @@
                 <span name="span_product_x_item_number" t-field="line.x_item_number"/>
             </td>
         </xpath>
-        <xpath expr="./*[1]" position="before">
-            <t t-set="order_lines_with_product" t-value="sale_order.order_line.filtered('product_id')"/>
-            <t t-set="effective_contract_type"
-            t-value="sale_order.x_so_contract_type if sale_order.x_so_contract_type in ('fixed_price', 'open_book') else
-            'fixed_price' if order_lines_with_product and all(ol.x_sol_contract_type == 'fixed_price' for ol in order_lines_with_product) else
-            'open_book' if order_lines_with_product and all(ol.x_sol_contract_type == 'open_book' for ol in order_lines_with_product) else False"/>
-        </xpath>
-        <xpath expr="//div[@id='customer_info']" position="inside">
-            <t t-if="effective_contract_type">
-                <p class="mt-1"><strong>Contract Type</strong>
-                    <t t-out="dict(sale_order._fields['x_so_contract_type'].selection).get(effective_contract_type)"/>
-                </p>
-            </t>
-        </xpath>
-        <xpath expr="//th[@id='product_name_header']" position="after">
-            <t t-if="sale_order.x_so_contract_type == 'per_line' and not effective_contract_type">
-                <th class="text-start" id="contract_type">Type</th>
-            </t>
-        </xpath>
+
+        <!-- Contract Type columns (all rows to prevent missing column shifts) -->
         <xpath expr="//td[@name='td_product_name']" position="after">
             <t t-if="sale_order.x_so_contract_type == 'per_line' and not effective_contract_type">
                 <td name="td_contract_type" t-att-class="padding_class">
@@ -50,6 +60,24 @@
                 </td>
             </t>
         </xpath>
+        <!-- empty columns for sections notes and combos so that the end column price is well aligned -->
+        <xpath expr="//td[@name='td_section_name']" position="after">
+            <t t-if="sale_order.x_so_contract_type == 'per_line' and not effective_contract_type">
+                <td name="td_section_contract_type" t-att-class="padding_class"/>
+            </t>
+        </xpath>
+        <xpath expr="//td[@name='td_note_name']" position="after">
+            <t t-if="sale_order.x_so_contract_type == 'per_line' and not effective_contract_type">
+                <td name="td_note_contract_type" t-att-class="padding_class"/>
+            </t>
+        </xpath>
+        <xpath expr="//td[@name='td_combo_name']" position="after">
+            <t t-if="sale_order.x_so_contract_type == 'per_line' and not effective_contract_type">
+                <td name="td_combo_contract_type" t-att-class="padding_class"/>
+            </t>
+        </xpath>
+
+        <!-- bottom totals -->
         <xpath expr="//div[@name='total']" position="after">
             <t t-if="sale_order.x_so_contract_type == 'per_line' and not effective_contract_type">
                 <div id="contract_type_abbreviation" name="contract_type_abbreviation">
@@ -57,6 +85,16 @@
                     <t t-foreach="sale_order.order_line._fields['x_sol_contract_type'].selection" t-as="option">
                         <p class="mb-0"><strong><t t-out="''.join(word[0].upper() for word in option[0].split('_'))"/>: </strong><t t-out="option[1]"/></p>
                     </t>
+                </div>
+            </t>
+        </xpath>
+
+        <!-- Mobile: product Contract Type badge -->
+        <!-- no line number for mobile because it doesn't look good -->
+        <xpath expr="//div[@t-if='display_taxes and line.tax_ids']" position="inside">
+            <t t-if="sale_order.x_so_contract_type == 'per_line' and not effective_contract_type">
+                <div class="mt-1">
+                    <span class="badge text-bg-secondary" t-out="''.join([s[0].upper() for s in line.x_sol_contract_type.split('_')])"/>
                 </div>
             </t>
         </xpath>
