@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Website Industry - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code">
+website = env.ref('bike_shop.website_industry')
+
+to_deactivate = [
+    # Presets
+    'website_sale.products_attributes',
+    'website.header_text_element',
+    'website.template_footer_call_to_action',
+    # Default static pages
+    'website.homepage',
+    'website.contactus',
+]
+
+to_activate = [
+    # Presets
+    'website_sale.product_attribute_filters_form',
+    'website_sale.products_attributes_top',
+    'website.footer_custom',
+    'website.header_call_to_action',
+    'website.template_header_default_align_center',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
+
+# Default menu items to remove
+menus.search(base_domain + [('url', '=', '/')]).unlink()
+# Rename /shop menu to "Bikes" and point it to the "Bike" category
+menus.search(base_domain + [('url', '=', '/shop')], limit=1).write({
+    'name': 'Bikes',
+    'url': '/shop/category/%s' % env.ref('bike_shop.product_public_category_bike').id,
+    'sequence': 1,
+})
+
+# Add the "Services" menu item, holding the submenu created below
+services_menu = menus.search(base_domain + [('name', '=', 'Services')], limit=1)
+if not services_menu:
+    services_menu = menus.create({
+        'name': 'Services',
+        'url': '#',
+        'sequence': 3,
+        'website_id': website.id,
+        'parent_id': top_menu.id if top_menu else False,
+    })
+
+# Add the remaining top level menu items
+for name, url, sequence in [
+    ('Accessories', '/shop/category/%s' % env.ref('bike_shop.product_public_category_5').id, 1),
+    ('About', '/about', 4),
+    ('Contact', '/contactus', 5),
+]:
+    if not menus.search(base_domain + [('url', '=', url)]):
+        menus.create({
+            'name': name,
+            'url': url,
+            'sequence': sequence,
+            'website_id': website.id,
+            'parent_id': top_menu.id if top_menu else False,
+        })
+
+# Add the "Services" submenu items
+# Note: some of these urls (e.g. /appointment) already have a top-level menu
+# auto-created for this website by other modules (see website.menu.create()),
+# so we take over the existing record instead of skipping it.
+for name, url, sequence in [
+    ('Free Test Rides', '/appointment', 1),
+    ('Warranty &amp; Support', '/helpdesk/%s' % env.ref('bike_shop.helpdesk_team_1').id, 2),
+    ('Maintenance &amp; Repairs', '/maintenance-repairs', 10),
+]:
+    existing_menu = menus.search(base_domain + [('url', '=', url)], limit=1)
+    if existing_menu:
+        existing_menu.write({
+            'name': name,
+            'sequence': sequence,
+            'parent_id': services_menu.id,
+        })
+    else:
+        menus.create({
+            'name': name,
+            'url': url,
+            'sequence': sequence,
+            'website_id': website.id,
+            'parent_id': services_menu.id,
+        })
+        </field>
+    </record>
+
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
