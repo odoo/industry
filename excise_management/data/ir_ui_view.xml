@@ -49,17 +49,16 @@
             </xpath>
         </field>
     </record>
-    <record id="stock_move_view_search" model="ir.ui.view">
+    <record id="stock_line_view_search" model="ir.ui.view">
         <field name="name">stock.move.view.search.inherit.excise</field>
-        <field name="inherit_id" ref="stock.view_move_search"/>
-        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.stock_move_line_view_search"/>
+        <field name="model">stock.move.line</field>
         <field name="priority">99</field>
         <field name="type">search</field>
         <field name="mode">primary</field>
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='ready']" position="replace"/>
-            <xpath expr="//filter[@name='future']" position="replace"/>
+            <xpath expr="//filter[@name='todo']" position="replace"/>
             <xpath expr="//filter[@name='done']" position="replace"/>
         </field>
     </record>
@@ -90,21 +89,20 @@
             </xpath>
         </field>
     </record>
-    <record id="stock_move_view_list" model="ir.ui.view">
-        <field name="name">stock.move.view.list.excise</field>
-        <field name="model">stock.move</field>
+    <record id="stock_line_view_list" model="ir.ui.view">
+        <field name="name">stock.move.line.view.list.excise</field>
+        <field name="model">stock.move.line</field>
         <field name="priority">99</field>
         <field name="active" eval="True"/>
         <field name="type">list</field>
         <field name="arch" type="xml">
-            <list default_order="date, picking_id, sequence" string="Moves" create="0">
+            <list default_order="date, picking_id" string="Moves" create="0">
                 <field name="x_color" column_invisible="True"/>
-                <field name="date_deadline" optional="hide"/>
                 <field name="date" optional="show"/>
                 <field name="picking_id" optional="show" widget="many2one"/>
                 <field name="product_id" optional="show"/>
                 <field name="uom_id" optional="show" groups="uom.group_uom" widget="many2one_uom"/>
-                <field name="product_uom_qty" optional="show"/>
+                <field name="quantity" optional="show"/>
                 <field name="x_excise_category" optional="show"/>
                 <field name="x_excise_amount" optional="show" decoration-danger="x_color == 1" decoration-success="x_color == 2"/>
                 <field name="x_currency_id" column_invisible="True"/>
@@ -186,7 +184,7 @@
             </xpath>
             <xpath expr="//form//page[@name='note']" position="after">
                 <page string="Excises" name="excises">
-                    <field name="move_ids">
+                    <field name="move_line_ids">
                         <list create="0" edit="0" delete="0" editable="bottom">
                             <field name="x_currency_id" column_invisible="1"/>
                             <field name="x_excise_category"/>
@@ -207,8 +205,9 @@
         <field name="active" eval="True"/>
         <field name="type">list</field>
         <field name="arch" type="xml">
-            <list name="excise_report" edit="0" default_group_by="x_excise_license_id" default_order="x_from_date desc" expand="1">
+            <list name="excise_report" edit="0" default_order="x_from_date desc" expand="1">
                 <field name="x_name" />
+                <field name="x_excise_license_id"/>
                 <field name="x_from_date" optional="show" widget="daterange" options="{'end_date_field': 'x_to_date','numeric': true, 'always_range': true}"/>
                 <field name="x_external_id" />
                 <field name="activity_ids" optional="show" widget="list_activity"/>
@@ -227,7 +226,7 @@
                 </header>
                 <sheet>
                     <div name="button_box" class="oe_button_box">
-                        <button class="oe_stat_button" icon="fa-truck" type="action" name="%(action_excise_report_stock_moves)d" string="Moves" />
+                        <button class="oe_stat_button" icon="fa-truck" type="action" name="%(action_excise_report_stock_lines)d" string="Moves" />
                     </div>
                     <div class="oe_title">
                         <h1>
@@ -257,7 +256,7 @@
                                     <field name="x_excise_amount"/>
                                     <field name="x_excise_packaging_units" invisible="not x_excise_packaging_units" width="130px"/>
                                     <field name="x_excise_packaging_amount" invisible="not x_excise_packaging_amount" width="130px"/>
-                                    <button name="%(action_excise_report_line_stock_moves)d" type="action" string="Moves"/>
+                                    <button name="%(action_excise_report_line_stock_lines)d" type="action" string="Moves"/>
                                 </list>
                             </field>
                         </page>
@@ -278,6 +277,7 @@
                 <filter domain="[('activity_state', '=', 'planned')]" name="to_do_filter" string="To do"/>
                 <filter domain="[('x_state', '=', 'done')]" name="done_state_filter" string="Done"/>
                 <filter name="group_by_state" string="State" context="{'group_by': 'x_state'}"/>
+                <filter name="group_by_license" string="License" context="{'group_by' : 'x_excise_license_id'}"/>
             </search>
         </field>
     </record>
@@ -312,6 +312,19 @@
                 <field name="x_name"/>
                 <field name="x_warehouse_ids" widget="many2many_tags" domain="[('x_is_fiscal_deposit','=',True)]"/>
             </list>
+        </field>
+    </record>
+    <record id="stock_vpicktree_inherit" model="ir.ui.view">
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="mode">extension</field>
+        <field name="model">stock.picking</field>
+        <field name="name">stock.picking.list.inherit.excise_management</field>
+        <field name="active" eval="True"/>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="default_order">create_date, name</attribute>
+            </xpath>
         </field>
     </record>
 </odoo>

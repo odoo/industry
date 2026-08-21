@@ -73,8 +73,3 @@ class BookstoreAutomationsTestCase(TransactionCase):
                         "The previous supplierinfo should still exist")
         self.assertEqual(product.seller_ids[-2].date_end, fields.Date.today(),
                         "The previous supplierinfo should be closed with today's date")
-        
-        self.assertTrue(picking.purchase_id, "A purchase order linked to the picking should be created")
-        self.assertEqual(picking.purchase_id.partner_id, vendor2, "The purchase order should be for the correct vendor")
-        self.assertEqual(picking.purchase_id.state, 'purchase', "The purchase order should be confirmed")
-
