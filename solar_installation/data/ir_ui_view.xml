@@ -3,32 +3,130 @@
     <record id="helpdesk_ticket_form" model="ir.ui.view">
         <field name="name">helpdesk.ticket.form.customization</field>
         <field name="model">helpdesk.ticket</field>
-        <field name="active" eval="True"/>
-        <field name="inherit_id" ref="helpdesk_stock.helpdesk_ticket_view_form_inherit_helpdesk_stock"/>
+        <field name="active" eval="True" />
+        <field name="inherit_id"
+            ref="helpdesk_stock.helpdesk_ticket_view_form_inherit_helpdesk_stock" />
         <field name="priority">800</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
             <field name="tracking" position="after">
-                <field name="product_id" groups="stock.group_stock_user"/>
-                <field name="lot_id" groups="stock.group_stock_user"/>
-                <field name="x_warranty_end_date" groups="stock.group_stock_user"/>
+                <field name="product_id" groups="stock.group_stock_user" />
+                <field name="lot_id" groups="stock.group_stock_user" />
+                <field name="x_warranty_end_date" groups="stock.group_stock_user" />
             </field>
         </field>
     </record>
     <record id="stock_pr_lot_form" model="ir.ui.view">
         <field name="name">stock.production.lot.form.customization</field>
         <field name="model">stock.lot</field>
-        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="inherit_id" ref="stock.view_production_lot_form" />
         <field name="mode">extension</field>
-        <field name="active" eval="True"/>
+        <field name="active" eval="True" />
         <field name="priority">160</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
             <data>
                 <xpath expr="//field[@name='removal_date']" position="after">
-                    <field name="x_warranty_date"/>
+                    <field name="x_warranty_date" />
                 </xpath>
             </data>
+        </field>
+    </record>
+    <record id="planning_view_form_solar_installation" model="ir.ui.view">
+        <field name="name">planning.view.form.solar.installation</field>
+        <field name="model">planning.slot</field>
+        <field name="active" eval="True" />
+        <field name="inherit_id" ref="planning.planning_view_form" />
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='worksheet_template_id']" position="after">
+                <field name="x_studio_opportunity_name" />
+            </xpath>
+        </field>
+    </record>
+    <record id="sale_order_form_solar_installation" model="ir.ui.view">
+        <field name="name">sale.order.form.solar.installation</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="priority">160</field>
+        <field name="mode">extension</field>
+        <field name="type">form</field>
+        <field name="active" eval="True" />
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_cancel']" position="after">
+                <button name="%(solar_installation.action_sale_order_reset_non_service_lines)d"
+                    string="Set Quantity" type="action" class="btn-secondary"
+                    invisible="state not in ('draft', 'sent')" />
+            </xpath>
+            <xpath expr="//field[@name='order_line']//list/field[@name='product_template_id']"
+                position="before">
+                <field name="x_select" string="Select" />
+            </xpath>
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="readonly">state == 'cancel' or invoice_status == 'invoiced'</attribute>
+            </xpath>
+        </field>
+    </record>
+    <record id="x_crm_lead_check_log_view_list" model="ir.ui.view">
+        <field name="name">x_crm_lead_check_log.list</field>
+        <field name="model">x_crm_lead_check_log</field>
+        <field name="active" eval="True" />
+        <field name="arch" type="xml">
+            <list string="Check In/Out Logs Report" create="false" edit="false" delete="false" open_form_view="false">
+                <field name="x_date" string="Date" readonly="1" />
+                <field name="x_user_id" string="User" readonly="1" />
+                <field name="x_lead_id" string="Opp Name" readonly="1" />
+                <field name="x_stage_id" string="Opp Stage" readonly="1" />
+                <field name="x_check_in_time" string="Check In Time" readonly="1" />
+                <field name="x_check_in_location" string="Check In Location" widget="html" />
+                <field name="x_check_out_time" string="Check out Time" readonly="1" />
+                <field name="x_check_out_location" string="Check out Location" widget="html" />
+                <field name="x_duration" string="Duration" readonly="1" />
+            </list>
+        </field>
+    </record>
+
+    <record id="crm_lead_view_form_inherit_check_log" model="ir.ui.view">
+        <field name="name">crm.lead.view.form.inherit.check.log</field>
+        <field name="model">crm.lead</field>
+        <field name="active" eval="True" />
+        <field name="inherit_id" ref="crm.crm_lead_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Check In / Out Logs" invisible="not x_crm_checkout_logs">
+                    <field name="x_crm_checkout_logs" invisible="1" />
+                    <field name="x_check_log_ids" readonly="1">
+                        <list create="false" edit="false" delete="false" open_form_view="false">
+                            <field name="x_date" string="Date" readonly="1" />
+                            <field name="x_user_id" string="User" readonly="1" />
+                            <field name="x_lead_id" column_invisible="1" />
+                            <field name="x_stage_id" string="Opp Stage" readonly="1" />
+                            <field name="x_check_in_time" string="Check In Time" readonly="1" />
+                            <field name="x_check_in_location" string="Check In Location"
+                                widget="html" />
+                            <field name="x_check_out_time" string="Check out Time" readonly="1" />
+                            <field name="x_check_out_location" string="Check out Location"
+                                widget="html" />
+                            <field name="x_duration" string="Duration" readonly="1" />
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_config_settings_view_form_inherit_checkout_logs" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.checkout.logs</field>
+        <field name="model">res.config.settings</field>
+        <field name="active" eval="True" />
+        <field name="inherit_id" ref="crm.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='crm_lead']" position="after">
+                <setting id="crm_checkout_logs_setting" title="Check In/Out Logs"
+                    help="Enable Check In/Out Logs in CRM Opportunity">
+                    <field name="x_crm_checkout_logs" />
+                </setting>
+            </xpath>
         </field>
     </record>
 </odoo>
