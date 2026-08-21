@@ -616,10 +616,11 @@ for record in self:
         <field name="model_id" ref="resource.model_resource_resource" />
         <field name="store">False</field>
         <field name="compute"><![CDATA[
+for record in self:
+  record['x_time_allocated_today'] = 0
 today = datetime.datetime.today()
 resource_slots = self.env['planning.slot']._read_group([('resource_ids', 'in', self.ids), ('resource_ids.x_category', '=', 'house_keeping'), ('end_datetime', '>=', today)], ['resource_ids'], ['id:recordset'])
-for slots, resource in resource_slots:
-  resource['x_time_allocated_today'] = 0
+for resource, slots in resource_slots:
   for slot in slots:
     if slot.start_datetime.date() <= today.date():
       resource['x_time_allocated_today'] += max((min(slot.end_datetime, today.replace(hour=23, minute=59, second=59)) - max(today, slot.start_datetime)).total_seconds(), 0)
