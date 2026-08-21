@@ -1,6 +1,12 @@
 {
     'name': 'Construction Builder',
+<<<<<<< fe293abdb0991b941e6d108d9afdfad7f5813014
     'version': '1.7',
+||||||| 48bf24c13af0008058a0f40fae24eb528080a43c
+    'version': '1.8',
+=======
+    'version': '1.9',
+>>>>>>> 6f2967522475ebc16254d671999c37abf5938cfc
     'category': 'Construction',
     'depends': [
         'base_industry_data',
