@@ -1,5 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo noupdate="1">
+  <!-- The company default pricelist is a backend one (no website, not selectable), so no pricelist
+       is available on the website: `request.pricelist` would stay empty, the recurring rules of the
+       memberships would never be found and Flex/Resident would not be addable to the cart.
+       Making it selectable turns it into the generic website pricelist. -->
+  <function model="product.pricelist" name="write">
+    <value model="product.pricelist" eval="obj().search([('website_id', '=', False), ('selectable', '=', False)]).ids"/>
+    <value eval="{'selectable': True}"/>
+  </function>
   <record id="product_pricelist_2" model="product.pricelist">
     <field name="name">Members</field>
   </record>
