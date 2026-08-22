@@ -47,19 +47,32 @@
         'data/mail_message.xml',
         'data/crm_tag.xml',
         'data/website_view.xml',
-        'data/website_page.xml',
-        'data/website_menu.xml',
-        'data/website_theme_apply.xml',
         'data/uninstall_hook.xml',
         'data/website.xml',
     ],
     'demo': [
+        # The website record comes first: it is repointed onto the
+        # `website.default_website` xmlid, which later files reference.
+        'demo/website/website.xml',
+        'demo/website/views/website_templates.xml',
+        'demo/website/views/website_sale_templates.xml',
+        # Before any page: deactivates the generic website.homepage /
+        # website.contactus views by copy-on-write.
+        'demo/website/server_actions.xml',
+        'demo/website/assets.xml',
+        'demo/website/images.xml',
+        'demo/website/pages/contactus.xml',
+        'demo/website/pages/match.xml',
         'demo/res_company.xml',
         'demo/product_attribute_value.xml',
         'demo/res_partner.xml',
         'demo/hr_department.xml',
         'demo/hr_employee.xml',
         'demo/product_template.xml',
+        # After product_template.xml: the page's own <function> substitutes the raw
+        # /shop/<slug>-<id> links the export snapshotted, so the property templates
+        # it points at have to exist already.
+        'demo/website/pages/home.xml',
         'demo/product_document.xml',
         'demo/product_image.xml',
         'demo/product_template_attribute_line.xml',
@@ -75,16 +88,17 @@
         'demo/project_task.xml',
         'demo/sale_commission_plan_user.xml',
         'demo/ir_attachment_post.xml',
-        'demo/website_view.xml',
-        'demo/website_page.xml',
-        'demo/website_theme_apply.xml',
-        'demo/website.xml',
     ],
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "data/uninstall_hook.xml",
         "data/website_view.xml",
-        "demo/website_view.xml",
+        "demo/website/pages/home.xml",
+        "demo/website/pages/contactus.xml",
+        "demo/website/pages/match.xml",
+        "demo/website/views/website_templates.xml",
+        "demo/website/views/website_sale_templates.xml",
+        "static/src/scss/primary_variables.scss",
     ],
     'application': True,
     'images': ['images/main.png'],
