@@ -42,18 +42,6 @@ for so in self: so['x_any_sol_bom'] = any(line.x_bom_id for line in so.order_lin
     </record>
 
 
-    <record model="ir.actions.server" id="action_apply_bom_cost_to_sol">
-        <field name="name">Construction Developer: Apply BOM Cost</field>
-        <field name="model_id" ref="sale.model_sale_order_line"/>
-        <field name="state">code</field>
-        <field name="code">
-for sol in records:
-    if sol.x_bom_id: sol.write({'purchase_price': sol.x_bom_id.x_bom_cost})
-action = {'type': 'ir.actions.client', 'tag': 'soft_reload'}
-</field>
-    </record>
-
-
 
     <record model="ir.ui.view" id="view_sale_order_line_bom_list">
         <field name="name">sale.order.line.view.list.construction_developer</field>
@@ -64,7 +52,7 @@ action = {'type': 'ir.actions.client', 'tag': 'soft_reload'}
         <field name="arch" type="xml">
             <list create="0" delete="0" editable="bottom">
                 <header>
-                    <button name="%(action_apply_bom_cost_to_sol)d" 
+                    <button name="%(action_update_sol_cost_price_margin_on_x_bom_id_write)d" 
                             type="action" 
                             string="Apply to Selected" 
                             class="btn-primary"/>
@@ -80,7 +68,7 @@ action = {'type': 'ir.actions.client', 'tag': 'soft_reload'}
                 <field name="x_bom_cost" readonly="1"/>
 
                 <!-- have to add the group because purchase_price requires it -->
-                <button name="%(action_apply_bom_cost_to_sol)d"
+                <button name="%(action_update_sol_cost_price_margin_on_x_bom_id_write)d"
                         type="action"
                         icon="west"
                         title="Apply BOM Cost"
@@ -119,8 +107,9 @@ action = {'type': 'ir.actions.client', 'tag': 'soft_reload'}
         <field name="state">code</field>
         <field name="code">
 for sol in record.order_line: sol['x_different_bom_cost'] = float_compare(sol.x_bom_id.x_bom_cost, sol.purchase_price, precision_digits=2) if sol.x_bom_id else False
+
 action = env.ref('construction_developer.window_action_view_sale_order_line_bom_list').read()[0]
-action['res_ids'] = record.order_line
+action['domain'] = [('x_bom_id', '!=', False), ('id', 'in', record.order_line.ids)]
 </field>
     </record>
 
@@ -129,7 +118,8 @@ action['res_ids'] = record.order_line
         <field name="res_model">sale.order.line</field>
         <field name="view_id" ref="view_sale_order_line_bom_list"/>
         <field name="search_view_id" ref="view_sale_order_line_bom_search"/>
-        <field name="domain">[('x_bom_id', '!=', False)]</field>
+        <!-- the server action overwrites the domain -->
+        <field name="domain">[]</field>
         <field name="context">{'search_default_to_update': True}</field>
         <field name="view_mode">list</field>
         <field name="target">new</field>
