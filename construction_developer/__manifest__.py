@@ -1,6 +1,6 @@
 {
     'name': 'Construction Developer',
-    'version': '2.0',
+    'version': '2.1',
     'category': 'Construction',
     'depends': [
         'base_industry_data',
@@ -40,6 +40,7 @@
         'features/product/cost_nature.xml',
         'data/product_category.xml',
 
+        'features/spreadsheet_dashboard/progress_approver.xml',
         'features/spreadsheet_dashboard/reports.xml',
 
         'data/views_standard.xml',
