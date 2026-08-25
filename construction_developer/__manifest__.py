@@ -17,6 +17,7 @@
 
         'features/remarks/project_project.xml',
         'features/remarks/project_task.xml',
+        'features/remarks/menus_and_task_override.xml',
         'data/project_tags.xml',
 
         'features/sale/sol_numbering.xml',
