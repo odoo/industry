@@ -1,7 +1,6 @@
 import { registry } from '@web/core/registry';
 
 registry.category("web_tour.tours").add("Condominium_Acquisition", {
-    url: "/odoo",
     steps: () => [
     {
         trigger: ".o_app[data-menu-xmlid='sale\\.sale_menu_root']",
