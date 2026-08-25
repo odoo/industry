@@ -1,16 +1,13 @@
+<<<<<<< HEAD
+||||||| MERGE BASE
+=======
 /** @odoo-module **/
 
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
 
-registry.category("web_tour.tours").add("billboard_rental_knowledge_tour", {
-<<<<<<< 134aa9d5f4bd42e166983ed85585fa9085b8fc57
-||||||| fd6aee8b29a784c76ef1aedb3a19cf87d9c1af70
-    url: "/odoo",
+registry.category("web_tour.tours").add("clothing_boutique_knowledge_tour", {
     
-=======
-    
->>>>>>> 7da5a32870b611ac0bdd3dbf751a7d6466ea92c0
     steps: () => [
         {
             trigger: '.o_app[data-menu-xmlid="knowledge.knowledge_menu_root"]',
@@ -19,3 +16,5 @@ registry.category("web_tour.tours").add("billboard_rental_knowledge_tour", {
         },
     ],
 });
+
+>>>>>>> FORWARD PORTED
