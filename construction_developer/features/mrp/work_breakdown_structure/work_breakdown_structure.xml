@@ -10,7 +10,8 @@
         <field name="state">code</field>
         <field name="code">
 action = env.ref('construction_developer.action_show_wbs').read()[0]
-action.update({'domain': [('location_src_id', '=', record.partner_shipping_id.x_ws_location_id.id), ('sale_line_id.order_id', '=', record.id)]})
+rec = env['sale.order'].browse(so_ids) if (so_ids := env.context.get('project_so_ids', False)) else record
+action.update({'domain': [('location_src_id', '=', rec.partner_shipping_id.x_ws_location_id.id), ('sale_line_id.order_id', '=', rec.id)]})
 </field>
     </record>
 
