@@ -1,5 +1,6 @@
 {
     'name': 'Property Listing',
+    'version': '1.1',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
@@ -13,6 +14,7 @@
         'data/ir_ui_view.xml',
         'data/crm_team.xml',
         'data/product_public_category.xml',
+        'data/ir_default.xml',
         'data/website_view.xml',
         'data/website_page.xml',
         'data/website_theme_apply.xml',
