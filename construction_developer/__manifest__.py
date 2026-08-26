@@ -32,6 +32,7 @@
         'features/stock/so_worksite_loc/bridge_so_bom_cost_updates.xml',
         'features/stock/so_stock.xml',
         'features/purchase/po_confirm_link_picking.xml',
+        'features/project/so_o2m.xml',
         'features/mrp/delivery_progress.xml',
         'features/sale/contract_type.xml',
         'features/mrp/work_breakdown_structure/override_deadline_with_custom_field.xml',
