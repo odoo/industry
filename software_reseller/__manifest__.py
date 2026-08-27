@@ -1,6 +1,6 @@
 {
     'name': 'Software Reseller',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Services',
     'depends': [
         'base_industry_data',
@@ -9,7 +9,7 @@
         'sale_planning',
         'sale_purchase',
         'sale_subscription',
-        'sale_timesheet',
+        'sale_timesheet_enterprise',
         'web_studio',
     ],
     'data': [
