@@ -27,8 +27,9 @@ for partner in records:
             if quantity == 0: continue
             line.write({'quantity': quantity, 'sequence': (sequence := sequence + 1)})
             used_invoice_lines |= set([display_line, line])
-        so['x_last_invoice'] = next_date
-    invoice['invoice_line_ids'] = [Command.unlink(line.id) for line in invoice.invoice_line_ids if line not in used_invoice_lines]
+    invoice.write({'x_provisional_date': next_date, 'x_is_rrb_invoice': True,
+        'invoice_line_ids': [Command.unlink(line.id) for line in invoice.invoice_line_ids if line not in used_invoice_lines]
+    })
     if len(invoice.invoice_line_ids) == 0: invoice.unlink()
     else: invoices.append(invoice.id)
 if len(invoices) > 0:
@@ -44,5 +45,15 @@ else: action = {
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="state">code</field>
         <field name="name">Consolidated Down Payment</field>
+    </record>
+
+    <record id="action_write_rrb_invoice_date_on_confirm" model="ir.actions.server">
+        <field name="name">Recurring Rental Billing: Write Invoice Billing Date on Confirm</field>
+        <field name="model_id" ref="sale.model_account_move"/>
+        <field name="state">code</field>
+        <field name="code">
+for record in records:
+    env['sale.order'].search([('invoice_ids', 'in', record.id)]).write({'x_last_invoice': record.x_provisional_date})
+</field>
     </record>
 </odoo>
