@@ -13,6 +13,7 @@
         'data/ir_model_fields.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_actions_server.xml',
+        'data/base_automation.xml',
         'data/ir_ui_view.xml',
         'data/sale_order_template.xml',
         'data/product_category.xml',
