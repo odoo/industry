@@ -162,6 +162,19 @@
         </xpath>
     </field>
   </record>
+  <record id="crm_lead_form_inherit" model="ir.ui.view">
+    <field name="name">crm.lead.form.inherit</field>
+    <field name="inherit_id" ref="crm_lead_form_customization_view"/>
+    <field name="mode">primary</field>
+    <field name="active" eval="True"/>
+    <field name="model">crm.lead</field>
+    <field name="priority">160</field>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='x_interested_in_id']" position="attributes">
+          <attribute name="required">True</attribute>
+        </xpath>
+    </field>
+  </record>
   <record id="account_move_form_customizations" model="ir.ui.view">
     <field name="name">account.move.form customization</field>
     <field name="inherit_id" ref="account.view_move_form"/>
@@ -399,6 +412,43 @@
           <attribute name="widget">many2one</attribute>
         </xpath>
     </field>
+  </record>
+  <record id="crm_lead_quick_create_inherit" model="ir.ui.view">
+    <field name="name">crm_lead_quick_create.inherit</field>
+    <field name="inherit_id" ref="crm.quick_create_opportunity_form"/>
+    <field name="mode">primary</field>
+    <field name="active" eval="True"/>
+    <field name="model">crm.lead</field>
+    <field name="priority">320</field>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='phone']/.." position="after">
+          <div class="d-flex align-items-center" colspan="2">
+            <i class="fa fa-home fa-lg" title="Interested in"/>
+            <field name="x_interested_in_id" nolabel="1" placeholder="Interested in" required="True" display="full"/>
+          </div>
+        </xpath>
+    </field>
+  </record>
+  <record id="crm_lead_kanban_lead_inherit" model="ir.ui.view">
+    <field name="name">crm.lead.kanban.lead.inherit</field>
+    <field name="inherit_id" ref="crm_lead_kanban_lead_customization_view"/>
+    <field name="mode">primary</field>
+    <field name="active" eval="True"/>
+    <field name="model">crm.lead</field>
+    <field name="priority">320</field>
+    <field name="type">kanban</field>
+    <field name="arch" type="xml">
+        <xpath expr="//kanban" position="attributes">
+          <attribute name="quick_create_view">real_estate.crm_lead_quick_create_inherit</attribute>
+        </xpath>
+    </field>
+  </record>
+  <record id="opportunities_act_window" model="ir.actions.act_window">
+    <field name="view_ids" eval="[
+      (5, 0, 0),
+      (0, 0, {'view_mode': 'kanban', 'view_id': ref('crm_lead_kanban_lead_inherit')}),
+      (0, 0, {'view_mode': 'form', 'view_id': ref('crm_lead_form_inherit')}),
+    ]"/>
   </record>
   <record id="product_template_product_kanban_customization_view" model="ir.ui.view">
     <field name="name">Product.template.product.kanban customization</field>

@@ -1,6 +1,6 @@
 {
     'name': 'Real Estate Agency',
-    'version': '2.1',
+    'version': '2.2',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
