@@ -1,6 +1,6 @@
 {
     'name': 'Microbrewery',
-    'version': '2.7',
+    'version': '2.8',
     'category': 'Supply Chain',
     'depends': [
         'account',
@@ -44,6 +44,7 @@
         'data/mrp_bom.xml',
         'data/mrp_bom_line.xml',
         'data/product_template_post.xml',
+        'data/resource_calendar.xml',
         'data/mrp_workcenter.xml',
         'data/mrp_routing_workcenter.xml',
         'data/sale_order_template.xml',
@@ -70,7 +71,6 @@
         'demo/stock_warehouse.xml',
         'demo/stock_warehouse_orderpoint.xml',
         'demo/mrp_orderpoint_post.xml',
-        'demo/mrp_production.xml',
         'demo/purchase_order.xml',
         'demo/purchase_order_line.xml',
         'demo/purchase_order_post.xml',
@@ -78,7 +78,6 @@
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
         'demo/stock_picking.xml',
-        'demo/quality_point.xml',
         'demo/website_attachment.xml',
         'demo/website_view.xml',
         'demo/website_page.xml',
