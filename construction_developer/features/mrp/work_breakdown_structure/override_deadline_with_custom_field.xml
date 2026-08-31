@@ -16,10 +16,16 @@
         <field name="name">Construction Developer: Start MOs</field>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-for record in records: 
+for record in records:
     record.action_start()
-    record['x_date_planned_end'] = (parent := record.production_group_id.production_ids[record.backorder_sequence - 2]).x_date_planned_end
-    parent['x_date_planned_end'] = datetime.datetime.now()
+    parent = record.production_group_id.production_ids[record.backorder_sequence - 2]
+    now = datetime.datetime.now()
+    # The backorder picks up the remaining qty at the moment the original (incomplete) MO is completed, so
+    # it starts now() (already set by action_start()). Keep the original planned end if it's
+    # still ahead of now (e.g. 5-15 completed on the 10th -> backorder is 10-15)
+    # only fall back to a fresh now()+1d window when the MO was overdue (original end already in the past)
+    record['x_date_planned_end'] = parent.x_date_planned_end if parent.x_date_planned_end > now else now + datetime.timedelta(days=1)
+    parent['x_date_planned_end'] = now
 ]]></field>
     </record>
 

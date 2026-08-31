@@ -157,9 +157,15 @@ for mrp in records:
         <field name="name">Construction Developer: Force Component Recalculation</field>
         <field name="model_id" ref="mrp.model_mrp_production"/>
         <field name="state">code</field>
-        <field name="code"><![CDATA[
-for mo in records: mo._change_producing()
-]]></field>
+        <field name="code">
+for mo in records:
+    # _change_producing() may push the state back to 'progress' (e.g. it was just
+    # recomputed to 'to_close'), and that bare state write resets date_start to now().
+    # Restore it so producing an MO doesn't move its planned WBS schedule.
+    date_start = mo.date_start
+    mo._change_producing()
+    if mo.date_start != date_start: mo['date_start'] = date_start
+</field>
     </record>
 
     <record model="base.automation" id="automation_force_recalculation_on_write">
