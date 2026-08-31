@@ -18,6 +18,7 @@
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/product_public_category.xml',
+        'data/website.xml',
         'data/product_ribbon.xml',
         'data/product_template.xml',
         'data/product_attribute.xml',
