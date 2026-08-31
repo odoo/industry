@@ -1,6 +1,6 @@
 {
     'name': 'Candy Shop',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Retail',
     'author': 'Odoo S.A.',
     'depends': [

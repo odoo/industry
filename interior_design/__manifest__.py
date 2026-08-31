@@ -1,5 +1,6 @@
 {
     'name': 'Interior Design',
+    'version': '1.1',
     'category': 'Construction',
     'author': 'Odoo S.A.',
     'depends': [
