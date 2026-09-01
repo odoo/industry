@@ -9,8 +9,8 @@
     ],
     'data': [
         'data/ir_model.xml',
-        'data/ir_access.xml',
         'data/ir_model_fields.xml',
+        'data/ir_access.xml',
         'data/ir_model_2.xml',
         'data/ir_default.xml',
         'data/ir_actions_server.xml',

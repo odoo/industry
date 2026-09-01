@@ -79,6 +79,17 @@
     <field name="active" eval="True"/>
     <field name="type">form</field>
   </record>
+  <record id="default_property_list_view" model="ir.ui.view">
+    <field name="model">x_property</field>
+    <field name="type">list</field>
+    <field name="mode">primary</field>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+      <list editable="bottom">
+        <field name="x_name"/>
+      </list>
+    </field>
+  </record>
   <record id="default_list_view_building" model="ir.ui.view">
     <field name="model">x_buildings</field>
     <field name="type">list</field>
@@ -292,5 +303,138 @@
         </button>
       </xpath>
     </field>
+  </record>
+  <record id="account_move_form_view_inherit_property" model="ir.ui.view">
+    <field name="name">account.move.form.inherit.property</field>
+    <field name="model">account.move</field>
+    <field name="inherit_id" ref="account.view_move_form"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="priority">160</field>
+    <field name="type">form</field>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='invoice_line_ids']//field[@name='product_id']" position="after">
+        <field name="x_property_id" optional="hide"/>
+      </xpath>
+      <xpath expr="//form/sheet/notebook" position="inside">
+        <page string="Distribution" name="distribution_page">
+          <group name="distribution_group">
+            <group name="distribution_group_left" string="Distribution">
+              <field name="x_distribution_key"
+                     options="{'no_create': true}"
+              />
+              <field name="x_period_start"
+                     required="x_distribution_key or x_based_on == 'Meter Readings'"
+                     help="Used to distribute costs by meter; closest meter reading date used"
+              />
+              <field name="x_period_end"
+                     help="Used to distribute costs by meter; closest meter reading date used"
+              />
+            </group>
+          </group>
+        </page>
+      </xpath>
+      <xpath expr="//form/header" position="inside">
+        <button string="Distribute Costs"
+                name="%(property_assets_distribution.ir_actions_server_distribute_costs)d"
+                invisible="not x_distribution_key"
+                type="action"
+        />
+      </xpath>
+    </field>
+  </record>
+  <record id="view_account_invoice_filter_inherit" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <data>
+        <xpath expr="//filter[@name='salesperson']" position="after">
+          <filter name="distribution_key_group_by" string="Distribution Key" context="{'group_by': 'x_distribution_key'}"/>
+        </xpath>
+        <xpath expr="//filter[@name='myinvoices']" position="after">
+          <filter domain="[('x_distribution_key', '=', False)]" name="undistributed" help="Without distribution"/>
+          <separator/>
+        </xpath>
+      </data>
+    </field>
+    <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+    <field name="mode">extension</field>
+    <field name="model">account.move</field>
+    <field name="active" eval="True"/>
+    <field name="priority">160</field>
+    <field name="type">search</field>
+  </record>
+  <record id="account_analytic_account_search_view_standard" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <xpath expr="//filter[@name='inactive']" position="before">
+        <filter string="Tenants" name="tenants" domain="[('x_type', '=', 'tenant')]"/>
+      </xpath>
+      <xpath expr="//filter[@name='associatedpartner']" position="after">
+        <filter string="Property" name="property" context="{'group_by': 'x_property'}"/>
+        <filter string="Type" name="type" context="{'group_by': 'x_type'}"/>
+      </xpath>
+    </field>
+    <field name="inherit_id" ref="analytic.view_account_analytic_account_search"/>
+    <field name="mode">extension</field>
+    <field name="active" eval="True"/>
+    <field name="model">account.analytic.account</field>
+    <field name="type">search</field>
+  </record>
+  <record id="x_distribution_key_form_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <form>
+        <sheet string="Distribution Key">
+          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
+          <field name="x_active" invisible="1"/>
+          <field name="x_company_id" invisible="1"/>
+          <div class="oe_title">
+            <h1>
+              <field name="x_name" required="1" placeholder="Name..."/>
+            </h1>
+          </div>
+          <group name="x_distribution_key_group">
+            <group name="x_distribution_key_group_left">
+              <field name="x_based_on" required="True"/>
+              <field name="x_meter" options="{'create_name_field': 'x_name'}" invisible="x_based_on != 'Meter Readings'" force_save="0" required="x_based_on == 'Meter Readings'"/>
+            </group>
+            <field name="x_ratio_ids" invisible="x_based_on != 'Shares'">
+              <list editable="bottom">
+                <field name="x_sequence" widget="handle"/>
+                <field name="x_property_ratios" optional="show" domain="[('x_company_id', '=', parent.x_company_id)]"/>
+                <field name="x_ratio" sum="Sum of Ratio" optional="show" options="{'digits':[6,2]}"/>
+              </list>
+            </field>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+    <field name="model">x_distribution_key</field>
+    <field name="active" eval="True"/>
+    <field name="type">form</field>
+  </record>
+  <record id="x_distribution_key_search_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <search>
+        <field name="x_name"/>
+        <separator/>
+        <filter string="Archived" name="archived_x_distribution_key" domain="[['x_active', '=', False]]"/>
+        <separator/>
+      </search>
+    </field>
+    <field name="model">x_distribution_key</field>
+    <field name="active" eval="True"/>
+    <field name="type">search</field>
+  </record>
+  <record id="x_distribution_key_list_view" model="ir.ui.view">
+    <field name="arch" type="xml">
+      <list>
+        <field name="x_sequence" widget="handle"/>
+        <field name="x_name"/>
+        <field name="x_based_on" optional="show"/>
+        <field name="x_meter" optional="show" invisible="x_based_on != 'Meter Readings'"/>
+      </list>
+    </field>
+    <field name="model">x_distribution_key</field>
+    <field name="active" eval="True"/>
+    <field name="type">list</field>
   </record>
 </odoo>

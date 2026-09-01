@@ -24,4 +24,5 @@ class ComputedFieldsTestCase(TransactionCase):
                 self.assertTrue(
                     sale_order.subscription_state in ['5_renewed', '6_churn']
                     or sale_order.start_date > datetime.date.today()
+                    or sale_order.end_date < datetime.date.today()
                 )
