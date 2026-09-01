@@ -1,6 +1,6 @@
 {
     'name': 'Clothing Stores',
-    'version': '1.3',
+    'version': '1.4',
     'category': 'Retail',
     'author': 'Odoo S.A.',
     'depends': [
@@ -18,7 +18,6 @@
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/product_public_category.xml',
-        'data/website.xml',
         'data/product_ribbon.xml',
         'data/product_template.xml',
         'data/product_attribute.xml',
@@ -30,6 +29,7 @@
         'data/product_image.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
+        'data/website.xml',
     ],
     'demo': [
         'demo/mailing_mailing.xml',
