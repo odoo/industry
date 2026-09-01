@@ -157,19 +157,18 @@ if template and template.send_mail(res_id=record.id):
         <field name="usage">base_automation</field>
         <field name="code"><![CDATA[plans = env['sale.commission.plan'].search([('state', '=', 'approved')])
 for record in records:
-    if not record.x_seller or record.x_seller == record.invoice_user_id:
-        continue
+    if not record.x_seller or record.x_seller == record.invoice_user_id: continue
     for plan in plans:
-        plan_user_id_finder = plan.user_ids.filtered(lambda u, iu=record.invoice_user_id: u.user_id.id == iu.id)
-        plan_user_id_seller = plan.user_ids.filtered(lambda u, s=record.x_seller: u.user_id.id == s.id)
-        seller_achievements = plan.achievement_ids.filtered(lambda a: a.x_receiver == 'Seller' and a.rate)
-        if plan_user_id_finder and plan_user_id_seller:
-            for achievement in seller_achievements:
+        plan_users = plan.user_ids.user_id
+        if record.x_seller in plan_users and record.invoice_user_id in plan_users:
+            for achievement in plan.achievement_ids.filtered(lambda a: a.x_receiver == 'Seller' and a.rate):
                 env['sale.commission.achievement'].create({
                     'achieved': record.amount_untaxed * achievement.rate,
                     'currency_id': record.currency_id.id,
-                    'add_user_id': plan_user_id_seller.id,
-                    'reduce_user_id': plan_user_id_finder.id,
+                    'add_user_id': record.x_seller.id,
+                    'add_plan_id': plan.id,
+                    'reduce_user_id': record.invoice_user_id.id,
+                    'reduce_plan_id': plan.id,
                     'company_id': record.company_id.id,
                 })
         ]]></field>

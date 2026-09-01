@@ -100,15 +100,16 @@ class RealEstateAutomationsTestCase(TransactionCase):
                            "The last notification update should be updated when the price changes")
 
     def test_commission_plan(self):
+        plan = self.env.ref('real_estate.sale_commission_plan_7')
         seller = self.env['res.users'].create({'name': 'Seller', 'login': 'seller@example.com'})
-        commission_plan_seller = self.env['sale.commission.plan.user'].create({
+        self.env['sale.commission.plan.user'].create({
             'user_id': seller.id,
-            'plan_id': self.env['sale.commission.plan'].search([('state', '=', 'approved')], limit=1).id
+            'plan_id': plan.id,
         })
         finder = self.env['res.users'].create({'name': 'Finder', 'login': 'finder@example.com'})
         self.env['sale.commission.plan.user'].create({
             'user_id': finder.id,
-            'plan_id': self.env['sale.commission.plan'].search([('state', '=', 'approved')], limit=1).id
+            'plan_id': plan.id,
         })
         product = self.env['product.product'].create({
             'name': 'Test Property',
@@ -136,7 +137,7 @@ class RealEstateAutomationsTestCase(TransactionCase):
 
         # Check that a commission achievement was created
         achievement = self.env['sale.commission.achievement'].search([
-            ('add_user_id', '=', commission_plan_seller.id),
+            ('add_user_id', '=', seller.id),
         ])
         self.assertTrue(achievement, "A commission achievement should be created for the seller")
 
