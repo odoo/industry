@@ -14,6 +14,7 @@
         'data/stock_location.xml',
 
         'features/product/automate_cost_update.xml',
+        'features/product/pricelist_margin.xml',
 
         'features/remarks/project_project.xml',
         'features/remarks/project_task.xml',
@@ -55,10 +56,12 @@
         'data/sale_order_template_line.xml',
     ],
     'demo': [
+        'demo/product_pricelist.xml',
         'demo/stock_location.xml',
         'demo/res_company.xml',
         'demo/sale_order_post.xml',
         'demo/project_project.xml',
+        'demo/carport_showcase.xml',
         'demo/remarks.xml',
         'demo/ir_attachment.xml',
     ],
