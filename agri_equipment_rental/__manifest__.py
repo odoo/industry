@@ -1,6 +1,6 @@
 {
     'name': 'Agri-Equipment Rental',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
