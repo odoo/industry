@@ -585,6 +585,15 @@ class TestEnv(IndustryCase):
                     record.get('id'),
                     file_name,
                 )
+        if file_name == 'knowledge_article.xml':
+            return
+        for template in root.xpath("//template"):
+            if template.get('active') != "True":
+                _logger.warning(
+                    "You forgot to enforce active=True on template (id=%s in data/%s).",
+                    template.get('id'),
+                    file_name,
+                )
 
     def _check_res_config_setting(self, root):
         if root.xpath("//record[@model='res.config.settings']/field[@name='account_price_include']"):
