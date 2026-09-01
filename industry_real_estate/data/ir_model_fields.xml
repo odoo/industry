@@ -27,13 +27,6 @@
         <field name="relation">account.move</field>
         <field name="ttype">many2one</field>
     </record>
-    <record id="field_move_line_property_id" model="ir.model.fields">
-        <field name="name">x_property_id</field>
-        <field name="ttype">many2one</field>
-        <field name="model_id" ref="account.model_account_move_line"/>
-        <field name="relation">x_property</field>
-        <field name="field_description">Property</field>
-    </record>
     <record id="field_property_image" model="ir.model.fields">
         <field name="name">x_property_image</field>
         <field name="field_description">Property Image</field>
@@ -52,14 +45,6 @@
         <field name="field_description">Currency</field>
         <field name="model_id" ref="property_assets_distribution.model_x_property"/>
         <field name="relation">res.currency</field>
-    </record>
-    <record id="field_sale_order_property_id" model="ir.model.fields">
-        <field name="name">x_property_id</field>
-        <field name="field_description">Property</field>
-        <field name="model_id" ref="sale.model_sale_order"/>
-        <field name="ttype">many2one</field>
-        <field name="relation">x_property</field>
-        <field name="group_expand" eval="True"/>
     </record>
     <record id="field_property_subscription_count" model="ir.model.fields">
         <field name="name">x_subscription_count</field>
@@ -114,7 +99,7 @@ for record in self:
     <!-- After field_rental_start_date because field_property_rental_contract_id needs it-->
     <record id="field_property_rental_contract_id" model="ir.model.fields">
         <field name="name">x_rental_contract_id</field>
-        <field name="field_description">Rental Contract</field>
+        <field name="field_description">Current Rental Contract</field>
         <field name="model_id" ref="property_assets_distribution.model_x_property"/>
         <field name="relation">sale.order</field>
         <field name="ttype">many2one</field>
@@ -122,7 +107,16 @@ for record in self:
         <field name="store" eval="False"/>
         <field name="compute">
 <![CDATA[
-sale_orders = self.env['sale.order']._read_group([('x_property_id', 'in', self.ids), ('state', '=', 'sale'), ('start_date', '<=', datetime.date.today()), ('subscription_state', 'not in', ['5_renewed', '6_churn'])], groupby=['x_property_id','id'], order='start_date:max')
+sale_orders = self.env['sale.order']._read_group(
+    domain=[('x_property_id', 'in', self.ids), ('state', '=', 'sale'),
+            ('subscription_state', 'not in', ['5_renewed', '6_churn']),
+            ('start_date', '<=', datetime.date.today()),
+            '|', ('end_date', '=', False),
+                 ('end_date', '>=', datetime.date.today()),
+    ],
+    groupby=['x_property_id', 'id'],
+    order='start_date:max',
+)
 mapped_data = {x_property_id.id: so for x_property_id, so in sale_orders}
 for record in self:
     record['x_rental_contract_id'] = mapped_data.get(record.id, False)

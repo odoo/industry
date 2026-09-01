@@ -49,6 +49,8 @@
         'demo/sale_order_confirm.xml',
         'demo/account_move.xml',
         'demo/account_move_line.xml',
+        'demo/x_meter_reading.xml',
+        'demo/x_distribution_key.xml',
         'demo/website_attachment.xml',
         'demo/website_view.xml',
         'demo/website_page.xml',

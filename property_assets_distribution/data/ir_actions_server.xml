@@ -44,4 +44,51 @@ for line in records:
         }).id
         </field>
     </record>
+    <record id="ir_actions_server_distribute_costs" model="ir.actions.server">
+        <field name="name">Distribute Costs</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+def findClosestMeterReading(meter_readings, date):
+    # return the closest meter reading to the given date.
+    # if no date is given, assume it is infinitely large to find the latest reading.
+    date = date or datetime.date.max
+    closest_mr, cur_diff = False, float('inf')
+    for mr in meter_readings:
+        diff = abs((date - mr.x_date).days)
+        if diff< cur_diff: closest_mr, cur_diff = mr, diff
+    return closest_mr
+
+for record in (records or []):
+    analytic_distribution = {}
+    if (dist_key := record.x_distribution_key):
+        period_start, period_end = record.x_period_start, record.x_period_end or datetime.date.today()
+        # Share distribution
+        if dist_key.x_based_on == "Shares" and period_start:
+            for ratio in dist_key.x_ratio_ids:
+                if not ratio.x_ratio: continue
+                for account in ratio.x_property_ratios.x_account_ids:
+                    acc_start, acc_end = account.x_start_date, account.x_end_date
+                    if acc_start <= period_end and (not acc_end or period_start <= acc_end):
+                        overlap_start, overlap_end = max(acc_start, period_start), min(acc_end or period_end, period_end)
+                        analytic_distribution[account.id] = analytic_distribution.get(account.id, 0) + ((overlap_end - overlap_start).days + 1) * ratio.x_ratio
+        # Meter distribution
+        elif dist_key.x_based_on == "Meter Readings" and period_start:
+            for property in record.invoice_line_ids.x_property_id or env['x_property'].search([('x_company_id', '=', dist_key.x_company_id.id)]):
+                readings = property.x_meter_reading_ids.filtered(lambda mr: mr.x_meter_id.id == dist_key.x_meter.id)
+                if len(readings) < 2: continue
+                for account in property.x_account_ids:
+                    acc_start, acc_end = account.x_start_date, account.x_end_date
+                    if not acc_start or acc_start > period_end or (acc_end and acc_end <= period_start): continue
+                    mrostart = findClosestMeterReading(readings, acc_start)
+                    mroend = findClosestMeterReading(readings, acc_end)
+                    if mrostart.x_date < mroend.x_date:
+                        analytic_distribution[account.id] = abs(mroend.x_quantity - mrostart.x_quantity)
+        # Outcome
+        if (total_ratio := sum(analytic_distribution.values())):
+            for key in analytic_distribution: analytic_distribution[key] *= 100 / total_ratio
+        record.invoice_line_ids.write({'analytic_distribution': analytic_distribution})
+]]></field>
+    </record>
 </odoo>

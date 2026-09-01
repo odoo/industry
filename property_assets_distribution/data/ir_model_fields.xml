@@ -25,6 +25,15 @@
         <field name="field_description">Sequence</field>
         <field name="model_id" ref="model_buildings"/>
     </record>
+    <record id="company_buildings" model="ir.model.fields">
+        <field name="name">x_company_id</field>
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Company</field>
+        <field name="model_id" ref="model_buildings"/>
+        <field name="relation">res.company</field>
+        <field name="tracking">1</field>
+    </record>
     <record id="street" model="ir.model.fields">
         <field name="name">x_street</field>
         <field name="ttype">char</field>
@@ -182,6 +191,21 @@ for record in self: record['x_x_current_owner_x_property_count'] = owner_propert
         <field name="name">x_account_ids</field>
         <field name="relation">account.analytic.account</field>
         <field name="relation_field">x_property</field>
+    </record>
+    <record id="field_sale_order_property_id" model="ir.model.fields">
+        <field name="name">x_property_id</field>
+        <field name="field_description">Property</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">x_property</field>
+        <field name="group_expand" eval="True"/>
+    </record>
+    <record id="field_move_line_property_id" model="ir.model.fields">
+        <field name="name">x_property_id</field>
+        <field name="ttype">many2one</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="relation">x_property</field>
+        <field name="field_description">Property</field>
     </record>
     <record id="field_property_invoice_count" model="ir.model.fields">
         <field name="name">x_account_ids_count</field>
@@ -422,5 +446,149 @@ for record in self: record['x_account_ids_count'] = len(record.x_account_ids)
         <field name="ttype">boolean</field>
         <field name="field_description">Property plan</field>
         <field name="model_id" ref="analytic.model_account_analytic_plan"/>
+    </record>
+
+    <!-- ratio fields -->
+    <record id="sequence_field" model="ir.model.fields">
+        <field name="name">x_sequence</field>
+        <field name="ttype">integer</field>
+        <field name="copied" eval="True" />
+        <field name="field_description">Sequence</field>
+        <field name="model_id" ref="ratios_model" />
+    </record>
+    <record id="company_ratios_field" model="ir.model.fields">
+        <field name="name">x_company_id</field>
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Company</field>
+        <field name="model_id" ref="ratios_model"/>
+        <field name="relation">res.company</field>
+    </record>
+    <record id="x_ratio_field" model="ir.model.fields">
+        <field name="ttype">float</field>
+        <field name="copied" eval="True" />
+        <field name="field_description">Ratio</field>
+        <field name="model_id" ref="ratios_model" />
+        <field name="name">x_ratio</field>
+    </record>
+    <record id="field_ratios_property" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Property</field>
+        <field name="model_id" ref="ratios_model"/>
+        <field name="name">x_property_ratios</field>
+        <field name="relation">x_property</field>
+    </record>
+    <record id="field_x_distribution_key_on_x_ratios" model="ir.model.fields">
+        <field name="name">x_distribution_key</field>
+        <field name="ttype">many2one</field>
+        <field name="model_id" ref="ratios_model"/>
+        <field name="field_description">Distribution Key</field>
+        <field name="relation">x_distribution_key</field>
+    </record>
+
+    <!-- distribution fields -->
+    <record id="name_distribution_key" model="ir.model.fields">
+        <field name="name">x_name</field>
+        <field name="ttype">char</field>
+        <field name="field_description">Name</field>
+        <field name="model_id" ref="model_x_distribution_key"/>
+        <field name="required" eval="True"/>
+    </record>
+    <record id="active_distribution_field" model="ir.model.fields">
+        <field name="ttype">boolean</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Active</field>
+        <field name="model_id" ref="model_x_distribution_key"/>
+        <field name="name">x_active</field>
+        <field name="tracking">1</field>
+    </record>
+    <record id="company_distribution_field" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Company</field>
+        <field name="model_id" ref="model_x_distribution_key"/>
+        <field name="name">x_company_id</field>
+        <field name="relation">res.company</field>
+        <field name="tracking">1</field>
+    </record>
+    <record id="distribution_key_account_move_field" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Distribution Key</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="name">x_distribution_key</field>
+        <field name="relation">x_distribution_key</field>
+    </record>
+    <record id="distribution_key_sale_order_field" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Distribution Key</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="name">x_distribution_key</field>
+        <field name="relation">x_distribution_key</field>
+    </record>
+    <record id="sequence_distributio_field" model="ir.model.fields">
+        <field name="ttype">integer</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Sequence</field>
+        <field name="model_id" ref="model_x_distribution_key"/>
+        <field name="name">x_sequence</field>
+    </record>
+    <record id="field_distribution_key_base_meter" model="ir.model.fields">
+        <field name="ttype">many2one</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Meter</field>
+        <field name="model_id" ref="model_x_distribution_key"/>
+        <field name="name">x_meter</field>
+        <field name="relation">x_meters</field>
+    </record>
+    <record id="field_distribution_key_base_on" model="ir.model.fields">
+        <field name="ttype">selection</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Based on</field>
+        <field name="model_id" ref="model_x_distribution_key"/>
+        <field name="name">x_based_on</field>
+    </record>
+    <record id="x_based_on_shares" model="ir.model.fields.selection">
+        <field name="field_id" ref="field_distribution_key_base_on"/>
+        <field name="value">Shares</field>
+        <field name="name">Shares</field>
+    </record>
+    <record id="x_based_on_meter_readings" model="ir.model.fields.selection">
+        <field name="field_id" ref="field_distribution_key_base_on"/>
+        <field name="value">Meter Readings</field>
+        <field name="name">Meter Readings</field>
+    </record>
+    <record id="base_on_account_move_field" model="ir.model.fields">
+        <field name="ttype">selection</field>
+        <field name="related">x_distribution_key.x_based_on</field>
+        <field name="field_description">Based on</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="name">x_based_on</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="field_distribution_key_ratio_ids" model="ir.model.fields">
+        <field name="ttype">one2many</field>
+        <field name="field_description">Ratios</field>
+        <field name="model_id" ref="model_x_distribution_key"/>
+        <field name="name">x_ratio_ids</field>
+        <field name="relation">x_ratios</field>
+        <field name="relation_field">x_distribution_key</field>
+    </record>
+    <record id="field_account_move_period_start" model="ir.model.fields">
+        <field name="ttype">date</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Period Start</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="name">x_period_start</field>
+    </record>
+    <record id="field_account_move_period_end" model="ir.model.fields">
+        <field name="ttype">date</field>
+        <field name="copied" eval="True"/>
+        <field name="field_description">Period End</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="name">x_period_end</field>
     </record>
 </odoo>

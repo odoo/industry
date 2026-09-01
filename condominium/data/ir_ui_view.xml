@@ -203,18 +203,6 @@
     <field name="priority">400</field>
     <field name="type">list</field>
   </record>
-  <record id="account_analytic_account_search_view_standard" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <xpath expr="//filter[@name='associatedpartner']" position="after">
-        <filter string="Property" name="property" domain="[]" context="{'group_by': 'x_property'}"/>
-      </xpath>
-    </field>
-    <field name="inherit_id" ref="analytic.view_account_analytic_account_search"/>
-    <field name="mode">extension</field>
-    <field name="active" eval="True"/>
-    <field name="model">account.analytic.account</field>
-    <field name="type">search</field>
-  </record>
   <record id="account_analytic_account_search_view_condominium" model="ir.ui.view">
     <field name="arch" type="xml">
       <xpath expr="//filter[@name='inactive']" position="after">
@@ -467,112 +455,31 @@
     <field name="priority">99</field>
     <field name="type">list</field>
   </record>
-  <record id="view_account_invoice_filter_inherit" model="ir.ui.view">
+  <record id="x_distribution_key_form_view_inherit" model="ir.ui.view">
     <field name="arch" type="xml">
-      <data>
-        <xpath expr="//filter[@name='salesperson']" position="after">
-          <filter name="distribution_key_group_by" string="Distribution Key" context="{'group_by': 'x_distribution_key'}"/>
-        </xpath>
-        <xpath expr="//filter[@name='myinvoices']" position="after">
-          <filter domain="[('x_distribution_key', '=', False)]" name="undistributed" help="Without distribution"/>
-          <separator/>
-        </xpath>
-      </data>
-    </field>
-    <field name="inherit_id" ref="account.view_account_invoice_filter"/>
-    <field name="mode">extension</field>
-    <field name="model">account.move</field>
-    <field name="active" eval="True"/>
-    <field name="priority">160</field>
-    <field name="type">search</field>
-  </record>
-  <record id="x_distribution_key_form_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <form>
+      <xpath expr="//sheet" position="before">
         <header>
           <button string="Populate" name="%(action_populate_distribution_key)d" type="action" class="btn-primary" invisible="x_based_on != 'Shares'"/>
           <button string="Compute Ratios" name="%(action_compute_distribution_key_ratios)d" type="action" invisible="x_based_on != 'Shares'"/>
         </header>
-        <sheet string="Distribution Key">
-          <widget name="web_ribbon" text="Archived" bg_color="text-bg-danger" invisible="x_active"/>
-          <field name="x_active" invisible="1"/>
-          <div class="oe_title">
-            <h1>
-              <field name="x_name" required="1" placeholder="Name..."/>
-            </h1>
-          </div>
-          <group name="x_distribution_key_group">
-            <group name="x_distribution_key_group_left">
-              <field name="x_based_on" required="True"/>
-              <field name="x_meter" options="{'create_name_field': 'x_name'}" invisible="x_based_on != 'Meter Readings'" force_save="0" required="x_based_on == 'Meter Readings'"/>
-            </group>
-            <group name="x_distribution_key_group_right">
-              <field name="x_company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
-            </group>
-            <field name="x_ratio_ids" invisible="x_based_on != 'Shares'">
-              <list editable="bottom">
-                <field name="x_sequence" widget="handle"/>
-                <field name="x_property_ratios" optional="show" domain="[('x_company_id', '=', parent.x_company_id)]"/>
-                <field name="x_owner" strinng="Current Owner" optional="show"/>
-                <field name="x_building" optional="show"/>
-                <field name="x_type" optional="show"/>
-                <field name="x_floor" optional="show"/>
-                <field name="x_area" sum="Sum of Area" optional="show"/>
-                <field name="x_ratio" sum="Sum of Ratio" optional="show" options="{'digits':[6,2]}"/>
-              </list>
-            </field>
-          </group>
-        </sheet>
-        <chatter/>
-      </form>
+      </xpath>
+      <xpath expr="//field[@name='x_ratio']" position="before">
+        <field name="x_owner" strinng="Current Owner" optional="show"/>
+        <field name="x_building" optional="show"/>
+        <field name="x_type" optional="show"/>
+        <field name="x_floor" optional="show"/>
+        <field name="x_area" sum="Sum of Area" optional="show"/>
+      </xpath>
+      <xpath expr="//group[@name='x_distribution_key_group_left']" position="after">
+        <group name="x_distribution_key_group_right">
+          <field name="x_company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+        </group>
+      </xpath>
     </field>
-    <field name="model">x_distribution_key</field>
-    <field name="active" eval="True"/>
-    <field name="type">form</field>
-  </record>
-  <record id="x_distribution_key_search_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <search>
-        <field name="x_name"/>
-        <separator/>
-        <filter string="Archived" name="archived_x_distribution_key" domain="[['x_active', '=', False]]"/>
-        <separator/>
-      </search>
-    </field>
-    <field name="model">x_distribution_key</field>
-    <field name="active" eval="True"/>
-    <field name="type">search</field>
-  </record>
-  <record id="account_move_custom_form_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <data>
-        <xpath expr="//form/sheet/notebook" position="inside">
-          <page string="Distribution" name="distribution_page">
-            <group name="distribution_group">
-              <group name="distribution_group_left" string="Distribution">
-                <field name="x_distribution_key" options="{'create_name_field': 'x_name', 'no_create': true}"/>
-                <field name="x_period_start" help="Used to distribute costs by meter; closest meter reading date used"/>
-                <field name="x_period_end" help="Used to distribute costs by meter; closest meter reading date used"/>
-              </group>
-            </group>
-          </page>
-        </xpath>
-        <xpath expr="//form/header" position="inside">
-          <button string="Distribute Costs" name="%(ir_actions_server_distribute_costs)d" type="action"/>
-        </xpath>
-        <xpath expr="//field[@name='x_period_start']" position="attributes">
-          <attribute name="required">x_based_on == "Meter Readings"</attribute>
-        </xpath>
-        <xpath expr="//field[@name='x_period_end']" position="attributes">
-          <attribute name="required">x_based_on == "Meter Readings"</attribute>
-        </xpath>
-      </data>
-    </field>
-    <field name="inherit_id" ref="account.view_move_form" />
+    <field name="inherit_id" ref="property_assets_distribution.x_distribution_key_form_view"/>
     <field name="mode">extension</field>
+    <field name="model">x_distribution_key</field>
     <field name="active" eval="True"/>
-    <field name="model">account.move</field>
-    <field name="priority">16000</field>
     <field name="type">form</field>
   </record>
   <record id="analytic_account_wizard_form" model="ir.ui.view">
@@ -615,23 +522,10 @@
     ]"/>
   </record>
   <record id="distribution_action_window" model="ir.actions.act_window">
-    <field name="search_view_id" ref="view_account_invoice_filter_inherit"/>
+    <field name="search_view_id" ref="property_assets_distribution.view_account_invoice_filter_inherit"/>
     <field name="view_ids" eval="[
         (5, 0, 0),
         (0, 0, {'view_mode': 'list', 'view_id': ref('view_invoice_tree_inherit')}),
     ]"/>
-  </record>
-  <record id="x_distribution_key_list_view" model="ir.ui.view">
-    <field name="arch" type="xml">
-      <list>
-        <field name="x_sequence" widget="handle"/>
-        <field name="x_name"/>
-        <field name="x_based_on" optional="show"/>
-        <field name="x_meter" optional="show" invisible="x_based_on != 'Meter Readings'"/>
-      </list>
-    </field>
-    <field name="model">x_distribution_key</field>
-    <field name="active" eval="True"/>
-    <field name="type">list</field>
   </record>
 </odoo>
