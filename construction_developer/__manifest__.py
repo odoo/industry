@@ -1,6 +1,6 @@
 {
     'name': 'Construction Developer',
-    'version': '2.1',
+    'version': '2.2',
     'category': 'Construction',
     'depends': [
         'base_industry_data',
@@ -35,6 +35,7 @@
         'features/project/so_o2m.xml',
         'features/mrp/delivery_progress.xml',
         'features/sale/contract_type.xml',
+        'features/sale/discount_split_on_lines.xml',
         'features/mrp/work_breakdown_structure/override_deadline_with_custom_field.xml',
         'features/mrp/work_breakdown_structure/work_breakdown_structure.xml',
 
