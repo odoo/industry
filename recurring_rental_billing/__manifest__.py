@@ -1,5 +1,6 @@
 {
     'name': 'Recurring Rental Billing',
+    'version': '1.1',
     'category': 'Construction',
     'author': 'Odoo S.A.',
     'depends': [
@@ -15,7 +16,6 @@
         'data/ir_ui_view.xml',
         'data/sale_order_template.xml',
         'data/product_category.xml',
-        'data/res_config_settings.xml',
     ],
     'license': 'OEEL-1',
     'images': ['images/main.png'],
