@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!--
+        This feature adds a "Split on Lines" button on the SO discount wizard, only visible for the
+        "Fixed Amount" option, that converts the fixed discount amount into a percentage of the 
+        order's current total, and applies that percentage as a discount on every order line, 
+        scaling them all proportionally.
+
+        It also adds a "Total Discount Applied" field on the sale order totals, summing up the
+        discounts of the order lines to trace back a split done through the button.
+    -->
+    <record model="ir.model.fields" id="field_sale_order_x_total_discount_amount">
+        <field name="name">x_total_discount_amount</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="field_description">Total Line Discount Applied</field>
+        <field name="ttype">monetary</field>
+        <field name="currency_field">currency_id</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+        <field name="depends">order_line,order_line.display_type,order_line.discount,order_line.price_unit,order_line.product_uom_qty</field>
+        <field name="compute"><![CDATA[
+for order in self:
+    lines = order.order_line.filtered(lambda l: not l.display_type)
+    order['x_total_discount_amount'] = sum(l.price_unit * l.product_uom_qty - l.price_subtotal for l in lines if l.discount)
+]]></field>
+    </record>
+
+
+
+    <record model="ir.actions.server" id="action_split_discount_on_lines">
+        <field name="name">Split Fixed Discount On Lines</field>
+        <field name="model_id" ref="sale.model_sale_order_discount"/>
+        <field name="state">code</field>
+        <field name="code">
+for wizard in records:
+    order_lines = wizard.sale_order_id.order_line.filtered(lambda l: not l.display_type and l.price_unit * l.product_uom_qty)
+    if not order_lines or not (total_amount := sum(order_lines.mapped('price_subtotal'))):
+        continue
+    for line in order_lines:
+        line['discount'] = 100 * (wizard.discount_amount / total_amount)
+action = {'type': 'ir.actions.act_window_close'} # short-circuit the modal to not apply the discount normally
+</field>
+    </record>
+</odoo>

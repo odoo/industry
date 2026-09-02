@@ -466,6 +466,31 @@
             <xpath expr="//notebook//page[@name='order_lines']//list//field[@name='product_uom_qty']" position="after">
                 <field name="x_sol_contract_type" optional="show" readonly="parent.state == 'sale'" invisible="not product_id or x_so_contract_type != 'per_line'" width="150px"/>
             </xpath>
+            <xpath expr="//field[@name='extra_total_fields']" position="before">
+                <div class="d-flex justify-content-end gap-3" invisible="not x_total_discount_amount">
+                    <label for="x_total_discount_amount"/>
+                    <field name="x_total_discount_amount" class="w-auto"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="sale_order_line_wizard_form_inherit">
+        <field name="name">sale.order.discount.view.form.inherit.construction_developer</field>
+        <field name="model">sale.order.discount</field>
+        <field name="inherit_id" ref="sale.sale_order_line_wizard_form"/>
+        <field name="mode">extension</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//footer/button[@name='action_apply_discount']" position="after">
+                <button type="action"
+                        name="%(construction_developer.action_split_discount_on_lines)d"
+                        string="Split on Lines"
+                        class="btn btn-primary"
+                        invisible="discount_type != 'amount'"/>
+            </xpath>
         </field>
     </record>
 
