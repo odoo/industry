@@ -1,7 +1,8 @@
 {
     'name': 'Custom Website Art Book',
     'description': 'A professional Odoo theme for libraries',
-    'version': '19.0.1.0.0',
+    #'version': '19.0.1.0.0',
+    'version': 'saas~19.4.1.0.0',
     'author': 'Odoo',
     'license': 'LGPL-3',
     'depends': [
