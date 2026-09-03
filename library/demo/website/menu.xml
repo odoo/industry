@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data noupdate="1">
+    <!-- Website menus - parent_id via search on root (url=#) -->
+    <!-- Custom menu: Books (mega menu) -->
+    <record id="menu_books" model="website.menu">
+      <field name="name">Books</field>
+      <field name="url">#</field>
+      <field name="parent_id" model="website.menu" search="[('url', '=', '#'), ('website_id', '=', ref('library.website_industry'))]"/>
+      <field name="website_id" ref="website_industry"/>
+      <field name="sequence" eval="1"/>
+      <field name="is_visible" eval="True"/>
+      <field name="is_mega_menu" eval="1"/>
+      <field name="mega_menu_content"><![CDATA[
+        <section class="s_mega_menu_multi_menus py-4 o_colored_level o_cc o_cc1" data-oe-version="2.0">
+            <div class="container">
+                <div class="row">
+
+                        <div class="col-12 py-2 text-center o_colored_level col-lg-3">
+                            <nav class="nav flex-column"><a href="/shop/category/__EXPORT_FILTER_XMLID__library.product_public_category_6__EXPORT_FILTER_XMLID__" class="nav-link" data-name="Menu Item" style="text-align: start;">Art</a>
+                                    <a href="/shop/category/__EXPORT_FILTER_XMLID__library.product_public_category_7__EXPORT_FILTER_XMLID__" class="nav-link" data-name="Menu Item" style="text-align: start;">Film</a>
+                                    <a href="/shop/category/__EXPORT_FILTER_XMLID__library.product_public_category_8__EXPORT_FILTER_XMLID__" class="nav-link" data-name="Menu Item" style="text-align: start;">Graphic Design</a>
+                            </nav>
+                        </div><div class="col-12 py-2 text-center col-lg-3 o_colored_level">
+                            <nav class="nav flex-column"><a href="/shop/category/__EXPORT_FILTER_XMLID__library.product_public_category_14__EXPORT_FILTER_XMLID__" class="nav-link" data-name="Menu Item" style="text-align: start;">Comics</a>
+                                    <a href="/shop/category/__EXPORT_FILTER_XMLID__library.product_public_category_15__EXPORT_FILTER_XMLID__" class="nav-link" data-name="Menu Item" style="text-align: start;">Fashion</a>
+                                    <a href="/shop/category/__EXPORT_FILTER_XMLID__library.product_public_category_11__EXPORT_FILTER_XMLID__" class="nav-link" data-name="Menu Item" style="text-align: start;">Music</a>
+                            </nav>
+                        </div><div class="col-12 py-2 text-center col-lg-3 o_colored_level">
+                            <nav class="nav flex-column"><a href="/shop/category/__EXPORT_FILTER_XMLID__library.product_public_category_12__EXPORT_FILTER_XMLID__" class="nav-link" data-name="Menu Item" style="text-align: start;">Beautiful Books</a>
+                                    <a href="/shop/category/__EXPORT_FILTER_XMLID__library.product_public_category_13__EXPORT_FILTER_XMLID__" class="nav-link" data-name="Menu Item" style="text-align: start;">Classics</a>
+                                    <a href="/shop" class="nav-link" data-name="Menu Item" style="text-align: start;">All Books</a>
+                            </nav>
+                        </div>
+
+
+                </div>
+            </div>
+        </section>
+      ]]></field>
+    </record>
+    <!-- Custom menu: About Us -->
+    <record id="menu_about_us" model="website.menu">
+      <field name="name">About Us</field>
+      <field name="url">/about-us</field>
+      <field name="parent_id" model="website.menu" search="[('url', '=', '#'), ('website_id', '=', ref('library.website_industry'))]"/>
+      <field name="website_id" ref="website_industry"/>
+      <field name="sequence" eval="55"/>
+      <field name="is_visible" eval="True"/>
+    </record>
+    <!-- Custom menu: Contact Us -->
+    <record id="menu_contactus" model="website.menu">
+      <field name="name">Contact Us</field>
+      <field name="url">/contactus</field>
+      <field name="parent_id" model="website.menu" search="[('url', '=', '#'), ('website_id', '=', ref('library.website_industry'))]"/>
+      <field name="website_id" ref="website_industry"/>
+      <field name="sequence" eval="60"/>
+      <field name="is_visible" eval="True"/>
+    </record>
+    <!-- Default menu (rename/reorder): Home -->
+    <function name="write" model="website.menu">
+      <value model="website.menu" search="[('url', '=', '/'), ('website_id', '=', ref('library.website_industry'))]"/>
+      <value eval="{'name': 'Home', 'sequence': 10, 'is_visible': True}"/>
+    </function>
+    <!-- Events menu already exists for the website (copied from website_event's
+         default main menu when the website was created): reorder it instead of
+         creating a duplicate entry -->
+    <function name="write" model="website.menu">
+      <value model="website.menu" search="[('url', '=', '/event'), ('website_id', '=', ref('library.website_industry'))]"/>
+      <value eval="{'sequence': 2, 'is_visible': True}"/>
+    </function>
+    <!-- The 'appointment' module auto-creates an Appointment menu on every new
+         website: this site doesn't showcase appointments, drop it -->
+    <function name="unlink" model="website.menu">
+      <value model="website.menu" eval="obj().search([
+            ('website_id', '=', ref('library.website_industry')),
+            ('url', '=', '/appointment'),
+          ]).ids"/>
+    </function>
+    <!-- Default menu (rename): Shop -> Catalog -->
+    <function name="write" model="website.menu">
+      <value model="website.menu" eval="obj().search([
+              ('website_id', '=', ref('library.website_industry')),
+              ('name', '=', 'Shop'),
+          ], limit=1).id"/>
+      <value eval="{'name': 'Catalog'}"/>
+    </function>
+  </data>
+</odoo>
