@@ -1,6 +1,6 @@
 {
     'name': 'Photography',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Services',
     'depends': [
         'crm',
@@ -13,7 +13,6 @@
         'website_appointment',
     ],
     'data': [
-        'data/res_groups_data.xml',
         'data/mail_templates.xml',
         'data/project_data.xml',
         'data/product_data.xml',

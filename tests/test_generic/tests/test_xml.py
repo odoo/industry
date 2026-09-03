@@ -203,6 +203,7 @@ class TestEnv(IndustryCase):
                 self._check_text_based_xpath(tree, file_name)
                 self._check_portal_login_is_email(tree, file_name)
                 self._check_pos_session(tree, file_name)
+                self._check_record_has_fields(tree, file_name)
                 if root.split('/')[-1] == 'data':
                     self._check_view_active(tree, file_name)
                     self._check_is_published_false(tree, file_name)
@@ -469,6 +470,15 @@ class TestEnv(IndustryCase):
                     f"Duplicate record updates in {file_name}: {record_id} in model {model}"
                 )
             records[record_key] |= fields
+
+    def _check_record_has_fields(self, root, file_name):
+        for record in root.xpath("//record"):
+            if not record.xpath("./field"):
+                _logger.warning(
+                    "Record %s in %s has no fields defined.",
+                    record.get('id'),
+                    file_name,
+                )
 
     def _check_fields(self, root, file_name):
         warned_records = set()
