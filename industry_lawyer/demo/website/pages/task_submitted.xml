@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_page_task_submitted" model="ir.ui.view">
+        <field name="name">Task Submitted</field>
+        <field name="key">industry_lawyer.page_task_submitted</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="website_industry"/>
+        <field name="arch" type="xml">
+            <t name="Task Submitted" t-name="industry_lawyer.page_task_submitted">
+                <t t-call="website.layout">
+                    <div id="wrap" class="oe_structure oe_empty">
+                        <section class="s_text_block o_colored_level o_cc pb120 o_cc2 pt192 o_three_quarter_height" data-snippet="s_text_block" data-name="Thank You Section">
+                            <div class="s_allow_columns container">
+                                <div class="row">
+                                    <div class="col-lg-12 o_colored_level" style="text-align: center;">
+                                        <t t-if="request.session.get('form_builder_model_model', '') == 'project.task'">
+                                            <t t-set="task" t-value="website._website_form_last_record()"/>
+                                        </t>
+                                        <h1 class="display-2" style="font-weight: normal;">
+                                            <span class="text-o-color-2">Thank you!</span>
+                                        </h1>
+                                        <t t-if="task">
+                                            <p>
+                                                <span class="h4-fs">
+                                                    <br />Your task has been sent. Our team will get right on it.
+                                                </span>
+                                            </p>
+                                            <p>
+                                                <br />
+                                            </p>
+                                            <p>
+                                                <a t-if="request.session.uid and task.sudo().project_id.id and task.sudo().project_privacy_visibility in ['employees', 'portal']" class="my-3 text-bg-primary border-0 px-4 py-3 fs-5 text-decoration-none" t-attf-href="/my/tasks/#{task.id}" t-att-title="'Ticket #' + str(task.id)">
+                                                    Task #<span t-field="task.id"/>
+                                                </a>
+                                                <span t-else="" class="text-bg-primary my-3 border-0 px-4 py-3 fs-5">
+                                                    Task #<span t-field="task.id"/>
+                                                </span>
+                                            </p>
+                                        </t>
+                                        <p>
+                                            <br />
+                                        </p>
+                                        <p>
+                                            <a href="/" class="o_translate_inline btn btn-outline-secondary">Go to Homepage</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </t>
+            </t>
+        </field>
+    </record>
+    <data noupdate="1">
+        <record id="page_task_submitted" model="website.page" forcecreate="0">
+            <field name="view_id" ref="view_page_task_submitted"/>
+            <field name="url">/your-task-has-been-submitted</field>
+            <field name="website_id" ref="website_industry"/>
+            <field name="is_published" eval="True"/>
+            <field name="website_indexed" eval="False"/>
+        </record>
+    </data>
+</odoo>
