@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Custom Website Art Book - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+website = env.ref('library.website_industry')
+
+to_deactivate = [
+    'website_event.opt_events_list_columns',
+    'website_sale.filmstrip_categories_images',
+    'website_sale.product_add_to_compare',
+    'website_sale.products_attributes_collapsible',
+    'website_sale.products_categories_list_collapsible',
+    'website.footer_custom',
+    'website.template_footer_headline',
+    'website.template_footer_minimalist',
+    'website.homepage',
+    'website.contactus',
+]
+to_activate = [
+    'website_event.opt_event_description_cover_top',
+    'website_sale.filmstrip_categories_tabs',
+    'website_sale.filter_products_price',
+    'website_sale.products_categories',
+    'website.footer_copyright_content_width_fluid',
+    'website.footer_no_copyright',
+    'website.header_call_to_action',
+    'website.header_text_element',
+    'website.header_width_full',
+    'website.template_footer_centered',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+MARK = '__EXPORT_FILTER_XMLID__'
+
+def resolve_markers(content):
+    new_content = content
+    while MARK in new_content:
+        start = new_content.index(MARK)
+        end = new_content.index(MARK, start + len(MARK)) + len(MARK)
+        xmlid = new_content[start + len(MARK):end - len(MARK)]
+        try:
+            resolved = str(env.ref(xmlid).id)
+        except ValueError:
+            resolved = '0'
+        new_content = new_content[:start] + resolved + new_content[end:]
+    return new_content
+
+for view in env['ir.ui.view'].sudo().search([('website_id', '=', website.id)]):
+    arch = view.arch_db or ''
+    if MARK in arch:
+        view.write({'arch_db': resolve_markers(arch)})
+
+Menu = env['website.menu'].sudo()
+
+for menu in Menu.search([('website_id', '=', website.id)]):
+    content = menu.mega_menu_content or ''
+    if MARK in content:
+        menu.write({'mega_menu_content': resolve_markers(content)})
+
+# Default menus (rename/reorder), keyed by url since it is unique per website
+menu_updates = {
+    '/': {'name': 'Home', 'sequence': 1},
+    # Events menu already exists for the website (copied from website_event's
+    # default main menu when the website was created): reorder it instead of
+    # creating a duplicate entry
+    '/event': {'sequence': 3},
+}
+for url, vals in menu_updates.items():
+    Menu.search([('url', '=', url), ('website_id', '=', website.id)], limit=1).write(vals)
+# The 'website_sale' and 'appointment' modules auto-create a Shop and an
+# Appointment menu on every new website: the Books mega menu already covers
+# browsing/buying, and this site doesn't showcase appointments, so drop these
+# instead of showing redundant entries
+Menu.search([
+    ('website_id', '=', website.id),
+    ('url', 'in', ['/shop', '/appointment']),
+]).unlink()
+
+top_menu = Menu.search([('parent_id', '=', False), ('website_id', '=', website.id)], limit=1)
+
+# Custom menu: About Us
+Menu.create({
+    'name': 'About Us',
+    'url': '/about-us',
+    'parent_id': top_menu.id,
+    'website_id': website.id,
+    'sequence': 55,
+})
+        ]]></field>
+    </record>
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
