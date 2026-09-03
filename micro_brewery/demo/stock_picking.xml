@@ -1,18 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo noupdate="1">
-    <record id="stock_picking_1" model="stock.picking">
-        <field name="partner_id" ref="base.partner_admin"/>
-        <field name="picking_type_id" ref="stock.picking_type_internal"/>
-        <field name="location_id" ref="stock.stock_location_stock"/>
-        <field name="location_dest_id" model="stock.location" eval="obj().env.ref('micro_brewery.warehouse_1').lot_stock_id.id"/>
-    </record>
-    <record id="stock_move_1" model="stock.move">
-        <field name="inventory_name">Move 1</field>
-        <field name="product_id" ref="product_product_17"/>
-        <field name="product_uom_qty" eval="2"/>
-        <field name="picking_id" ref="stock_picking_1"/>
-        <field name="lot_ids" eval="[ref('stock_lot_5')]"/>
-    </record>
     <record id="stock_picking_2" model="stock.picking">
         <field name="partner_id" ref="base.partner_admin"/>
         <field name="picking_type_id" ref="stock.picking_type_internal"/>
@@ -52,8 +39,32 @@
         <field name="picking_id" ref="stock_picking_4"/>
         <field name="location_id" ref="stock.stock_location_stock"/>
     </record>
+    <record id="stock_picking_5" model="stock.picking">
+        <field name="partner_id" ref="base.partner_admin"/>
+        <field name="picking_type_id" ref="stock.picking_type_in"/>
+        <field name="location_id" ref="stock.stock_location_suppliers"/>
+        <field name="location_dest_id" ref="stock.stock_location_stock"/>
+    </record>
+    <record id="stock_move_5" model="stock.move">
+        <field name="inventory_name">Move 5</field>
+        <field name="product_id" ref="product_product_3"/>
+        <field name="product_uom_qty" eval="32"/>
+        <field name="picking_id" ref="stock_picking_5"/>
+        <field name="location_id" ref="stock.stock_location_suppliers"/>
+        <field name="location_dest_id" ref="stock.stock_location_stock"/>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="state">done</field>
+        <field name="move_line_ids" eval="[(0, 0, {
+            'company_id': ref('base.main_company'),
+            'product_id': ref('product_product_3'),
+            'lot_id': ref('stock_lot_13'),
+            'quantity': 30.0,
+            'location_id': ref('stock.stock_location_suppliers'),
+            'location_dest_id': ref('stock.stock_location_stock'),
+        })]"/>
+    </record>
     <function name="button_validate" model="stock.picking" context="{'skip_sms': True}">
-        <value model="stock.picking" eval="[ref('stock_picking_1'), ref('stock_picking_2'), ref('stock_picking_3'), ref('stock_picking_4')]"/>
+        <value model="stock.picking" eval="[ref('stock_picking_2'), ref('stock_picking_3'), ref('stock_picking_4')]"/>
     </function>
 
     <function model="pos.config" name="write">
