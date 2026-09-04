@@ -1,15 +1,16 @@
 {
     'name': 'Gardening',
+    'version': '1.1',
     'category': 'Construction',
     'depends': [
         'knowledge',
-        'planning_field_service_sale_stock',
         'planning_field_service_sale_worksheet',
         'sale_crm',
-        'sale_purchase_stock',
+        'sale_purchase',
     ],
     'data': [
         'data/res_config_settings.xml',
+        'data/ir_ui_menu.xml',
         'data/ir_attachment_pre.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
