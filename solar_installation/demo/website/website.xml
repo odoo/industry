@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="website_industry" model="website">
+        <field name="name">Solart Systems</field>
+        <field name="sequence">1</field>
+        <field name="configurator_done" eval="True"/>
+        <field name="user_id" ref="base.public_user"/>
+        <field name="favicon" type="bytes" file="solar_installation/static/src/img/content/website/solar_installation-image-01.svg"/>
+        <field name="logo" type="bytes" file="solar_installation/static/src/img/content/website/solar_installation-image-02.svg"/>
+        <field name="channel_id" ref="im_livechat.im_livechat_channel_data"/>
+    </record>
+    <function name="write" model="ir.model.data">
+        <value model="ir.model.data" search="[('name', '=', 'default_website'), ('module', '=', 'base'), ('model', '=', 'website')]"/>
+        <value eval="{'res_id': ref('website_industry')}"/>
+    </function>
+
+    <!-- helpdesk.team.website_id is a stored computed field evaluated once,
+         when the team was created in data/helpdesk_config.xml (before this
+         website existed): repoint it explicitly to the new website. -->
+    <record id="helpdesk.helpdesk_team1" model="helpdesk.team" forcecreate="True">
+        <field name="website_id" ref="website_industry"/>
+    </record>
+</odoo>

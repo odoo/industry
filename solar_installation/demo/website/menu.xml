@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Website menus - parent_id via search on root (url=#) -->
+        <!-- Custom menu: Product & Services -->
+        <record id="menu_product_services" model="website.menu">
+            <field name="name">Product &amp; Services</field>
+            <field name="url">/products-and-services</field>
+            <field name="parent_id" model="website.menu" search="[('url', '=', '#'), ('website_id', '=', ref('solar_installation.website_industry'))]"/>
+            <field name="website_id" ref="website_industry"/>
+            <field name="sequence" eval="2"/>
+            <field name="is_visible" eval="True"/>
+        </record>
+        <!-- Default menu (rename/reorder): Home -->
+        <function name="write" model="website.menu">
+            <value model="website.menu" search="[('url', '=', '/'), ('website_id', '=', ref('solar_installation.website_industry'))]"/>
+            <value eval="{'name': 'Home', 'sequence': 1, 'is_visible': True}"/>
+        </function>
+        <!-- Default menu (Disable Contactus): Home -->
+        <function name="write" model="website.menu">
+            <value model="website.menu" eval="obj().search([
+                ('website_id', '=', ref('solar_installation.website_industry')),
+                ('url', '=', '/contactus'),
+            ], limit=1).id"/>
+            <value model="website.menu" eval="{'website_id': False}"/>
+        </function>
+        <!-- Custom menu: Help -->
+        <record id="menu_help" model="website.menu">
+            <field name="name">Help</field>
+            <field name="url">/helpdesk</field>
+            <field name="parent_id" model="website.menu" search="[('url', '=', '#'), ('website_id', '=', ref('solar_installation.website_industry'))]"/>
+            <field name="website_id" ref="website_industry"/>
+            <field name="sequence" eval="3"/>
+            <field name="is_visible" eval="True"/>
+        </record>
+    </data>
+</odoo>
