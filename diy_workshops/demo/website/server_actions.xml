@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Custom Website - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code">
+website = env.ref('diy_workshops.website_industry')
+
+to_deactivate = [
+    'website_event.opt_event_location_block',
+    'website_event.opt_event_organizer_block',
+    'website_event.opt_events_list_columns',
+    'website_sale.product_add_to_compare',
+    'website_sale.product_quantity',
+    'website.header_search_box',
+    'website.header_text_element',
+    # The hamburger header replaces the default one (see primary_variables.scss:
+    # 'header-template': 'hamburger'). The export writes the scss value but not
+    # the view toggle, and website.template_header_default ships active.
+    'website.template_header_default',
+    # The descriptive footer replaces the default one (see
+    # primary_variables.scss: 'footer-template': 'descriptive').
+    'website.footer_custom',
+    # Offcanvas menu items stay left-aligned: the builder's "Align Left" is
+    # the absence of both alignment views (they ship inactive, deactivate them
+    # in case a theme turned one on).
+    'website.template_header_hamburger_mobile_align_center',
+    'website.template_header_hamburger_mobile_align_right',
+    'website.homepage',
+    'website.contactus',
+]
+to_activate = [
+    'website_event.event_description_dates',
+    'website_event.index_topbar',
+    'website_event.opt_event_description_cover_hidden',
+    'website_event.opt_event_share_block',
+    'website.header_call_to_action',
+    'website.header_width_full',
+    # Hamburger header: the template plus the extra view the builder enables
+    # with it.
+    'website.template_header_hamburger',
+    'website.no_autohide_menu',
+    'website.template_footer_slideout',
+    'website.template_footer_descriptive',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
+
+# Default menu items to remove: /shop is copied from the generic menu tree
+# (website_sale) onto every new website but the site sells through /event and
+# the membership pages; /contactus is reachable through the header
+# "Contact Us" call to action instead.
+menus.search(base_domain + [('url', 'in', ['/shop', '/contactus'])]).unlink()
+
+# Default menus to rename/reorder. /event is created by website_event on every
+# new website, so rename it rather than adding a second menu on the same url.
+menus.search(base_domain + [('url', '=', '/')], limit=1).write({'name': 'Home', 'sequence': 10})
+menus.search(base_domain + [('url', '=', '/event')], limit=1).write({'name': 'Workshops', 'sequence': 20})
+
+# Menu item of the design that has no module creating it.
+if not menus.search(base_domain + [('url', '=', '/the-studio')]):
+    menus.create({
+        'name': 'The studio',
+        'url': '/the-studio',
+        'website_id': website.id,
+        'parent_id': top_menu.id if top_menu else False,
+        'sequence': 30,
+    })
+
+def resolve_db_id(xmlid):
+    try:
+        return str(env.ref(xmlid).id)
+    except ValueError:
+        return '0'
+
+def resolve_product_url(xmlid):
+    try:
+        return env.ref(xmlid).website_url
+    except ValueError:
+        return '/shop'
+
+# Wraps an xml id wherever a snippet needs a raw database id, which is not
+# stable across installs: dynamic snippet filter ids (data-filter-id) and
+# single-record snippet targets (data-snippet-res-id). __PRODUCT_URL__ does
+# the same for hrefs pointing to a product page, whose url isn't stable either.
+markers = [
+    ('__EXPORT_FILTER_XMLID__', resolve_db_id),
+    ('__PRODUCT_URL__', resolve_product_url),
+]
+for view in env['ir.ui.view'].sudo().search([('website_id', '=', website.id)]):
+    arch = view.arch_db or ''
+    new_arch = arch
+    for mark, resolve in markers:
+        while mark in new_arch:
+            start = new_arch.index(mark)
+            end = new_arch.index(mark, start + len(mark)) + len(mark)
+            xmlid = new_arch[start + len(mark):end - len(mark)]
+            new_arch = new_arch[:start] + resolve(xmlid) + new_arch[end:]
+    if new_arch != arch:
+        view.write({'arch_db': new_arch})
+        </field>
+    </record>
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
