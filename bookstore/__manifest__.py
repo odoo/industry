@@ -1,6 +1,6 @@
 {
     'name': 'Bookstore',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Retail',
     'depends': [
         'account_followup',

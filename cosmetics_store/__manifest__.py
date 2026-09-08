@@ -1,6 +1,6 @@
 {
     'name': 'Cosmetics Store',
-    'version': '1.4',
+    'version': '1.5',
     'category': 'Retail',
     'author': 'Odoo S.A.',
     'depends': [
