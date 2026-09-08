@@ -1,6 +1,6 @@
 {
     'name': 'Textile Manufacturing',
-    'version': '1.7',
+    'version': '1.8',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
@@ -12,6 +12,7 @@
         'product_conversion',
         'purchase_mrp',
         'quality_mrp_workorder',
+        'sale_product_matrix',
         'sale_project',
         'website_crm',
         'website_sale_stock',
