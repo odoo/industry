@@ -1,6 +1,6 @@
 {
     'name': 'Outdoor Activities',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Health and Fitness',
     'depends': [
         'appointment_account_payment',
@@ -8,7 +8,6 @@
         'event_crm',
         'knowledge',
         'pos_sale',
-        'pos_stock',
         'sale_service',
         'website_appointment',
         'website_crm',
@@ -16,6 +15,7 @@
     ],
     'data': [
         'data/ir_attachment.xml',
+        'data/ir_ui_menu.xml',
         'data/crm_stages.xml',
         'data/crm_tags.xml',
         'data/product_product.xml',
