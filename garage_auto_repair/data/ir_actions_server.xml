@@ -130,10 +130,22 @@ for task in records:
     if not task.x_appointment_type_id:
         raise UserError("You must set an Appointment Type before moving to Booking Confirm.")
 
-    invite = env['appointment.invite'].search([('appointment_type_ids', 'in', [task.x_appointment_type_id.id]), ('x_task_id', '=', task.id),], limit=1)
-    if not invite:
-        invite = env['appointment.invite'].create({'appointment_type_ids': [(6, 0, [task.x_appointment_type_id.id])],'x_task_id': task.id})
-    booking_url = invite.book_url or ''
+    task.x_appointment_type_id.sudo().write({'website_published': True})
+    event = env['calendar.event'].search([('x_task_id', '=', task.id)], limit=1)
+    if not event:
+        placeholder_start = datetime.datetime.now() + dateutil.relativedelta.relativedelta(years=100)
+        event = env['calendar.event'].create({
+            'name': task.x_appointment_type_id.name,
+            'appointment_type_id': task.x_appointment_type_id.id,
+            'start': placeholder_start,
+            'stop': placeholder_start + dateutil.relativedelta.relativedelta(minutes=task.x_appointment_type_id.appointment_duration * 60),
+            'partner_ids': [(6, 0, [task.partner_id.id])],
+            'appointment_booker_id': task.partner_id.id,
+            'x_task_id': task.id,
+        })
+    base_url = env['ir.config_parameter'].sudo().get_str('web.base.url')
+    slug = env['ir.http']._slug(task.x_appointment_type_id)
+    booking_url = f"{base_url}/appointment/{slug}?state=reschedule&access_token={event.access_token}"
     task.write({'x_booking_url': booking_url})
     # Send appointment booking email
     env.ref('garage_auto_repair.mail_template_task_appointment_booking').send_mail(task.id)
@@ -145,20 +157,9 @@ for task in records:
         <field name="state">code</field>
         <field name="code"><![CDATA[
 for event in records:
-    invite = event.appointment_invite_id
-    if not invite or not invite.x_task_id:
+    if not event.x_task_id:
         continue
-    task = invite.x_task_id
-    task.write({'state': '03_approved', 'x_appointment_date': event.start})
-    main_partner = task.partner_id
-    booking_partners = event.partner_ids.filtered(
-        lambda p: p.id != main_partner.id
-    )
-    if main_partner and booking_partners:
-        env['base.partner.merge.automatic.wizard']._merge(
-            booking_partners.ids + [main_partner.id],
-            main_partner
-        )
+    event.x_task_id.write({'state': '03_approved', 'x_appointment_date': event.start})
 ]]></field>
     </record>
     <record id="ir_actions_server_730" model="ir.actions.server">
