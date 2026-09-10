@@ -1,6 +1,6 @@
 {
     'name': 'Student Organization',
-    'version': '1.3',
+    'version': '1.4',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
