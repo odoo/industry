@@ -123,9 +123,22 @@ class ComputedFieldsTestCase(TransactionCase):
 
     def test_x_total_guests_computation(self):
         # add a guest product in order line
+        self.guest_product_variant_id.x_has_city_tax = True
         _, order_line = self._create_sale_order(self.guest_product_variant_id)
+        guest_order_line = order_line.filtered(lambda line: line.product_id == self.guest_product_variant_id)
+        city_tax_order_line = order_line.filtered(lambda line: line.product_id.x_accommodation_product == 'stay_tax')[:1]
+        self.assertEqual(guest_order_line.x_total_guests, 2, "Total guests should be the sum of adults.")
 
-        self.assertEqual(order_line.x_total_guests, 2, "Total guests should be the sum of adults.")
+        city_tax_order_line.product_id.x_city_tax_applies_to = 'adults_and_children'
+        _, order_line2 = self._create_sale_order(self.guest_product_variant_id)
+        guest_order_line2 = order_line2.filtered(lambda line: line.product_id == self.guest_product_variant_id)
+        self.assertEqual(guest_order_line2.x_total_guests, 3, "Total guests should be the sum of adults and children.")
+
+        self.value.x_infants = 2
+        city_tax_order_line.product_id.x_city_tax_applies_to = 'adults_children_infants'
+        _, order_line3 = self._create_sale_order(self.guest_product_variant_id)
+        guest_order_line3 = order_line3.filtered(lambda line: line.product_id == self.guest_product_variant_id)
+        self.assertEqual(guest_order_line3.x_total_guests, 5, "Total guests should be the sum of adults, children and infants.")
 
     def test_x_nights_and_city_tax_computation(self):
         order, order_line = self._create_sale_order(self.guest_product_variant_id)
