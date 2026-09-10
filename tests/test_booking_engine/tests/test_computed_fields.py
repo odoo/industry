@@ -123,9 +123,16 @@ class ComputedFieldsTestCase(TransactionCase):
 
     def test_x_total_guests_computation(self):
         # add a guest product in order line
+        self.guest_product_variant_id.write({
+            'x_has_city_tax': True,
+        })
         _, order_line = self._create_sale_order(self.guest_product_variant_id)
+        guest_order_line = order_line.filtered(lambda line: line.product_id == self.guest_product_variant_id)
+        city_tax_order_line = order_line.filtered(lambda line: line.product_id.x_accommodation_product == 'stay_tax')[:1]
 
-        self.assertEqual(order_line.x_total_guests, 2, "Total guests should be the sum of adults.")
+        self.assertEqual(guest_order_line.x_total_guests, 2, "Total guests should be the sum of adults.")
+        city_tax_order_line.product_id.write({'x_city_tax_applies_to': 'adults_and_children'})
+        self.assertEqual(guest_order_line.x_total_guests, 3, "Total guests should be the sum of adults and children.")
 
     def test_x_nights_and_city_tax_computation(self):
         order, order_line = self._create_sale_order(self.guest_product_variant_id)
