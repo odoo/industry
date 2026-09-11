@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="website_sale_cta_wrapper" model="ir.ui.view">
+        <field name="name">Custom Valleverde - CTA Wrapper</field>
+        <field name="key">website_sale.cta_wrapper</field>
+        <field name="inherit_id" ref="website_sale.cta_wrapper"/>
+        <field name="website_id" ref="website_industry"/>
+        <field name="arch" type="xml">
+            <xpath expr="." position="replace">
+                <t name="CTA Wrapper" t-name="website_sale.cta_wrapper">
+                    <div class="availability_messages o_not_editable"/>
+                    <input id="wsale_user_email" type="hidden" t-att-value="user_email"/>
+                    <div id="o_wsale_cta_wrapper" t-att-class="'d-flex flex-wrap align-items-center gap-2 mb-4' +                 (' w-100 w-lg-auto' if is_50_pc else ' w-100') +                 (' ' if not is_fullwidth_content and not is_view_active('website_sale.cta_wrapper_boxed') else ' ')">
+                        <div id="add_to_cart_wrap" t-attf-class="{{'d-none' if combination_info['prevent_sale'] else 'd-flex'}} flex-grow-1 flex-lg-grow-0 flex-wrap align-items-center gap-2 {{'' if is_50_pc else ' w-100'}}">
+                            <!-- data-action="add_to_cart" is the default, but it's needed to distinguish this
+                            button from the "buy now" button in xpaths. -->
+                            <button name="add_to_cart" t-attf-class="btn btn-primary flex-grow-1" data-action="add_to_cart" data-animation-selector=".o_wsale_product_images" t-att-data-product-category-id="product.public_categ_ids.ids and product.public_categ_ids.ids[0]" t-att-data-product-id="product_variant.id" t-att-data-product-template-id="product.id" t-att-data-product-type="product.type" t-att-data-show-quantity="is_view_active('website_sale.product_quantity')" class="btn btn-primary flex-grow-1">
+                                ADD TO CART</button>
+                        </div>
+                        <div id="contact_us_wrapper" t-attf-class="{{'d-flex' if combination_info['prevent_sale'] else 'd-none'}} flex-grow-1 flex-lg-grow-0 flex-wrap align-items-center gap-2 {{'' if is_50_pc else 'w-100'}}">
+                            <a t-att-href="website._get_contact_us_url(combination_info.get('display_name', ''))" class="btn btn-primary flex-grow-1 w-100">
+                                Contact Us
+                            </a>
+                        </div>
+                        <div id="product_option_block" t-attf-class="d-flex d-empty-none flex-wrap gap-2 w-100 {{'w-sm-auto' if is_50_pc and not (is_view_active('website_sale.cta_wrapper_boxed') or is_view_active('website_sale.cta_wrapper_large')) else ''}}"/>
+                    </div>
+                </t>
+            </xpath>
+        </field>
+    </record>
+    <record id="website_sale_product_add_to_wishlist" model="ir.ui.view">
+        <field name="name">Custom Valleverde - Wishlist Button</field>
+        <field name="key">website_sale.product_add_to_wishlist</field>
+        <field name="inherit_id" ref="website_sale.cta_wrapper"/>
+        <field name="website_id" ref="website_industry"/>
+        <field name="arch" type="xml"><xpath expr="//div[@id='product_option_block']" position="inside">
+                <t t-set="product_variant" t-value="product_variant or product._create_first_product_variant()"/>
+                <t t-set="_button_classes" t-valuef="o_add_wishlist_dyn btn btn-outline-primary text-nowrap"/>
+                <t t-if="website.product_page_image_width == '50_pc' and not (is_view_active('website_sale.cta_wrapper_boxed') or is_view_active('website_sale.cta_wrapper_large'))" t-set="_button_classes" t-value="_button_classes + ' flex-grow-1 flex-sm-grow-0'"/>
+                <t t-else="" t-set="_button_classes" t-value="_button_classes + ' flex-grow-1'"/>
+                <t t-if="is_view_active('website_sale.cta_wrapper_large')" t-set="_button_classes" t-value="_button_classes + ' btn-lg px-lg-0'"/>
+                <button t-if="product_variant" t-att-class="_button_classes" t-att-disabled="product_variant._is_in_wishlist()" t-att-data-product-id="product_variant.id" t-att-data-product-template-id="product.id" title="Add to wishlist">
+                    <i class="fa fa-heart-o me-2 me-lg-0" role="img" aria-label="Add to wishlist"/>
+                    <t t-set="_span_classes" t-valuef="d-inline"/>
+                    <t t-if="website.product_page_image_width == '50_pc' and not (is_view_active('website_sale.cta_wrapper_boxed') or is_view_active('website_sale.cta_wrapper_large'))" t-set="_span_classes" t-value="_span_classes + ' d-lg-none'"/>
+                    <span t-att-class="_span_classes" class="d-inline">ADD TO WISHLIST</span>
+                </button>
+            </xpath>
+        </field>
+    </record>
+    <record id="website_sale_product_oe_structure_website_sale_product_2" model="ir.ui.view">
+        <field name="name">Custom Valleverde - Product (oe_structure_website_sale_product_2)</field>
+        <field name="key">website_sale.product_oe_structure_website_sale_product_2</field>
+        <field name="inherit_id" ref="website_sale.product"/>
+        <field name="website_id" ref="website_industry"/>
+        <field name="arch" type="xml">
+            <xpath expr="//*[hasclass('oe_structure')][@id='oe_structure_website_sale_product_2']" position="replace">
+                <div class="oe_structure oe_empty oe_structure_not_nearest mt16" id="oe_structure_website_sale_product_2" data-editor-message="Drag blocks here to add them on all products">
+                    <section class="s_announcement_scroll s_announcement_scroll_direction_left w-100 o_colored_level s_announcement_scroll_parallax pb16 s_custom_snippet pt48" style="--marquee-animation-speed: 5s; position: relative; --marquee-item-font-size: 320;" role="marquee" data-snippet="s_announcement_scroll" data-oe-shape-data="{&quot;shape&quot;:&quot;html_builder/Bold/16&quot;,&quot;colors&quot;:{&quot;c5&quot;:&quot;o-color-1&quot;},&quot;flip&quot;:[&quot;x&quot;],&quot;showOnMobile&quot;:false,&quot;shapeAnimationSpeed&quot;:&quot;0&quot;,&quot;selectedColor&quot;:true}" data-name="Custom Custom Announcement Scroll"><div class="o_we_shape o_html_builder_Bold_16 bg-o-color-5" style="background-image: url(&quot;/html_editor/shape/html_builder%2FBold%2F16.svg?c5=%2300A57A&amp;flip=x&quot;); background-position: 50% 50%;"/>
+                        <div class="s_announcement_scroll_marquee_container d-flex s_announcement_scroll_heading_family">
+                            <div class="o_not_editable s_announcement_scroll_marquee_item lh-1">[ CONTACT ]</div>
+                        </div>
+                    </section>
+                    <section class="s_newsletter_block s_newsletter_list o_cc o_colored_level pb64 o_cc4 pt72 s_custom_snippet" data-list-id="1" data-snippet="s_newsletter_block" data-scroll-background-ratio="0" data-name="Custom Newsletter Block">
+                        <div class="container">
+                            <div class="row">
+
+
+                                <div class="o_colored_level col-lg-3">
+                                    <h2>JOIN THE MAILING LIST</h2>
+                                </div><div class="o_colored_level o_cc o_cc1 border col-lg-9" style="--box-border-left-width: 25px; --box-border-bottom-width: 25px; --box-border-right-width: 25px; --box-border-top-width: 25px; border-color: rgba(255, 255, 255, 0) !important;">
+                                    <div data-vxml="001" data-list-id="0" data-name="Newsletter Form" class="s_newsletter_subscribe_form s_newsletter_list js_subscribe" data-snippet="s_newsletter_subscribe_form">
+                                        <div class="js_subscribed_wrap d-none">
+                                            <p class="h4-fs text-center text-success"><i class="fa fa-check-circle-o" role="img"/> Thanks for registering!</p>
+                                        </div>
+                                        <div class="js_subscribe_wrap">
+                                            <div class="input-group">
+                                                <input type="email" name="email" placeholder="Email" class="s_newsletter_subscribe_form_input js_subscribe_value form-control "/>
+                                                <a role="button" href="#" class="js_subscribe_btn o_submit o_translate_inline btn btn-primary">SUBSCRIBE</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                            </div></div>
+                        </div>
+                    </section>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    <record id="website_sale_product_terms_and_conditions" model="ir.ui.view">
+        <field name="name">Custom Valleverde - Terms and Conditions</field>
+        <field name="key">website_sale.product_terms_and_conditions</field>
+        <field name="inherit_id" ref="website_sale.product"/>
+        <field name="website_id" ref="website_industry"/>
+        <field name="arch" type="xml"><div id="o_wsale_product_cta_section" position="inside">
+                <small class="text-muted mb-0">
+                    <a href="/terms" class="o_translate_inline text-muted"><u>TERMS AND CONDITIONS</u></a></small>
+            </div>
+        </field>
+    </record>
+    <record id="website_sale_products_oe_structure_website_sale_products_2" model="ir.ui.view">
+        <field name="name">Custom Valleverde - Products (oe_structure_website_sale_products_2)</field>
+        <field name="key">website_sale.products_oe_structure_website_sale_products_2</field>
+        <field name="inherit_id" ref="website_sale.products"/>
+        <field name="website_id" ref="website_industry"/>
+        <field name="arch" type="xml">
+            <xpath expr="//*[hasclass('oe_structure')][@id='oe_structure_website_sale_products_2']" position="replace">
+                <div class="oe_structure oe_empty oe_structure_not_nearest" id="oe_structure_website_sale_products_2" data-editor-message-default="true" data-editor-message="Drag blocks here">
+                    <section class="s_announcement_scroll s_announcement_scroll_direction_left w-100 o_colored_level s_announcement_scroll_parallax pb16 s_custom_snippet pt48" style="--marquee-animation-speed: 5s; position: relative; --marquee-item-font-size: 320;" role="marquee" data-snippet="s_announcement_scroll" data-oe-shape-data="{&quot;shape&quot;:&quot;html_builder/Bold/16&quot;,&quot;colors&quot;:{&quot;c5&quot;:&quot;o-color-1&quot;},&quot;flip&quot;:[&quot;x&quot;],&quot;showOnMobile&quot;:false,&quot;shapeAnimationSpeed&quot;:&quot;0&quot;,&quot;selectedColor&quot;:true}" data-name="Custom Custom Announcement Scroll"><div class="o_we_shape o_html_builder_Bold_16 bg-o-color-5" style="background-image: url(&quot;/html_editor/shape/html_builder%2FBold%2F16.svg?c5=%2300A57A&amp;flip=x&quot;); background-position: 50% 50%;"/>
+                        <div class="s_announcement_scroll_marquee_container d-flex s_announcement_scroll_heading_family">
+                            <div class="o_not_editable s_announcement_scroll_marquee_item lh-1">[ CONTACT ]</div>
+                        </div>
+                    </section>
+                    <section class="s_newsletter_block s_newsletter_list o_cc o_colored_level pb64 o_cc4 pt72 s_custom_snippet" data-list-id="1" data-snippet="s_newsletter_block" data-scroll-background-ratio="0" data-name="Custom Newsletter Block">
+                        <div class="container">
+                            <div class="row">
+
+
+                                <div class="o_colored_level col-lg-3">
+                                    <h2>JOIN THE MAILING LIST</h2>
+                                </div><div class="o_colored_level o_cc o_cc1 border col-lg-9" style="--box-border-left-width: 25px; --box-border-bottom-width: 25px; --box-border-right-width: 25px; --box-border-top-width: 25px; border-color: rgba(255, 255, 255, 0) !important;">
+                                    <div data-vxml="001" data-list-id="0" data-name="Newsletter Form" class="s_newsletter_subscribe_form s_newsletter_list js_subscribe" data-snippet="s_newsletter_subscribe_form">
+                                        <div class="js_subscribed_wrap d-none">
+                                            <p class="h4-fs text-center text-success"><i class="fa fa-check-circle-o" role="img"/> Thanks for registering!</p>
+                                        </div>
+                                        <div class="js_subscribe_wrap">
+                                            <div class="input-group">
+                                                <input type="email" name="email" placeholder="Email" class="s_newsletter_subscribe_form_input js_subscribe_value form-control "/>
+                                                <a role="button" href="#" class="js_subscribe_btn o_submit o_translate_inline btn btn-primary">SUBSCRIBE</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                            </div></div>
+                        </div>
+                    </section>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    <record id="footer_custom" model="ir.ui.view">
+        <field name="name">Custom Valleverde - Default</field>
+        <field name="key">website.footer_custom</field>
+        <field name="inherit_id" ref="website.layout"/>
+        <field name="website_id" ref="website_industry"/>
+        <field name="arch" type="xml"><xpath expr="//div[@id='footer']" position="replace">
+                <div id="footer" class="oe_structure oe_structure_solo text-break border" t-ignore="true" t-if="not no_footer" style="--box-border-left-width: 0px; --box-border-bottom-width: 0px; --box-border-right-width: 0px; --box-border-top-width: 0px;">
+                    <section class="s_text_block pb16 pt0" data-snippet="s_text_block" data-name="Container">
+                        <div class="container">
+                            <div class="row">
+
+                                <div class="o_colored_level col-lg-3 pt24 pb24">
+                                    <p class="lead"><span class="h4-fs bg-o-color-5"><a href="/" class="o_translate_inline"><span class="h5-fs">&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;nbsp;</span><br/><span class="h5-fs">&amp;nbsp; VALLEVERDE&amp;nbsp;&amp;nbsp;</span><br/><span class="h5-fs">&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;nbsp;</span></a></span></p>
+                                    <ul class="list-unstyled">
+                                        <li class="oe-nested"><br/></li>
+                                    </ul>
+                                </div><div class="o_colored_level col-lg-2 pt24 pb24">
+                                    <ul class="list-unstyled"><li>BRUSSELS</li>
+                                    </ul><p class="small"><span style="font-size: clamp(8px, 1em - 0.1406vw, 400px);" class="o_rfs">18&amp;nbsp;Rue de Flandre</span><br/><span style="font-size: clamp(8px, 1em - 0.1406vw, 400px);" class="o_rfs">1000 Brussels</span><br/><span style="font-size: clamp(8px, 1em - 0.1406vw, 400px);" class="o_rfs">Belgium</span></p><p class="small"><span style="font-size: clamp(8px, 1em - 0.1406vw, 400px);" class="o_rfs">+32 2 450 11 22<br/>brussels@valleverde.com</span></p></div><div class="o_colored_level col-lg-2 pt24 pb24">
+                                    <ul class="list-unstyled"><li>NEW YORK</li>
+                                    </ul><p class="small"><span style="font-size: clamp(8px, 1em - 0.1406vw, 400px);" class="o_rfs">44 Valley Street</span><br/><span style="font-size: clamp(8px, 1em - 0.1406vw, 400px);" class="o_rfs">10013 New York<br/></span>USA<span style="font-size: clamp(8px, 1em - 0.1406vw, 400px);" class="o_rfs"/></p><p class="small"><span style="font-size: clamp(8px, 1em - 0.1406vw, 400px);" class="o_rfs">+1 212 222&amp;nbsp;9999<br/>nyc@valleverde.com</span></p></div><div class="pt24 pb24 o_colored_level offset-lg-2 col-lg-2">
+                                    <ul class="list-unstyled"><li><a href="/contactus" class="o_translate_inline"><span class="o_small-fs">Contact</span></a></li><li class="o_small-fs"><a href="/artists" class="o_translate_inline">Artists</a></li><li class="o_small-fs"><a href="/info" class="o_translate_inline">Info</a></li></ul></div><div class="o_colored_level pt24 pb24 col-lg-1">
+                                    <div class="s_social_media o_not_editable no_icon_color text-end" data-snippet="s_social_media" data-name="Social Media">
+                                        <h5 class="s_social_media_title d-none">Follow us</h5>
+                                        <a href="https://www.instagram.com/your-page" target="_blank" aria-label="Instagram" class="s_social_media_instagram">
+                                            <i class="fa o_editable_media shadow-sm rounded-circle o_cc o_cc5 fa-instagram"/>
+                                        </a>
+                                        <a href="https://www.facebook.com/your-page" target="_blank" aria-label="Facebook" class="s_social_media_facebook">
+                                            <i class="fa o_editable_media shadow-sm rounded-circle o_cc o_cc5 fa-facebook"/>
+                                        </a>
+                                        <a href="https://www.twitter.com/your-page" class="s_social_media_twitter" target="_blank" aria-label="X">
+                                            <i class="fa fa-twitter o_editable_media shadow-sm rounded-circle o_cc o_cc5"/>
+                                        </a>
+                                        <a href="https://www.linkedin.com/your-page" target="_blank" aria-label="LinkedIn" class="s_social_media_linkedin">
+                                            <i class="fa o_editable_media shadow-sm rounded-circle o_cc o_cc5 fa-linkedin"/>
+                                        </a>
+                                    </div>
+                                </div><div class="o_colored_level col-lg-12 pt0 pb0">
+                                    <p class="small"><span style="font-size: clamp(8px, 1em - 0.2813vw, 400px);" class="o_rfs">COPYRIGHT © VALLEVERDE&amp;nbsp;</span></p></div>
+
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    <record id="option_header_brand_name" model="ir.ui.view">
+        <field name="name">Custom Valleverde - Header Brand Name</field>
+        <field name="key">website.option_header_brand_name</field>
+        <field name="inherit_id" ref="website.placeholder_header_brand"/>
+        <field name="website_id" ref="website_industry"/>
+        <field name="active" eval="False"/>
+        <field name="arch" type="xml"><xpath expr="//*[@id='o_fake_navbar_brand']" position="replace">
+                <a href="/" t-attf-class="navbar-brand #{_link_class}" class="navbar-brand me-4"><span><span><span data-text-effect="{&quot;preset&quot;:&quot;blurred_black&quot;,&quot;shadows&quot;:[{&quot;shadowBlur&quot;:&quot;10px&quot;}]}" style="text-shadow: rgba(0, 0, 0, 0.5) 2px 2px 10px;" class="bg-o-color-5">&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;nbsp;<br/>&amp;nbsp; </span><span data-text-effect="{&quot;preset&quot;:&quot;blurred_black&quot;,&quot;shadows&quot;:[{&quot;shadowBlur&quot;:&quot;10px&quot;}]}" style="text-shadow: rgba(0, 0, 0, 0.5) 2px 2px 10px;" class="bg-o-color-5">VALLEVERDE</span><span data-text-effect="{&quot;preset&quot;:&quot;blurred_black&quot;,&quot;shadows&quot;:[{&quot;shadowBlur&quot;:&quot;10px&quot;}]}" style="text-shadow: rgba(0, 0, 0, 0.5) 2px 2px 10px;" class="bg-o-color-5">&amp;nbsp;&amp;nbsp;<br/>&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;nbsp;</span></span></span></a>
+            </xpath>
+        </field>
+    </record>
+    <record id="website_blog_index_oe_structure_blog_footer" model="ir.ui.view">
+        <field name="name">Custom Valleverde - Blog (oe_structure_blog_footer)</field>
+        <field name="key">website_blog.index_oe_structure_blog_footer</field>
+        <field name="inherit_id" ref="website_blog.index"/>
+        <field name="website_id" ref="website_industry"/>
+        <field name="arch" type="xml">
+            <xpath expr="//*[hasclass('oe_structure')][@id='oe_structure_blog_footer']" position="replace"><div class="oe_structure oe_empty" id="oe_structure_blog_footer" data-editor-message="Drag blocks here to add them on all blogs"><section class="s_announcement_scroll s_announcement_scroll_direction_left w-100 o_colored_level s_announcement_scroll_parallax pb16 s_custom_snippet pt48" style="--marquee-animation-speed: 5s; position: relative; --marquee-item-font-size: 320;" role="marquee" data-snippet="s_announcement_scroll" data-oe-shape-data="{&quot;shape&quot;:&quot;html_builder/Bold/16&quot;,&quot;colors&quot;:{&quot;c5&quot;:&quot;o-color-1&quot;},&quot;flip&quot;:[&quot;x&quot;],&quot;showOnMobile&quot;:false,&quot;shapeAnimationSpeed&quot;:&quot;0&quot;,&quot;selectedColor&quot;:true}" data-name="Custom Custom Announcement Scroll"><div class="o_we_shape o_html_builder_Bold_16 bg-o-color-5" style="background-image: url(&quot;/html_editor/shape/html_builder%2FBold%2F16.svg?c5=%2300A57A&amp;flip=x&quot;); background-position: 50% 50%;"/>
+                        <div class="s_announcement_scroll_marquee_container d-flex s_announcement_scroll_heading_family">
+                            <div class="o_not_editable s_announcement_scroll_marquee_item lh-1">[ CONTACT ]</div>
+                        </div>
+                    </section><section class="s_newsletter_block s_newsletter_list o_cc o_colored_level pb64 o_cc4 pt72 s_custom_snippet" data-list-id="1" data-snippet="s_newsletter_block" data-scroll-background-ratio="0" data-name="Custom Newsletter Block">
+                        <div class="container">
+                            <div class="row">
+
+
+                                <div class="o_colored_level col-lg-3">
+                                    <h2>JOIN THE MAILING LIST</h2>
+                                </div><div class="o_colored_level o_cc o_cc1 border col-lg-9" style="--box-border-left-width: 25px; --box-border-bottom-width: 25px; --box-border-right-width: 25px; --box-border-top-width: 25px; border-color: rgba(255, 255, 255, 0) !important;">
+                                    <div data-vxml="001" data-list-id="0" data-name="Newsletter Form" class="s_newsletter_subscribe_form s_newsletter_list js_subscribe" data-snippet="s_newsletter_subscribe_form">
+                                        <div class="js_subscribed_wrap d-none">
+                                            <p class="h4-fs text-center text-success"><i class="fa fa-check-circle-o" role="img"/> Thanks for registering!</p>
+                                        </div>
+                                        <div class="js_subscribe_wrap">
+                                            <div class="input-group">
+                                                <input type="email" name="email" placeholder="Email" class="s_newsletter_subscribe_form_input js_subscribe_value form-control "/>
+                                                <a role="button" href="#" class="js_subscribe_btn o_submit o_translate_inline btn btn-primary">SUBSCRIBE</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                            </div></div>
+                        </div>
+            </section></div></xpath>
+        </field>
+    </record>
+</odoo>
