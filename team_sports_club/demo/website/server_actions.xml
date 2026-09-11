@@ -78,7 +78,7 @@ grade_women = env.ref('team_sports_club.res_partner_grade_16', raise_if_not_foun
 for name, url, sequence, parent_id in [
     ('Women First Team', grade_women.website_url if grade_women else '/partners', 1, teams.id),
     ('First team', grade_first.website_url if grade_first else '/partners', 10, teams.id),
-    ('About', '/about', 40, top_menu_id),
+    ('About', '/about-us', 40, top_menu_id),
     ('Contact', '/contactus', 50, top_menu_id),
 ]:
     if not menus.search(base_domain + [('url', '=', url)]):
@@ -131,6 +131,18 @@ for token, xml_id in tokens.items():
     record = env.ref(xml_id, raise_if_not_found=False)
     if record and record.website_url:
         urls[token] = record.website_url
+
+# event.tag has no real website_url (it stays on the mixin's default '#'), the
+# footer instead links to the /event listing filtered on the tag, built from its slug.
+tag_tokens = {
+    '*single_match_ticket_tag*': 'team_sports_club.event_tag_1',  # Single Match Ticket
+    '*season_ticket_tag*': 'team_sports_club.event_tag_2',        # Season Ticket
+    '*youth_camp_tag*': 'team_sports_club.event_tag_3',           # Youth Camp
+}
+for token, xml_id in tag_tokens.items():
+    tag = env.ref(xml_id, raise_if_not_found=False)
+    if tag:
+        urls[token] = '/event/tags/%s' % env['ir.http']._slug(tag)
 
 views = [
     'team_sports_club.view_page_home',
