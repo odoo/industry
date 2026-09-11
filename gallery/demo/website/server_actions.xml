@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Custom Gallery - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+website = env.ref('gallery.website_industry')
+
+to_deactivate = [
+    'portal.user_sign_in',
+    'website_blog.opt_blog_cover_post',
+    'website_blog.opt_blog_post_read_next',
+    'website_blog.opt_blog_post_readable',
+    'website_blog.opt_posts_loop_show_author',
+    'website_blog.opt_posts_loop_show_cover',
+    'website_blog.opt_posts_loop_show_teaser',
+    'website_sale.cta_separator',
+    'website_sale.product_add_to_compare',
+    'website_sale.product_attributes_body',
+    'website_sale.product_quantity',
+    'website_sale.products_attributes',
+    'website_sale.products_attributes_collapsible',
+    'website_sale.products_categories_list_collapsible',
+    'website_sale.products_shop_title',
+    'website_sale.search',
+    'website_sale.sort',
+    'website.header_call_to_action',
+    'website.header_search_box',
+    'website.header_text_element',
+    'website.header_visibility_standard',
+    'website.option_header_brand_logo',
+    'website.template_footer_links',
+    'website.template_footer_mega_cards',
+    'website.homepage',
+    'website.contactus',
+]
+to_activate = [
+    'website_blog.opt_blog_post_regular_cover',
+    'website_event.opt_event_fixed_sidebar',
+    'website_sale.cta_wrapper',
+    'website_sale.floating_bar',
+    'website_sale.header_hide_empty_cart_link',
+    'website_sale.product_add_to_wishlist',
+    'website_sale.product_terms_and_conditions',
+    'website_sale.products_attributes_top',
+    'website.template_header_default_align_right',
+    'website.template_header_navlink_no_background',
+    'website.footer_custom',
+    'website.footer_no_copyright',
+    'website.header_visibility_fixed',
+    'website.header_width_full',
+    'website.option_header_brand_name',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+# Pages link to shop categories by database id, which is only known at install
+# time: the page files ship a marker around the xmlid instead.
+MARK = '__EXPORT_FILTER_XMLID__'
+
+def resolve_markers(content):
+    new_content = content
+    while MARK in new_content:
+        start = new_content.index(MARK)
+        end = new_content.index(MARK, start + len(MARK)) + len(MARK)
+        xmlid = new_content[start + len(MARK):end - len(MARK)]
+        try:
+            resolved = str(env.ref(xmlid).id)
+        except ValueError:
+            resolved = '0'
+        new_content = new_content[:start] + resolved + new_content[end:]
+    return new_content
+
+for view in env['ir.ui.view'].sudo().search([('website_id', '=', website.id)]):
+    arch = view.arch_db or ''
+    if MARK in arch:
+        view.write({'arch_db': resolve_markers(arch)})
+
+# The contact form files a crm.lead: its "You are ... ?" checkboxes carry the
+# database ids of the crm tags, so they are patched in the same way.
+contactus = env.ref('gallery.view_page_contactus')
+tags = {
+    '*artist_tag*': 'gallery.crm_tag_1',
+    '*vendor_tag*': 'gallery.crm_tag_2',
+    '*museum_tag*': 'gallery.crm_tag_3',
+    '*press_tag*': 'gallery.crm_tag_5',
+    '*interested_to_buy_tag*': 'gallery.crm_tag_6',
+    '*other_tag*': 'sales_team.categ_oppor8',
+}
+arch = contactus.arch_db or ''
+for marker, xml_id in tags.items():
+    arch = arch.replace(marker, str(env.ref(xml_id).id))
+contactus.write({'arch_db': arch})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+
+# Menus that dependencies auto-create on every new website have no xmlid to
+# target, so they are matched by url. Home is redundant with the logo, and this
+# site has no ticketed events, so both are dropped rather than hidden: leaving
+# them would show "Home" and "Events" alongside the five entries below.
+menus.search(base_domain + [('url', 'in', ['/', '/event'])]).unlink()
+
+# Renamed in place: creating XML records for these would add a second entry on
+# the same url (website_sale ships /shop, website_blog ships /blog).
+for url, vals in [
+    ('/blog', {'name': 'NEWS', 'sequence': 3}),
+    ('/shop', {'name': 'SHOP', 'sequence': 4}),
+]:
+    menus.search(base_domain + [('url', '=', url)], limit=1).write(vals)
+
+# Custom menus. The website root menu computes its url to '#' like any
+# dropdown, so it is matched on parent_id rather than on url.
+top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
+for name, url, sequence in [
+    ('ARTISTS', '/artists', 1),
+    ('EXHIBITIONS', '/exhibitions', 2),
+    ('INFO', '/info', 5),
+]:
+    if not menus.search(base_domain + [('url', '=', url)]):
+        menus.create({
+            'name': name,
+            'url': url,
+            'sequence': sequence,
+            'website_id': website.id,
+            'parent_id': top_menu.id if top_menu else False,
+        })
+]]></field>
+    </record>
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
