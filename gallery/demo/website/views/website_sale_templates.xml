@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="website_sale_cta_wrapper" model="ir.ui.view">
+        <field name="name">Custom Valleverde - CTA Wrapper</field>
+        <field name="key">website_sale.cta_wrapper</field>
+        <field name="inherit_id" ref="website_sale.cta_wrapper"/>
+        <field name="website_id" ref="website_industry"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='add_to_cart']" position="replace">
+                <button name="add_to_cart" t-attf-class="btn btn-primary flex-grow-1"
+                    data-action="add_to_cart" data-animation-selector=".o_wsale_product_images"
+                    t-att-data-product-category-id="product.public_categ_ids.ids and product.public_categ_ids.ids[0]"
+                    t-att-data-product-id="product_variant.id"
+                    t-att-data-product-template-id="product.id"
+                    t-att-data-product-type="product.type"
+                    t-att-data-show-quantity="is_view_active('website_sale.product_quantity')">
+                    ADD TO CART
+                </button>
+            </xpath>
+        </field>
+    </record>
+    <record id="website_sale_product_add_to_wishlist" model="ir.ui.view">
+        <field name="name">Custom Valleverde - Wishlist Button</field>
+        <field name="key">website_sale.product_add_to_wishlist</field>
+        <field name="inherit_id" ref="website_sale.cta_wrapper"/>
+        <field name="website_id" ref="website_industry"/>
+        <field name="arch" type="xml"><xpath expr="//div[@id='product_option_block']" position="inside">
+                <t t-set="product_variant" t-value="product_variant or product._create_first_product_variant()"/>
+                <t t-set="_button_classes" t-valuef="o_add_wishlist_dyn btn btn-outline-primary text-nowrap"/>
+                <t t-if="website.product_page_image_width == '50_pc' and not (is_view_active('website_sale.cta_wrapper_boxed') or is_view_active('website_sale.cta_wrapper_large'))" t-set="_button_classes" t-value="_button_classes + ' flex-grow-1 flex-sm-grow-0'"/>
+                <t t-else="" t-set="_button_classes" t-value="_button_classes + ' flex-grow-1'"/>
+                <t t-if="is_view_active('website_sale.cta_wrapper_large')" t-set="_button_classes" t-value="_button_classes + ' btn-lg px-lg-0'"/>
+                <button t-if="product_variant" t-att-class="_button_classes" t-att-disabled="product_variant._is_in_wishlist()" t-att-data-product-id="product_variant.id" t-att-data-product-template-id="product.id" title="Add to wishlist">
+                    <i class="fa fa-heart-o me-2 me-lg-0" role="img" aria-label="Add to wishlist"/>
+                    <t t-set="_span_classes" t-valuef="d-inline"/>
+                    <t t-if="website.product_page_image_width == '50_pc' and not (is_view_active('website_sale.cta_wrapper_boxed') or is_view_active('website_sale.cta_wrapper_large'))" t-set="_span_classes" t-value="_span_classes + ' d-lg-none'"/>
+                    <span t-att-class="_span_classes">ADD TO WISHLIST</span>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="website_sale_product_terms_and_conditions" model="ir.ui.view">
+        <field name="name">Custom Valleverde - Terms and Conditions</field>
+        <field name="key">website_sale.product_terms_and_conditions</field>
+        <field name="inherit_id" ref="website_sale.product"/>
+        <field name="website_id" ref="website_industry"/>
+        <field name="arch" type="xml"><div id="o_wsale_product_cta_section" position="inside">
+                <small class="text-muted mb-0">
+                    <a href="/terms" class="o_translate_inline text-muted"><u>TERMS AND CONDITIONS</u></a>
+                </small>
+            </div>
+        </field>
+    </record>
+</odoo>
