@@ -26,9 +26,7 @@ class AutomationsTestCase(TransactionCase):
         })
         cls.device_product = cls.env['product.product'].create({
             'name': 'HVAC Device',
-            'type': 'consu',
-            'is_storable': True,
-            'tracking': 'serial',
+            'store_by': 'serial',
         })
         cls.lot_1 = cls.env['stock.lot'].create({
             'name': 'HVAC-SERIAL-01',

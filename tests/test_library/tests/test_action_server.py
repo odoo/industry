@@ -215,11 +215,11 @@ class LibraryAutomationsTestCase(TransactionCase):
 
     def test_automation_add_qty_on_product_create(self):
         """Test for the automation_add_qty_on_product_create automation."""
-        product_not_storable = self.env['product.product'].create({'name': "Test product not storable", 'is_storable': False})
+        product_not_storable = self.env['product.product'].create({'name': "Test product not storable", 'store_by': 'untracked'})
         self.assertEqual(self.env['stock.quant'].search_count([('product_id', '=', product_not_storable.id)]), 0,
                          "The automation should not work on targets outside of the domain on create")
 
-        product_storable = self.env['product.product'].create({'name': "Test product storable", 'is_storable': True})
+        product_storable = self.env['product.product'].create({'name': "Test product storable", 'store_by': 'quantity'})
         self.assertEqual(self.env['stock.quant'].search_count([('product_id', '=', product_storable.id)]), 2,
                          "The automation should create a WH/Stock and an inventory adjustment if the product is storable")
         self.assertEqual(product_storable.qty_available, 1, "A product is automatically made available")
