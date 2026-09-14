@@ -1,6 +1,6 @@
 {
     'name': 'Property Assets & Distribution',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Services',
     'depends': [
         'sale_subscription',
@@ -11,6 +11,7 @@
         'data/ir_model.xml',
         'data/ir_model_access.xml',
         'data/ir_model_fields.xml',
+        'data/ir_rule.xml',
         'data/ir_model_2.xml',
         'data/ir_default.xml',
         'data/ir_actions_server.xml',
