@@ -25,6 +25,7 @@
         'data/documents_document.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
+        'data/stock_route.xml',
         'data/product_attribute.xml',
         'data/product_category.xml',
         'data/product_template.xml',
