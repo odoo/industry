@@ -71,6 +71,24 @@ for wizard in records:
     )
 
     if move:
+        if wizard.x_replace_on_transfer:
+            if wizard.x_quantity > move.product_uom_qty:
+                raise UserError(f"Quantity to replace must be less than or equal to the demand quantity of the original move (original move demand quantity is {move.product_uom_qty}).")
+            new_move = env['stock.move'].create({
+                'product_id': wizard.x_product_convert_into.id,
+                'product_uom_qty': wizard.x_quantity,
+                'uom_id': wizard.x_product_convert_into.uom_id.id,
+                'picking_id': move.picking_id.id,
+            })
+            new_move_line = env['stock.move.line'].create({
+                'move_id': new_move.id,
+                'product_id': wizard.x_product_convert_into.id,
+                'lot_id': lot.id if lot_name else False,
+                'quantity': wizard.x_quantity,
+            })
+            move.write({'product_uom_qty': move.product_uom_qty - wizard.x_quantity})
+            if move.picking_id.show_check_availability: move.picking_id.action_assign()
+
         move.picking_id.message_post(
             body=(
                 '<b>%s</b> from location <b>%s</b> converted into <b>%s</b> in Manufacturing Order '
@@ -133,5 +151,15 @@ else:
         <field name="code"><![CDATA[
 records.write({'x_is_convert_attribute': False})
         ]]></field>
+    </record>
+    <record id="action_clear_destination_location" model="ir.actions.server">
+        <field name="name">Clear Destination Location</field>
+        <field name="model_id" ref="x_model_convert_product_wizard"/>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="x_model_convert_product_wizard"/>
+        <field name="update_field_id" ref="x_field_convert_product_wizard_destination_location_id"/>
+        <field name="update_path">x_destination_location_id</field>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[False]]></field>
     </record>
 </odoo>
