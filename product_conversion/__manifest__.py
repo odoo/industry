@@ -1,6 +1,6 @@
 {
     'name': 'Product Conversion & Grading Management',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Supply Chain',
     'depends': [
         'mrp',
@@ -10,8 +10,8 @@
         'data/res_config_settings.xml',
         'data/ir_model.xml',
         'data/ir_access.xml',
-        'data/ir_actions_server.xml',
         'data/ir_model_fields.xml',
+        'data/ir_actions_server.xml',
         'data/ir_ui_view.xml',
         'data/base_automation.xml',
     ],
