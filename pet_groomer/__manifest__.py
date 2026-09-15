@@ -1,5 +1,6 @@
 {
     'name': 'Pet Groomers',
+    'version': '1.1',
     'category': 'Health and Fitness',
     'author': 'Odoo S.A.',
     'depends': [
