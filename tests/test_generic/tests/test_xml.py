@@ -155,6 +155,7 @@ class TestEnv(IndustryCase):
         manifest_content = None
         uninitialized_sessions = []
         session_functions = []
+        with_demo = self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1)
         for root, dirs, files in os.walk(path):
             # sort the directory by alphabetical order so static directory is read first.
             dirs.sort(reverse=True)
@@ -179,7 +180,7 @@ class TestEnv(IndustryCase):
                         manifest_content = decoded_content
                     continue
 
-                if root.split('/')[-1] == 'demo' and not self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1):
+                if root.split('/')[-1] == 'demo' and not with_demo:
                     continue
                 try:
                     tree = etree.fromstring(encoded_content)
@@ -217,7 +218,7 @@ class TestEnv(IndustryCase):
                 if root.split('/')[-1] == 'demo':
                     has_main_company_record = has_main_company_record or self._check_main_company_inherit_is_present(tree, file_name, module)
 
-        if not has_main_company_record and module in self.installed_industries:
+        if not has_main_company_record and module in self.installed_industries and with_demo:
             _logger.warning(
                 "The module %s does not contain an extension of main_company."
                 "It should change the name and logo of the company to the industry ones.",
