@@ -1,5 +1,5 @@
 {
-    'name': 'Construction Developer',
+    'name': 'Property Developer',
     'version': '1.17',
     'category': 'Construction',
     'depends': [
