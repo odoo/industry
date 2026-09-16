@@ -1,5 +1,6 @@
 {
     'name': 'Community Care',
+    'version': '1.1',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
@@ -41,6 +42,7 @@
     ],
     'demo': [
         'demo/res_company.xml',
+        'demo/resource_calendar.xml',
         'demo/resource_resource.xml',
         'demo/hr_employee.xml',
         'demo/x_family_unit.xml',
