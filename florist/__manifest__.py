@@ -1,13 +1,12 @@
 {
     'name': 'Florist',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Retail',
     'author': 'Odoo S.A.',
     'depends': [
         'base_industry_data',
         'crm_enterprise',
         'pos_online_payment',
-        'pos_stock',
         'project_enterprise',
         'sale_crm',
         'sale_loyalty',
@@ -16,6 +15,7 @@
         'website_crm',
     ],
     'data': [
+        'data/ir_ui_menu.xml',
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/pos_category.xml',
