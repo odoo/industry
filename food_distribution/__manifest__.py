@@ -35,6 +35,7 @@
         'data/product_category.xml',
         'data/uom_uom.xml',
         'data/x_nutritional_facts.xml',
+        'data/stock_route.xml',
         'data/product_template.xml',
         'data/product_product.xml',
         'data/mrp_bom.xml',

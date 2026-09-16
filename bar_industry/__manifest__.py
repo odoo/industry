@@ -24,6 +24,7 @@
         'data/pos_category.xml',
         'data/pos_config.xml',
         'data/uom_uom.xml',
+        'data/stock_route.xml',
         'data/product_product.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',

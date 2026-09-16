@@ -28,6 +28,7 @@
         'data/project_task.xml',
         'data/planning_role.xml',
         'data/uom_uom.xml',
+        'data/stock_route.xml',
         'data/product_template.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',

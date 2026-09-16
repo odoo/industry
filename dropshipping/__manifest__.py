@@ -15,6 +15,7 @@
     ],
     'data': [
         'data/product_category.xml',
+        'data/stock_route.xml',
         'data/product_template.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',

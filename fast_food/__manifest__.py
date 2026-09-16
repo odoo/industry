@@ -21,6 +21,7 @@
         'data/ir_attachment_pre.xml',
         'data/product_category.xml',
         'data/uom_uom.xml',
+        'data/stock_route.xml',
         'data/product_product.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
