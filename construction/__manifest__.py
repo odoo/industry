@@ -1,5 +1,5 @@
 {
-    'name': 'Construction Builder',
+    'name': 'General Contractor',
     'version': '1.4',
     'category': 'Construction',
     'depends': [
