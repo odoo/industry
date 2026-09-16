@@ -20,6 +20,7 @@
         'data/project_task_type.xml',
         'data/project_project.xml',
         'data/project_task.xml',
+        'data/stock_route.xml',
         'data/product_product.xml',
         'data/sale_order_spreadsheet.xml',
         'data/sale_order_template.xml',

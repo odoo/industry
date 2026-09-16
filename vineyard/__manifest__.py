@@ -32,6 +32,7 @@
         'data/uom_uom.xml',
         'data/product_category.xml',
         'data/product_tag.xml',
+        'data/stock_route.xml',
         'data/product_product.xml',
         'data/pos_config.xml',
         'data/mrp_bom_byproduct.xml',
