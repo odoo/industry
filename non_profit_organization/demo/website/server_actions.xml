@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Custom Website Uplift - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code">
+website = env.ref('non_profit_organization.website_industry')
+
+to_deactivate = [
+    'website.template_header_default',
+    'website_sale.products_categories_top',
+    'website.footer_custom',
+    'website.header_search_box',
+    'website.header_text_element',
+    'website.template_footer_headline',
+    'website.homepage',
+    'website.contactus',
+]
+to_activate = [
+    'website_sale.header_hide_empty_cart_link',
+    'website.header_call_to_action',
+    'website.template_footer_call_to_action',
+    'website.template_header_boxed',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+# Menus. website / website_sale / website_event each copy a menu onto every new
+# website at creation time, so those rows have no xmlid to target declaratively:
+# match them by url and rename, and create only what is genuinely missing.
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
+
+for url, name, sequence in [
+    ('/', 'Home', 10),
+    ('/event', 'Events', 16),
+    ('/shop', 'Shop', 20),
+]:
+    menus.search(base_domain + [('url', '=', url)], limit=1).write({
+        'name': name,
+        'sequence': sequence,
+        'is_visible': True,
+    })
+
+for url, name, sequence in [
+    ('/become-a-member', 'Become a member', 15),
+]:
+    if not menus.search(base_domain + [('url', '=', url)]):
+        menus.create({
+            'name': name,
+            'url': url,
+            'website_id': website.id,
+            'parent_id': top_menu.id if top_menu else False,
+            'sequence': sequence,
+            'is_visible': True,
+        })
+
+# The checkout "Extra Info" customisation lives in data/, tied to the pre-existing
+# default website. Leave it there and mirror the same activation onto the new
+# website, without touching the default website's records.
+extra_info = env.ref('non_profit_organization.website_checkout_extra_info')
+env['website'].with_context(**ctx).viewref('website_sale.extra_info').write({'arch': extra_info.arch})
+env['website.checkout.step'].search([
+    ('step_href', '=', '/shop/extra_info'),
+    ('website_id', '=', website.id),
+]).write({'is_published': True})
+
+# Dynamic snippets store a numeric website.snippet.filter id, or a specific
+# record's res_id, in the arch; the export replaces those with a marker
+# holding the xmlid, resolved here.
+MARKS = ['__EXPORT_FILTER_XMLID__', '__EXPORT_RES_ID_XMLID__']
+for view in env['ir.ui.view'].sudo().search([('website_id', '=', website.id)]):
+    arch = view.arch_db or ''
+    if not any(mark in arch for mark in MARKS):
+        continue
+    new_arch = arch
+    for MARK in MARKS:
+        while MARK in new_arch:
+            start = new_arch.index(MARK)
+            end = new_arch.index(MARK, start + len(MARK)) + len(MARK)
+            xmlid = new_arch[start + len(MARK):end - len(MARK)]
+            try:
+                resolved = str(env.ref(xmlid).id)
+            except ValueError:
+                resolved = '0'
+            new_arch = new_arch[:start] + resolved + new_arch[end:]
+    view.write({'arch_db': new_arch})
+
+# The builder exports hrefs containing database ids (/shop/membership-14). Those
+# ids differ on every install, so the pages ship a *token* and we swap in the
+# real website_url here.
+tokens = {
+    '*membership_product*': 'non_profit_organization.product_product_4',
+}
+urls = {}
+for token, xml_id in tokens.items():
+    record = env.ref(xml_id, raise_if_not_found=False)
+    if record and record.website_url:
+        urls[token] = record.website_url
+
+views = [
+    'non_profit_organization.view_page_become_a_member',
+    'non_profit_organization.template_footer_call_to_action',
+]
+for xml_id in views:
+    view = env.ref(xml_id, raise_if_not_found=False)
+    if not view:
+        continue
+    arch = view.arch
+    for token, url in urls.items():
+        arch = arch.replace(token, url)
+    if arch != view.arch:
+        view.write({'arch': arch})
+</field>
+    </record>
+
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
