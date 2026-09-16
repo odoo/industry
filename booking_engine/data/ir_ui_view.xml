@@ -114,44 +114,60 @@
   </record>
   <record id="planning_search_view" model="ir.ui.view">
     <field name="arch" type="xml">
-        <xpath expr="//search[1]/group[1]/separator[1]" position="replace"/>
-        <xpath expr="//filter[@name='group_by_manager']" position="replace"/>
-        <xpath expr="//filter[@name='group_by_department']" position="replace"/>
-        <xpath expr="//search[1]/separator[7]" position="replace"/>
-        <xpath expr="//filter[@name='published_shifts']" position="replace"/>
-        <xpath expr="//filter[@name='unpublished_shifts']" position="replace"/>
-        <xpath expr="//search[1]/separator[6]" position="replace"/>
-        <xpath expr="//search[1]/separator[5]" position="replace"/>
-        <xpath expr="//filter[@name='non_billable']" position="replace"/>
-        <xpath expr="//filter[@name='billable']" position="replace"/>
-        <xpath expr="//search[1]/separator[4]" position="replace"/>
-        <xpath expr="//filter[@name='materials']" position="replace"/>
-        <xpath expr="//filter[@name='employees']" position="replace"/>
-        <xpath expr="//filter[@name='my_role']" position="replace"/>
-        <xpath expr="//filter[@name='unwanted_shifts']" position="replace"/>
-        <xpath expr="//filter[@name='my_department_shifts']" position="replace"/>
-        <xpath expr="//filter[@name='my_team_shifts']" position="replace"/>
-        <xpath expr="//filter[@name='my_shifts']" position="replace"/>
-        <xpath expr="//filter[@name='open_shifts']" position="replace"/>
-        <xpath expr="//field[@name='employee_skill_ids']" position="replace"/>
-        <xpath expr="//field[@name='manager_id']" position="replace"/>
-        <xpath expr="//field[@name='department_id']" position="replace"/>
-        <xpath expr="//field[@name='resource_ids']" position="before">
-          <field name="partner_id"/>
-        </xpath>
-        <xpath expr="//filter[@name='group_by_role']" position="after">
-          <filter string="Customer" name="Customer" context="{'group_by':'partner_id'}"/>
-        </xpath>
-        <xpath expr="//filter[@name='conflict_shifts']" position="before">
-          <filter string="Today's Check In" name="filter_checkin_today" domain="[('sale_order_id.rental_status', '=', 'pickup'), ('sale_order_id.rental_start_date', '&gt;=', 'today'), ('sale_order_id.rental_start_date', '&lt;', 'today +1d')]"/>
-          <filter string="Today's Check Out" name="filter_checkout_today" domain="[('sale_order_id.rental_status', '=', 'return'), ('sale_order_id.rental_return_date', '&gt;=', 'today'), ('sale_order_id.rental_return_date', '&lt;', 'today +1d')]"/>
-          <separator/>
-        </xpath>
+        <search>
+            <field name="partner_id"/>
+            <field name="resource_ids"/>
+            <field name="role_id" groups="planning.group_planning_user"/>
+            <field name="sale_order_id"/>
+            <field name="company_id" groups="base.group_multi_company"/>
+            <field name="name" groups="planning.group_planning_user"/>
+            <field name="request_to_switch" groups="planning.group_planning_user"/>
+            <filter string="Today's Check In" name="filter_checkin_today" domain="[('sale_order_id.rental_status', '=', 'pickup'), ('sale_order_id.rental_start_date', '&gt;=', 'today'), ('sale_order_id.rental_start_date', '&lt;', 'today +1d')]"/>
+            <filter string="Today's Check Out" name="filter_checkout_today" domain="[('sale_order_id.rental_status', '=', 'return'), ('sale_order_id.rental_return_date', '&gt;=', 'today'), ('sale_order_id.rental_return_date', '&lt;', 'today +1d')]"/>
+            <separator/>
+            <filter name="conflict_shifts" string="Shifts in Conflict" groups="planning.group_planning_manager" context="{'highlight_conflicting': 1}"/>
+            <separator/>
+            <filter string="Start Date" name="start_datetime" date="start_datetime" end_month="1">
+                <filter name="start_today" string="Today" domain="[
+                    ('start_datetime', '&lt;', 'today +1d'),
+                    ('start_datetime', '&gt;=', 'today'),
+                ]"/>
+                <filter name="start_this_week" string="This Week" domain="[
+                    ('start_datetime', '&gt;=', '=week_start'),
+                    ('start_datetime', '&lt;', '=week_start +1w'),
+                ]"/>
+                <filter name="start_next_week" string="Next Week" domain="[
+                    ('start_datetime', '&gt;=', '=week_start +1w'),
+                    ('start_datetime', '&lt;', '=week_start +2w'),
+                ]"/>
+            </filter>
+            <filter string="End Date" name="end_datetime" date="end_datetime" end_month="1">
+                <filter name="end_today" string="Today" domain="[
+                    ('end_datetime', '&gt;=', 'today'),
+                    ('end_datetime', '&lt;', 'today +1d'),
+                ]"/>
+                <filter name="end_this_week" string="This Week" domain="[
+                    ('end_datetime', '&gt;=', '=week_start'),
+                    ('end_datetime', '&lt;', '=week_start +1w'),
+                ]"/>
+                <filter name="end_next_week" string="Next Week" domain="[
+                    ('end_datetime', '&gt;=', '=week_start +1w'),
+                    ('end_datetime', '&lt;', '=week_start +2w'),
+                ]"/>
+            </filter>
+            <group>
+                <filter name="group_by_role" string="Role" context="{'group_by': 'role_id'}"/>
+                <filter name="group_by_company" string="Company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                <filter name="group_by_sale_order_id" string="Sale Order" context="{'group_by': 'sale_order_id'}"/>
+                <filter name="group_by_start_datetime" string="Start Date" context="{'group_by':'start_datetime:day'}"/>
+                <filter name="group_by_end_datetime" string="End Date" context="{'group_by':'end_datetime:day'}"/>
+                <filter name="group_by_properties" string="Properties" context="{'group_by': 'slot_properties'}"/>
+            </group>
+        </search>
     </field>
-    <field name="inherit_id" ref="planning.planning_view_search"/>
     <field name="mode">primary</field>
     <field name="model">planning.slot</field>
-    <field name="name">planning.slot.search.inherit.booking_engine</field>
+    <field name="name">planning.slot.search.booking_engine</field>
     <field name="priority">99</field>
     <field name="type">search</field>
     <field name="active" eval="True"/>
