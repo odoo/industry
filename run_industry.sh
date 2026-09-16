@@ -71,8 +71,16 @@ for module in "${MODULES[@]}"; do
   fi
 done
 
-TEST_TAGS="/test_generic"$(IFS= ; echo ",/test_${MODULES[*]}")
-TEST_MODULES="test_generic"$(IFS= ; echo ",test_${MODULES[*]}")
+# Built per-module and joined with a real comma -- ${MODULES[*]} with IFS
+# unset/empty (as the old one-liner had it) concatenates module names
+# together with no separator instead of giving each its own /test_<mod>
+# tag, silently breaking the moment -n is given more than one module.
+TEST_TAGS="/test_generic"
+TEST_MODULES="test_generic"
+for module in "${MODULES[@]}"; do
+  TEST_TAGS+=",/test_$module"
+  TEST_MODULES+=",test_$module"
+done
 
 #try to init the db to check if it exists
 if $PYTHON_BIN $ODOO_BIN db init $DEP_DB >/dev/null 2>&1; then
