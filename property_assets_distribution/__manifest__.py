@@ -1,6 +1,6 @@
 {
     'name': 'Property Assets & Distribution',
-    'version': '1.3',
+    'version': '1.4',
     'category': 'Services',
     'depends': [
         'sale_subscription',
