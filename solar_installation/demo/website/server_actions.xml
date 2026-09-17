@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Custom Website - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code">
+website = env.ref('solar_installation.website_industry')
+
+to_deactivate = [
+    'website.header_search_box',
+    'website.header_visibility_standard',
+    'website.homepage',
+    'website.contactus',
+]
+to_activate = [
+    'website.footer_custom',
+    'website.header_call_to_action',
+    'website.header_text_element',
+    'website.header_visibility_disappears',
+    'website.template_header_default_align_center',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+
+# Rename/reorder the default menu: Home
+menus.search(base_domain + [('url', '=', '/')], limit=1).write({'name': 'Home', 'sequence': 1, 'is_visible': True})
+# Disable the default Contact us menu
+menus.search(base_domain + [('url', '=', '/contactus')], limit=1).write({'website_id': False})
+# Add Product &amp; Services and Help menus
+parent_menu = menus.search(base_domain + [('url', '=', '#')], limit=1)
+menus.create({
+    'name': 'Product &amp; Services',
+    'url': '/products-and-services',
+    'parent_id': parent_menu.id,
+    'website_id': website.id,
+    'sequence': 2,
+    'is_visible': True,
+})
+menus.create({
+    'name': 'Help',
+    'url': '/helpdesk',
+    'parent_id': parent_menu.id,
+    'website_id': website.id,
+    'sequence': 3,
+    'is_visible': True,
+})
+</field>
+    </record>
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
