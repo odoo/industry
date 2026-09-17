@@ -15,13 +15,8 @@ usage() {
   echo "                       (default 5678) by (-P - 8069). The gevent port is picked at random"
   echo "                       from whatever's free between 8000-8999 -- nothing addresses it by"
   echo "                       hand, so it doesn't need to be predictable the way -P itself does."
-  echo "  -D <name>            Use this exact database name instead of the one derived from -n"
-  echo "                       (the dependency DB is still 'dep-<name>'). When not given, the"
-  echo "                       derived name gets auto-suffixed with a port-derived tag (e.g."
-  echo "                       '-p8169') whenever -P isn't the default 8069, since that's already"
-  echo "                       the flag you're changing to run a second instance -- so two"
-  echo "                       instances of the same industry still get separate databases with"
-  echo "                       zero extra effort. Pass -D to take full control instead."
+  echo "  -D <name>            Use this exact database name instead of the default"
+  echo "                       '<odoo-version>-<modules>-<port>'"
   exit 1
 }
 
@@ -114,16 +109,36 @@ run_odoo_shell_script() {
 
 IFS=',' read -r -a MODULES <<< "$INDUSTRY_NAME"
 MODULES=($(printf '%s\n' "${MODULES[@]}" | sort))
-DB_NAME=$(IFS=- ; echo "${MODULES[*]}")
+MODULE_STR=$(IFS=- ; echo "${MODULES[*]}")
+
 if [ -n "$DB_NAME_OVERRIDE" ]; then
   DB_NAME="$DB_NAME_OVERRIDE"
-elif [ "$PORT_OFFSET" -ne 0 ]; then
-  # -D wasn't given but -P was: auto-tag with the port so two instances of
-  # the same industry (started with different -P values) still don't share
-  # a database -- see usage()'s -D entry for the reasoning.
-  DB_NAME="$DB_NAME-p$HTTP_PORT"
+  DEP_DB="dep-$DB_NAME"
+else
+  # odoo/release.py's "series", e.g. "19.0", "20.1", or "saas-19.4"
+  # - the dependency DB is version-only ("dep-<modules>-<version>"), so
+  #   it's REUSED across every port/instance of the same version -- the
+  #   slow part (installing base_import_module + internal deps) only
+  #   ever needs to happen once per version, not once per instance.
+  # - the actual working DB adds the port on top
+  #   ("<modules>-<version>-<port>"), so two live instances of the same
+  #   version (e.g. comparing with/without a change, both on `master`)
+  #   each get their own mutable database while still sharing that one
+  #   dependency snapshot.
+  if [ -f "odoo/odoo/release.py" ]; then
+    ODOO_VERSION=$(python3 -c "
+import importlib.util
+spec = importlib.util.spec_from_file_location('release', 'odoo/odoo/release.py')
+release = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(release)
+print(release.series)
+" | tr '~' '-')
+  else
+    ODOO_VERSION="undefined"
+  fi
+  DEP_DB="dep-$ODOO_VERSION-$MODULE_STR"
+  DB_NAME="$ODOO_VERSION-$MODULE_STR-$HTTP_PORT"
 fi
-DEP_DB="dep-$DB_NAME"
 
 echo "Industries: $DB_NAME"
 echo "Install: $INSTALL"
