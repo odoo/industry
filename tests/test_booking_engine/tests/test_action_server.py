@@ -20,7 +20,7 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         cls.resource = cls.env['resource.resource'].create({
             'name': 'Room Resource Due Out',
             'resource_type': 'material',
-            'calendar_id': False,
+            'calendar_id': cls.env.ref('booking_engine.calendar_1').id,
         })
         cls.role = cls.env['planning.role'].create({
             'name': 'Role',
@@ -159,6 +159,7 @@ class BookingEngineAutomationsTestCase(TransactionCase):
             'name': 'Room Resource Due Out',
             'resource_type': 'material',
             'role_ids': [Command.link(role_has_checkout_cleaning.id)],
+            'calendar_id': self.env.ref('booking_engine.calendar_1').id,
         })
         self.product.planning_role_id = role_has_checkout_cleaning.id
         self.product.x_checkout_cleaning = 1.0
@@ -172,6 +173,7 @@ class BookingEngineAutomationsTestCase(TransactionCase):
             'name': 'Clea Noir',
             'resource_type': 'user',
             'role_ids': [Command.link(house_keeping_role.id)],
+            'calendar_id': self.env.ref('booking_engine.calendar_1').id,
         })
         self.product.x_house_keeping_role_id = house_keeping_role.id
 
@@ -582,6 +584,7 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         resource_2 = self.env['resource.resource'].create({
             'name': 'Test Room 2',
             'resource_type': 'material',
+            'calendar_id': self.env.ref('booking_engine.calendar_1').id,
         })
         self.room_offer_template.write({
             'x_resource_ids': [Command.link(resource_2.id)],
@@ -626,7 +629,7 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         resource_2 = self.env['resource.resource'].create({
             'name': 'Test Room 2',
             'resource_type': 'material',
-            'calendar_id': False,
+            'calendar_id': self.env.ref('booking_engine.calendar_1').id,
         })
 
         tmpl = self.product.product_tmpl_id
