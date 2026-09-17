@@ -90,6 +90,28 @@ INDUSTRY_PATH="industry/"
 PYTHON_BIN="python3"
 ODOO_BIN="odoo/odoo-bin"
 ADDONS_PATH="$INDUSTRY_PATH/tests,enterprise,odoo/addons,odoo/odoo/addons,design-themes"
+
+# Runs a Python snippet inside `odoo-bin shell` against the given database,
+# $1 is the database, every arg after that
+# is one line of the snippet's own payload (whatever sits between the
+# imports and the final commit).
+run_odoo_shell_script() {
+  local db="$1"; shift
+  local tmp_py
+  tmp_py=$(mktemp)
+  {
+    echo "import sys"
+    echo "sys.path.append('$INDUSTRY_PATH')"
+    echo "from utils import IndustryUtils"
+    printf '%s\n' "$@"
+    echo 'print("")'
+    echo "env.cr.commit()"
+    echo "exit()"
+  } > "$tmp_py"
+  $PYTHON_BIN $ODOO_BIN shell --addons-path="$ADDONS_PATH" -d "$db" < "$tmp_py"
+  rm -f "$tmp_py"
+}
+
 IFS=',' read -r -a MODULES <<< "$INDUSTRY_NAME"
 MODULES=($(printf '%s\n' "${MODULES[@]}" | sort))
 DB_NAME=$(IFS=- ; echo "${MODULES[*]}")
@@ -151,18 +173,8 @@ if $HARD_RESET; then
   $PYTHON_BIN $ODOO_BIN db init $DEP_DB --force
   echo "Initializing dependencies..."
   $PYTHON_BIN $ODOO_BIN --addons-path="$ADDONS_PATH" module install base_import_module -d $DEP_DB
-  TMP_DEP_PY=$(mktemp)
-  cat <<EOF > "$TMP_DEP_PY"
-import sys
-sys.path.append('$INDUSTRY_PATH')
-from utils import IndustryUtils
-IndustryUtils().install_internal_dependencies('$INDUSTRY_NAME', env)
-print("")
-env.cr.commit()
-exit()
-EOF
-  cat $TMP_DEP_PY | $PYTHON_BIN $ODOO_BIN shell --addons-path="$ADDONS_PATH" -d $DEP_DB
-  rm -f "$TMP_DEP_PY"
+  run_odoo_shell_script "$DEP_DB" \
+    "IndustryUtils().install_internal_dependencies('$INDUSTRY_NAME', env)"
 fi
 
 # reload db when reset
@@ -174,19 +186,9 @@ fi
 # install industry module 
 if $INSTALL; then
   echo "Initializing industry module..."
-  TMP_INSTALL_PY=$(mktemp)
-  cat <<EOF > "$TMP_INSTALL_PY"
-import sys
-sys.path.append('$INDUSTRY_PATH')
-from utils import IndustryUtils
-zip = IndustryUtils().get_zip('$INDUSTRY_NAME')
-env['ir.module.module']._import_zipfile(zip, force=False, with_demo=$DEMO)
-print("")
-env.cr.commit()
-exit()
-EOF
-  cat "$TMP_INSTALL_PY" | $PYTHON_BIN $ODOO_BIN shell --addons-path="$ADDONS_PATH" -d $DB_NAME
-  rm -f "$TMP_INSTALL_PY"
+  run_odoo_shell_script "$DB_NAME" \
+    "zip = IndustryUtils().get_zip('$INDUSTRY_NAME')" \
+    "env['ir.module.module']._import_zipfile(zip, force=False, with_demo=$DEMO)"
 fi
 
 if $TEST; then
