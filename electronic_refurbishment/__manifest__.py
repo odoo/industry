@@ -1,5 +1,6 @@
 {
     'name': 'Electronic Refurbishment',
+    'version': '1.1',
     'category': 'Retail',
     'author': 'Odoo S.A.',
     'depends': [
