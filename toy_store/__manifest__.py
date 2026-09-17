@@ -1,6 +1,6 @@
 {
     'name': 'Toy Store',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Retail',
     'depends': [
         'base_industry_data',
