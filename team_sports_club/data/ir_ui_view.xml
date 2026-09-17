@@ -50,22 +50,22 @@
         <header/>
         <sheet string="Team">
           <div name="button_box" class="oe_button_box">
-            <button name="%(action_res_partner_grade_players)d" class="oe_stat_button" icon="fa-users" type="action">
+            <button name="%(action_res_partner_grade_players)d" class="oe_stat_button" icon="group" type="action">
               <div class="o_stat_info">
                 <span class="o_stat_text">Players</span>
               </div>
             </button>
-            <button name="%(action_res_partner_grade_staff)d" class="oe_stat_button" icon="fa-user-md" type="action">
+            <button name="%(action_res_partner_grade_staff)d" class="oe_stat_button" icon="person" type="action">
               <div class="o_stat_info">
                 <span class="o_stat_text">Staff</span>
               </div>
             </button>
-            <button name="%(action_res_partner_grade_trainings)d" class="oe_stat_button" icon="fa-calendar-check-o" type="action">
+            <button name="%(action_res_partner_grade_trainings)d" class="oe_stat_button" icon="sports_soccer" type="action">
                 <div class="o_stat_info">
                 <span class="o_stat_text">Trainings</span>
               </div>
             </button>
-            <button name="%(action_res_partner_grade_games)d" class="oe_stat_button" icon="fa-calendar" type="action">
+            <button name="%(action_res_partner_grade_games)d" class="oe_stat_button" icon="calendar_today" type="action">
               <div class="o_stat_info">
                 <span class="o_stat_text">Games</span>
               </div>
@@ -168,12 +168,12 @@
   <record id="res_partner_form_view" model="ir.ui.view">
     <field name="arch" type="xml">
       <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
-        <button name="%(action_res_partner_player_teams)d" class="oe_stat_button" icon="fa-users" type="action">
+        <button name="%(action_res_partner_player_teams)d" class="oe_stat_button" icon="group" type="action">
           <div class="o_stat_info">
             <span class="o_stat_text">Teams</span>
           </div>
         </button>
-        <button name="%(action_res_partner_staff_teams)d" class="oe_stat_button" icon="fa-user-md" type="action">
+        <button name="%(action_res_partner_staff_teams)d" class="oe_stat_button" icon="person" type="action">
           <div class="o_stat_info">
             <span class="o_stat_text">Staffs</span>
           </div>
@@ -250,7 +250,7 @@
               <field name="x_partner_id"/>
               <field name="x_team_id"/>
               <field name="x_jersey"/>
-              <field name="x_role_ids" widget="many2many_tags" domain="[('id', 'in', x_partner_category_ids)]"/>
+              <field name="x_role_ids" widget="many2many_tags" domain="[('id', 'in', x_partner_category_ids)]" options="{'no_create': True}"/>
             </group>
           </sheet>
         </form>
@@ -267,6 +267,7 @@
         <filter name="groupby_x_team_id" string="Team" context="{'group_by': 'x_team_id'}"/>
         <separator/>
         <filter name="active_team" string="Active Team" domain="['|', ('x_team_id.x_to_date', '=', False), ('x_team_id.x_to_date', '>', context_today())]"/>
+        <filter name="filter_not_member" string="Not Member" domain="['&amp;', '|', ('x_team_id.x_to_date', '=', False), ('x_team_id.x_to_date', '>', context_today()), ('x_partner_id.grade_id', '=', False)]"/>
       </search>
     </field>
   </record>
@@ -296,7 +297,7 @@
           <group>
             <field name="x_partner_id"/>
             <field name="x_team_id"/>
-            <field name="x_role_ids" widget="many2many_tags" domain="[('id', 'in', x_partner_category_ids)]"/>
+            <field name="x_role_ids" widget="many2many_tags" domain="[('id', 'in', x_partner_category_ids)]" options="{'no_create': True}"/>
           </group>
         </sheet>
       </form>
@@ -330,5 +331,16 @@
         <field name="x_event_id" invisible="not x_is_game"/>
       </xpath>
     </field>
+  </record>
+  <record id="view_task_card" model="ir.ui.view">
+    <field name="name">view.task.card.inherit.team.sports.club</field>
+    <field name="model">project.task</field>
+    <field name="inherit_id" ref="project.view_task_card"/>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='displayed_image_id']" position="after">
+            <field name="x_team_ids" widget="many2many_tags"/>
+        </xpath>
+      </field>
   </record>
 </odoo>
