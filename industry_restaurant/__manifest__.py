@@ -1,6 +1,6 @@
 {
     'name': 'Fine Dining Restaurant',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Hospitality',
     'depends': [
         'account_followup',
@@ -17,6 +17,7 @@
         'website_appointment',
     ],
     'data': [
+        'data/ir_ui_menu.xml',
         'data/product_category.xml',
         'data/product_pricelist.xml',
         'data/res_config_settings.xml',
@@ -47,8 +48,6 @@
         'demo/pos_category.xml',
         'demo/product_supplierinfo.xml',
         'demo/product_product.xml',
-        'demo/stock_quant.xml',
-        'demo/stock_warehouse_orderpoint.xml',
         'demo/appointment_type.xml',
         'demo/calendar_event.xml',
         'demo/appointment_booking_line.xml',
@@ -65,6 +64,7 @@
         'demo/website_theme_apply.xml',
         'demo/pos_orders.xml',
         'demo/pos_order_lines.xml',
+        'demo/website.xml',
     ],
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
