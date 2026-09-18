@@ -5,27 +5,28 @@
         <field name="model_id" ref="x_model_city_tax"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-sequence, stay_tax_line = 0, False
-for so_line in record.x_sale_order_id.order_line:
-    if so_line.product_id.x_accommodation_product == 'stay_tax': stay_tax_line = so_line
-    sequence = max(sequence, so_line.sequence)
-if stay_tax_line: stay_tax_line.write({'product_uom_qty': record.x_total, 'qty_delivered': record.x_total, 'sequence': 1 + sequence})
-elif record.x_total > 0:
-    product = env['product.product'].search([('x_accommodation_product', '=', 'stay_tax')], limit=1)
-    env['sale.order.line'].create({'order_id': record.x_sale_order_id.id, 'product_id': product.id, 'product_uom_qty': record.x_total, 'qty_delivered': record.x_total})
+line_sum, section, tax_line, from_so = 0, False, False, env.context.get('from_so')
+for line in record.x_sale_order_id.order_line:
+    if line.display_type == 'line_section' and line.name == 'City Tax': section = line
+    elif line.product_id.x_accommodation_product == 'stay_tax': tax_line = line
+    elif line.product_id.x_is_a_room_offer: line_sum += line.product_uom_qty * line.x_total_guests
+if (total := line_sum * record.x_sale_order_id.x_nights if from_so else record.x_total) > 0:
+    if not section: section = env['sale.order.line'].create({'order_id': record.x_sale_order_id.id, 'display_type': 'line_section', 'name': 'City Tax'})
+    if tax_line: tax_line.write({('product_uom_qty' if from_so else 'qty_delivered'): total})
+    else:
+        product = env['product.product'].search([('x_accommodation_product', '=', 'stay_tax')], limit=1)
+        env['sale.order.line'].create({('product_uom_qty' if from_so else 'qty_delivered'): total, 'order_id': record.x_sale_order_id.id, 'product_id': product.id})
 ]]></field>
     </record>
-    <record id="ir_actions_add_city_tax_line_on_so_creation" model="ir.actions.server">
-        <field name="name">Booking Engine: Add city tax line on SO creation</field>
+    <record id="ir_actions_compute_city_tax_line_on_so" model="ir.actions.server">
+        <field name="name">Booking Engine: Compute City Tax on SO</field>
         <field name="model_id" ref="sale.model_sale_order_line"/>
         <field name="state">code</field>
         <field name="usage">base_automation</field>
         <field name="code"><![CDATA[
-if city_tax_product := env['product.product'].search([('x_accommodation_product', '=', 'stay_tax')], limit=1):
-    for order in records.order_id:
-        if not any(line.product_id.id == city_tax_product.id for line in order.order_line):
-            max_seq = max((line.sequence for line in order.order_line), default=10)
-            env['sale.order.line'].create({'order_id': order.id, 'product_id': city_tax_product.id, 'product_uom_qty': 0, 'sequence': max_seq + 1})
+for order in records.order_id:
+    city_tax = env['x_city_tax'].create({'x_sale_order_id': order.id})
+    env.ref('booking_engine.update_city_tax_action').with_context(active_id=city_tax.id, active_model='x_city_tax', from_so=True).run()
 ]]></field>
     </record>
     <record id="open_x_city_tax_action" model="ir.actions.act_window">
