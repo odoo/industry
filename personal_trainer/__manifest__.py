@@ -24,7 +24,6 @@
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
-        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/res_company.xml',
@@ -37,16 +36,10 @@
         'demo/account_analytic_line.xml',
     ],
     'license': 'OEEL-1',
-    'assets': {
-        'web.assets_backend': [
-            'personal_trainer/static/src/js/my_tour.js',
-        ]
-    },
     'author': 'Odoo S.A.',
     'images': ['images/main.png'],
     "cloc_exclude": [
         "data/knowledge_article.xml",
-        "static/src/js/my_tour.js",
     ],
     'application': True,
     'url': "https://www.odoo.com/trial?industry&selected_app=personal_trainer",
