@@ -145,14 +145,6 @@
     <field name="related">planning_role_id.resource_ids</field>
     <field name="relation">resource.resource</field>
   </record>
-  <record id="sale_model_sale_order_x_nights_field" model="ir.model.fields">
-    <field name="ttype">integer</field>
-    <field name="field_description">Nights</field>
-    <field name="readonly" eval="True"/>
-    <field name="model_id" ref="sale.model_sale_order_line"/>
-    <field name="copied" eval="False"/>
-    <field name="name">x_nights</field>
-  </record>
   <record id="sale_order_x_order_involves_room" model="ir.model.fields">
     <field name="ttype">boolean</field>
     <field name="field_description">Order Involves Room</field>
@@ -249,6 +241,19 @@ for record in self: record['x_order_involves_room'] = any(line.product_id.x_is_a
     <field name="name">x_nights</field>
     <field name="compute"><![CDATA[
 for record in self: record['x_nights'] = ((record.end_datetime - record.start_datetime).total_seconds() + 86399) // 86400 if (record.start_datetime and record.end_datetime) else 0
+]]></field>
+  </record>
+  <record id="sale_model_sale_order_x_nights_field" model="ir.model.fields">
+    <field name="ttype">integer</field>
+    <field name="field_description">Nights</field>
+    <field name="readonly" eval="True"/>
+    <field name="model_id" ref="sale.model_sale_order_line"/>
+    <field name="copied" eval="False"/>
+    <field name="store" eval="True"/>
+    <field name="name">x_nights</field>
+    <field name="depends">planning_slot_ids, planning_slot_ids.x_nights</field>
+    <field name="compute"><![CDATA[
+for record in self: record['x_nights'] = sum(record.planning_slot_ids.mapped('x_nights'))
 ]]></field>
   </record>
   <record id="model_planning_slot_x_guests" model="ir.model.fields">
