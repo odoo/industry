@@ -29,7 +29,6 @@
         'data/website_page.xml',
         'data/website_menu.xml',
         'data/website_theme_apply.xml',
-        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/res_company.xml',
@@ -45,16 +44,10 @@
         'demo/website.xml',
     ],
     'license': 'OEEL-1',
-    'assets': {
-        'web.assets_backend': [
-            'certification_organism/static/src/js/my_tour.js',
-        ]
-    },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "data/website_view.xml",
-        "static/src/js/my_tour.js",
     ],
     'application': True,
     'images': ['images/main.png'],

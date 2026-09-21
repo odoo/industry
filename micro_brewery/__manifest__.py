@@ -57,7 +57,6 @@
         'data/appointment_type.xml',
         'data/website_view.xml',
         'data/sale_order_spreadsheet.xml',
-        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/res_company.xml',

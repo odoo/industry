@@ -27,7 +27,6 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/ir_attachment_post.xml',
-        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/res_company.xml',
@@ -51,14 +50,8 @@
         'demo/payment_provider_demo_post.xml',
         'demo/website.xml',
     ],
-    'assets': {
-        'web.assets_backend': [
-            'toy_store/static/src/js/my_tour.js',
-        ]
-    },
     "cloc_exclude": [
         "data/knowledge_article.xml",
-        "static/src/js/my_tour.js",
         "demo/website_view.xml",
     ],
     'license': 'OEEL-1',
