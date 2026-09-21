@@ -40,7 +40,6 @@
         'data/sign_document.xml',
         'data/sign_item.xml',
         'data/mail_message.xml',
-        'data/knowledge_tour.xml',
         'data/knowledge_article_favorite.xml',
     ],
     'demo': [
@@ -86,15 +85,9 @@
         'demo/website.xml',
     ],
     'license': 'OEEL-1',
-    'assets': {
-        'web.assets_backend': [
-            'sport_events/static/src/js/my_tour.js',
-        ],
-    },
     'cloc_exclude': [
         'data/knowledge_article.xml',
         'demo/website_view.xml',
-        'static/src/js/my_tour.js',
     ],
     'application': True,
     'images': [
