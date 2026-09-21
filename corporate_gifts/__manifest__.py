@@ -50,7 +50,6 @@
         'data/crm_tag.xml',
         'data/website_view.xml',
         'data/website_menu.xml',
-        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/res_company.xml',
@@ -77,16 +76,10 @@
         'demo/website.xml',
     ],
     'license': 'OEEL-1',
-    'assets': {
-        'web.assets_backend': [
-            'corporate_gifts/static/src/js/my_tour.js',
-        ]
-    },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
         "data/website_view.xml",
-        "static/src/js/my_tour.js",
         "demo/website_view.xml",
     ],
     'application': True,

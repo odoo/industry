@@ -46,7 +46,6 @@
         'data/sign_item.xml',
         'data/crm_stage.xml',
         'data/website_view.xml',
-        'data/knowledge_tour.xml',
         'data/uninstall_hook.xml',
     ],
     'demo': [
@@ -72,18 +71,12 @@
         'demo/website.xml',
     ],
     'license': 'OEEL-1',
-    'assets': {
-        'web.assets_backend': [
-            'headhunter/static/src/js/my_tour.js',
-        ]
-    },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/portal_templates.xml",
         "data/knowledge_article.xml",
         "data/website_view.xml",
         "data/uninstall_hook.xml",
-        "static/src/js/my_tour.js",
         "demo/website_view.xml",
     ],
     'application': True,
