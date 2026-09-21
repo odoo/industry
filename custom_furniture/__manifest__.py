@@ -47,7 +47,6 @@
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
         'data/quality_point.xml',
-        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/res_company.xml',
@@ -70,15 +69,9 @@
         'demo/quality_check.xml',
         'demo/planning_slot.xml',
     ],
-    'assets': {
-        'web.assets_backend': [
-            'custom_furniture/static/src/js/my_tour.js',
-        ]
-    },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/knowledge_article.xml",
-        "static/src/js/my_tour.js",
     ],
     'license': 'OEEL-1',
     'application': True,
