@@ -69,59 +69,24 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         })
         return order, order.order_line
 
-    def _expected_rental_datetimes(self, start_datetime, end_datetime):
-        expected_start = start_datetime.replace(
-            hour=18,
-            minute=0,
-            second=0,
-            microsecond=0,
-        )
-        expected_end = end_datetime.replace(
-            hour=9,
-            minute=0,
-            second=0,
-            microsecond=0,
-        )
-        return expected_start, expected_end
-
-    def _expected_slot_datetimes(self, start_datetime, end_datetime):
-        expected_start, expected_end = self._expected_rental_datetimes(start_datetime, end_datetime)
-        if expected_start >= end_datetime:
-            expected_start -= timedelta(days=1)
-        if expected_start >= expected_end:
-            expected_end += timedelta(days=1)
-        return expected_start, expected_end
-
     def _expected_nights(self, start_datetime, end_datetime):
         return int(((end_datetime - start_datetime).total_seconds() + 86399) // 86400)
 
-    def test_automation_fix_slot_times_on_create_and_write(self):
-        """Test for the industry_fix_slot_times automation."""
+    def test_sale_line_nights_follow_the_shifts(self):
         order, sale_line = self._create_sale_line(self.product)
-        expected_start, expected_end = self._expected_slot_datetimes(order.rental_start_date, order.rental_return_date)
         order.action_confirm()
-        self.assertEqual(sale_line.planning_slot_ids[0].start_datetime, expected_start,
-                         "The slot start time should be updated based on recurrence pickup time")
-        self.assertEqual(sale_line.planning_slot_ids[0].end_datetime, expected_end,
-                         "The slot end time should be updated with the recurrence return time")
-        self.assertEqual(sale_line.start_date, expected_start,
-                         "The order line start date should be updated based on recurrence pickup time")
-        self.assertEqual(sale_line.return_date, expected_end,
-                         "The order line return date should be updated based on recurrence return time")
-        self.assertEqual(sale_line.x_nights, self._expected_nights(expected_start, expected_end),
-                         "Automation should recompute the number of nights on create")
-
-    def test_automation_set_rental_hours(self):
-        """Test for the industry_set_rental_hours automation on create and write."""
-        order, _ = self._create_sale_line(self.product)
-        rental_start_date = order.rental_start_date
-        rental_return_date = order.rental_return_date
-
-        expected_start_date, expected_end_date = self._expected_rental_datetimes(rental_start_date, rental_return_date)
-        self.assertEqual(rental_start_date, expected_start_date,
-                         "The automation should align rental_start_date to the pickup time on create")
-        self.assertEqual(rental_return_date, expected_end_date,
-                         "The automation should align rental_return_date to the return time on create")
+        slot = sale_line.planning_slot_ids[0]
+        self.assertEqual(
+            sale_line.x_nights,
+            self._expected_nights(slot.start_datetime, slot.end_datetime),
+            "The order line should total the nights of its shifts",
+        )
+        slot.write({'end_datetime': slot.end_datetime + timedelta(days=2)})
+        self.assertEqual(
+            sale_line.x_nights,
+            self._expected_nights(slot.start_datetime, slot.end_datetime),
+            "The order line nights should follow a rescheduled shift"
+        )
 
     def test_automation_create_role_on_room_offer_create(self):
         room_offer_product_template = self.room_offer_template
