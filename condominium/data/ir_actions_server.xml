@@ -113,9 +113,9 @@ for line in records.x_line_ids:
     if original_analytic_line:
         new_split_analytic_line_id = original_analytic_line.copy({account_plan_column_name: analytic_id.id, "amount": line.x_amount})
         if original_analytic_line.id in split_account_analytic_lines:
-            split_account_analytic_lines[original_analytic_line.id].update(new_split_analytic_line_id)
+            split_account_analytic_lines[original_analytic_line.id] |= new_split_analytic_line_id
         else:
-            split_account_analytic_lines.update({original_analytic_line.id: set(new_split_analytic_line_id)})
+            split_account_analytic_lines[original_analytic_line.id] = new_split_analytic_line_id
     analytic_url = f"/odoo/analytic-items/{new_split_analytic_line_id.id}"
     if original_analytic_line.id in note_details:
         note_line = f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{analytic_id.name}</a>"
