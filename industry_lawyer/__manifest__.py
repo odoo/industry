@@ -3,7 +3,7 @@
     'version': '1.7',
     'category': 'Services',
     'depends': [
-        'ai_app',
+        'ai_agentic',
         'appointment_account_payment',
         'base_industry_data',
         'contacts',
