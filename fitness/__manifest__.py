@@ -45,7 +45,6 @@
         'data/maintenance_equipment.xml',
         'data/appointment_view.xml',
         'data/planning_role.xml',
-        'data/knowledge_tour.xml',
     ],
     'demo': [
         'demo/res_company.xml',
@@ -82,16 +81,10 @@
         'demo/payment_provider_demo_post.xml',
     ],
     'license': 'OEEL-1',
-    'assets': {
-        'web.assets_backend': [
-            'fitness/static/src/js/my_tour.js',
-        ]
-    },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
         "data/appointment_view.xml",
         "data/knowledge_article.xml",
-        "static/src/js/my_tour.js",
         "demo/website/views/website_templates.xml",
         "demo/website/views/website_sale_templates.xml",
         'demo/website/views/website_appointment_templates.xml',
