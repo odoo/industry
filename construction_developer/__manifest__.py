@@ -5,7 +5,7 @@
     'depends': [
         'base_industry_data',
         'construction',
-        'mrp',
+        'mrp_account',
         'web_gantt',
         'web_studio',
     ],
