@@ -125,8 +125,7 @@ class ComputedFieldsTestCase(TransactionCase):
         # add a guest product in order line
         _, order_line = self._create_sale_order(self.guest_product_variant_id)
 
-        self.assertEqual(order_line.x_total_guests, 3,
-                         "Total guests should be the sum of adults plus children.")
+        self.assertEqual(order_line.x_total_guests, 2, "Total guests should be the sum of adults.")
 
     def test_x_nights_and_city_tax_computation(self):
         order, order_line = self._create_sale_order(self.guest_product_variant_id)
