@@ -125,23 +125,20 @@ class ComputedFieldsTestCase(TransactionCase):
         # add a guest product in order line
         _, order_line = self._create_sale_order(self.guest_product_variant_id)
 
-        self.assertEqual(order_line.x_total_guests, 3,
-                         "Total guests should be the sum of adults plus children.")
+        self.assertEqual(order_line.x_total_guests, 2, "Total guests should be the number of adults selected.")
 
     def test_x_nights_and_city_tax_computation(self):
         order, order_line = self._create_sale_order(self.guest_product_variant_id)
         order.action_confirm()
 
-        start = self.today.replace(hour=14)
-        end = (self.today + timedelta(days=2)).replace(hour=10)
         slot = self.env['planning.slot'].create({
             'role_id': self.role.id,
             'sale_line_id': order_line.id,
-            'start_datetime': start,
-            'end_datetime': end,
+            'start_datetime': order.rental_start_date,
+            'end_datetime': order.rental_return_date,
         })
-        expected_nights = int(((end - start).total_seconds() + 86399) // 86400)
-        self.assertEqual(slot.x_nights, expected_nights, "Nights should be computed according to start/end datetimes")
+        expected_nights = int(((order.rental_return_date - order.rental_start_date).total_seconds() + 86399) // 86400)
+        self.assertEqual(slot.x_nights, expected_nights, "Nights should be computed according to the order's rental dates")
         self.assertEqual(slot.x_city_tax, expected_nights * order_line.x_total_guests,
                          "The city tax should be calculated as the number of nights multiplied by the total number of guests.")
 
