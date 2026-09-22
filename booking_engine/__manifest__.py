@@ -28,7 +28,6 @@
         'data/planning_role.xml',
         'data/planning_slot_template.xml',
         'data/product_template.xml',
-        'data/product_product.xml',
         'data/ir_actions_server.xml',
         'data/base_automation.xml',
         'data/resource_calendar_data.xml',
