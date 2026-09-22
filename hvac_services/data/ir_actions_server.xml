@@ -44,9 +44,10 @@ picking = env['stock.picking'].create({'partner_id': record.x_partner_id.id,
     'picking_type_id': env.ref('stock.picking_type_out').id,
     'location_id': env.ref('stock.stock_location_suppliers').id,
     'location_dest_id': env.ref('stock.stock_location_customers').id,
+    'scheduled_date': record.x_delivery_date,
 })
 env['stock.move.line'].create({'picking_id': picking.id, 'lot_id': lot.id, 'product_id': record.x_product_id.id, 'quantity': 1, })
-picking.with_context(skip_sms=True).button_validate()
+picking.with_context(skip_sms=True, skip_zero_demand_check=True).button_validate()
 picking.write({'date_done': record.x_delivery_date})
 action = {'type': 'ir.actions.client', 'tag': 'display_notification','params': {'type': 'success', 'sticky': False,'message': ("New device created."), 'next': {'type': 'ir.actions.act_window_close'}, }}
     ]]></field>
