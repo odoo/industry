@@ -18,17 +18,6 @@ if (total := line_sum * record.x_sale_order_id.x_nights if from_so else record.x
         env['sale.order.line'].create({('product_uom_qty' if from_so else 'qty_delivered'): total, 'order_id': record.x_sale_order_id.id, 'product_id': product.id})
 ]]></field>
     </record>
-    <record id="ir_actions_compute_city_tax_line_on_so" model="ir.actions.server">
-        <field name="name">Booking Engine: Compute City Tax on SO</field>
-        <field name="model_id" ref="sale.model_sale_order_line"/>
-        <field name="state">code</field>
-        <field name="usage">base_automation</field>
-        <field name="code"><![CDATA[
-for order in records.order_id:
-    city_tax = env['x_city_tax'].create({'x_sale_order_id': order.id})
-    env.ref('booking_engine.update_city_tax_action').with_context(active_id=city_tax.id, active_model='x_city_tax', from_so=True).run()
-]]></field>
-    </record>
     <record id="open_x_city_tax_action" model="ir.actions.act_window">
         <field name="name">City Tax</field>
         <field name="res_model">x_city_tax</field>
