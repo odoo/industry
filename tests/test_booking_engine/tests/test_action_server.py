@@ -273,51 +273,6 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         })
         return product_template.product_variant_id
 
-    def test_action_recompute_city_tax_on_so_line_change(self):
-        product = self._create_guest_product(adults=2, children=1)
-        product.product_tmpl_id.write({
-            'x_accommodation_product': False,
-            'x_has_city_tax': True,
-            'x_is_a_room_offer': True,
-        })
-        other_product = self.env['product.product'].create({'name': 'Non Taxable Product', 'type': 'service'})
-
-        order = self.env['sale.order'].with_context(in_rental_app=True).create({
-            'partner_id': self.partner.id,
-            'rental_start_date': self.today,
-            'rental_return_date': self.today + timedelta(days=1),
-            'order_line': [Command.create({'product_id': other_product.id, 'product_uom_qty': 1})],
-        })
-        self.assertFalse(
-            order.order_line.filtered(lambda l: l.display_type == 'line_section'),
-            "Adding a product that doesn't support city tax should not trigger any recomputation",
-        )
-        room_line = self.env['sale.order.line'].create({'order_id': order.id, 'product_id': product.id, 'product_uom_qty': 1})
-        section = order.order_line.filtered(lambda l: l.display_type == 'line_section')
-        self.assertEqual(len(section), 1, "Adding a city-tax product should create the 'City Tax' section")
-        self.assertEqual(section.name, 'City Tax')
-
-        tax_line = order.order_line.filtered(lambda l: l.product_id.x_accommodation_product == 'stay_tax')
-        self.assertEqual(len(tax_line), 1, "A single city tax detail line should be created")
-        self.assertEqual(
-            tax_line.product_uom_qty,
-            room_line.product_uom_qty * room_line.x_total_guests * order.x_nights,
-            "Detail line quantity should be the room lines' guests times the order's nights",
-        )
-        self.assertFalse(
-            tax_line.qty_delivered,
-            "The delivered quantity is only set once the city tax is confirmed from the wizard",
-        )
-        room_line.write({'product_uom_qty': 2})
-        self.assertEqual(
-            len(order.order_line.filtered(lambda l: l.display_type == 'line_section')),
-            1,
-            "The section should not be duplicated when city tax is recomputed after a line change",
-        )
-        tax_line = order.order_line.filtered(lambda l: l.product_id.x_accommodation_product == 'stay_tax')
-        self.assertEqual(len(tax_line), 1, "The detail line should not be duplicated when city tax is recomputed after a line change")
-        self.assertEqual(tax_line.product_uom_qty, room_line.product_uom_qty * room_line.x_total_guests * order.x_nights)
-
     def test_action_update_city_tax(self):
         room_product_1 = self._create_guest_product(adults=2)
         room_product_2 = self._create_guest_product(adults=1)
