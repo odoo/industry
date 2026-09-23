@@ -69,30 +69,24 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         })
         return order, order.order_line
 
-    def _expected_rental_datetimes(self, start_datetime, end_datetime):
-        expected_start = start_datetime.replace(
-            hour=18,
-            minute=0,
-            second=0,
-            microsecond=0,
-        )
-        expected_end = end_datetime.replace(
-            hour=9,
-            minute=0,
-            second=0,
-            microsecond=0,
-        )
-        return expected_start, expected_end
-
-    def _expected_slot_datetimes(self, start_datetime, end_datetime):
-        expected_start, expected_end = self._expected_rental_datetimes(start_datetime, end_datetime)
-        expected_end += timedelta(
-            days=(end_datetime - start_datetime).days - (expected_end - expected_start).days
-        )
-        return expected_start, expected_end
-
     def _expected_nights(self, start_datetime, end_datetime):
         return int(((end_datetime - start_datetime).total_seconds() + 86399) // 86400)
+
+    def test_sale_line_nights_follow_the_shifts(self):
+        order, sale_line = self._create_sale_line(self.product)
+        order.action_confirm()
+        slot = sale_line.planning_slot_ids[0]
+        self.assertEqual(
+            sale_line.x_nights,
+            self._expected_nights(slot.start_datetime, slot.end_datetime),
+            "The order line should total the nights of its shifts",
+        )
+        slot.write({'end_datetime': slot.end_datetime + timedelta(days=2)})
+        self.assertEqual(
+            sale_line.x_nights,
+            self._expected_nights(slot.start_datetime, slot.end_datetime),
+            "The order line nights should follow a rescheduled shift"
+        )
 
     def test_automation_create_role_on_room_offer_create(self):
         room_offer_product_template = self.room_offer_template
