@@ -12,7 +12,7 @@ for owner in env['res.partner'].search([('x_companies', '=', record.company_id.i
     for sol in record.order_line: # The lines are re-created using the distribution key and the analytic account corresponding to the property is set
         for distribution_ratio_line in record.x_distribution_key.x_ratio_ids:
             if distribution_ratio_line.x_owner.id == owner.id:
-                account = env['account.analytic.account'].search([('partner_id', '=', distribution_ratio_line.x_owner), ('x_property', '=', distribution_ratio_line.x_property_ratios), ('x_end_date', '=', False)], limit=1)
+                account = env['account.analytic.account'].search([('partner_id', '=', distribution_ratio_line.x_owner.id), ('x_property', '=', distribution_ratio_line.x_property_ratios.id), ('x_end_date', '=', False)], limit=1)
                 new_so_lines.append((0, 0, {'order_id': record.id, 'product_id': sol.product_id.id, 'name': sol.name, 'product_uom_qty': sol.product_uom_qty, 'product_uom_id': sol.product_uom_id.id, 'price_unit': sol.price_unit * distribution_ratio_line.x_ratio / total_ratio, 'tax_ids': sol.tax_ids, 'discount': sol.discount, 'analytic_distribution': {account.id: 100} }))
     new_so.write({'order_line': new_so_lines})
 record.write({'state': 'cancel'})
@@ -113,9 +113,9 @@ for line in records.x_line_ids:
     if original_analytic_line:
         new_split_analytic_line_id = original_analytic_line.copy({account_plan_column_name: analytic_id.id, "amount": line.x_amount})
         if original_analytic_line.id in split_account_analytic_lines:
-            split_account_analytic_lines[original_analytic_line.id].update(new_split_analytic_line_id)
+            split_account_analytic_lines[original_analytic_line.id] |= new_split_analytic_line_id
         else:
-            split_account_analytic_lines.update({original_analytic_line.id: set(new_split_analytic_line_id)})
+            split_account_analytic_lines[original_analytic_line.id] = new_split_analytic_line_id
     analytic_url = f"/odoo/analytic-items/{new_split_analytic_line_id.id}"
     if original_analytic_line.id in note_details:
         note_line = f"- {line.x_share:.2f}% on <a href='{analytic_url}' target='_blank'>{analytic_id.name}</a>"
