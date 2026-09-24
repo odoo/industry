@@ -42,15 +42,88 @@ action['context'] = {'default_is_subscription': True}
         <field name="state">code</field>
         <field name="name">Add Tenant</field>
         <field name="usage">base_automation</field>
-        <field name="code">
+        <field name="code"><![CDATA[
 for order in record:
-    stake_holder = env['x_stake_holder'].create({
+    start = order.start_date
+    domain = [('x_property_id', '=', order.x_property_id.id), ('x_type', '=', 'tenant'), ('x_start_date', '!=', False), '|', ('x_end_date', '=', False), ('x_end_date', '>=', start)]
+    if order.end_date:
+        domain = [('x_start_date', '<=', order.end_date)] + domain
+    previous = env['x_stake_holder'].search(domain)
+    new_end = start - datetime.timedelta(days=1) if start else False
+    for rec in previous:
+        if new_end and rec.x_start_date <= new_end:
+            rec['x_end_date'] = new_end
+        else:
+            rec.unlink()
+    env['x_stake_holder'].create({
         'x_stake_holder': order.partner_id.id,
         'x_property_id': order.x_property_id.id,
         'x_start_date': order.start_date,
         'x_end_date': order.end_date,
         'x_type': 'tenant',
     })
-        </field>
+]]></field>
+    </record>
+    <record id="action_open_leasing_so_form" model="ir.actions.server">
+        <field name="name">Open Leasing Form</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+method = env.context.get('leasing_so_method')
+if method == 'prepare_renewal_order':
+    action = record.prepare_renewal_order()
+elif method == 'prepare_upsell_order':
+    action = record.prepare_upsell_order()
+elif method == 'open_subscription_renewal':
+    action = record.open_subscription_renewal()
+elif method == 'open_subscription_upsell':
+    action = record.open_subscription_upsell()
+elif method == 'create_alternative':
+    action = record.create_alternative()
+else:
+    action = False
+if action:
+    rental = env['ir.actions.act_window']._for_xml_id('industry_real_estate.action_rental_contracts')
+    form_id = env.ref('industry_real_estate.rental_form_view').id
+    views = []
+    for view in action.get('views') or []:
+        if view[1] == 'form':
+            views.append((form_id, 'form'))
+        else:
+            views.append((view[0], view[1]))
+    if not views:
+        views = [(form_id, 'form')]
+    modes = []
+    for view in views:
+        modes.append(view[1])
+    rental['views'] = views
+    rental['view_mode'] = ','.join(modes)
+    if action.get('res_id'):
+        rental['res_id'] = action['res_id']
+    if action.get('domain') is not None:
+        rental['domain'] = action['domain']
+    if action.get('name'):
+        rental['name'] = action['name']
+    if action.get('context'):
+        rental['context'] = action['context']
+    action = rental
+]]></field>
+    </record>
+    <record id="action_copy_property_from_parent" model="ir.actions.server">
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="name">Copy Property from Parent Contract</field>
+        <field name="usage">base_automation</field>
+        <field name="code"><![CDATA[
+for order in records:
+    parent = order.subscription_id
+    vals = {}
+    if parent.x_property_id and not order.x_property_id:
+        vals['x_property_id'] = parent.x_property_id.id
+    if parent.x_guarant_partner_id and not order.x_guarant_partner_id:
+        vals['x_guarant_partner_id'] = parent.x_guarant_partner_id.id
+    if vals:
+        order.write(vals)
+]]></field>
     </record>
 </odoo>
