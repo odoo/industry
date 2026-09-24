@@ -1,6 +1,6 @@
 {
     'name': 'Property Management',
-    'version': '3.5',
+    'version': '3.6',
     'category': 'Services',
     'depends': [
         'base_automation',
