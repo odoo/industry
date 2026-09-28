@@ -51,6 +51,7 @@
         'demo/sale_order_confirm.xml',
         'demo/payment_provider_demo.xml',
         'demo/website/website.xml',
+        'demo/product_public_category.xml',
         'demo/website/views/website_templates.xml',
         'demo/website/views/website_sale_templates.xml',
         'demo/website/assets.xml',
