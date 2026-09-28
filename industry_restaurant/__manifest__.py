@@ -47,7 +47,6 @@
         'demo/pos_config.xml',
         'demo/pos_category.xml',
         'demo/product_supplierinfo.xml',
-        'demo/stock_route.xml',
         'demo/product_product.xml',
         'demo/appointment_type.xml',
         'demo/calendar_event.xml',
