@@ -1,6 +1,12 @@
 {
     'name': 'Property Listing',
+<<<<<<< 256fa66424fe16317e5f68995fb503f466d75910
     'version': '1.4',
+||||||| 3a66602a42978e8d607b2d6123716531b0ff1e10
+    'version': '1.1',
+=======
+    'version': '1.2',
+>>>>>>> 4d63fd4f1991b1d45ee3a96cf5591f9cd8bc7e08
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
