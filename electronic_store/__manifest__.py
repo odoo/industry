@@ -1,6 +1,6 @@
 {
     'name': 'Electronic Store',
-    'version': '1.5',
+    'version': '1.6',
     'category': 'Retail',
     'depends': [
         'crm',
