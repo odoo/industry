@@ -1,6 +1,6 @@
 {
     'name': 'Property Developer',
-    'version': '1.19',
+    'version': '1.20',
     'category': 'Construction',
     'depends': [
         'base_industry_data',
