@@ -1,6 +1,6 @@
 {
     'name': 'Billboard Rental',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Services',
     'depends': [
         'base_industry_data',
@@ -42,7 +42,6 @@
         'demo/account_analytic_account.xml',
         'demo/appointment_type.xml',
         'demo/sale_order.xml',
-        'demo/sale_order_line.xml',
         'demo/sale_order_post.xml',
         'demo/hr_employee.xml',
         'demo/website_view.xml',
