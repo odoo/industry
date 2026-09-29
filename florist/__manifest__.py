@@ -1,6 +1,6 @@
 {
     'name': 'Florist',
-    'version': '1.4',
+    'version': '1.5',
     'category': 'Retail',
     'author': 'Odoo S.A.',
     'depends': [
@@ -63,7 +63,6 @@
         'demo/project_project.xml',
         'demo/project_task.xml',
         'demo/mail_activity.xml',
-        'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
         'demo/product_supplierinfo.xml',
         'demo/website/website.xml',
