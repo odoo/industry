@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="bom_server_action" model="ir.actions.server">
+    <record id="bom_server_action" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[
 if (quant := record.x_quantity_by_deposit_product) == 1:
     raise UserError("Unit sale product should be undefined if this product can not be sold in a smaller unit.")
@@ -59,7 +59,7 @@ env['stock.warehouse.orderpoint'].create(orderpoints_to_create)
         <field name="state">code</field>
         <field name="name">Execute Code</field>
     </record>
-    <record id="action_update_product_template_route_ids" model="ir.actions.server">
+    <record id="action_update_product_template_route_ids" model="ir.actions.server" forcecreate="1">
         <field name="model_id" ref="product.model_product_template"/>
         <field name="update_path">route_ids</field>
         <field name="state">object_write</field>
@@ -68,7 +68,7 @@ env['stock.warehouse.orderpoint'].create(orderpoints_to_create)
         <field name="update_field_id" ref="stock.field_product_template__route_ids"/>
         <field name="usage">base_automation</field>
     </record>
-    <record id="update_sales_taxes_server_action" model="ir.actions.server">
+    <record id="update_sales_taxes_server_action" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[
 for product in records:
     if product.x_deposit_product_1:
@@ -82,13 +82,13 @@ for product in records:
         <field name="state">code</field>
         <field name="name">Execute Code</field>
     </record>
-    <record id="update_state" model="ir.actions.server">
+    <record id="update_state" model="ir.actions.server" forcecreate="1">
         <field name="child_ids" eval="[(6, 0, [ref('mrp.action_production_order_mark_done')])]"/>
         <field name="model_id" ref="mrp.model_mrp_production"/>
         <field name="state">multi</field>
         <field name="name">Execute Existing Actions</field>
     </record>
-    <record id="action_make_deposit_storable_delivery_invoice" model="ir.actions.server">
+    <record id="action_make_deposit_storable_delivery_invoice" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[
 record.write({'invoice_policy':'delivery', 'type': 'consu', 'is_storable': True})
 ]]></field>
@@ -96,7 +96,7 @@ record.write({'invoice_policy':'delivery', 'type': 'consu', 'is_storable': True}
         <field name="state">code</field>
         <field name="name">Execute Code</field>
     </record>
-    <record id="deposit_taxes_server_action" model="ir.actions.server">
+    <record id="deposit_taxes_server_action" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[
 all_taxes = env['account.tax'].search([('name', 'like', 'DEP %'), ('amount', 'in', records.mapped('x_deposit_amount'))])
 deposit_tax_group = env['account.tax.group'].search([('x_is_deposit', '=', True)], limit=1)
@@ -113,7 +113,7 @@ for product in records:
         <field name="state">code</field>
         <field name="name">Execute Code</field>
     </record>
-    <record id="resequence_the_order_of_taxes" model="ir.actions.server">
+    <record id="resequence_the_order_of_taxes" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[all_taxes = env['account.tax'].sudo().search([], order="x_is_deposit asc, sequence asc")
 for idx, tax in enumerate(all_taxes, start=1):
     tax['sequence'] = idx]]></field>
@@ -121,7 +121,7 @@ for idx, tax in enumerate(all_taxes, start=1):
         <field name="state">code</field>
         <field name="name">Sequence the deposit taxes</field>
     </record>
-    <record id="action_update_procurement_scheduler_nextcall" model="ir.actions.server">
+    <record id="action_update_procurement_scheduler_nextcall" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[
 nextcall_datetime = datetime.datetime.today()+dateutil.relativedelta.relativedelta(minutes=15)
 if cron := records.env.ref('stock.ir_cron_scheduler_action', raise_if_not_found=False):

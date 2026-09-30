@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="create_technical_partner_server_action" model="ir.actions.server">
+    <record id="create_technical_partner_server_action" model="ir.actions.server" forcecreate="1">
         <field name="model_id" ref="product.model_product_template"/>
         <field name="state">code</field>
         <field name="name">Create Technical Partner</field>
@@ -9,7 +9,7 @@
 for record in records: record['x_technical_partner_id'] = env['res.partner'].create({'name': record.name, 'street': record.x_street,  'zip': record.x_zip_code, 'city': record.x_city, 'country_id': record.x_country.id, 'x_is_technical_partner': True}).id
           ]]></field>
     </record>
-    <record id="update_is_published_server_action" model="ir.actions.server">
+    <record id="update_is_published_server_action" model="ir.actions.server" forcecreate="1">
         <field name="name">Update Is Published</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="state">object_write</field>
@@ -19,7 +19,7 @@ for record in records: record['x_technical_partner_id'] = env['res.partner'].cre
         <field name="update_boolean_value">false</field>
         <field name="usage">base_automation</field>
     </record>
-    <record id="update_appointments_active_server_action" model="ir.actions.server">
+    <record id="update_appointments_active_server_action" model="ir.actions.server" forcecreate="1">
         <field name="name">Update Appointments as Active</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="state">object_write</field>
@@ -29,7 +29,7 @@ for record in records: record['x_technical_partner_id'] = env['res.partner'].cre
         <field name="update_boolean_value">false</field>
         <field name="usage">base_automation</field>
     </record>
-    <record id="on_ribbon_update_server_action" model="ir.actions.server">
+    <record id="on_ribbon_update_server_action" model="ir.actions.server" forcecreate="1">
         <field name="name">Notify on ribbon update</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="state">code</field>
@@ -38,7 +38,7 @@ for record in records: record['x_technical_partner_id'] = env['res.partner'].cre
 for product in records: product.update({'x_ribbon_stage_is_accounted': True, 'x_last_notification_update': datetime.datetime.now()})
         ]]></field>
     </record>
-    <record id="on_price_change_server_action" model="ir.actions.server">
+    <record id="on_price_change_server_action" model="ir.actions.server" forcecreate="1">
         <field name="name">Notify on price change</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="usage">base_automation</field>
@@ -47,7 +47,7 @@ for product in records: product.update({'x_ribbon_stage_is_accounted': True, 'x_
 for product in records: product['x_last_notification_update'] = datetime.datetime.now()
         ]]></field>
     </record>
-    <record id="search_for_property_reference_server_action" model="ir.actions.server">
+    <record id="search_for_property_reference_server_action" model="ir.actions.server" forcecreate="1">
         <field name="name">Search for property reference</field>
         <field name="model_id" ref="crm.model_crm_lead"/>
         <field name="state">code</field>
@@ -65,7 +65,7 @@ for record in records:
         break
         ]]></field>
     </record>
-    <record id="create_appointment_link_server_action" model="ir.actions.server">
+    <record id="create_appointment_link_server_action" model="ir.actions.server" forcecreate="1">
         <field name="name">Create Appointment &amp; Link</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="binding_model_id" ref="product.model_product_template"/>
@@ -82,7 +82,7 @@ if env.context.get('from_form_view') and len(records) == 1 and appointment:
     action = {'type': 'ir.actions.act_window', 'res_model': 'appointment.type', 'view_mode': 'form', 'res_id': appointment.id}
         ]]></field>
     </record>
-    <record id="server_action_property_appointments" model="ir.actions.server">
+    <record id="server_action_property_appointments" model="ir.actions.server" forcecreate="1">
         <field name="name">Open Appointments</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="state">code</field>
@@ -95,7 +95,7 @@ action = {
 action.update({'view_mode': 'form', 'res_id': appointments.id}) if len(appointments) == 1 else action.update({'name': 'Appointments', 'view_mode': 'list,form', 'domain': [('id', 'in', appointments.ids)]})
         ]]></field>
     </record>
-    <record id="send_matches_from_contact_server_action" model="ir.actions.server">
+    <record id="send_matches_from_contact_server_action" model="ir.actions.server" forcecreate="1">
         <field name="name">Send matches from contact</field>
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="binding_model_id" ref="base.model_res_partner"/>
@@ -106,7 +106,7 @@ if template and template.send_mail(res_id=record.id):
     record['x_last_notification'] = datetime.datetime.now()
         ]]></field>
     </record>
-    <record id="notify_contacts_for_matches_server_action" model="ir.actions.server">
+    <record id="notify_contacts_for_matches_server_action" model="ir.actions.server" forcecreate="1">
         <field name="name">Notify contacts for their matches</field>
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="state">code</field>
@@ -118,19 +118,19 @@ for contact in model.search([('x_subscribe', '=', True), ('x_to_notify_property_
         contact['x_last_notification'] = datetime.datetime.now()
     ]]></field>
     </record>
-    <record id="notify_contacts_for_matches_cron" model="ir.cron">
+    <record id="notify_contacts_for_matches_cron" model="ir.cron" forcecreate="1">
         <field name="interval_type">days</field>
         <field name="state">code</field>
         <field name="ir_actions_server_id" ref="notify_contacts_for_matches_server_action"/>
     </record>
-    <record id="book_your_visit_server_action" model="ir.actions.server">
+    <record id="book_your_visit_server_action" model="ir.actions.server" forcecreate="1">
         <field name="name">Send email: Book your visit</field>
         <field name="binding_model_id" ref="crm.model_crm_lead"/>
         <field name="model_id" ref="crm.model_crm_lead"/>
         <field name="state">mail_post</field>
         <field name="template_id" ref="book_your_visit_mail_template"/>
     </record>
-    <record id="create_lead_from_match_server_action" model="ir.actions.server">
+    <record id="create_lead_from_match_server_action" model="ir.actions.server" forcecreate="1">
         <field name="name">Create lead from match</field>
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="state">code</field>

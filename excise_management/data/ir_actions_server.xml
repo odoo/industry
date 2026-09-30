@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="add_excise_server_action" model="ir.actions.server">
+    <record id="add_excise_server_action" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[if (taxes := record.taxes_id.filtered('x_is_excise')):
     record['taxes_id'] = [Command.unlink(id) for id in taxes.ids]
 if (taxes := record.supplier_taxes_id.filtered('x_is_excise')):
@@ -12,7 +12,7 @@ if (categ := record.x_excise_category):
         <field name="state">code</field>
         <field name="name">Add/Remove excise tax on Product</field>
     </record>
-    <record id="create_excise_tax_server_action" model="ir.actions.server">
+    <record id="create_excise_tax_server_action" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[
 common_values = {'name': 'Ex. ' + record.x_name, 'description': record.x_description, 'amount_type': 'code',
     'price_include_override': 'tax_included', 'include_base_amount': True, 'formula': '(quantity * uom.factor) * (product.x_excise_amount + product.x_packaging_units * product.x_excise_packaging_tax)',
@@ -29,7 +29,7 @@ env['account.fiscal.position'].search([('x_is_fiscal_deposit', '=', False)])['ta
         <field name="state">code</field>
         <field name="name">Create excise tax</field>
     </record>
-    <record id="add_excise_taxes_fiscal_position_server_action" model="ir.actions.server">
+    <record id="add_excise_taxes_fiscal_position_server_action" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[
 no_excises_taxes = env.ref('excise_management.no_excise_tax_sale') | env.ref('excise_management.no_excise_tax_purchase')
 for fp in records:
@@ -42,7 +42,7 @@ for fp in records:
         <field name="state">code</field>
         <field name="name">Add/Remove excise tax on Fiscal Position</field>
     </record>
-    <record id="resequence_the_order_of_taxes" model="ir.actions.server">
+    <record id="resequence_the_order_of_taxes" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[all_taxes = env['account.tax'].sudo().search([], order="x_is_excise desc, sequence asc")
 for idx, tax in enumerate(all_taxes, start=1):
     tax['sequence'] = idx]]></field>
@@ -50,7 +50,7 @@ for idx, tax in enumerate(all_taxes, start=1):
         <field name="state">code</field>
         <field name="name">Sequence the excise taxes</field>
     </record>
-    <record id="cron_generate_excise_report" model="ir.cron">
+    <record id="cron_generate_excise_report" model="ir.cron" forcecreate="1">
         <field name="name">Generate Excise Report</field>
         <field name="model_id" ref="excise_report"/>
         <field name="state">code</field>
@@ -69,7 +69,7 @@ for license in excise_licenses:
         env['mail.activity'].create({'activity_type_id': env.ref('mail.mail_activity_data_todo').id, 'summary': f"Excise Report {res_id.x_name}",'res_model_id': env.ref('excise_management.excise_report').id, 'res_id': res_id.id, 'user_id': res_id.x_reporter_id.id, 'date_deadline': to_date + datetime.timedelta(weeks=1)})
         ]]></field>
     </record>
-    <record id="action_excise_report_stock_lines" model="ir.actions.server">
+    <record id="action_excise_report_stock_lines" model="ir.actions.server" forcecreate="1">
         <field name="model_id" ref="excise_report"/>
         <field name="state">code</field>
         <field name="name">Open stock lines from Excise Report</field>
@@ -77,7 +77,7 @@ for license in excise_licenses:
 action = {'view_mode': 'list', 'res_model': 'stock.move.line', 'type': 'ir.actions.act_window', 'domain': [('id', 'in', record.x_line_ids.x_line_ids.ids)], 'context': {'license_id': record.x_excise_license_id.id},'view_id': env.ref('excise_management.stock_line_view_list').id, 'name': 'Excises Analysis', 'search_view_id': (env.ref('excise_management.stock_line_view_search').id, 'search')}
         ]]></field>
     </record>
-    <record id="action_excise_report_line_stock_lines" model="ir.actions.server">
+    <record id="action_excise_report_line_stock_lines" model="ir.actions.server" forcecreate="1">
         <field name="model_id" ref="excise_report_line"/>
         <field name="state">code</field>
         <field name="name">Open stock lines from Excise Report Line</field>
@@ -85,7 +85,7 @@ action = {'view_mode': 'list', 'res_model': 'stock.move.line', 'type': 'ir.actio
 action = {'view_mode': 'list', 'res_model': 'stock.move.line', 'type': 'ir.actions.act_window', 'domain': [('id', 'in', record.x_line_ids.ids)], 'context': {'license_id': record.x_excise_report_id.x_excise_license_id.id},'view_id': env.ref('excise_management.stock_line_view_list').id, 'name': 'Excises Analysis', 'search_view_id': (env.ref('excise_management.stock_line_view_search').id, 'search')}
         ]]></field>
     </record>
-    <record id="ir_action_compute_excise_report_line" model="ir.actions.server">
+    <record id="ir_action_compute_excise_report_line" model="ir.actions.server" forcecreate="1">
         <field name="model_id" ref="excise_report"/>
         <field name="name">Compute excise report line</field>
         <field name="state">code</field>
