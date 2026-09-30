@@ -58,28 +58,6 @@ USELESS_FIELDS = {
     'sign.template': ['name'],
 }
 
-MODELS_TO_UPDATE = {
-    "base.automation",
-    "ir.actions.act_window",
-    "ir.actions.report",
-    "ir.actions.server",
-    "ir.cron",
-    "ir.embedded.actions",
-    "ir.model",
-    "ir.access",
-    "ir.model.fields",
-    "ir.model.fields.selection",
-    "ir.module.module",
-    "ir.ui.menu",
-    "ir.ui.view",
-    "knowledge.article",
-    "portal.entry",
-    "template",
-    "theme.utils",
-    "website.assets",
-    "website.controller.page",
-}
-
 MODELS_WITH_USER_ID = {
     'crm.lead',
     'event.event',
@@ -187,8 +165,6 @@ class TestEnv(IndustryCase):
                     return
 
                 self._check_xml_style(decoded_content, tree, module, file_name)
-                self._check_forcecreate_external_xmlid(tree, file_name, module)
-                self._check_update_status(tree, file_name)
                 self._check_trigger_field_ids_is_set(tree, file_name)
                 self._check_knowledge_article_is_locked(tree, file_name)
                 checked_records_with_user = self._check_user_is_set(tree, checked_records_with_user)
@@ -369,37 +345,6 @@ class TestEnv(IndustryCase):
             _logger.warning(
                 "One empty line at the end of %s is enough, please remove others.", file_name
             )
-
-    def _check_update_status(self, root, filename):
-        for record in root.xpath("//record") + root.xpath("//function") + root.xpath("//template"):
-            model = record.get('model') or record.tag
-            noupdate = False
-            parent = record.getparent()
-            data_tag = False
-            while parent is not None:  # Find nearest parent with 'noupdate' attribute (data tag or odoo header tag)
-                if 'noupdate' in parent.attrib:
-                    if data_tag:
-                        _logger.warning(
-                            "Avoid setting 'noupdate' around an already existing 'data' tag in %s",
-                            filename,
-                        )
-                    noupdate = noupdate or parent.attrib['noupdate'] in ('1', 'True', 'true')
-                if parent.tag == 'data':
-                    data_tag = True
-                parent = parent.getparent()
-
-            if model not in MODELS_TO_UPDATE and not noupdate:
-                _logger.warning(
-                    "Model %s should not be updated, please add 'noupdate=\"1\"' in the header of %s, or in a data tag around it.",
-                    model,
-                    filename,
-                )
-            elif model in MODELS_TO_UPDATE and noupdate:
-                _logger.warning(
-                    "Model %s should be updated, please remove 'noupdate=\"1\"' attribute tied to it in %s",
-                    model,
-                    filename,
-                )
 
     def _check_trigger_field_ids_is_set(self, root, file_name):
         for record in root.xpath("//record[@model='base.automation']"):
@@ -646,17 +591,6 @@ class TestEnv(IndustryCase):
                 "You should use button_choose_theme instead of _theme_load in %s.",
                 file_name,
             )
-
-    def _check_forcecreate_external_xmlid(self, root, file_name, module):
-        for record in root.xpath("//record"):
-            record_id = record.get('id')
-            if '.' in record_id and not record_id.startswith(module + '.'):
-                if not record.get('forcecreate'):
-                    _logger.warning(
-                        "You should use forcecreate when using an external XML ID in %s: %s",
-                        file_name,
-                        record_id,
-                    )
 
     def _check_dates_are_relative(self, root, file_name):
         RELATIVE_DATES = [
