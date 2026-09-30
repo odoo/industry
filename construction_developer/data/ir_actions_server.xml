@@ -156,12 +156,15 @@ for product in records:
     <record id="server_action_update_product_price" model="ir.actions.server">
         <field name="name">Construction: Work Item - Update product price</field>
         <field name="model_id" ref="x_work_item_model"/>
-        <field name="state">object_write</field>
-        <field name="crud_model_id" ref="product.model_product_product"/>
-        <field name="update_path">x_product_id.lst_price</field>
-        <field name="update_field_id" ref="product.field_product_product__lst_price"/>
-        <field name="evaluation_type">equation</field>
-        <field name="value"><![CDATA[record.x_unit_price]]></field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+# When margin is fixed, server_action_update_price_if_margin_fixed is responsible
+# for recomputing x_unit_price AND syncing it to the product.
+# Skipping here avoids writing a stale price to the product before the recomputation runs.
+for wi in records:
+    if not wi.x_is_margin_fixed:
+        wi.x_product_id['lst_price'] = wi.x_unit_price
+]]></field>
     </record>
     <record id="server_action_update_margin_if_margin_fixed" model="ir.actions.server">
         <field name="name">Construction: Work Item - Update margin on price change if margin is fixed</field>
@@ -177,8 +180,12 @@ for wi in records:
         <field name="model_id" ref="x_work_item_model" />
         <field name="state">code</field>
         <field name="code"><![CDATA[
+# Recompute price from cost and margin, then sync to product.
+# This is the sole owner of lst_price sync when x_is_margin_fixed=True.
 for wi in records:
     wi['x_unit_price'] = wi.x_unit_cost / (1 - wi.x_unit_margin)
+    if wi.x_is_template and wi.x_product_id:
+        wi.x_product_id['lst_price'] = wi.x_unit_price
 ]]></field>
     </record>
     <record id="server_action_recompute_price_with_components_prices" model="ir.actions.server">
@@ -251,7 +258,7 @@ elif record.x_targeted_so_id:
         <field name="code"><![CDATA[
 for sol in records:
     wi = sol.product_id.x_work_item_template_id.copy({
-        'x_sale_order_line_id': record.id,
+        'x_sale_order_line_id': sol.id,
         'x_is_template': False,
     })
     sol['x_line_work_item_id'] = wi.id
@@ -348,16 +355,38 @@ if result and result[0] == 'r': env.cr.execute('DROP TABLE x_cost_nature_analysi
 
 # action called from a project: fetch the records from the project
 # action called from a sale order: passed in the context as active_ids 
-so_ids = (env.context.get('active_ids') if not (project_id := env.context.get('project_id')) else env['sale.order'].search([('project_id', '=', project_id)]).ids) or [0]
+if project_id := env.context.get('project_id'):
+    project = env['project.project'].browse(project_id)
+    so_ids = (
+        project.sale_order_id.ids
+        or env['sale.order'].search(['|', ('project_id', '=', project_id), ('order_line.project_id', '=', project_id)]).ids
+    )
+else:
+    so_ids = env.context.get('active_ids')
+so_ids = so_ids or [0]
+
+# Ensure work items exist for sale order lines that have a work item template
+sols_without_wi = env['sale.order.line'].search([
+    ('order_id', 'in', so_ids),
+    ('display_type', '=', False),
+    ('product_id', '!=', False),
+    ('x_line_work_item_id', '=', False),
+]).filtered(lambda l: l.product_id.x_work_item_template_id)
+for sol in sols_without_wi:
+    wi = sol.product_id.x_work_item_template_id.copy({
+        'x_sale_order_line_id': sol.id,
+        'x_is_template': False,
+    })
+    sol['x_line_work_item_id'] = wi.id
 
 action = { 'name': "Cost Nature Analysis", 'view_mode': 'list', 'res_model': 'x_cost_nature_analysis_report', 'type': 'ir.actions.act_window',
            'context': {'view_id': 'view_x_margin_report_analysis_list', 'search_default_group_by_cost_nature': True, 'search_default_group_by_category': True, 'search_default_group_by_product': True }}
 
-# skip the query if there are no sale orders
-if so_ids != [0]:
-    # Format the Python list into a valid SQL tuple string
-    # e.g., [1, 2] becomes "(1, 2)" and [1] becomes "(1)"
-    so_ids_sql = tuple(so_ids) if len(so_ids) > 1 else f"({so_ids[0]})"
+# Format the Python list into a valid SQL tuple string
+# e.g., [1, 2] becomes "(1, 2)" and [1] becomes "(1)"
+so_ids_sql = tuple(so_ids) if len(so_ids) > 1 else f"({so_ids[0]})"
+
+env.flush_all()
 
     # Actual logic
     env.cr.execute(f'''
