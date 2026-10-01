@@ -1,7 +1,9 @@
+import ast
 import logging
 import optparse
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -30,6 +32,13 @@ def duplicate(db_original_name, db_name):
     to_fs = config.filestore(db_name)
     if os.path.exists(from_fs) and not os.path.exists(to_fs):
         shutil.copytree(from_fs, to_fs)
+
+
+def get_industry_db_name(industry_module):
+    with open(utils.IndustryUtils().get_manifest(industry_module), encoding="utf-8") as f:
+        display_name = ast.literal_eval(f.read()).get('name') or industry_module
+    db_name = re.sub(r'[^a-zA-Z0-9]+', '_', display_name).strip('_') or industry_module
+    return db_name
 
 
 class Test_Industry(Command):
@@ -68,10 +77,9 @@ class Test_Industry(Command):
         for industry_module in industry_modules:
             try:
                 install = True
-                if res.singledb:
-                    target_db = init_db
-                else:
-                    target_db = f"{init_db}-{industry_module}"
+                target_db = str(init_db)
+                if not res.singledb:
+                    target_db += '-' + get_industry_db_name(industry_module)
                     with sql_db.db_connect('postgres').cursor() as cr:
                         cr.execute("SELECT datname FROM pg_database WHERE datname = %s", (target_db,), log_exceptions=False)
                         db_exists = cr.fetchall()
