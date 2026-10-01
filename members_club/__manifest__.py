@@ -1,6 +1,6 @@
 {
     'name': 'Members Club',
-    'version': '1.5',
+    'version': '1.6',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -9,14 +9,16 @@
         'crm_sale_subscription',
         'event_crm',
         'marketing_automation',
-        'partnership',
+        'partner_commission',
         'project_sale_subscription',
+        'web_studio',
         'website_blog',
         'website_event_sale',
         'website_sale_subscription',
     ],
     'data': [
         'data/res_config_setting.xml',
+        'data/ir_ui_view.xml',
         'data/knowledge_article.xml',
         'data/mail_message.xml',
         'data/product_public_category.xml',
