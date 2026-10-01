@@ -1,17 +1,20 @@
+import ast
 import logging
 import optparse
 import os
 import pathlib
+import re
 import sys
 import threading
 
-from odoo import api
-from odoo.addons.base_automation.models import base_automation
 from odoo.cli.command import Command
 from odoo.modules import db
 from odoo.modules.registry import Registry
 from odoo.service import server
 from odoo.tools import config
+
+from odoo import api
+from odoo.addons.base_automation.models import base_automation
 
 sys.path.append(pathlib.Path(__file__).parent.parent.parent.parent.as_posix())
 import utils
@@ -29,6 +32,13 @@ def job_log_level(status, duration):
 
 
 base_automation.job_log_level = job_log_level
+
+
+def get_industry_db_name(industry_module):
+    with open(utils.IndustryUtils().get_manifest(industry_module), encoding="utf-8") as f:
+        display_name = ast.literal_eval(f.read()).get('name') or industry_module
+    db_name = re.sub(r'[^a-zA-Z0-9]+', '_', display_name).strip('_') or industry_module
+    return db_name
 
 
 class Test_Industry(Command):
@@ -67,10 +77,9 @@ class Test_Industry(Command):
         for industry_module in industry_modules:
             try:
                 install = True
-                if config.get('singledb'):
-                    target_db = init_db
-                else:
-                    target_db = f"{init_db}-{industry_module}"
+                target_db = str(init_db)
+                if not config.get('singledb'):
+                    target_db += '-' + get_industry_db_name(industry_module)
                     if db.exist(target_db):
                         if config.get('drop_if_exists'):
                             db.drop(target_db)
