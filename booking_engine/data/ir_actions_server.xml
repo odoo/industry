@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="update_city_tax_action" model="ir.actions.server">
+    <record id="update_city_tax_action" model="ir.actions.server" forcecreate="1">
         <field name="name">Add/Update City Tax</field>
         <field name="model_id" ref="x_model_city_tax"/>
         <field name="state">code</field>
@@ -18,13 +18,13 @@ if (total := line_sum * record.x_sale_order_id.x_nights if from_so else record.x
         env['sale.order.line'].create({('product_uom_qty' if from_so else 'qty_delivered'): total, 'order_id': record.x_sale_order_id.id, 'product_id': product.id})
 ]]></field>
     </record>
-    <record id="open_x_city_tax_action" model="ir.actions.act_window">
+    <record id="open_x_city_tax_action" model="ir.actions.act_window" forcecreate="1">
         <field name="name">City Tax</field>
         <field name="res_model">x_city_tax</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>
-    <record id="industry_limit_slot_resources" model="ir.actions.server">
+    <record id="industry_limit_slot_resources" model="ir.actions.server" forcecreate="1">
         <field name="model_id" ref="planning.model_planning_slot"/>
         <field name="usage">base_automation</field>
         <field name="state">code</field>
@@ -35,7 +35,7 @@ for slot in records:
         raise UserError("Only one room can be assigned to a planning slot")
         ]]></field>
     </record>
-    <record id="apply_rental_check_out" model="ir.actions.server">
+    <record id="apply_rental_check_out" model="ir.actions.server" forcecreate="1">
         <field name="name">Apply Rental Checkout</field>
         <field name="model_id" ref="sale_renting.model_rental_order_wizard"/>
         <field name="state">code</field>
@@ -46,7 +46,7 @@ if record.order_id.rental_status == "returned" and any(line.product_id.x_has_cit
     action['context'] = {'search_default_x_sale_order_id': record.order_id.id, 'default_x_sale_order_id': record.order_id.id}
 ]]></field>
     </record>
-    <record id="industry_create_roles" model="ir.actions.server">
+    <record id="industry_create_roles" model="ir.actions.server" forcecreate="1">
         <field name="name">Create Plan Services</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="usage">base_automation</field>
@@ -55,7 +55,7 @@ if record.order_id.rental_status == "returned" and any(line.product_id.x_has_cit
 for record in records: env['planning.role'].create({'name': record.name, 'sync_shift_rental': True, 'x_resource_category': 'stay_offer', 'product_ids': [record.id]})
         </field>
     </record>
-    <record id="industry_edit_roles" model="ir.actions.server">
+    <record id="industry_edit_roles" model="ir.actions.server" forcecreate="1">
         <field name="name">Edit Plan Services</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="usage">base_automation</field>
@@ -64,7 +64,7 @@ for record in records: env['planning.role'].create({'name': record.name, 'sync_s
 for record in records: record.planning_role_id.write({'name': record.name})
         </field>
     </record>
-    <record id="industry_delete_roles" model="ir.actions.server">
+    <record id="industry_delete_roles" model="ir.actions.server" forcecreate="1">
         <field name="name">Delete Plan Services</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="usage">base_automation</field>
@@ -75,7 +75,7 @@ if records: records.planning_role_id.unlink()
     </record>
 
     <!-- House Keeping -->
-    <record id="server_action_set_resources_occupied" model="ir.actions.server">
+    <record id="server_action_set_resources_occupied" model="ir.actions.server" forcecreate="1">
         <field name="name">HouseKeeping: Set resources as occupied</field>
         <field name="code"><![CDATA[
 for slot in records.order_line.planning_slot_ids:
@@ -84,7 +84,7 @@ for slot in records.order_line.planning_slot_ids:
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
     </record>
-    <record id="server_action_set_resources_vacant" model="ir.actions.server">
+    <record id="server_action_set_resources_vacant" model="ir.actions.server" forcecreate="1">
         <field name="name">HouseKeeping: Set resources as vacant</field>
         <field name="code"><![CDATA[
 for slot in records.order_line.planning_slot_ids:
@@ -94,7 +94,7 @@ for slot in records.order_line.planning_slot_ids:
         <field name="state">code</field>
     </record>
 
-    <record id="server_action_set_task_ready_if_no_approvers" model="ir.actions.server">
+    <record id="server_action_set_task_ready_if_no_approvers" model="ir.actions.server" forcecreate="1">
         <field name="name">HouseKeeping: Set task ready if no approvers required after cleaning</field>
         <field name="code"><![CDATA[
 if not env['ir.config_parameter'].get_bool('booking_engine.x_approvers_setting', False) and (stage := env.ref('booking_engine.project_task_type_18', raise_if_not_found=False)):
@@ -104,7 +104,7 @@ if not env['ir.config_parameter'].get_bool('booking_engine.x_approvers_setting',
         <field name="state">code</field>
     </record>
 
-    <record id="server_action_check_has_right_to_approve_tasks" model="ir.actions.server">
+    <record id="server_action_check_has_right_to_approve_tasks" model="ir.actions.server" forcecreate="1">
         <field name="name">HouseKeeping: Has right to approve tasks</field>
         <field name="code"><![CDATA[
 if env['ir.config_parameter'].get_bool('booking_engine.x_approvers_setting', False) and env.user.id not in env.company.x_setting_approver_users_ids.ids:
@@ -114,7 +114,7 @@ if env['ir.config_parameter'].get_bool('booking_engine.x_approvers_setting', Fal
         <field name="state">code</field>
     </record>
 
-    <record id="server_action_update_task_cleaning_state" model="ir.actions.server">
+    <record id="server_action_update_task_cleaning_state" model="ir.actions.server" forcecreate="1">
         <field name="name">HouseKeeping: Update task cleaning state</field>
         <field name="model_id" ref="project.model_project_task"/>
         <field name="state">object_write</field>
@@ -125,7 +125,7 @@ if env['ir.config_parameter'].get_bool('booking_engine.x_approvers_setting', Fal
         <field name="value"><![CDATA[record.stage_id.id]]></field>
     </record>
 
-    <record id="server_action_update_rooms" model="ir.actions.server">
+    <record id="server_action_update_rooms" model="ir.actions.server" forcecreate="1">
         <field name="name">Housekeeping: Update rooms server action</field>
         <field name="model_id" ref="project.model_project_task"/>
         <field name="state">code</field>
@@ -159,7 +159,7 @@ if (project := env['project.project'].search([('x_is_house_keeping_project', '='
         env.ref('booking_engine.server_action_assign_house_keeping_tasks').run()
 ]]></field>
     </record>
-    <record id="server_action_assign_house_keeping_tasks" model="ir.actions.server">
+    <record id="server_action_assign_house_keeping_tasks" model="ir.actions.server" forcecreate="1">
         <field name="name">HouseKeeping: Task assignment action</field>
         <field name="model_id" ref="project.model_project_task"/>
         <field name="state">code</field>
@@ -185,7 +185,7 @@ if (tasks := records.filtered(lambda e: not e.x_employee_id) if records else env
     <!--
         Availabilities: create & update logic
     -->
-    <record id="server_action_update_availabilities" model="ir.actions.server">
+    <record id="server_action_update_availabilities" model="ir.actions.server" forcecreate="1">
         <field name="name">Booking Engine: Update Availabilities</field>
         <field name="model_id" ref="x_model_availability"/>
         <field name="state">code</field>
@@ -253,7 +253,7 @@ if (records := env['x_availability'].search([('x_to_recompute', '=', True)])):
 ]]></field>
     </record>
 
-    <record id="server_action_create_500_days_availability" model="ir.actions.server">
+    <record id="server_action_create_500_days_availability" model="ir.actions.server" forcecreate="1">
         <field name="name">Booking Engine: Update and create Availabilities</field>
         <field name="model_id" ref="x_model_availability"/>
         <field name="state">code</field>
@@ -294,7 +294,7 @@ env.ref('booking_engine.server_action_update_availabilities').run()
 ]]></field>
     </record>
 
-    <record id="server_action_helper_compute_new_avails_to_recompute" model="ir.actions.server">
+    <record id="server_action_helper_compute_new_avails_to_recompute" model="ir.actions.server" forcecreate="1">
         <field name="name">Booking Engine: Availability Helper - Compute New Availabilities M2M</field>
         <field name="model_id" ref="base.model_ir_actions_server"/>
         <field name="state">code</field>
@@ -374,7 +374,7 @@ env.ref('booking_engine.server_action_update_availabilities').run()
         race conditions. To try to mitigate this, we recompute all availabilities in the cron
         once a day.
     -->
-    <record id="server_action_update_availability_for_planning_slot_delete" model="ir.actions.server">
+    <record id="server_action_update_availability_for_planning_slot_delete" model="ir.actions.server" forcecreate="1">
         <field name="name">Booking Engine: Slot Delete Availability Logic</field>
         <field name="model_id" ref="planning.model_planning_slot"/>
         <field name="state">code</field>
@@ -388,7 +388,7 @@ env.ref('booking_engine.ir_cron_create_500_days_availability')._trigger()
 ]]></field>
     </record>
 
-    <record id="server_action_update_availability_for_resource_calendar_leaves_delete" model="ir.actions.server">
+    <record id="server_action_update_availability_for_resource_calendar_leaves_delete" model="ir.actions.server" forcecreate="1">
         <field name="name">Booking Engine: Leave Delete Availability Logic</field>
         <field name="model_id" ref="resource.model_resource_calendar_leaves"/>
         <field name="state">code</field>
@@ -402,7 +402,7 @@ env.ref('booking_engine.ir_cron_create_500_days_availability')._trigger()
 ]]></field>
     </record>
 
-    <record id="server_action_update_availability_for_resource_resource_delete" model="ir.actions.server">
+    <record id="server_action_update_availability_for_resource_resource_delete" model="ir.actions.server" forcecreate="1">
         <field name="name">Booking Engine: Room Delete Availability Logic</field>
         <field name="model_id" ref="resource.model_resource_resource"/>
         <field name="state">code</field>
@@ -416,7 +416,7 @@ env.ref('booking_engine.ir_cron_create_500_days_availability')._trigger()
 ]]></field>
     </record>
 
-    <record id="server_action_update_availability_for_product_template_delete" model="ir.actions.server">
+    <record id="server_action_update_availability_for_product_template_delete" model="ir.actions.server" forcecreate="1">
         <field name="name">Booking Engine: Stay Offer Delete Availability Logic</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="state">code</field>
@@ -432,7 +432,7 @@ env['x_availability'].search([('x_stay_offer_id', 'in', records.ids)]).unlink()
     <!--
         Availability dependencies: Update
     -->
-    <record id="server_action_update_availability_for_planning_slot" model="ir.actions.server">
+    <record id="server_action_update_availability_for_planning_slot" model="ir.actions.server" forcecreate="1">
         <field name="name">Booking Engine: Availability Slot Modify Logic</field>
         <field name="model_id" ref="planning.model_planning_slot"/>
         <field name="state">code</field>
@@ -449,7 +449,7 @@ if (valid_slots := records.filtered('resource_ids')):
 ]]></field>
     </record>
 
-    <record id="server_action_update_availability_for_resource_calendar_leaves" model="ir.actions.server">
+    <record id="server_action_update_availability_for_resource_calendar_leaves" model="ir.actions.server" forcecreate="1">
         <field name="name">Booking Engine: Availability Leave Modify Logic</field>
         <field name="model_id" ref="resource.model_resource_calendar_leaves"/>
         <field name="state">code</field>
@@ -467,7 +467,7 @@ if (resources := env['resource.resource'].search(['|', ('calendar_id', 'in', glo
 ]]></field>
     </record>
 
-    <record id="server_action_update_availability_for_resource_resource" model="ir.actions.server">
+    <record id="server_action_update_availability_for_resource_resource" model="ir.actions.server" forcecreate="1">
         <field name="name">Booking Engine: Availability Room Modify Logic</field>
         <field name="model_id" ref="resource.model_resource_resource"/>
         <field name="state">code</field>
@@ -480,7 +480,7 @@ env.ref('booking_engine.server_action_update_availabilities').run()
 ]]></field>
     </record>
 
-    <record id="server_action_update_availability_for_product_template" model="ir.actions.server">
+    <record id="server_action_update_availability_for_product_template" model="ir.actions.server" forcecreate="1">
         <field name="name">Booking Engine: Availability Offer Modify Logic</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="state">code</field>
@@ -511,7 +511,7 @@ if (new_offers := records.filtered(lambda r: r.x_is_a_room_offer and r.active) -
 env.ref('booking_engine.server_action_update_availabilities').run()
 ]]></field>
     </record>
-    <record id="ir_actions_server_send_survey" model="ir.actions.server">
+    <record id="ir_actions_server_send_survey" model="ir.actions.server" forcecreate="1">
         <field name="name">Booking Engine: Send Customer Satisfaction Survey</field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
@@ -546,7 +546,7 @@ if env['ir.config_parameter'].get_param('booking_engine.x_setting_automated_surv
     </record>
 
     <!-- Daily Lines -->
-    <record id="server_action_create_daily_lines_from_so" model="ir.actions.server">
+    <record id="server_action_create_daily_lines_from_so" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[
 dates_covered = []
 current_date = record.rental_start_date
@@ -561,7 +561,7 @@ env.ref('booking_engine.server_action_method_create_daily_lines').with_context(
         <field name="state">code</field>
         <field name="name">Dashboard: Create daily lines from so</field>
     </record>
-    <record id="server_action_unlink_daily_lines_from_so" model="ir.actions.server">
+    <record id="server_action_unlink_daily_lines_from_so" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[
 records.x_daily_lines_ids.unlink()
 ]]></field>
@@ -569,7 +569,7 @@ records.x_daily_lines_ids.unlink()
         <field name="state">code</field>
         <field name="name">Dashboard: Delete daily lines from so</field>
     </record>
-    <record id="server_action_unlink_daily_lines_from_so_2" model="ir.actions.server">
+    <record id="server_action_unlink_daily_lines_from_so_2" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[
 records.x_daily_lines_ids.unlink()
 ]]></field>
@@ -577,7 +577,7 @@ records.x_daily_lines_ids.unlink()
         <field name="state">code</field>
         <field name="name">Dashboard: Delete daily lines from so 2</field>
     </record>
-    <record id="server_action_create_daily_lines_from_sol" model="ir.actions.server">
+    <record id="server_action_create_daily_lines_from_sol" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[
 dates_covered = []
 current_date = record.order_id.rental_start_date
@@ -592,7 +592,7 @@ env.ref('booking_engine.server_action_method_create_daily_lines').with_context(
         <field name="state">code</field>
         <field name="name">Dashboard: Create daily lines from sol</field>
     </record>
-    <record id="server_action_method_create_daily_lines" model="ir.actions.server">
+    <record id="server_action_method_create_daily_lines" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[
 dates_covered = env.context.get('dates') or []
 daily_lines_values = []
@@ -611,7 +611,7 @@ env['x_so_daily_line'].create(daily_lines_values)
         <field name="state">code</field>
         <field name="name">Dashboard: Create daily lines, Method</field>
     </record>
-    <record id="server_action_modify_daily_lines_from_sol" model="ir.actions.server">
+    <record id="server_action_modify_daily_lines_from_sol" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[
 for record in records:
     for daily_line in record.x_daily_line_ids:
@@ -623,7 +623,7 @@ for record in records:
         <field name="state">code</field>
         <field name="name">Dashboard: Modify daily lines from sol</field>
     </record>
-    <record id="server_action_modify_daily_lines_from_so_date_change" model="ir.actions.server">
+    <record id="server_action_modify_daily_lines_from_so_date_change" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[
 for record in records:
     for daily_line in record.x_daily_lines_ids:

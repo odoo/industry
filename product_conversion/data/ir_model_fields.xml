@@ -1,19 +1,19 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="x_is_convert_attribute_field_product_attribute" model="ir.model.fields">
+    <record id="x_is_convert_attribute_field_product_attribute" model="ir.model.fields" forcecreate="1">
         <field name="name">x_is_convert_attribute</field>
         <field name="field_description">Convert Attribute</field>
         <field name="model_id" ref="product.model_product_attribute"/>
         <field name="ttype">boolean</field>
     </record>
-    <record id="x_picking_id_field_mrp_production" model="ir.model.fields">
+    <record id="x_picking_id_field_mrp_production" model="ir.model.fields" forcecreate="1">
         <field name="name">x_picking_id</field>
         <field name="field_description">Source Operation</field>
         <field name="model_id" ref="mrp.model_mrp_production"/>
         <field name="ttype">many2one</field>
         <field name="relation">stock.picking</field>
     </record>
-    <record id="x_conversions_field_stock_picking" model="ir.model.fields">
+    <record id="x_conversions_field_stock_picking" model="ir.model.fields" forcecreate="1">
         <field name="name">x_conversions</field>
         <field name="field_description">Conversions</field>
         <field name="model_id" ref="stock.model_stock_picking"/>
@@ -22,7 +22,7 @@
         <field name="relation_field">x_picking_id</field>
         <field name="readonly">True</field>
     </record>
-    <record id="x_conversion_count_field_stock_picking" model="ir.model.fields">
+    <record id="x_conversion_count_field_stock_picking" model="ir.model.fields" forcecreate="1">
         <field name="name">x_conversion_count</field>
         <field name="field_description">Conversion Count</field>
         <field name="model_id" ref="stock.model_stock_picking"/>
@@ -34,7 +34,7 @@ for picking in self:
     picking['x_conversion_count'] = len(picking.x_conversions)
         ]]></field>
     </record>
-    <record id="x_show_convert_field_for_stock_picking_button" model="ir.model.fields">
+    <record id="x_show_convert_field_for_stock_picking_button" model="ir.model.fields" forcecreate="1">
         <field name="name">x_show_convert</field>
         <field name="field_description">Show Convert Button</field>
         <field name="model_id" ref="stock.model_stock_picking"/>
@@ -46,14 +46,14 @@ for picking in self:
     picking['x_show_convert'] = picking.picking_type_id.code not in ('incoming', 'dropship') and picking.state not in ('draft', 'cancel') and any(move.product_id.is_storable for move in picking.move_ids)
         ]]></field>
     </record>
-    <record id="x_field_convert_product_wizard_picking_id" model="ir.model.fields">
+    <record id="x_field_convert_product_wizard_picking_id" model="ir.model.fields" forcecreate="1">
         <field name="name">x_picking_id</field>
         <field name="field_description">Stock Picking</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
         <field name="ttype">many2one</field>
         <field name="relation">stock.picking</field>
     </record>
-    <record id="x_convertable_product_ids_field" model="ir.model.fields">
+    <record id="x_convertable_product_ids_field" model="ir.model.fields" forcecreate="1">
         <field name="name">x_convertable_product_ids</field>
         <field name="field_description">Convertible Products</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
@@ -67,14 +67,14 @@ for wizard in self:
     wizard['x_convertable_product_ids'] = [(6, 0, [move.product_id.id for move in wizard.x_picking_id.move_ids if move.product_id.is_storable])]
         ]]></field>
     </record>
-    <record id="x_field_convert_product_wizard_product_id" model="ir.model.fields">
+    <record id="x_field_convert_product_wizard_product_id" model="ir.model.fields" forcecreate="1">
         <field name="name">x_product_id</field>
         <field name="field_description">Product To Convert</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
         <field name="ttype">many2one</field>
         <field name="relation">product.product</field>
     </record>
-    <record id="x_field_convert_product_wizard_move_id" model="ir.model.fields">
+    <record id="x_field_convert_product_wizard_move_id" model="ir.model.fields" forcecreate="1">
         <field name="name">x_move_id</field>
         <field name="field_description">Stock Move</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
@@ -87,7 +87,7 @@ for wizard in self:
         wizard['x_move_id'] = wizard.env['stock.move'].search([('picking_id', '=', wizard.x_picking_id.id), ('product_id', '=', wizard.x_product_id.id)], limit=1).id
         ]]></field>
     </record>
-    <record id="x_field_convert_product_wizard_move_location_id" model="ir.model.fields">
+    <record id="x_field_convert_product_wizard_move_location_id" model="ir.model.fields" forcecreate="1">
         <field name="name">x_move_location_id</field>
         <field name="field_description">Stock Move Location</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
@@ -95,7 +95,7 @@ for wizard in self:
         <field name="relation">stock.location</field>
         <field name="related">x_move_id.location_id</field>
     </record>
-    <record id="field_convert_product_wizard_quant_id" model="ir.model.fields">
+    <record id="field_convert_product_wizard_quant_id" model="ir.model.fields" forcecreate="1">
         <field name="name">x_quant_id</field>
         <field name="field_description">Available Quant</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
@@ -110,7 +110,7 @@ for wizard in self:
         wizard['x_quant_id'] = self.env['stock.quant'].search([('product_id', '=', move_line.product_id.id), ('location_id', '=', move_line.location_id.id), ('lot_id', '=', move_line.lot_id.id)], limit=1)
         ]]></field>  
     </record>
-    <record id="field_convert_product_wizard_quantity" model="ir.model.fields">
+    <record id="field_convert_product_wizard_quantity" model="ir.model.fields" forcecreate="1">
         <field name="name">x_quantity</field>
         <field name="field_description">Quantity to Convert</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
@@ -123,7 +123,7 @@ for wizard in self:
     wizard['x_quantity'] = move_line.quantity if move_line else 0.0
         ]]></field>
     </record>
-    <record id="field_convert_product_wizard_keep_lot" model="ir.model.fields">
+    <record id="field_convert_product_wizard_keep_lot" model="ir.model.fields" forcecreate="1">
         <field name="name">x_keep_lot_sn</field>
         <field name="field_description">Keep Lot/Serial</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
@@ -134,20 +134,20 @@ for wizard in self:
     wizard['x_keep_lot_sn'] = wizard.x_product_id.tracking in ('lot', 'serial')
         ]]></field>
     </record>
-    <record id="field_convert_product_wizard_new_lot_id" model="ir.model.fields">
+    <record id="field_convert_product_wizard_new_lot_id" model="ir.model.fields" forcecreate="1">
         <field name="name">x_new_lot_sn</field>
         <field name="field_description">New Lot/Serial</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
         <field name="ttype">char</field>
     </record>
-    <record id="field_convert_product_wizard_grade_id" model="ir.model.fields">
+    <record id="field_convert_product_wizard_grade_id" model="ir.model.fields" forcecreate="1">
         <field name="name">x_product_convert_into</field>
         <field name="field_description">Product Convert Into</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
         <field name="ttype">many2one</field>
         <field name="relation">product.product</field>
     </record>
-    <record id="field_convert_wizard_product_tracking" model="ir.model.fields">
+    <record id="field_convert_wizard_product_tracking" model="ir.model.fields" forcecreate="1">
         <field name="name">x_source_tracking</field>
         <field name="field_description">Source Tracking</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
@@ -156,7 +156,7 @@ for wizard in self:
         <field name="store" eval="False"/>
         <field name="readonly" eval="True"/>
     </record>
-    <record id="field_convert_product_wizard_source_tmpl_id" model="ir.model.fields">
+    <record id="field_convert_product_wizard_source_tmpl_id" model="ir.model.fields" forcecreate="1">
         <field name="name">x_source_product_tmpl_id</field>
         <field name="field_description">Product To Convert Template</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
@@ -164,7 +164,7 @@ for wizard in self:
         <field name="store" eval="False"/>
         <field name="related">x_product_id.product_tmpl_id.id</field>
     </record>
-    <record id="x_allowed_product_ids_field" model="ir.model.fields">
+    <record id="x_allowed_product_ids_field" model="ir.model.fields" forcecreate="1">
         <field name="name">x_allowed_product_ids</field>
         <field name="field_description">Allowed Target Products</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
@@ -203,14 +203,14 @@ for wizard in self:
     wizard['x_allowed_product_ids'] = [(6, 0, allowed.ids)]
         ]]></field>
     </record>
-    <record id="x_field_convert_product_wizard_destination_location_id" model="ir.model.fields">
+    <record id="x_field_convert_product_wizard_destination_location_id" model="ir.model.fields" forcecreate="1">
         <field name="name">x_destination_location_id</field>
         <field name="field_description">Destination Location</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
         <field name="ttype">many2one</field>
         <field name="relation">stock.location</field>
     </record>
-    <record id="x_field_convert_product_wizard_show_destination_location" model="ir.model.fields">
+    <record id="x_field_convert_product_wizard_show_destination_location" model="ir.model.fields" forcecreate="1">
         <field name="name">x_show_destination_location</field>
         <field name="field_description">Show Destination Location</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
@@ -221,7 +221,7 @@ for wizard in self:
 self['x_show_destination_location'] = self.env['stock.location'].search_count([('usage', '=', 'internal')], limit=2) > 1
         ]]></field>
     </record>
-    <record id="field_convert_product_wizard_replace_on_transfer" model="ir.model.fields">
+    <record id="field_convert_product_wizard_replace_on_transfer" model="ir.model.fields" forcecreate="1">
         <field name="name">x_replace_on_transfer</field>
         <field name="field_description">Replace on Transfer</field>
         <field name="model_id" ref="x_model_convert_product_wizard"/>
