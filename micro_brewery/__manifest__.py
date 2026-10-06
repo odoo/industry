@@ -1,6 +1,6 @@
 {
     'name': 'Microbrewery',
-    'version': '2.10',
+    'version': '2.11',
     'category': 'Supply Chain',
     'depends': [
         'account',
