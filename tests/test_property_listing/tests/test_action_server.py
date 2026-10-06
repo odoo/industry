@@ -195,8 +195,8 @@ class PropertyListingAutomationsTestCase(TransactionCase):
         self.assertEqual(email, 1, "One email should be sent to the client with matched properties")
 
         # check for notify_contacts_for_matches_server_action (also tests the x_to_notify_property_ids field)
-        notify_action = self.env.ref('property_listing.notify_contacts_for_matches_server_action')
-        notify_action.run()
+        with self.registry_test_mode():
+            self.env.ref('property_listing.notify_contacts_for_matches_cron').method_direct_trigger()
         email_count = self.env['mail.mail'].search_count([('recipient_ids.id', '=', client.id)])
         self.assertEqual(email_count, 2, "One email should be sent to the client after notification by notify_contacts_for_matches action")
 

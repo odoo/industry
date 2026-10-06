@@ -112,10 +112,14 @@ if template and template.send_mail(res_id=record.id):
         <field name="state">code</field>
         <field name="usage">ir_cron</field>
         <field name="code"><![CDATA[
-template = env.company.x_matchmaking_email_template_id
-for contact in model.search([('x_subscribe', '=', True), ('x_to_notify_property_ids', '!=', False)]):
-    if template and template.send_mail(res_id=contact.id):
-        contact['x_last_notification'] = datetime.datetime.now()
+if template := env.company.x_matchmaking_email_template_id:
+    contacts = model.search([('x_subscribe', '=', True), ('x_to_notify_property_ids', '!=', False)])
+    env['ir.cron']._commit_progress(remaining=len(contacts))
+    for contact in contacts:
+        if template.send_mail(res_id=contact.id):
+            contact['x_last_notification'] = datetime.datetime.now()
+        if not env['ir.cron']._commit_progress(1):
+            break
     ]]></field>
     </record>
     <record id="notify_contacts_for_matches_cron" model="ir.cron">
