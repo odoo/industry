@@ -1,6 +1,6 @@
 {
     'name': 'Property Listing',
-    'version': '1.4',
+    'version': '1.5',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
