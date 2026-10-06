@@ -1,6 +1,6 @@
 {
     'name': 'Excise Management',
-    'version': '2.10',
+    'version': '2.11',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
@@ -26,9 +26,7 @@
         'data/uom_uom.xml',
         'data/x_excise_category.xml',
         'data/res_config_setting.xml',
-    ],
-    'demo': [
-        'demo/excise_report.xml',
+        'data/spreadsheet_dashboard.xml',
     ],
     'cloc_exclude': [
         'data/qweb_view.xml',
