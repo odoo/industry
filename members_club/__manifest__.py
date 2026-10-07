@@ -16,6 +16,7 @@
         'website_sale_subscription',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_setting.xml',
         'data/knowledge_article.xml',
         'data/mail_message.xml',
@@ -52,6 +53,7 @@
     ],
     'license': 'OEEL-1',
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',
         'demo/website_view.xml',
     ],

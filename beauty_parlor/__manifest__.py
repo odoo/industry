@@ -14,6 +14,7 @@
         'website_appointment_crm',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/ir_attachment_pre.xml',
         'data/crm_team.xml',
         'data/crm_stage.xml',
@@ -52,6 +53,7 @@
         ],
     },
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',
         'static/src/js/my_tour.js',
         'demo/website_view.xml',

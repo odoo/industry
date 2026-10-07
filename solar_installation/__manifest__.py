@@ -21,6 +21,7 @@
         'website_livechat',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/base_automation.xml',
         'data/ir_actions_server.xml',
@@ -96,6 +97,7 @@
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
         "data/website_view.xml",
         "static/src/js/my_tour.js",

@@ -11,6 +11,7 @@
         'website_sale',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/ir_model.xml',
         'data/ir_access.xml',
         'data/ir_model_fields.xml',
@@ -45,6 +46,7 @@
     ],
     'license': 'OEEL-1',
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/website_view.xml',
         'data/uninstall_hook.xml',
         'demo/website/pages/matchmaking.xml',

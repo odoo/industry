@@ -18,6 +18,7 @@
         'website_sale_stock',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/res_config_settings_views.xml',
         'data/ir_ui_menu.xml',
@@ -84,6 +85,7 @@
     ],
     'license': 'OEEL-1',
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/knowledge_article.xml',
         'demo/website/views/website_templates.xml',

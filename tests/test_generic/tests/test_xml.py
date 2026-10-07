@@ -210,7 +210,7 @@ class TestEnv(IndustryCase):
                     self._check_view_active(tree, file_name)
                     self._check_is_published_false(tree, file_name)
                     self._check_base_records_update(tree, file_name, module)
-                    if not is_studio_required:
+                    if not is_studio_required and file_name != 'ir_module_module_dependency.xml':
                         is_studio_required = self._check_studio(tree, file_name)
                 if root.split('/')[-1] == 'demo':
                     has_main_company_record = has_main_company_record or self._check_main_company_inherit_is_present(tree, file_name, module)

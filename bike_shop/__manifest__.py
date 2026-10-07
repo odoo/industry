@@ -19,6 +19,7 @@
         'website_sale_collect',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/mail_template.xml',
         'data/ir_model_fields.xml',
@@ -99,6 +100,7 @@
     ],
     'license': 'OEEL-1',
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',
         'data/qweb_views.xml',
         'demo/website/views/website_templates.xml',

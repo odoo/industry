@@ -16,6 +16,7 @@
         'social',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/project_task_type.xml',
@@ -50,6 +51,7 @@
         'demo/purchase_order_line.xml',
     ],
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
     ],
     'application': True,

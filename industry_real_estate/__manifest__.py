@@ -10,6 +10,7 @@
         'property_listing',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/ir_model_fields.xml',
         'data/crm_stages.xml',
         'data/res_config_setting.xml',
@@ -66,6 +67,7 @@
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
         "data/website_view.xml",
         "data/uninstall_hook.xml",

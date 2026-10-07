@@ -12,6 +12,7 @@
         'project_sale_subscription',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/product_category.xml',
         'data/project_task_type.xml',
@@ -43,6 +44,7 @@
         'demo/purchase_order_line.xml',
     ],
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
     ],
     'images': ['images/main.png'],

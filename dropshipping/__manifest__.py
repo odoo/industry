@@ -14,6 +14,7 @@
         'website_sale_mass_mailing',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/product_category.xml',
         'data/stock_route.xml',
         'data/product_template.xml',
@@ -54,6 +55,7 @@
     ],
     'author': 'Odoo S.A.',
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
         "demo/website_view.xml",
     ],

@@ -11,6 +11,7 @@
         'stock',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/ir_attachment.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
@@ -38,6 +39,7 @@
         'demo/resource_calendar.xml',
     ],
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',
     ],
     'license': 'OEEL-1',
