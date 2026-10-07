@@ -12,6 +12,7 @@
         'website_sale',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/product_product.xml',
         'data/ir_attachment.xml',
         'data/knowledge_article_cover.xml',
@@ -50,6 +51,7 @@
         ],
     },
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',
         'static/src/js/my_tour.js',
         'demo/website_view.xml',

@@ -17,6 +17,7 @@
         'website_sale',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/account_tax.xml',
         'data/res_config_settings.xml',
         'data/ir_model_fields.xml',
@@ -64,6 +65,7 @@
     'application': True,
     'license': 'OEEL-1',
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',
         'demo/website/views/website_templates.xml',
         'demo/website/views/website_sale_templates.xml',

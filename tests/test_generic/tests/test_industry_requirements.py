@@ -73,6 +73,20 @@ class TestEnv(IndustryCase):
                 if not cloc_entry[2].endswith('.js'):
                     self.assertIn(cloc_entry[0], ['ir.actions.server', 'ir.model.fields'], message)
 
+    def test_soft_dependency_cron(self):
+        Dependency = self.env['ir.module.module.dependency']
+        for module in self.installed_modules:
+            cron = self.env.ref(f"{module}.soft_dependency_ir_cron", raise_if_not_found=False)
+            self.assertTrue(cron, f"Missing 'soft_dependency_ir_cron' in module '{module}', copy 'data/ir_module_module_dependency.xml' from another module.")
+            self.assertEqual(cron.model_id.model, 'ir.module.module.dependency', f"Wrong model for 'soft_dependency_ir_cron' in module '{module}'.")
+            self.assertIn(f"'{module}'", cron.code, f"The soft dependency cron of module '{module}' should target its own module.")
+
+            domain = [('module_id.name', '=', module)]
+            self.assertTrue(Dependency.search_count(domain, limit=1), f"Module '{module}' should have dependencies before running its soft dependency cron.")
+            with self.enter_registry_test_mode():
+                cron.method_direct_trigger()
+            self.assertFalse(Dependency.search_count(domain, limit=1), f"The soft dependency cron of module '{module}' should remove its dependencies.")
+
     def test_sale_ok_and_is_published_in_db(self):
         models = ["product.template", "product.product"]
         for model in models:

@@ -10,6 +10,7 @@
         'web_studio',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/ir_model_fields.xml',
         'data/ir_actions_act_window.xml',
         'data/ir_actions_server.xml',
@@ -19,6 +20,9 @@
         'data/product_category.xml',
     ],
     'license': 'OEEL-1',
+    'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
+    ],
     'images': ['images/main.png'],
     'website': "https://www.odoo.com/all-industries",
 }

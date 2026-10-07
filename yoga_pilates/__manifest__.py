@@ -16,6 +16,7 @@
         'website_sale_subscription',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/appointment_resource.xml',
         'data/product_category.xml',
@@ -65,6 +66,7 @@
         'demo/website.xml',
     ],
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
         "demo/website_view.xml",
     ],

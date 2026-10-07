@@ -20,6 +20,7 @@
         'website',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/ir_model.xml',
         'data/ir_access.xml',
         'data/ir_attachment_pre.xml',
@@ -74,6 +75,7 @@
         'demo/website.xml',
     ],
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',
         'data/portal_templates.xml',
         'demo/qweb_view.xml',

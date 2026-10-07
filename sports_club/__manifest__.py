@@ -15,6 +15,7 @@
         'website_sale',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/product_pricelist.xml',
         'data/res_config_settings.xml',
         'data/pos_category.xml',
@@ -84,6 +85,7 @@
         ],
     },
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
         "static/src/scss/primary_variables.scss",

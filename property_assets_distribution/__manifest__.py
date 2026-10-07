@@ -8,6 +8,7 @@
         'website_sale',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
         'data/ir_access.xml',
@@ -28,5 +29,8 @@
         'demo/payment_provider_demo_post.xml',
     ],
     'license': 'OEEL-1',
+    'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
+    ],
     'author': 'Odoo S.A.',
 }

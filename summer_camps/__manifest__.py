@@ -18,6 +18,7 @@
         'website_event_sale',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/ir_attachment.xml',
         'data/ir_model_fields.xml',
         'data/ir_actions_server.xml',
@@ -67,6 +68,7 @@
     ],
     'license': 'OEEL-1',
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',
         'data/website_event_templates.xml',
         "demo/website_view.xml",

@@ -17,6 +17,7 @@
         'website',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/crm_tag.xml',
         'data/ir_attachment_pre.xml',
         'data/appointment_type.xml',
@@ -55,6 +56,7 @@
         'demo/sale_order_confirm.xml',
     ],
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
         'demo/website/views/website_templates.xml',
         'demo/website/pages/home.xml',

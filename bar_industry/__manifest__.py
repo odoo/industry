@@ -14,6 +14,7 @@
         'purchase',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/product_category.xml',
         'data/product_pricelist.xml',
@@ -53,6 +54,7 @@
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
     ],
     'application': True,

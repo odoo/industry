@@ -17,6 +17,7 @@
         'website_appointment_sale_project',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_setting.xml',
         'data/stock_warehouse.xml',
         'data/ir_sequence.xml',
@@ -76,6 +77,7 @@
         'demo/website.xml',
     ],
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',
         'demo/website_view.xml',
     ],

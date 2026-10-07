@@ -18,6 +18,7 @@
         'website_appointment',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/ir_default.xml',
         'data/project_task_type.xml',
@@ -80,6 +81,7 @@
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
         "static/src/scss/primary_variables.scss",
         "demo/website/views/website_templates.xml",
