@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!-- <function model="ir.module.module.dependency" name="unlink">
+        <function eval="[[('module_id.name','=', 'agriculture_shop')]]" model="ir.module.module.dependency" name="search"/>
+    </function> -->
+    <record id="soft_dependency_ir_cron" model="ir.cron">
+        <field name="name">Soft dependency</field>
+        <field name="model_id" ref="base.model_ir_module_module_dependency"/>
+        <field name="state">code</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="nextcall" eval="(DateTime.now() + timedelta(minutes=5)).strftime('%Y-%m-%d %H:%M:%S')" />
+    </record>
+    <record id="soft_dependency_server_action" model="ir.actions.server">
+        <field name="name">Soft dependency</field>
+        <field name="model_id" ref="base.model_ir_module_module_dependency"/>
+        <field name="state">code</field>
+        <field name="usage">ir_cron</field>
+        <field name="code"><![CDATA[
+model.search([('module_id.name','=', 'agriculture_shop')]).unlink()
+env.ref('agriculture_shop.soft_dependency_ir_cron')._commit_progress(processed=1, remaining=0, deactivate=True)
+    ]]></field>
+    </record>
+    <record id="soft_dependency_ir_cron" model="ir.cron">
+        <field name="ir_actions_server_id" ref="soft_dependency_server_action"/>
+    </record>
+</odoo>
+
