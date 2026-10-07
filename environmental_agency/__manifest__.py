@@ -14,6 +14,7 @@
         'website_appointment',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/crm_stage.xml',
         'data/crm_team.xml',
@@ -61,6 +62,7 @@
     ],
     'license': 'OEEL-1',
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',
         'demo/website_view.xml',
     ],

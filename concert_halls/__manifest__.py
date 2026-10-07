@@ -14,6 +14,7 @@
         'website_event',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/pos_category.xml',
@@ -53,6 +54,7 @@
     ],
     'license': 'OEEL-1',
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',
         'data/website_view.xml',
         'demo/website/views/website_templates.xml',

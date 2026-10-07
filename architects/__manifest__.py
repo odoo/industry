@@ -21,6 +21,7 @@
         'website_partner',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/crm_stage.xml',
         'data/base_automation.xml',
@@ -63,6 +64,7 @@
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
         "data/uninstall_hook.xml",
         "data/website_view.xml",

@@ -10,6 +10,7 @@
         'web_studio',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/ir_model_fields.xml',
         'data/ir_ui_view.xml',
         'data/qweb_view.xml',
@@ -22,6 +23,7 @@
         'data/stock_route.xml',
     ],
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/qweb_view.xml',
     ],
     'license': 'OEEL-1',

@@ -15,6 +15,7 @@
         'website_appointment',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/ir_model.xml',
         'data/ir_access.xml',
@@ -65,6 +66,7 @@
         'demo/website.xml',
     ],
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',
         "data/qweb_view.xml",
         "demo/website_view.xml",

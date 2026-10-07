@@ -11,6 +11,7 @@
         'web_studio',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/ir_model.xml',
         'data/ir_model_fields.xml',
         'data/ir_actions_server.xml',
@@ -29,6 +30,7 @@
         'data/spreadsheet_dashboard.xml',
     ],
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/qweb_view.xml',
     ],
     'license': 'OEEL-1',

@@ -14,6 +14,7 @@
         'sign',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/website_base_unit.xml',
         'data/ir_model_fields.xml',
         'data/sign_template.xml',
@@ -82,6 +83,7 @@
         'demo/ir_attachment_post.xml',
     ],
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
         "data/uninstall_hook.xml",
         "data/website_view.xml",

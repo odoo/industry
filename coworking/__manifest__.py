@@ -19,6 +19,7 @@
         'website_sale_subscription',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/crm_stage.xml',
@@ -77,6 +78,7 @@
     'application': True,
     'license': 'OEEL-1',
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',
         'static/src/scss/primary_variables.scss',
         'demo/website/views/website_templates.xml',

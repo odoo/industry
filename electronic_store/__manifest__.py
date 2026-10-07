@@ -19,6 +19,7 @@
         'website_sale',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/helpdesk_config.xml',
         'data/res_config_settings.xml',
         'data/base_automation.xml',
@@ -82,6 +83,7 @@
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
         "demo/website_view.xml",
