@@ -7,6 +7,7 @@
         'web_studio',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/ir_model.xml',
         'data/ir_access.xml',
@@ -22,6 +23,7 @@
         ]
     },
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "static/src/xml/main.xml",
     ],
     'license': 'OEEL-1',

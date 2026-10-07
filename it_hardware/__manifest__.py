@@ -15,6 +15,7 @@
         'website_sale_stock',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/stock_picking_type.xml',
@@ -66,6 +67,7 @@
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
         "data/website_view.xml",
         "static/src/js/my_tour.js",

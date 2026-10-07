@@ -18,6 +18,7 @@
         'website_event_sale',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/ir_attachment.xml',
         'data/crm_tag.xml',
         'data/crm_stage.xml',
@@ -91,6 +92,7 @@
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
         "data/qweb_view.xml",
         "demo/website/views/website_templates.xml",

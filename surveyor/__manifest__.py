@@ -12,6 +12,7 @@
         'website',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/ir_ui_menu.xml',
         'data/worksheet_template.xml',
@@ -56,6 +57,7 @@
     'application': True,
     'images': ['images/main.png'],
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
         "data/website_view.xml",
         "static/src/js/my_tour.js",

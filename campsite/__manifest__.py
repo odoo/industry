@@ -10,6 +10,7 @@
         'web_studio',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/pos_category.xml',
         'data/pos_config.xml',
         'data/product_category.xml',
@@ -43,6 +44,7 @@
     ],
     'license': 'OEEL-1',
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',
         'data/web_views.xml',
         'demo/website_view.xml',

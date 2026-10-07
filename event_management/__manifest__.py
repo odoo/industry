@@ -24,6 +24,7 @@
         'website_hr_recruitment',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/product_category.xml',
         'data/crm_stage.xml',
@@ -90,6 +91,7 @@
     ],
     'license': 'OEEL-1',
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',
         'data/website_view.xml',
         'demo/website_view.xml',

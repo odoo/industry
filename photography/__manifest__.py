@@ -13,6 +13,7 @@
         'website_appointment',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/mail_templates.xml',
         'data/project_data.xml',
         'data/product_data.xml',
@@ -59,6 +60,7 @@
     },
     'author': 'Odoo S.A.',
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
         "static/src/js/my_tour.js",
         "data/website_view.xml",

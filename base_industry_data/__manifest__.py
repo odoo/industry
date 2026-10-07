@@ -9,6 +9,7 @@
         'knowledge',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_tour.xml',
         'data/res_partner_category.xml',
     ],
@@ -26,6 +27,7 @@
         ],
     },
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'static/src/js/my_tour.js',
     ],
 }

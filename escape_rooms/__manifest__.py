@@ -13,6 +13,7 @@
         'website_sale_loyalty',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/ir_attachment_pre.xml',
         'data/appointment_type.xml',
         'data/appointment_resource.xml',
@@ -55,6 +56,7 @@
     ],
     'license': 'OEEL-1',
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',
         'data/website_view.xml',
         'demo/website_view.xml',

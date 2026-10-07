@@ -10,6 +10,7 @@
         'web_studio',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/stock_location.xml',
 
@@ -72,6 +73,7 @@
         ],
     },
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/qweb_view.xml',
     ],
     'images': ['images/main.png'],

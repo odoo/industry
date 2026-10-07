@@ -10,6 +10,7 @@
         'sale_crm',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/pos_config.xml',
         'data/crm_tag.xml',
         'data/uom_uom.xml',
@@ -33,6 +34,7 @@
         'demo/project_task.xml',
     ],
     "cloc_exclude": [
+        'data/ir_module_module_dependency.xml',
         "data/knowledge_article.xml",
     ],
     'application': True,

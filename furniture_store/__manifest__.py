@@ -19,6 +19,7 @@
         'website_sale_stock',
     ],
     'data': [
+        'data/ir_module_module_dependency.xml',
         'data/ir_attachment_pre.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
@@ -62,6 +63,7 @@
     'license': 'OEEL-1',
     'author': 'Odoo S.A.',
     'cloc_exclude': [
+        'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',
         'demo/website_view.xml',
     ],
