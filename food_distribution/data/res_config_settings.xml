@@ -31,20 +31,23 @@
 
     <record id="action_toggle_food_drinks_labels" model="ir.actions.server">
         <field name="code"><![CDATA[
-def toggle_food_drink_label(state):
-    if report := env.ref('stock.action_report_lot_label', raise_if_not_found=False):
-        report['paperformat_id'] = env.ref('food_distribution.report_paperformat_1').id if state else env.ref('product.paperformat_label_sheet').id
-    for to_unarchive in [
-        'food_distribution_inherit_product_template_only_form_view',
-        'food_distribution_inherit_report_lot_label',
-        'food_distribution_inherit_report_lot_label_expiry',
-        'inventory_nutritional_facts_menu',
-        'quality_point_18',
-        'quality_point_19'
-    ]:
-        if external_id := env.ref(f'food_distribution.{to_unarchive}', raise_if_not_found=False):
-            external_id['active'] = state
-toggle_food_drink_label(record.x_module_food_drinks_labels)
+state = record.company_id.x_module_food_drinks_labels
+lot_label_pdf = env.ref('stock.action_print_lot_label_pdf')
+food_label_pdf = env.ref('food_distribution.action_print_lot_label_pdf')
+lot_label_pdf['binding_model_id'] = False if state else lot_label_pdf.model_id
+food_label_pdf['binding_model_id'] = lot_label_pdf.model_id if state else False
+env.ref('product.action_report_product_label_dymo').write({
+    'name': food_label_pdf.name if state else 'Finished Product PDF - Food',
+    'paperformat_id': (food_label_pdf.paperformat_id if state else env.ref('product.paperformat_label_sheet_dymo')).id,
+})
+for xmlid in [
+    'food_distribution_inherit_product_template_only_form_view',
+    'inventory_nutritional_facts_menu',
+    'quality_point_18',
+    'quality_point_19',
+]:
+    if to_toggle := env.ref(f'food_distribution.{xmlid}', raise_if_not_found=False):
+        to_toggle['active'] = state
     ]]></field>
         <field name="model_id" ref="base_setup.model_res_config_settings"/>
         <field name="state">code</field>
@@ -57,6 +60,39 @@ toggle_food_drink_label(record.x_module_food_drinks_labels)
         <field name="trigger">on_create_or_write</field>
         <field name="name">Food Distribution: Toggle Food &amp; Drinks Labels</field>
         <field name="trigger_field_ids" eval="[(6, 0, [ref('field_res_config_setting_x_module_food_drinks_labels')])]"/>
+    </record>
+
+    <record id="action_shop_floor_food_label" model="ir.actions.server">
+        <field name="code"><![CDATA[
+record.write({'print_format': 'dymo', 'extra_html': str(record.quality_check_id.id)})
+    ]]></field>
+        <field name="model_id" ref="mrp_workorder.model_quality_check_label_layout"/>
+        <field name="state">code</field>
+        <field name="name">Food Distribution: Shop Floor Food Label</field>
+    </record>
+    <record id="automation_shop_floor_food_label" model="base.automation">
+        <field name="model_id" ref="mrp_workorder.model_quality_check_label_layout"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('action_shop_floor_food_label')])]"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[('print_format', '=', '4x12'), ('quality_check_id.lot_ids', '!=', False), ('quality_check_id.company_id.x_module_food_drinks_labels', '=', True)]</field>
+        <field name="name">Food Distribution: Shop Floor Food Label</field>
+    </record>
+
+    <record id="uninstall_hook_action_server" model="ir.actions.server">
+        <field name="code"><![CDATA[
+env['res.config.settings'].create({'x_module_food_drinks_labels': False})
+    ]]></field>
+        <field name="model_id" ref="base.model_ir_module_module"/>
+        <field name="state">code</field>
+        <field name="name">Food Distribution: Uninstall Hook</field>
+    </record>
+    <record id="uninstall_hook_base_automation" model="base.automation">
+        <field name="model_id" ref="base.model_ir_module_module"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('uninstall_hook_action_server')])]"/>
+        <field name="trigger">on_state_set</field>
+        <field name="trg_selection_field_id" ref="base.selection__ir_module_module__state__to_remove"/>
+        <field name="filter_pre_domain" eval="[('id', '=', ref('base.module_food_distribution'))]"/>
+        <field name="name">Food Distribution: Uninstall Hook</field>
     </record>
 
     <record id="res_config_settings_form_view_inherited" model="ir.ui.view">
