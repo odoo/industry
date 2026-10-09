@@ -1,6 +1,6 @@
 {
     'name': 'Electronic Refurbishment',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Retail',
     'author': 'Odoo S.A.',
     'depends': [
@@ -11,6 +11,7 @@
         'product_conversion',
         'product_margin',
         'purchase_mrp',
+        'repair',
         'sale_management',
         'web_studio',
         'website_appointment',
@@ -34,10 +35,13 @@
         'data/product_product.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
+        'data/stock_warehouse.xml',
     ],
     'demo': [
         'demo/res_company.xml',
+        'demo/product_category.xml',
         'demo/product_template.xml',
+        'demo/mrp_bom.xml',
         'demo/res_users.xml',
         'demo/rating_rating.xml',
         'demo/stock_lot.xml',
