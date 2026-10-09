@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <record id="spreadsheet_dashboard_1" model="spreadsheet.dashboard">
+        <field name="name">Excises</field>
+        <field name="dashboard_group_id" ref="spreadsheet_dashboard.spreadsheet_dashboard_group_finance"/>
+        <field name="group_ids" eval="[(6, 0, [ref('stock.group_stock_manager')])]"/>
+        <field name="spreadsheet_binary_data" type="bytes" file="excise_management/static/src/binary/spreadsheet_dashboard/Excises.osheet.json"/>
+    </record>
+
+     <function model="spreadsheet.dashboard" name="write">
+        <value model="spreadsheet.dashboard" eval="obj().env.ref('excise_management.spreadsheet_dashboard_1').id"/>
+        <value model="spreadsheet.dashboard" eval="{
+            'spreadsheet_data': (
+                obj().env.ref('excise_management.spreadsheet_dashboard_1').spreadsheet_data
+            ).replace(
+                '*location_usage_field_id*', str(obj().env.ref('stock.field_stock_location__usage').id)
+            )
+        }"/>
+    </function>
+</odoo>
