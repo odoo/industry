@@ -1,6 +1,6 @@
 {
     'name': 'Food Distribution',
-    'version': '1.4',
+    'version': '1.5',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
@@ -69,6 +69,7 @@
     'cloc_exclude': [
         'data/knowledge_article.xml',
         'data/qweb_view.xml',
+        'data/res_config_settings.xml',
     ],
     'application': True,
     'images': [
