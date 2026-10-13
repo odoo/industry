@@ -140,7 +140,7 @@ class ComputedFieldsTestCase(TransactionCase):
         picking.move_ids.write({'lot_ids': [Command.link(self.lot_1.id)]})
         picking.button_validate()
 
-        self.lot_1._invalidate_cache()
+        self.lot_1.invalidate_model()
 
         self.assertEqual(self.lot_1.x_maintenance, 'No Maintenance', "Delivered lot without active maintenance must show 'No Maintenance'.")
 
@@ -155,6 +155,6 @@ class ComputedFieldsTestCase(TransactionCase):
         })
         maintenance_so.subscription_state = '3_progress'
 
-        self.lot_1._invalidate_cache()
+        self.lot_1.invalidate_model()
 
         self.assertEqual(self.lot_1.x_maintenance, 'Maintained', "Lot must show 'Maintained' when an active maintenance exists.")

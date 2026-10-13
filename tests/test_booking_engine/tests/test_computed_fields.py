@@ -228,9 +228,9 @@ class ComputedFieldsTestCase(TransactionCase):
                          "Ongoing bookings should include resources where the partner is an occupant")
 
         order_line.qty_returned = 1
-        # x_ongoing_bookings is store=False so use _invalidate_cache
-        resource._invalidate_cache(['x_occupant_ids'])
-        self.guests[0]._invalidate_cache(['x_ongoing_bookings'])
+        # x_ongoing_bookings is store=False so use invalidate_model
+        resource.invalidate_model(['x_occupant_ids'])
+        self.guests[0].invalidate_model(['x_ongoing_bookings'])
         self.assertFalse(resource.x_occupant_ids,
                          "Resource occupants should be empty when there is no ongoing booking")
         self.assertFalse(self.guests[0].x_ongoing_bookings,
@@ -253,11 +253,12 @@ class ComputedFieldsTestCase(TransactionCase):
                 'x_guest_partner_id': guest.id,
             }
         ])
-        # x_guests_count is store=False so use _invalidate_cache
-        guest._invalidate_cache(['x_guests_count'])
+        # x_guests_count is store=False so use invalidate_model
+        guest.invalidate_model(['x_guests_count'])
         self.assertEqual(guest.x_guests_count, 2,
                          "Guests count should reflect the number of guest lines for the partner.")
         self.env['x_guests_line'].search([('x_guest_partner_id', '=', guest.id)], limit=1).unlink()
+        guest.invalidate_model(['x_guests_count'])
         self.assertEqual(guest.x_guests_count, 1,
                          "Guests count should update after removing a guest line.")
 
