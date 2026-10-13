@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
     <data noupdate="1">
-        <record id="res_config_setting_textile_manufacturing" model="res.config.settings">
+        <record id="res_config_setting_textile_manufacturing" model="res.config.settings" forcecreate="0">
             <field name="group_mrp_routings" eval="1"/>
             <field name="group_mrp_wo_tablet_timer" eval="1"/>
             <field name="group_project_stages" eval="1"/>
@@ -12,7 +12,7 @@
         </function>
     </data>
 
-    <record id="x_setting_field_module_product_conversion" model="ir.model.fields">
+    <record id="x_setting_field_module_product_conversion" model="ir.model.fields" forcecreate="1">
         <field name="ttype">boolean</field>
         <field name="field_description">Product Conversion</field>
         <field name="name">x_module_product_conversion</field>
@@ -22,7 +22,7 @@
 self['x_module_product_conversion'] = self.env['ir.config_parameter'].get_bool('textile_manufacturing.x_setting_product_conversion', False)
 ]]>        </field>
     </record>
-    <record id="action_product_conversion" model="ir.actions.server">
+    <record id="action_product_conversion" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[
 if not (env.context.get('install_module') == 'product_conversion' and env.context.get('install_mode')):
     if record.x_module_product_conversion:
@@ -38,7 +38,7 @@ if not (env.context.get('install_module') == 'product_conversion' and env.contex
         <field name="name">Action Install/Uninstall Product Conversion From Settings</field>
     </record>
     <!-- Keep Product Conversion Setting Synced When The Industry Is Installed/Uninstalled From Apps -->
-    <record id="action_sync_with_product_conversion_setting" model="ir.actions.server">
+    <record id="action_sync_with_product_conversion_setting" model="ir.actions.server" forcecreate="1">
         <field name="name">Sync Product Conversion Setting</field>
         <field name="model_id" ref="base.model_ir_module_module"/>
         <field name="state">code</field>
@@ -46,7 +46,7 @@ if not (env.context.get('install_module') == 'product_conversion' and env.contex
 env['ir.config_parameter'].set_bool('textile_manufacturing.x_setting_product_conversion', record.state == 'installed')
     ]]>        </field>
     </record>
-    <record id="base_automation_on_product_conversion_module_state" model="base.automation">
+    <record id="base_automation_on_product_conversion_module_state" model="base.automation" forcecreate="1">
         <field name="name">Sync Product Conversion Setting</field>
         <field name="action_server_ids" eval="[(6, 0, [ref('action_sync_with_product_conversion_setting')])]"/>
         <field name="model_id" ref="base.model_ir_module_module"/>
@@ -54,7 +54,7 @@ env['ir.config_parameter'].set_bool('textile_manufacturing.x_setting_product_con
         <field name="filter_domain">[('name', '=', 'product_conversion')]</field>
         <field name="trigger">on_create_or_write</field>
     </record>
-    <record id="action_enable_product_conversion_attribute" model="ir.actions.server">
+    <record id="action_enable_product_conversion_attribute" model="ir.actions.server" forcecreate="1">
         <field name="name">Enable Product Conversion Attribute</field>
         <field name="model_id" ref="base.model_ir_model_fields"/>
         <field name="state">code</field>
@@ -63,14 +63,14 @@ attribute = env.ref('textile_manufacturing.product_attribute_1', raise_if_not_fo
 if attribute: attribute['x_is_convert_attribute'] = True
     ]]></field>
     </record>
-    <record id="base_automation_on_product_conversion_attribute_field" model="base.automation">
+    <record id="base_automation_on_product_conversion_attribute_field" model="base.automation" forcecreate="1">
         <field name="name">Enable Product Conversion Attribute</field>
         <field name="action_server_ids" eval="[(6, 0, [ref('action_enable_product_conversion_attribute')])]"/>
         <field name="model_id" ref="base.model_ir_model_fields"/>
         <field name="filter_domain">[('name', '=', 'x_is_convert_attribute'), ('model', '=', 'product.attribute')]</field>
         <field name="trigger">on_create</field>
     </record>
-    <record id="base_automation_on_product_conversion_setting" model="base.automation">
+    <record id="base_automation_on_product_conversion_setting" model="base.automation" forcecreate="1">
         <field name="name">Automation For Install/Uninstall Product Conversion from Settings</field>
         <field name="action_server_ids" eval="[(6, 0, [ref('action_product_conversion')])]"/>
         <field name="model_id" ref="base_setup.model_res_config_settings"/>

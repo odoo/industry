@@ -6,7 +6,7 @@
         Updating the BOM field also (un)checks the corresponding custom routes we set up.
     -->
 
-    <record model="ir.model.fields" id="field_product_template_x_bom_template_id">
+    <record model="ir.model.fields" id="field_product_template_x_bom_template_id" forcecreate="1">
         <field name="name">x_bom_template_id</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="ttype">many2one</field>
@@ -14,7 +14,7 @@
         <field name="relation">mrp.bom</field>
     </record>
 
-    <record model="ir.model.fields" id="field_mrp_bom_x_is_template">
+    <record model="ir.model.fields" id="field_mrp_bom_x_is_template" forcecreate="1">
         <field name="name">x_is_template</field>
         <field name="model_id" ref="mrp.model_mrp_bom"/>
         <field name="field_description">Is Template</field>
@@ -34,7 +34,7 @@ for bom in self:
 ]]></field>
     </record>
 
-    <record model="ir.model.fields" id="field_product_template_x_bom_available">
+    <record model="ir.model.fields" id="field_product_template_x_bom_available" forcecreate="1">
         <field name="name">x_bom_available</field>
         <field name="model_id" ref="product.model_product_template"/>
         <field name="field_description">Is a BOM Available</field>
@@ -48,7 +48,7 @@ for p in self: p['x_bom_available'] = bool(self.env['mrp.bom'].search_count([('p
 
 
     <!-- When creating a BOM, automatically set it as the default template on the product if none-->
-    <record model="ir.actions.server" id="action_set_template_bom_on_product">
+    <record model="ir.actions.server" id="action_set_template_bom_on_product" forcecreate="1">
         <field name="name">Construction Developer: Set Template BOM On Product</field>
         <field name="model_id" ref="mrp.model_mrp_bom"/>
         <field name="state">object_write</field>
@@ -59,7 +59,7 @@ for p in self: p['x_bom_available'] = bool(self.env['mrp.bom'].search_count([('p
         <field name="value"><![CDATA[record.id]]></field>
     </record>
 
-    <record model="base.automation" id="automation_set_default_product_bom_on_bom_create">
+    <record model="base.automation" id="automation_set_default_product_bom_on_bom_create" forcecreate="1">
         <field name="name">Construction Developer: Set Default Product Bom on Template BOM create</field>
         <field name="model_id" ref="mrp.model_mrp_bom"/>
         <field name="trigger">on_create</field>
@@ -69,7 +69,7 @@ for p in self: p['x_bom_available'] = bool(self.env['mrp.bom'].search_count([('p
 
 
     <!-- change the code when x_is_template is toggled -->
-    <record model="ir.actions.server" id="action_set_bom_template_code">
+    <record model="ir.actions.server" id="action_set_bom_template_code" forcecreate="1">
         <field name="name">Construction Developer: Set BOM Template Code</field>
         <field name="model_id" ref="mrp.model_mrp_bom"/>
         <field name="state">object_write</field>
@@ -80,7 +80,7 @@ for p in self: p['x_bom_available'] = bool(self.env['mrp.bom'].search_count([('p
         <field name="value"><![CDATA["Template" if record.x_is_template else (False if record.code == "Template" else record.code)]]></field>
     </record>
 
-    <record model="base.automation" id="automation_set_bom_template_code_on_x_is_template_write">
+    <record model="base.automation" id="automation_set_bom_template_code_on_x_is_template_write" forcecreate="1">
         <field name="name">Construction Developer: Update BOM code on template status change</field>
         <field name="model_id" ref="mrp.model_mrp_bom"/>
         <field name="trigger">on_create_or_write</field>
@@ -90,7 +90,7 @@ for p in self: p['x_bom_available'] = bool(self.env['mrp.bom'].search_count([('p
 
 
     <!-- Automation 1: when ADDING a BOM, sets the correct Purchase & route values-->
-    <record model="ir.actions.server" id="action_set_product_template_purchase_ok_false">
+    <record model="ir.actions.server" id="action_set_product_template_purchase_ok_false" forcecreate="1">
         <field name="name">Construction Developer: Set Purchase On Product False</field>
         <field name="model_id" ref="sale.model_product_template"/>
         <field name="state">object_write</field>
@@ -101,7 +101,7 @@ for p in self: p['x_bom_available'] = bool(self.env['mrp.bom'].search_count([('p
         <field name="value"><![CDATA[False]]></field>
     </record>
 
-    <record model="ir.actions.server" id="action_set_product_routes_on_add_bom_write">
+    <record model="ir.actions.server" id="action_set_product_routes_on_add_bom_write" forcecreate="1">
         <field name="name">Construction Developer: Set Product Routes on Add BOM Write</field>
         <field name="model_id" ref="sale.model_product_template"/>
         <field name="state">object_write</field>
@@ -112,7 +112,7 @@ for p in self: p['x_bom_available'] = bool(self.env['mrp.bom'].search_count([('p
         <field name="value"><![CDATA[[(6, 0, [record.env.ref('construction_developer.stock_route_on_site_consumption_bom').id])]]]></field>
     </record>
 
-    <record model="base.automation" id="automation_set_product_routes_on_add_bom_write">
+    <record model="base.automation" id="automation_set_product_routes_on_add_bom_write" forcecreate="1">
         <field name="name">Construction Developer: Set Product Routes on Add BOM Write</field>
         <field name="model_id" ref="sale.model_product_template"/>
         <field name="trigger">on_create_or_write</field>
@@ -124,7 +124,7 @@ for p in self: p['x_bom_available'] = bool(self.env['mrp.bom'].search_count([('p
 
     <!-- Automation 2: when REMOVING a BOM (e.g. changing the product on the BOM, removing 'normal'), sets the correct Purchase & route values -->
     <!-- NB: it's impossible to leave the field empty once a BOM exists so the case BOM -> no BOM cannot exist unless deleting it (Automation 3) -->
-    <record model="ir.actions.server" id="action_set_product_template_purchase_ok_true">
+    <record model="ir.actions.server" id="action_set_product_template_purchase_ok_true" forcecreate="1">
         <field name="name">Construction Developer: Set Purchase On Product True</field>
         <field name="model_id" ref="sale.model_product_template"/>
         <field name="state">object_write</field>
@@ -135,7 +135,7 @@ for p in self: p['x_bom_available'] = bool(self.env['mrp.bom'].search_count([('p
         <field name="value"><![CDATA[True]]></field>
     </record>
 
-    <record model="ir.actions.server" id="action_set_product_routes_on_remove_bom_write">
+    <record model="ir.actions.server" id="action_set_product_routes_on_remove_bom_write" forcecreate="1">
         <field name="name">Construction Developer: Set Product Routes on Remove BOM Write</field>
         <field name="model_id" ref="sale.model_product_template"/>
         <field name="state">object_write</field>
@@ -150,7 +150,7 @@ for p in self: p['x_bom_available'] = bool(self.env['mrp.bom'].search_count([('p
         ])]]]></field>
     </record>
 
-    <record model="base.automation" id="automation_set_product_routes_on_remove_bom_write">
+    <record model="base.automation" id="automation_set_product_routes_on_remove_bom_write" forcecreate="1">
         <field name="name">Construction Developer: Set Product Routes on Remove BOM Write</field>
         <field name="model_id" ref="sale.model_product_template"/>
         <field name="trigger">on_create_or_write</field>
@@ -161,7 +161,7 @@ for p in self: p['x_bom_available'] = bool(self.env['mrp.bom'].search_count([('p
     
 
     <!-- Automation 3: when DELETING a BOM, sets the correct Purchase & route values on its product if it's a template -->
-    <record model="ir.actions.server" id="action_set_bom_product_template_purchase_ok_true">
+    <record model="ir.actions.server" id="action_set_bom_product_template_purchase_ok_true" forcecreate="1">
         <field name="name">Construction Developer: Remove BOM: Set Purchase On Product True</field>
         <field name="model_id" ref="mrp.model_mrp_bom"/>
         <field name="state">object_write</field>
@@ -172,7 +172,7 @@ for p in self: p['x_bom_available'] = bool(self.env['mrp.bom'].search_count([('p
         <field name="value"><![CDATA[True]]></field>
     </record>
 
-    <record model="ir.actions.server" id="action_set_bom_product_routes_on_remove_bom_write">
+    <record model="ir.actions.server" id="action_set_bom_product_routes_on_remove_bom_write" forcecreate="1">
         <field name="name">Construction Developer: Remove BOM: Set Product Routes on Remove BOM Write</field>
         <field name="model_id" ref="mrp.model_mrp_bom"/>
         <field name="state">object_write</field>
@@ -187,7 +187,7 @@ for p in self: p['x_bom_available'] = bool(self.env['mrp.bom'].search_count([('p
         ])]]]></field>
     </record>
 
-    <record model="base.automation" id="automation_set_product_routes_on_unlink_bom">
+    <record model="base.automation" id="automation_set_product_routes_on_unlink_bom" forcecreate="1">
         <field name="name">Construction Developer: Set Product Routes on BOM Delete</field>
         <field name="model_id" ref="mrp.model_mrp_bom"/>
         <field name="trigger">on_unlink</field>
