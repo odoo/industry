@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Website Industry - Enable/disable views and set up menus</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code">
+website = env.ref('takeaway_restaurant.website_industry')
+
+to_deactivate = [
+    # Presets
+    'website.footer_custom',
+    'website.header_search_box',
+    'website.header_visibility_standard',
+    'website.template_footer_descriptive',
+    'website.template_footer_mega_links',
+    # Default static pages
+    'website.homepage',
+    'website.contactus',
+]
+to_activate = [
+    # Presets
+    'website.header_navbar_pills_style',
+    'website.header_visibility_fade_out',
+    'website.template_footer_centered',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
+pos_config = env.ref('pos_restaurant.pos_config_main_restaurant')
+menus.search(base_domain + [('url', 'in', ['/shop', '/event', '/appointment'])]).unlink()
+
+for name, url, sequence, new_window in [
+    ('Home', '/', 10, False),
+    ('Menu', '/pos-self/%s' % pos_config.id, 20, True),
+]:
+    menu = menus.search(base_domain + [('url', '=', url)], limit=1)
+    if menu:
+        menu.write({'name': name, 'sequence': sequence, 'new_window': new_window})
+    else:
+        menus.create({
+            'name': name,
+            'url': url,
+            'sequence': sequence,
+            'new_window': new_window,
+            'website_id': website.id,
+            'parent_id': top_menu.id,
+        })
+        </field>
+    </record>
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
