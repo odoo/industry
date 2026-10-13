@@ -3,7 +3,7 @@
     <!--
         This feature adds proper sequencing for the SOL and line numbers based on the sections.
     -->
-    <record id="field_sale_order_line_x_item_number" model="ir.model.fields">
+    <record id="field_sale_order_line_x_item_number" model="ir.model.fields" forcecreate="1">
         <field name="name">x_item_number</field>
         <field name="model_id" ref="sale.model_sale_order_line"/>
         <field name="field_description">Line Number</field>
@@ -12,7 +12,7 @@
         <field name="readonly" eval="True"/>
     </record>
 
-    <record id="field_sale_order_line_x_reference" model="ir.model.fields">
+    <record id="field_sale_order_line_x_reference" model="ir.model.fields" forcecreate="1">
         <field name="name">x_reference</field>
         <field name="model_id" ref="sale.model_sale_order_line"/>
         <field name="field_description">Line Reference</field>
@@ -25,7 +25,7 @@ for sol in self: sol['x_reference'] = f"{sol.order_id.name}.{sol.x_item_number}"
 ]]></field>
     </record>
 
-    <record id="field_account_move_line_x_reference" model="ir.model.fields">
+    <record id="field_account_move_line_x_reference" model="ir.model.fields" forcecreate="1">
         <field name="ttype">char</field>
         <field name="field_description">Line Reference</field>
         <field name="model_id" ref="sale.model_account_move_line"/>
@@ -40,7 +40,7 @@ for aml in self: aml['x_reference'] = (aml.sale_line_ids.x_reference if len(aml.
 
 
 
-    <record id="action_initialize_sales_order_line_sequence_on_sales_order_create" model="ir.actions.server">
+    <record id="action_initialize_sales_order_line_sequence_on_sales_order_create" model="ir.actions.server" forcecreate="1">
         <field name="name">Construction Developer: Initialize Sales Order Line Sequence on Sales Order create</field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
@@ -51,7 +51,7 @@ for record in records:
 ]]></field>
     </record>
 
-    <record id="server_action_update_sol_numbering" model="ir.actions.server">
+    <record id="server_action_update_sol_numbering" model="ir.actions.server" forcecreate="1">
         <field name="name">Construction Developer: Update SOL numbering</field>
         <field name="model_id" ref="sale.model_sale_order_line"/>
         <field name="state">code</field>
@@ -60,7 +60,7 @@ env.ref('construction_developer.server_action_setup_sol_numbering').with_context
 ]]></field>
     </record>
 
-    <record id="server_action_setup_sol_numbering" model="ir.actions.server">
+    <record id="server_action_setup_sol_numbering" model="ir.actions.server" forcecreate="1">
         <field name="name">Construction Developer: Setup SOL numbering</field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
@@ -90,7 +90,7 @@ for record in records:
 ]]></field>
     </record>
 
-    <record id="automation_initialize_sales_order_line_sequence_on_sales_order_create" model="base.automation">
+    <record id="automation_initialize_sales_order_line_sequence_on_sales_order_create" model="base.automation" forcecreate="1">
         <field name="name">Construction Developer: Initialize Sales Order Line Sequence on Sales Order create or write</field>
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="trigger">on_create_or_write</field>
@@ -98,7 +98,7 @@ for record in records:
         <field name="action_server_ids" eval="[(6, 0, [ref('server_action_setup_sol_numbering'), ref('action_initialize_sales_order_line_sequence_on_sales_order_create')])]"/>
     </record>
 
-    <record id="automation_update_sol_numbering_on_sol_change" model="base.automation">
+    <record id="automation_update_sol_numbering_on_sol_change" model="base.automation" forcecreate="1">
         <field name="name">Construction Developer: Update Sales Order Line Number on SOL write</field>
         <field name="model_id" ref="sale.model_sale_order_line"/>
         <field name="trigger">on_create_or_write</field>

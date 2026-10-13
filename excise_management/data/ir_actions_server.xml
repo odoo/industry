@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="add_excise_server_action" model="ir.actions.server">
+    <record id="add_excise_server_action" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[if (taxes := record.taxes_id.filtered('x_is_excise')):
     record['taxes_id'] = [Command.unlink(id) for id in taxes.ids]
 if (taxes := record.supplier_taxes_id.filtered('x_is_excise')):
@@ -12,7 +12,7 @@ if (categ := record.x_excise_category):
         <field name="state">code</field>
         <field name="name">Add/Remove excise tax on Product</field>
     </record>
-    <record id="create_excise_tax_server_action" model="ir.actions.server">
+    <record id="create_excise_tax_server_action" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[
 common_values = {'name': 'Ex. ' + record.x_name, 'description': record.x_description, 'amount_type': 'code',
     'price_include_override': 'tax_included', 'include_base_amount': True, 'formula': '(quantity * uom.factor) * (product.x_excise_amount + product.x_packaging_units * product.x_excise_packaging_tax)',
@@ -29,7 +29,7 @@ env['account.fiscal.position'].search([('x_is_fiscal_deposit', '=', False)])['ta
         <field name="state">code</field>
         <field name="name">Create excise tax</field>
     </record>
-    <record id="add_excise_taxes_fiscal_position_server_action" model="ir.actions.server">
+    <record id="add_excise_taxes_fiscal_position_server_action" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[
 no_excises_taxes = env.ref('excise_management.no_excise_tax_sale') | env.ref('excise_management.no_excise_tax_purchase')
 for fp in records:
@@ -42,7 +42,7 @@ for fp in records:
         <field name="state">code</field>
         <field name="name">Add/Remove excise tax on Fiscal Position</field>
     </record>
-    <record id="resequence_the_order_of_taxes" model="ir.actions.server">
+    <record id="resequence_the_order_of_taxes" model="ir.actions.server" forcecreate="1">
         <field name="code"><![CDATA[all_taxes = env['account.tax'].sudo().search([], order="x_is_excise desc, sequence asc")
 for idx, tax in enumerate(all_taxes, start=1):
     tax['sequence'] = idx]]></field>

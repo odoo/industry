@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
-    <record id="x_maintained_serials_on_sale_order_line_field" model="ir.model.fields">
+    <record id="x_maintained_serials_on_sale_order_line_field" model="ir.model.fields" forcecreate="1">
         <field name="name">x_maintained_serials_ids</field>
         <field name="ttype">many2many</field>
         <field name="field_description">Serials</field>
@@ -8,7 +8,7 @@
         <field name="relation">stock.lot</field>
         <field name="copied" eval="True"/>
     </record>
-    <record id="x_maintained_serials_on_sale_order_field" model="ir.model.fields">
+    <record id="x_maintained_serials_on_sale_order_field" model="ir.model.fields" forcecreate="1">
         <field name="name">x_maintained_serials_ids</field>
         <field name="ttype">many2many</field>
         <field name="field_description">Serials</field>
@@ -21,35 +21,35 @@ for so in self:
     so['x_maintained_serials_ids'] = [(6, 0, so.order_line.mapped('x_maintained_serials_ids').ids)]
 ]]></field>
     </record>
-    <record id="x_serials_field" model="ir.model.fields">
+    <record id="x_serials_field" model="ir.model.fields" forcecreate="1">
         <field name="name">x_serials</field>
         <field name="ttype">many2many</field>
         <field name="field_description">Serials</field>
         <field name="model_id" ref="project.model_project_task"/>
         <field name="relation">stock.lot</field>
     </record>
-    <record id="x_is_refrigerant_field" model="ir.model.fields">
+    <record id="x_is_refrigerant_field" model="ir.model.fields" forcecreate="1">
         <field name="name">x_is_refrigerant</field>
         <field name="ttype">boolean</field>
         <field name="field_description">Is Refrigerant</field>
         <field name="copied" eval="True"/>
         <field name="model_id" ref="product.model_product_template"/>
     </record>
-    <record id="x_is_maintenance_field" model="ir.model.fields">
+    <record id="x_is_maintenance_field" model="ir.model.fields" forcecreate="1">
         <field name="name">x_is_maintenance</field>
         <field name="ttype">boolean</field>
         <field name="field_description">Is Maintenance or Repair</field>
         <field name="copied" eval="True"/>
         <field name="model_id" ref="product.model_product_template"/>
     </record>
-    <record id="x_product_is_maintenance_field" model="ir.model.fields">
+    <record id="x_product_is_maintenance_field" model="ir.model.fields" forcecreate="1">
         <field name="name">x_product_is_maintenance</field>
         <field name="ttype">boolean</field>
         <field name="field_description">Is Maintenance or Repair</field>
         <field name="model_id" ref="sale.model_sale_order_line"/>
         <field name="related">product_id.x_is_maintenance</field>
     </record>
-    <record id="x_sale_order_count_field" model="ir.model.fields">
+    <record id="x_sale_order_count_field" model="ir.model.fields" forcecreate="1">
         <field name="name">x_sale_order_count</field>
         <field name="ttype">integer</field>
         <field name="field_description">Sale Order count</field>
@@ -60,7 +60,7 @@ for so in self:
 for record in self: record['x_sale_order_count'] = self.env['sale.order'].search_count([('x_maintained_serials_ids', '=', record.id)])
 ]]></field>
     </record>
-    <record id="x_project_task_count_field" model="ir.model.fields">
+    <record id="x_project_task_count_field" model="ir.model.fields" forcecreate="1">
         <field name="name">x_project_task_count</field>
         <field name="ttype">integer</field>
         <field name="field_description">Project Task count</field>
@@ -71,7 +71,7 @@ for record in self: record['x_sale_order_count'] = self.env['sale.order'].search
 for record in self: record['x_project_task_count'] = self.env['project.task'].search_count([('x_serials', '=', record.id)])
 ]]></field>
     </record>
-    <record id="x_delivery_field" model="ir.model.fields">
+    <record id="x_delivery_field" model="ir.model.fields" forcecreate="1">
         <field name="name">x_delivery</field>
         <field name="ttype">datetime</field>
         <field name="field_description">Delivery</field>
@@ -83,7 +83,7 @@ for record in self:
     record['x_delivery'] = max(record.delivery_ids.filtered(lambda d: d.picking_type_code == "outgoing").mapped('date_done'), default=False)
 ]]></field>
     </record>
-    <record id="x_maintenances_field" model="ir.model.fields">
+    <record id="x_maintenances_field" model="ir.model.fields" forcecreate="1">
         <field name="name">x_maintenances_ids</field>
         <field name="ttype">many2many</field>
         <field name="field_description">Maintenances</field>
@@ -98,7 +98,7 @@ for record in self:
     ]).mapped('order_id')).ids)]
 ]]></field>
     </record>
-    <record id="x_maintenance_field" model="ir.model.fields">
+    <record id="x_maintenance_field" model="ir.model.fields" forcecreate="1">
         <field name="name">x_maintenance</field>
         <field name="ttype">selection</field>
         <field name="field_description">Maintenance</field>
@@ -106,22 +106,22 @@ for record in self:
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
     </record>
-    <record id="x_maintenance_field_selection_maintained" model="ir.model.fields.selection">
+    <record id="x_maintenance_field_selection_maintained" model="ir.model.fields.selection" forcecreate="1">
         <field name="name">Maintained</field>
         <field name="field_id" ref="x_maintenance_field" />
         <field name="value">Maintained</field>
     </record>
-    <record id="x_maintenance_field_selection_no_maintenance" model="ir.model.fields.selection">
+    <record id="x_maintenance_field_selection_no_maintenance" model="ir.model.fields.selection" forcecreate="1">
         <field name="name">No Maintenance</field>
         <field name="field_id" ref="x_maintenance_field" />
         <field name="value">No Maintenance</field>
     </record>
-    <record id="x_maintenance_field_selection_na" model="ir.model.fields.selection">
+    <record id="x_maintenance_field_selection_na" model="ir.model.fields.selection" forcecreate="1">
         <field name="name">N/A</field>
         <field name="field_id" ref="x_maintenance_field" />
         <field name="value">N/A</field>
     </record>
-    <record id="x_maintenance_field" model="ir.model.fields">
+    <record id="x_maintenance_field" model="ir.model.fields" forcecreate="1">
         <field name="compute"><![CDATA[
 for record in self:
     x_maintenance = 'N/A'
@@ -132,7 +132,7 @@ for record in self:
     record['x_maintenance'] = x_maintenance
 ]]></field>
     </record>
-    <record id="x_partner_id_field" model="ir.model.fields">
+    <record id="x_partner_id_field" model="ir.model.fields" forcecreate="1">
         <field name="name">x_partner_id</field>
         <field name="ttype">many2one</field>
         <field name="field_description">Customer</field>
@@ -141,7 +141,7 @@ for record in self:
         <field name="required" eval="True"/>
         <field name="on_delete">cascade</field>
     </record>
-    <record id="x_product_id_field" model="ir.model.fields">
+    <record id="x_product_id_field" model="ir.model.fields" forcecreate="1">
         <field name="name">x_product_id</field>
         <field name="ttype">many2one</field>
         <field name="field_description">Device</field>
@@ -151,21 +151,21 @@ for record in self:
         <field name="required" eval="True"/>
         <field name="on_delete">cascade</field>
     </record>
-    <record id="x_serial_number_field" model="ir.model.fields">
+    <record id="x_serial_number_field" model="ir.model.fields" forcecreate="1">
         <field name="name">x_serial_number</field>
         <field name="ttype">char</field>
         <field name="field_description">Serial</field>
         <field name="model_id" ref="x_new_devices"/>
         <field name="required" eval="True"/>
     </record>
-    <record id="x_delivery_date_field" model="ir.model.fields">
+    <record id="x_delivery_date_field" model="ir.model.fields" forcecreate="1">
         <field name="name">x_delivery_date</field>
         <field name="ttype">date</field>
         <field name="field_description">Delivery Date</field>
         <field name="model_id" ref="x_new_devices"/>
         <field name="required" eval="True"/>
     </record>
-    <record id="x_document_tag_ids_field_product_document" model="ir.model.fields">
+    <record id="x_document_tag_ids_field_product_document" model="ir.model.fields" forcecreate="1">
         <field name="name">x_document_tag_ids</field>
         <field name="ttype">many2many</field>
         <field name="field_description">Tags</field>
