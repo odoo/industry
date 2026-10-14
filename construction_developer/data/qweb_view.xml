@@ -53,6 +53,9 @@
             <attribute name="t-att-colspan">2 + (1 if show_type_column else 0)
             </attribute>
         </xpath>
+        <xpath expr="//td[@name='td_combo_name']" position="attributes">
+            <attribute name="t-att-colspan">2 + (1 if show_type_column else 0)</attribute>
+        </xpath>
     </template>
     <template id="sale_order_report_document_inherit" inherit_id="sale.report_saleorder_document">
         <xpath expr="//th[@name='th_description']" position="before">
@@ -104,6 +107,10 @@
         </xpath>
         <xpath expr="//td[@name='td_section_group_name']" position="attributes">
             <attribute name="t-att-colspan">2 + (1 if show_type_column else 0)
+            </attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_combo_name']" position="attributes">
+            <attribute name="t-att-colspan">4 + (1 if display_discount else 0) + (1 if display_taxes else 0) + (1 if show_type_column else 0)
             </attribute>
         </xpath>
     </template>
@@ -576,11 +583,18 @@
                 <span t-field="line.x_reference"></span>
             </td>
         </xpath>
-        <xpath expr="//t[@t-set='line_colspan']" position="after">
+        <!--  Adjust section colspan (when composition and price are shown)  -->
+        <xpath expr="//td[@name='line_name_td']" position="before">
             <t t-set="line_colspan" t-value="line_colspan + 1"/>
         </xpath>
-        <xpath expr="//td[@name='td_quantity_grouped']" position="attributes">
-            <attribute name="t-att-colspan">2</attribute>
+        <!-- Adjust grouped section colspan (when composition or price is hidden) -->
+        <xpath expr="//td[@name='account_invoice_line_name_grouped_desktop']" position="before">
+            <t t-if="grouped_line['display_type'] != 'product'">
+                <t t-set="line_colspan" t-value="line_colspan + 1"/>
+            </t>
+            <t t-else="">
+                <td name="account_invoice_line_sequence_grouped"/>
+            </t>
         </xpath>
     </template>
 </odoo>
