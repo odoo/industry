@@ -72,7 +72,7 @@
         'demo/website.xml',
     ],
     'license': 'OEEL-1',
-    'version': '1.2',
+    'version': '1.3',
     'cloc_exclude': [
         'data/ir_module_module_dependency.xml',
         'data/knowledge_article.xml',

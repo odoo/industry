@@ -1,6 +1,6 @@
 {
     'name': 'Sports Facilities',
-    'version': '1.7',
+    'version': '1.8',
     'category': 'Health and Fitness',
     'depends': [
         'appointment_crm',

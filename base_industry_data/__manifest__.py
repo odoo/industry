@@ -1,6 +1,6 @@
 {
     'name': 'Industry base',
-    'version': '1.2',
+    'version': '1.3',
     'author': 'Odoo S.A.',
     'category': 'Hidden/Tools',
     'depends': [

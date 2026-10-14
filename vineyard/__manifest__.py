@@ -1,6 +1,6 @@
 {
     'name': 'Vineyard',
-    'version': '1.6',
+    'version': '1.7',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [

@@ -1,6 +1,6 @@
 {
     'name': 'Hair Salon',
-    'version': '1.6',
+    'version': '1.7',
     'category': 'Services',
     'depends': [
         'base_automation',

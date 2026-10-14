@@ -1,6 +1,6 @@
 {
     'name': 'Tattoo Shop',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [

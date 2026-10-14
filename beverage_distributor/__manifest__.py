@@ -1,6 +1,6 @@
 {
     'name': 'Beverage Distributor',
-    'version': '2.8',
+    'version': '2.9',
     'category': 'Supply Chain',
     'depends': [
         'base_automation',
