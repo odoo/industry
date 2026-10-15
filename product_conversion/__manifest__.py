@@ -1,6 +1,6 @@
 {
     'name': 'Product Conversion & Grading Management',
-    'version': '1.3',
+    'version': '1.4',
     'category': 'Supply Chain',
     'depends': [
         'mrp',
