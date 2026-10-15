@@ -20,7 +20,6 @@ class TestEnv(IndustryCase):
         if not self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1):
             return
         no_online_payment_industries = [
-            'bike_leasing',
             'real_estate',
         ]
         if any(m in self.installed_industries for m in no_online_payment_industries):
