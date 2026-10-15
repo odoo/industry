@@ -27,10 +27,10 @@
         <field name="ttype">boolean</field>
         <field name="field_description">House Keeping</field>
         <field name="model_id" ref="base_setup.model_res_config_settings"/>
-        <field name="name">x_module_house_keeping</field>
+        <field name="name">x_setting_house_keeping</field>
         <field name="store" eval="True"/>
         <field name="compute"><![CDATA[
-self['x_module_house_keeping'] = self.env.user.has_group('booking_engine.group_house_keeping')
+self['x_setting_house_keeping'] = self.env.user.has_group('booking_engine.group_house_keeping')
 ]]></field>
     </record>
     <record id="x_action_activate_house_keeping" model="ir.actions.server">
@@ -114,7 +114,7 @@ for cloc_entry in [
         <field name="action_server_ids" eval="[(6, 0, [ref('x_action_activate_house_keeping')])]"/>
         <field name="model_id" ref="base_setup.model_res_config_settings"/>
         <field name="trigger_field_ids" eval="[(6, 0, [ref('x_setting_field_house_keeping')])]"/>
-        <field name="filter_domain">[('x_module_house_keeping', '=', True)]</field>
+        <field name="filter_domain">[('x_setting_house_keeping', '=', True)]</field>
         <field name="trigger">on_create_or_write</field>
     </record>
     <record id="base_automation_on_house_keeping_setting_unset" model="base.automation">
@@ -122,7 +122,7 @@ for cloc_entry in [
         <field name="action_server_ids" eval="[(6, 0, [ref('x_action_deactivate_house_keeping')])]"/>
         <field name="model_id" ref="base_setup.model_res_config_settings"/>
         <field name="trigger_field_ids" eval="[(6, 0, [ref('x_setting_field_house_keeping')])]"/>
-        <field name="filter_domain">[('x_module_house_keeping', '=', False)]</field>
+        <field name="filter_domain">[('x_setting_house_keeping', '=', False)]</field>
         <field name="trigger">on_create_or_write</field>
     </record>
 
@@ -398,11 +398,8 @@ else:
                 <app string="Accomodation" name="accomodation">
                     <block title="Operations" name="booking_operations_config_block">
                         <setting id="booking_engine_house_keeping_setting" help="Access cleanness state and manage tasks.">
-                            <field name="x_module_house_keeping"/>
-                            <div class="text-warning">
-                                This feature relies on additional lines of code, which may affect your subscription cost.
-                            </div>
-                            <div class="row mt-2" invisible="not x_module_house_keeping">
+                            <field name="x_setting_house_keeping"/>
+                            <div class="row mt-2" invisible="not x_setting_house_keeping">
                                 <field name="x_setting_approvers" class="col flex-grow-0 ml16 mr0 pe-2"/>
                                 <div class="col ps-0">
                                     <label for="x_setting_approvers"/>
@@ -413,7 +410,7 @@ else:
                                     </div>
                                 </div>
                             </div>
-                            <div class="row mt-2" invisible="not x_module_house_keeping">
+                            <div class="row mt-2" invisible="not x_setting_house_keeping">
                                 <field name="x_setting_automated_assignment" class="col flex-grow-0 ml16 mr0 pe-2"/>
                                 <div class="col ps-0">
                                     <label for="x_setting_automated_assignment"/>
