@@ -85,16 +85,7 @@
         <field name="type">form</field>
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@name='button_box']" position="inside">
-                <button class="oe_stat_button" icon="refresh" type="action" name="%(get_maintenances_action)d" context="{'default_partner_id': partner_ids and partner_ids[0]}">
-                    <field widget="statinfo" name="x_sale_order_count" string="Maintenances"/>
-                </button>
-                <button class="oe_stat_button" icon="flash_on" type="action" name="%(get_field_services_action)d">
-                    <field widget="statinfo" name="x_project_task_count" string="Field Services"/>
-                </button>
-            </xpath>
-            <xpath expr="//field[@name='partner_ids']" position="after">
-                <field name="x_delivery" force_save="1" readonly="True" widget="remaining_days"/>
+            <xpath expr="//form/sheet" position="after">
                 <widget name="web_ribbon" title="Maintained" invisible="x_maintenance != 'Maintained'"/>
                 <widget name="web_ribbon" title="No Maintenance" invisible="x_maintenance != 'No Maintenance'" bg_color="text-bg-danger"/>
             </xpath>
@@ -114,7 +105,6 @@
                 <field name="partner_ids" widget="many2many_tags" string="Transfer to"/>
             </xpath>
             <xpath expr="//field[@name='create_date']" position="replace">
-                <field name="x_delivery" optional="show" widget="remaining_days" decoration-danger="x_delivery &lt; current_date"/>
                 <field name="x_maintenance" optional="show" widget="badge" decoration-success="x_maintenance == 'Maintained'" decoration-danger="x_maintenance == 'No Maintenance'"/>
             </xpath>
             <xpath expr="//field[@name='ref']" position="replace"/>
@@ -138,33 +128,6 @@
                         <span class="o_stat_text">Lots/Serial Numbers</span>
                     </div>
                 </button>
-            </xpath>
-        </field>
-    </record>
-    <record id="project_task_form_view" model="ir.ui.view">
-        <field name="name">HVAC form view for project task</field>
-        <field name="inherit_id" ref="project.view_task_form2"/>
-        <field name="mode">extension</field>
-        <field name="model">project.task</field>
-        <field name="priority">9990</field>
-        <field name="type">form</field>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <xpath expr="//notebook[1]" position="inside">
-                <page string="Serials" name="serials_page">
-                    <field name="x_serials" context="{'search_default_partner_ids': partner_id}">
-                        <list string="Lots/Serial Numbers">
-                            <field name="name" decoration-bf="1" string="Serial Number" help="Unique Serial Number"/>
-                            <field name="product_id" readonly="1"/>
-                            <field name="partner_ids" optional="show" widget="many2many_tags"/>
-                            <field name="x_delivery" optional="show" widget="remaining_days" decoration-danger="x_delivery &lt; current_date"/>
-                            <field name="x_maintenance" optional="show" widget="badge" decoration-success="x_maintenance == 'Maintained'" decoration-danger="x_maintenance == 'No Maintenance'"/>
-                            <field name="company_id" groups="base.group_multi_company"/>
-                            <field name="lot_properties" optional="hide"/>
-                            <field name="product_qty" optional="hide"/>
-                        </list>
-                    </field>
-                </page>
             </xpath>
         </field>
     </record>
