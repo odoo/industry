@@ -66,51 +66,6 @@ class ComputedFieldsTestCase(TransactionCase):
         })
         self.assertEqual(set(so2.x_maintained_serials_ids.ids), {self.lot_1.id, self.lot_2.id}, "Sale order serials must be aggregated from order lines.")
 
-    def test_lot_sale_order_count(self):
-        self.env['sale.order'].create({
-            'partner_id': self.partner.id,
-            'x_maintained_serials_ids': [Command.link(self.lot_1.id)],
-        })
-        self.env['sale.order'].create({
-            'partner_id': self.partner.id,
-            'x_maintained_serials_ids': [Command.link(self.lot_1.id)],
-        })
-        self.assertEqual(self.lot_1.x_sale_order_count, 2, "Lot must count how many sale orders reference it.")
-        self.assertEqual(self.lot_2.x_sale_order_count, 0, "Lot without sale orders must have zero count.")
-
-    def test_lot_project_task_count(self):
-        self.env['project.task'].create({
-            'name': 'FSM Task 1',
-            'project_id': self.fsm_project.id,
-            'x_serials': [Command.link(self.lot_1.id)],
-        })
-        self.env['project.task'].create({
-            'name': 'FSM Task 2',
-            'project_id': self.fsm_project.id,
-            'x_serials': [Command.link(self.lot_1.id)],
-        })
-
-        self.assertEqual(self.lot_1.x_project_task_count, 2, "Lot must count related FSM tasks.")
-        self.assertEqual(self.lot_2.x_project_task_count, 0, "Lot without tasks must have zero task count.")
-
-    def test_lot_delivery_date(self):
-        so = self.env['sale.order'].create({
-            'partner_id': self.partner.id,
-            'order_line': [
-                Command.create({
-                    'product_id': self.device_product.id,
-                    'product_uom_qty': 1,
-                }),
-            ],
-        })
-        so.action_confirm()
-
-        picking = so.picking_ids
-        move = picking.move_ids
-        move.write({'lot_ids': [Command.link(self.lot_1.id)]})
-        picking.button_validate()
-        self.assertTrue(self.lot_1.x_delivery, "Lot delivery date must be set after outgoing picking is done.")
-
     def test_lot_maintenances_ids(self):
         so = self.env['sale.order'].create({
             'partner_id': self.partner.id,

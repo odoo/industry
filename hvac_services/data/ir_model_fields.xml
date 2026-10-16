@@ -49,40 +49,6 @@ for so in self:
         <field name="model_id" ref="sale.model_sale_order_line"/>
         <field name="related">product_id.x_is_maintenance</field>
     </record>
-    <record id="x_sale_order_count_field" model="ir.model.fields">
-        <field name="name">x_sale_order_count</field>
-        <field name="ttype">integer</field>
-        <field name="field_description">Sale Order count</field>
-        <field name="model_id" ref="stock.model_stock_lot"/>
-        <field name="selectable" eval="False"/>
-        <field name="store" eval="False"/>
-        <field name="compute"><![CDATA[
-for record in self: record['x_sale_order_count'] = self.env['sale.order'].search_count([('x_maintained_serials_ids', '=', record.id)])
-]]></field>
-    </record>
-    <record id="x_project_task_count_field" model="ir.model.fields">
-        <field name="name">x_project_task_count</field>
-        <field name="ttype">integer</field>
-        <field name="field_description">Project Task count</field>
-        <field name="model_id" ref="stock.model_stock_lot"/>
-        <field name="selectable" eval="False"/>
-        <field name="store" eval="False"/>
-        <field name="compute"><![CDATA[
-for record in self: record['x_project_task_count'] = self.env['project.task'].search_count([('x_serials', '=', record.id)])
-]]></field>
-    </record>
-    <record id="x_delivery_field" model="ir.model.fields">
-        <field name="name">x_delivery</field>
-        <field name="ttype">datetime</field>
-        <field name="field_description">Delivery</field>
-        <field name="model_id" ref="stock.model_stock_lot"/>
-        <field name="readonly" eval="True"/>
-        <field name="store" eval="False"/>
-        <field name="compute"><![CDATA[
-for record in self: 
-    record['x_delivery'] = max(record.delivery_ids.filtered(lambda d: d.picking_type_code == "outgoing").mapped('date_done'), default=False)
-]]></field>
-    </record>
     <record id="x_maintenances_field" model="ir.model.fields">
         <field name="name">x_maintenances_ids</field>
         <field name="ttype">many2many</field>
