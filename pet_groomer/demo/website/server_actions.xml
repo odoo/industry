@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Custom Website - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code">
+website = env.ref('pet_groomer.website_industry')
+
+to_deactivate = [
+    'website.header_search_box',
+    'website.header_text_element',
+    'website.homepage',
+    'website.contactus',
+]
+to_activate = [
+    'website_sale.header_hide_empty_cart_link',
+    'website.header_call_to_action',
+    'website.template_footer_centered',
+    'website.template_footer_slideout',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
+
+# Default menu items to remove (created by website_sale, website_appointment, website_event)
+menus.search(base_domain + [('url', 'in', ['/shop', '/appointment', '/event'])]).unlink()
+# Rename and reorder the default "Home" menu item
+menus.search(base_domain + [('url', '=', '/')], limit=1).write({
+    'name': 'Home',
+    'sequence': 10,
+    'is_visible': True,
+})
+# Add the "Contact us" menu item (no longer created by default)
+if not menus.search(base_domain + [('url', '=', '/contactus')]):
+    menus.create({
+        'name': 'Contact us',
+        'url': '/contactus',
+        'page_id': env.ref('pet_groomer.page_contactus').id,
+        'sequence': 20,
+        'website_id': website.id,
+        'parent_id': top_menu.id if top_menu else False,
+    })
+        </field>
+    </record>
+
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
