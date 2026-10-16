@@ -1,6 +1,6 @@
 {
     'name': 'Excise Management',
-    'version': '2.11',
+    'version': '2.12',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [

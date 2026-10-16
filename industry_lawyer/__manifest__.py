@@ -1,6 +1,6 @@
 {
     'name': 'Law Firm',
-    'version': '1.7',
+    'version': '1.8',
     'category': 'Services',
     'depends': [
         'ai_agentic',

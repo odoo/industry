@@ -1,6 +1,6 @@
 {
     'name': 'Fine Dining Restaurant',
-    'version': '1.3',
+    'version': '1.4',
     'category': 'Hospitality',
     'depends': [
         'account_followup',

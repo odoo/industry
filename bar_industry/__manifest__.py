@@ -1,6 +1,6 @@
 {
     'name': 'Bar & Pub',
-    'version': '1.4',
+    'version': '1.5',
     'category': 'Hospitality',
     'depends': [
         'base_industry_data',

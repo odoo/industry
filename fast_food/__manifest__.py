@@ -1,6 +1,6 @@
 {
     'name': 'Fast Food',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Hospitality',
     'depends': [
         'account_followup',

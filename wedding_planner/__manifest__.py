@@ -1,5 +1,6 @@
 {
     'name': 'Wedding Planner',
+    'version': '1.1',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [

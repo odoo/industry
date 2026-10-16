@@ -1,6 +1,6 @@
 {
     'name': 'Dropshipping',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Services',
     'depends': [
         'base_industry_data',

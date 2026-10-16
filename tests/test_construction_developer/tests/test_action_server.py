@@ -41,7 +41,7 @@ class ActionServerTestCase(TransactionCase):
         })
         self.assertFalse(self.test_template_work_item.x_active, "The old work item template should be inactive after the new one is created")
         self.assertTrue(self.test_template_work_item_2.x_active, "The new work item template should be active after being created")
-        self.test_product._invalidate_cache()
+        self.test_product.invalidate_model()
         self.assertEqual(self.test_product.x_work_item_template_id.id, self.test_template_work_item_2.id, "The work item template registered on the product should be the last template created")
 
     # to be adapted to the new work items

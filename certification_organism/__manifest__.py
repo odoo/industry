@@ -1,6 +1,6 @@
 {
     'name': 'Audit & Certification',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Services',
     'depends': [
         'base_industry_data',

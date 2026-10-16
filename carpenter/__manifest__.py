@@ -1,5 +1,6 @@
 {
     'name': 'Carpenter',
+    'version': '1.1',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
