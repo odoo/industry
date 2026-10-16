@@ -72,6 +72,9 @@ class TestEnv(IndustryCase):
                 message += "Please add the file in 'cloc_exclude' list of the manifest."
                 if not cloc_entry[2].endswith('.js'):
                     self.assertIn(cloc_entry[0], ['ir.actions.server', 'ir.model.fields'], message)
+        for module, module_errors in c.errors.items():
+            for item, error in module_errors.items():
+                _logger.warning("Cloc error: %s: %s (%s)", module, item, error)
 
     def test_soft_dependency_cron(self):
         Dependency = self.env['ir.module.module.dependency']
