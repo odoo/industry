@@ -1,6 +1,6 @@
 {
     'name': 'Deposit Management',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Supply Chain',
     'depends': [
         'base_automation',
