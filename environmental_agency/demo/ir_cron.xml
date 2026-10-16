@@ -1,15 +1,25 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <odoo>
+    <record id="load_ademe_data_server_action" model="ir.actions.server">
+        <field name="name">Load ADEME Data</field>
+        <field name="model_id" ref="esg.model_esg_database"/>
+        <field name="state">code</field>
+        <field name="usage">ir_cron</field>
+        <field name="code"><![CDATA[
+model.env.ref('esg.esg_database_ademe').action_load_data()
+model.env['ir.cron']._commit_progress(processed=1, remaining=0, deactivate=True)
+if server_action := env.ref('environmental_agency.load_ademe_data_server_action', raise_if_not_found=False):
+    if external_identifier := env['ir.model.data'].search([('module', '=', 'environmental_agency'),('res_id', '=', server_action.id)], limit=1):
+        external_identifier['module'] = '__cloc__exclude__'
+    ]]></field>
+    </record>
     <record id="ir_cron_load_ademe_data" model="ir.cron">
         <field name="name">Load ADEME Data</field>
         <field name="model_id" ref="esg.model_esg_database"/>
         <field name="state">code</field>
-        <field name="code"><![CDATA[
-model.env.ref('esg.esg_database_ademe').action_load_data()
-model.env['ir.cron']._commit_progress(processed=1, remaining=0, deactivate=True)
-        ]]></field>
         <field name="interval_number">1</field>
         <field name="interval_type">minutes</field>
         <field name="nextcall" eval="datetime.today().date()+relativedelta(minutes=1)"/>
+        <field name="ir_actions_server_id" ref="load_ademe_data_server_action"/>
     </record>
 </odoo>
