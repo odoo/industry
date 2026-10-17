@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data noupdate="1">
+    <!-- Website menus - parent_id via search on root (url=#) -->
+    <!-- Default menu (rename/reorder): Home -->
+    <function name="write" model="website.menu">
+      <value model="website.menu" search="[('url', '=', '/'), ('website_id', '=', ref('pet_groomer.website_industry'))]"/>
+      <value eval="{'name': 'Home', 'sequence': 10, 'is_visible': True}"/>
+    </function>
+    <!-- Custom menu: Contact us (no longer created by default since 19.4), after Home -->
+    <record id="menu_contactus" model="website.menu">
+      <field name="name">Contact us</field>
+      <field name="url">/contactus</field>
+      <field name="page_id" ref="page_contactus"/>
+      <field name="parent_id" model="website.menu" search="[('parent_id', '=', False), ('website_id', '=', ref('pet_groomer.website_industry'))]"/>
+      <field name="website_id" ref="website_industry"/>
+      <field name="sequence" eval="20"/>
+    </record>
+    <!-- Default menus created by website_sale / website_appointment: not on the designed site -->
+    <function model="website.menu" name="unlink">
+      <value model="website.menu" search="[('url', '=', '/shop'), ('website_id', '=', ref('pet_groomer.website_industry'))]"/>
+    </function>
+    <function model="website.menu" name="unlink">
+      <value model="website.menu" search="[('url', '=', '/appointment'), ('website_id', '=', ref('pet_groomer.website_industry'))]"/>
+    </function>
+    <!-- Menu added by website_event (installed on runbot) -->
+    <function model="website.menu" name="unlink">
+      <value model="website.menu" search="[('url', '=', '/event'), ('website_id', '=', ref('pet_groomer.website_industry'))]"/>
+    </function>
+  </data>
+</odoo>
