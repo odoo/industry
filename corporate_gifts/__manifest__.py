@@ -1,6 +1,6 @@
 {
     'name': 'Corporate Gifts',
-    'version': '1.5',
+    'version': '1.6',
     'category': 'Supply Chain',
     'depends': [
         'base_automation',
