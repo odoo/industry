@@ -1,6 +1,6 @@
 {
     'name': 'Textile Manufacturing',
-    'version': '1.13',
+    'version': '1.14',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
