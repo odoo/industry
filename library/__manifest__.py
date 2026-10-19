@@ -1,6 +1,6 @@
 {
     'name': 'Library',
-    'version': '1.3',
+    'version': '1.4',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
@@ -36,12 +36,12 @@
         'data/pos_category.xml',
         'data/product_category.xml',
         'data/product_public_category.xml',
+        'data/res_partner_grade.xml',
         'data/product_product.xml',
         'data/product_pricelist_item.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
         'data/ir_filters.xml',
-        'data/res_partner_grade.xml',
         'data/stock_rule.xml',
         'data/delivery_carrier.xml',
         'data/pos_config.xml',

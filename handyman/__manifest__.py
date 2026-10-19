@@ -1,6 +1,6 @@
 {
     'name': 'Handyman Services',
-    'version': '1.6',
+    'version': '1.7',
     'category': 'Services',
     'depends': [
         'account_accountant',
