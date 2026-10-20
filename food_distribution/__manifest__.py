@@ -1,6 +1,6 @@
 {
     'name': 'Food Distribution',
-    'version': '1.5',
+    'version': '1.6',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
