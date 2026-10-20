@@ -100,7 +100,7 @@
                                                 <t t-set="attr_rooms" t-value="request.env.ref('property_listing.product_attribute_16', raise_if_not_found=False)"/>
                                                 <t t-set="attr_available" t-value="request.env.ref('property_listing.product_attribute_13', raise_if_not_found=False)"/>
                                                 <t t-set="attr_pool" t-value="request.env.ref('property_listing.product_attribute_14', raise_if_not_found=False)"/>
-                                                <t t-set="attr_others" t-value="request.env['product.attribute'].browse([a.id for a in [attr_available, attr_pool] if a and a.value_ids])"/>
+                                                <t t-set="attr_others" t-value="request.env['product.attribute'].browse([a.id for a in [attr_pool] if a and a.value_ids])"/>
                                                 <t t-foreach="request.env['product.attribute'].search([('x_is_matchmaking', '!=', False)])" t-as="attr">
                                                     <t t-if="attr == attr_bathrooms or attr == attr_rooms">
                                                         <div data-name="Field" class="s_website_form_field mb-3 col-12 col-lg-6" data-type="many2many" data-translated-name="Field">
@@ -139,18 +139,17 @@
                                                         </div>
                                                     </t>
                                                 </t>
-                                                <div t-if="attr_others" data-name="Field" class="s_website_form_field mb-3 col-12" data-type="many2many" data-translated-name="Field">
+                                                <div t-if="attr_others and attr_others.filtered('x_is_matchmaking')" data-name="Field" class="s_website_form_field mb-3 col-12" data-type="many2many" data-translated-name="Field">
                                                     <label class="s_website_form_label o-contenteditable-false fw-bold mb-2" style="width: 600px" t-attf-for="o_match_#{attr_others[:1].id}">
                                                         <span class="s_website_form_label_content">Other</span>
                                                     </label>
                                                     <div class="row s_col_no_resize s_col_no_bgcolor s_website_form_multiple" data-name="x_criteria_ids" data-display="horizontal">
-                                                        <t t-foreach="attr_others" t-as="attr">
+                                                        <t t-foreach="attr_others.filtered('x_is_matchmaking')" t-as="attr">
                                                             <div class="checkbox col-auto">
                                                                 <div class="form-check">
                                                                     <input type="checkbox" class="s_website_form_input form-check-input" name="x_criteria_ids" t-attf-id="o_match_#{attr.id}" t-att-value="attr.value_ids[:1].id"/>
                                                                     <label class="form-check-label s_website_form_check_label" t-attf-for="o_match_#{attr.id}">
-                                                                        <t t-if="attr == attr_available">Available immediately</t>
-                                                                        <t t-elif="attr == attr_pool">With a swimming pool</t>
+                                                                        <t t-if="attr == attr_pool">With a swimming pool</t>
                                                                         <t t-else="" t-out="attr.name"/>
                                                                     </label>
                                                                 </div>
