@@ -7,6 +7,7 @@
         'base_industry_data',
         'contacts',
         'documents',
+        'hazardous_product_management',
         'hr',
         'planning_field_service_sale_stock',
         'planning_field_service_sale_worksheet',
@@ -16,7 +17,6 @@
         'sale_planning',
         'sale_purchase_stock',
         'sale_subscription',
-        'web_studio',
     ],
     'data': [
         'data/ir_module_module_dependency.xml',
