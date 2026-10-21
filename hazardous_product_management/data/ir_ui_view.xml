@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="product_template_form_view_inherit" model="ir.ui.view">
+        <field name="name">product.template.view.form.inherit.hazardous_product_management</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="mode">extension</field>
+        <field name="model">product.template</field>
+        <field name="type">form</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='categ_id']" position="after">
+                <field name="x_hazardous_product_category_id"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="hazardous_product_transaction_list_view" model="ir.ui.view">
+        <field name="name">x_hazardous_product_transaction.view.list</field>
+        <field name="model">x_hazardous_product_transaction</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list editable="top">
+                <field name="x_date"/>
+                <field name="x_planning_shift_id"/>
+                <field name="x_hazardous_product_id" options="{'no_create': True}"/>
+                <field name="x_categ_id"/>
+                <field name="x_transaction"/>
+                <field name="x_quantity"/>
+                <field name="x_unit_id"/>
+                <field name="x_device_lot_serial_number_id"/>
+                <field name="x_recipient_ids" widget="many2many_tags"/>
+            </list>
+        </field>
+    </record>
+    <record id="hazardous_product_transaction_search_view" model="ir.ui.view">
+        <field name="name">x_hazardous_product_transaction.view.search</field>
+        <field name="model">x_hazardous_product_transaction</field>
+        <field name="type">search</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <search>
+                <field name="x_hazardous_product_id"/>
+                <field name="x_device_lot_serial_number_id"/>
+                <field name="x_recipient_ids" widget="many2many_tags"/>
+                <field name="x_categ_id"/>
+                <!-- filters -->
+                <filter string="Date" name="filter_create_date" date="x_date"/>
+                <filter string="Charged" name="filter_charged" domain="[['x_transaction', '=', 'charged']]"/>
+                <filter string="Extracted" name="filter_extracted" domain="[['x_transaction', '=', 'extracted']]"/>
+                <!-- groupby -->
+                <filter string="Device Lot/Serial" name="group_device" context="{'group_by': 'x_device_lot_serial_number_id'}"/>
+                <filter string="Product" name="group_product" context="{'group_by': 'x_hazardous_product_id'}"/>
+                <filter string="Recipient" name="group_recipient" context="{'group_by': 'x_recipient_ids'}"/>
+                <filter string="Category" name="group_category" context="{'group_by': 'x_categ_id'}"/>
+            </search>
+        </field>
+    </record>
+    <record id="hazardous_category_list_view" model="ir.ui.view">
+        <field name="name">x_hazardous_category.view.list</field>
+        <field name="model">x_hazardous_category</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="x_name"/>
+                <field name="x_reporting_unit_id"/>
+            </list>
+        </field>
+    </record>
+    <record id="hazardous_recipient_list_view" model="ir.ui.view">
+        <field name="name">x_recipient.view.list</field>
+        <field name="model">x_recipient</field>
+        <field name="type">list</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="x_name"/>
+            </list>
+        </field>
+    </record>
+    <record id="planning_slot_form_view_inherit" model="ir.ui.view">
+        <field name="name">planning.slot.form.inherit.hazardous_product_management</field>
+        <field name="inherit_id" ref="planning.planning_view_form"/>
+        <field name="mode">extension</field>
+        <field name="model">planning.slot</field>
+        <field name="type">form</field>
+        <field name="priority">160</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='internal_note']" position="after">
+                <page string="Hazardous Products" name="hazardous_products">
+                    <field name="x_hazardous_product_ids">
+                        <list editable="bottom">
+                            <field name="x_hazardous_product_id" options="{'no_create': True}"/>
+                            <field name="x_categ_id"/>
+                            <field name="x_transaction"/>
+                            <field name="x_quantity"/>
+                            <field name="x_unit_id"/>
+                            <field name="x_device_lot_serial_number_id"/>
+                            <field name="x_recipient_ids" widget="many2many_tags"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
