@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="x_hazardous_product_category_field" model="ir.model.fields">
+        <field name="name">x_hazardous_product_category_id</field>
+        <field name="field_description">Hazardous Product Category</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">x_hazardous_category</field>
+    </record>
+    <record id="x_planning_shift_field" model="ir.model.fields">
+        <field name="name">x_planning_shift_id</field>
+        <field name="field_description">Shift</field>
+        <field name="model_id" ref="x_hazardous_product_transaction_model"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">planning.slot</field>
+        <field name="required" eval="True"/>
+        <field name="on_delete">cascade</field>
+    </record>
+    <record id="x_date_field" model="ir.model.fields">
+        <field name="name">x_date</field>
+        <field name="field_description">Date</field>
+        <field name="model_id" ref="x_hazardous_product_transaction_model"/>
+        <field name="related">x_planning_shift_id.start_datetime</field>
+        <field name="ttype">datetime</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="x_hazardous_product_ids_field_res_partner" model="ir.model.fields">
+        <field name="name">x_hazardous_product_ids</field>
+        <field name="field_description">Hazardous Products</field>
+        <field name="model_id" ref="planning.model_planning_slot"/>
+        <field name="ttype">one2many</field>
+        <field name="relation">x_hazardous_product_transaction</field>
+        <field name="relation_field">x_planning_shift_id</field>
+    </record>
+    <record id="x_hazardous_product_field" model="ir.model.fields">
+        <field name="name">x_hazardous_product_id</field>
+        <field name="field_description">Product</field>
+        <field name="model_id" ref="x_hazardous_product_transaction_model"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">product.template</field>
+        <field name="required" eval="True"/>
+        <field name="on_delete">cascade</field>
+        <field name="domain">[('x_hazardous_product_category_id','!=',False)]</field>
+    </record>
+    <record id="x_categ_id_field" model="ir.model.fields">
+        <field name="name">x_categ_id</field>
+        <field name="field_description">Category</field>
+        <field name="ttype">many2one</field>
+        <field name="model_id" ref="x_hazardous_product_transaction_model"/>
+        <field name="relation">x_hazardous_category</field>
+        <field name="related">x_hazardous_product_id.x_hazardous_product_category_id</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="x_transaction_field" model="ir.model.fields">
+        <field name="name">x_transaction</field>
+        <field name="field_description">Transaction</field>
+        <field name="ttype">selection</field>
+        <field name="model_id" ref="x_hazardous_product_transaction_model"/>
+        <field name="required" eval="True"/>
+    </record>
+    <record id="x_transaction_field_selection_charged" model="ir.model.fields.selection">
+        <field name="name">Charged</field>
+        <field name="field_id" ref="x_transaction_field" />
+        <field name="value">charged</field>
+    </record>
+    <record id="x_transaction_field_selection_extracted" model="ir.model.fields.selection">
+        <field name="name">Extracted</field>
+        <field name="field_id" ref="x_transaction_field" />
+        <field name="value">extracted</field>
+    </record>
+    <record id="x_quantity_field" model="ir.model.fields">
+        <field name="name">x_quantity</field>
+        <field name="field_description">Quantity</field>
+        <field name="ttype">float</field>
+        <field name="model_id" ref="x_hazardous_product_transaction_model"/>
+        <field name="required" eval="True"/>
+    </record>
+     <record id="x_device_lot_serial_number_id_field" model="ir.model.fields">
+        <field name="name">x_device_lot_serial_number_id</field>
+        <field name="field_description">Device Lot/Serial</field>
+        <field name="model_id" ref="x_hazardous_product_transaction_model"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">stock.lot</field>
+    </record>
+    <record id="x_recipient_ids_field" model="ir.model.fields">
+        <field name="name">x_recipient_ids</field>
+        <field name="field_description">Recipient</field>
+        <field name="model_id" ref="x_hazardous_product_transaction_model"/>
+        <field name="ttype">many2many</field>
+        <field name="relation">x_recipient</field>
+    </record>
+    <record id="x_name_field" model="ir.model.fields">
+        <field name="name">x_name</field>
+        <field name="field_description">Name</field>
+        <field name="ttype">char</field>
+        <field name="model_id" ref="x_hazardous_category_model"/>
+        <field name="required" eval="True"/>
+    </record>
+    <record id="x_reporting_unit_field" model="ir.model.fields">
+        <field name="name">x_reporting_unit_id</field>
+        <field name="field_description">Reporting Unit</field>
+        <field name="ttype">many2one</field>
+        <field name="model_id" ref="x_hazardous_category_model"/>
+        <field name="relation">uom.uom</field>
+        <field name="required" eval="True"/>
+        <field name="on_delete">cascade</field>
+    </record>
+    <record id="x_unit_id_field" model="ir.model.fields">
+        <field name="name">x_unit_id</field>
+        <field name="field_description">Unit</field>
+        <field name="ttype">many2one</field>
+        <field name="model_id" ref="x_hazardous_product_transaction_model"/>
+        <field name="relation">uom.uom</field>
+        <field name="related">x_hazardous_product_id.x_hazardous_product_category_id.x_reporting_unit_id</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="x_name_field_recipient_model" model="ir.model.fields">
+        <field name="name">x_name</field>
+        <field name="field_description">Name</field>
+        <field name="ttype">char</field>
+        <field name="model_id" ref="x_recipient_model"/>
+    </record>
+</odoo>
