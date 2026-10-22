@@ -35,7 +35,7 @@ self['x_module_house_keeping'] = self.env.user.has_group('booking_engine.group_h
     </record>
     <record id="x_action_activate_house_keeping" model="ir.actions.server">
         <field name="code"><![CDATA[
-env.ref('base.group_user')._apply_group(env.ref('booking_engine.group_house_keeping'))
+env.ref('base.group_user_regular')._apply_group(env.ref('booking_engine.group_house_keeping'))
 for to_unarchive in [
     'automation_on_check_in',
     'automation_on_check_out',
@@ -72,7 +72,7 @@ for cloc_entry in [
     </record>
     <record id="x_action_deactivate_house_keeping" model="ir.actions.server">
         <field name="code"><![CDATA[
-env.ref('base.group_user')._remove_group(env.ref('booking_engine.group_house_keeping'))
+env.ref('base.group_user_regular')._remove_group(env.ref('booking_engine.group_house_keeping'))
 for to_archive in [
     'automation_on_check_in',
     'automation_on_check_out',
@@ -216,7 +216,7 @@ cloc_entries = [
 ]
 env['ir.config_parameter'].set_bool('booking_engine.x_steering_setting', record.x_setting_steering)
 if record.x_setting_steering:
-    env.ref('base.group_user')._apply_group(env.ref('booking_engine.group_steering'))
+    env.ref('base.group_user_regular')._apply_group(env.ref('booking_engine.group_steering'))
     for to_unarchive in records_archive:
         env.ref(f'booking_engine.{to_unarchive}')['active'] = True
     for cloc_entry in cloc_entries:
@@ -230,7 +230,7 @@ if record.x_setting_steering:
             ], limit=1).unlink()
     env.ref('booking_engine.spreadsheet_dashboard_1')['is_published'] = True
 else:
-    env.ref('base.group_user')._remove_group(env.ref('booking_engine.group_steering'))
+    env.ref('base.group_user_regular')._remove_group(env.ref('booking_engine.group_steering'))
     for to_archive in records_archive:
         env.ref(f'booking_engine.{to_archive}')['active'] = False
     for cloc_entry in cloc_entries:
@@ -353,7 +353,7 @@ cloc_entries = [
 ]
 env['ir.config_parameter'].set_bool('booking_engine.x_automated_assignment_setting', bool(record.x_setting_automated_assignment))
 if record.x_setting_approvers:
-    env.ref('base.group_user')._apply_group(env.ref('booking_engine.group_automate_housekeeping'))
+    env.ref('base.group_user_regular')._apply_group(env.ref('booking_engine.group_automate_housekeeping'))
     for cloc_entry in cloc_entries:
         if (cloc_entry_id := env.ref(f'__cloc_exclude__.booking_engine_{cloc_entry}', raise_if_not_found=False)):
             entry_model = 'ir.actions.server' if cloc_entry.startswith('server_action') else 'ir.model.fields'
@@ -364,7 +364,7 @@ if record.x_setting_approvers:
                 ('res_id', '=', cloc_entry_id.id),
             ], limit=1).unlink()
 else:
-    env.ref('base.group_user')._remove_group(env.ref('booking_engine.group_automate_housekeeping'))
+    env.ref('base.group_user_regular')._remove_group(env.ref('booking_engine.group_automate_housekeeping'))
     for cloc_entry in cloc_entries:
         cloc_exclude_id = f'booking_engine_{cloc_entry}'
         entry_model = 'ir.actions.server' if cloc_entry.startswith('server_action') else 'ir.model.fields'
