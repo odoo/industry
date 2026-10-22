@@ -1,6 +1,6 @@
 {
     'name': 'Usage Based Maintenance',
-    'version': '1.2',
+    'version': '1.3',
     'category': 'Construction',
     'author': 'Odoo S.A.',
     'depends': [
