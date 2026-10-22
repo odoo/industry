@@ -1,5 +1,6 @@
 {
     'name': 'Garage & Auto repair',
+    'version': '1.1',
     'category': 'Services',
     'depends': [
         'base_industry_data',
