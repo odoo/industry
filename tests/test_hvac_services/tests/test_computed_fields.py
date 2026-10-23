@@ -66,6 +66,18 @@ class ComputedFieldsTestCase(TransactionCase):
         })
         self.assertEqual(set(so2.x_maintained_serials_ids.ids), {self.lot_1.id, self.lot_2.id}, "Sale order serials must be aggregated from order lines.")
 
+    def test_lot_sale_order_count(self):
+        self.env['sale.order'].create({
+            'partner_id': self.partner.id,
+            'x_maintained_serials_ids': [Command.link(self.lot_1.id)],
+        })
+        self.env['sale.order'].create({
+            'partner_id': self.partner.id,
+            'x_maintained_serials_ids': [Command.link(self.lot_1.id)],
+        })
+        self.assertEqual(self.lot_1.x_sale_order_count, 2, "Lot must count how many sale orders reference it.")
+        self.assertEqual(self.lot_2.x_sale_order_count, 0, "Lot without sale orders must have zero count.")
+
     def test_lot_maintenances_ids(self):
         so = self.env['sale.order'].create({
             'partner_id': self.partner.id,
