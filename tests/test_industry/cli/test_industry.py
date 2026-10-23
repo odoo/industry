@@ -4,6 +4,8 @@ import optparse
 import os
 import pathlib
 import re
+import shutil
+import subprocess
 import sys
 import threading
 
@@ -38,6 +40,16 @@ def get_industry_db_name(industry_module):
         display_name = ast.literal_eval(f.read()).get('name') or industry_module
     db_name = re.sub(r'[^a-zA-Z0-9]+', '_', display_name).strip('_') or industry_module
     return db_name
+
+
+def duplicate(db_original_name, db_name):
+    _logger.info("Duplicate database `%s` to `%s`.", db_original_name, db_name)
+    subprocess.run(["createdb", db_name, "-T", db_original_name], check=True)
+
+    from_fs = config.filestore(db_original_name)
+    to_fs = config.filestore(db_name)
+    if os.path.exists(from_fs) and not os.path.exists(to_fs):
+        shutil.copytree(from_fs, to_fs, dirs_exist_ok=True)
 
 
 class Test_Industry(Command):
@@ -88,7 +100,7 @@ class Test_Industry(Command):
                         else:
                             raise ValueError(f"Database {target_db} already exists, use --drop-if-exists to drop it before installing the industry module {industry_module}")
                     if install:
-                        db.duplicate(init_db, target_db)
+                        duplicate(init_db, target_db)
                 threading.current_thread().dbname = target_db
                 registry = Registry(target_db)
                 if install:
