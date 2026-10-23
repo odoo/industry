@@ -1,6 +1,12 @@
 {
     'name': 'Vineyard',
+<<<<<<< 5ab987773701c13409f21d046a9ce16bc557d507
     'version': '1.6',
+||||||| 080ff5c080136d47ab4d50aa9af9cb3ba8859d78
+    'version': '1.4',
+=======
+    'version': '1.5',
+>>>>>>> 53e36a88c411849e9718e28585e45fcdf9f0db52
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
@@ -39,6 +45,7 @@
         'data/mrp_bom_byproduct.xml',
         'data/mrp_bom.xml',
         'data/mrp_bom_line.xml',
+        'data/mrp_eco_stage.xml',
         'data/base_automation.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',
@@ -56,7 +63,6 @@
         'demo/stock_picking.xml',
         'demo/stock_move.xml',
         'demo/mrp_production.xml',
-        'demo/mrp_eco_stage.xml',
         'demo/mrp_eco.xml',
         'demo/ir_attachment_post.xml',
         'demo/project_task_type.xml',
