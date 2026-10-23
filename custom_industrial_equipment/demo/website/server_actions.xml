@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Custom Website - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+website = env.ref('custom_industrial_equipment.website_industry')
+
+to_deactivate = [
+    'website.footer_custom',
+    'website.header_search_box',
+    'website.header_text_element',
+    'website.option_header_disclaimer',
+    'website.template_footer_contact',
+    'website.homepage',
+    'website.contactus',
+]
+to_activate = [
+    'website.header_call_to_action',
+    'website.option_footer_scrolltop',
+    'website.template_footer_mega',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+
+# Menu items added by installed modules (e.g. website_planning_field_service,
+# auto-installed): not part of the design.
+menus.search(base_domain + [('url', 'in', ['/service-requests', '/event', '/appointment', '/shop'])]).unlink()
+
+# Menu items of the design, in navbar order (created if no installed module
+# provides them).
+for name, url, sequence in [
+    ('Home', '/', 10),
+    ('Our Solutions', '/services', 20),
+    ('About us', '/about-us', 30),
+]:
+    menu = menus.search(base_domain + [('url', '=', url)], limit=1)
+    if menu:
+        menu.write({'name': name, 'sequence': sequence})
+    else:
+        menus.create({
+            'name': name,
+            'url': url,
+            'sequence': sequence,
+            'parent_id': website.menu_id.id,
+            'website_id': website.id,
+        })
+]]>
+        </field>
+    </record>
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
