@@ -114,8 +114,9 @@ class Test_Industry(Command):
                             test_modules.append(test_industry_name)
                         with registry.cursor() as cr:
                             env = api.Environment(cr, api.SUPERUSER_ID, {})
-                            modules = env['ir.module.module'].search([('name', 'in', test_modules)])
-                            modules.button_immediate_install()
+                            modules = env['ir.module.module'].search([('name', 'in', test_modules), ('state', '!=', 'installed')])
+                            if modules:
+                                modules.button_immediate_install()
                         if test_tags:
                             config['test_tags'] = test_tags
                         else:
