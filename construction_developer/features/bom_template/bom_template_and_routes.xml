@@ -80,11 +80,23 @@ for p in self: p['x_bom_available'] = bool(self.env['mrp.bom'].search_count([('p
         <field name="value"><![CDATA["Template" if record.x_is_template else (False if record.code == "Template" else record.code)]]></field>
     </record>
 
+    <!-- also float a newly (re)selected template back to the top -->
+    <record model="ir.actions.server" id="action_set_bom_template_sequence">
+        <field name="name">Construction Developer: Set BOM Template Sequence</field>
+        <field name="model_id" ref="mrp.model_mrp_bom"/>
+        <field name="state">object_write</field>
+        <field name="crud_model_id" ref="mrp.model_mrp_bom"/>
+        <field name="update_field_id" ref="mrp.field_mrp_bom__sequence"/>
+        <field name="update_path">sequence</field>
+        <field name="evaluation_type">equation</field>
+        <field name="value"><![CDATA[0 if record.x_is_template else 1]]></field>
+    </record>
+
     <record model="base.automation" id="automation_set_bom_template_code_on_x_is_template_write">
         <field name="name">Construction Developer: Update BOM code on template status change</field>
         <field name="model_id" ref="mrp.model_mrp_bom"/>
         <field name="trigger">on_create_or_write</field>
-        <field name="action_server_ids" eval="[(6, 0, [ref('construction_developer.action_set_bom_template_code')])]"/>
+        <field name="action_server_ids" eval="[(6, 0, [ref('construction_developer.action_set_bom_template_code'), ref('construction_developer.action_set_bom_template_sequence')])]"/>
         <field name="trigger_field_ids" eval="[(6, 0, [ref('construction_developer.field_mrp_bom_x_is_template')])]"/>
     </record>
 
