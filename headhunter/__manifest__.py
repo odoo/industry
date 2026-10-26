@@ -1,6 +1,6 @@
 {
     'name': 'Talent Acquisition',
-    'version': '1.10',
+    'version': '1.11',
     'category': 'Services',
     'depends': [
         'account',
