@@ -36,6 +36,11 @@ def job_log_level(status, duration):
 base_automation.job_log_level = job_log_level
 
 
+def no_test_data_filter(record):
+    # industry databases don't have test data, so we ignore the log message about it
+    return not str(record.msg).startswith('No test data loaded in module')
+
+
 def get_industry_db_name(industry_module):
     with open(utils.IndustryUtils().get_manifest(industry_module), encoding="utf-8") as f:
         display_name = ast.literal_eval(f.read()).get('name') or industry_module
@@ -85,6 +90,7 @@ class Test_Industry(Command):
 
         if test_enable:
             from odoo.tests.result import OdooTestResult  # noqa: PLC0415
+            logging.getLogger('odoo.modules.loading').addFilter(no_test_data_filter)
 
         for industry_module in industry_modules:
             try:
