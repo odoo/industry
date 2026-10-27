@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Custom Website - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+website = env.ref('yoga_pilates.website_industry')
+
+to_deactivate = [
+    'website.footer_custom',
+    'website.header_search_box',
+    'website.header_text_element',
+    'website.homepage',
+    'website.contactus',
+]
+to_activate = [
+    'website_event.opt_event_description_cover_top',
+    'website_sale.header_hide_empty_cart_link',
+    'website.header_call_to_action',
+    'website.template_footer_centered',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id), ('parent_id', '=', website.menu_id.id)]
+
+# Menu items of the design, in navbar order (created if no installed module
+# provides them).
+design_menus = [
+    ('Home', '/', 0),
+    ('Shop', '/shop', 10),
+    ('Wellbeing Events', '/event', 20),
+    ('Appointments', '/appointment', 30),
+    ('About us', '/about-us', 40),
+]
+
+for name, url, sequence in design_menus:
+    menu = menus.search(base_domain + [('url', '=', url)], limit=1)
+    if menu:
+        menu.write({'name': name, 'sequence': sequence})
+    else:
+        menus.create({
+            'name': name,
+            'url': url,
+            'sequence': sequence,
+            'parent_id': website.menu_id.id,
+            'website_id': website.id,
+        })
+        ]]>
+        </field>
+    </record>
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
