@@ -234,6 +234,7 @@ class TestEnv(IndustryCase):
                 self._check_portal_login_is_email(tree, file_name)
                 self._check_pos_session(tree, file_name)
                 self._check_record_has_fields(tree, file_name)
+                self._check_record_inputs_are_in_form(tree, file_name)
                 if root.split('/')[-1] == 'data':
                     self._check_view_active(tree, file_name)
                     self._check_is_published_false(tree, file_name)
@@ -517,6 +518,14 @@ class TestEnv(IndustryCase):
                     record.get('id'),
                     file_name,
                 )
+
+    def _check_record_inputs_are_in_form(self, root, file_name):
+        for input_tag in root.xpath(".//input[not(ancestor::form)]"):
+            _logger.warning(
+                "An input tag with the name %s in %s is not in any form. Put it in a form or remove it.",
+                input_tag.get('name') or "UNDEFINED",
+                file_name,
+            )
 
     def _check_fields(self, root, file_name):
         warned_records = set()
