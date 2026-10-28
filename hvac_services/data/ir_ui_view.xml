@@ -45,7 +45,7 @@
                 <div class="d-flex flex-row justify-content-center">
                     <div name="related_documents_div" class="col text-end">
                         <t name="related_documents" t-if="record.product_document_count.raw_value">
-                            <a type="action" name="%(action_product_related_document)d">
+                            <a type="object" name="action_open_documents">
                                 <span class="fw-bold" t-out="record.product_document_count.raw_value"/>
                                 <span class="small"> Documents</span>
                             </a>
@@ -85,6 +85,11 @@
         <field name="type">form</field>
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" icon="refresh" type="action" name="%(get_maintenances_action)d" context="{'default_partner_id': partner_ids and partner_ids[0]}">
+                    <field widget="statinfo" name="x_sale_order_count" string="Maintenances"/>
+                </button>
+            </xpath>
             <xpath expr="//form/sheet" position="after">
                 <widget name="web_ribbon" title="Maintained" invisible="x_maintenance != 'Maintained'"/>
                 <widget name="web_ribbon" title="No Maintenance" invisible="x_maintenance != 'No Maintenance'" bg_color="text-bg-danger"/>
@@ -222,11 +227,5 @@
                 </footer>
             </xpath>
         </field>
-    </record>
-    <record id="action_product_related_document" model="ir.actions.act_window">
-        <field name="view_mode">kanban,list</field>
-        <field name="view_ids" eval="[(5,0,0),
-            (0, 0, {'view_mode': 'kanban', 'view_id': ref('product_document_kanban_view_extended')}),
-            (0, 0, {'view_mode': 'list', 'view_id': ref('product_document_list_view_extended')})]"/>
     </record>
 </odoo>
