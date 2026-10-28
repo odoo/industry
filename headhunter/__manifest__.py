@@ -1,6 +1,6 @@
 {
     'name': 'Talent Acquisition',
-    'version': '1.11',
+    'version': '1.12',
     'category': 'Services',
     'depends': [
         'account',
@@ -9,6 +9,7 @@
         'base_automation',
         'base_industry_data',
         'crm_enterprise',
+        'data_recycle',
         'documents_hr',
         'documents_product',
         'hr_skills',
@@ -46,6 +47,7 @@
         'data/sign_template.xml',
         'data/sign_item.xml',
         'data/crm_stage.xml',
+        'data/data_cleaning_data.xml',
         'data/website_view.xml',
         'data/uninstall_hook.xml',
     ],
