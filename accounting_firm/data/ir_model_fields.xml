@@ -255,6 +255,82 @@
         <field name="ttype">boolean</field>
     </record>
 
+    <!-- Customer Mandate fields -->
+    <record id="x_partner_id_field_x_customer_mandate" model="ir.model.fields">
+        <field name="name">x_partner_id</field>
+        <field name="field_description">Customer</field>
+        <field name="model_id" ref="x_customer_mandate_model"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.partner</field>
+        <field name="required" eval="True"/>
+        <field name="on_delete">cascade</field>
+    </record>
+    <record id="x_mandate_id_field_x_customer_mandate" model="ir.model.fields">
+        <field name="name">x_mandate_id</field>
+        <field name="field_description">Mandate</field>
+        <field name="model_id" ref="x_customer_mandate_model"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">x_mandate</field>
+        <field name="required" eval="True"/>
+        <field name="on_delete">restrict</field>
+    </record>
+    <record id="x_status_field_x_customer_mandate" model="ir.model.fields">
+        <field name="name">x_status</field>
+        <field name="field_description">Status</field>
+        <field name="model_id" ref="x_customer_mandate_model"/>
+        <field name="ttype">selection</field>
+        <field name="required" eval="True"/>
+    </record>
+    <!-- Values are prefixed so that sorting by status follows the workflow -->
+    <record id="x_status_customer_mandate_field_selection_to_request" model="ir.model.fields.selection">
+        <field name="name">To Request</field>
+        <field name="field_id" ref="x_status_field_x_customer_mandate"/>
+        <field name="value">1_to_request</field>
+    </record>
+    <record id="x_status_customer_mandate_field_selection_requested" model="ir.model.fields.selection">
+        <field name="name">Requested</field>
+        <field name="field_id" ref="x_status_field_x_customer_mandate"/>
+        <field name="value">2_requested</field>
+    </record>
+    <record id="x_status_customer_mandate_field_selection_active" model="ir.model.fields.selection">
+        <field name="name">Active</field>
+        <field name="field_id" ref="x_status_field_x_customer_mandate"/>
+        <field name="value">3_active</field>
+    </record>
+    <record id="x_status_customer_mandate_field_selection_refused" model="ir.model.fields.selection">
+        <field name="name">Refused</field>
+        <field name="field_id" ref="x_status_field_x_customer_mandate"/>
+        <field name="value">4_refused</field>
+    </record>
+    <record id="x_status_customer_mandate_field_selection_revoked" model="ir.model.fields.selection">
+        <field name="name">Revoked</field>
+        <field name="field_id" ref="x_status_field_x_customer_mandate"/>
+        <field name="value">5_revoked</field>
+    </record>
+    <record id="x_expiration_date_field_x_customer_mandate" model="ir.model.fields">
+        <field name="name">x_expiration_date</field>
+        <field name="field_description">Expiration Date</field>
+        <field name="model_id" ref="x_customer_mandate_model"/>
+        <field name="ttype">date</field>
+    </record>
+    <record id="x_mandated_field_x_customer_mandate" model="ir.model.fields">
+        <field name="name">x_mandated</field>
+        <field name="field_description">Mandated</field>
+        <field name="model_id" ref="x_customer_mandate_model"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.users</field>
+        <field name="domain">[('share', '=', False)]</field>
+    </record>
+    <record id="x_customer_mandate_ids_field_res_partner" model="ir.model.fields">
+        <field name="name">x_customer_mandate_ids</field>
+        <field name="field_description">Customer Mandates</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="ttype">one2many</field>
+        <field name="relation">x_customer_mandate</field>
+        <field name="relation_field">x_partner_id</field>
+        <field name="domain">[('x_mandate_id.x_active', '=', True)]</field>
+    </record>
+
 
     <!-- Project Project fields -->
     <record id="x_assistant_ids_field_project_project" model="ir.model.fields">
