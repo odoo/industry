@@ -51,6 +51,18 @@
                         </field>
                     </group>
                 </page>
+                <page string="Mandates" name="accounting_firm_mandate_page">
+                    <field name="x_customer_mandate_ids">
+                        <list editable="bottom" default_order="x_status, x_expiration_date">
+                            <field name="x_mandate_id"/>
+                            <field name="x_status" optional="show"/>
+                            <field name="activity_ids" widget="list_activity" optional="show" invisible="not id"/>
+                            <field name="x_expiration_date" string="Expiration" optional="show" options="{'warning': 'past'}"/>
+                            <field name="x_mandated" optional="show" widget="many2one_avatar"/>
+                            <button string="Send Request" type="action" name="%(action_server_send_mandate_request)d" invisible="x_status in ('4_refused', '5_revoked')"/>
+                        </list>
+                    </field>
+                </page>
             </xpath>
             <xpath expr="//group[@id='accounting_firm_id_page_left_group']" position="inside">
                 <xpath expr="//field[@name='ubo_national_identifier']" position="move"/>
@@ -61,9 +73,6 @@
                 <field name="x_closing_month" invisible="not project_ids"/>
                 <field name="x_vat_declaration_recurrence" invisible="not project_ids"/>
                 <field name="x_interim_situation" invisible="not project_ids"/>
-            </xpath>
-            <xpath expr="//field[@name='category_id']" position="after">
-                <field name="x_mandate_ids" widget="many2many_tags" options="{'color_field': 'x_color'}" invisible="not project_ids"/>
             </xpath>
         </field>
     </record>
@@ -112,6 +121,44 @@
                 <field name="x_mandate_parent_id" string="Category" domain="[('id', '!=', id)]"/>
                 <field name="x_color" widget="color_picker"/>
             </list>
+        </field>
+    </record>
+
+    <!-- Customer Mandate views -->
+    <record id="x_customer_mandate_view_list" model="ir.ui.view">
+        <field name="name">Customer Mandates</field>
+        <field name="model">x_customer_mandate</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <list string="Customer Mandates" editable="bottom" default_order="x_status, x_expiration_date">
+                <field name="x_partner_id"/>
+                <field name="x_mandate_id"/>
+                <field name="x_status" optional="show"/>
+                <field name="activity_ids" widget="list_activity" optional="show" invisible="not id"/>
+                <field name="x_expiration_date" string="Expiration" optional="show" options="{'warning': 'past'}"/>
+                <field name="x_mandated" optional="show" widget="many2one_avatar"/>
+            </list>
+        </field>
+    </record>
+    <record id="x_customer_mandate_view_search" model="ir.ui.view">
+        <field name="name">Customer Mandates</field>
+        <field name="model">x_customer_mandate</field>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <search string="Customer Mandates">
+                <field name="x_partner_id"/>
+                <field name="x_mandate_id"/>
+                <filter string="To Request" name="filter_to_request" domain="[('x_status', '=', '1_to_request')]"/>
+                <filter string="Requested" name="filter_requested" domain="[('x_status', '=', '2_requested')]"/>
+                <separator/>
+                <filter string="Expired" name="filter_expired" domain="[('x_expiration_date', '&lt;', 'today')]"/>
+                <filter string="Expiring Soon" name="filter_expiring_soon" domain="[('x_expiration_date', '&gt;=', 'today'), ('x_expiration_date', '&lt;=', 'today +1m')]"/>
+                <group>
+                    <filter string="Status" name="groupby_status" context="{'group_by': 'x_status'}"/>
+                    <filter string="Expiration Date" name="groupby_expiration_date" context="{'group_by': 'x_expiration_date'}"/>
+                    <filter string="Mandated" name="groupby_mandated" context="{'group_by': 'x_mandated'}"/>
+                </group>
+            </search>
         </field>
     </record>
 
