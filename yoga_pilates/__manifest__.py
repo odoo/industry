@@ -6,7 +6,7 @@
     'depends': [
         'appointment_crm',
         'base_industry_data',
-        'hr_skills_survey',
+        'hr_survey',
         'partnership',
         'sale_planning',
         'website_appointment_sale',
