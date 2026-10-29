@@ -55,6 +55,7 @@
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
         'demo/payment_provider_demo.xml',
+        'demo/mass_mailing.xml',
         'demo/website/website.xml',
         'demo/product_public_category.xml',
         'demo/website/views/website_templates.xml',
