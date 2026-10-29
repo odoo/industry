@@ -81,10 +81,11 @@ if [[ $DEMO == True ]]; then
   INSTALL=true
 fi
 
+COMMUNITY_PATH="odoo/"
 INDUSTRY_PATH="industry/"
 PYTHON_BIN="python3"
-ODOO_BIN="odoo/odoo-bin"
-ADDONS_PATH="$INDUSTRY_PATH/tests,enterprise,odoo/addons,odoo/odoo/addons,design-themes"
+ODOO_BIN="$COMMUNITY_PATH/odoo-bin"
+ADDONS_PATH="$INDUSTRY_PATH/tests,enterprise,$COMMUNITY_PATH/addons,$COMMUNITY_PATH/odoo/addons,design-themes"
 
 # Runs a Python snippet inside `odoo-bin shell` against the given database,
 # $1 is the database, every arg after that
@@ -125,10 +126,10 @@ else
   #   version (e.g. comparing with/without a change, both on `master`)
   #   each get their own mutable database while still sharing that one
   #   dependency snapshot.
-  if [ -f "odoo/odoo/release.py" ]; then
+  if [ -f "$COMMUNITY_PATH/odoo/release.py" ]; then
     ODOO_VERSION=$(python3 -c "
 import importlib.util
-spec = importlib.util.spec_from_file_location('release', 'odoo/odoo/release.py')
+spec = importlib.util.spec_from_file_location('release', '$COMMUNITY_PATH/odoo/release.py')
 release = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(release)
 print(release.series)
