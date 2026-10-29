@@ -1,11 +1,12 @@
 {
     'name': 'Food Distribution',
-    'version': '1.7',
+    'version': '1.8',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
         'appointment_account_payment',
         'base_industry_data',
+        'hr_fleet',
         'mrp_mps',
         'product_expiry',
         'project_mrp_workorder_account',
