@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1" context="{'mail_auto_subscribe_no_notify': True}">
+    <function model="sale.order.line" name="write">
+        <value eval="[ref('sale_order_line_9')]"/>
+        <value eval="{'qty_delivered': 60.0}"/>
+    </function>
+    <function model="sale.order.line" name="write">
+        <value eval="[ref('sale_order_line_20')]"/>
+        <value eval="{'qty_delivered': 30.0}"/>
+    </function>
+    <function model="sale.order" name="_create_invoices" eval="[[ref('sale_order_2'), ref('sale_order_3'), ref('sale_order_4')]]"/>
+    <function model="account.move.line" name="write">
+        <value model="account.move.line" search="[('sale_line_ids', '=', ref('sale_order_line_5'))]"/>
+        <value eval="{'quantity': 8.0}"/>
+    </function>
+    <function model="account.move.line" name="write">
+        <value model="account.move.line" search="[('sale_line_ids', '=', ref('sale_order_line_6'))]"/>
+        <value eval="{'quantity': 6.0}"/>
+    </function>
+    <function model="account.move.line" name="write">
+        <value model="account.move.line" search="[('sale_line_ids', '=', ref('sale_order_line_9'))]"/>
+        <value eval="{'quantity': 40.0}"/>
+    </function>
+    <function model="account.move.line" name="unlink">
+        <value model="account.move.line" eval="obj().search([('sale_line_ids', 'in', [ref('sale_order_line_7'), ref('sale_order_line_8')])]).ids"/>
+    </function>
+    <function model="account.move" name="action_post">
+        <value model="account.move" eval="(
+            obj().env.ref('architects.sale_order_2') +
+            obj().env.ref('architects.sale_order_3') +
+            obj().env.ref('architects.sale_order_4')
+        ).invoice_ids.ids"/>
+    </function>
+</odoo>

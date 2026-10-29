@@ -1,6 +1,6 @@
 {
     'name': 'Architecture Firm',
-    'version': '1.4',
+    'version': '1.5',
     'category': 'Services',
     'depends': [
         'account_followup',
@@ -44,6 +44,7 @@
         'data/mail_message.xml',
         'data/website_view.xml',
         'data/website_theme_apply.xml',
+        'data/spreadsheet_dashboard.xml',
         'data/uninstall_hook.xml',
     ],
     'demo': [
@@ -54,6 +55,8 @@
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
+        'demo/account_analytic_line.xml',
+        'demo/sale_order_post.xml',
         'demo/ir_attachment_post.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',
