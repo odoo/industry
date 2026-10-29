@@ -6,7 +6,7 @@
     'depends': [
         'base_industry_data',
         'crm_enterprise',
-        'hr_skills',
+        'hr',
         'pos_enterprise',
         'purchase_stock',
         'sale_management',

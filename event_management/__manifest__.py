@@ -7,7 +7,7 @@
         'base_industry_data',
         'crm_enterprise',
         'documents_project',
-        'hr_recruitment_skills',
+        'hr_recruitment',
         'project_forecast',
         'project_purchase',
         'purchase_alternative',

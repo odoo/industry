@@ -7,7 +7,7 @@
         'base_automation',
         'contacts',
         'knowledge',
-        'planning_hr_skills',
+        'planning',
         'sale_project',
         'survey',
         'web_gantt',

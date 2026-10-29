@@ -11,7 +11,6 @@
         'crm_enterprise',
         'documents_hr',
         'documents_product',
-        'hr_skills',
         'sale_crm',
         'sale_management',
         'sign',
