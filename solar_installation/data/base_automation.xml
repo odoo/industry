@@ -7,4 +7,45 @@
         <field name="trigger">on_create_or_write</field>
         <field name="trigger_field_ids" eval="[(6, 0, [ref('stock.field_stock_move_line__state')])]"/>
     </record>
+    <record id="base_automation_on_delivery_done" model="base.automation">
+        <field name="name">Auto-update Delivered &amp; Invoiced Qty on Delivery Validation</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="trigger">on_state_set</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('stock.field_stock_picking__state')])]"/>
+        <field name="filter_domain">[("state", "=", "done")]</field>
+    </record>
+    <record id="base_automation_on_invoice_paid" model="base.automation">
+        <field name="name">Update Invoiced Qty on Full Payment</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="trigger">on_state_set</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('account.field_account_move__payment_state')])]"/>
+        <field name="filter_domain">[("payment_state", "in", ["paid", "in_payment"]), ("move_type", "=", "out_invoice")]</field>
+    </record>
+    <record id="base_automation_planning_slot_check_in" model="base.automation">
+        <field name="name">Auto Check In CRM on Planning Slot Sign In</field>
+        <field name="model_id" ref="planning.model_planning_slot"/>
+        <field name="trigger">on_state_set</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('planning.field_planning_slot__state')])]"/>
+        <field name="filter_domain">[("state", "=", "in_progress")]</field>
+    </record>
+    <record id="base_automation_planning_slot_check_out" model="base.automation">
+        <field name="name">Auto Check Out CRM on Planning Slot Complete</field>
+        <field name="model_id" ref="planning.model_planning_slot"/>
+        <field name="trigger">on_state_set</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('planning.field_planning_slot__state')])]"/>
+        <field name="filter_domain">[("state", "=", "completed")]</field>
+    </record>
+    <record id="base_automation_toggle_checkinout_menu" model="base.automation">
+        <field name="name">Toggle Check In/Out Logs Menu on Setting Change</field>
+        <field name="model_id" ref="base.model_res_company"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('field_res_company_x_crm_checkout_logs')])]"/>
+    </record>
+    <record id="base_automation_solar_zero_subproduct_prices" model="base.automation">
+        <field name="name">Auto Zero Sub-Product Prices on Quotation Template</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale_management.field_sale_order__sale_order_template_id')])]"/>
+        <field name="filter_domain">[("sale_order_template_id", "!=", False)]</field>
+    </record>
 </odoo>
