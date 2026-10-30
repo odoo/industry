@@ -1,6 +1,6 @@
 {
     'name': 'Veterinary Clinic',
-    'version': '1.7',
+    'version': '1.8',
     'category': 'Health and Fitness',
     'author': 'Odoo S.A.',
     'depends': [
