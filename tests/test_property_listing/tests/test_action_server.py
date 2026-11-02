@@ -252,7 +252,7 @@ class PropertyListingAutomationsTestCase(TransactionCase):
         self.assertFalse(client_4.id in property.x_contact_matches_properties.ids,
                          "Client 4 should not be matched with the property")
 
-    def test_create_lead_from_match(self):
+    def test_create_opportunity_from_match(self):
         property = self.env['product.template'].create({
             'name': 'Property 1',
             'categ_id': self.env.ref('property_listing.product_category_5').id,
@@ -270,12 +270,13 @@ class PropertyListingAutomationsTestCase(TransactionCase):
             'x_criteria_ids': self.region_value_1,
         })
 
-        create_lead_action = self.env.ref('property_listing.create_lead_from_match_server_action')
-        create_lead_action.with_context(active_id=matching_client.id, active_model="res.partner", property_id=property.id).run()
+        create_opportunity_action = self.env.ref('property_listing.create_opportunity_from_match_server_action')
+        create_opportunity_action.with_context(active_id=matching_client.id, active_model="res.partner", property_id=property.id).run()
 
-        lead = self.env['crm.lead'].search([('partner_id', '=', matching_client.id)], limit=1)
-        self.assertTrue(lead, "A lead should be created for the matching client")
-        self.assertEqual(lead.x_interested_in_id.id, property.id,
-                         "The lead should be linked to the matched property by the x_interested_in_id field")
-        self.assertEqual(lead.partner_id.id, matching_client.id,
-                         "The lead should be linked to the matching client")
+        opportunity = self.env['crm.lead'].search([('partner_id', '=', matching_client.id)], limit=1)
+        self.assertTrue(opportunity, "An opportunity should be created for the matching client")
+        self.assertEqual(opportunity.type, 'opportunity', "The created record should be an opportunity")
+        self.assertEqual(opportunity.x_interested_in_id.id, property.id,
+                         "The opportunity should be linked to the matched property by the x_interested_in_id field")
+        self.assertEqual(opportunity.partner_id.id, matching_client.id,
+                         "The opportunity should be linked to the matching client")
