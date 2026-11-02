@@ -87,11 +87,6 @@ MODELS_WITH_USER_ID = {
     'sale.order',
 }
 
-ALLOWED_PYTHON_FILES = [
-    '__init__.py',
-    '__manifest__.py',
-]
-
 ESCAPE_STUDIO_TEST = [
     'construction',
 ]
@@ -167,12 +162,12 @@ class TestEnv(IndustryCase):
                 encoded_content = pathlib.Path(file_path).read_bytes()
                 decoded_content = encoded_content.decode('utf8')
                 if ext == '.py':
-                    if file_name not in ALLOWED_PYTHON_FILES:
+                    if file_name != '__manifest__.py':
                         _logger.warning(
                             "Python file %s is not allowed in industry modules.",
                             file_name,
                         )
-                    elif file_name == '__manifest__.py':
+                    else:
                         manifest_content = decoded_content
                     continue
 

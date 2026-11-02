@@ -27,7 +27,6 @@ class FileTest(IndustryCase):
 
             required_files = {
                 'index html file': '/static/description/index.html',
-                'init': '/__init__.py',
             }
             if module in self.installed_industries:
                 required_files.update({
