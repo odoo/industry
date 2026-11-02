@@ -11,4 +11,112 @@ for line in move_lines:
     line.lot_id.write({'x_warranty_date': datetime.datetime.today() + datetime.timedelta(line.product_id.expiration_time)})
         ]]></field>
     </record>
+    <record id="action_planning_slot_check_in" model="ir.actions.server">
+        <field name="name">Check In: Log Technician Arrival on CRM Lead</field>
+        <field name="model_id" ref="planning.model_planning_slot" />
+        <field name="binding_model_id" ref="planning.model_planning_slot" />
+        <field name="binding_view_types">form</field>
+        <field name="base_automation_id" ref="base_automation_planning_slot_check_in"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for slot in records:
+    if lead := slot.x_opportunity_name or (slot.partner_id and env['crm.lead'].search([('partner_id', '=', slot.partner_id.id)], limit=1)):
+        technician = slot.user_ids[0] if slot.user_ids else env.user
+        if env['x_crm_lead_check_log'].search([('x_lead_id', '=', lead.id), ('x_user_id', '=', technician.id), ('x_check_out_time', '=', False)], limit=1):
+            continue
+        geo = env.context.get('geolocation') or {}
+        lat, lng = (geo.get('latitude'), geo.get('longitude')) if geo.get('success') else (0.0, 0.0)
+        if lat and lng:
+            localisation = env['base.geocoder']._get_localisation(latitude=lat, longitude=lng)
+            label = localisation or ('%.6f, %.6f' % (lat, lng))
+            maps_url = 'https://maps.google.com/?q=%s,%s' % (lat, lng)
+            location_html = '<p><a href="%s" target="_blank" style="color:#00a09d">%s</a></p>' % (maps_url, label)
+        else:
+            label, maps_url, location_html = 'On Site', '', '<p>On Site</p>'
+        now = datetime.datetime.now()
+        env['x_crm_lead_check_log'].create({'x_date': now.date(), 'x_user_id': technician.id, 'x_lead_id': lead.id, 'x_check_in_time': now, 'x_check_in_location': location_html})
+        lead.message_post(body='<p>Checked in: %s</p>' % ('<a href="%s" target="_blank" style="color:#00a09d">%s</a>' % (maps_url, label) if maps_url else label), body_is_html=True)
+]]></field>
+    </record>
+    <record id="action_planning_slot_check_out" model="ir.actions.server">
+        <field name="name">Check Out: Log Technician Departure on CRM Lead</field>
+        <field name="model_id" ref="planning.model_planning_slot" />
+        <field name="binding_model_id" ref="planning.model_planning_slot" />
+        <field name="binding_view_types">form</field>
+        <field name="base_automation_id" ref="base_automation_planning_slot_check_out"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for slot in records:
+    if lead := slot.x_opportunity_name or (slot.partner_id and env['crm.lead'].search([('partner_id', '=', slot.partner_id.id)], limit=1)):
+        technician = slot.user_ids[:1] or env.user
+        if open_log := env['x_crm_lead_check_log'].search([('x_lead_id', '=', lead.id), ('x_user_id', '=', technician.id), ('x_check_out_time', '=', False)], limit=1):
+            location_html = str(open_log.x_check_in_location or '<p>On Site</p>')
+            now = datetime.datetime.now()
+            duration = (lambda m: m // 60 + (m % 60) / 100)(int((now - open_log.x_check_in_time).total_seconds() / 60)) if open_log.x_check_in_time else 0.0
+            open_log.write({'x_check_out_time': now, 'x_check_out_location': location_html, 'x_duration': duration})
+            lead.message_post(body='<p>Signed out: %s</p>' % location_html[3:-4], body_is_html=True)
+]]></field>
+    </record>
+    <record id="action_sale_order_reset_non_service_lines" model="ir.actions.server">
+        <field name="name">Reset Price and Qty on Non-Service Order Lines</field>
+        <field name="model_id" ref="sale.model_sale_order" />
+        <field name="binding_model_id" ref="sale.model_sale_order" />
+        <field name="binding_view_types">form</field>
+        <field name="base_automation_id" ref="base_automation_solar_zero_subproduct_prices"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+solar_service_tmpl = env.ref('solar_installation.product_template_8', raise_if_not_found=False)
+lines = records.order_line.filtered(lambda l: not l.display_type and l.product_id and not ((solar_service_tmpl and l.product_id.product_tmpl_id == solar_service_tmpl) or 'installation' in l.product_id.name.lower()))
+if selected := lines.filtered(lambda l: l.x_select):
+    selected.write({'price_unit': 0.0})
+if unselected := lines - selected:
+    unselected.write({'price_unit': 0.0, 'product_uom_qty': 0.0})
+]]></field>
+    </record>
+    <record id="action_sync_delivered_qty_on_delivery" model="ir.actions.server">
+        <field name="name">Sync Delivered Qty to Invoiced on Delivery Validation</field>
+        <field name="model_id" ref="stock.model_stock_picking" />
+        <field name="binding_model_id" ref="stock.model_stock_picking" />
+        <field name="state">code</field>
+        <field name="base_automation_id" ref="base_automation_on_delivery_done"/>
+        <field name="code"><![CDATA[
+for picking in records:
+    if order := picking.sale_id:
+        invoices = order.invoice_ids.filtered(lambda inv: inv.state == 'posted')
+        paid_total = sum(inv.amount_total for inv in invoices if inv.payment_state in ('paid', 'in_payment'))
+        is_fully_paid = invoices and order.currency_id.compare_amounts(paid_total, order.amount_total) >= 0
+        is_partial = invoices and not is_fully_paid and any(inv.payment_state in ('not_paid', 'partial') for inv in invoices)
+        if not is_partial:
+            for line in order.order_line.filtered(lambda l: not l.display_type and l.product_uom_qty > 0):
+                line.write({'qty_invoiced': line.qty_delivered})
+]]></field>
+    </record>
+    <record id="action_sync_delivered_qty_on_full_payment" model="ir.actions.server">
+        <field name="name">Sync Delivered Qty to Invoiced on Full Payment</field>
+        <field name="model_id" ref="account.model_account_move" />
+        <field name="binding_model_id" ref="account.model_account_move" />
+        <field name="base_automation_id" ref="base_automation_on_invoice_paid"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+sale_orders = records.invoice_line_ids.sale_line_ids.order_id
+for order in sale_orders:
+    invoices = order.invoice_ids.filtered(lambda inv: inv.state == 'posted')
+    paid_total = sum(inv.amount_total for inv in invoices if inv.payment_state in ('paid', 'in_payment'))
+    is_fully_paid = invoices and order.currency_id.compare_amounts(paid_total, order.amount_total) >= 0
+    if is_fully_paid:
+        for line in order.order_line.filtered(lambda l: not l.display_type and l.product_uom_qty > 0):
+            line.write({'qty_invoiced': line.qty_delivered})
+]]></field>
+    </record>
+    <record id="action_toggle_checkinout_menu" model="ir.actions.server">
+        <field name="name">Toggle Check In/Out Logs Menu Visibility</field>
+        <field name="model_id" ref="base.model_res_company" />
+        <field name="base_automation_id" ref="base_automation_toggle_checkinout_menu"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+menu = env.ref('solar_installation.menu_x_crm_lead_check_log', raise_if_not_found=False)
+if menu:
+    menu.write({'active': record.x_crm_checkout_logs})
+]]></field>
+    </record>
 </odoo>
