@@ -1,6 +1,6 @@
 {
     'name': 'Accounting Firm',
-    'version': '1.5',
+    'version': '1.6',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
@@ -20,12 +20,12 @@
         'data/ir_module_module_dependency.xml',
         'data/ir_attachment_pre.xml',
         'data/res_config_settings.xml',
+        'data/documents_tag.xml',
         'data/ir_model.xml',
         'data/ir_access.xml',
         'data/ir_model_fields.xml',
         'data/ir_default.xml',
         'data/ir_actions_server.xml',
-        'data/base_automation.xml',
         'data/ir_cron.xml',
         'data/ir_ui_view.xml',
         'data/ir_actions_act_window.xml',
