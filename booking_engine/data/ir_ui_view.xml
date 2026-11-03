@@ -32,6 +32,7 @@
     <field name="arch" type="xml">
       <xpath expr="//list//field[@name='product_id']" position="after">
         <field name="x_resource_ids" widget="many2many_tags" readonly="1"/>
+        <field name="x_house_keeping" widget="badge" readonly="1" column_invisible="parent.status == 'return'" groups="booking_engine.group_house_keeping" options="{'color_field': 'x_house_keeping_color'}"/>
       </xpath>
       <xpath expr="//button[@name='apply']" position="replace">
         <button string="Validate" class="btn btn-primary" type="action" name="%(apply_rental_check_out)d" data-hotkey="q"/>
@@ -719,7 +720,7 @@
                 <field name="x_employee_id" optional="show" widget="many2one_avatar_employee"/>
             </xpath>
             <xpath expr="/list//field[@name='stage_id']" position="attributes">
-                <attribute name="options">{'color_field': 'color'}</attribute>
+                <attribute name="options">{'color_field': 'x_stage_color'}</attribute>
             </xpath>
             <xpath expr="/list//field[@name='user_ids']" position="replace"/>
             <xpath expr="/list//field[@name='activity_ids']" position="replace"/>
@@ -1087,6 +1088,28 @@
     <field name="arch" type="xml">
         <xpath expr="//field[@name='order_id']" position="attributes">
           <attribute name="context">{'form_view_ref': 'booking_engine.rental_order_view', 'in_rental_app': 1}</attribute>
+        </xpath>
+    </field>
+  </record>
+  <record id="project_task_type_edit_booking_engine" model="ir.ui.view">
+    <field name="name">project.task.type.edit.booking.engine</field>
+    <field name="model">project.task.type</field>
+    <field name="inherit_id" ref="project.task_type_edit"/>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+        <xpath expr="/form//field[@name='sequence']" position="after">
+          <field name="x_color" widget="color_picker"/>
+        </xpath>
+    </field>
+  </record>
+  <record id="project_task_type_tree_inherited_booking_engine" model="ir.ui.view">
+    <field name="name">project.task.type.tree.inherited.booking.engine</field>
+    <field name="model">project.task.type</field>
+    <field name="inherit_id" ref="project.task_type_tree_inherited"/>
+    <field name="active" eval="True"/>
+    <field name="arch" type="xml">
+        <xpath expr="/list//field[@name='project_ids']" position="after">
+          <field name="x_color" optional="show" widget="color_picker"/>
         </xpath>
     </field>
   </record>
