@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Markd - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+website = env.ref('corporate_gifts.website_industry')
+
+to_deactivate = [
+    'website_sale.cta_separator',
+    'website_sale.product_add_to_compare',
+    'website_sale.product_attributes_body',
+    'website.header_text_element',
+    'website.header_visibility_standard',
+    'website.option_header_brand_name',
+    'website.option_header_disclaimer',
+    'website.template_footer_call_to_action',
+    'website.template_footer_centered',
+    'website.homepage',
+    'website.contactus',
+]
+to_activate = [
+    'website_sale.accordion_specs_item',
+    'website_sale.cta_wrapper_large',
+    'website_sale.extra_info',
+    'website_sale.product_buy_now_large',
+    'website_sale.product_comment',
+    'website_sale.product_quantity_large',
+    'website_sale.tax_indication',
+    'website.footer_copyright_content_width_fluid',
+    'website.footer_custom',
+    'website.header_call_to_action',
+    'website.header_visibility_disappears',
+    'website.header_width_full',
+    'website.template_header_additional_color_secondary',
+    'website.template_header_navlink_no_background',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+
+def category_url(xmlid):
+    return env.ref(xmlid).website_url
+
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
+
+menus.search(base_domain + [('url', 'in', ['/', '/shop', '/appointment', '/event'])]).unlink()
+
+for name, url, sequence in [
+    ('Office', category_url('corporate_gifts.product_public_category_6'), 10),
+    ('Gifts', category_url('corporate_gifts.product_public_category_1'), 20),
+    ('Services', '/our-services', 30),
+]:
+    menu = menus.search(base_domain + [('url', '=', url)], limit=1)
+    if menu:
+        menu.write({'name': name, 'sequence': sequence})
+    else:
+        menus.create({
+            'name': name,
+            'url': url,
+            'sequence': sequence,
+            'website_id': website.id,
+            'parent_id': top_menu.id,
+        })
+
+def record_id(xmlid):
+    return str(env.ref(xmlid).id)
+
+
+# Views and the mega menu reference records by database id or by url:
+# replace the exported xmlid placeholders by the actual ids and category urls.
+MARKS = {
+    '__EXPORT_FILTER_XMLID__': record_id,
+    '__EXPORT_SLUG_XMLID__': category_url,
+}
+
+
+def resolve_marks(content):
+    for mark, resolve in MARKS.items():
+        while mark in content:
+            start = content.index(mark)
+            end = content.index(mark, start + len(mark)) + len(mark)
+            xmlid = content[start + len(mark):end - len(mark)]
+            try:
+                resolved = resolve(xmlid)
+            except ValueError:
+                resolved = '0'
+            content = content[:start] + resolved + content[end:]
+    return content
+
+
+for view in env['ir.ui.view'].sudo().search([('website_id', '=', website.id)]):
+    arch = view.arch_db or ''
+    new_arch = resolve_marks(arch)
+    if new_arch != arch:
+        view.write({'arch_db': new_arch})
+
+mega_menu = env.ref('corporate_gifts.website_menu_apparel')
+mega_menu.write({'mega_menu_content': resolve_marks(str(mega_menu.mega_menu_content))})
+]]>
+        </field>
+    </record>
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
