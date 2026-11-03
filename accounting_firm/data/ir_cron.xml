@@ -7,20 +7,10 @@
         <field name="model_id" ref="base.model_res_partner"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
-for contact in model.search([('x_id_expiration_date', '!=', False), ('x_id_expiration_date', '<', datetime.datetime.today().date() + dateutil.relativedelta.relativedelta(days=7))]):
-    if not env['documents.document'].search_count([('partner_id', '=', contact.id), ('x_is_identity_document_request', '!=', False), ('attachment_id', '=', False)], limit=1):
-        doc = env['documents.request_wizard'].create({
-            "folder_id": env.ref('documents.document_inbox_folder').id,
-            "res_id": contact.id,
-            "res_model": env.context.get("default_res_model", False),
-            "name": "Identity Document - " + contact.name,
-            "requestee_id": contact.id,
-            "partner_id": contact.id,
-            "activity_date_deadline_range": 7,
-            "activity_note": "Please provide your identity document for update.",
-        }).request_document()
-        doc['x_is_identity_document_request'] = True
-        contact.message_post(body="Document request has been sent")
+contacts = model.search([('x_identity_document_expiration', '!=', False), ('x_identity_document_expiration', '<', datetime.datetime.today().date() + dateutil.relativedelta.relativedelta(days=7))])
+contacts_with_open_request = env['documents.document'].search([('partner_id', 'in', contacts.ids), ('x_is_identity_document_request', '!=', False), ('attachment_id', '=', False),]).mapped('partner_id')
+if contacts_to_request := contacts - contacts_with_open_request:
+    env.ref('accounting_firm.action_server_request_identity_document').with_context(active_model='res.partner', active_ids=contacts_to_request.ids, from_cron=True).run()
 ]]></field>
     </record>
 </odoo>

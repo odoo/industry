@@ -21,15 +21,6 @@
                 </header>
             </div>
             <xpath expr="//page[@name='equity_ubo']" position="after">
-                <page string="ID" name="accounting_firm_id_page" invisible="is_company">
-                    <group>
-                        <group id="accounting_firm_id_page_left_group"/>
-                        <group>
-                            <field name="x_id_expiration_date" decoration-danger="x_id_expiration_date &lt; current_date"/>
-                            <field name="x_id_scan" widget="pdf_viewer"/>
-                        </group>
-                    </group>
-                </page>
                 <page string="AML" name="accounting_firm_aml_page">
                     <group>
                         <group>
@@ -52,17 +43,11 @@
                     </group>
                 </page>
             </xpath>
-            <xpath expr="//group[@id='accounting_firm_id_page_left_group']" position="inside">
-                <xpath expr="//field[@name='ubo_national_identifier']" position="move"/>
-                <xpath expr="//field[@name='birth_date']" position="move"/>
-                <xpath expr="//field[@name='ubo_birth_place']" position="move"/>
-            </xpath>
-            <xpath expr="//div[hasclass('o_address_format')]" position="after">
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="x_identity_document_expiration" invisible="is_company"/>
                 <field name="x_closing_month" invisible="not project_ids"/>
                 <field name="x_vat_declaration_recurrence" invisible="not project_ids"/>
                 <field name="x_interim_situation" invisible="not project_ids"/>
-            </xpath>
-            <xpath expr="//field[@name='category_id']" position="after">
                 <field name="x_mandate_ids" widget="many2many_tags" options="{'color_field': 'x_color'}" invisible="not project_ids"/>
             </xpath>
         </field>
@@ -76,9 +61,9 @@
         <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='filter_vat_set']" position="after">
-                <filter string="Expired IDs"
-                    name="filter_expired_ids"
-                    domain="[('x_id_expiration_date', '!=', False), ('x_id_expiration_date', '&lt;=', 'today')]"/>
+                <separator/>
+                    <filter string="Identity Document Expiration Date" name="filter_identity_document_expiration" date="x_identity_document_expiration"/>
+                <separator/>
             </xpath>
         </field>
     </record>
@@ -163,22 +148,6 @@
             </form>
         </field>
     </record>
-    
-    <!-- Equity UBO views -->
-    <record id="equity_ubo_form_view_inherited" model="ir.ui.view">
-        <field name="name">equity.ubo.form.view.inherited</field>
-        <field name="model">equity.ubo</field>
-        <field name="type">form</field>
-        <field name="inherit_id" ref="equity.view_equity_ubo_form"/>
-        <field name="active" eval="True"/>
-        <field name="arch" type="xml">
-            <xpath expr="//h1" position="before">
-                <header invisible="not attachment_ids or not attachment_expiration_date">
-                    <button string="Update Owner ID" type="action" name="%(server_action_update_owner_id)d"/>
-                </header>
-            </xpath>
-        </field>
-    </record>
 
     <!-- Documents Document views-->
     <record id="document_document_kanban_view_inherited" model="ir.ui.view">
@@ -207,6 +176,20 @@
             <xpath expr="//button[@name='request_document']" position="replace">
                 <button invisible="x_has_chatter_message" name="request_document" type="object" string="Request" class="btn btn-primary" data-hotkey="q"/>
                 <button invisible="not x_has_chatter_message" name="%(server_action_request_document_with_chatter_message)d" type="action" string="Request" class="btn btn-primary" data-hotkey="q"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Documents Document views -->
+    <record id="documents_view_list_main" model="ir.ui.view">
+        <field name="name">documents.view.list.main.inherit.accounting.firm</field>
+        <field name="model">documents.document</field>
+        <field name="type">list</field>
+        <field name="inherit_id" ref="documents.documents_view_list_main"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tag_ids']" position="after">
+                <field name="x_id_expiration_date" placeholder="Expiration Date" optional="show" readonly="not attachment_id"/>
             </xpath>
         </field>
     </record>
