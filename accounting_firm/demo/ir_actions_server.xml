@@ -39,7 +39,7 @@ if quarter_tag := env['project.tags'].search([('name', 'ilike', quarter)], limit
     project_tasks.filtered(lambda t: quarter_tag in t.tag_ids).write({'stage_id': stage_2.id})
 
 # Assign admin user
-project_tasks.write({'user_ids': [env.ref('base.user_admin').id]})
+project_tasks.with_context(mail_auto_subscribe_no_notify=True).write({'user_ids': [env.ref('base.user_admin').id]})
 
 # Move customer onboarding tasks to stage 3
 onboarding_tasks = project_tasks.filtered(lambda t: 'customer onboarding' in (t.name or '').lower())
