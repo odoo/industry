@@ -60,11 +60,12 @@ for so in self: so['x_any_sol_bom'] = any(line.x_bom_id for line in so.order_lin
 
                 <field name="x_item_number" string="#"/>
                 <field name="product_id" readonly="1"/>
-                <field name="purchase_price"
-                    decoration-danger="purchase_price &lt; x_bom_cost"
+                <field name="purchase_price" widget="monetary" options="{'currency_field': 'currency_id', 'no_symbol': True}"
+                    decoration-danger="x_different_bom_cost and purchase_price &lt; x_bom_cost"
                     decoration-success="not x_different_bom_cost"
-                    decoration-warning="purchase_price &gt; x_bom_cost"
+                    decoration-warning="x_different_bom_cost and purchase_price &gt; x_bom_cost"
                 />
+                <field name="currency_id" column_invisible="True"/>
                 <field name="x_bom_cost" readonly="1"/>
 
                 <!-- have to add the group because purchase_price requires it -->
@@ -106,7 +107,7 @@ for so in self: so['x_any_sol_bom'] = any(line.x_bom_id for line in so.order_lin
         <field name="model_id" ref="sale.model_sale_order"/>
         <field name="state">code</field>
         <field name="code">
-for sol in record.order_line: sol['x_different_bom_cost'] = float_compare(sol.x_bom_id.x_bom_cost, sol.purchase_price, precision_digits=2) if sol.x_bom_id else False
+for sol in record.order_line: sol['x_different_bom_cost'] = sol.currency_id.compare_amounts(sol.x_bom_id.x_bom_cost, sol.purchase_price) if sol.x_bom_id else False
 
 action = env.ref('construction_developer.window_action_view_sale_order_line_bom_list').read()[0]
 action['domain'] = [('x_bom_id', '!=', False), ('id', 'in', record.order_line.ids)]
