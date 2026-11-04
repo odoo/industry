@@ -7,6 +7,7 @@
         'frontdesk_partnership',
         'knowledge',
         'loyalty',
+        'mass_mailing',
         'planning',
         'pos_restaurant',
         'sale_subscription',
@@ -38,7 +39,7 @@
         'data/appointment_type.xml',
         'data/appointment_resource.xml',
         'data/knowledge_tour.xml',
-        'data/ir_ui_menu.xml'
+        'data/ir_ui_menu.xml',
     ],
     'demo': [
         # The website record must come first: everything below resolves
@@ -47,6 +48,7 @@
         'demo/product_pricelist.xml',
         'demo/delivery_carrier.xml',
         'demo/res_company.xml',
+        'demo/resource_calendar.xml',
         'demo/product_pricelist_item.xml',
         'demo/res_partner.xml',
         'demo/hr_employee.xml',
@@ -62,6 +64,8 @@
         'demo/appointment_invite.xml',
         'demo/calendar_event.xml',
         'demo/appointment_booking_line.xml',
+        'demo/mailing_mailing.xml',
+        'demo/planning_shift_template_data.xml',
         # Website: views before the pages, server_actions last (it rewrites
         # the arch of the views the page files create).
         'demo/website/assets.xml',
