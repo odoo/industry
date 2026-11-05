@@ -1,6 +1,6 @@
 {
     'name': 'Talent Acquisition',
-    'version': '1.12',
+    'version': '1.13',
     'category': 'Services',
     'depends': [
         'account',
@@ -23,6 +23,7 @@
     ],
     'data': [
         'data/ir_module_module_dependency.xml',
+        'data/res_config_settings.xml',
         'data/ir_model.xml',
         'data/ir_access.xml',
         'data/ir_model_fields.xml',
@@ -37,6 +38,9 @@
         'data/ir_default.xml',
         'data/ir_ui_view.xml',
         'data/product_product.xml',
+        'data/product_pricelist.xml',
+        'data/sale_order_template.xml',
+        'data/sale_order_template_line.xml',
         'data/knowledge_cover.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
@@ -60,10 +64,12 @@
         'demo/crm_lead.xml',
         'demo/sale_order.xml',
         'demo/hr_job.xml',
+        'demo/hr_job_skill.xml',
         'demo/sale_order_line.xml',
         'demo/sale_order_confirm.xml',
         'demo/hr_talent_pool.xml',
         'demo/hr_applicant.xml',
+        'demo/hr_applicant_skill.xml',
         'demo/website_ir_attachment.xml',
         'demo/x_cv_sent_application.xml',
         'demo/mail_activity.xml',
