@@ -329,14 +329,16 @@ class TestEnv(IndustryCase):
 
     def _check_static_files_usage_in_xml(self, root, in_use_files):
         for element in root.iter():
-            file_names = {
-                element.attrib.get(key) for key in ["file", "src", "data-original-src"]
-            }
+            file_names = {element.attrib.get(key) for key in ["file", "src"]}
+
             if element.text:
-                if element.get("name") == "cover_properties":
-                    file_names.update(
-                        re.findall(r"url\(['\"]?([^'\")]+)['\"]?\)", element.text)
+                file_names.update(
+                    re.findall(
+                        r"url\((?:&quot;|['\"])?(/?[\w.-]+/static/[^'\")&?]+)",
+                        element.text,
                     )
+                )
+
                 file_names.update(re.findall(r'src="([^"]+)"', element.text))
 
             in_use_files.update(
@@ -1092,3 +1094,23 @@ class TestEnv(IndustryCase):
                         record_model,
                         file_name,
                     )
+
+    def _check_useless_html_attributes(self, root, file_name):
+        bad_attr = {
+            "data-original-src",
+            "data-original-id",
+            "data-mimetype-before-conversion",
+            "data-original-mimetype",
+            "data-attachment-id",
+        }
+        xpath_expr = " | ".join(
+            [f"//section[@{attr}] | //img[@{attr}]" for attr in bad_attr]
+        )
+        for element in root.xpath(xpath_expr):
+            _logger.warning(
+                "Useless HTML attribute '%s' found in <%s> in %s. "
+                "Remove unnecessary attributes added by studio or other tools.",
+                next(attr for attr in bad_attr if element.get(attr) is not None),
+                element.tag,
+                file_name,
+            )
