@@ -63,7 +63,6 @@
         'demo/appointment_type.xml',
         'demo/appointment_invite.xml',
         'demo/calendar_event.xml',
-        'demo/appointment_booking_line.xml',
         'demo/mailing_mailing.xml',
         'demo/planning_shift_template_data.xml',
         # Website: views before the pages, server_actions last (it rewrites
