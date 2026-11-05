@@ -48,6 +48,8 @@
         "demo/product_pricelist.xml",
         "demo/delivery_carrier.xml",
         "demo/res_company.xml",
+        "demo/res_config_settings.xml",
+        "demo/resource_calendar.xml",
         "demo/product_pricelist_item.xml",
         "demo/res_partner.xml",
         "demo/hr_employee.xml",
@@ -64,6 +66,7 @@
         "demo/calendar_event.xml",
         "demo/appointment_booking_line.xml",
         "demo/mailing_mailing.xml",
+        "demo/planning_shift_template_data.xml",
         # Website: views before the pages, server_actions last (it rewrites
         # the arch of the views the page files create).
         "demo/website/assets.xml",
