@@ -1,5 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from . import dashboard_case
 from . import industry_case
 from . import test_industry_mail_behavior
 from . import test_industry_requirements
