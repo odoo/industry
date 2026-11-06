@@ -50,21 +50,6 @@
         <field name="ttype">many2one</field>
         <field name="relation">res.partner</field>
     </record>
-
-    <!-- Res partner fields -->
-    <record id="x_id_expiration_date_field_res_partner" model="ir.model.fields">
-        <field name="name">x_id_expiration_date</field>
-        <field name="field_description">ID Expiration Date</field>
-        <field name="model_id" ref="base.model_res_partner"/>
-        <field name="ttype">date</field>
-    </record>
-    <record id="x_id_scan_field_res_partner" model="ir.model.fields">
-        <field name="name">x_id_scan</field>
-        <field name="field_description">Scan</field>
-        <field name="model_id" ref="base.model_res_partner"/>
-        <field name="ttype">binary</field>
-    </record>
-
     <record id="x_relation_nature_field_res_partner" model="ir.model.fields">
         <field name="name">x_relation_nature</field>
         <field name="field_description">Relation Nature</field>
@@ -288,5 +273,26 @@
         <field name="field_description">Is Identity Document Request</field>
         <field name="model_id" ref="documents.model_documents_document"/>
         <field name="ttype">boolean</field>
+    </record>
+    <record id="x_id_expiration_date_field_document_document" model="ir.model.fields">
+        <field name="name">x_id_expiration_date</field>
+        <field name="field_description">Expiration Date</field>
+        <field name="model_id" ref="documents.model_documents_document"/>
+        <field name="ttype">date</field>
+    </record>
+
+    <!-- Res Partner -->
+    <record id="x_identity_document_expiration_field_res_partner" model="ir.model.fields">
+        <field name="name">x_identity_document_expiration</field>
+        <field name="field_description">Identity Document Expiration</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="ttype">date</field>
+        <field name="readonly" eval="1"/>
+        <field name="depends">document_ids, document_ids.x_id_expiration_date, document_ids.tag_ids</field>
+        <field name="compute"><![CDATA[
+tag = self.env.ref('accounting_firm.documents_tag_1', raise_if_not_found=False)
+for record in self:
+    record['x_identity_document_expiration'] = max(record.document_ids.filtered(lambda doc: doc.x_id_expiration_date and tag in doc.tag_ids).mapped('x_id_expiration_date'), default=False)
+        ]]></field>
     </record>
 </odoo>
