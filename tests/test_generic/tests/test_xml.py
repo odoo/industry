@@ -113,6 +113,37 @@ RISKY_FIELDS = {
     "filter_pre_domain",
 }
 
+# https://www.odoo.com/contactus
+ODOO_PHONE_NUMBERS = {
+    '6506913277',  # +1 650 691 3277 (United States)
+    '7162492880',  # +1 716 249 2880 (United States)
+    '9293526366',  # +1 929 352 6366 (United States, former office)
+    '22903490',  # +32 2 290 34 90 (Belgium)
+    '26168002',  # +32 2 616 80 02 (Belgium)
+    '33615430',  # +32 3 361 54 30 (Belgium)
+    '81813700',  # +32 81 81 37 00 (Belgium, former number)
+    '30138830190',  # +49 30 138 830 190 (Germany)
+    '0299944460',  # +39 029 994 4460 (Italy)
+    '207640404',  # +254 20 7640404 (Kenya)
+    '20211452',  # +352 20 21 14 52 (Luxembourg)
+    '911870700',  # +34 911 870 700 (Spain)
+    '44987800',  # +971 4 498 7800 (United Arab Emirates)
+    '428770103',  # +33 4 28 77 01 03 (France)
+    '1150771930',  # +54 11 5077 1930 (Argentina)
+    '4135424471',  # +55 41 3542 4471 (Brazil)
+    '232783816',  # +56 2 3278 3816 (Chile)
+    '15088900',  # +57 1 508 8900 (Colombia)
+    '5550816564',  # +52 55 5081 6564 (Mexico)
+    '17050298',  # +51 1 705 0298 (Peru)
+    '958678959',  # +593 95 867 8959 (Ecuador)
+    '26329300',  # +852 2632 9300 (Hong Kong)
+    '7940500100',  # +91 79 4050 0100 (India)
+    '2139732863',  # +62 21 3973 2863 (Indonesia)
+    '416922428',  # +61 416 922 428 (Australia)
+}
+PHONE_NUMBER_RE = re.compile(r'[+(]?\d(?:[\d().\-/ ]|%20)*\d')
+ODOO_EMAIL_RE = re.compile(r'[\w.+-]+@odoo\.com\b', re.IGNORECASE)
+
 MODULE_PO_FILE_DICT = {}
 
 
@@ -215,6 +246,7 @@ class TestEnv(IndustryCase):
                     return
 
                 self._check_xml_style(decoded_content, tree, module, file_name)
+                self._check_odoo_contact_data(decoded_content, file_name)
                 self._check_forcecreate_external_xmlid(tree, file_name, module)
                 self._check_update_status(tree, file_name)
                 self._check_trigger_field_ids_is_set(tree, file_name)
@@ -831,6 +863,19 @@ class TestEnv(IndustryCase):
                     file_name,
                     expr,
                 )
+
+    def _check_odoo_contact_data(self, s, file_name):
+        found = {match.group() for match in ODOO_EMAIL_RE.finditer(s)}
+        for match in PHONE_NUMBER_RE.finditer(s):
+            digits = re.sub(r'\D', '', match.group().replace('%20', ''))
+            if any(digits.endswith(number) for number in ODOO_PHONE_NUMBERS):
+                found.add(match.group())
+        if found:
+            _logger.warning(
+                "Real Odoo phone numbers or emails found in %s: %s. Demo data must only use fake ones.",
+                file_name,
+                ', '.join(sorted(found)),
+            )
 
     def _check_portal_login_is_email(self, root, file_name):
         for record in root.xpath("//record[@model='res.users']"):
