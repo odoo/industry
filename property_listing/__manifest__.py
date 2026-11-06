@@ -12,6 +12,7 @@
     ],
     'data': [
         'data/ir_module_module_dependency.xml',
+        'data/product_base_unit.xml',
         'data/ir_model.xml',
         'data/ir_access.xml',
         'data/ir_model_fields.xml',
@@ -24,6 +25,7 @@
         'data/product_category.xml',
         'data/ir_ui_view.xml',
         'data/res_config_settings.xml',
+        'data/product_attribute_category.xml',
         'data/product_attribute.xml',
         'data/product_attribute_value.xml',
         'data/base_automation.xml',
