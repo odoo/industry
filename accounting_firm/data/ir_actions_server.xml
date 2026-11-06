@@ -105,4 +105,15 @@ action = {
 }
 ]]></field>
     </record>
+    <record id="action_server_send_mandate_request" model="ir.actions.server">
+        <field name="name">Accounting Firm: Send Mandate Request Email</field>
+        <field name="model_id" ref="x_customer_mandate_model"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+template = env.ref('accounting_firm.mail_template_mandate_request_completion')
+for customer_mandate in records:
+    message = customer_mandate.message_post_with_source(template, message_type='auto_comment', subtype_xmlid='mail.mt_comment', partner_ids=customer_mandate.x_mandated.partner_id.ids)
+    customer_mandate.x_partner_id.message_post(body=message.body, subject=message.subject, message_type='auto_comment', subtype_xmlid='mail.mt_comment', notify_skip_followers=True)
+]]></field>
+    </record>
 </odoo>
