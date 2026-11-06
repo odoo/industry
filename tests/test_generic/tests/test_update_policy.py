@@ -41,8 +41,11 @@ MODELS_TO_FORCECREATE = MODELS_TO_UPDATE.union({
 })
 
 # records referenced in a server action, an automation or a computed field:
-# they must be created again when missing, TO BE REMOVED
+# they must be created again when missing, or records that we prefer not to
+# create again
+# TODO find a better approach than this hardcoded list
 FORCECREATE_EXCEPTIONS = {
+    "accounting_firm.default_x_mandate_x_mail_template_id",
     "agri_equipment_rental.stock_location_18",
     "architects.crm_stage_5",
     "booking_engine.project_task_type_17",
