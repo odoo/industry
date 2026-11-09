@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Environmental Agency - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code">
+website = env.ref('environmental_agency.website_industry')
+
+to_deactivate = [
+    # Presets
+    'website.footer_custom',
+    'website.header_text_element',
+    'website.header_visibility_standard',
+    'website.template_header_default',
+    # Default static pages
+    'website.homepage',
+    'website.contactus',
+]
+
+to_activate = [
+    'website.header_navbar_pills_style',
+    'website.header_visibility_fixed',
+    'website.template_footer_descriptive',
+    'website.template_header_boxed',
+    'website.template_header_navlink_no_background',
+    'website_appointment.opt_appointments_index_pictures',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+# Requests sent through the website forms go to a dedicated team. It doesn't
+# use leads, so they are created as opportunities until the Leads setting is
+# enabled (which turns on leads on every team).
+if 'crm_default_team_id' in website._fields:
+    website.write({'crm_default_team_id': env.ref('environmental_agency.crm_team_1').id})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
+
+# Menu items added by installed modules
+menus.search(base_domain + [('url', 'in', ['/appointment', '/shop', '/event'])]).unlink()
+
+# Menu items of the design, in navbar order.
+for name, url, sequence in [
+    ('Home', '/', 10),
+    ('Contact us', '/contactus', 20),
+]:
+    menu = menus.search(base_domain + [('url', '=', url)], limit=1)
+    if menu:
+        menu.write({'name': name, 'sequence': sequence})
+    else:
+        menus.create({
+            'name': name,
+            'url': url,
+            'sequence': sequence,
+            'website_id': website.id,
+            'parent_id': top_menu.id if top_menu else False,
+        })
+        </field>
+    </record>
+
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
