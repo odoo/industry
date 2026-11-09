@@ -50,6 +50,7 @@
     'demo': [
         'demo/res_company.xml',
         'demo/res_partner.xml',
+        'demo/hr_job.xml',
         'demo/hr_employee.xml',
         'demo/frontdesk_frontdesk.xml',
         'demo/appointment_type.xml',

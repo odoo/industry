@@ -44,6 +44,7 @@
         'demo/appointment_type.xml',
         'demo/sale_order.xml',
         'demo/sale_order_post.xml',
+        'demo/hr_job.xml',
         'demo/hr_employee.xml',
         'demo/website_view.xml',
         'demo/website_theme_apply.xml',

@@ -56,6 +56,7 @@
         'demo/crm_lead.xml',
         'demo/equity_ubo.xml',
         'demo/hr_department.xml',
+        'demo/hr_job.xml',
         'demo/hr_employee.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',

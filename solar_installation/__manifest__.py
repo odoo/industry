@@ -54,6 +54,7 @@
     'demo': [
         'demo/res_company.xml',
         'demo/res_partner.xml',
+        'demo/hr_job.xml',
         'demo/hr_employee.xml',
         'demo/crm_tag.xml',
         'demo/crm_lead.xml',

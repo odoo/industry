@@ -14,6 +14,7 @@
         'data/res_partner_category.xml',
     ],
     'demo': [
+        'demo/hr_job.xml',
         'demo/hr_employee.xml',
         'demo/ir_cron.xml',
         'demo/res_users.xml',

@@ -40,6 +40,7 @@
         'demo/crm_tag.xml',
         'demo/res_company.xml',
         'demo/hr_department.xml',
+        'demo/hr_job.xml',
         'demo/hr_employee.xml',
         'demo/resource_resource.xml',
         'demo/crm_lead.xml',
