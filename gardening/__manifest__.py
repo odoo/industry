@@ -35,6 +35,7 @@
         'demo/res_user.xml',
         'demo/account_analytic_account.xml',
         'demo/crm_lead.xml',
+        'demo/hr_job.xml',
         'demo/hr_employee.xml',
         'demo/product_supplierinfo.xml',
         'demo/project_project.xml',

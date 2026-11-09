@@ -48,6 +48,7 @@
         'demo/crm_team.xml',
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
+        'demo/hr_job.xml',
         'demo/hr_employee.xml',
         'demo/event_tag.xml',
         'demo/ir_attachment.xml',

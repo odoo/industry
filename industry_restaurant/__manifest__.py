@@ -40,6 +40,7 @@
         'demo/pos_payment_method.xml',
         'demo/payment_provider_demo_post.xml',
         'demo/res_partner.xml',
+        'demo/hr_job.xml',
         'demo/hr_employee.xml',
         'demo/planning_role.xml',
         'demo/planning_slot_templates.xml',

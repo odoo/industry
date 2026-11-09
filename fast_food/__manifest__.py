@@ -34,6 +34,7 @@
         'demo/res_company.xml',
         'demo/pos_payment_method.xml',
         'demo/res_partner.xml',
+        'demo/hr_job.xml',
         'demo/hr_employee.xml',
         'demo/loyalty_program.xml',
         'demo/kitchen_display.xml',

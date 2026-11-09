@@ -42,6 +42,7 @@
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/mail_activity.xml',
+        'demo/hr_job.xml',
         'demo/hr_employee.xml',
         'demo/planning_recurrency.xml',
         'demo/sale_order.xml',

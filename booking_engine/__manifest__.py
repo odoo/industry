@@ -49,6 +49,7 @@
         'data/spreadsheet_dashboard.xml',
     ],
     'demo': [
+        'demo/hr_job.xml',
         'demo/hr_employee.xml',
         'demo/website_menu.xml',
         'demo/payment_provider_demo.xml',
