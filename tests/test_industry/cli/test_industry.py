@@ -102,7 +102,7 @@ class Test_Industry(Command):
                         with_demo = res.industry_demo
                         _logger.info('Loading module %s into database %s %s', industry_module, target_db, with_demo and 'with demo data' or '')
                         zip_content = utils.IndustryUtils().get_zip(industry_module)
-                        env['ir.module.module']._import_zipfile(zip_content, force=False, with_demo=with_demo)
+                        env['ir.module.module'].with_context(data_module=True)._import_zipfile(zip_content, force=False, with_demo=with_demo)
                         env.cr.commit()
                 if test_enable:
                     try:
