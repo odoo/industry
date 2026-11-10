@@ -40,6 +40,7 @@
         'data/appointment_resource.xml',
         'data/knowledge_tour.xml',
         'data/ir_ui_menu.xml',
+        'data/planning_shift_template_data.xml',
     ],
     'demo': [
         # The website record must come first: everything below resolves
@@ -48,7 +49,6 @@
         'demo/product_pricelist.xml',
         'demo/delivery_carrier.xml',
         'demo/res_company.xml',
-        'demo/resource_calendar.xml',
         'demo/product_pricelist_item.xml',
         'demo/res_partner.xml',
         'demo/hr_employee.xml',
