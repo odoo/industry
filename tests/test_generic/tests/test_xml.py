@@ -2,6 +2,7 @@
 
 import ast
 import html
+import json
 import logging
 import os
 import pathlib
@@ -221,7 +222,10 @@ class TestEnv(IndustryCase):
                 ext = os.path.splitext(file_path)[1].lower()
                 if 'static/' in file_path and not any(p in file_path for p in ['src/js/', 'src/widget', 'src/scss', 'src/css', 'src/xml']):
                     static_files.add(os.path.relpath(file_path, start=get_industry_path()))
-                if ext not in ['.py', '.xml']:
+                if ext == '.json':
+                    self._check_static_ids_in_dashboard_file(file_name, file_path, module)
+                    continue
+                elif ext not in ['.py', '.xml']:
                     continue
                 if os.path.getsize(file_path) > MAX_FILE_SIZE:
                     raise "Max file size exceeded"
@@ -314,6 +318,139 @@ class TestEnv(IndustryCase):
                 }
             )
 
+<<<<<<< 37dcfef32935333407c3f7954f3d8cb7ffeef1c6
+||||||| ae40dbbbd305af232a2ecd5a3217f5e8d988a94e
+    def _check_attachment_usage_in_xml(self, module, xml_files):
+        """Warn about ir.attachment records that are never referenced in the module.
+
+        An attachment is considered used when its xmlid appears as a reference
+        (``ref="xmlid"``, ``ref('xmlid')``, ``%(xmlid)d``) or as a module-qualified
+        xmlid (e.g. ``/web/image/module.xmlid``) in any XML file of the module.
+        It is also considered used when its ``key`` is referenced through
+        ``/web/image/<key>``, ``/web/content/<key>`` or
+        ``/web_editor/image_shape/<key>/...``, since the website resolves
+        those urls on the attachment ``key``.
+        Records overriding an attachment of another module (e.g.
+        ``id="other_module.xmlid"``) are skipped: their usage is checked in
+        the module owning them.
+        """
+        all_content = "\n".join(content for _tree, content in xml_files.values())
+        for file_name, (root, _content) in xml_files.items():
+            for element in root.xpath("//record[@model='ir.attachment']"):
+                element_id = element.get("id")
+                if not element_id:
+                    _logger.warning("Found ir.attachment record without an id in %s/%s.", module, file_name)
+                    continue
+                if element.xpath(
+                    "field[@name='res_model'][normalize-space()]"
+                    " and field[@name='res_id'][@ref or @eval or @search or normalize-space()]",
+                ):
+                    # This attachment is linked to a specific record, so it is not considered unused.
+                    continue
+                xmlid_module, _dot, xmlid = element_id.rpartition(".")
+                if xmlid_module and xmlid_module != module:
+                    # This record overrides an attachment of another module, which is responsible for using it.
+                    continue
+                usage_re = (
+                    rf"""(?:\bref=["']|\bref\(\s*["']|%\()(?:{re.escape(module)}\.)?{re.escape(xmlid)}\b"""
+                    rf"""|(?<![\w.]){re.escape(module)}\.{re.escape(xmlid)}\b"""
+                )
+                if key := element.xpath("string(field[@name='key'])").strip():
+                    usage_re += rf"""|/(?:web/image|web/content|(?:web|html)_editor/image_shape)/{re.escape(key)}(?![\w.])"""
+                if not re.search(usage_re, all_content):
+                    _logger.warning(
+                        "Unused attachment %s defined in %s/%s.",
+                        element_id,
+                        module,
+                        file_name,
+                    )
+
+=======
+    def _check_attachment_usage_in_xml(self, module, xml_files):
+        """Warn about ir.attachment records that are never referenced in the module.
+
+        An attachment is considered used when its xmlid appears as a reference
+        (``ref="xmlid"``, ``ref('xmlid')``, ``%(xmlid)d``) or as a module-qualified
+        xmlid (e.g. ``/web/image/module.xmlid``) in any XML file of the module.
+        It is also considered used when its ``key`` is referenced through
+        ``/web/image/<key>``, ``/web/content/<key>`` or
+        ``/web_editor/image_shape/<key>/...``, since the website resolves
+        those urls on the attachment ``key``.
+        Records overriding an attachment of another module (e.g.
+        ``id="other_module.xmlid"``) are skipped: their usage is checked in
+        the module owning them.
+        """
+        all_content = "\n".join(content for _tree, content in xml_files.values())
+        for file_name, (root, _content) in xml_files.items():
+            for element in root.xpath("//record[@model='ir.attachment']"):
+                element_id = element.get("id")
+                if not element_id:
+                    _logger.warning("Found ir.attachment record without an id in %s/%s.", module, file_name)
+                    continue
+                if element.xpath(
+                    "field[@name='res_model'][normalize-space()]"
+                    " and field[@name='res_id'][@ref or @eval or @search or normalize-space()]",
+                ):
+                    # This attachment is linked to a specific record, so it is not considered unused.
+                    continue
+                xmlid_module, _dot, xmlid = element_id.rpartition(".")
+                if xmlid_module and xmlid_module != module:
+                    # This record overrides an attachment of another module, which is responsible for using it.
+                    continue
+                usage_re = (
+                    rf"""(?:\bref=["']|\bref\(\s*["']|%\()(?:{re.escape(module)}\.)?{re.escape(xmlid)}\b"""
+                    rf"""|(?<![\w.]){re.escape(module)}\.{re.escape(xmlid)}\b"""
+                )
+                if key := element.xpath("string(field[@name='key'])").strip():
+                    usage_re += rf"""|/(?:web/image|web/content|(?:web|html)_editor/image_shape)/{re.escape(key)}(?![\w.])"""
+                if not re.search(usage_re, all_content):
+                    _logger.warning(
+                        "Unused attachment %s defined in %s/%s.",
+                        element_id,
+                        module,
+                        file_name,
+                    )
+
+    def _check_static_ids_in_dashboard_file(self, filename, file_path, module):
+
+        invalid_domain_rules = []
+
+        def check_nodes(node):
+            if isinstance(node, dict):
+                for key, value in node.items():
+                    if key == "domain" and isinstance(value, list):
+                        for domain_rule in value:
+                            if not isinstance(domain_rule, (list, tuple)) or len(domain_rule) != 3:
+                                continue
+                            if (domain_rule[0].endswith(('id', 'ids'))) and \
+                                ((isinstance(domain_rule[2], int) and not isinstance(domain_rule[2], bool)) or
+                                (isinstance(domain_rule[2], list) and any(isinstance(val, int) for val in domain_rule[2]))):
+                                invalid_domain_rules.append(domain_rule)
+                    elif key == "context" and isinstance(value, dict):
+                        for ctx_key, ctx_value in value.items():
+                            if (ctx_key.endswith(('id', 'ids'))) and \
+                                ((isinstance(ctx_value, int) and not isinstance(ctx_value, bool)) or
+                                (isinstance(ctx_value, list) and any(isinstance(val, int) for val in ctx_value))):
+                                invalid_domain_rules.append(domain_rule)
+                    check_nodes(value)
+            elif isinstance(node, list):
+                for item in node:
+                    check_nodes(item)
+
+        with open(file_path, encoding="utf-8") as file:
+            data = json.load(file)
+            if all(key in data for key in ["sheets", "pivots", "lists"]):  # Proves this json is used as a dashboard
+                check_nodes(data)
+
+            if invalid_domain_rules:
+                _logger.warning("Static ids were found for the domain rules %s in the file %s from %s."
+                " Remove them by not using ids for the domain, or injecting the ids from a write function after loading the dashboard record.",
+                invalid_domain_rules,
+                filename,
+                module
+            )
+
+>>>>>>> 0c659696ca3b5bae4d8d61e6943c3503be986c04
     def _check_index_html_images(self, module):
         desc_path = os.path.join(get_industry_path(), module, "description", "index.html")
         if not os.path.isfile(desc_path):

@@ -1,6 +1,6 @@
 {
     'name': 'Metal Fabricator',
-    'version': '1.1',
+    'version': '1.2',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
@@ -24,7 +24,6 @@
         'data/project_task.xml',
         'data/stock_route.xml',
         'data/product_product.xml',
-        'data/sale_order_spreadsheet.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
         'data/crm_lead.xml',
@@ -36,6 +35,8 @@
         'demo/res_partner.xml',
         'demo/crm_lead.xml',
         'demo/product_supplierinfo.xml',
+        'demo/sale_order_spreadsheet.xml',
+        'demo/sale_order_template.xml',
         'demo/product_product.xml',
         'demo/sale_order.xml',
         'demo/sale_order_line.xml',

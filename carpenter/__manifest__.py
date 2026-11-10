@@ -1,5 +1,6 @@
 {
     'name': 'Carpenter',
+    'version': '1.1',
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
@@ -23,7 +24,6 @@
         'data/project_task.xml',
         'data/stock_route.xml',
         'data/product_product.xml',
-        'data/sale_order_spreadsheet.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
         'data/mail_message.xml',
