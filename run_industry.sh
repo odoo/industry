@@ -204,7 +204,7 @@ if $INSTALL; then
   echo "Initializing industry module..."
   run_odoo_shell_script "$DB_NAME" \
     "zip = IndustryUtils().get_zip('$INDUSTRY_NAME')" \
-    "env['ir.module.module']._import_zipfile(zip, force=False, with_demo=$DEMO)"
+    "env['ir.module.module'].with_context(data_module=True)._import_zipfile(zip, force=False, with_demo=$DEMO)"
 fi
 
 if $TEST; then
