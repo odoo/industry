@@ -4,11 +4,27 @@
     <record id="planning_slot_morning" model="planning.slot">
         <field name="name">Morning Shift</field>
         <field name="role_id" ref="planning_role_1"/>
+        <field name="template_id" ref="planning.planning_slot_template_morning"/>
         <field name="start_datetime" model="res.users" eval="
-            (DateTime.today() + relativedelta(hours=8)).replace(tzinfo=pytz.timezone(obj().env.ref('base.user_admin').tz or 'Europe/Brussels')).astimezone(pytz.UTC).replace(tzinfo=None)
+            (DateTime.today().date() + relativedelta(hours=6)).replace(tzinfo=pytz.timezone(obj().env.ref('base.user_admin').tz or 'Europe/Brussels')).astimezone(pytz.UTC).replace(tzinfo=None)
         "/>
         <field name="end_datetime" model="res.users" eval="
-            (DateTime.today() + relativedelta(hours=15, minutes=30)).replace(tzinfo=pytz.timezone(obj().env.ref('base.user_admin').tz or 'Europe/Brussels')).astimezone(pytz.UTC).replace(tzinfo=None)
+            (DateTime.today().date() + relativedelta(hours=14)).replace(tzinfo=pytz.timezone(obj().env.ref('base.user_admin').tz or 'Europe/Brussels')).astimezone(pytz.UTC).replace(tzinfo=None)
+        "/>
+        <field name="repeat" eval="True"/>
+        <field name="repeat_interval">1</field>
+        <field name="repeat_unit">day</field>
+    </record>
+
+    <record id="planning_slot_noon" model="planning.slot">
+        <field name="name">Day Shift</field>
+        <field name="role_id" ref="planning_role_1"/>
+        <field name="template_id" ref="planning.planning_slot_template_standard"/>
+        <field name="start_datetime" model="res.users" eval="
+            (DateTime.today().date() + relativedelta(hours=9)).replace(tzinfo=pytz.timezone(obj().env.ref('base.user_admin').tz or 'Europe/Brussels')).astimezone(pytz.UTC).replace(tzinfo=None)
+        "/>
+        <field name="end_datetime" model="res.users" eval="
+            (DateTime.today().date() + relativedelta(hours=17)).replace(tzinfo=pytz.timezone(obj().env.ref('base.user_admin').tz or 'Europe/Brussels')).astimezone(pytz.UTC).replace(tzinfo=None)
         "/>
         <field name="repeat" eval="True"/>
         <field name="repeat_interval">1</field>
@@ -18,15 +34,27 @@
     <record id="planning_slot_afternoon" model="planning.slot">
         <field name="name">Afternoon Shift</field>
         <field name="role_id" ref="planning_role_1"/>
+        <field name="template_id" ref="planning.planning_slot_template_afternoon"/>
         <field name="start_datetime" model="res.users" eval="
-            (DateTime.today() + relativedelta(hours=15, minutes=30)).replace(tzinfo=pytz.timezone(obj().env.ref('base.user_admin').tz or 'Europe/Brussels')).astimezone(pytz.UTC).replace(tzinfo=None)
+            (DateTime.today().date() + relativedelta(hours=14)).replace(tzinfo=pytz.timezone(obj().env.ref('base.user_admin').tz or 'Europe/Brussels')).astimezone(pytz.UTC).replace(tzinfo=None)
         "/>
         <field name="end_datetime" model="res.users" eval="
-            (DateTime.today() + relativedelta(hours=23)).replace(tzinfo=pytz.timezone(obj().env.ref('base.user_admin').tz or 'Europe/Brussels')).astimezone(pytz.UTC).replace(tzinfo=None)
+            (DateTime.today().date() + relativedelta(hours=23)).replace(tzinfo=pytz.timezone(obj().env.ref('base.user_admin').tz or 'Europe/Brussels')).astimezone(pytz.UTC).replace(tzinfo=None)
         "/>
         <field name="repeat" eval="True"/>
         <field name="repeat_interval">1</field>
         <field name="repeat_unit">day</field>
     </record>
+
+    <!-- Auto-plan the open shifts created above -->
+    <function name="auto_plan_ids" model="planning.slot" context="{'planning_slot_id': ref('planning_slot_morning')}">
+        <value eval="[]"/>
+    </function>
+    <function name="auto_plan_ids" model="planning.slot" context="{'planning_slot_id': ref('planning_slot_noon')}">
+        <value eval="[]"/>
+    </function>
+    <function name="auto_plan_ids" model="planning.slot" context="{'planning_slot_id': ref('planning_slot_afternoon')}">
+        <value eval="[]"/>
+    </function>
 
 </odoo>
