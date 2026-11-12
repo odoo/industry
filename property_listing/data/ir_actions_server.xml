@@ -6,7 +6,10 @@
         <field name="name">Create Technical Partner</field>
         <field name="usage">base_automation</field>
         <field name="code"><![CDATA[
-for record in records: record['x_technical_partner_id'] = env['res.partner'].create({'name': record.name, 'street': record.x_street,  'zip': record.x_zip_code, 'city': record.x_city, 'country_id': record.x_country.id, 'x_is_technical_partner': True}).id
+for record in records:
+    address = {'street': record.x_street, 'zip': record.x_zip_code, 'city': record.x_city, 'country_id': record.x_country.id}
+    if record.x_technical_partner_id: record.x_technical_partner_id.write(address)
+    else: record['x_technical_partner_id'] = env['res.partner'].create({'name': record.name, 'x_is_technical_partner': True, **address}).id
           ]]></field>
     </record>
     <record id="update_is_published_server_action" model="ir.actions.server">
