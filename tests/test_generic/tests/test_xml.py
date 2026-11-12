@@ -337,13 +337,19 @@ class TestEnv(IndustryCase):
             for element in root.xpath("//record[@model='ir.attachment']"):
                 element_id = element.get("id")
                 if not element_id:
+                    _logger.warning("Found ir.attachment record without an id in %s/%s.", module, file_name)
+                    continue
+                if element.xpath(
+                    "field[@name='res_model'][normalize-space()]"
+                    " and field[@name='res_id'][@ref or @eval or @search or normalize-space()]",
+                ):
+                    # This attachment is linked to a specific record, so it is not considered unused.
                     continue
                 xmlid = element_id.split(".")[-1]
                 usage_re = (
                     rf"""(?:\bref=["']|\bref\(\s*["']|%\()(?:{re.escape(module)}\.)?{re.escape(xmlid)}\b"""
                     rf"""|(?<![\w.]){re.escape(module)}\.{re.escape(xmlid)}\b"""
                 )
-                _logger.info("Checking usage of attachment %s in %s/%s", element_id, module, file_name)
                 if not re.search(usage_re, all_content):
                     _logger.warning(
                         "Unused attachment %s defined in %s/%s.",
