@@ -51,7 +51,7 @@ class BookingEngineAutomationsTestCase(TransactionCase):
         cls.stage_ready = cls.env.ref('booking_engine.project_task_type_18')
         cls.today = Datetime.today()
         cls.env["res.config.settings"].create({
-            'x_module_house_keeping': True,
+            'x_setting_house_keeping': True,
             'x_setting_steering': True,
         }).execute()
 
