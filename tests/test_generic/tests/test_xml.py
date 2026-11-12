@@ -214,6 +214,7 @@ class TestEnv(IndustryCase):
         in_use_files = set()
         checked_records_with_user = {}
         manifest_content = None
+        xml_files = {}
         with_demo = self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1)
         for root, dirs, files in os.walk(path):
             # sort the directory by alphabetical order so static directory is read first.
@@ -246,6 +247,7 @@ class TestEnv(IndustryCase):
                 except etree.XMLSyntaxError as e:
                     _logger.error("XML syntax error in file %s: %s", file_name, e)
                     return
+                xml_files[os.path.relpath(file_path, path)] = (tree, decoded_content)
 
                 self._check_xml_style(decoded_content, tree, module, file_name)
                 self._check_odoo_contact_data(decoded_content, file_name)
@@ -299,6 +301,7 @@ class TestEnv(IndustryCase):
                     _logger.warning("Unused static file: %s.", file)
             for file in in_use_files - static_files:
                 _logger.warning("No reference found for this file: %s.", file)
+            self._check_attachment_usage_in_xml(module, xml_files)
 
     def _check_static_files_usage_in_xml(self, root, in_use_files):
         for element in root.iter():
@@ -321,6 +324,33 @@ class TestEnv(IndustryCase):
                     if file and not file.startswith(('web', '/web', 'https', '/unsplash'))
                 },
             )
+
+    def _check_attachment_usage_in_xml(self, module, xml_files):
+        """Warn about ir.attachment records that are never referenced in the module.
+
+        An attachment is considered used when its xmlid appears as a reference
+        (``ref="xmlid"``, ``ref('xmlid')``, ``%(xmlid)d``) or as a module-qualified
+        xmlid (e.g. ``/web/image/module.xmlid``) in any XML file of the module.
+        """
+        all_content = "\n".join(content for _tree, content in xml_files.values())
+        for file_name, (root, _content) in xml_files.items():
+            for element in root.xpath("//record[@model='ir.attachment']"):
+                element_id = element.get("id")
+                if not element_id:
+                    continue
+                xmlid = element_id.split(".")[-1]
+                usage_re = (
+                    rf"""(?:\bref=["']|\bref\(\s*["']|%\()(?:{re.escape(module)}\.)?{re.escape(xmlid)}\b"""
+                    rf"""|(?<![\w.]){re.escape(module)}\.{re.escape(xmlid)}\b"""
+                )
+                _logger.info("Checking usage of attachment %s in %s/%s", element_id, module, file_name)
+                if not re.search(usage_re, all_content):
+                    _logger.warning(
+                        "Unused attachment %s defined in %s/%s.",
+                        element_id,
+                        module,
+                        file_name,
+                    )
 
     def _check_index_html_images(self, module):
         desc_path = os.path.join(get_industry_path(), module, "description", "index.html")
