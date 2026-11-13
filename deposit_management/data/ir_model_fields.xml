@@ -112,6 +112,16 @@ self['x_deposit_categ_id'] = self.env['product.category'].search([('x_is_a_depos
         <field name="ttype">boolean</field>
         <field name="readonly" eval="True"/>
     </record>
+    <record id="sale_order_line_x_currency_id_field" model="ir.model.fields">
+        <field name="name">x_currency_id</field>
+        <field name="field_description">Currency </field>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.currency</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="related">order_id.currency_id</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
     <record id="sale_order_line_total_deposits_field" model="ir.model.fields">
         <field name="name">x_total_deposits</field>
         <field name="field_description">Deposits</field>
@@ -123,7 +133,7 @@ self['x_deposit_categ_id'] = self.env['product.category'].search([('x_is_a_depos
         record['x_total_deposits'] = deposit * record.product_uom_qty]]></field>
         <field name="readonly" eval="True"/>
         <field name="store" eval="False"/>
-        <field name="currency_field">currency_id</field>
+        <field name="currency_field">x_currency_id</field>
     </record>
     <record id="sale_order_has_deposit_line_field" model="ir.model.fields">
         <field name="name">x_has_deposit_line</field>
@@ -136,6 +146,16 @@ for record in self:
     record['x_has_deposit_line'] = any(line.x_total_deposits for line in record.order_line)]]></field>
         <field name="store" eval="False"/>
     </record>
+    <record id="account_move_line_x_company_currency_id_field" model="ir.model.fields">
+        <field name="name">x_company_currency_id</field>
+        <field name="field_description">Company Currency </field>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.currency</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="related">company_currency_id</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
     <record id="account_move_line_total_deposits_field" model="ir.model.fields">
         <field name="name">x_total_deposits_account_move</field>
         <field name="field_description">Deposits</field>
@@ -146,7 +166,7 @@ for record in self:
         deposit = sum(tax.amount for tax in record.tax_ids if tax.x_is_deposit)
         record['x_total_deposits_account_move'] = deposit * record.quantity]]></field>
         <field name="readonly" eval="True"/>
-        <field name="currency_field">company_currency_id</field>
+        <field name="currency_field">x_company_currency_id</field>
     </record>
     <record id="account_move_has_deposit_line_field" model="ir.model.fields">
         <field name="name">x_has_deposit_line</field>
