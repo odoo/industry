@@ -5,14 +5,16 @@ import html
 import logging
 import os
 import pathlib
-import polib
 import re
 import sys
 from collections import defaultdict
+
+import polib
 from lxml import etree
 
 from odoo.modules import get_module_path
 from odoo.tools.mail import single_email_re
+
 from .industry_case import IndustryCase, get_industry_path
 
 sys.path.append(pathlib.Path(__file__).parent.parent.parent.parent.as_posix())
@@ -29,7 +31,7 @@ USELESS_FIELDS = {
     'account.analytic.plan': ['color'],
     'crm.lead': [
         'city', 'street', 'zip', 'state_id', 'country_id', 'email', 'email_from', 'mobile', 'contact_name',
-        'partner_name', 'title', 'function', 'website', 'street2', 'phone', 'company_id'
+        'partner_name', 'title', 'function', 'website', 'street2', 'phone', 'company_id',
     ],
     'crm.tag': ['color'],
     'hr.applicant': ['last_stage_id'],
@@ -54,7 +56,7 @@ USELESS_FIELDS = {
     'res.partner': ['tz'],
     'sale.order': [
         'access_token', 'date_order', 'health', 'origin', 'partner_invoice_id',
-        'validity_date', 'warehouse_id', 'company_id'
+        'validity_date', 'warehouse_id', 'company_id',
     ],
     'sale.order.line': ['qty_delivered', 'company_id'],
     'sign.template': ['name'],
@@ -212,6 +214,7 @@ class TestEnv(IndustryCase):
         in_use_files = set()
         checked_records_with_user = {}
         manifest_content = None
+        xml_files = {}
         with_demo = self.env['ir.module.module'].search_count([('demo', '=', True)], limit=1)
         for root, dirs, files in os.walk(path):
             # sort the directory by alphabetical order so static directory is read first.
@@ -244,6 +247,7 @@ class TestEnv(IndustryCase):
                 except etree.XMLSyntaxError as e:
                     _logger.error("XML syntax error in file %s: %s", file_name, e)
                     return
+                xml_files[os.path.relpath(file_path, path)] = (tree, decoded_content)
 
                 self._check_xml_style(decoded_content, tree, module, file_name)
                 self._check_odoo_contact_data(decoded_content, file_name)
@@ -297,13 +301,20 @@ class TestEnv(IndustryCase):
                     _logger.warning("Unused static file: %s.", file)
             for file in in_use_files - static_files:
                 _logger.warning("No reference found for this file: %s.", file)
+            self._check_attachment_usage_in_xml(module, xml_files)
 
     def _check_static_files_usage_in_xml(self, root, in_use_files):
         for element in root.iter():
-            file_names = {element.attrib.get(key) for key in ['file', 'src', 'data-original-src']}
+            file_names = {element.attrib.get(key) for key in ["file", "src"]}
+
             if element.text:
-                if element.get("name") == "cover_properties":
-                    file_names.update(re.findall(r"url\(['\"]?([^'\")]+)['\"]?\)", element.text))
+                file_names.update(
+                    re.findall(
+                        r"url\((?:&quot;|['\"])?(/?[\w.-]+/static/[^'\")&?]+)",
+                        element.text,
+                    ),
+                )
+
                 file_names.update(re.findall(r'src="([^"]+)"', element.text))
 
             in_use_files.update(
@@ -311,8 +322,41 @@ class TestEnv(IndustryCase):
                     file
                     for file in file_names
                     if file and not file.startswith(('web', '/web', 'https', '/unsplash'))
-                }
+                },
             )
+
+    def _check_attachment_usage_in_xml(self, module, xml_files):
+        """Warn about ir.attachment records that are never referenced in the module.
+
+        An attachment is considered used when its xmlid appears as a reference
+        (``ref="xmlid"``, ``ref('xmlid')``, ``%(xmlid)d``) or as a module-qualified
+        xmlid (e.g. ``/web/image/module.xmlid``) in any XML file of the module.
+        """
+        all_content = "\n".join(content for _tree, content in xml_files.values())
+        for file_name, (root, _content) in xml_files.items():
+            for element in root.xpath("//record[@model='ir.attachment']"):
+                element_id = element.get("id")
+                if not element_id:
+                    _logger.warning("Found ir.attachment record without an id in %s/%s.", module, file_name)
+                    continue
+                if element.xpath(
+                    "field[@name='res_model'][normalize-space()]"
+                    " and field[@name='res_id'][@ref or @eval or @search or normalize-space()]",
+                ):
+                    # This attachment is linked to a specific record, so it is not considered unused.
+                    continue
+                xmlid = element_id.split(".")[-1]
+                usage_re = (
+                    rf"""(?:\bref=["']|\bref\(\s*["']|%\()(?:{re.escape(module)}\.)?{re.escape(xmlid)}\b"""
+                    rf"""|(?<![\w.]){re.escape(module)}\.{re.escape(xmlid)}\b"""
+                )
+                if not re.search(usage_re, all_content):
+                    _logger.warning(
+                        "Unused attachment %s defined in %s/%s.",
+                        element_id,
+                        module,
+                        file_name,
+                    )
 
     def _check_index_html_images(self, module):
         desc_path = os.path.join(get_industry_path(), module, "description", "index.html")
@@ -343,7 +387,7 @@ class TestEnv(IndustryCase):
         if 'payment_demo' in dependency_list:
             _logger.warning(
                 "'payment_demo' should not be in the dependencies. Instead, call "
-                "'button_install' on 'base.module_payment_demo' in demo."
+                "'button_install' on 'base.module_payment_demo' in demo.",
             )
 
         if escape_studio_test:
@@ -406,7 +450,7 @@ class TestEnv(IndustryCase):
                 "Defining or referring to an xmlid with the current module name is useless, module name will be added automatically. "
                 "Found occurence(s) of ' id=\"%s.ID' in %s: %s. "
                 "This remark does not apply to 'env.ref(\"%s.ID\")' where it is required.",
-                module, file_name, ', '.join(elements), module
+                module, file_name, ', '.join(elements), module,
             )
         elements = [value for element in root.iter() if (value := element.get('id')) and value.startswith('x_studio')]
         if elements:
@@ -424,11 +468,11 @@ class TestEnv(IndustryCase):
         end_of_file = repr(s).split('\\')
         if 'n' not in end_of_file[-1] or len(end_of_file[-1]) > 2:
             _logger.warning(
-                "It looks like you forgot to add an empty line at the end of %s.", file_name
+                "It looks like you forgot to add an empty line at the end of %s.", file_name,
             )
         elif 'n' in end_of_file[-2] and len(end_of_file[-2]) <= 2:
             _logger.warning(
-                "One empty line at the end of %s is enough, please remove others.", file_name
+                "One empty line at the end of %s is enough, please remove others.", file_name,
             )
 
     def _check_update_status(self, root, filename):
@@ -471,7 +515,7 @@ class TestEnv(IndustryCase):
             ):
                 _logger.warning(
                     "Automation %s is missing trigger_field_ids definition (otherwise fields from filter_domain are used).",
-                    record.get('id')
+                    record.get('id'),
                 )
 
     def _check_knowledge_article_is_locked(self, root, file_name):
@@ -508,7 +552,7 @@ class TestEnv(IndustryCase):
             website_published_fields = record.xpath(".//field[@name='website_published' and @eval='True']")
             if website_published_fields:
                 _logger.warning(
-                    f"Model in {file_name} should not have 'website_published' set to True, 'is_published' is preferred in demo only."
+                    "Model in %s should not have 'website_published' set to True, 'is_published' is preferred in demo only.", file_name,
                 )
 
     def _check_duplicate_records(self, root, file_name):
@@ -532,12 +576,16 @@ class TestEnv(IndustryCase):
             fields = frozenset(fields_list)
             if len(fields_list) != len(fields):
                 _logger.warning(
-                    f"Duplicate field updates in record {record_id} of model {model} in {file_name}: {', '.join(field[0] for field in fields if fields_list.count(field) > 1)}"
+                    "Duplicate field updates in record %s of model %s in %s: %s",
+                    record_id,
+                    model,
+                    file_name,
+                    ', '.join(field[0] for field in fields if fields_list.count(field) > 1),
                 )
             record_key = (record_id, model)
             if fields & records[record_key] and model != 'pos.config':
                 _logger.warning(
-                    f"Duplicate record updates in {file_name}: {record_id} in model {model}"
+                    'Duplicate record updates in %s: %s in model %s', file_name, record_id, model,
                 )
             records[record_key] |= fields
 
@@ -566,7 +614,7 @@ class TestEnv(IndustryCase):
                         _logger.warning(
                             "Inline selection values defined in %s. "
                             "Remove inline 'selection' field and define values in ir.model.fields.selection.",
-                            record_id
+                            record_id,
                         )
                         warned_records.add(record_id)
             fields_set_in_record = {
@@ -587,14 +635,13 @@ class TestEnv(IndustryCase):
                                 file_name,
                             )
                         continue
-                    else:
-                        _logger.warning(
-                            "Field '%s' in model '%s' is useless and should not be set in XML data (file: %s). ",
-                            field_name,
-                            model_name,
-                            file_name,
-                        )
-                        continue
+                    _logger.warning(
+                        "Field '%s' in model '%s' is useless and should not be set in XML data (file: %s). ",
+                        field_name,
+                        model_name,
+                        file_name,
+                    )
+                    continue
                 if field and field.compute and field.readonly and field_name not in EXCLUDED_READONLY_FIELDS:
                     _logger.warning(
                         "Field '%s' in model '%s' is a readonly computed field without inverse and should not be set "
@@ -678,7 +725,7 @@ class TestEnv(IndustryCase):
             if field.get('eval') in ('1', 'True'):
                 _logger.warning(
                     "You should not install modules in res.config.settings data. "
-                    "Move %s installation to manifest instead", field.get('name')[7:]
+                    "Move %s installation to manifest instead", field.get('name')[7:],
                 )
 
     def _check_user_is_set(self, root, previous_records):
@@ -803,7 +850,7 @@ class TestEnv(IndustryCase):
                 model_name,
                 func_name,
                 ', '.join(expected_context),
-                function.get('context') or 'None'
+                function.get('context') or 'None',
             )
         for record in root.xpath("//record"):
             model_name = record.get('model')
@@ -815,7 +862,7 @@ class TestEnv(IndustryCase):
                     _logger.warning(
                         "Remove or set user_id to False in file '%s' for model '%s' to prevent mail pollution.",
                         file_name,
-                        model_name
+                        model_name,
                     )
 
         for function in root.xpath("//function"):
@@ -970,3 +1017,23 @@ class TestEnv(IndustryCase):
                         record_model,
                         file_name,
                     )
+
+    def _check_useless_html_attributes(self, root, file_name):
+        bad_attr = {
+            "data-original-src",
+            "data-original-id",
+            "data-mimetype-before-conversion",
+            "data-original-mimetype",
+            "data-attachment-id",
+        }
+        xpath_expr = " | ".join(
+            [f"//section[@{attr}] | //img[@{attr}] | //div[@{attr}] | //span[@{attr}]" for attr in bad_attr],
+        )
+        for element in root.xpath(xpath_expr):
+            _logger.warning(
+                "Useless HTML attribute '%s' found in <%s> in %s. "
+                "Remove unnecessary attributes added by studio or other tools.",
+                next(attr for attr in bad_attr if element.get(attr) is not None),
+                element.tag,
+                file_name,
+            )

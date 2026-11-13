@@ -56,7 +56,6 @@
         'demo/purchase_order_post.xml',
         'demo/hr_employee.xml',
         'demo/sale_order.xml',
-        'demo/ir_attachment_post.xml',
         'demo/sale_order_line.xml',
         'demo/stock_quant.xml',
         'demo/sale_order_confirm.xml',

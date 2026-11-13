@@ -52,7 +52,6 @@
         'demo/appointment_booking_line.xml',
         'demo/loyalty_reward.xml',
         'demo/sale_order.xml',
-        'demo/ir_attachment_post.xml',
         'demo/sale_order_line.xml',
         'demo/loyalty_rule.xml',
         'demo/res_company.xml',
