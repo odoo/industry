@@ -65,10 +65,29 @@ class Test_Industry(Command):
 
         parser.add_option_group(group)
         config.parse_config(['--no-http'] + args, setup_logging=True)
+
+        # To Remove
+        _logger.info("Modified modules from config: %s" % set(config['industries'].split(',')))
+        all_industries = sorted(
+            p.name for p in ROOT_PATH.iterdir()
+            if p.is_dir() and (p / '__manifest__.py').exists()
+        )
+
         if config.get('all'):
-            industry_modules = sorted([p.name for p in (ROOT_PATH).iterdir() if p.is_dir() and (p / '__manifest__.py').exists()])
+            industry_modules = all_industries
         else:
-            industry_modules = (config['industries'] or '').split(',')
+            modified_modules = (config['industries'] or '').split(',')
+            if not modified_modules:
+                industry_modules = all_industries
+            elif all(mod.startswith('test_') for mod in modified_modules):
+                tested_mod = {mod.removeprefix('test_') for mod in modified_modules}
+                industry_modules = sorted(tested_mod & set(all_industries)) or all_industries
+            else:
+                industry_modules = sorted({mod for mod in modified_modules if not mod.startswith('test_')})
+
+        # To Remove
+        _logger.info("Modified modules after filtering: %s" % industry_modules)
+
         if not industry_modules:
             raise ValueError("You must provide industry modules to install using --industries=industry_module or use --all")
         config['init'] = []
