@@ -2,6 +2,7 @@
 
 import ast
 import html
+import json
 import logging
 import os
 import pathlib
@@ -221,7 +222,10 @@ class TestEnv(IndustryCase):
                 ext = os.path.splitext(file_path)[1].lower()
                 if 'static/' in file_path and not any(p in file_path for p in ['src/js/', 'src/widget', 'src/scss', 'src/css', 'src/xml']):
                     static_files.add(os.path.relpath(file_path, start=get_industry_path()))
-                if ext not in ['.py', '.xml']:
+                if ext == '.json':
+                    self._check_static_ids_in_dashboard_file(file_name, file_path, module)
+                    continue
+                elif ext not in ['.py', '.xml']:
                     continue
                 if os.path.getsize(file_path) > MAX_FILE_SIZE:
                     raise "Max file size exceeded"
@@ -312,6 +316,45 @@ class TestEnv(IndustryCase):
                     for file in file_names
                     if file and not file.startswith(('web', '/web', 'https', '/unsplash'))
                 }
+            )
+
+    def _check_static_ids_in_dashboard_file(self, filename, file_path, module):
+
+        invalid_domain_rules = []
+
+        def check_nodes(node):
+            if isinstance(node, dict):
+                for key, value in node.items():
+                    if key == "domain" and isinstance(value, list):
+                        for domain_rule in value:
+                            if not isinstance(domain_rule, list) or len(domain_rule) != 3:
+                                continue
+                            if (domain_rule[0].endswith('id') or domain_rule[0].endswith('ids')) and \
+                                ((isinstance(domain_rule[2], int) and not isinstance(domain_rule[2], bool)) or
+                                (isinstance(domain_rule[2], list) and any(isinstance(val, int) for val in domain_rule[2]))):
+                                invalid_domain_rules.append(domain_rule)
+                    elif key == "context" and isinstance(value, dict):
+                        for ctx_key, ctx_value in value.items():
+                            if (ctx_key.endswith('id') or ctx_key.endswith('ids')) and \
+                                ((isinstance(ctx_value, int) and not isinstance(ctx_value, bool)) or
+                                (isinstance(ctx_value, list) and any(isinstance(val, int) for val in ctx_value))):
+                                invalid_domain_rules.append(domain_rule)
+                    check_nodes(value)
+            elif isinstance(node, list):
+                for item in node:
+                    check_nodes(item)
+
+        with open(file_path, encoding="utf-8") as file:
+            data = json.load(file)
+            if all(key in data for key in ["sheets", "pivots", "lists"]):  # Proves this json is used as a dashboard
+                check_nodes(data)
+
+            if invalid_domain_rules:
+                _logger.warning("Static ids were found for the domain rules %s in the file %s from %s."
+                " Remove them by not using ids for the domain, or injecting the ids from a write function after loading the dashboard record.",
+                invalid_domain_rules,
+                filename,
+                module
             )
 
     def _check_index_html_images(self, module):
