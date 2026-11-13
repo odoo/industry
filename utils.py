@@ -70,7 +70,7 @@ class IndustryUtils:
     def install_internal_dependencies(self, module_names: str, env):
         dependencies = self.get_dependencies(module_names)[1]
         modules = env['ir.module.module'].search([('name', 'in', list(dependencies))])
-        return modules.button_immediate_install()
+        return modules.button_install()
 
     def has_module_dependency(self, module_name: str, dependency_module_name: str):
         industries, other_dep = self.get_dependencies(module_name, full_standard_list=True)
