@@ -6,4 +6,5 @@ from . import test_industry_requirements
 from . import test_mandatory_files
 from . import test_manifest
 from . import test_pot_export
+from . import test_update_policy
 from . import test_xml
