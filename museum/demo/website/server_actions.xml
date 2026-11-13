@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Crown Fine Art Museum - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code">
+website = env.ref('museum.website_industry')
+
+to_deactivate = [
+    # Presets
+    'portal.user_sign_in',
+    'website.header_text_element',
+    'website_event.opt_event_calendar_block',
+    'website_event.opt_event_organizer_block',
+    'website_event.opt_event_share_block',
+    # Default static pages
+    'website.homepage',
+    'website.contactus',
+]
+
+to_activate = [
+    'website.template_header_default_align_center',
+    'website.template_header_navlink_no_background',
+    'website_event.opt_event_description_cover_top',
+    'website_sale.header_hide_empty_cart_link',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
+
+# Menu items added by installed modules
+menus.search(base_domain + [('url', 'in', ['/shop', '/event', '/appointment'])]).unlink()
+
+# Menu items of the design, in navbar order.
+for name, url, sequence in [
+    ('HOME', '/', 10),
+    ('EXHIBITIONS', '/exhibitions', 20),
+    ('VISIT', env.ref('museum.event_event_4').website_url, 30),
+    ('CONTACT US', '/contactus', 40),
+]:
+    menu = menus.search(base_domain + [('url', '=', url)], limit=1)
+    if menu:
+        menu.write({'name': name, 'sequence': sequence})
+    else:
+        menus.create({
+            'name': name,
+            'url': url,
+            'sequence': sequence,
+            'website_id': website.id,
+            'parent_id': top_menu.id if top_menu else False,
+        })
+        </field>
+    </record>
+
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
