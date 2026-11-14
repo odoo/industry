@@ -132,4 +132,23 @@ if cron := records.env.ref('stock.ir_cron_scheduler_action', raise_if_not_found=
         <field name="name">Update procurement scheduler nextcall</field>
         <field name="usage">base_automation</field>
     </record>
+    <record id="action_create_edit_so_deposit_sol" model="ir.actions.server">
+        <field name="code"><![CDATA[
+for record in records:
+    deposit_line = record.order_id.order_line.filtered(lambda sol: sol.product_id.id == record.product_id.x_product_deposit_id.id)[:1]
+    deposit_uom = record.product_id.x_product_deposit_id.uom_id
+    deposit_uom_qty = record.product_uom_qty*deposit_uom.relative_factor if (deposit_uom.id != record.product_id.uom_id.id and deposit_uom.relative_uom_id.id == record.product_id.uom_id.id) else record.product_uom_qty
+    if deposit_line:
+        deposit_line['product_uom_qty'] = deposit_uom_qty
+    else:
+        env['sale.order.line'].create({
+            'product_id': record.product_id.x_product_deposit_id.id,
+            'product_uom_qty': deposit_uom_qty,
+            'order_id': record.order_id.id,
+        })
+]]></field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="name">Deposit Management: Create or Edit linked deposit SOL</field>
+    </record>
 </odoo>
