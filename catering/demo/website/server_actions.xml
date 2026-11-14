@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">La Table - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code">
+website = env.ref('catering.website_industry')
+
+to_deactivate = [
+    # Presets
+    'portal.user_sign_in',
+    'website.footer_custom',
+    'website.header_search_box',
+    'website.header_text_element',
+    'website.template_header_default',
+    'website_blog.opt_blog_cover_post',
+    'website_blog.opt_blog_post_footer_share_links_display',
+    'website_blog.opt_blog_post_footer_tags_display',
+    'website_blog.opt_blog_post_header_author_avatar_display',
+    'website_blog.opt_blog_post_header_tags_display',
+    'website_blog.opt_blog_post_read_next',
+    'website_blog.opt_blog_post_readable',
+    'website_blog.opt_blog_post_regular_cover',
+    'website_blog.opt_blog_post_toc_display',
+    'website_blog.opt_posts_loop_show_author',
+    # Default static pages
+    'website.homepage',
+    'website.contactus',
+]
+
+to_activate = [
+    'website.footer_no_copyright',
+    'website.no_autohide_menu',
+    'website.template_footer_descriptive',
+    'website.template_header_hamburger',
+    'website_appointment.opt_appointments_index_pictures',
+    'website_blog.opt_blog_list_view',
+    'website_blog.opt_blog_post_large_container',
+    'website_blog.opt_blog_post_sidebar',
+    'website_blog.opt_blog_post_tags_display',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
+
+menus.search(base_domain + [('url', 'in', ['/event', '/shop'])]).unlink()
+
+for name, url, sequence in [
+    ('HOME', '/', 10),
+    ('OUR CATERING', '/catering', 20),
+    ('BOOK AN EXPERIENCE', '/appointment', 30),
+    ('OUR VENUES', '/blog', 40),
+]:
+    menu = menus.search(base_domain + [('url', '=', url)], limit=1)
+    if menu:
+        menu.write({'name': name, 'sequence': sequence})
+    else:
+        menus.create({
+            'name': name,
+            'url': url,
+            'sequence': sequence,
+            'website_id': website.id,
+            'parent_id': top_menu.id,
+        })
+        </field>
+    </record>
+
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
