@@ -57,47 +57,6 @@ class AutomationsTestCase(TransactionCase):
 
         self.assertEqual(line.product_uom_qty, 2, "SO line quantity must equal number of maintained serials.")
 
-    def test_task_inherits_serials_on_create(self):
-        so = self.env['sale.order'].create({
-            'partner_id': self.partner.id,
-            'order_line': [
-                Command.create({
-                    'product_id': self.service_product.id,
-                    'x_maintained_serials_ids': [
-                        Command.link(self.lot_1.id),
-                        Command.link(self.lot_2.id),
-                    ],
-                }),
-            ],
-        })
-        so.action_confirm()
-        task = so.tasks_ids
-        self.assertTrue(task, "FSM task must be created.")
-        self.assertEqual(set(task.x_serials.ids), {self.lot_1.id, self.lot_2.id}, "FSM task must inherit serials on creation.")
-
-    def test_task_serials_updated_on_delivery(self):
-        so = self.env['sale.order'].create({
-            'partner_id': self.partner.id,
-            'order_line': [
-                Command.create({
-                    'product_id': self.device_product.id,
-                    'product_uom_qty': 1,
-                }),
-                Command.create({
-                    'product_id': self.service_product.id,
-                }),
-            ],
-        })
-        so.action_confirm()
-        task = so.tasks_ids
-        picking = so.picking_ids
-        move = picking.move_ids
-        move.write({
-            'lot_ids': [Command.link(self.lot_1.id)],
-        })
-        picking.button_validate()
-        self.assertIn(self.lot_1, task.x_serials, "Delivered serial must be added to FSM task via automation.")
-
     def test_add_new_device_duplicate_serial_error(self):
         self.env['stock.lot'].create({
             'name': 'DUPLICATE-001',

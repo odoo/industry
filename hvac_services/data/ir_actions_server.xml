@@ -9,29 +9,6 @@ for so_line in records:
 ]]></field>
         <field name="model_id" ref="sale.model_sale_order_line"/>
     </record>
-    <record id="update_fs_task_serials_on_create" model="ir.actions.server">
-        <field name="name">Update FS Task Serials on create</field>
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-for task in records:
-    for lot_id in task.sale_order_id.order_line.mapped('x_maintained_serials_ids').filtered(lambda l: l and l not in task.x_serials):
-        task['x_serials'] = [Command.link(lot_id.id)]
-]]></field>
-        <field name="model_id" ref="project.model_project_task"/>
-    </record>
-    <record id="update_fs_task_serials_on_delivery" model="ir.actions.server">
-        <field name="name">Update FS Task Serials on Delivery</field>
-        <field name="state">code</field>
-        <field name="code"><![CDATA[
-for stock_pick in records:
-    for task in stock_pick.sale_id.tasks_ids:
-        for move in stock_pick.move_ids:
-            if move.product_id.is_storable and move.product_id.tracking == "serial":
-                for lot_id in move.lot_ids.filtered(lambda l: l not in task.x_serials):
-                    task['x_serials'] = [Command.link(lot_id.id)]
-]]></field>
-        <field name="model_id" ref="stock.model_stock_picking"/>
-    </record>
     <record id="add_new_device_to_customer" model="ir.actions.server">
         <field name="name">Add new device to customer</field>
         <field name="model_id" ref="x_new_devices"/>
