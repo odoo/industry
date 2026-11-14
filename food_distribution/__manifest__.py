@@ -50,6 +50,7 @@
         'data/knowledge_article_favorite.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
+        'data/set_mto_without_date.xml',
     ],
     'demo': [
         'demo/res_company.xml',

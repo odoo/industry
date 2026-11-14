@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+  <record id="action_sales_order_set_mto_without_date" model="ir.actions.server">
+    <field name="model_id" ref="sale.model_sale_order"/>
+    <field name="state">object_write</field>
+    <field name="update_path">x_is_mto_without_date</field>
+    <field name="evaluation_type">equation</field>
+    <field name="value">bool(env.ref('stock.route_warehouse0_mto', raise_if_not_found=False) in record.order_line.product_template_id.route_ids and not record.commitment_date)</field>
+    <field name="name">Food Distribution: Set MTO without Date</field>
+    <field name="usage">base_automation</field>
+  </record>
+  <record id="automation_sales_order_set_mto_without_date" model="base.automation">
+    <field name="name">Food Distribution: Set MTO without Date</field>
+    <field name="model_id" ref="sale.model_sale_order"/>
+    <field name="trigger">on_create_or_write</field>
+    <field name="trigger_field_ids" eval="[(6, 0, [ref('sale.field_sale_order__commitment_date'), ref('sale.field_sale_order__order_line')])]"/>
+    <field name="action_server_ids" eval="[(6, 0, [ref('action_sales_order_set_mto_without_date')])]"/>
+  </record>
+</odoo>
