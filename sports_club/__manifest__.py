@@ -1,6 +1,6 @@
 {
     'name': 'Sports Facilities',
-    'version': '1.4',
+    'version': '1.5',
     'category': 'Health and Fitness',
     'depends': [
         'appointment_crm',
@@ -58,7 +58,6 @@
         'demo/sale_order_post.xml',
         'demo/planning_slot.xml',
         'demo/appointment_type.xml',
-        'demo/appointment_invite.xml',
         'demo/calendar_event.xml',
         'demo/appointment_booking_line.xml',
         # Website: views before the pages, server_actions last (it rewrites
