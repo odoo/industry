@@ -54,7 +54,6 @@
         'demo/planning_slot_template.xml',
         'demo/hr_employee.xml',
         'demo/planning_slot.xml',
-        'demo/ir_attachment_post.xml',
         'demo/product_supplierinfo.xml',
         'demo/crm_team.xml',
         'demo/website/website.xml',
