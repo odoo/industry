@@ -193,4 +193,32 @@
             </xpath>
         </field>
     </record>
+
+    <record id="hr_timesheet_line_form_inherit_accounting_firm" model="ir.ui.view">
+        <field name="name">account.analytic.line.form.inherit</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_form"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='task_id']" position="after">
+                <label for="x_task_stage_id" string="Stage" invisible="not task_id"/>
+                <div class="o_row" invisible="not task_id">
+                    <field name="x_task_stage_id" domain="[('project_ids', '=', project_id)]" options="{'no_create': True, 'no_open': True}"/>
+                    <field name="x_task_state" widget="project_task_state_selection" options="{'hide_label': True}"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    <record id="hr_timesheet_line_tree_inherit_accounting_firm" model="ir.ui.view">
+        <field name="name">account.analytic.line.list.inherit</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='task_id']" position="after">
+                <field name="x_task_state" widget="project_task_state_selection" nolabel="1" width="20px" optional="show" readonly="not task_id" options="{'is_toggle_mode': False, 'hide_label': True}"/>
+                <field name="x_task_stage_id" string="Stage" domain="[('project_ids', '=', project_id)]" optional="show" readonly="not task_id" options="{'no_create': True, 'no_open': True}"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>
