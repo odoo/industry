@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="server_action_presets" model="ir.actions.server" forcecreate="0">
+        <field name="name">Haze Springs - Enable/disable views</field>
+        <field name="model_id" ref="website.model_website"/>
+        <field name="state">code</field>
+        <field name="code">
+website = env.ref('spa_resort.website_industry')
+
+to_deactivate = [
+    # Presets
+    'portal.footer_language_selector',
+    'portal.portal_docs_entry_layout',
+    'website.footer_custom',
+    'website.header_search_box',
+    'website.header_text_element',
+    'website_sale.header_pricelist_selector',
+    'website_sale.product_add_to_compare',
+    'website_sale.product_add_to_wishlist',
+    'website_sale.product_picture_magnify_click',
+    'website_sale.products_shop_title',
+    'website_sale.search',
+    'website_sale.sort',
+    # Default static pages
+    'website.homepage',
+    'website.contactus',
+]
+
+to_activate = [
+    'website.footer_copyright_content_width_fluid',
+    'website.template_footer_minimalist',
+    'website.template_header_navlink_no_background',
+    'website_appointment.opt_appointments_index_cards',
+    'website_sale.cta_wrapper_large',
+    'website_sale.product_buy_now_large',
+    'website_sale.product_quantity_large',
+    'website_sale.products_mobile_cols_single',
+]
+
+ctx = {'website_id': website.id}
+
+for xml_id in to_deactivate:
+    env.ref(xml_id).with_context(**ctx).write({'active': False})
+for xml_id in to_activate:
+    env.ref(xml_id).with_context(**ctx).write({'active': True})
+
+menus = env['website.menu']
+base_domain = [('website_id', '=', website.id)]
+top_menu = menus.search(base_domain + [('parent_id', '=', False)], limit=1)
+
+# Menu items added by installed modules
+menus.search(base_domain + [('url', 'in', ['/', '/appointment', '/shop', '/event'])]).unlink()
+
+# Menu items of the design, in navbar order.
+for name, url, sequence in [
+    ('ESCAPES', '/wellness-access', 10),
+    ('MASSAGES', '/massages-treatments', 20),
+    ('GIFT PASS', env.ref('loyalty.gift_card_product_50').website_url, 30),
+    ('THE SANCTUARY', '/contactus', 40),
+]:
+    menu = menus.search(base_domain + [('url', '=', url)], limit=1)
+    if menu:
+        menu.write({'name': name, 'sequence': sequence})
+    else:
+        menus.create({
+            'name': name,
+            'url': url,
+            'sequence': sequence,
+            'website_id': website.id,
+            'parent_id': top_menu.id,
+        })
+        </field>
+    </record>
+
+    <function name="run" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+    <function name="unlink" model="ir.actions.server" eval="[ref('server_action_presets', raise_if_not_found=False)]"/>
+</odoo>
