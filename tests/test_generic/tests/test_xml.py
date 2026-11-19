@@ -144,11 +144,10 @@ def _has_valid_search(eval_string):
                 if (isinstance(func, ast.Attribute) and func.attr == 'search') or (
                     isinstance(func, ast.Name) and func.id == 'search'
                 ):
-                    has_limit_1 = any(
+                    return any(
                         kw.arg == 'limit' and isinstance(kw.value, ast.Constant) and kw.value.value == 1
                         for kw in call_node.keywords
                     )
-                    return has_limit_1
     return True
 
 
@@ -904,3 +903,23 @@ class TestEnv(IndustryCase):
                         record_model,
                         file_name,
                     )
+
+    def _check_useless_html_attributes(self, root, file_name):
+        bad_attr = {
+            "data-original-src",
+            "data-original-id",
+            "data-mimetype-before-conversion",
+            "data-original-mimetype",
+            "data-attachment-id",
+        }
+        xpath_expr = " | ".join(
+            [f"//section[@{attr}] | //img[@{attr}] | //div[@{attr}] | //span[@{attr}]" for attr in bad_attr],
+        )
+        for element in root.xpath(xpath_expr):
+            _logger.warning(
+                "Useless HTML attribute '%s' found in <%s> in %s. "
+                "Remove unnecessary attributes added by studio or other tools.",
+                next(attr for attr in bad_attr if element.get(attr) is not None),
+                element.tag,
+                file_name,
+            )
