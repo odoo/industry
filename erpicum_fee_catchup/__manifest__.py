@@ -1,10 +1,8 @@
 {
     'name': 'Construction-cost Architecture Fees',
-    'version': '1.0',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'license': 'OEEL-1',
-    'icon': 'erpicum_fee_catchup/static/description/icon.svg',
     'depends': ['base_automation', 'sale_management', 'sale_project', 'web_studio'],
     'data': [
         'data/ir_module_module_dependency.xml',
