@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="field_sale_order_dental_appointment" model="ir.model.fields">
+        <field name="name">x_dental_appointment_id</field>
+        <field name="field_description">Dental Appointment</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">calendar.event</field>
+        <field name="index">btree_not_null</field>
+        <field name="copied" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="field_calendar_event_dental_sale_orders" model="ir.model.fields">
+        <field name="name">x_dental_sale_order_ids</field>
+        <field name="field_description">Dental Quotations and Orders</field>
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="ttype">one2many</field>
+        <field name="relation">sale.order</field>
+        <field name="relation_field">x_dental_appointment_id</field>
+        <field name="readonly" eval="True"/>
+    </record>
+
+    <record id="action_calendar_event_dental_quotation" model="ir.actions.server">
+        <field name="name">Open or Create Dental Quotation</field>
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="group_ids" eval="[Command.link(ref('sales_team.group_sale_salesman'))]"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if not record or (records and len(records) != 1):
+    raise UserError(env._("Open one appointment to prepare its quotation."))
+
+record.check_access("read")
+if record._check_private_event_conditions():
+    raise UserError(env._("Ask the calendar owner for access to the appointment details."))
+
+orders = record.x_dental_sale_order_ids
+if not orders:
+    if not (record.active and record.user_can_edit and (record.appointment_type_id or record.opportunity_id)):
+        raise UserError(env._("Open an active patient appointment or CRM meeting you can edit."))
+
+    record.check_access("write")
+    record.lock_for_update(allow_referencing=True)
+    # A linked order can be outside this salesperson's record rules or active companies.
+    if env["sale.order"].sudo().search_count([("x_dental_appointment_id", "=", record.id)], limit=1):
+        raise UserError(env._("A quotation already exists for this appointment. Ask its owner for access."))
+
+    opportunity = record.opportunity_id
+    customer = opportunity.partner_id
+    booker = record.appointment_booker_id
+    if customer and booker and customer != booker and customer not in record.partner_ids:
+        raise UserError(env._("The booking and opportunity have different contacts. Add the correct patient to the appointment before quoting."))
+
+    patient = customer or booker
+    if not patient:
+        attendees = (record.partner_ids - record.partner_id).filtered("partner_share")
+        if len(attendees) == 1:
+            patient = attendees
+    if not patient or not patient.active:
+        raise UserError(env._("Select an active patient on the opportunity or appointment before quoting."))
+
+    company = opportunity.company_id or record.user_id.company_id or env.company
+    quotation_context = {key: value for key, value in env.context.items() if not key.startswith("default_")}
+    if opportunity:
+        quotation_context.update(opportunity._prepare_opportunity_quotation_context())
+    appointment = record.with_context(quotation_context).with_company(company)
+    appointment.write({"x_dental_sale_order_ids": [Command.create({
+        "partner_id": patient.id,
+        "company_id": company.id,
+        "opportunity_id": opportunity.id,
+    })]})
+    orders = appointment.x_dental_sale_order_ids
+
+action = {
+    "type": "ir.actions.act_window",
+    "name": env._("Quotations / Orders"),
+    "res_model": "sale.order",
+    "views": [(False, "list"), (False, "form")],
+    "domain": [("x_dental_appointment_id", "=", record.id)],
+    "context": {"create": False, "allowed_company_ids": orders.env.companies.ids},
+}
+if len(orders) == 1:
+    action.update(res_id=orders.id, views=[(False, "form")])
+        ]]></field>
+    </record>
+
+    <record id="action_sale_order_dental_appointment" model="ir.actions.server">
+        <field name="name">Open Dental Appointment</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="group_ids" eval="[Command.link(ref('sales_team.group_sale_salesman'))]"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if record:
+    record.check_access("read")
+    appointment = record.x_dental_appointment_id
+    if appointment:
+        appointment.check_access("read")
+        action = {
+            "type": "ir.actions.act_window",
+            "name": env._("Appointment"),
+            "res_model": "calendar.event",
+            "views": [(False, "form")],
+            "res_id": appointment.id,
+        }
+        ]]></field>
+    </record>
+
+    <record id="calendar_event_form_dental_quotation" model="ir.ui.view">
+        <field name="active" eval="True"/>
+        <field name="name">calendar.event.form.dental.quotation</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="appointment.calendar_event_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="opportunity_id" invisible="1" groups="sales_team.group_sale_salesman"/>
+                <button name="%(action_calendar_event_dental_quotation)d" type="action"
+                    string="Create Quotation" class="btn btn-secondary" groups="sales_team.group_sale_salesman"
+                    invisible="not id or not active or not user_can_edit or not (appointment_type_id or opportunity_id) or x_dental_sale_order_ids"/>
+            </xpath>
+            <xpath expr="//sheet/div[hasclass('oe_title')]" position="before">
+                <div class="oe_button_box" name="dental_button_box" groups="sales_team.group_sale_salesman">
+                    <field name="x_dental_sale_order_ids" invisible="1"/>
+                    <button name="%(action_calendar_event_dental_quotation)d" type="action"
+                        class="oe_stat_button" icon="receipt_long" string="Quotations / Orders"
+                        invisible="not x_dental_sale_order_ids"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_form_dental_appointment" model="ir.ui.view">
+        <field name="active" eval="True"/>
+        <field name="name">sale.order.form.dental.appointment</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <field name="x_dental_appointment_id" invisible="1" groups="sales_team.group_sale_salesman"/>
+                <button name="%(action_sale_order_dental_appointment)d" type="action"
+                    class="oe_stat_button" icon="calendar_today" string="Appointment"
+                    groups="sales_team.group_sale_salesman" invisible="not x_dental_appointment_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1" context="{'mail_auto_subscribe_no_notify': True, 'mail_activity_quick_update': True}">
+    <record id="sale_order_nora_reception" model="sale.order">
+        <field name="opportunity_id" ref="crm_nora_journey"/>
+        <field name="partner_id" ref="partner_nora_patel_reception"/>
+        <field name="x_dental_appointment_id" ref="event_nora_hygiene_diary"/>
+        <field name="user_id" ref="user_reception_demo"/>
+        <field name="pricelist_id" ref="pricelist_patient_journey_demo"/>
+        <field name="client_order_ref">RECEPTION-HYGIENE-VISIT</field>
+        <field name="note" type="html">
+            <p>Hygiene visit for reception checkout. Review the service, fee and applicable taxes before collecting payment. No invoice or payment has been created.</p>
+        </field>
+    </record>
+    <record id="sale_line_nora_reception_hygiene" model="sale.order.line">
+        <field name="order_id" ref="sale_order_nora_reception"/>
+        <field name="product_id" ref="product_hygiene"/>
+        <field name="product_uom_qty">1</field>
+        <field name="price_unit">90</field>
+    </record>
+    <record id="activity_nora_reception_payment" model="mail.activity">
+        <field name="res_model_id" ref="sale.model_sale_order"/>
+        <field name="res_id" ref="sale_order_nora_reception"/>
+        <field name="activity_type_id" ref="activity_type_reception_checkout"/>
+        <field name="user_id" ref="user_reception_demo"/>
+        <field name="date_deadline" model="res.users" eval="DateTime.now(pytz.timezone(obj().env.user.tz or 'UTC')).date()"/>
+        <field name="summary">Collect Nora's hygiene visit payment at reception</field>
+        <field name="note" type="html">
+            <p>Open the Reception point of sale and select Nora. Use Quotation / Order to select this quotation, then Settle the order. Review the amount and collect payment through the practice's chosen cash or card process. The Card method records an externally completed card payment; no terminal is connected.</p>
+            <p>When a charge already has an invoice, confirm that invoice and use the customer's Settle invoices action instead of adding the service as a new sale.</p>
+        </field>
+    </record>
+</odoo>

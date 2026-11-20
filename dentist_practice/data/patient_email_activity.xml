@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <record id="activity_type_patient_registration_email" model="mail.activity.type" forcecreate="0">
+        <field name="name">Send patient registration email</field>
+        <field name="summary">Help the patient complete registration</field>
+        <field name="category">default</field>
+        <field name="sequence">70</field>
+        <field name="icon">mail</field>
+        <field name="res_model">res.partner</field>
+        <field name="mail_template_ids" eval="[Command.link(ref('mail_template_reception_registration'))]"/>
+        <field name="suggested_next_type_id" ref="activity_type_visit_preparation"/>
+        <field name="default_note" type="html">
+            <p>Review the patient's preferred contact method and preview the registration email. Share the actual document or send a personal request through Sign when needed; this introductory email does not create or send a signature request.</p>
+        </field>
+    </record>
+    <record id="activity_type_estimate_followup_email" model="mail.activity.type" forcecreate="0">
+        <field name="name">Send treatment estimate follow-up</field>
+        <field name="summary">Follow up on the patient's quotation</field>
+        <field name="category">default</field>
+        <field name="sequence">80</field>
+        <field name="icon">mail</field>
+        <field name="res_model">sale.order</field>
+        <field name="mail_template_ids" eval="[Command.link(ref('mail_template_financial_proposal_followup'))]"/>
+        <field name="suggested_next_type_id" ref="activity_type_estimate_discussion"/>
+        <field name="default_note" type="html">
+            <p>Review the quotation, any reply and the agreed contact method before following up. Preview the email and quotation portal link. Complete this activity if the proposal is already accepted, cancelled or otherwise resolved, and update the linked opportunity's next step.</p>
+        </field>
+    </record>
+    <record id="activity_type_patient_checkin_email" model="mail.activity.type" forcecreate="0">
+        <field name="name">Send patient post-visit email</field>
+        <field name="summary">Check in with the patient after the visit</field>
+        <field name="category">default</field>
+        <field name="sequence">90</field>
+        <field name="icon">mail</field>
+        <field name="res_model">res.partner</field>
+        <field name="delay_count">1</field>
+        <field name="delay_unit">days</field>
+        <field name="delay_from">current_date</field>
+        <field name="mail_template_ids" eval="[Command.link(ref('mail_template_post_visit_checkin'))]"/>
+        <field name="suggested_next_type_id" ref="activity_type_next_visit"/>
+        <field name="default_note" type="html">
+            <p>Confirm that the visit took place, check the preferred contact method and use the timing agreed with the practitioner. Preview this reception check-in before sending and route questions about care to the responsible practitioner.</p>
+        </field>
+    </record>
+    <record id="activity_type_patient_invoice_email" model="mail.activity.type" forcecreate="0">
+        <field name="name">Send patient payment reminder</field>
+        <field name="summary">Follow up on an outstanding patient invoice</field>
+        <field name="category">default</field>
+        <field name="sequence">100</field>
+        <field name="icon">mail</field>
+        <field name="res_model">account.move</field>
+        <field name="mail_template_ids" eval="[Command.link(ref('mail_template_patient_invoice_reminder'))]"/>
+        <field name="suggested_next_type_id" ref="activity_type_reception_checkout"/>
+        <field name="default_note" type="html">
+            <p>Review the posted customer invoice, remaining balance, due date and recent collections before contacting the patient. Preview the reminder, which uses the current remaining balance. Complete the activity if the invoice has been paid, reversed or cancelled. The activity does not post an invoice or collect payment.</p>
+        </field>
+    </record>
+</odoo>

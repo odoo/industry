@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <record id="base.default_website" model="website" forcecreate="0">
+        <field name="name">Willow Dental</field>
+        <field name="homepage_url">/</field>
+        <field name="configurator_done" eval="True"/>
+    </record>
+    <!-- These are the Website editor's own theme preferences, not an additional stylesheet. -->
+    <function model="website.assets" name="make_scss_customization" context="{'website_id': ref('base.default_website')}">
+        <value eval="'/website/static/src/scss/options/user_values.scss'"/>
+        <value eval="{
+            'color-palettes-name': &quot;'base-1'&quot;,
+            'font': &quot;'Inter'&quot;,
+            'headings-font': &quot;'Noto Serif'&quot;,
+            'navbar-font': &quot;'Inter'&quot;,
+            'buttons-font': &quot;'Inter'&quot;,
+            'header-template': 'default',
+            'footer-template': 'default',
+            'btn-border-radius': '2rem',
+            'btn-border-radius-lg': '2rem',
+            'input-border-radius': '0.5rem',
+            'menu-border-width': '0px',
+        }"/>
+    </function>
+    <function model="website.assets" name="make_scss_customization" context="{'website_id': ref('base.default_website')}">
+        <value eval="'/website/static/src/scss/options/colors/user_color_palette.scss'"/>
+        <value eval="{
+            'o-color-1': '#234E46',
+            'o-color-2': '#8DA697',
+            'o-color-3': '#F4F2EA',
+            'o-color-4': '#FFFFFF',
+            'o-color-5': '#173139',
+            'menu': 1,
+            'footer': 5,
+            'copyright': 5,
+        }"/>
+    </function>
+    <function model="ir.ui.view" name="write" context="{'website_id': ref('base.default_website')}">
+        <value model="ir.ui.view" eval="obj().with_context(active_test=False).search([
+            ('key', 'in', [
+                'website.template_header_hamburger', 'website.template_header_stretch',
+                'website.template_header_vertical', 'website.template_header_search',
+                'website.template_header_sales_one', 'website.template_header_sales_two',
+                'website.template_header_sales_three', 'website.template_header_sales_four',
+                'website.template_header_sidebar', 'website.template_header_boxed',
+                'website.option_header_brand_logo', 'website.header_text_element',
+                'website.header_search_box', 'website.header_social_links',
+                'website.template_footer_descriptive', 'website.template_footer_centered',
+                'website.template_footer_links', 'website.template_footer_minimalist',
+                'website.template_footer_contact', 'website.template_footer_call_to_action',
+                'website.template_footer_headline', 'website.template_footer_mega',
+                'website.template_footer_mega_columns', 'website.template_footer_mega_links',
+                'website.template_footer_mega_cards',
+            ]),
+            ('website_id', 'in', [False, ref('base.default_website')]),
+        ]).ids"/>
+        <value eval="{'active': False}"/>
+    </function>
+    <record id="website.template_header_default" model="ir.ui.view" forcecreate="0" context="{'website_id': ref('base.default_website')}">
+        <field name="active" eval="True"/>
+    </record>
+    <record id="website.option_header_brand_name" model="ir.ui.view" forcecreate="0" context="{'website_id': ref('base.default_website')}">
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//*[@id='o_fake_navbar_brand']" position="replace">
+                <a href="/" t-attf-class="navbar-brand text-primary #{_link_class}">Willow Dental</a>
+            </xpath>
+        </field>
+    </record>
+    <record id="website.header_call_to_action" model="ir.ui.view" forcecreate="0" context="{'website_id': ref('base.default_website')}">
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="." position="inside">
+                <li t-attf-class="#{_item_class}">
+                    <div t-attf-class="oe_structure oe_structure_solo #{_div_class}">
+                        <section class="oe_unremovable oe_unmovable s_text_block" data-snippet="s_text_block" data-name="Text">
+                            <div class="container"><a href="/appointment" class="oe_unremovable btn btn-primary btn_cta">Book a visit</a></div>
+                        </section>
+                    </div>
+                </li>
+            </xpath>
+        </field>
+    </record>
+    <record id="website.footer_custom" model="ir.ui.view" forcecreate="0" context="{'website_id': ref('base.default_website')}">
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='footer']" position="replace">
+                <div id="footer" class="oe_structure oe_structure_solo text-break" t-ignore="true" t-if="not no_footer">
+                    <section class="s_text_block o_cc o_cc5 pt64 pb48" data-snippet="s_text_block" data-name="Willow footer">
+                        <div class="container">
+                            <div class="row g-4 g-lg-5">
+                                <div class="col-lg-5"><h2 class="h3-fs mb-3">Willow Dental</h2><p class="lead mb-3">Room to feel at ease.</p><p>Everyday dentistry, clear conversations<br/>and a practical next step.</p></div>
+                                <div class="col-6 col-lg-3"><h3 class="h6-fs mb-3">Explore Willow</h3><ul class="list-unstyled"><li class="mb-2"><a href="/our-care">Our care</a></li><li class="mb-2"><a href="/our-practice">Our practice</a></li><li class="mb-2"><a href="/fees-and-first-visit">Fees and your first visit</a></li></ul></div>
+                                <div class="col-6 col-lg-4"><h3 class="h6-fs mb-3">Your next step</h3><ul class="list-unstyled"><li class="mb-2"><a href="/dentist/new-patient">Talk to reception</a></li><li class="mb-2"><a href="/appointment">View appointments</a></li><li class="mb-2"><a href="/my">Patient portal</a></li></ul><p class="small mt-4 mb-0">Visits by appointment.</p></div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

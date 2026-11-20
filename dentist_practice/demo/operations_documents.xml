@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1" context="{'mail_auto_subscribe_no_notify': True, 'mail_activity_quick_update': True, 'mail_notrack': True}">
+    <record id="document_sophie_registration_request_demo" model="documents.document">
+        <field name="name">Sophie Taylor - Patient registration</field>
+        <field name="type">request</field>
+        <field name="folder_id" ref="documents_folder_patient_administration"/>
+        <field name="owner_id" ref="user_reception_demo"/>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="partner_id" ref="partner_sophie_taylor_demo"/>
+        <field name="requestee_partner_id" ref="partner_sophie_taylor_demo"/>
+        <field name="res_model">res.partner</field>
+        <field name="res_id" ref="partner_sophie_taylor_demo"/>
+        <field name="tag_ids" eval="[Command.link(ref('documents_tag_administration'))]"/>
+        <field name="access_internal">none</field>
+        <field name="access_via_link">none</field>
+        <field name="is_access_via_link_hidden" eval="True"/>
+    </record>
+    <record id="activity_sophie_registration_upload_demo" model="mail.activity">
+        <field name="res_model_id" ref="documents.model_documents_document"/>
+        <field name="res_id" ref="document_sophie_registration_request_demo"/>
+        <field name="activity_type_id" ref="mail.mail_activity_data_upload_document"/>
+        <field name="user_id" ref="user_reception_demo"/>
+        <field name="date_deadline" model="res.users" eval="(DateTime.now(pytz.timezone(obj().env.ref('base.user_admin').tz or 'UTC')) + relativedelta(days=3)).date()"/>
+        <field name="summary">Sophie - collect patient registration</field>
+        <field name="note" type="html">
+            <p>Collect Sophie's completed registration. Upload the received document here or use the Documents request/share flow to arrange an external upload.</p>
+        </field>
+    </record>
+    <record id="document_autoclave_report_request_demo" model="documents.document">
+        <field name="name">Autoclave - Supplier service report</field>
+        <field name="type">request</field>
+        <field name="folder_id" ref="documents_folder_equipment_records"/>
+        <field name="owner_id" ref="user_operations_demo"/>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="requestee_partner_id" ref="base.partner_admin"/>
+        <field name="res_model">maintenance.equipment</field>
+        <field name="res_id" ref="equipment_autoclave_demo"/>
+        <field name="tag_ids" eval="[Command.link(ref('documents_tag_equipment_service'))]"/>
+        <field name="access_internal">none</field>
+        <field name="access_via_link">none</field>
+        <field name="is_access_via_link_hidden" eval="True"/>
+    </record>
+    <record id="activity_autoclave_report_upload_demo" model="mail.activity">
+        <field name="res_model_id" ref="documents.model_documents_document"/>
+        <field name="res_id" ref="document_autoclave_report_request_demo"/>
+        <field name="activity_type_id" ref="mail.mail_activity_data_upload_document"/>
+        <field name="user_id" ref="user_operations_demo"/>
+        <field name="date_deadline" model="res.users" eval="(DateTime.now(pytz.timezone(obj().env.ref('base.user_admin').tz or 'UTC')) + relativedelta(days=7)).date()"/>
+        <field name="summary">Autoclave - file the supplier service report</field>
+        <field name="note" type="html">
+            <p>Upload the supplier's report after the autoclave service. Check the equipment reference and service date before filing it.</p>
+        </field>
+    </record>
+</odoo>

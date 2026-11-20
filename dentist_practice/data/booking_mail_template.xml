@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <record id="mail_template_opportunity_booking_link" model="mail.template" forcecreate="0">
+        <field name="name">Dentist Practice: Book a first examination</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="subject">Arrange your appointment with {{ user.company_id.name }}</field>
+        <field name="email_from">{{ user.email_formatted }}</field>
+        <field name="email_to">{{ object.email_from or object.partner_id.email or '' }}</field>
+        <field name="lang">{{ object.partner_id.lang }}</field>
+        <field name="description">Invitation to the published first-examination booking page.</field>
+        <field name="body_html" type="html">
+            <div>
+                <t t-set="first_visit" t-value="object.env.ref('dentist_practice.appointment_new_patient', raise_if_not_found=False)"/>
+                <p>Hello <t t-out="object.partner_id.name or object.contact_name or 'there'"/>,</p>
+                <p>Thank you for getting in touch with <t t-out="user.company_id.name"/>. We would be pleased to help you arrange your visit.</p>
+                <t t-if="first_visit and first_visit.is_published">
+                    <p>Choose a suitable time for your first examination:</p>
+                    <p><a t-att-href="first_visit.website_absolute_url" style="display:inline-block;padding:12px 20px;border-radius:6px;background-color:#234E46;color:#FFFFFF;text-decoration:none;">Book a first examination</a></p>
+                    <p>Your appointment is reserved once you complete the booking and receive its confirmation.</p>
+                </t>
+                <p t-else="">Please contact reception so we can help you agree a suitable appointment time.</p>
+                <p>If you cannot find a suitable time or would prefer to book with reception, please reply to this email.</p>
+                <p>Kind regards,<br/>Reception<br/><t t-out="user.company_id.name"/></p>
+            </div>
+        </field>
+    </record>
+    <record id="mail_template_patient_booking_link" model="mail.template" forcecreate="0">
+        <field name="name">Dentist Practice: Choose an appointment (Patient)</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="subject">Arrange your next visit to {{ user.company_id.name }}</field>
+        <field name="email_from">{{ user.email_formatted }}</field>
+        <field name="email_to">{{ object.email_formatted }}</field>
+        <field name="lang">{{ object.lang }}</field>
+        <field name="description">Invitation to the practice's published appointment options.</field>
+        <field name="body_html" type="html">
+            <div>
+                <p>Hello <t t-out="object.name or 'there'"/>,</p>
+                <p>Reception is getting in touch to help arrange your next visit to <t t-out="user.company_id.name"/>.</p>
+                <p>You can view available times and choose an appointment here:</p>
+                <p><a t-att-href="object.get_base_url() + '/appointment'" style="display:inline-block;padding:12px 20px;border-radius:6px;background-color:#234E46;color:#FFFFFF;text-decoration:none;">Choose an appointment</a></p>
+                <p>Please choose the appointment discussed with the practice. If you need help finding a suitable time, reply to this email and reception will help.</p>
+                <p>Kind regards,<br/>Reception<br/><t t-out="user.company_id.name"/></p>
+            </div>
+        </field>
+    </record>
+</odoo>

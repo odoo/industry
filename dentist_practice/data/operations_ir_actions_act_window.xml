@@ -1,0 +1,163 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <!-- Customer-deleted business configuration leaves an empty scope on update. -->
+    <record id="action_practice_diary" model="ir.actions.act_window">
+        <field name="name">Diary</field>
+        <field name="res_model">calendar.event</field>
+        <field name="view_mode">calendar,list,form,activity</field>
+        <field name="view_ids" eval="[Command.clear(),
+            Command.create({'view_mode': 'calendar', 'view_id': ref('appointment.calendar_event_view_calendar')}),
+            Command.create({'view_mode': 'list', 'view_id': ref('appointment.calendar_event_view_tree_booking')}),
+        ]"/>
+        <field name="search_view_id" ref="appointment.calendar_event_view_search_booking"/>
+        <field name="domain">[('appointment_type_id', '!=', False), ('appointment_type_schedule_based_on', '=', 'users')]</field>
+        <field name="context">{'appointment_default_assign_user_attendees': True, 'appointment_schedule_based_on': 'users', 'show_calendar_event_name_with_count': True, 'default_partner_ids': []}</field>
+        <field name="group_ids" eval="[Command.link(ref('appointment.group_appointment_user'))]"/>
+    </record>
+    <record id="action_practice_patients" model="ir.actions.act_window">
+        <field name="name">Patients</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,kanban,form,activity</field>
+        <field name="domain" eval="[('category_id', 'in', [ref('res_partner_category_patient', raise_if_not_found=False) or 0])]"/>
+        <!-- Context is serialized for the browser's Python-expression parser. -->
+        <field name="context" eval="{'default_is_company': False, 'default_category_id': [(4, ref('res_partner_category_patient'), 0)] if ref('res_partner_category_patient', raise_if_not_found=False) else [], 'create': bool(ref('res_partner_category_patient', raise_if_not_found=False))}"/>
+        <field name="group_ids" eval="[Command.link(ref('base.group_user'))]"/>
+    </record>
+    <record id="action_practice_patient_acquisition" model="ir.actions.act_window">
+        <field name="name">Patient Journey</field>
+        <field name="res_model">crm.lead</field>
+        <field name="view_mode">kanban,list,form,activity</field>
+        <field name="view_id" ref="crm.crm_case_kanban_view_leads"/>
+        <field name="search_view_id" ref="crm.view_crm_case_opportunities_filter"/>
+        <field name="domain" eval="[('type', '=', 'opportunity'), ('team_id', '=', ref('crm_team_patient_journey', raise_if_not_found=False) or 0)]"/>
+        <field name="context" eval="{
+            'default_type': 'opportunity',
+            'default_team_id': ref('crm_team_patient_journey', raise_if_not_found=False),
+            'default_stage_id': ref('crm_stage_enquiry_new', raise_if_not_found=False),
+            'read_group_expand': False,
+            'create': bool(ref('crm_team_patient_journey', raise_if_not_found=False)),
+        }"/>
+        <field name="group_ids" eval="[Command.link(ref('sales_team.group_sale_salesman'))]"/>
+    </record>
+    <record id="action_practice_reception_followups" model="ir.actions.act_window">
+        <field name="name">Reception Follow-ups</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">activity,list,kanban,form</field>
+        <field name="view_id" ref="mail.res_partner_view_activity"/>
+        <field name="domain" eval="[('category_id', 'in', [ref('res_partner_category_patient', raise_if_not_found=False) or 0]), ('activity_ids', '!=', False)]"/>
+        <field name="group_ids" eval="[Command.link(ref('base.group_user'))]"/>
+    </record>
+    <record id="action_practice_patient_quotations" model="ir.actions.act_window">
+        <field name="name">Quotations and Orders</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">list,kanban,form,activity</field>
+        <field name="domain" eval="[('partner_id.category_id', 'in', [ref('res_partner_category_patient', raise_if_not_found=False) or 0])]"/>
+        <field name="context" eval="{'default_sale_order_template_id': ref('sale_order_template_treatment_estimate', raise_if_not_found=False)}"/>
+        <field name="group_ids" eval="[Command.link(ref('sales_team.group_sale_salesman'))]"/>
+    </record>
+    <record id="action_practice_draft_invoices" model="ir.actions.act_window">
+        <field name="name">Draft Patient Invoices</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,kanban,form,activity</field>
+        <field name="view_id" ref="account.view_out_invoice_tree"/>
+        <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+        <field name="domain" eval="[('move_type', '=', 'out_invoice'), ('state', '=', 'draft'), ('partner_id.category_id', 'in', [ref('res_partner_category_patient', raise_if_not_found=False) or 0])]"/>
+        <field name="context">{'default_move_type': 'out_invoice'}</field>
+        <field name="group_ids" eval="[Command.link(ref('account.group_account_invoice')), Command.link(ref('account.group_account_readonly'))]"/>
+    </record>
+    <record id="action_practice_unpaid_invoices" model="ir.actions.act_window">
+        <field name="name">Unpaid Patient Invoices</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,kanban,form,activity</field>
+        <field name="view_id" ref="account.view_out_invoice_tree"/>
+        <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+        <field name="domain" eval="[('move_type', '=', 'out_invoice'), ('state', '=', 'posted'), ('payment_state', 'in', ['not_paid', 'partial']), ('partner_id.category_id', 'in', [ref('res_partner_category_patient', raise_if_not_found=False) or 0])]"/>
+        <field name="context">{'default_move_type': 'out_invoice'}</field>
+        <field name="group_ids" eval="[Command.link(ref('account.group_account_invoice')), Command.link(ref('account.group_account_readonly'))]"/>
+    </record>
+    <record id="action_practice_supplies" model="ir.actions.act_window">
+        <field name="name">Supplies</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list,kanban,form,activity</field>
+        <field name="domain" eval="[('categ_id', 'child_of', ref('product_category_dental_supplies', raise_if_not_found=False) or 0)]"/>
+        <field name="context" eval="{'default_categ_id': ref('product_category_dental_supplies', raise_if_not_found=False), 'default_purchase_ok': True, 'default_sale_ok': False, 'create': bool(ref('product_category_dental_supplies', raise_if_not_found=False))}"/>
+        <field name="group_ids" eval="[Command.link(ref('stock.group_stock_user'))]"/>
+    </record>
+    <record id="action_practice_replenishment_rules" model="ir.actions.act_window">
+        <field name="name">Replenishment Rules</field>
+        <field name="res_model">stock.warehouse.orderpoint</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="view_id" ref="stock.view_warehouse_orderpoint_tree_editable_show_trigger"/>
+        <field name="search_view_id" ref="stock.warehouse_orderpoint_search"/>
+        <field name="domain" eval="[('product_id.categ_id', 'child_of', ref('product_category_dental_supplies', raise_if_not_found=False) or 0), ('location_id', 'child_of', ref('stock_location_dental_supplies', raise_if_not_found=False) or 0)]"/>
+        <field name="context" eval="{'default_location_id': ref('stock_location_dental_supplies', raise_if_not_found=False), 'default_trigger': 'manual', 'create': bool(ref('stock_location_dental_supplies', raise_if_not_found=False))}"/>
+        <field name="group_ids" eval="[Command.link(ref('stock.group_stock_manager'))]"/>
+    </record>
+    <record id="action_practice_supply_purchases" model="ir.actions.act_window">
+        <field name="name">Purchases</field>
+        <field name="res_model">purchase.order</field>
+        <field name="view_mode">list,kanban,form,activity</field>
+        <field name="view_id" ref="purchase.purchase_order_view_tree"/>
+        <field name="domain" eval="[('order_line.product_id.categ_id', 'child_of', ref('product_category_dental_supplies', raise_if_not_found=False) or 0)]"/>
+        <field name="group_ids" eval="[Command.link(ref('purchase.group_purchase_user'))]"/>
+    </record>
+    <record id="action_practice_supply_receipts" model="ir.actions.act_window">
+        <field name="name">Receipts</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">list,kanban,form,activity</field>
+        <field name="domain" eval="[('picking_type_code', '=', 'incoming'), ('move_ids.product_id.categ_id', 'child_of', ref('product_category_dental_supplies', raise_if_not_found=False) or 0)]"/>
+        <field name="context">{'restricted_picking_type_code': 'incoming'}</field>
+        <field name="group_ids" eval="[Command.link(ref('stock.group_stock_user'))]"/>
+    </record>
+    <record id="action_practice_lab_orders" model="ir.actions.act_window">
+        <field name="name">Lab Orders</field>
+        <field name="res_model">purchase.order</field>
+        <field name="view_mode">list,kanban,form,activity</field>
+        <field name="view_id" ref="purchase.purchase_order_view_tree"/>
+        <field name="domain" eval="[('order_line.product_id.categ_id', 'child_of', ref('product_category_dental_lab', raise_if_not_found=False) or 0)]"/>
+        <field name="group_ids" eval="[Command.link(ref('purchase.group_purchase_user'))]"/>
+    </record>
+    <record id="action_practice_maintenance_requests" model="ir.actions.act_window">
+        <field name="name">Maintenance Requests</field>
+        <field name="res_model">maintenance.request</field>
+        <field name="view_mode">kanban,list,form,calendar,activity</field>
+        <field name="domain" eval="[('maintenance_team_id', '=', ref('maintenance_team_practice_equipment', raise_if_not_found=False) or 0)]"/>
+        <field name="context" eval="{'default_maintenance_team_id': ref('maintenance_team_practice_equipment', raise_if_not_found=False)}"/>
+        <field name="group_ids" eval="[Command.link(ref('base.group_user'))]"/>
+    </record>
+    <record id="action_practice_equipment" model="ir.actions.act_window">
+        <field name="name">Equipment</field>
+        <field name="res_model">maintenance.equipment</field>
+        <field name="view_mode">kanban,list,form,activity</field>
+        <field name="domain" eval="[('category_id', 'in', [ref('maintenance_category_dental_chairs', raise_if_not_found=False) or 0, ref('maintenance_category_compressed_air', raise_if_not_found=False) or 0, ref('maintenance_category_sterilization', raise_if_not_found=False) or 0])]"/>
+        <field name="context" eval="{'default_maintenance_team_id': ref('maintenance_team_practice_equipment', raise_if_not_found=False)}"/>
+        <field name="group_ids" eval="[Command.link(ref('maintenance.group_equipment_manager'))]"/>
+    </record>
+    <record id="action_practice_paperwork" model="ir.actions.act_window">
+        <field name="name">Paperwork</field>
+        <field name="res_model">documents.document</field>
+        <field name="view_mode">kanban,list,activity</field>
+        <field name="view_ids" eval="[Command.clear(),
+            Command.create({'view_mode': 'kanban', 'view_id': ref('documents.document_view_kanban')}),
+            Command.create({'view_mode': 'list', 'view_id': ref('documents.documents_view_list')}),
+            Command.create({'view_mode': 'activity', 'view_id': ref('documents.documents_view_activity')}),
+        ]"/>
+        <field name="domain" eval="[('id', 'child_of', ref('documents_folder_practice_operations', raise_if_not_found=False) or 0)]"/>
+        <field name="context" eval="{'skip_res_field_check': True, 'default_folder_id': ref('documents_folder_practice_operations', raise_if_not_found=False), 'searchpanel_default_user_folder_id': str(ref('documents_folder_practice_operations')) if ref('documents_folder_practice_operations', raise_if_not_found=False) else 'MY', 'create': bool(ref('documents_folder_practice_operations', raise_if_not_found=False))}"/>
+        <field name="group_ids" eval="[Command.link(ref('documents.group_documents_user'))]"/>
+    </record>
+    <record id="action_practice_signing_templates" model="ir.actions.act_window">
+        <field name="name">Signing Templates</field>
+        <field name="res_model">sign.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain" eval="[('folder_id', 'child_of', ref('documents_folder_practice_operations', raise_if_not_found=False) or 0)]"/>
+        <field name="group_ids" eval="[Command.link(ref('sign.group_sign_user'))]"/>
+    </record>
+    <record id="action_practice_signature_requests" model="ir.actions.act_window">
+        <field name="name">Signature Requests</field>
+        <field name="res_model">sign.request</field>
+        <field name="view_mode">list,kanban,form,activity</field>
+        <field name="domain" eval="[('template_id.folder_id', 'child_of', ref('documents_folder_practice_operations', raise_if_not_found=False) or 0)]"/>
+        <field name="group_ids" eval="[Command.link(ref('sign.group_sign_user'))]"/>
+    </record>
+</odoo>

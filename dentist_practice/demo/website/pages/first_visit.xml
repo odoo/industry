@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="view_willow_first_visit" model="ir.ui.view">
+        <field name="name">Willow Dental - Fees and first visit</field>
+        <field name="key">dentist_practice.willow_first_visit</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="base.default_website"/>
+        <field name="arch" type="xml">
+            <t name="Fees and your first visit" t-name="dentist_practice.willow_first_visit">
+                <t t-call="website.layout">
+                    <div id="wrap" class="oe_structure oe_empty">
+                        <section class="s_text_image o_cc o_cc2 pt64 pb64 o_colored_level" data-snippet="s_text_image" data-name="Your first visit introduction"><div class="container"><div class="row align-items-center g-4 g-lg-5"><div class="col-lg-6 pt24 pb24"><p class="small text-uppercase fw-semibold text-primary">Fees and your first visit</p><h1 class="display-3 mb-4">A clear first step.<br/>A plan you understand.</h1><p class="lead">New to the area, or simply new to us? We would like to help you arrange your first visit.</p><p>Start with a conversation with reception, then agree a time to meet the practice and discuss what comes next.</p><a href="/dentist/new-patient" class="btn btn-primary btn-lg mt-3">Arrange a first visit</a></div><div class="col-lg-6 pt16 pb16"><figure class="ratio ratio-1x1 rounded-5 overflow-hidden mb-0"><img src="/dentist_practice/static/src/img/website/willow-first-visit.webp" alt="A welcoming setting for a first conversation at the practice" class="img img-fluid w-100 h-100 object-fit-cover o_we_custom_image"/></figure></div></div></div></section>
+                        <section class="s_text_block pt80 pb80 o_colored_level" data-snippet="s_text_block" data-name="How a first visit works"><div class="container s_allow_columns"><div class="row g-4 g-lg-5"><div class="col-lg-5"><p class="small text-uppercase fw-semibold text-primary">What to expect</p><h2 class="display-5">Before, during<br/>and after.</h2></div><div class="col-lg-6 offset-lg-1"><div class="border-bottom pb24 mb-4"><p class="small text-primary">01 / BEFORE YOUR VISIT</p><h3 class="h4-fs">Agree the practical details.</h3><p class="mb-0">Share your contact details and preferred times. Reception will discuss availability and confirm the arrangements. If you book online, review your appointment confirmation.</p></div><div class="border-bottom pb24 mb-4"><p class="small text-primary">02 / AT THE PRACTICE</p><h3 class="h4-fs">Begin with a conversation.</h3><p class="mb-0">Meet the team, discuss why you are visiting and ask questions. Your practitioner can explain the appointment and any proposed next steps.</p></div><div><p class="small text-primary">03 / AFTER YOUR VISIT</p><h3 class="h4-fs">Leave with a next step.</h3><p class="mb-0">Review any proposed care and its estimate. Reception can help with payment arrangements and a returning appointment when one is agreed.</p></div></div></div></div></section>
+                        <section class="s_text_block o_cc o_cc2 pt64 pb64 o_colored_level" data-snippet="s_text_block" data-name="Appointment fee guide">
+                            <div class="container s_allow_columns">
+                                <div class="row g-4 g-lg-5">
+                                    <div class="col-lg-5"><p class="small text-uppercase fw-semibold text-primary">A guide to appointment fees</p><h2 class="display-5 mb-4">Know the fee.<br/>Ask your questions.</h2><p>These listed fees are a starting point for common appointments. Ask reception to confirm the fee for your booking and review the estimate for any additional proposed care.</p><p>Your practitioner can talk through the care. Reception can help with fees, booking and payment questions.</p></div>
+                                    <div class="col-lg-6 offset-lg-1">
+                                        <t t-set="examination_fee" t-value="request.env.ref('dentist_practice.pricelist_item_examination_demo', raise_if_not_found=False)"/>
+                                        <t t-set="hygiene_fee" t-value="request.env.ref('dentist_practice.pricelist_item_hygiene_demo', raise_if_not_found=False)"/>
+                                        <t t-set="consultation_fee" t-value="request.env.ref('dentist_practice.pricelist_item_urgent_demo', raise_if_not_found=False)"/>
+                                        <div class="table-responsive" t-if="examination_fee and hygiene_fee and consultation_fee">
+                                            <t t-set="examination_fee" t-value="examination_fee.sudo()"/>
+                                            <t t-set="hygiene_fee" t-value="hygiene_fee.sudo()"/>
+                                            <t t-set="consultation_fee" t-value="consultation_fee.sudo()"/>
+                                            <table class="table align-middle mb-0">
+                                                <thead><tr><th scope="col" class="py-3">Appointment</th><th scope="col" class="py-3 text-end">Listed fee</th></tr></thead>
+                                                <tbody>
+                                                    <tr><th scope="row" class="py-4 fw-normal">New-patient examination</th><td class="py-4 text-end text-nowrap"><span t-field="examination_fee.fixed_price" t-options="{'widget': 'monetary', 'display_currency': examination_fee.pricelist_id.currency_id}"/></td></tr>
+                                                    <tr><th scope="row" class="py-4 fw-normal">Hygiene visit</th><td class="py-4 text-end text-nowrap"><span t-field="hygiene_fee.fixed_price" t-options="{'widget': 'monetary', 'display_currency': hygiene_fee.pricelist_id.currency_id}"/></td></tr>
+                                                    <tr><th scope="row" class="py-4 fw-normal">Urgent consultation</th><td class="py-4 text-end text-nowrap"><span t-field="consultation_fee.fixed_price" t-options="{'widget': 'monetary', 'display_currency': consultation_fee.pricelist_id.currency_id}"/></td></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <p t-else="">Please ask reception for the current appointment fees.</p>
+                                        <p class="small mt-4 mb-0">Reception will explain the services and any applicable taxes on your estimate.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="s_faq_list pt80 pb80 o_colored_level" data-snippet="s_faq_list" data-name="First visit questions"><div class="container"><p class="small text-uppercase fw-semibold text-primary">Good to know</p><h2 class="display-5 mb-5">Before you get in touch.</h2><div class="row g-4 g-lg-5"><div class="col-lg-4"><h3 class="h5-fs">Does an enquiry reserve a visit?</h3><p>No. An enquiry lets reception review your details and discuss availability. A booking is made after a slot is agreed, or through the appointment page.</p></div><div class="col-lg-4"><h3 class="h5-fs">Can I ask about the estimate?</h3><p>Reception can explain the proposed fees and arrangements. Speak with the practitioner about clinical options or questions about care.</p></div><div class="col-lg-4"><h3 class="h5-fs">What should I put in the form?</h3><p>Your name, a way to reach you, preferred times and any practical booking questions. Keep clinical information for a direct conversation with the practice.</p></div></div></div></section>
+                        <section class="s_call_to_action o_cc o_cc4 pt64 pb64 o_colored_level" data-snippet="s_call_to_action" data-name="Arrange your visit"><div class="container"><div class="row align-items-center g-4"><div class="col-lg-8"><h2 class="display-5 mb-3">We can start with a conversation.</h2><p class="lead mb-0">Tell reception when you would like to visit.</p></div><div class="col-lg-4 text-lg-end"><a href="/dentist/new-patient" class="btn btn-light btn-lg">Make an enquiry</a></div></div></div></section>
+                    </div>
+                </t>
+            </t>
+        </field>
+    </record>
+    <data noupdate="1">
+        <record id="page_willow_first_visit" model="website.page" forcecreate="0"><field name="view_id" ref="view_willow_first_visit"/><field name="url">/fees-and-first-visit</field><field name="website_id" ref="base.default_website"/><field name="is_published" eval="True"/></record>
+    </data>
+</odoo>

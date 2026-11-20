@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1" context="{'mail_auto_subscribe_no_notify': True, 'mail_notrack': True}">
+    <record id="documents_folder_practice_operations" model="documents.document" forcecreate="0">
+        <field name="name">Dentist Practice</field>
+        <field name="type">folder</field>
+        <field name="owner_id" ref="base.user_admin"/>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="access_internal">none</field>
+        <field name="access_via_link">none</field>
+        <field name="is_access_via_link_hidden" eval="True"/>
+    </record>
+    <record id="documents_folder_patient_administration" model="documents.document" forcecreate="0">
+        <field name="name">Patient Administration</field>
+        <field name="type">folder</field>
+        <field name="folder_id" ref="documents_folder_practice_operations"/>
+        <field name="owner_id" ref="base.user_admin"/>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="access_internal">none</field>
+        <field name="access_via_link">none</field>
+        <field name="is_access_via_link_hidden" eval="True"/>
+    </record>
+    <record id="documents_folder_financial_proposals" model="documents.document" forcecreate="0">
+        <field name="name">Financial Proposals</field>
+        <field name="type">folder</field>
+        <field name="folder_id" ref="documents_folder_practice_operations"/>
+        <field name="owner_id" ref="base.user_admin"/>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="access_internal">none</field>
+        <field name="access_via_link">none</field>
+        <field name="is_access_via_link_hidden" eval="True"/>
+    </record>
+    <record id="documents_folder_signed_administration" model="documents.document" forcecreate="0">
+        <field name="name">Signed Administration</field>
+        <field name="type">folder</field>
+        <field name="folder_id" ref="documents_folder_patient_administration"/>
+        <field name="owner_id" ref="base.user_admin"/>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="access_internal">none</field>
+        <field name="access_via_link">none</field>
+        <field name="is_access_via_link_hidden" eval="True"/>
+    </record>
+    <record id="documents_folder_equipment_records" model="documents.document" forcecreate="0">
+        <field name="name">Equipment Records</field>
+        <field name="type">folder</field>
+        <field name="folder_id" ref="documents_folder_practice_operations"/>
+        <field name="owner_id" ref="base.user_admin"/>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="access_internal">none</field>
+        <field name="access_via_link">none</field>
+        <field name="is_access_via_link_hidden" eval="True"/>
+    </record>
+    <record id="documents_folder_administrative_templates" model="documents.document" forcecreate="0">
+        <field name="name">Administrative Templates</field>
+        <field name="type">folder</field>
+        <field name="folder_id" ref="documents_folder_practice_operations"/>
+        <field name="owner_id" ref="base.user_admin"/>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="access_internal">none</field>
+        <field name="access_via_link">none</field>
+        <field name="is_access_via_link_hidden" eval="True"/>
+    </record>
+    <record id="documents_tag_administration" model="documents.tag" forcecreate="0">
+        <field name="name">Dental Administration</field>
+    </record>
+    <record id="documents_tag_financial_proposal" model="documents.tag" forcecreate="0">
+        <field name="name">Dental Cost Proposal</field>
+    </record>
+    <record id="documents_tag_equipment_service" model="documents.tag" forcecreate="0">
+        <field name="name">Dental Equipment Service</field>
+    </record>
+    <record id="activity_type_administrative_upload" model="mail.activity.type" forcecreate="0">
+        <field name="name">Collect Administrative Registration</field>
+        <field name="summary">Collect the administrative registration document</field>
+        <field name="res_model">res.partner</field>
+        <field name="category">upload_file</field>
+        <field name="folder_id" ref="documents_folder_patient_administration"/>
+        <field name="tag_ids" eval="[Command.link(ref('documents_tag_administration'))]"/>
+        <field name="delay_count">3</field>
+        <field name="default_note" type="html">
+            <p>Collect the practice's administrative registration document and review the contact details. Keep clinical information in the practice's separate clinical workflow.</p>
+        </field>
+    </record>
+    <record id="activity_type_equipment_report_upload" model="mail.activity.type" forcecreate="0">
+        <field name="name">Collect Equipment Service Report</field>
+        <field name="summary">File the equipment service report</field>
+        <field name="res_model">maintenance.equipment</field>
+        <field name="category">upload_file</field>
+        <field name="folder_id" ref="documents_folder_equipment_records"/>
+        <field name="tag_ids" eval="[Command.link(ref('documents_tag_equipment_service'))]"/>
+        <field name="delay_count">7</field>
+        <field name="default_note" type="html">
+            <p>Collect the supplier's report after servicing. Review the equipment reference and attach the report to the asset's administrative record.</p>
+        </field>
+    </record>
+</odoo>

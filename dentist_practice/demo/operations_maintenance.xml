@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1" context="{'mail_auto_subscribe_no_notify': True, 'mail_activity_quick_update': True, 'mail_notrack': True}">
+    <record id="equipment_chair_one_demo" model="maintenance.equipment">
+        <field name="name">Treatment room 1 - Chair</field>
+        <field name="category_id" ref="maintenance_category_dental_chairs"/>
+        <field name="maintenance_team_id" ref="maintenance_team_practice_equipment"/>
+        <field name="technician_user_id" ref="user_operations_demo"/>
+        <field name="serial_no">WD-CH-001</field>
+        <field name="note" type="html">
+            <p>Treatment room 1. Casey coordinates supplier servicing and keeps the equipment details and service reports with this record.</p>
+        </field>
+    </record>
+    <record id="equipment_chair_two_demo" model="maintenance.equipment">
+        <field name="name">Treatment room 2 - Chair</field>
+        <field name="category_id" ref="maintenance_category_dental_chairs"/>
+        <field name="maintenance_team_id" ref="maintenance_team_practice_equipment"/>
+        <field name="technician_user_id" ref="user_operations_demo"/>
+        <field name="serial_no">WD-CH-002</field>
+        <field name="note" type="html">
+            <p>Treatment room 2. Coordinate service visits with reception and attach the supplier's report to this equipment record.</p>
+        </field>
+    </record>
+    <record id="equipment_compressor_demo" model="maintenance.equipment">
+        <field name="name">Plant room - Compressor</field>
+        <field name="category_id" ref="maintenance_category_compressed_air"/>
+        <field name="maintenance_team_id" ref="maintenance_team_practice_equipment"/>
+        <field name="technician_user_id" ref="user_operations_demo"/>
+        <field name="serial_no">WD-AIR-001</field>
+        <field name="note" type="html">
+            <p>Plant-room compressor. Keep supplier contact details, approved service instructions and completed reports with this record.</p>
+        </field>
+    </record>
+    <record id="equipment_autoclave_demo" model="maintenance.equipment">
+        <field name="name">Sterilization room - Autoclave</field>
+        <field name="category_id" ref="maintenance_category_sterilization"/>
+        <field name="maintenance_team_id" ref="maintenance_team_practice_equipment"/>
+        <field name="technician_user_id" ref="user_operations_demo"/>
+        <field name="serial_no">WD-AUTO-001</field>
+        <field name="note" type="html">
+            <p>Sterilization-room autoclave. Coordinate supplier servicing and file the completed equipment service report.</p>
+        </field>
+    </record>
+    <record id="maintenance_chair_one_service_demo" model="maintenance.request">
+        <field name="name">Chair 1 - routine service</field>
+        <field name="equipment_id" ref="equipment_chair_one_demo"/>
+        <field name="maintenance_type">preventive</field>
+        <field name="user_ids" eval="[Command.link(ref('user_operations_demo'))]"/>
+        <field name="schedule_date" model="res.users" eval="(DateTime.now(pytz.timezone(obj().env.ref('base.user_admin').tz or 'UTC')) + relativedelta(days=7)).replace(hour=8, minute=0, second=0, microsecond=0).astimezone(pytz.UTC).replace(tzinfo=None)"/>
+        <field name="recurring_maintenance" eval="True"/>
+        <field name="repeat_interval">1</field>
+        <field name="repeat_unit">month</field>
+        <field name="description" type="html">
+            <p>Confirm the service visit with the supplier and reception. Review the approved equipment service schedule, then attach the supplier's report after the work.</p>
+        </field>
+    </record>
+    <record id="maintenance_chair_two_service_demo" model="maintenance.request">
+        <field name="name">Chair 2 - routine service</field>
+        <field name="equipment_id" ref="equipment_chair_two_demo"/>
+        <field name="maintenance_type">preventive</field>
+        <field name="user_ids" eval="[Command.link(ref('user_operations_demo'))]"/>
+        <field name="schedule_date" model="res.users" eval="(DateTime.now(pytz.timezone(obj().env.ref('base.user_admin').tz or 'UTC')) + relativedelta(days=14)).replace(hour=8, minute=0, second=0, microsecond=0).astimezone(pytz.UTC).replace(tzinfo=None)"/>
+        <field name="recurring_maintenance" eval="True"/>
+        <field name="repeat_interval">1</field>
+        <field name="repeat_unit">month</field>
+        <field name="description" type="html">
+            <p>Agree a service time with reception and the supplier. Keep the recurring dates aligned with the equipment service instructions and file the completed report.</p>
+        </field>
+    </record>
+    <record id="maintenance_compressor_service_demo" model="maintenance.request">
+        <field name="name">Compressor - supplier service</field>
+        <field name="equipment_id" ref="equipment_compressor_demo"/>
+        <field name="maintenance_type">preventive</field>
+        <field name="user_ids" eval="[Command.link(ref('user_operations_demo'))]"/>
+        <field name="schedule_date" model="res.users" eval="(DateTime.now(pytz.timezone(obj().env.ref('base.user_admin').tz or 'UTC')) + relativedelta(days=10)).replace(hour=8, minute=0, second=0, microsecond=0).astimezone(pytz.UTC).replace(tzinfo=None)"/>
+        <field name="recurring_maintenance" eval="True"/>
+        <field name="repeat_interval">6</field>
+        <field name="repeat_unit">month</field>
+        <field name="description" type="html">
+            <p>Arrange the supplier visit, confirm the service scope against the equipment instructions, and file the report when the work is completed.</p>
+        </field>
+    </record>
+    <record id="maintenance_autoclave_service_demo" model="maintenance.request">
+        <field name="name">Autoclave - equipment service</field>
+        <field name="equipment_id" ref="equipment_autoclave_demo"/>
+        <field name="maintenance_type">preventive</field>
+        <field name="user_ids" eval="[Command.link(ref('user_operations_demo'))]"/>
+        <field name="schedule_date" model="res.users" eval="(DateTime.now(pytz.timezone(obj().env.ref('base.user_admin').tz or 'UTC')) + relativedelta(days=5)).replace(hour=8, minute=0, second=0, microsecond=0).astimezone(pytz.UTC).replace(tzinfo=None)"/>
+        <field name="recurring_maintenance" eval="True"/>
+        <field name="repeat_interval">1</field>
+        <field name="repeat_unit">month</field>
+        <field name="description" type="html">
+            <p>Confirm the supplier's service visit and the equipment's approved schedule. Collect the service report and update the request after completion.</p>
+        </field>
+    </record>
+</odoo>
