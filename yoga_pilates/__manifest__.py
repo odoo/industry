@@ -26,7 +26,6 @@
         'data/product_product.xml',
         'data/product_pricelist_item.xml',
         'data/appointment_type.xml',
-        'data/ir_attachment_post.xml',
         'data/knowledge_article.xml',
         'data/knowledge_article_favorite.xml',
         'data/mail_message.xml',
