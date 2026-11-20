@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="project_follow_up_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-if="doc.x_arch_update_type == 'site' or (doc.x_arch_update_type == 'financial' and user.has_group('account.group_account_invoice') and doc.x_arch_financial_snapshot)"
+                   t-call="web.external_layout">
+                    <t t-set="o" t-value="doc"/>
+                    <t t-set="company" t-value="doc.project_id.company_id or res_company"/>
+                    <div class="page">
+                        <h2 t-field="doc.name"/>
+                        <p>
+                            <strong t-field="doc.x_arch_update_type"/> · <span t-field="doc.date"/><br/>
+                            <span t-field="doc.project_id.name"/>
+                        </p>
+                        <p t-if="doc.project_id.x_arch_owner_id">
+                            <strong>Project owner</strong> <span t-field="doc.project_id.x_arch_owner_id.name"/>
+                        </p>
+                        <t t-if="doc.x_arch_update_type == 'site'">
+                            <p t-if="doc.project_id.x_associated_location">
+                                <strong>Site</strong> <span t-field="doc.project_id.x_associated_location.name"/>
+                            </p>
+                            <h4>Attendance</h4>
+                            <table t-if="doc.x_arch_attendee_ids" class="table table-sm">
+                                <thead>
+                                    <tr><th>Contact</th><th>Role or trade</th><th>Attendance</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.x_arch_attendee_ids" t-as="attendee">
+                                        <td><span t-field="attendee.x_partner_id.name"/></td>
+                                        <td><span t-field="attendee.x_name"/></td>
+                                        <td>
+                                            <span t-if="attendee.x_status" t-field="attendee.x_status"/>
+                                            <span t-else="">Not recorded</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p t-else="">No attendance recorded.</p>
+                        </t>
+                        <div t-if="doc.x_arch_update_type == 'financial'" t-field="doc.x_arch_financial_snapshot"/>
+                        <div t-field="doc.description"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_project_follow_up" model="ir.actions.report">
+        <field name="name">Project follow-up report</field>
+        <field name="model">project.update</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">architects.project_follow_up_document</field>
+        <field name="print_report_name">object.name</field>
+        <field name="group_ids" eval="[(4, ref('project.group_project_user'))]"/>
+    </record>
+
+    <data noupdate="1">
+        <record id="mail_template_project_follow_up" model="mail.template" forcecreate="0">
+            <field name="name">Architecture: Project follow-up</field>
+            <field name="model_id" ref="project.model_project_update"/>
+            <field name="subject">{{ object.name }}</field>
+            <field name="use_default_to" eval="False"/>
+            <field name="partner_to">{{ object.x_arch_recipient_id.id }}</field>
+            <field name="email_layout_xmlid">mail.mail_notification_light</field>
+            <field name="report_template_ids" eval="[(4, ref('action_report_project_follow_up'))]"/>
+            <field name="body_html" type="html">
+                <p>Hello <t t-out="object.x_arch_recipient_id.name"/>,</p>
+                <p>Please find attached the latest report for <t t-out="object.project_id.name"/>.</p>
+            </field>
+        </record>
+    </data>
+</odoo>

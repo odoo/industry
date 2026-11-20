@@ -83,21 +83,16 @@
                     "R": "+R1"
                 },
                 "I4": "Date",
-                "I5": "Total Ordered Amount",
-                "I6": "Total Invoiced Amount",
-                "I7": "Total To Invoice Amount",
+                "I5": "Ordered excl. VAT",
+                "I6": "Invoiced excl. VAT",
+                "I7": "Unbilled before drafts",
                 "L4": "=now()",
-                "L5": "=sum($I10:$I1000)",
-                "L6": {
-                    "R": "$L10:$L1000"
-                },
-                "L7": {
-                    "R": "$N10:$N1000"
-                },
-                "N6": "=L6/L5",
-                "N7": {
-                    "R": "+R1|="
-                }
+                "L5": "=IF(IFERROR(COUNTUNIQUE(FILTER(P10:P,P10:P<>\"\")),0)>1,\"\",SUM(I10:I))",
+                "L6": "=IF(IFERROR(COUNTUNIQUE(FILTER(P10:P,P10:P<>\"\")),0)>1,\"\",SUM(L10:L))",
+                "L7": "=IF(IFERROR(COUNTUNIQUE(FILTER(P10:P,P10:P<>\"\")),0)>1,\"\",SUM(N10:N))",
+                "N6": "=IF(L5=\"\",\"\",IFERROR(L6/L5,0))",
+                "N7": "=IF(L5=\"\",\"\",IFERROR(L7/L5,0))",
+                "B8": "=IF(IFERROR(COUNTUNIQUE(FILTER(P10:P,P10:P<>\"\")),0)>1,\"Select one currency, project or order to view totals.\",\"\")"
             },
             "styles": {
                 "A1": 1,
@@ -726,6 +721,13 @@
             "type": "relation",
             "modelName": "sale.order",
             "domainOfAllowedValues": []
+        },
+        {
+            "id": "architecture-report-currency",
+            "label": "Currency",
+            "type": "relation",
+            "modelName": "res.currency",
+            "domainOfAllowedValues": []
         }
     ],
     "lists": {
@@ -805,8 +807,8 @@
                     "hidden": false
                 },
                 {
-                    "name": "price_total",
-                    "string": "Ordered Amount",
+                    "name": "price_subtotal",
+                    "string": "Ordered Amount excl. VAT",
                     "hidden": false
                 },
                 {
@@ -820,25 +822,31 @@
                     "hidden": false
                 },
                 {
-                    "name": "amount_invoiced",
-                    "string": "Invoiced Amount",
+                    "name": "x_fee_amount_invoiced",
+                    "string": "Invoiced Amount excl. VAT",
                     "hidden": false
                 },
                 {
-                    "name": "To Invoice Quantity",
+                    "name": "qty_to_invoice",
                     "string": "To Invoice Quantity",
-                    "computedBy": {
-                        "sheetId": "834d44ac-7041",
-                        "formula": "=max(0, qty_delivered-qty_invoiced)"
-                    },
                     "hidden": false
                 },
                 {
-                    "name": "To Invoice Amount",
-                    "string": "To Invoice Amount",
+                    "name": "untaxed_amount_to_invoice",
+                    "string": "Native Untaxed Unbilled Amount",
+                    "hidden": true
+                },
+                {
+                    "name": "untaxed_amount_invoiced",
+                    "string": "Native Untaxed Invoiced Amount",
+                    "hidden": true
+                },
+                {
+                    "name": "Unbilled Amount Before Drafts",
+                    "string": "Unbilled excl. VAT (before drafts)",
                     "computedBy": {
                         "sheetId": "834d44ac-7041",
-                        "formula": "='To Invoice Quantity'/if(product_uom_qty=0, 1, product_uom_qty)*price_total"
+                        "formula": "=untaxed_amount_to_invoice + untaxed_amount_invoiced - x_fee_amount_invoiced"
                     },
                     "hidden": false
                 },
@@ -852,12 +860,23 @@
                     "string": "Display Type Value",
                     "computedBy": {
                         "sheetId": "834d44ac-7041",
-                        "formula": "=XLOOKUP(display_type, 'Fields Selection (List #6)'!D:D, 'Fields Selection (List #6)'!C:C, \"\")"
+                        "formula": "=XLOOKUP(display_type, 'Fields Selection (List #6)'!C:C, 'Fields Selection (List #6)'!D:D, \"\")"
                     },
+                    "hidden": false
+                },
+                {
+                    "name": "currency_id",
+                    "string": "Currency",
                     "hidden": false
                 }
             ],
-            "domain": [],
+            "domain": [
+                [
+                    "state",
+                    "=",
+                    "sale"
+                ]
+            ],
             "context": {},
             "orderBy": [
                 {
@@ -880,6 +899,10 @@
                 },
                 "da8d70c7-bbd3": {
                     "chain": "order_id",
+                    "type": "many2one"
+                },
+                "architecture-report-currency": {
+                    "chain": "currency_id",
                     "type": "many2one"
                 }
             }
@@ -912,7 +935,7 @@
                 },
                 {
                     "name": "x_progress_approver",
-                    "string": "Progress Approver",
+                    "string": "Client review contact",
                     "hidden": false
                 },
                 {
@@ -926,7 +949,13 @@
                     "hidden": false
                 }
             ],
-            "domain": [],
+            "domain": [
+                [
+                    "is_template",
+                    "=",
+                    false
+                ]
+            ],
             "context": {},
             "orderBy": [],
             "fieldMatching": {
@@ -934,7 +963,11 @@
                     "chain": "id",
                     "type": "integer"
                 },
-                "da8d70c7-bbd3": {}
+                "da8d70c7-bbd3": {},
+                "architecture-report-currency": {
+                    "chain": "sale_order_id.currency_id",
+                    "type": "many2one"
+                }
             }
         },
         "3": {
@@ -970,7 +1003,13 @@
                     "string": "Invoice Status"
                 }
             ],
-            "domain": [],
+            "domain": [
+                [
+                    "state",
+                    "=",
+                    "sale"
+                ]
+            ],
             "context": {},
             "orderBy": [],
             "fieldMatching": {
@@ -980,6 +1019,10 @@
                 },
                 "73b6da1d-6563": {
                     "chain": "project_id",
+                    "type": "many2one"
+                },
+                "architecture-report-currency": {
+                    "chain": "currency_id",
                     "type": "many2one"
                 }
             }

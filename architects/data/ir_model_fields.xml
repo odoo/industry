@@ -5,12 +5,15 @@
         <field name="model_id" ref="base.model_res_partner" />
         <field name="ttype">boolean</field>
         <field name="field_description">Is a project location</field>
+        <field name="help">Mark this contact as a work site so it can be selected as the associated location on a project.</field>
     </record>
     <record id="crm_lead_project_expected_start_date" model="ir.model.fields">
         <field name="name">x_project_expected_start_date</field>
         <field name="model_id" ref="crm.model_crm_lead" />
         <field name="ttype">date</field>
         <field name="field_description">Project expected start date</field>
+        <field name="help">Start date requested by the client. Confirm the actual schedule on the project after acceptance.</field>
+        <field name="website_form_blacklisted" eval="False"/>
     </record>
     <record id="crm_lead_request_date" model="ir.model.fields">
         <field name="name">x_request_date</field>
@@ -23,6 +26,7 @@
         <field name="model_id" ref="project.model_project_project" />
         <field name="ttype">many2one</field>
         <field name="field_description">Associated Location</field>
+        <field name="help">Select the contact record for the work site. Its address is used in the project map.</field>
         <field name="relation">res.partner</field>
     </record>
     <record id="project_promoter" model="ir.model.fields">
@@ -37,9 +41,10 @@
         <field name="model_id" ref="crm.model_crm_lead" />
         <field name="ttype">selection</field>
         <field name="field_description">Project type</field>
+        <field name="website_form_blacklisted" eval="False"/>
     </record>
     <record id="crm_lead_project_type_selection_peb" model="ir.model.fields.selection">
-        <field name="name">PEB analysis</field>
+        <field name="name">Energy assessment</field>
         <field name="field_id" ref="crm_lead_project_type" />
         <field name="value">peb</field>
     </record>
@@ -64,7 +69,69 @@
         <field name="name">x_progress_approver</field>
         <field name="model_id" ref="project.model_project_project" />
         <field name="ttype">many2one</field>
-        <field name="field_description">Progress Approver</field>
+        <field name="field_description">Client review contact</field>
+        <field name="help">Contact whose feedback is required for phase reviews. Record the decision on the review task before marking a billing milestone as reached.</field>
         <field name="relation">res.partner</field>
+    </record>
+    <record id="crm_lead_site_address" model="ir.model.fields">
+        <field name="name">x_site_address</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="ttype">char</field>
+        <field name="field_description">Project site address</field>
+        <field name="website_form_blacklisted" eval="False"/>
+    </record>
+    <record id="crm_lead_budget_range" model="ir.model.fields">
+        <field name="name">x_budget_range</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="ttype">char</field>
+        <field name="field_description">Indicative works budget and currency</field>
+        <field name="help">Record the client's approximate construction budget and currency, for example EUR 250,000–300,000. Enter the agreed fee basis on the quotation.</field>
+        <field name="website_form_blacklisted" eval="False"/>
+    </record>
+    <record id="crm_lead_project_brief" model="ir.model.fields">
+        <field name="name">x_project_brief</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="ttype">text</field>
+        <field name="field_description">Project brief and constraints</field>
+        <field name="help">Summarize the requested work and any constraints to discuss, such as site access, planning permission, or timing.</field>
+        <field name="website_form_blacklisted" eval="False"/>
+    </record>
+    <record id="project_brief_site_address" model="ir.model.fields">
+        <field name="name">x_site_address</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="ttype">char</field>
+        <field name="field_description">Enquiry site address</field>
+        <field name="help">Address entered on the opportunity linked to this project's sales order. Select the confirmed site in Associated Location.</field>
+        <field name="related">sale_order_id.opportunity_id.x_site_address</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="project_brief_budget_range" model="ir.model.fields">
+        <field name="name">x_budget_range</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="ttype">char</field>
+        <field name="field_description">Indicative works budget and currency</field>
+        <field name="related">sale_order_id.opportunity_id.x_budget_range</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="project_brief_project_brief" model="ir.model.fields">
+        <field name="name">x_project_brief</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="ttype">text</field>
+        <field name="field_description">Enquiry brief and constraints</field>
+        <field name="related">sale_order_id.opportunity_id.x_project_brief</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+    </record>
+    <record id="project_brief_project_expected_start_date" model="ir.model.fields">
+        <field name="name">x_project_expected_start_date</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="ttype">date</field>
+        <field name="field_description">Client's requested start date</field>
+        <field name="help">Requested start date from the linked opportunity. Use the project dates to schedule the agreed work.</field>
+        <field name="related">sale_order_id.opportunity_id.x_project_expected_start_date</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
     </record>
 </odoo>

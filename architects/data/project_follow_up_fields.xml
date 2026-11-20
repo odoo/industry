@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="model_arch_project_contact" model="ir.model">
+        <field name="name">Architecture Project Contact</field>
+        <field name="model">x_arch_project_contact</field>
+    </record>
+    <record id="model_arch_meeting_attendee" model="ir.model">
+        <field name="name">Architecture Meeting Attendee</field>
+        <field name="model">x_arch_meeting_attendee</field>
+    </record>
+
+    <record id="field_arch_project_enabled" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="name">x_architecture_project</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">Architecture follow-up</field>
+        <field name="help">Enable Project Contacts and the architecture report types on this project's updates.</field>
+    </record>
+    <record id="field_arch_project_owner" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="name">x_arch_owner_id</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.partner</field>
+        <field name="field_description">Project owner</field>
+        <field name="help">Maître d’ouvrage: the client who commissions the project.</field>
+        <field name="copied" eval="False"/>
+    </record>
+    <record id="field_arch_project_site_lead" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="name">x_arch_site_lead_id</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.partner</field>
+        <field name="field_description">Works coordinator</field>
+        <field name="help">Maître d’œuvre: the contact who coordinates the client, professionals, and contractors.</field>
+        <field name="copied" eval="False"/>
+    </record>
+    <record id="field_arch_project_contact_role" model="ir.model.fields">
+        <field name="model_id" ref="model_arch_project_contact"/>
+        <field name="name">x_name</field>
+        <field name="ttype">char</field>
+        <field name="field_description">Role or trade</field>
+        <field name="required" eval="True"/>
+    </record>
+    <record id="field_arch_project_contact_project" model="ir.model.fields">
+        <field name="model_id" ref="model_arch_project_contact"/>
+        <field name="name">x_project_id</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">project.project</field>
+        <field name="field_description">Project</field>
+        <field name="required" eval="True"/>
+        <field name="on_delete">cascade</field>
+        <field name="index">btree</field>
+    </record>
+    <record id="field_arch_project_contact_partner" model="ir.model.fields">
+        <field name="model_id" ref="model_arch_project_contact"/>
+        <field name="name">x_partner_id</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.partner</field>
+        <field name="field_description">Contact</field>
+        <field name="required" eval="True"/>
+        <field name="on_delete">restrict</field>
+    </record>
+    <record id="field_arch_project_contact_ids" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="name">x_arch_contact_ids</field>
+        <field name="ttype">one2many</field>
+        <field name="relation">x_arch_project_contact</field>
+        <field name="relation_field">x_project_id</field>
+        <field name="field_description">Other project contacts</field>
+        <field name="help">Add contractors, consultants, and other people involved in the project. Use Add project contacts on a site meeting to copy them to its attendance list.</field>
+    </record>
+
+    <record id="field_arch_update_project_enabled" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_update"/>
+        <field name="name">x_architecture_project</field>
+        <field name="ttype">boolean</field>
+        <field name="field_description">Architecture follow-up</field>
+        <field name="related">project_id.x_architecture_project</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="True"/>
+    </record>
+    <record id="field_arch_update_type" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_update"/>
+        <field name="name">x_arch_update_type</field>
+        <field name="ttype">selection</field>
+        <field name="field_description">Report type</field>
+        <field name="help">Choose Site meeting for attendance and decisions, or Monthly financial update to record a dated billing summary.</field>
+    </record>
+    <record id="arch_update_type_site" model="ir.model.fields.selection">
+        <field name="field_id" ref="field_arch_update_type"/>
+        <field name="name">Site meeting</field>
+        <field name="value">site</field>
+    </record>
+    <record id="arch_update_type_financial" model="ir.model.fields.selection">
+        <field name="field_id" ref="field_arch_update_type"/>
+        <field name="name">Monthly financial update</field>
+        <field name="value">financial</field>
+    </record>
+    <record id="field_arch_update_recipient" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_update"/>
+        <field name="name">x_arch_recipient_id</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.partner</field>
+        <field name="field_description">Report recipient</field>
+        <field name="help">Select the contact who should receive the report. Send report opens a draft email with the recipient and PDF for review.</field>
+        <field name="copied" eval="False"/>
+    </record>
+    <record id="field_arch_update_recipient_email" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_update"/>
+        <field name="name">x_arch_recipient_email</field>
+        <field name="ttype">char</field>
+        <field name="field_description">Report recipient email</field>
+        <field name="related">x_arch_recipient_id.email</field>
+        <field name="readonly" eval="True"/>
+        <field name="store" eval="False"/>
+        <field name="groups" eval="[Command.link(ref('project.group_project_user'))]"/>
+    </record>
+    <record id="field_arch_attendee_update" model="ir.model.fields">
+        <field name="model_id" ref="model_arch_meeting_attendee"/>
+        <field name="name">x_update_id</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">project.update</field>
+        <field name="field_description">Site meeting</field>
+        <field name="required" eval="True"/>
+        <field name="on_delete">cascade</field>
+        <field name="index">btree</field>
+    </record>
+    <record id="field_arch_attendee_partner" model="ir.model.fields">
+        <field name="model_id" ref="model_arch_meeting_attendee"/>
+        <field name="name">x_partner_id</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.partner</field>
+        <field name="field_description">Contact</field>
+        <field name="required" eval="True"/>
+        <field name="on_delete">restrict</field>
+    </record>
+    <record id="field_arch_attendee_role" model="ir.model.fields">
+        <field name="model_id" ref="model_arch_meeting_attendee"/>
+        <field name="name">x_name</field>
+        <field name="ttype">char</field>
+        <field name="field_description">Role at the meeting</field>
+    </record>
+    <record id="field_arch_attendee_status" model="ir.model.fields">
+        <field name="model_id" ref="model_arch_meeting_attendee"/>
+        <field name="name">x_status</field>
+        <field name="ttype">selection</field>
+        <field name="field_description">Attendance</field>
+        <field name="help">Record whether the contact was present, absent, or excused. Leave this blank until attendance is known.</field>
+    </record>
+    <record id="arch_attendee_present" model="ir.model.fields.selection">
+        <field name="field_id" ref="field_arch_attendee_status"/>
+        <field name="name">Present</field>
+        <field name="value">present</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="arch_attendee_absent" model="ir.model.fields.selection">
+        <field name="field_id" ref="field_arch_attendee_status"/>
+        <field name="name">Absent</field>
+        <field name="value">absent</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="arch_attendee_excused" model="ir.model.fields.selection">
+        <field name="field_id" ref="field_arch_attendee_status"/>
+        <field name="name">Excused</field>
+        <field name="value">excused</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="field_arch_update_attendees" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_update"/>
+        <field name="name">x_arch_attendee_ids</field>
+        <field name="ttype">one2many</field>
+        <field name="relation">x_arch_meeting_attendee</field>
+        <field name="relation_field">x_update_id</field>
+        <field name="field_description">Attendance</field>
+    </record>
+
+    <record id="field_arch_financial_snapshot" model="ir.model.fields">
+        <field name="model_id" ref="project.model_project_update"/>
+        <field name="name">x_arch_financial_snapshot</field>
+        <field name="ttype">html</field>
+        <field name="field_description">Financial snapshot</field>
+        <field name="help">Enter the dated figures from Sales and Invoicing. Include the currency and tax basis. Create a new monthly update for later figures.</field>
+        <field name="copied" eval="False"/>
+        <field name="groups" eval="[Command.set([ref('account.group_account_invoice')])]"/>
+    </record>
+    <record id="field_arch_product_phase_stage" model="ir.model.fields">
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="name">x_arch_phase_stage_id</field>
+        <field name="ttype">many2one</field>
+        <field name="relation">project.task.type</field>
+        <field name="field_description">Architecture phase stage</field>
+    </record>
+
+    <record id="arch_project_contact_read" model="ir.access">
+        <field name="name">Architecture contacts on readable projects</field>
+        <field name="model_id" ref="model_arch_project_contact"/>
+        <field name="group_id" ref="project.group_project_user"/>
+        <field name="operation">r</field>
+        <field name="domain">[('x_project_id', 'access', 'read')]</field>
+    </record>
+    <record id="arch_project_contact_edit" model="ir.access">
+        <field name="name">Architecture contacts on writable projects</field>
+        <field name="model_id" ref="model_arch_project_contact"/>
+        <field name="group_id" ref="project.group_project_user"/>
+        <field name="operation">cud</field>
+        <field name="domain">[('x_project_id', 'access', 'write')]</field>
+    </record>
+    <record id="arch_meeting_attendee_read" model="ir.access">
+        <field name="name">Attendance on readable site meetings</field>
+        <field name="model_id" ref="model_arch_meeting_attendee"/>
+        <field name="group_id" ref="project.group_project_user"/>
+        <field name="operation">r</field>
+        <field name="domain">[('x_update_id.x_arch_update_type', '=', 'site'), ('x_update_id', 'access', 'read')]</field>
+    </record>
+    <record id="arch_meeting_attendee_edit" model="ir.access">
+        <field name="name">Attendance on writable site meetings</field>
+        <field name="model_id" ref="model_arch_meeting_attendee"/>
+        <field name="group_id" ref="project.group_project_user"/>
+        <field name="operation">cud</field>
+        <field name="domain">[('x_update_id.x_arch_update_type', '=', 'site'), ('x_update_id', 'access', 'write')]</field>
+    </record>
+</odoo>

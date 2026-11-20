@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="action_assign_architecture_phase_stage" model="ir.actions.server">
+        <field name="name">Place new architecture tasks in their phase</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">object_write</field>
+        <field name="update_path">stage_id</field>
+        <field name="evaluation_type">equation</field>
+        <field name="value">((record.sale_line_id.product_id.x_arch_phase_stage_id &amp; record.project_id.type_ids) or record.stage_id).id</field>
+    </record>
+    <record id="automation_assign_architecture_phase_stage" model="base.automation">
+        <field name="name">Place new architecture tasks in their phase</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[('is_template', '=', False), ('project_id.x_architecture_project', '=', True), ('sale_line_id.product_id.x_arch_phase_stage_id', '!=', False)]</field>
+        <field name="action_server_ids" eval="[(4, ref('action_assign_architecture_phase_stage'))]"/>
+    </record>
+
+    <record id="action_send_architecture_follow_up" model="ir.actions.act_window">
+        <field name="name">Send project report</field>
+        <field name="res_model">mail.compose.message</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="mail.email_compose_message_wizard_form"/>
+        <field name="target">new</field>
+        <field name="group_ids" eval="[Command.link(ref('project.group_project_user'))]"/>
+        <field name="context" eval="str({
+            'default_model': 'project.update',
+            'default_template_id': ref('mail_template_project_follow_up'),
+            'default_composition_mode': 'comment',
+            'default_notify_skip_followers': True,
+            'mail_post_autofollow': False,
+            'force_email': True,
+        })"/>
+    </record>
+</odoo>

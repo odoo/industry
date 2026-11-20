@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+    <record id="task_stage_architecture_schematic" model="project.task.type" forcecreate="0">
+        <field name="name">Schematic Design</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="task_stage_architecture_preliminary" model="project.task.type" forcecreate="0">
+        <field name="name">Preliminary Design</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="task_stage_architecture_detailed" model="project.task.type" forcecreate="0">
+        <field name="name">Detailed Design</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="task_stage_architecture_site" model="project.task.type" forcecreate="0">
+        <field name="name">Construction Administration</field>
+        <field name="sequence">40</field>
+    </record>
+
+    <record id="documents_phase_project" model="documents.document" forcecreate="0">
+        <field name="name">Architecture by Phase</field>
+        <field name="type">folder</field>
+        <field name="owner_id" eval="False"/>
+        <field name="access_via_link">none</field>
+        <field name="access_internal">edit</field>
+        <field name="folder_id" ref="documents_project.document_project_folder"/>
+    </record>
+    <record id="documents_phase_client_deliverables" model="documents.document" forcecreate="0">
+        <field name="name">Client Deliverables</field>
+        <field name="type">folder</field>
+        <field name="owner_id" eval="False"/>
+        <field name="access_via_link">none</field>
+        <field name="access_internal">edit</field>
+        <field name="folder_id" ref="documents_phase_project"/>
+    </record>
+    <record id="project_template_architecture_phases" model="project.project" forcecreate="0" context="{'mail_auto_subscribe_no_notify': True}">
+        <field name="name">Architecture by Phase from Sales</field>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="label_tasks">Phases</field>
+        <field name="is_template" eval="True"/>
+        <field name="x_architecture_project" eval="True"/>
+        <field name="allow_billable" eval="True"/>
+        <field name="allow_timesheets" eval="True"/>
+        <field name="allow_milestones" eval="True"/>
+        <field name="documents_folder_id" ref="documents_phase_project"/>
+        <field name="type_ids" eval="[(6, 0, [ref('task_stage_architecture_schematic'), ref('task_stage_architecture_preliminary'), ref('task_stage_architecture_detailed'), ref('task_stage_architecture_site')])]"/>
+    </record>
+
+    <record id="task_template_architecture_phase_schematic" model="project.task" forcecreate="0">
+        <field name="name">Schematic Design</field>
+        <field name="is_template" eval="True"/>
+        <field name="description" type="html"><p>Confirm feasibility and the brief, compare design options, and record the agreed concept and completion condition.</p></field>
+    </record>
+    <record id="task_template_architecture_phase_preliminary" model="project.task" forcecreate="0">
+        <field name="name">Preliminary Design</field>
+        <field name="is_template" eval="True"/>
+        <field name="description" type="html"><p>Develop the agreed option, review the current construction budget, and record the client’s decision.</p></field>
+    </record>
+    <record id="task_template_architecture_phase_detailed" model="project.task" forcecreate="0">
+        <field name="name">Detailed Design</field>
+        <field name="is_template" eval="True"/>
+        <field name="description" type="html"><p>Coordinate the technical drawings and specifications, record approval, and file the released package.</p></field>
+    </record>
+    <record id="task_template_architecture_phase_site" model="project.task" forcecreate="0">
+        <field name="name">Construction Administration</field>
+        <field name="is_template" eval="True"/>
+        <field name="description" type="html"><p>Record site meetings in Project Updates, track contractor decisions and changes, and confirm the handover condition.</p></field>
+    </record>
+
+    <record id="documents_manual_phase_project" model="documents.document" forcecreate="0">
+        <field name="name">Architecture by Phase Starter</field>
+        <field name="type">folder</field>
+        <field name="owner_id" eval="False"/>
+        <field name="access_via_link">none</field>
+        <field name="access_internal">edit</field>
+        <field name="folder_id" ref="documents_project.document_project_folder"/>
+    </record>
+    <record id="documents_manual_phase_client_deliverables" model="documents.document" forcecreate="0">
+        <field name="name">Client Deliverables</field>
+        <field name="type">folder</field>
+        <field name="owner_id" eval="False"/>
+        <field name="access_via_link">none</field>
+        <field name="access_internal">edit</field>
+        <field name="folder_id" ref="documents_manual_phase_project"/>
+    </record>
+    <record id="project_template_architecture_phases_manual" model="project.project" forcecreate="0" context="{'mail_auto_subscribe_no_notify': True}">
+        <field name="name">Architecture by Phase</field>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="label_tasks">Phases</field>
+        <field name="is_template" eval="True"/>
+        <field name="x_architecture_project" eval="True"/>
+        <field name="allow_billable" eval="True"/>
+        <field name="allow_timesheets" eval="True"/>
+        <field name="allow_milestones" eval="True"/>
+        <field name="documents_folder_id" ref="documents_manual_phase_project"/>
+        <field name="type_ids" eval="[Command.set([ref('task_stage_architecture_schematic'), ref('task_stage_architecture_preliminary'), ref('task_stage_architecture_detailed'), ref('task_stage_architecture_site')])]"/>
+    </record>
+    <record id="manual_phase_schematic" model="project.task" forcecreate="0">
+        <field name="name">Schematic Design</field>
+        <field name="project_id" ref="project_template_architecture_phases_manual"/>
+        <field name="stage_id" ref="task_stage_architecture_schematic"/>
+        <field name="description" model="project.task" eval="obj().browse(ref('task_template_architecture_phase_schematic')).description"/>
+    </record>
+    <record id="manual_phase_preliminary" model="project.task" forcecreate="0">
+        <field name="name">Preliminary Design</field>
+        <field name="project_id" ref="project_template_architecture_phases_manual"/>
+        <field name="stage_id" ref="task_stage_architecture_preliminary"/>
+        <field name="description" model="project.task" eval="obj().browse(ref('task_template_architecture_phase_preliminary')).description"/>
+    </record>
+    <record id="manual_phase_detailed" model="project.task" forcecreate="0">
+        <field name="name">Detailed Design</field>
+        <field name="project_id" ref="project_template_architecture_phases_manual"/>
+        <field name="stage_id" ref="task_stage_architecture_detailed"/>
+        <field name="description" model="project.task" eval="obj().browse(ref('task_template_architecture_phase_detailed')).description"/>
+    </record>
+    <record id="manual_phase_site" model="project.task" forcecreate="0">
+        <field name="name">Construction Administration</field>
+        <field name="project_id" ref="project_template_architecture_phases_manual"/>
+        <field name="stage_id" ref="task_stage_architecture_site"/>
+        <field name="description" model="project.task" eval="obj().browse(ref('task_template_architecture_phase_site')).description"/>
+    </record>
+</odoo>

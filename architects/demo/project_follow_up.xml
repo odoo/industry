@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1" context="{'mail_auto_subscribe_no_notify': True, 'mail_notify_force_send': False, 'mail_create_nosubscribe': True}">
+    <record id="willow_plumbing_contact" model="x_arch_project_contact">
+        <field name="x_project_id" model="sale.order" eval="obj().browse(ref('sale_order_cost_fee_demo')).project_id.id"/>
+        <field name="x_partner_id" ref="partner_demo_plumbing"/>
+        <field name="x_name">Plumbing supervisor</field>
+    </record>
+    <record id="willow_electrical_contact" model="x_arch_project_contact">
+        <field name="x_project_id" model="sale.order" eval="obj().browse(ref('sale_order_cost_fee_demo')).project_id.id"/>
+        <field name="x_partner_id" ref="partner_demo_electrical"/>
+        <field name="x_name">Electrical contractor</field>
+    </record>
+    <record id="willow_site_meeting" model="project.update">
+        <field name="name">Willow Farm: site coordination</field>
+        <field name="project_id" model="sale.order" eval="obj().browse(ref('sale_order_cost_fee_demo')).project_id.id"/>
+        <field name="x_arch_update_type">site</field>
+        <field name="x_arch_recipient_id" ref="res_partner_17"/>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="date" eval="DateTime.today().date() - relativedelta(days=2)"/>
+        <field name="status">on_track</field>
+        <field name="progress">70</field>
+        <field name="description" type="html">
+            <h4>Decisions</h4>
+            <p>The owner approved the revised utility room layout. The plumbing supervisor confirmed that the service route stays accessible.</p>
+            <h4>Before the next visit</h4>
+            <ul>
+                <li>Elise to issue the coordinated drawing by Friday.</li>
+                <li>Jules to confirm the electrical route before any ceiling work starts.</li>
+            </ul>
+        </field>
+        <field name="x_arch_attendee_ids" eval="[
+            (0, 0, {'x_partner_id': ref('res_partner_17'), 'x_name': 'Project owner', 'x_status': 'present'}),
+            (0, 0, {'x_partner_id': ref('partner_demo_works_coordinator'), 'x_name': 'Works coordinator', 'x_status': 'present'}),
+            (0, 0, {'x_partner_id': ref('partner_demo_plumbing'), 'x_name': 'Plumbing supervisor', 'x_status': 'present'}),
+            (0, 0, {'x_partner_id': ref('partner_demo_electrical'), 'x_name': 'Electrical contractor', 'x_status': 'absent'}),
+        ]"/>
+    </record>
+
+    <record id="willow_pending_scope_quote" model="sale.order">
+        <field name="partner_id" ref="res_partner_17"/>
+        <field name="partner_invoice_id" ref="partner_willow_farm_billing"/>
+        <field name="project_id" model="sale.order" eval="obj().browse(ref('sale_order_cost_fee_demo')).project_id.id"/>
+        <field name="pricelist_id" ref="pricelist_architecture_services"/>
+        <field name="team_id" ref="crm_team_architecture"/>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="client_order_ref">Willow Farm: lighting layout option</field>
+    </record>
+    <record id="willow_pending_scope_quote_line" model="sale.order.line">
+        <field name="order_id" ref="willow_pending_scope_quote"/>
+        <field name="product_id" ref="product_additional_design_work"/>
+        <field name="name">Optional revised lighting layout</field>
+        <field name="product_uom_qty">4</field>
+        <field name="price_unit">125</field>
+        <field name="tax_ids" eval="[(5, 0, 0)]"/>
+    </record>
+    <record id="willow_monthly_financial_update" model="project.update">
+        <field name="name">Willow Farm: monthly financial update</field>
+        <field name="project_id" model="sale.order" eval="obj().browse(ref('sale_order_cost_fee_demo')).project_id.id"/>
+        <field name="x_arch_update_type">financial</field>
+        <field name="x_arch_recipient_id" ref="res_partner_17"/>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="status">on_track</field>
+        <field name="progress">70</field>
+        <field name="description" type="html">
+            <h4>Approved changes</h4>
+            <p>The owner approved the revised construction budget for the renovation. The fixed fee rate remains 5%.</p>
+            <h4>Pending decisions</h4>
+            <p>The lighting layout option is awaiting approval. The detailed design invoice is under review.</p>
+        </field>
+        <field name="x_arch_financial_snapshot" type="html">
+            <p>Amounts exclude VAT and use the sales order currency. Prepared as of the update date.</p>
+            <table class="table table-sm">
+                <tbody>
+                    <tr><th scope="row">Original quoted fee</th><td>15,000</td></tr>
+                    <tr><th scope="row">Current contract value</th><td>17,500</td></tr>
+                    <tr><th scope="row">Invoiced net of credit notes</th><td>6,000</td></tr>
+                    <tr><th scope="row">Pending in draft invoices</th><td>6,250</td></tr>
+                    <tr><th scope="row">Remaining after drafts</th><td>5,250</td></tr>
+                </tbody>
+            </table>
+            <p>A separate 500 quotation for the lighting layout awaits approval.</p>
+        </field>
+    </record>
+</odoo>

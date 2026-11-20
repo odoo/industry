@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_project_architecture_contacts" model="ir.ui.view">
+        <field name="name">project.project.architecture.contacts</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='settings']/group/group[1]" position="inside">
+                <field name="x_architecture_project" groups="project.group_project_user"/>
+            </xpath>
+            <xpath expr="//page[@name='description']" position="after">
+                <page name="architecture_contacts" string="Project Contacts"
+                      invisible="not x_architecture_project or is_template" groups="project.group_project_user">
+                    <group>
+                        <field name="x_arch_owner_id" options="{'no_quick_create': True}"/>
+                        <field name="x_arch_site_lead_id" options="{'no_quick_create': True}"/>
+                    </group>
+                    <separator string="Other project contacts"/>
+                    <field name="x_arch_contact_ids" nolabel="1">
+                        <list editable="bottom">
+                            <field name="x_partner_id" options="{'no_quick_create': True}"/>
+                            <field name="x_name" placeholder="e.g. Plumbing supervisor"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_project_update_architecture_follow_up" model="ir.ui.view">
+        <field name="name">project.update.architecture.follow.up</field>
+        <field name="model">project.update</field>
+        <field name="inherit_id" ref="project.project_update_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet" position="before">
+                <header groups="project.group_project_user">
+                    <button name="%(action_report_project_follow_up)d" type="action" string="Print report"
+                            class="btn-secondary" invisible="x_arch_update_type != 'site'"/>
+                    <button name="%(action_send_architecture_follow_up)d" type="action" string="Send report"
+                            class="btn-secondary" context="{'default_res_ids': [id]}"
+                            invisible="not id or x_arch_update_type != 'site' or not x_arch_recipient_email"/>
+                    <button name="%(action_report_project_follow_up)d" type="action" string="Print report"
+                            class="btn-secondary" groups="account.group_account_invoice"
+                            invisible="x_arch_update_type != 'financial' or not x_arch_financial_snapshot"/>
+                    <button name="%(action_send_architecture_follow_up)d" type="action" string="Send report"
+                            class="btn-secondary" groups="account.group_account_invoice"
+                            context="{'default_res_ids': [id]}"
+                            invisible="not id or x_arch_update_type != 'financial' or not x_arch_recipient_email or not x_arch_financial_snapshot"/>
+                </header>
+            </xpath>
+            <field name="date" position="after">
+                <field name="x_architecture_project" invisible="1"/>
+                <field name="x_arch_update_type" invisible="not x_architecture_project and not x_arch_update_type"
+                       readonly="id and x_arch_update_type" groups="project.group_project_user"/>
+                <field name="x_arch_recipient_id" invisible="not x_arch_update_type"
+                       options="{'no_quick_create': True}" domain="[('email', '!=', False)]"
+                       groups="project.group_project_user"/>
+                <field name="x_arch_recipient_email" invisible="1" groups="project.group_project_user"/>
+            </field>
+            <xpath expr="//page[@name='description']" position="after">
+                <page name="architecture_attendance" string="Attendance" invisible="x_arch_update_type != 'site'"
+                      groups="project.group_project_user">
+                    <field name="x_arch_attendee_ids" nolabel="1">
+                        <list editable="bottom" decoration-muted="x_status == 'excused'">
+                            <field name="x_partner_id" options="{'no_quick_create': True}"/>
+                            <field name="x_name"/>
+                            <field name="x_status"/>
+                        </list>
+                    </field>
+                </page>
+                <page name="architecture_financial_snapshot" string="Financial Snapshot" invisible="x_arch_update_type != 'financial'"
+                      groups="account.group_account_invoice">
+                    <field name="x_arch_financial_snapshot" nolabel="1"
+                           placeholder="Enter the dated amounts, currency, tax basis, and any quotations awaiting approval."/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_project_update_architecture_search" model="ir.ui.view">
+        <field name="name">project.update.architecture.search</field>
+        <field name="model">project.update</field>
+        <field name="inherit_id" ref="project.project_update_view_search"/>
+        <field name="arch" type="xml">
+            <filter name="my_updates" position="after">
+                <separator/>
+                <filter name="architecture_site_meetings" string="Site Meetings" domain="[('x_arch_update_type', '=', 'site')]"/>
+                <filter name="architecture_financial_updates" string="Monthly Financial Updates" domain="[('x_arch_update_type', '=', 'financial')]"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1" context="{'mail_auto_subscribe_no_notify': True, 'mail_notify_force_send': False, 'mail_activity_quick_update': True}">
+    <record id="sale_order_phase_workflow_demo" model="sale.order">
+        <field name="partner_id" ref="res_partner_24"/>
+        <field name="opportunity_id" ref="crm_lead_phase_workflow_demo"/>
+        <field name="team_id" ref="crm_team_architecture"/>
+        <field name="pricelist_id" ref="pricelist_architecture_services"/>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="client_order_ref">Cedar Works Technical Package</field>
+        <field name="document_tax_mode">tax_excluded</field>
+    </record>
+    <record id="sale_line_phase_workflow_demo" model="sale.order.line">
+        <field name="order_id" ref="sale_order_phase_workflow_demo"/>
+        <field name="product_id" ref="product_product_22"/>
+        <field name="product_uom_qty">8</field>
+        <field name="name">Technical drawing package, billed on release of the client-approved revision</field>
+    </record>
+    <record id="sale_line_hourly_workflow_demo" model="sale.order.line">
+        <field name="order_id" ref="sale_order_phase_workflow_demo"/>
+        <field name="product_id" ref="product_additional_design_work"/>
+        <field name="product_uom_qty">3</field>
+        <field name="name">Approved layout revision, billed for actual hours worked (up to three hours)</field>
+    </record>
+    <function model="sale.order" name="action_confirm" eval="[[ref('sale_order_phase_workflow_demo')]]"/>
+    <function model="crm.lead" name="action_set_won" eval="[[ref('crm_lead_phase_workflow_demo')]]"/>
+    <function model="project.project" name="write">
+        <value model="sale.order.line" eval="obj().browse(ref('sale_line_phase_workflow_demo')).task_id.project_id.ids"/>
+        <value eval="{
+            'name': 'Cedar Works',
+            'stage_id': ref('project.project_project_stage_2'),
+            'x_associated_location': ref('res_partner_25'),
+            'x_promoter': ref('res_partner_26'),
+            'x_progress_approver': ref('res_partner_24'),
+            'x_project_reference': 'Cedar Works Technical Package',
+        }"/>
+    </function>
+    <function model="project.task" name="write">
+        <value model="sale.order.line" eval="obj().browse(ref('sale_line_phase_workflow_demo')).task_id.child_ids.filtered('dependent_ids').ids"/>
+        <value eval="{'stage_id': ref('project_task_type_15'), 'state': '1_done'}"/>
+    </function>
+    <function model="project.task" name="write">
+        <value model="sale.order.line" eval="obj().browse(ref('sale_line_phase_workflow_demo')).task_id.ids"/>
+        <value eval="{'stage_id': ref('task_stage_client_review')}"/>
+    </function>
+    <function model="project.task" name="write">
+        <value model="sale.order.line" eval="obj().browse(ref('sale_line_phase_workflow_demo')).task_id.child_ids.filtered(lambda task: not task.dependent_ids).ids"/>
+        <value eval="{'stage_id': ref('task_stage_client_review'), 'date_deadline': DateTime.now() + relativedelta(days=3)}"/>
+    </function>
+    <record id="timesheet_additional_work_demo" model="account.analytic.line">
+        <field name="name">Cedar Works — revise the reception layout and coordinate partition changes</field>
+        <field name="employee_id" ref="employee_designer_demo"/>
+        <field name="project_id" model="sale.order.line" eval="obj().browse(ref('sale_line_hourly_workflow_demo')).task_id.project_id.id"/>
+        <field name="task_id" model="sale.order.line" eval="obj().browse(ref('sale_line_hourly_workflow_demo')).task_id.id"/>
+        <field name="so_line" ref="sale_line_hourly_workflow_demo"/>
+        <field name="unit_amount">1.5</field>
+        <field name="date" eval="DateTime.today().date() - relativedelta(days=1)"/>
+    </record>
+    <function model="account.analytic.line" name="action_validate_timesheet" eval="[[ref('timesheet_additional_work_demo')]]"/>
+    <record id="planning_design_session_demo" model="planning.slot">
+        <field name="name">Reserve time for Cedar Works drawing revisions after client review</field>
+        <field name="role_id" ref="planning_role_1"/>
+        <field name="resource_ids" model="hr.employee" eval="[Command.set(obj().browse(ref('employee_designer_demo')).resource_id.ids)]"/>
+        <field name="sale_line_id" ref="sale_line_phase_workflow_demo"/>
+        <field name="start_datetime" eval="(DateTime.now() + relativedelta(days=14 - DateTime.now().weekday())).replace(hour=9, minute=0, second=0, microsecond=0)"/>
+        <field name="end_datetime" eval="(DateTime.now() + relativedelta(days=14 - DateTime.now().weekday())).replace(hour=11, minute=0, second=0, microsecond=0)"/>
+        <field name="state">1_draft</field>
+    </record>
+</odoo>
