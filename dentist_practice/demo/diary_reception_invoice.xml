@@ -31,7 +31,10 @@
         <field name="res_id" model="sale.order" eval="obj(ref('sale_order_freya_examination_diary')).invoice_ids[:1].id"/>
         <field name="activity_type_id" ref="activity_type_reception_checkout"/>
         <field name="user_id" ref="user_reception_demo"/>
-        <field name="date_deadline" eval="DateTime.today().date()"/>
+        <field name="date_deadline" model="calendar.event"
+            eval="obj(ref('event_freya_examination_diary')).start.replace(tzinfo=pytz.UTC).astimezone(
+                pytz.timezone(obj(ref('event_freya_examination_diary')).appointment_type_id.appointment_tz)
+            ).date()"/>
         <field name="summary">Freya - collect the examination invoice at reception</field>
         <field name="note" type="html">
             <p>Review the existing invoice and balance. In Reception POS, select Freya and choose Settle invoices. Record the collection against this invoice once.</p>
