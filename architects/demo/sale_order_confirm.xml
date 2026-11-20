@@ -1,55 +1,34 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<odoo noupdate="1">
-    <!-- Action confirm -->
-    <function model="sale.order" name="action_confirm">
-        <value eval="[
-            ref('sale_order_1'),
-            ref('sale_order_2'),
-            ref('sale_order_3'),
-            ref('sale_order_4'),
-            ref('sale_order_5'),
-            ref('sale_order_6')
-        ]"/>
+<odoo noupdate="1" context="{'mail_auto_subscribe_no_notify': True, 'mail_notify_force_send': False}">
+    <function model="sale.order" name="action_quotation_sent" eval="[[ref('sale_order_5')]]"/>
+    <function model="sale.order" name="action_confirm" eval="[[ref('sale_order_2'), ref('sale_order_4')]]"/>
+    <function model="sale.order" name="write">
+        <value eval="[ref('sale_order_2'), ref('sale_order_4')]"/>
+        <value eval="{'date_order': DateTime.now() - relativedelta(weeks=2)}"/>
     </function>
-
-    <function model="project.task" name="write">
-        <value model="project.task" eval="
-            (
-                obj().env.ref('architects.sale_order_line_4') +
-                obj().env.ref('architects.sale_order_line_10') +
-                obj().env.ref('architects.sale_order_line_12') +
-                obj().env.ref('architects.sale_order_line_15') +
-                obj().env.ref('architects.sale_order_line_21')
-            ).task_id.ids"/>
-        <value eval="{'stage_id': ref('project_task_type_14')}"/>
-    </function>
-
+    <function model="crm.lead" name="action_set_won" eval="[[ref('crm_lead_7'), ref('crm_lead_9')]]"/>
     <function model="project.project" name="write">
-        <value model="project.project" eval="obj().env.ref('architects.sale_order_6').project_ids.ids"/>
+        <value model="sale.order.line" eval="obj().browse(ref('sale_order_line_4')).task_id.project_id.ids"/>
         <value eval="{
-            'x_associated_location': ref('res_partner_25'),
-            'x_promoter': ref('res_partner_26'),
-            'x_cadastral_number': '12345A1111/00B222',
-            'x_project_reference': 'DESIGN/003',
+            'name': 'Courtyard Studio',
+            'stage_id': ref('project.project_project_stage_2'),
+            'x_associated_location': ref('site_courtyard_studio'),
+            'x_project_reference': 'Courtyard Studio',
+            'x_progress_approver': ref('res_partner_21'),
         }"/>
     </function>
-
     <function model="project.project" name="write">
-        <value model="project.project" eval="
-            (
-                obj().env.ref('architects.sale_order_1') +
-                obj().env.ref('architects.sale_order_2') +
-                obj().env.ref('architects.sale_order_5')
-            ).project_ids.ids"/>
-        <value eval="{'stage_id': ref('project.project_project_stage_1')}"/>
+        <value model="sale.order.line" eval="obj().browse(ref('sale_order_line_12')).task_id.project_id.ids"/>
+        <value eval="{
+            'name': 'Riverside House',
+            'stage_id': ref('project.project_project_stage_2'),
+            'x_associated_location': ref('site_riverside_house'),
+            'x_project_reference': 'Riverside House',
+            'x_progress_approver': ref('res_partner_20'),
+        }"/>
     </function>
-
-    <function model="project.project" name="write">
-        <value model="project.project" eval="
-            (
-                obj().env.ref('architects.sale_order_3') +
-                obj().env.ref('architects.sale_order_4')
-            ).project_ids.ids"/>
-        <value eval="{'stage_id': ref('project.project_project_stage_2')}"/>
+    <function model="project.task" name="write">
+        <value model="sale.order.line" eval="obj().browse(ref('sale_order_line_14')).task_id.ids"/>
+        <value eval="{'stage_id': ref('task_stage_internal_review')}"/>
     </function>
 </odoo>

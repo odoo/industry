@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1" context="{'mail_auto_subscribe_no_notify': True, 'mail_notify_force_send': False}">
+    <record id="sale_order_cost_fee_demo" model="sale.order">
+        <field name="partner_id" ref="res_partner_17"/>
+        <field name="partner_invoice_id" ref="partner_willow_farm_billing"/>
+        <field name="opportunity_id" ref="crm_lead_13"/>
+        <field name="team_id" ref="crm_team_architecture"/>
+        <field name="pricelist_id" ref="pricelist_architecture_services"/>
+        <field name="sale_order_template_id" ref="sale_template_construction_cost_fees"/>
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="client_order_ref">Willow Farm Renovation</field>
+        <field name="document_tax_mode">tax_excluded</field>
+        <field name="x_fee_contract" eval="True"/>
+        <field name="x_construction_cost">300000</field>
+        <field name="x_fee_percentage">5</field>
+    </record>
+    <record id="sale_line_cost_fee_schematic_demo" model="sale.order.line">
+        <field name="order_id" ref="sale_order_cost_fee_demo"/>
+        <field name="product_id" ref="product_fee_phase_schematic"/>
+        <field name="sequence">1</field>
+        <field name="product_uom_qty">1</field>
+        <field name="x_phase_percentage">20</field>
+        <field name="tax_ids" eval="[(5, 0, 0)]"/>
+    </record>
+    <record id="sale_line_cost_fee_preliminary_demo" model="sale.order.line">
+        <field name="order_id" ref="sale_order_cost_fee_demo"/>
+        <field name="product_id" ref="product_fee_phase_preliminary"/>
+        <field name="sequence">2</field>
+        <field name="product_uom_qty">1</field>
+        <field name="x_phase_percentage">20</field>
+        <field name="tax_ids" eval="[(5, 0, 0)]"/>
+    </record>
+    <record id="sale_line_cost_fee_detailed_demo" model="sale.order.line">
+        <field name="order_id" ref="sale_order_cost_fee_demo"/>
+        <field name="product_id" ref="product_fee_phase_detailed"/>
+        <field name="sequence">3</field>
+        <field name="product_uom_qty">1</field>
+        <field name="x_phase_percentage">30</field>
+        <field name="tax_ids" eval="[(5, 0, 0)]"/>
+    </record>
+    <record id="sale_line_cost_fee_construction_demo" model="sale.order.line">
+        <field name="order_id" ref="sale_order_cost_fee_demo"/>
+        <field name="product_id" ref="product_fee_phase_construction"/>
+        <field name="sequence">4</field>
+        <field name="product_uom_qty">1</field>
+        <field name="x_phase_percentage">30</field>
+        <field name="tax_ids" eval="[(5, 0, 0)]"/>
+    </record>
+    <function model="sale.order" name="action_confirm" eval="[[ref('sale_order_cost_fee_demo')]]"/>
+    <record id="sale_order_cost_fee_demo" model="sale.order">
+        <field name="date_order" eval="DateTime.now() - relativedelta(weeks=4)"/>
+    </record>
+    <function model="project.project" name="write">
+        <value model="sale.order.line" eval="obj().browse(ref('sale_line_cost_fee_schematic_demo')).task_id.project_id.ids"/>
+        <value eval="{
+            'name': 'Willow Farm',
+            'stage_id': ref('project.project_project_stage_1'),
+            'x_associated_location': ref('site_willow_farm'),
+            'x_progress_approver': ref('res_partner_17'),
+            'x_arch_owner_id': ref('res_partner_17'),
+            'x_arch_site_lead_id': ref('partner_demo_works_coordinator'),
+            'x_project_reference': 'Willow Farm Renovation',
+        }"/>
+    </function>
+    <function model="project.task" name="write">
+        <value model="sale.order.line" eval="obj().browse([
+            ref('sale_line_cost_fee_schematic_demo'),
+            ref('sale_line_cost_fee_preliminary_demo'),
+            ref('sale_line_cost_fee_detailed_demo'),
+        ]).task_id.ids"/>
+        <value eval="{'state': '1_done'}"/>
+    </function>
+    <function model="project.milestone" name="write">
+        <value model="sale.order.line" eval="obj().browse([ref('sale_line_cost_fee_schematic_demo'), ref('sale_line_cost_fee_preliminary_demo')]).task_id.milestone_id.ids"/>
+        <value eval="{'is_reached': True}"/>
+    </function>
+    <function model="sale.order" name="_create_invoices" eval="[[ref('sale_order_cost_fee_demo')]]"/>
+    <function model="account.move" name="action_post">
+        <value model="sale.order" eval="obj().env.ref('architects.sale_order_cost_fee_demo').invoice_ids.ids"/>
+    </function>
+    <record id="sale_order_cost_fee_demo" model="sale.order">
+        <field name="x_construction_cost">350000</field>
+    </record>
+    <function model="project.milestone" name="write">
+        <value model="sale.order.line" eval="obj().browse(ref('sale_line_cost_fee_detailed_demo')).task_id.milestone_id.ids"/>
+        <value eval="{'is_reached': True}"/>
+    </function>
+    <function model="sale.order" name="_create_invoices" eval="[[ref('sale_order_cost_fee_demo')]]"/>
+    <function model="crm.lead" name="action_set_won" eval="[[ref('crm_lead_13')]]"/>
+</odoo>

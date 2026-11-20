@@ -1,25 +1,34 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <record id="base_automation_2" model="base.automation">
-        <field name="name">Create activity to send quote</field>
-        <field name="model_id" ref="crm.model_crm_lead"/>
-        <field name="trigger">on_create_or_write</field>
-        <field name="trigger_field_ids" eval="[(6, 0, [ref('crm.field_crm_lead__stage_id')])]"/>
-        <field name="filter_pre_domain" eval="[('stage_id', 'in', [ref('crm.stage_lead1')])]"/>
-        <field name="filter_domain" eval="[('stage_id', 'in', [ref('crm_stage_5'), ref('crm.stage_lead2')])]"/>
+        <field name="name">Architecture enquiry: first contact</field>
+        <field name="model_id" ref="crm.model_crm_lead" />
+        <field name="trigger">on_create</field>
+        <field name="trigger_field_ids" eval="[(5, 0, 0)]" />
+        <field name="filter_pre_domain" eval="False" />
+        <field name="filter_domain" eval="[('active', '=', True), ('team_id', '=', ref('crm_team_architecture'))]"/>
     </record>
     <record id="base_automation_3" model="base.automation">
-        <field name="name">Mark as To-do when opportunity needs analysis</field>
-        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="name">Architecture enquiry: scope the brief</field>
+        <field name="model_id" ref="crm.model_crm_lead" />
         <field name="trigger">on_create_or_write</field>
-        <field name="trigger_field_ids" eval="[(6, 0, [ref('crm.field_crm_lead__stage_id')])]"/>
-        <field name="filter_domain" eval="[('stage_id', 'in', [ref('crm_stage_5')])]"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('crm.field_crm_lead__stage_id')])]" />
+        <field name="filter_pre_domain" eval="[('stage_id', '!=', ref('crm_stage_5'))]" />
+        <field name="filter_domain" eval="[('team_id', '=', ref('crm_team_architecture')), ('stage_id', '=', ref('crm_stage_5'))]"/>
     </record>
-    <record id="base_automation_4" model="base.automation">
-        <field name="name">Set a reminder when quote is sent</field>
-        <field name="model_id" ref="crm.model_crm_lead"/>
+    <record id="automation_quotation_sent" model="base.automation">
+        <field name="name">Architecture quotation: follow up after sending</field>
+        <field name="model_id" ref="sale.model_sale_order" />
         <field name="trigger">on_create_or_write</field>
-        <field name="trigger_field_ids" eval="[(6, 0, [ref('crm.field_crm_lead__stage_id')])]"/>
-        <field name="filter_domain" eval="[('stage_id', 'in', [ref('crm.stage_lead3')])]"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('sale.field_sale_order__state')])]" />
+        <field name="filter_pre_domain">[('state', '!=', 'sent')]</field>
+        <field name="filter_domain" eval="[
+            ('team_id', '=', ref('crm_team_architecture')),
+            ('state', '=', 'sent'),
+            ('activity_ids', 'not any', [
+                ('active', '=', True),
+                ('activity_type_id', '=', ref('activity_type_architecture_quotation_followup')),
+            ]),
+        ]"/>
     </record>
 </odoo>
