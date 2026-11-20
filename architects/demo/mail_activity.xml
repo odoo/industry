@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<odoo noupdate="1" context="{'mail_notify_force_send': False, 'mail_activity_quick_update': True}">
+<odoo noupdate="1" context="{'mail_auto_subscribe_no_notify': True, 'mail_notify_force_send': False, 'mail_activity_quick_update': True}">
+    <function model="project.task" name="write">
+        <value model="sale.order" eval="obj().browse([
+            ref('sale_order_2'),
+            ref('sale_order_4'),
+            ref('sale_order_phase_workflow_demo'),
+            ref('sale_order_cost_fee_demo'),
+        ]).order_line.task_id.ids"/>
+        <value eval="{'user_ids': [Command.link(ref('base.user_admin'))]}"/>
+    </function>
     <record id="activity_cedar_works_client_review" model="mail.activity">
         <field name="res_model_id" ref="project.model_project_task"/>
         <field name="res_id" model="sale.order.line" eval="obj().browse(ref('sale_line_phase_workflow_demo')).task_id.id"/>
