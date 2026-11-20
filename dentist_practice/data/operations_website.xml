@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="view_new_patient_enquiry" model="ir.ui.view">
+        <field name="active" eval="True"/>
+        <field name="name">New-patient enquiry</field>
+        <field name="key">dentist_practice.new_patient_enquiry</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="base.default_website"/>
+        <field name="arch" type="xml">
+            <t name="New-patient enquiry" t-name="dentist_practice.new_patient_enquiry">
+                <t t-call="website.layout">
+                    <div id="wrap" class="oe_structure oe_empty">
+                        <section class="s_title pt80 pb48 o_cc o_cc2 o_colored_level" data-snippet="s_title" data-name="New-patient enquiry">
+                            <div class="o_container_small">
+                                <p class="small text-uppercase fw-semibold text-primary">A first conversation</p>
+                                <h1 class="display-3 mb-4">Let's plan your first visit.</h1>
+                                <p class="lead">Tell us how to reach you and which times work for you. Reception will help you take the next step.</p>
+                            </div>
+                        </section>
+                        <section class="s_website_form pt48 pb80 o_cc o_cc1 o_colored_level" data-vcss="001" data-snippet="s_website_form" data-name="New-patient form">
+                            <div class="o_container_small">
+                                <p class="mb-4">Please keep your message to booking and reception arrangements. Discuss clinical questions directly with the practice.</p>
+                                <form id="dentist_new_patient_form" action="/website/form/" method="post" enctype="multipart/form-data" class="o_mark_required" data-mark="*" data-model_name="crm.lead" data-success-mode="redirect" data-success-page="/dentist/enquiry-received" data-pre-fill="true">
+                                    <div class="s_website_form_rows row s_col_no_bgcolor">
+                                        <div class="s_website_form_field mb-3 col-12 s_website_form_required" data-type="char" data-name="Field">
+                                            <label class="s_website_form_label form-label" for="dentist_enquiry_contact_name">
+                                                <span class="s_website_form_label_content">Your name</span>
+                                                <span class="s_website_form_mark"> *</span>
+                                            </label>
+                                            <input id="dentist_enquiry_contact_name" class="form-control s_website_form_input" type="text" name="contact_name" autocomplete="name" data-fill-with="name" required="1"/>
+                                        </div>
+                                        <div class="s_website_form_field mb-3 col-12 col-md-6 s_website_form_required" data-type="email" data-name="Field">
+                                            <label class="s_website_form_label form-label" for="dentist_enquiry_email">
+                                                <span class="s_website_form_label_content">Email</span>
+                                                <span class="s_website_form_mark"> *</span>
+                                            </label>
+                                            <input id="dentist_enquiry_email" class="form-control s_website_form_input" type="email" name="email_from" autocomplete="email" data-fill-with="email" required="1"/>
+                                        </div>
+                                        <div class="s_website_form_field mb-3 col-12 col-md-6" data-type="tel" data-name="Field">
+                                            <label class="s_website_form_label form-label" for="dentist_enquiry_phone">
+                                                <span class="s_website_form_label_content">Phone</span>
+                                            </label>
+                                            <input id="dentist_enquiry_phone" class="form-control s_website_form_input" type="tel" name="phone" autocomplete="tel" data-fill-with="phone"/>
+                                        </div>
+                                        <div class="s_website_form_field s_website_form_custom mb-3 col-12" data-type="char" data-name="Field">
+                                            <label class="s_website_form_label form-label" for="dentist_enquiry_preferred_times">
+                                                <span class="s_website_form_label_content">Preferred days or times</span>
+                                            </label>
+                                            <input id="dentist_enquiry_preferred_times" class="form-control s_website_form_input" type="text" name="Preferred days or times" placeholder="For example, Monday mornings or after 15:00"/>
+                                        </div>
+                                        <div class="s_website_form_field mb-3 col-12" data-type="text" data-name="Field">
+                                            <label class="s_website_form_label form-label" for="dentist_enquiry_message">
+                                                <span class="s_website_form_label_content">Administrative message</span>
+                                            </label>
+                                            <textarea id="dentist_enquiry_message" class="form-control s_website_form_input" name="description" rows="4" placeholder="Tell reception how they can help arrange your first visit."/>
+                                        </div>
+                                        <div class="s_website_form_field s_website_form_dnone" data-name="Field">
+                                            <input class="s_website_form_input" type="hidden" name="name" value="New-patient enquiry"/>
+                                        </div>
+                                        <t t-set="patient_team" t-value="request.env.ref('dentist_practice.crm_team_patient_journey', raise_if_not_found=False)"/>
+                                        <div t-if="patient_team" class="s_website_form_field s_website_form_dnone" data-name="Field">
+                                            <input class="s_website_form_input" type="hidden" name="team_id" t-att-value="patient_team.id"/>
+                                        </div>
+                                        <div t-if="patient_team and patient_team.sudo().user_id" class="s_website_form_field s_website_form_dnone" data-name="Field">
+                                            <input class="s_website_form_input" type="hidden" name="user_id" t-att-value="patient_team.sudo().user_id.id"/>
+                                        </div>
+                                        <div class="col-12">
+                                            <p>Reception will review your enquiry and follow up to agree the next step. Submitting this form does not reserve an appointment.</p>
+                                        </div>
+                                        <div class="mb-0 py-2 col-12 s_website_form_submit text-start s_website_form_no_submit_label" data-name="Submit Button">
+                                            <a href="#" role="button" class="btn btn-primary btn-lg s_website_form_send">Send enquiry</a>
+                                            <span id="s_website_form_result" class="ms-2"/>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </section>
+                    </div>
+                </t>
+            </t>
+        </field>
+    </record>
+    <record id="view_enquiry_received" model="ir.ui.view">
+        <field name="active" eval="True"/>
+        <field name="name">Enquiry received</field>
+        <field name="key">dentist_practice.enquiry_received</field>
+        <field name="type">qweb</field>
+        <field name="website_id" ref="base.default_website"/>
+        <field name="arch" type="xml">
+            <t name="Enquiry received" t-name="dentist_practice.enquiry_received">
+                <t t-call="website.layout">
+                    <div id="wrap" class="oe_structure oe_empty">
+                        <section class="s_text_block pt96 pb96 o_cc o_cc2 o_colored_level" data-snippet="s_text_block" data-name="Enquiry confirmation">
+                            <div class="o_container_small">
+                                <p class="small text-uppercase fw-semibold text-primary">Enquiry received</p>
+                                <h1 class="display-3 mb-4">Thank you for getting in touch.</h1>
+                                <p class="lead">Your details have been submitted for reception to review.</p>
+                                <p>Reception will follow up to discuss availability and agree the next step. Your enquiry does not reserve an appointment.</p>
+                                <p>If you would like to choose a time online, you can view the practice's published appointment options.</p>
+                                <p class="mt-4 d-flex flex-wrap gap-3">
+                                    <a href="/appointment" class="btn btn-primary btn-lg">View appointment options</a>
+                                    <a href="/" class="btn btn-outline-primary btn-lg">Return to the homepage</a>
+                                </p>
+                            </div>
+                        </section>
+                    </div>
+                </t>
+            </t>
+        </field>
+    </record>
+    <data noupdate="1">
+        <record id="page_new_patient_enquiry" model="website.page" forcecreate="0">
+            <field name="view_id" ref="view_new_patient_enquiry"/>
+            <field name="url">/dentist/new-patient</field>
+            <field name="website_id" ref="base.default_website"/>
+            <field name="is_published" eval="True"/>
+        </record>
+        <record id="page_enquiry_received" model="website.page" forcecreate="0">
+            <field name="view_id" ref="view_enquiry_received"/>
+            <field name="url">/dentist/enquiry-received</field>
+            <field name="website_id" ref="base.default_website"/>
+            <field name="is_published" eval="True"/>
+            <field name="website_indexed" eval="False"/>
+        </record>
+    </data>
+</odoo>

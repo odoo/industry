@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1" context="{'mail_auto_subscribe_no_notify': True, 'mail_activity_quick_update': True, 'mail_notrack': True}">
+    <record id="sale_order_freya_examination_diary" model="sale.order">
+        <field name="opportunity_id" ref="crm_freya_journey"/>
+        <field name="partner_id" ref="partner_freya_brooks_diary"/>
+        <field name="x_dental_appointment_id" ref="event_freya_examination_diary"/>
+        <field name="user_id" ref="user_reception_demo"/>
+        <field name="pricelist_id" ref="pricelist_patient_journey_demo"/>
+        <field name="client_order_ref">FREYA-FIRST-VISIT</field>
+        <field name="note" type="html">
+            <p>New-patient examination attended. Reception will collect the agreed examination fee against the existing invoice.</p>
+        </field>
+    </record>
+    <record id="sale_line_freya_examination_diary" model="sale.order.line">
+        <field name="order_id" ref="sale_order_freya_examination_diary"/>
+        <field name="product_id" ref="product_examination"/>
+        <field name="product_uom_qty">1</field>
+        <field name="price_unit">95</field>
+    </record>
+    <function model="sale.order" name="action_confirm">
+        <value eval="[ref('sale_order_freya_examination_diary')]"/>
+    </function>
+    <function model="sale.order" name="_create_invoices">
+        <value eval="[ref('sale_order_freya_examination_diary')]"/>
+    </function>
+    <function model="account.move" name="action_post">
+        <value model="sale.order" eval="obj(ref('sale_order_freya_examination_diary')).invoice_ids.filtered(lambda invoice: invoice.state == 'draft').ids"/>
+    </function>
+    <record id="activity_freya_invoice_collection_diary" model="mail.activity">
+        <field name="res_model_id" ref="account.model_account_move"/>
+        <field name="res_id" model="sale.order" eval="obj(ref('sale_order_freya_examination_diary')).invoice_ids[:1].id"/>
+        <field name="activity_type_id" ref="activity_type_reception_checkout"/>
+        <field name="user_id" ref="user_reception_demo"/>
+        <field name="date_deadline" model="calendar.event"
+            eval="obj(ref('event_freya_examination_diary')).start.replace(tzinfo=pytz.UTC).astimezone(
+                pytz.timezone(obj(ref('event_freya_examination_diary')).appointment_type_id.appointment_tz)
+            ).date()"/>
+        <field name="summary">Freya - collect the examination invoice at reception</field>
+        <field name="note" type="html">
+            <p>Review the existing invoice and balance. In Reception POS, select Freya and choose Settle invoices. Record the collection against this invoice once.</p>
+        </field>
+    </record>
+</odoo>

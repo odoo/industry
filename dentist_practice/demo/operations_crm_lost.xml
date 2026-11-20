@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1" context="{'mail_auto_subscribe_no_notify': True, 'mail_activity_quick_update': True, 'mail_notrack': True}">
+    <record id="partner_riley_carter_demo" model="res.partner">
+        <field name="name">Riley Carter</field>
+        <field name="email">riley.carter@patient.example.com</field>
+
+        <field name="comment" type="html">
+            <p>No appointment was agreed and this contact has not been registered as a patient.</p>
+        </field>
+    </record>
+    <record id="crm_riley_availability_lost_demo" model="crm.lead">
+        <field name="name">Riley Carter - no suitable first-visit slot</field>
+        <field name="type">opportunity</field>
+        <field name="partner_id" ref="partner_riley_carter_demo"/>
+        <field name="user_id" ref="user_reception_demo"/>
+        <field name="team_id" ref="crm_team_patient_journey"/>
+        <field name="tag_ids" eval="[Command.link(ref('crm_tag_first_examination'))]"/>
+        <field name="stage_id" eval="ref('crm_stage_enquiry_new', raise_if_not_found=False)
+            or ref('crm.stage_lead1', raise_if_not_found=False)"/>
+        <field name="medium_id" ref="utm.utm_medium_phone"/>
+        <field name="lost_reason_id" ref="crm_lost_reason_availability"/>
+        <field name="description" type="html">
+            <p>Reception discussed available times by telephone. Riley could not find a suitable first-visit slot and asked to close the enquiry. The example uses the standard Lost action and availability reason, with no booking or clinical record.</p>
+        </field>
+    </record>
+    <function model="crm.lead" name="action_set_lost">
+        <value eval="[ref('crm_riley_availability_lost_demo')]"/>
+    </function>
+</odoo>

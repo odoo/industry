@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <record id="filter_reception_today" model="ir.filters" forcecreate="0">
+        <field name="name">Today - all visits</field>
+        <field name="model_id">calendar.event</field>
+        <field name="action_id" ref="action_practice_today"/>
+        <field name="domain">[('start', '&gt;=', 'today'), ('start', '&lt;', 'today +1d')]</field>
+        <field name="is_default" eval="True"/>
+        <field name="sort">["start asc"]</field>
+    </record>
+    <record id="filter_reception_today_booked" model="ir.filters" forcecreate="0">
+        <field name="name">Today - booked</field>
+        <field name="model_id">calendar.event</field>
+        <field name="action_id" ref="action_practice_today"/>
+        <field name="domain">[('start', '&gt;=', 'today'), ('start', '&lt;', 'today +1d'), ('appointment_status', '=', 'booked')]</field>
+        <field name="sort">["start asc"]</field>
+    </record>
+    <record id="filter_reception_today_attended" model="ir.filters" forcecreate="0">
+        <field name="name">Today - checked in</field>
+        <field name="model_id">calendar.event</field>
+        <field name="action_id" ref="action_practice_today"/>
+        <field name="domain">[('start', '&gt;=', 'today'), ('start', '&lt;', 'today +1d'), ('appointment_status', '=', 'attended')]</field>
+        <field name="sort">["start asc"]</field>
+    </record>
+    <record id="filter_reception_today_no_show" model="ir.filters" forcecreate="0">
+        <field name="name">Today - no show</field>
+        <field name="model_id">calendar.event</field>
+        <field name="action_id" ref="action_practice_today"/>
+        <field name="domain">[('start', '&gt;=', 'today'), ('start', '&lt;', 'today +1d'), ('appointment_status', '=', 'no_show')]</field>
+        <field name="sort">["start asc"]</field>
+    </record>
+    <record id="filter_reception_diary_today" model="ir.filters" forcecreate="0">
+        <field name="name">Today - all visits</field>
+        <field name="model_id">calendar.event</field>
+        <field name="action_id" ref="action_practice_diary"/>
+        <field name="domain">[('start', '&gt;=', 'today'), ('start', '&lt;', 'today +1d')]</field>
+    </record>
+    <record id="filter_short_notice_by_purpose" model="ir.filters" forcecreate="0">
+        <field name="name">Short notice - by visit purpose</field>
+        <field name="model_id">crm.lead</field>
+        <field name="action_id" ref="action_practice_short_notice"/>
+        <field name="domain">[]</field>
+        <field name="context">{'group_by': 'tag_ids'}</field>
+    </record>
+    <record id="filter_reception_tasks_unassigned" model="ir.filters" forcecreate="0">
+        <field name="name">Reception - to claim</field>
+        <field name="model_id">mail.activity</field>
+        <field name="action_id" ref="action_practice_reception_tasks"/>
+        <field name="domain">[('user_id', '=', False)]</field>
+    </record>
+    <record id="filter_reception_tasks_due" model="ir.filters" forcecreate="0">
+        <field name="name">Reception - due or overdue</field>
+        <field name="model_id">mail.activity</field>
+        <field name="action_id" ref="action_practice_reception_tasks"/>
+        <field name="domain">[('date_deadline', '&lt;=', 'today')]</field>
+        <field name="sort">["date_deadline asc"]</field>
+    </record>
+    <record id="filter_supply_receipts_late" model="ir.filters" forcecreate="0">
+        <field name="name">Supplies - overdue receipts</field>
+        <field name="model_id">stock.picking</field>
+        <field name="action_id" ref="action_practice_supply_receipts"/>
+        <field name="domain">[('state', 'not in', ['done', 'cancel']), ('scheduled_date', '&lt;', 'now')]</field>
+        <field name="sort">["scheduled_date asc"]</field>
+    </record>
+    <record id="filter_supply_receipts_partial" model="ir.filters" forcecreate="0">
+        <field name="name">Supplies - open backorders</field>
+        <field name="model_id">stock.picking</field>
+        <field name="action_id" ref="action_practice_supply_receipts"/>
+        <field name="domain">[('state', 'not in', ['done', 'cancel']), ('backorder_id', '!=', False)]</field>
+    </record>
+    <record id="filter_supply_purchase_late" model="ir.filters" forcecreate="0">
+        <field name="name">Supplies - late deliveries</field>
+        <field name="model_id">purchase.order</field>
+        <field name="action_id" ref="action_practice_supply_purchases"/>
+        <field name="domain">[('state', '=', 'purchase'), ('is_late', '=', True)]</field>
+    </record>
+    <record id="filter_lab_orders_outstanding" model="ir.filters" forcecreate="0">
+        <field name="name">Lab - outstanding work</field>
+        <field name="model_id">purchase.order</field>
+        <field name="action_id" ref="action_practice_lab_orders"/>
+        <field name="domain" eval="[('state', '=', 'purchase'), ('order_line', 'any', [
+            ('product_id.categ_id', 'child_of', ref('product_category_dental_lab')),
+            ('x_dental_service_to_receive', '=', True),
+        ])]"/>
+    </record>
+    <record id="filter_lab_orders_overdue" model="ir.filters" forcecreate="0">
+        <field name="name">Lab - overdue work</field>
+        <field name="model_id">purchase.order</field>
+        <field name="action_id" ref="action_practice_lab_orders"/>
+        <field name="domain" eval="[('state', '=', 'purchase'), ('order_line', 'any', [
+            ('product_id.categ_id', 'child_of', ref('product_category_dental_lab')),
+            ('x_dental_service_to_receive', '=', True), ('date_planned', '&lt;', 'now'),
+        ])]"/>
+    </record>
+    <record id="filter_supply_expiry_attention" model="ir.filters" forcecreate="0">
+        <field name="name">Expiry - attention within 30 days</field>
+        <field name="model_id">stock.lot</field>
+        <field name="action_id" ref="action_practice_expiry_lots"/>
+        <field name="domain">[('product_qty', '&gt;', 0), ('use_expiration_date', '=', True), '|', ('alert_date', '&lt;=', 'now'), ('expiration_date', '&lt;=', 'now +30d')]</field>
+        <field name="is_default" eval="True"/>
+        <field name="sort">["expiration_date asc"]</field>
+    </record>
+    <record id="filter_supply_expired_on_hand" model="ir.filters" forcecreate="0">
+        <field name="name">Expiry - expired stock on hand</field>
+        <field name="model_id">stock.lot</field>
+        <field name="action_id" ref="action_practice_expiry_lots"/>
+        <field name="domain">[('product_qty', '&gt;', 0), ('expiration_date', '&lt;=', 'now')]</field>
+    </record>
+</odoo>

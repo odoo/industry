@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1" context="{'mail_activity_quick_update': True}">
+    <record id="activity_supply_check_demo" model="mail.activity">
+        <field name="res_model_id" ref="product.model_product_template"/>
+        <field name="res_id" model="product.product" eval="obj(ref('product_supply_masks')).product_tmpl_id.id"/>
+        <field name="activity_type_id" ref="mail.mail_activity_data_todo"/>
+        <field name="user_id" ref="user_operations_demo"/>
+        <field name="date_deadline" eval="DateTime.today().date()"/>
+        <field name="summary">Supplies - count stock and review manual replenishment</field>
+        <field name="note" type="html">
+            <p>Count Dental Supplies and reconcile differences through Inventory. Masks, suction tips and pouches are below the minimum. Review RFQ SUP-2026-0041 before ordering again, using the configured pack sizes and vendor lead times.</p>
+            <p>Launch the Weekly supply check plan on products for the next review and choose the responsible staff member. No supplies are consumed automatically from appointments.</p>
+        </field>
+    </record>
+    <record id="activity_supply_expiry_demo" model="mail.activity">
+        <field name="res_model_id" ref="stock.model_stock_lot"/>
+        <field name="res_id" ref="lot_composite_expiry_review_demo"/>
+        <field name="activity_type_id" ref="mail.mail_activity_data_todo"/>
+        <field name="user_id" ref="user_operations_demo"/>
+        <field name="date_deadline" eval="DateTime.today().date()"/>
+        <field name="summary">Supplies - review batch CR-251205B before expiry</field>
+        <field name="note" type="html">
+            <p>Compare the expiration and alert dates with the package label. Review the remaining stock, approved handling procedure and replacement needs with the supply coordinator.</p>
+        </field>
+    </record>
+    <record id="activity_supplier_bill_review_demo" model="mail.activity">
+        <field name="res_model_id" ref="purchase.model_purchase_order"/>
+        <field name="res_id" ref="purchase_order_supply_receipt_demo"/>
+        <field name="activity_type_id" ref="mail.mail_activity_data_todo"/>
+        <field name="user_id" ref="user_operations_demo"/>
+        <field name="date_deadline" eval="DateTime.today().date()"/>
+        <field name="summary">Purchases - match received packs and review the draft vendor bill</field>
+        <field name="note" type="html">
+            <p>Open the completed receipt and linked draft bill. Compare ordered packs, received quantities, vendor reference, prices and applicable taxes. Review before selecting Confirm, then arrange payment through the supplier-payment process.</p>
+        </field>
+    </record>
+    <record id="activity_lab_due_demo" model="mail.activity">
+        <field name="res_model_id" ref="purchase.model_purchase_order"/>
+        <field name="res_id" ref="purchase_order_lab_pending_demo"/>
+        <field name="activity_type_id" ref="mail.mail_activity_data_call"/>
+        <field name="user_id" ref="user_operations_demo"/>
+        <field name="date_deadline" eval="(DateTime.today() + relativedelta(days=5)).date()"/>
+        <field name="summary">Laboratory - confirm delivery of LAB-2026-0017</field>
+        <field name="note" type="html">
+            <p>Confirm the administrative delivery date with the laboratory and reception before arranging the next visit. The purchase line is due in seven days. On delivery, record the service's received quantity and review any matching vendor bill. Keep clinical instructions in the practice's approved clinical process.</p>
+        </field>
+    </record>
+</odoo>

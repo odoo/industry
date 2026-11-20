@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <record id="mail_template_patient_invoice_reminder" model="mail.template" forcecreate="0">
+        <field name="name">Dentist Practice: Patient Invoice Reminder</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="subject">Your invoice {{ object.name }} from {{ object.company_id.name }}</field>
+        <field name="email_from">{{ user.email_formatted }}</field>
+        <field name="email_to">{{ object.partner_id.email_formatted }}</field>
+        <field name="lang">{{ object.partner_id.lang }}</field>
+        <field name="description">Manual reminder showing the remaining balance of a posted patient invoice and its standard portal link.</field>
+        <field name="body_html" type="html">
+            <div>
+                <p>Hello <t t-out="object.partner_id.name or ''"/>,</p>
+                <t t-if="object.state == 'posted' and object.move_type == 'out_invoice' and object.amount_residual &gt; 0 and not object.currency_id.is_zero(object.amount_residual)">
+                    <p>We are getting in touch about the remaining balance of
+                        <strong t-out="format_amount(object.amount_residual, object.currency_id)"/>
+                        on invoice <strong t-out="object.name"/>.</p>
+                    <p t-if="object.invoice_date_due">The invoice due date is
+                        <t t-out="format_date(object.invoice_date_due)"/>.</p>
+                    <p><a t-att-href="object.get_portal_url()">Review your invoice</a></p>
+                    <p>Please contact reception if you need help arranging payment or have a question about this balance. If you have recently paid, let us know so we can check the payment with you.</p>
+                </t>
+                <t t-else="">
+                    <p>Please contact reception if you have a question about your invoice or payment record.</p>
+                </t>
+                <p>Kind regards,<br/><t t-out="object.company_id.name"/></p>
+            </div>
+        </field>
+    </record>
+</odoo>

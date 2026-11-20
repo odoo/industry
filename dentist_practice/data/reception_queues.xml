@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="action_practice_today" model="ir.actions.act_window">
+        <field name="name">Today at Reception</field>
+        <field name="res_model">calendar.event</field>
+        <field name="view_mode">list,calendar,form,activity</field>
+        <field name="view_ids" eval="[Command.clear(), Command.create({'view_mode': 'list', 'view_id': ref('appointment.calendar_event_view_tree_booking')}), Command.create({'view_mode': 'calendar', 'view_id': ref('appointment.calendar_event_view_calendar')})]"/>
+        <field name="search_view_id" ref="appointment.calendar_event_view_search_booking"/>
+        <field name="domain">[('appointment_type_id', '!=', False), ('appointment_type_schedule_based_on', '=', 'users')]</field>
+        <field name="context">{'appointment_default_assign_user_attendees': True, 'appointment_schedule_based_on': 'users', 'show_calendar_event_name_with_count': True, 'default_partner_ids': []}</field>
+        <field name="group_ids" eval="[Command.link(ref('appointment.group_appointment_user'))]"/>
+    </record>
+    <record id="action_practice_short_notice" model="ir.actions.act_window">
+        <field name="name">Short-notice Callbacks</field>
+        <field name="res_model">crm.lead</field>
+        <field name="view_mode">list,form,activity</field>
+        <field name="search_view_id" ref="crm.view_crm_case_opportunities_filter"/>
+        <field name="domain" eval="[
+            ('type', '=', 'opportunity'),
+            ('team_id', '=', ref('crm_team_patient_journey', raise_if_not_found=False) or 0),
+            ('stage_id.is_won', '=', False),
+            ('lead_properties.dental_short_notice', '=', 'yes'),
+        ]"/>
+        <field name="context">{'create': False}</field>
+        <field name="group_ids" eval="[Command.link(ref('sales_team.group_sale_salesman'))]"/>
+    </record>
+    <record id="action_practice_unsigned_forms" model="ir.actions.act_window">
+        <field name="name">Awaiting Patient Signatures</field>
+        <field name="res_model">sign.request</field>
+        <field name="view_mode">list,kanban,form,activity</field>
+        <field name="domain" eval="[('template_id.folder_id', 'child_of', ref('documents_folder_practice_operations', raise_if_not_found=False) or 0), ('state', '=', 'sent')]"/>
+        <field name="group_ids" eval="[Command.link(ref('sign.group_sign_user'))]"/>
+    </record>
+    <record id="action_practice_outstanding_uploads" model="ir.actions.act_window">
+        <field name="name">Outstanding Uploads</field>
+        <field name="res_model">documents.document</field>
+        <field name="view_mode">kanban,list,activity</field>
+        <field name="view_ids" eval="[Command.clear(),             Command.create({'view_mode': 'kanban', 'view_id': ref('documents.document_view_kanban')}),             Command.create({'view_mode': 'list', 'view_id': ref('documents.documents_view_list')}),             Command.create({'view_mode': 'activity', 'view_id': ref('documents.documents_view_activity')}),         ]"/>
+        <field name="domain" eval="[('id', 'child_of', ref('documents_folder_practice_operations', raise_if_not_found=False) or 0), ('type', '=', 'request')]"/>
+        <field name="context" eval="{
+            'skip_res_field_check': True,
+            'documents_unique_folder_id': ref('documents_folder_practice_operations', raise_if_not_found=False),
+            'documents_init_folder_id': False,
+            'search_default_is_deep_search': True,
+            'create': False,
+        }"/>
+        <field name="group_ids" eval="[Command.link(ref('documents.group_documents_user'))]"/>
+    </record>
+    <record id="action_practice_reception_tasks" model="ir.actions.act_window">
+        <field name="name">Reception Tasks</field>
+        <field name="res_model">mail.activity</field>
+        <field name="view_mode">list,kanban,calendar</field>
+        <field name="view_ids" eval="[Command.clear(), Command.create({'view_mode': 'list', 'view_id': ref('mail.mail_activity_view_tree_open_target')}), Command.create({'view_mode': 'kanban', 'view_id': ref('mail.mail_activity_view_kanban_open_target')}), Command.create({'view_mode': 'calendar', 'view_id': ref('mail.mail_activity_view_calendar')})]"/>
+        <field name="search_view_id" ref="mail.mail_activity_view_search"/>
+        <field name="domain" eval="[('role_id', '=', ref('role_dental_reception', raise_if_not_found=False) or 0)]"/>
+        <field name="context" eval="{'force_search_count': 1, 'default_role_id': ref('role_dental_reception', raise_if_not_found=False), 'default_user_id': False}"/>
+        <field name="group_ids" eval="[Command.link(ref('base.group_user'))]"/>
+    </record>
+    <record id="action_practice_expiry_lots" model="ir.actions.act_window">
+        <field name="name">Batches and Expiry</field>
+        <field name="res_model">stock.lot</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="stock.view_production_lot_tree"/>
+        <field name="domain" eval="[('product_id.categ_id', 'child_of', ref('product_category_dental_supplies', raise_if_not_found=False) or 0)]"/>
+        <field name="group_ids" eval="[Command.link(ref('stock.group_stock_user'))]"/>
+    </record>
+    <menuitem id="menu_practice_today" name="Today" parent="menu_practice_reception" action="action_practice_today" sequence="5" groups="appointment.group_appointment_user"/>
+    <menuitem id="menu_practice_short_notice" name="Short-notice Callbacks" parent="menu_practice_reception" action="action_practice_short_notice" sequence="45" groups="sales_team.group_sale_salesman"/>
+    <menuitem id="menu_practice_reception_tasks" name="Reception Tasks" parent="menu_practice_reception" action="action_practice_reception_tasks" sequence="55" groups="base.group_user"/>
+    <menuitem id="menu_practice_unsigned_forms" name="Awaiting Signatures" parent="menu_practice_operations" action="action_practice_unsigned_forms" sequence="51" groups="sign.group_sign_user"/>
+    <menuitem id="menu_practice_outstanding_uploads" name="Outstanding Uploads" parent="menu_practice_operations" action="action_practice_outstanding_uploads" sequence="52" groups="documents.group_documents_user"/>
+    <menuitem id="menu_practice_expiry_lots" name="Batches and Expiry" parent="menu_practice_supplies_lab" action="action_practice_expiry_lots" sequence="60" groups="stock.group_stock_user"/>
+</odoo>
