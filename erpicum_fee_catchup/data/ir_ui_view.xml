@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="sale_order_fee_form" model="ir.ui.view">
+        <field name="name">sale.order.construction.cost.fees</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@id='quotation_send_primary']" position="attributes">
+                <attribute name="name">%(action_validate_fee_order)d</attribute>
+                <attribute name="type">action</attribute>
+                <attribute name="context">{'validate_analytic': True, 'check_document_layout': True, 'open_quotation_composer': True}</attribute>
+            </xpath>
+            <xpath expr="//button[@id='quotation_send']" position="attributes">
+                <attribute name="name">%(action_validate_fee_order)d</attribute>
+                <attribute name="type">action</attribute>
+                <attribute name="context">{'validate_analytic': True, 'check_document_layout': True, 'open_quotation_composer': True}</attribute>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="%(action_fee_invoices)d" type="action" class="oe_stat_button"
+                        icon="fa-file-text-o" string="Fee Invoices"
+                        invisible="not x_fee_contract or state in ('draft', 'sent')"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="x_fee_contract" readonly="state not in ('draft', 'sent') or invoice_count"/>
+                <field name="x_construction_cost" invisible="not x_fee_contract" readonly="state == 'cancel'"/>
+                <field name="x_fee_percentage" invisible="not x_fee_contract" readonly="state not in ('draft', 'sent')"/>
+                <field name="x_total_architecture_fee" invisible="not x_fee_contract"/>
+                <field name="x_total_phase_percentage" invisible="not x_fee_contract"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/column[@name='price_unit']" position="before">
+                <field name="x_phase_percentage" optional="show" column_invisible="not parent.x_fee_contract"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="before">
+                <field name="x_phase_percentage" invisible="not parent.x_fee_contract"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="account_move_fee_form" model="ir.ui.view">
+        <field name="name">account.move.construction.cost.fees</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="(//header/button[@name='button_cancel'])[last()]" position="after">
+                <button name="%(erpicum_fee_catchup.action_recalculate_adjustments)d" type="action"
+                        string="Recalculate fee adjustments" class="btn-secondary"
+                        invisible="state != 'draft' or move_type not in ('out_invoice', 'out_refund') or reversed_entry_id or not x_fee_catchup_order_ids"/>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/list/column[@name='product_and_description']" position="after">
+                <field name="x_catchup_sale_line_id" optional="hide" readonly="1"/>
+            </xpath>
+            <xpath expr="//field[@name='invoice_origin']" position="after">
+                <field name="x_fee_catchup_order_ids" widget="many2many_tags" readonly="1" invisible="not x_fee_catchup_order_ids"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="action_reprice_fee_order" model="ir.actions.server">
+        <field name="name">Recalculate construction-cost phase prices</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+require_complete = env.context.get('require_complete_fee_contract')
+message = env._("""Check the construction-cost fee requirements:
+• Enable Construction-cost fees when using fee phase products.
+• Use Tax Excl. pricing, a positive construction cost, and a fixed fee rate above 0% and at most 100%.
+• Use milestone billing, positive quantities, and no discounts on fee phases.
+• Allocate a positive share to each fee phase. The allocations must total 100% before sending, confirming, or invoicing.""")
+orders = records.filtered_domain([('state', '!=', 'cancel')])
+fee_orders = orders.filtered('x_fee_contract')
+if require_complete and (orders - fee_orders).order_line.filtered_domain([
+    '|', ('x_phase_percentage', '!=', 0), ('product_id.x_default_phase_percentage', '!=', 0),
+]):
+    raise UserError(message)
+for order in fee_orders:
+    if order.document_tax_mode != 'tax_excluded' or order.x_construction_cost < 0 or not 0 <= order.x_fee_percentage <= 100:
+        raise UserError(message)
+    phases = order.order_line.filtered('x_phase_percentage').sorted('sequence, id')
+    total = order.x_total_architecture_fee
+    fully_allocated = abs(order.x_total_phase_percentage - 100) <= 0.000001
+    if require_complete and (total <= 0 or not fully_allocated or order.order_line.filtered('product_id.x_default_phase_percentage') - phases):
+        raise UserError(message)
+    remaining = total
+    for phase in phases:
+        if not 0 < phase.x_phase_percentage <= 100 or phase.product_uom_qty <= 0 or phase.product_id.service_type != 'milestones' or phase.discount:
+            raise UserError(message)
+        amount = order.currency_id.round(total * phase.x_phase_percentage / 100)
+        if phase == phases[-1] and fully_allocated:
+            amount = remaining
+        remaining -= amount
+        price = amount / phase.product_uom_qty
+        if abs(phase.price_unit - price) > 0.0000001:
+            phase.with_context(skip_fee_repricing=True).write({'price_unit': price})
+        ]]></field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_view_types">form</field>
+    </record>
+    <record id="action_validate_fee_order" model="ir.actions.server">
+        <field name="name">Validate the fee quotation</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+env.ref('erpicum_fee_catchup.action_reprice_fee_order').with_context(require_complete_fee_contract=True).run()
+if env.context.get('open_quotation_composer'):
+    action = records.action_quotation_send()
+        ]]></field>
+    </record>
+    <record id="action_lock_fee_pricing_mode" model="ir.actions.server">
+        <field name="name">Protect the confirmed fee pricing mode</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+# The before-update domain is skipped on creation.
+if env.context.get('old_values') is not None:
+    raise UserError(env._('Choose the fee pricing mode before confirming the quotation or creating an invoice.'))
+        ]]></field>
+    </record>
+    <record id="action_initialize_fee_phase" model="ir.actions.server">
+        <field name="name">Initialize the fee phase allocation</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">object_write</field>
+        <field name="update_path">x_phase_percentage</field>
+        <field name="evaluation_type">equation</field>
+        <field name="value">record.product_id.x_default_phase_percentage</field>
+    </record>
+    <record id="action_reprice_from_phase" model="ir.actions.server">
+        <field name="name">Reprice the construction-cost fee order</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+if not env.context.get('skip_fee_repricing'):
+    env.ref('erpicum_fee_catchup.action_reprice_fee_order').with_context(active_model='sale.order', active_id=False, active_ids=records.order_id.ids).run()
+        ]]></field>
+    </record>
+    <record id="action_recalculate_adjustments" model="ir.actions.server">
+        <field name="name">Recalculate fee adjustments</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+message = env._("""Check the fee adjustment requirements:
+• Use Tax Excl. pricing and the same company and currency on the fee order, invoice, and billing history.
+• Post or cancel any other draft invoice or credit note for the fee order.
+• Link each billed fee line to exactly one sales order phase, including in posted invoices and credit notes.""")
+for invoice in records.filtered_domain([('state', '=', 'draft'), ('move_type', 'in', ('out_invoice', 'out_refund')), ('reversed_entry_id', '=', False)]):
+    orders = (invoice.invoice_line_ids.sale_line_ids.order_id | invoice.x_fee_catchup_order_ids).filtered('x_fee_contract')
+    if not orders or (invoice.move_type == 'out_refund' and not invoice.x_fee_catchup_order_ids):
+        continue
+    orders.sorted('id').lock_for_update(allow_referencing=True)
+    compatible = invoice.document_tax_mode == 'tax_excluded' and orders.company_id == invoice.company_id and orders.currency_id == invoice.currency_id
+    linked_moves = orders.invoice_ids | orders.order_line.x_fee_catchup_line_ids.move_id
+    other_draft = env['account.move'].search_count([
+        ('id', '!=', invoice.id), ('state', '=', 'draft'), ('move_type', 'in', ('out_invoice', 'out_refund')),
+        '|', ('id', 'in', linked_moves.ids), ('x_fee_catchup_order_ids', 'in', orders.ids),
+    ], limit=1)
+    if not compatible or other_draft:
+        raise UserError(message)
+    env.ref('erpicum_fee_catchup.action_reprice_fee_order').with_context(
+        active_model='sale.order', active_id=False, active_ids=orders.ids, require_complete_fee_contract=True,
+    ).run()
+    product = env.ref('erpicum_fee_catchup.product_fee_adjustment')
+    commands = [Command.delete(line.id) for line in invoice.invoice_line_ids.filtered('x_catchup_sale_line_id')]
+    phases = orders.order_line.filtered('x_phase_percentage')
+    for item in invoice.invoice_line_ids.filtered(lambda line: not line.x_catchup_sale_line_id):
+        phase = item.sale_line_ids & phases
+        if (phase and len(item.sale_line_ids) != 1) or (item.product_id.x_default_phase_percentage and not item.sale_line_ids):
+            raise UserError(message)
+        if phase:
+            item.write({'price_unit': phase.product_uom_id._compute_price(phase.price_unit, item.product_uom_id), 'discount': 0})
+    posted = [('move_id.state', '=', 'posted'), ('move_id.move_type', 'in', ('out_invoice', 'out_refund'))]
+    start_sequence = max(invoice.invoice_line_ids.mapped('sequence'), default=0) + 1
+    for sequence, phase in enumerate(phases, start=start_sequence):
+        posted_lines = (phase.invoice_lines | phase.x_fee_catchup_line_ids).filtered_domain(posted)
+        history = posted_lines & phase.invoice_lines
+        incompatible_history = posted_lines and (posted_lines.currency_id != invoice.currency_id or posted_lines.company_id != invoice.company_id)
+        if incompatible_history or any(len(line.sale_line_ids) != 1 for line in history):
+            raise UserError(message)
+        quantity = sum(-line.move_id.direction_sign * line.product_uom_id._compute_quantity(line.quantity, phase.product_uom_id, round=False) for line in history)
+        billed = sum(-line.move_id.direction_sign * line.price_subtotal for line in posted_lines)
+        difference = invoice.currency_id.round(phase.price_reduce_taxexcl * quantity - billed)
+        if difference:
+            income = phase.product_id.product_tmpl_id.with_company(invoice.company_id).get_product_accounts(invoice.fiscal_position_id)['income']
+            # The same economic correction has opposite signs on an invoice and a credit note.
+            values = phase._prepare_invoice_line(
+                quantity=1, price_unit=-invoice.direction_sign * difference,
+                product_id=product.id, product_uom_id=product.uom_id.id,
+                name='%s — %s — %s' % (product.display_name, phase.order_id.name, phase.product_id.display_name),
+                sale_line_ids=[], x_catchup_sale_line_id=phase.id, extra_tax_data=False, sequence=sequence,
+                **({'account_id': income.id} if income else {}),
+            )
+            commands.append(Command.create(values))
+    invoice.write({'x_fee_catchup_order_ids': [Command.set(orders.ids)], 'invoice_line_ids': commands})
+    if invoice.amount_total < 0:
+        invoice.action_switch_move_type()
+        ]]></field>
+    </record>
+    <record id="action_create_adjustment_invoice" model="ir.actions.server">
+        <field name="name">Create fee adjustment invoice</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+order = records.ensure_one()
+if not order.x_fee_contract or order.state != 'sale':
+    raise UserError('Select a confirmed construction-cost fee order.')
+order.check_access('write')
+values = order._prepare_invoice()
+values['x_fee_catchup_order_ids'] = [Command.set(order.ids)]
+invoice = order._create_account_invoices([values])
+if not invoice.invoice_line_ids:
+    raise UserError('There is no fee shortfall to adjust for this order.')
+action = order.action_view_invoice(invoices=invoice)
+        ]]></field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_view_types">form</field>
+    </record>
+</odoo>

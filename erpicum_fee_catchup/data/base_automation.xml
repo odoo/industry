@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="automation_validate_fee_order" model="base.automation">
+        <field name="name">Validate fee quotations when sent or confirmed</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[Command.set([ref('sale.field_sale_order__state')])]"/>
+        <field name="filter_domain">[
+            ('state', 'in', ('sent', 'sale')), '|',
+            ('x_fee_contract', '=', True),
+            ('order_line', 'any', ['|', ('x_phase_percentage', '!=', 0), ('product_id.x_default_phase_percentage', '!=', 0)]),
+        ]</field>
+        <field name="action_server_ids" eval="[Command.link(ref('action_validate_fee_order'))]"/>
+    </record>
+    <record id="automation_lock_fee_pricing_mode" model="base.automation">
+        <field name="name">Protect the confirmed fee pricing mode</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="trigger_field_ids" eval="[Command.set([ref('field_order_fee_contract')])]"/>
+        <field name="filter_pre_domain">['|', ('state', 'in', ('sale', 'cancel')), ('invoice_ids', '!=', False)]</field>
+        <field name="action_server_ids" eval="[Command.link(ref('action_lock_fee_pricing_mode'))]"/>
+    </record>
+    <record id="automation_fee_budget_changed" model="base.automation">
+        <field name="name">Reprice fees when the construction-cost base changes</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="action_server_ids" eval="[(4, ref('action_reprice_fee_order'))]"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('field_order_fee_contract'), ref('field_order_construction_cost'), ref('field_order_fee_percentage')])]"/>
+    </record>
+    <record id="automation_fee_phase_created" model="base.automation">
+        <field name="name">Initialize a new fee phase</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="trigger">on_create</field>
+        <field name="filter_domain">[('x_phase_percentage', '=', 0), ('product_id.x_default_phase_percentage', '!=', 0)]</field>
+        <field name="action_server_ids" eval="[(4, ref('action_initialize_fee_phase'))]"/>
+    </record>
+    <record id="automation_fee_phase_changed" model="base.automation">
+        <field name="name">Reprice fees when a phase changes</field>
+        <field name="model_id" ref="sale.model_sale_order_line"/>
+        <field name="trigger">on_create_or_write</field>
+        <field name="action_server_ids" eval="[(4, ref('action_reprice_from_phase'))]"/>
+        <field name="trigger_field_ids" eval="[(6, 0, [ref('field_sale_line_phase_percentage'), ref('sale.field_sale_order_line__product_uom_qty'), ref('sale.field_sale_order_line__price_unit'), ref('sale.field_sale_order_line__discount')])]"/>
+    </record>
+    <record id="automation_fee_invoice_created" model="base.automation">
+        <field name="name">Calculate fee catch-up on a new customer invoice</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="trigger">on_create</field>
+        <field name="action_server_ids" eval="[(4, ref('action_recalculate_adjustments'))]"/>
+        <field name="filter_domain">[('move_type', '=', 'out_invoice'), ('state', '=', 'draft')]</field>
+    </record>
+</odoo>

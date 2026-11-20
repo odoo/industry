@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="field_invoice_line_catchup_phase" model="ir.model.fields">
+        <field name="name">x_catchup_sale_line_id</field>
+        <field name="model_id" ref="account.model_account_move_line" />
+        <field name="ttype">many2one</field>
+        <field name="field_description">Fee phase corrected</field>
+        <field name="relation">sale.order.line</field>
+        <field name="copied" eval="True" />
+        <field name="index">btree_not_null</field>
+        <field name="on_delete">restrict</field>
+        <field name="help">Source phase corrected by this value-only adjustment. Preserved on credit-note reversals; draft copies are recomputed.</field>
+    </record>
+    <record id="field_invoice_catchup_orders" model="ir.model.fields">
+        <field name="name">x_fee_catchup_order_ids</field>
+        <field name="model_id" ref="account.model_account_move" />
+        <field name="ttype">many2many</field>
+        <field name="field_description">Construction-cost fee orders</field>
+        <field name="relation">sale.order</field>
+        <field name="relation_table">x_fee_catchup_move_sale_rel</field>
+        <field name="column1">move_id</field>
+        <field name="column2">sale_order_id</field>
+        <field name="copied" eval="True" />
+        <field name="help">Orders included in fee adjustment calculation, including adjustment-only invoices.</field>
+    </record>
+    <record id="field_order_fee_contract" model="ir.model.fields">
+        <field name="name">x_fee_contract</field>
+        <field name="model_id" ref="sale.model_sale_order" />
+        <field name="ttype">boolean</field>
+        <field name="field_description">Construction-cost fees</field>
+        <field name="help">Use this when architecture fees are a fixed percentage of the construction cost, split across billing milestones.</field>
+    </record>
+    <record id="field_order_construction_cost" model="ir.model.fields">
+        <field name="name">x_construction_cost</field>
+        <field name="model_id" ref="sale.model_sale_order" />
+        <field name="ttype">monetary</field>
+        <field name="field_description">Construction cost excl. VAT</field>
+        <field name="help">Enter the agreed construction cost excluding VAT in the order currency. Revising this amount recalculates the phase prices. Use Recalculate fee adjustments to refresh an existing draft invoice.</field>
+        <field name="currency_field">currency_id</field>
+    </record>
+    <record id="field_order_fee_percentage" model="ir.model.fields">
+        <field name="name">x_fee_percentage</field>
+        <field name="model_id" ref="sale.model_sale_order" />
+        <field name="ttype">float</field>
+        <field name="field_description">Fixed fee rate (%)</field>
+        <field name="help">Contractual percentage, for example 5 for 5%. Budget revisions change the construction-cost base, not this rate.</field>
+    </record>
+    <record id="field_sale_line_phase_percentage" model="ir.model.fields">
+        <field name="name">x_phase_percentage</field>
+        <field name="model_id" ref="sale.model_sale_order_line" />
+        <field name="ttype">float</field>
+        <field name="field_description">Phase allocation (%)</field>
+        <field name="help">Share of the total architecture fee, for example 20 for 20%. All fee phase allocations on an order must total 100%.</field>
+    </record>
+    <record id="field_product_phase_percentage" model="ir.model.fields">
+        <field name="name">x_default_phase_percentage</field>
+        <field name="model_id" ref="product.model_product_product" />
+        <field name="ttype">float</field>
+        <field name="field_description">Default fee phase allocation (%)</field>
+    </record>
+    <record id="field_order_total_fee" model="ir.model.fields">
+        <field name="name">x_total_architecture_fee</field>
+        <field name="model_id" ref="sale.model_sale_order" />
+        <field name="ttype">monetary</field>
+        <field name="field_description">Architecture fee excl. VAT</field>
+        <field name="help">Construction cost excluding VAT multiplied by the fixed fee rate. This is the full architecture fee across all phases.</field>
+        <field name="currency_field">currency_id</field>
+        <field name="readonly" eval="True" />
+        <field name="store" eval="True" />
+        <field name="depends">x_construction_cost,x_fee_percentage,currency_id,currency_id.rounding</field>
+        <field name="compute">for order in self:
+    order['x_total_architecture_fee'] = order.currency_id.round(order.x_construction_cost * order.x_fee_percentage / 100)</field>
+    </record>
+    <record id="field_order_phase_percentage" model="ir.model.fields">
+        <field name="name">x_total_phase_percentage</field>
+        <field name="model_id" ref="sale.model_sale_order" />
+        <field name="ttype">float</field>
+        <field name="field_description">Allocated fee (%)</field>
+        <field name="help">Sum of the phase allocations on this order. Allocate 100% of the fee before invoicing.</field>
+        <field name="readonly" eval="True" />
+        <field name="store" eval="False" />
+        <field name="depends">order_line.x_phase_percentage</field>
+        <field name="compute">for order in self:
+    order['x_total_phase_percentage'] = sum(order.order_line.mapped('x_phase_percentage'))</field>
+    </record>
+    <record id="field_sale_line_catchup_lines" model="ir.model.fields">
+        <field name="name">x_fee_catchup_line_ids</field>
+        <field name="model_id" ref="sale.model_sale_order_line" />
+        <field name="ttype">one2many</field>
+        <field name="field_description">Fee adjustments</field>
+        <field name="relation">account.move.line</field>
+        <field name="relation_field">x_catchup_sale_line_id</field>
+        <field name="copied" eval="False" />
+        <field name="readonly" eval="True" />
+    </record>
+    <record id="field_sale_line_fee_invoiced" model="ir.model.fields">
+        <field name="name">x_fee_amount_invoiced</field>
+        <field name="model_id" ref="sale.model_sale_order_line" />
+        <field name="ttype">monetary</field>
+        <field name="field_description">Invoiced amount excl. VAT incl. fee adjustments</field>
+        <field name="currency_field">currency_id</field>
+        <field name="readonly" eval="True" />
+        <field name="store" eval="False" />
+        <field name="depends">untaxed_amount_invoiced,x_fee_catchup_line_ids.price_subtotal,x_fee_catchup_line_ids.move_id.state,x_fee_catchup_line_ids.move_id.move_type</field>
+        <field name="compute">for line in self:
+    adjustments = line.sudo().x_fee_catchup_line_ids.filtered_domain([('move_id.state', '=', 'posted'), ('move_id.move_type', 'in', ('out_invoice', 'out_refund'))])
+    line['x_fee_amount_invoiced'] = line.untaxed_amount_invoiced - sum(adjustment.move_id.direction_sign * adjustment.price_subtotal for adjustment in adjustments)</field>
+    </record>
+</odoo>
