@@ -23,7 +23,9 @@
     ],
     'data': [
         'data/ir_module_module_dependency.xml',
+        'data/product_pricelist.xml',
         'data/res_config_settings.xml',
+        'data/product_pricelist_item.xml',
         'data/ir_model.xml',
         'data/ir_access.xml',
         'data/ir_model_fields.xml',
@@ -38,7 +40,6 @@
         'data/ir_default.xml',
         'data/ir_ui_view.xml',
         'data/product_product.xml',
-        'data/product_pricelist.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
         'data/knowledge_cover.xml',

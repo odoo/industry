@@ -17,12 +17,12 @@
     ],
     'data': [
         'data/ir_module_module_dependency.xml',
+        'data/product_pricelist.xml',
         'data/res_config_setting.xml',
         'data/knowledge_article.xml',
         'data/mail_message.xml',
         'data/product_public_category.xml',
         'data/sale_subscription_pricing.xml',
-        'data/product_pricelist.xml',
         'data/res_partner_grade.xml',
         'data/product_template.xml',
         'data/product_product.xml',
