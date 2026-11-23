@@ -1,5 +1,6 @@
 {
     'name': 'Hazardous Product Management',
+    'version': '1.1',
     'category': 'Services',
     'depends': [
         'planning_field_service_stock',
