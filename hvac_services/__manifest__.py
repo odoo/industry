@@ -1,6 +1,6 @@
 {
     'name': 'HVAC Services',
-    'version': '1.11',
+    'version': '1.12',
     'category': 'Services',
     'depends': [
         'appointment_account_payment',
@@ -36,7 +36,6 @@
         'data/ir_ui_view.xml',
         'data/qweb_view.xml',
         'data/worksheet_template.xml',
-        'data/project_project.xml',
         'data/product_template.xml',
         'data/product_document.xml',
         'data/product_product.xml',
@@ -55,7 +54,6 @@
         'demo/stock_lot.xml',
         'demo/sale_order_line.xml',
         'demo/purchase_order_post.xml',
-        'demo/project_task.xml',
         'demo/sale_order_post.xml',
         'demo/planning_slot.xml',
     ],
