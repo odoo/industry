@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="appointment_type_customization" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <xpath expr="//form[1]/sheet[1]/group[1]/group[@name='left_details']/div[1]" position="after">
+                <label for="x_break"/>
+                <div class="o_row">
+                    <field name="x_break"/>
+                    <span invisible="not x_break">From</span>
+                    <field name="x_break_start_appointment" widget="float_time" class="oe_inline" invisible="not x_break"/>
+                    <span invisible="not x_break">To</span>
+                    <field name="x_break_end_appointment" widget="float_time" class="oe_inline" invisible="not x_break"/>
+                </div>
+            </xpath>
+        </field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="appointment.appointment_type_view_form"/>
+        <field name="mode">extension</field>
+        <field name="model">appointment.type</field>
+        <field name="name">appointment.type.form customization</field>
+        <field name="priority">200</field>
+        <field name="type">form</field>
+    </record>
+    <record id="calendar_event_view_form_gantt_booking_inherit" model="ir.ui.view">
+        <field name="name">calendar.event.view.form.gantt.booking.inherit</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="appointment.calendar_event_view_form_gantt_booking"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='stop']" position="after">
+                <div class="o_form_group o_inline" invisible="not x_parent_id">
+                    <label for="x_parent_id" string="Original Booking" class="oe_inline me-2"/>
+                    <field name="x_parent_id" options="{'no_create': True}" class="oe_inline"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    <record id="calendar_event_parent_customization" model="ir.ui.view">
+        <field name="arch" type="xml">
+            <xpath expr="//form[1]/sheet[1]/group[1]/group[1]/div[1]" position="after">
+                <label for="x_break_start" string="Break" invisible="x_parent_id"/>
+                <div class="o_row" invisible="x_parent_id">
+                    <span>From</span>
+                    <field name="x_break_start" widget="float_time" class="oe_inline" readonly="1"/>
+                    <span>To</span>
+                    <field name="x_break_end" widget="float_time" class="oe_inline" readonly="1"/>
+                </div>
+            </xpath>
+            <xpath expr="/form/sheet/widget[@name='web_ribbon']" position="before">
+                <div name="button_box" class="oe_button_box">
+                    <button class="oe_stat_button" icon="view_timeline" type="action" name="%(action_calendar_event_view_parts)d" invisible="not x_appointment_part_1 and not x_appointment_part_2">
+                        <div class="o_stat_info">
+                            <span class="o_stat_text">Parts</span>
+                        </div>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='location']" position="before">
+                <field name="x_parent_id" invisible="not x_parent_id"/>
+            </xpath>
+        </field>
+        <field name="active" eval="True"/>
+        <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
+        <field name="mode">extension</field>
+        <field name="model">calendar.event</field>
+        <field name="name">calendar.event.form customization</field>
+        <field name="priority">160</field>
+        <field name="type">form</field>
+    </record>
+</odoo>
