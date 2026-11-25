@@ -400,4 +400,40 @@ for record in self:
         <field name="related">task_id.state</field>
         <field name="store" eval="False"/>
     </record>
+
+    <!-- Sign Template Tag fields -->
+    <record id="x_confirm_so_field_sign_template_tag" model="ir.model.fields">
+        <field name="name">x_confirm_so</field>
+        <field name="field_description">Confirm Quotation</field>
+        <field name="model_id" ref="sign.model_sign_template_tag"/>
+        <field name="ttype">boolean</field>
+    </record>
+
+    <!-- Sign Request fields -->
+    <record id="x_sale_order_id_field_sign_request" model="ir.model.fields">
+        <field name="name">x_sale_order_id</field>
+        <field name="field_description">Sales Order</field>
+        <field name="model_id" ref="sign.model_sign_request"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">sale.order</field>
+        <field name="readonly" eval="1"/>
+        <field name="depends">reference_doc</field>
+        <field name="compute"><![CDATA[
+for request in self:
+    if (order := request.reference_doc): request['x_sale_order_id'] = order.id if order.exists() and order._name == 'sale.order' else False
+        ]]></field>
+    </record>
+
+    <!-- Sale Order fields -->
+    <record id="x_sign_request_count_field_sale_order" model="ir.model.fields">
+        <field name="name">x_sign_request_count</field>
+        <field name="field_description">Signature Requests</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="ttype">integer</field>
+        <field name="store" eval="False"/>
+        <field name="readonly" eval="1"/>
+        <field name="compute"><![CDATA[
+for order in self: order['x_sign_request_count'] = order.env['sign.request'].search_count([('x_sale_order_id', 'in', order.ids)])
+        ]]></field>
+    </record>
 </odoo>

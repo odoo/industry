@@ -7,7 +7,7 @@
         <field name="code"><![CDATA[
 action = {
     "type": "ir.actions.act_url",
-    "url": ''.join([substr + (str(record.vat[4:]) if record.country_code == 'FR' else str(record.vat[len(record.country_code):]) if record.vat.startswith(record.country_code) else str(record.vat)) for substr in env.context.get('link')]),
+    "url": ''.join([substr + str(record.vat[4:] if record.country_code == 'FR' else record.vat[len(record.country_code):] if record.vat.startswith(record.country_code) else record.vat) for substr in env.context.get('link')]),
     "target": "new",
 }
         ]]></field>
@@ -75,6 +75,25 @@ action.update({'view_mode': 'form', 'res_id': records.partner_id.id}) if len(rec
 for customer_mandate in records:
     message = customer_mandate.message_post_with_source(customer_mandate.x_mandate_id.x_mail_template_id, message_type='auto_comment', subtype_xmlid='mail.mt_comment', partner_ids=customer_mandate.x_mandated.partner_id.ids)
     customer_mandate.x_partner_id.message_post(body=message.body, subject=message.subject, message_type='auto_comment', subtype_xmlid='mail.mt_comment', notify_skip_followers=True)
+]]></field>
+    </record>
+    <record id="action_server_confirm_sale_order_on_signature" model="ir.actions.server">
+        <field name="name">Accounting Firm: Confirm Quotation on Signature</field>
+        <field name="model_id" ref="sign.model_sign_request"/>
+        <field name="base_automation_id" ref="base_automation_confirm_sale_order_on_signature"/>
+        <field name="usage">base_automation</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+for order in records.x_sale_order_id:
+    if order.state in ('draft', 'sent'): order.action_confirm()
+]]></field>
+    </record>
+    <record id="action_server_open_sign_requests" model="ir.actions.server">
+        <field name="name">Signature Requests</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+action = {'type': 'ir.actions.act_window', 'name': 'Signature Requests', 'res_model': 'sign.request', 'view_mode': 'list,kanban,form', 'domain': [('x_sale_order_id', '=', record.id)]}
 ]]></field>
     </record>
 </odoo>
