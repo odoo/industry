@@ -51,7 +51,7 @@
                 </td>
             </t>
         </xpath>
-        <!-- empty columns for sections notes and combos so that the end column price is well aligned -->
+        <!-- empty columns for sections, section group, notes and combos so that the end column price is well aligned -->
         <xpath expr="//td[@name='td_section_name']" position="after">
             <t t-if="sale_order.x_so_contract_type == 'per_line' and not effective_contract_type">
                 <td name="td_section_contract_type" t-att-class="padding_class"/>
@@ -66,6 +66,11 @@
             <t t-if="sale_order.x_so_contract_type == 'per_line' and not effective_contract_type">
                 <td name="td_combo_contract_type" t-att-class="padding_class"/>
             </t>
+        </xpath>
+        <xpath expr="//td[@name='td_section_group_name']" position="attributes">
+            <attribute name="t-att-colspan">
+                2 if sale_order.x_so_contract_type == 'per_line' and not effective_contract_type else 1
+            </attribute>
         </xpath>
 
         <!-- bottom totals -->
@@ -127,7 +132,8 @@
         </xpath>
         <xpath expr="//th[@name='th_description']" position="after">
             <t t-if="doc.x_so_contract_type == 'per_line' and not effective_contract_type">
-        <th class="text-start" id="contract_type">Type</th>
+                <th class="text-start" id="contract_type">Type</th>
+                <t t-set="colspan_count" t-value="colspan_count + 1"/>
             </t>
         </xpath>
         <xpath expr="//td[@name='td_product_name']" position="after">
@@ -136,6 +142,16 @@
                     <span name="span_contract_type" t-out="''.join([s[0].upper() for s in line.x_sol_contract_type.split('_')])"/>
                 </td>
             </t>
+        </xpath>
+        <xpath expr="//td[@name='td_combo_name']" position="attributes">
+            <attribute name="t-att-colspan">
+                2 if doc.x_so_contract_type == 'per_line' and not effective_contract_type else 1
+            </attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_section_group_name']" position="attributes">
+            <attribute name="t-att-colspan">
+                2 if doc.x_so_contract_type == 'per_line' and not effective_contract_type else 1
+            </attribute>
         </xpath>
         <xpath expr="//div[@name='total']" position="after">
             <t t-if="doc.x_so_contract_type == 'per_line' and not effective_contract_type">
