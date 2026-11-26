@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="field_purchase_order_line_service_to_receive" model="ir.model.fields">
+        <field name="name">x_dental_service_to_receive</field>
+        <field name="field_description">Service to Receive</field>
+        <field name="model_id" ref="purchase.model_purchase_order_line"/>
+        <field name="ttype">boolean</field>
+        <field name="readonly" eval="True"/>
+        <field name="depends">product_id.type, product_qty, qty_received, uom_id</field>
+        <field name="compute"><![CDATA[
+for line in self:
+    line['x_dental_service_to_receive'] = (
+        line.product_id.type == 'service'
+        and line.uom_id.compare(line.qty_received, line.product_qty) < 0
+    )
+        ]]></field>
+    </record>
+</odoo>

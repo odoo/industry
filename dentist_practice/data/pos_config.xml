@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1" context="{'allowed_company_ids': [ref('base.main_company')]}">
+    <!-- The standard retail onboarding provisions the POS journals and cash method. -->
+    <function model="pos.config" name="load_onboarding_retail_scenario">
+        <value name="with_demo_data" eval="False"/>
+    </function>
+    <record id="point_of_sale.pos_config_retail" model="pos.config" forcecreate="0">
+        <field name="name">Reception</field>
+        <field name="limit_categories" eval="True"/>
+        <field name="iface_available_categ_ids" eval="[Command.set([ref('pos_category_dental_services')])]"/>
+        <field name="payment_method_ids" model="pos.payment.method" eval="[Command.set(obj().search([('config_ids', 'in', [ref('point_of_sale.pos_config_retail')]), ('type', '=', 'cash')], limit=1).ids + [ref('pos_payment_method_card_reception')])]"/>
+        <field name="iface_tipproduct" eval="False"/>
+    </record>
+</odoo>

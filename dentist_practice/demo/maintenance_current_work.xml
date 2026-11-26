@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1" context="{'mail_auto_subscribe_no_notify': True, 'mail_activity_quick_update': True, 'mail_notrack': True}">
+    <record id="maintenance_chair_two_suction_repair" model="maintenance.request">
+        <field name="name">Chair 2 - suction connection leak</field>
+        <field name="equipment_id" ref="equipment_chair_two_demo"/>
+        <field name="maintenance_type">corrective</field>
+        <field name="stage_id" ref="maintenance.stage_1"/>
+        <field name="priority">3</field>
+        <field name="user_ids" eval="[Command.link(ref('user_operations_demo'))]"/>
+        <field name="schedule_date" model="res.users" eval="DateTime.now(pytz.timezone(obj().env.user.tz or 'UTC')).replace(hour=13, minute=0, second=0, microsecond=0).astimezone(pytz.UTC).replace(tzinfo=None)"/>
+        <field name="description" type="html">
+            <p>Reception reported a leak at the treatment-unit suction connection. The supplier has been contacted and the repair is in progress. Casey coordinates the visit and keeps Jamie informed about room availability.</p>
+            <p>File the supplier's service report and record the outcome on this request after the work.</p>
+        </field>
+    </record>
+    <record id="maintenance_compressor_pressure_review" model="maintenance.request">
+        <field name="name">Compressor - intermittent pressure warning</field>
+        <field name="equipment_id" ref="equipment_compressor_demo"/>
+        <field name="maintenance_type">corrective</field>
+        <field name="stage_id" ref="maintenance.stage_0"/>
+        <field name="priority">3</field>
+        <field name="user_ids" eval="[Command.link(ref('user_operations_demo'))]"/>
+        <field name="schedule_date" model="res.users" eval="(DateTime.now(pytz.timezone(obj().env.user.tz or 'UTC')) + relativedelta(days=-1)).replace(hour=8, minute=0, second=0, microsecond=0).astimezone(pytz.UTC).replace(tzinfo=None)"/>
+        <field name="description" type="html">
+            <p>The team reported an intermittent pressure warning. Supplier assessment is awaiting confirmation. Casey needs to obtain the visit time and coordinate the practice's arrangements with reception.</p>
+        </field>
+    </record>
+    <record id="activity_chair_two_repair_handoff" model="mail.activity">
+        <field name="res_model_id" ref="maintenance.model_maintenance_request"/>
+        <field name="res_id" ref="maintenance_chair_two_suction_repair"/>
+        <field name="activity_type_id" ref="mail.mail_activity_data_todo"/>
+        <field name="user_id" ref="user_operations_demo"/>
+        <field name="date_deadline" eval="DateTime.today().date()"/>
+        <field name="summary">Chair 2 - update reception after the supplier visit</field>
+        <field name="note" type="html"><p>Confirm the supplier's outcome, attach the service report and tell reception the agreed room arrangements. Update the request's stage and status.</p></field>
+    </record>
+    <record id="activity_compressor_supplier_callback" model="mail.activity">
+        <field name="res_model_id" ref="maintenance.model_maintenance_request"/>
+        <field name="res_id" ref="maintenance_compressor_pressure_review"/>
+        <field name="activity_type_id" ref="mail.mail_activity_data_call"/>
+        <field name="user_id" ref="user_operations_demo"/>
+        <field name="date_deadline" eval="(DateTime.today() + relativedelta(days=-1)).date()"/>
+        <field name="summary">Compressor - confirm the supplier's assessment time</field>
+        <field name="note" type="html"><p>Call the service supplier to confirm a visit time and update the request. Coordinate the practice's arrangements with reception.</p></field>
+    </record>
+</odoo>

@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1" context="{'no_sign_mail': True, 'mail_auto_subscribe_no_notify': True, 'mail_activity_quick_update': True, 'mail_notrack': True}">
+    <record id="sign_request_sophie_administration_demo" model="sign.request">
+        <field name="template_id" ref="sign_template_administrative_contact"/>
+        <field name="reference">Sophie Taylor - Patient registration</field>
+        <field name="subject">Your registration with Willow Dental</field>
+        <field name="reference_doc" eval="'res.partner,%s' % ref('partner_sophie_taylor_demo')"/>
+        <field name="validity" model="res.users" eval="(DateTime.now(pytz.timezone(obj().env.ref('base.user_admin').tz or 'UTC')) + relativedelta(days=30)).date()"/>
+        <field name="reminder_enabled" eval="False"/>
+        <field name="message" type="html">
+            <p>Welcome to Willow Dental, Sophie. Please review your contact details and complete the registration form. Reception can help if any details need updating.</p>
+        </field>
+        <field name="request_item_ids" eval="[Command.create({
+            'partner_id': ref('partner_sophie_taylor_demo'),
+            'role_id': ref('sign_role_contact_details_patient'),
+        })]"/>
+    </record>
+    <record id="sign_request_aisha_financial_receipt_demo" model="sign.request">
+        <field name="template_id" ref="sign_template_financial_receipt"/>
+        <field name="reference">Aisha Khan - Financial proposal acknowledgement</field>
+        <field name="subject">Your financial proposal from Willow Dental</field>
+        <field name="reference_doc" eval="'sale.order,%s' % ref('sale_order_aisha_demo')"/>
+        <field name="validity" model="res.users" eval="(DateTime.now(pytz.timezone(obj().env.ref('base.user_admin').tz or 'UTC')) + relativedelta(days=30)).date()"/>
+        <field name="reminder_enabled" eval="False"/>
+        <field name="message" type="html">
+            <p>Hello Aisha. Please acknowledge receipt of the financial proposal shared by reception. You can review and accept the proposal separately through your quotation. Contact us if you would like to discuss the amounts, payment arrangements, or your next appointment.</p>
+        </field>
+        <field name="request_item_ids" eval="[Command.create({
+            'partner_id': ref('partner_aisha_khan_demo'),
+            'role_id': ref('sign_role_proposal_receipt_patient'),
+        })]"/>
+    </record>
+    <function model="sign.request" name="message_subscribe">
+        <value eval="[ref('sign_request_sophie_administration_demo'), ref('sign_request_aisha_financial_receipt_demo')]"/>
+        <value name="partner_ids" eval="[ref('partner_staff_reception_demo')]"/>
+    </function>
+</odoo>

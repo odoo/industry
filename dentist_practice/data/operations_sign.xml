@@ -1,0 +1,151 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1" context="{'mail_auto_subscribe_no_notify': True, 'mail_notrack': True, 'no_document': True}">
+    <record id="sign_role_contact_details_patient" model="sign.item.role" forcecreate="0">
+        <field name="name">Patient</field>
+    </record>
+    <record id="sign_role_proposal_receipt_patient" model="sign.item.role" forcecreate="0">
+        <field name="name">Patient</field>
+    </record>
+    <record id="sign_template_administrative_contact" model="sign.template" forcecreate="0">
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="authorized_ids" eval="[Command.set([ref('base.user_admin')])]"/>
+        <field name="favorited_ids" eval="[Command.link(ref('base.user_admin'))]"/>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="folder_id" ref="documents_folder_signed_administration"/>
+        <field name="documents_tag_ids" eval="[Command.link(ref('documents_tag_administration'))]"/>
+        <field name="message" type="html">
+            <p>Please review your contact details and complete your registration with the practice.</p>
+        </field>
+    </record>
+    <record id="attachment_administrative_contact_form" model="ir.attachment" forcecreate="0">
+        <field name="name">Patient registration.pdf</field>
+        <field name="raw" type="bytes" file="dentist_practice/static/src/pdf/patient_registration.pdf"/>
+        <field name="mimetype">application/pdf</field>
+    </record>
+    <record id="sign_document_administrative_contact" model="sign.document" forcecreate="0">
+        <field name="attachment_id" ref="attachment_administrative_contact_form"/>
+        <field name="template_id" ref="sign_template_administrative_contact"/>
+    </record>
+    <record id="sign_item_contact_name" model="sign.item" forcecreate="0">
+        <field name="document_id" ref="sign_document_administrative_contact"/>
+        <field name="type_id" ref="sign.sign_item_type_name"/>
+        <field name="responsible_id" ref="sign_role_contact_details_patient"/>
+        <field name="name">Full name</field>
+        <field name="posX">0.084</field>
+        <field name="posY">0.355</field>
+        <field name="width">0.832</field>
+        <field name="height">0.042</field>
+    </record>
+    <record id="sign_item_contact_email" model="sign.item" forcecreate="0">
+        <field name="document_id" ref="sign_document_administrative_contact"/>
+        <field name="type_id" ref="sign.sign_item_type_email"/>
+        <field name="responsible_id" ref="sign_role_contact_details_patient"/>
+        <field name="name">Email address</field>
+        <field name="posX">0.084</field>
+        <field name="posY">0.450</field>
+        <field name="width">0.400</field>
+        <field name="height">0.042</field>
+    </record>
+    <record id="sign_item_contact_phone" model="sign.item" forcecreate="0">
+        <field name="document_id" ref="sign_document_administrative_contact"/>
+        <field name="type_id" ref="sign.sign_item_type_phone"/>
+        <field name="responsible_id" ref="sign_role_contact_details_patient"/>
+        <field name="name">Telephone number</field>
+        <field name="required" eval="False"/>
+        <field name="posX">0.516</field>
+        <field name="posY">0.450</field>
+        <field name="width">0.400</field>
+        <field name="height">0.042</field>
+    </record>
+    <record id="sign_item_contact_preference" model="sign.item" forcecreate="0">
+        <field name="document_id" ref="sign_document_administrative_contact"/>
+        <field name="type_id" ref="sign.sign_item_type_text"/>
+        <field name="responsible_id" ref="sign_role_contact_details_patient"/>
+        <field name="name">Preferred contact method</field>
+        <field name="required" eval="False"/>
+        <field name="posX">0.084</field>
+        <field name="posY">0.545</field>
+        <field name="width">0.832</field>
+        <field name="height">0.042</field>
+    </record>
+    <record id="sign_item_contact_signature" model="sign.item" forcecreate="0">
+        <field name="document_id" ref="sign_document_administrative_contact"/>
+        <field name="type_id" ref="sign.sign_item_type_signature"/>
+        <field name="responsible_id" ref="sign_role_contact_details_patient"/>
+        <field name="name">Signature</field>
+        <field name="posX">0.084</field>
+        <field name="posY">0.790</field>
+        <field name="width">0.500</field>
+        <field name="height">0.065</field>
+    </record>
+    <record id="sign_item_contact_date" model="sign.item" forcecreate="0">
+        <field name="document_id" ref="sign_document_administrative_contact"/>
+        <field name="type_id" ref="sign.sign_item_type_date"/>
+        <field name="responsible_id" ref="sign_role_contact_details_patient"/>
+        <field name="name">Date signed</field>
+        <field name="posX">0.650</field>
+        <field name="posY">0.790</field>
+        <field name="width">0.266</field>
+        <field name="height">0.042</field>
+    </record>
+    <record id="sign_template_financial_receipt" model="sign.template" forcecreate="0">
+        <field name="user_id" ref="base.user_admin"/>
+        <field name="authorized_ids" eval="[Command.set([ref('base.user_admin')])]"/>
+        <field name="favorited_ids" eval="[Command.link(ref('base.user_admin'))]"/>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="folder_id" ref="documents_folder_financial_proposals"/>
+        <field name="documents_tag_ids" eval="[Command.link(ref('documents_tag_financial_proposal'))]"/>
+        <field name="message" type="html">
+            <p>Please acknowledge receipt of your financial proposal from the practice. You can review and accept the proposal separately through your quotation.</p>
+        </field>
+    </record>
+    <record id="attachment_financial_receipt_form" model="ir.attachment" forcecreate="0">
+        <field name="name">Financial proposal acknowledgement.pdf</field>
+        <field name="raw" type="bytes" file="dentist_practice/static/src/pdf/proposal_acknowledgement.pdf"/>
+        <field name="mimetype">application/pdf</field>
+    </record>
+    <record id="sign_document_financial_receipt" model="sign.document" forcecreate="0">
+        <field name="attachment_id" ref="attachment_financial_receipt_form"/>
+        <field name="template_id" ref="sign_template_financial_receipt"/>
+    </record>
+    <record id="sign_item_financial_name" model="sign.item" forcecreate="0">
+        <field name="document_id" ref="sign_document_financial_receipt"/>
+        <field name="type_id" ref="sign.sign_item_type_name"/>
+        <field name="responsible_id" ref="sign_role_proposal_receipt_patient"/>
+        <field name="name">Patient full name</field>
+        <field name="posX">0.084</field>
+        <field name="posY">0.398</field>
+        <field name="width">0.832</field>
+        <field name="height">0.042</field>
+    </record>
+    <record id="sign_item_financial_reference" model="sign.item" forcecreate="0">
+        <field name="document_id" ref="sign_document_financial_receipt"/>
+        <field name="type_id" ref="sign.sign_item_type_text"/>
+        <field name="responsible_id" ref="sign_role_proposal_receipt_patient"/>
+        <field name="name">Proposal reference</field>
+        <field name="posX">0.084</field>
+        <field name="posY">0.490</field>
+        <field name="width">0.832</field>
+        <field name="height">0.042</field>
+    </record>
+    <record id="sign_item_financial_signature" model="sign.item" forcecreate="0">
+        <field name="document_id" ref="sign_document_financial_receipt"/>
+        <field name="type_id" ref="sign.sign_item_type_signature"/>
+        <field name="responsible_id" ref="sign_role_proposal_receipt_patient"/>
+        <field name="name">Signature</field>
+        <field name="posX">0.084</field>
+        <field name="posY">0.790</field>
+        <field name="width">0.500</field>
+        <field name="height">0.065</field>
+    </record>
+    <record id="sign_item_financial_date" model="sign.item" forcecreate="0">
+        <field name="document_id" ref="sign_document_financial_receipt"/>
+        <field name="type_id" ref="sign.sign_item_type_date"/>
+        <field name="responsible_id" ref="sign_role_proposal_receipt_patient"/>
+        <field name="name">Date signed</field>
+        <field name="posX">0.650</field>
+        <field name="posY">0.790</field>
+        <field name="width">0.266</field>
+        <field name="height">0.042</field>
+    </record>
+</odoo>

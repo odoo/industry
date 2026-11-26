@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <record id="filter_patient_enquiries_open" model="ir.filters" forcecreate="0">
+        <field name="name">Patient journey - open</field>
+        <field name="model_id">crm.lead</field>
+        <field name="domain" eval="[
+            ('type', '=', 'opportunity'),
+            ('team_id', '=', ref('crm_team_patient_journey')),
+            ('active', '=', True),
+            ('stage_id', 'in', [
+                ref('crm.stage_lead1', raise_if_not_found=False) or 0,
+                ref('crm.stage_lead2', raise_if_not_found=False) or 0,
+                ref('crm.stage_lead3', raise_if_not_found=False) or 0,
+                ref('crm_stage_treatment_followup'),
+            ]),
+        ]"/>
+    </record>
+    <record id="filter_patient_enquiries_due" model="ir.filters" forcecreate="0">
+        <field name="name">Patient journey - follow-ups due</field>
+        <field name="model_id">crm.lead</field>
+        <field name="domain" eval="[
+            ('type', '=', 'opportunity'),
+            ('team_id', '=', ref('crm_team_patient_journey')),
+            ('active', '=', True),
+            ('stage_id', 'in', [
+                ref('crm.stage_lead1', raise_if_not_found=False) or 0,
+                ref('crm.stage_lead2', raise_if_not_found=False) or 0,
+                ref('crm.stage_lead3', raise_if_not_found=False) or 0,
+                ref('crm_stage_treatment_followup'),
+            ]),
+            ('activity_state', 'in', ['overdue', 'today']),
+        ]"/>
+    </record>
+    <record id="filter_patient_estimates_awaiting_decision" model="ir.filters" forcecreate="0">
+        <field name="name">Dental estimates - awaiting decision</field>
+        <field name="model_id">crm.lead</field>
+        <field name="domain" eval="[
+            ('type', '=', 'opportunity'),
+            ('team_id', '=', ref('crm_team_patient_journey')),
+            ('active', '=', True),
+            ('stage_id', 'in', [
+                ref('crm.stage_lead3', raise_if_not_found=False) or 0,
+                ref('crm_stage_treatment_followup'),
+            ]),
+        ]"/>
+    </record>
+    <record id="filter_patient_followups_missing_activity" model="ir.filters" forcecreate="0">
+        <field name="name">Patient journey - no next activity</field>
+        <field name="model_id">crm.lead</field>
+        <field name="domain" eval="[
+            ('type', '=', 'opportunity'),
+            ('team_id', '=', ref('crm_team_patient_journey')),
+            ('active', '=', True),
+            ('stage_id', 'in', [
+                ref('crm.stage_lead1', raise_if_not_found=False) or 0,
+                ref('crm.stage_lead3', raise_if_not_found=False) or 0,
+                ref('crm_stage_treatment_followup'),
+            ]),
+            ('activity_ids', '=', False),
+        ]"/>
+    </record>
+    <record id="filter_patient_reception_due" model="ir.filters" forcecreate="0">
+        <field name="name">Patients - reception follow-ups due</field>
+        <field name="model_id">res.partner</field>
+        <field name="domain" eval="[('category_id', 'in', [ref('res_partner_category_patient')]), ('activity_state', 'in', ['overdue', 'today'])]"/>
+    </record>
+</odoo>

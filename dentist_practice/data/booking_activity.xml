@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1">
+    <record id="activity_type_opportunity_booking_link" model="mail.activity.type" forcecreate="0">
+        <field name="name">Send appointment booking link</field>
+        <field name="summary">Invite the patient to choose an appointment</field>
+        <field name="category">default</field>
+        <field name="icon">mail</field>
+        <field name="res_model">crm.lead</field>
+        <field name="mail_template_ids" eval="[Command.link(ref('mail_template_opportunity_booking_link'))]"/>
+        <field name="suggested_next_type_id" ref="activity_type_enquiry_callback"/>
+        <field name="default_note" type="html">
+            <p>Preview the first-examination booking email and check the recipient. For an invitation linked to this opportunity, use its calendar sharing controls and put the generated link in the email. Follow up if no appointment is agreed.</p>
+        </field>
+    </record>
+    <record id="activity_type_patient_booking_link" model="mail.activity.type" forcecreate="0">
+        <field name="name">Send patient booking link</field>
+        <field name="summary">Invite the patient to arrange the next visit</field>
+        <field name="category">default</field>
+        <field name="icon">mail</field>
+        <field name="res_model">res.partner</field>
+        <field name="mail_template_ids" eval="[Command.link(ref('mail_template_patient_booking_link'))]"/>
+        <field name="suggested_next_type_id" ref="activity_type_next_visit"/>
+        <field name="default_note" type="html">
+            <p>Preview the invitation and check that the published options cover the agreed next visit. For a specific visit, copy its link from Appointments into the email before sending.</p>
+        </field>
+    </record>
+    <record id="activity_plan_booking_invitation" model="mail.activity.plan" forcecreate="0">
+        <field name="name">Dental booking invitation</field>
+        <field name="res_model">crm.lead</field>
+        <field name="company_id" ref="base.main_company"/>
+    </record>
+    <record id="activity_template_booking_invitation_send" model="mail.activity.plan.template" forcecreate="0">
+        <field name="plan_id" ref="activity_plan_booking_invitation"/>
+        <field name="sequence">10</field>
+        <field name="activity_type_id" ref="activity_type_opportunity_booking_link"/>
+        <field name="responsible_type">role</field>
+        <field name="delay_count">0</field>
+        <field name="delay_unit">days</field>
+        <field name="delay_from">after_plan_date</field>
+        <field name="role_id" ref="role_dental_reception"/>
+    </record>
+    <record id="activity_template_booking_invitation_followup" model="mail.activity.plan.template" forcecreate="0">
+        <field name="plan_id" ref="activity_plan_booking_invitation"/>
+        <field name="sequence">20</field>
+        <field name="activity_type_id" ref="activity_type_enquiry_callback"/>
+        <field name="summary">Follow up if the invitation has not led to a booking</field>
+        <field name="responsible_type">role</field>
+        <field name="delay_count">2</field>
+        <field name="delay_unit">days</field>
+        <field name="delay_from">after_plan_date</field>
+        <field name="note" type="html">
+            <p>Review the diary and enquiry before contacting the patient. If an appointment has been agreed, complete this follow-up and prepare the visit. Otherwise ask whether reception can help find a suitable time.</p>
+        </field>
+        <field name="role_id" ref="role_dental_reception"/>
+    </record>
+</odoo>

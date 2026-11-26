@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo noupdate="1" context="{'mail_auto_subscribe_no_notify': True, 'mail_notrack': True, 'mail_activity_quick_update': True, 'no_mail_to_attendees': True, 'dont_notify': True}">
+    <record id="activity_reception_ben_journey" model="mail.activity">
+        <field name="res_model_id" ref="crm.model_crm_lead"/>
+        <field name="res_id" ref="crm_ben_journey"/>
+        <field name="activity_type_id" ref="activity_type_visit_preparation"/>
+        <field name="user_id" ref="user_reception_demo"/>
+        <field name="date_deadline" eval="DateTime.today().date()"/>
+        <field name="summary">Ben - reception follow-up</field>
+        <field name="note" type="html">
+            <p>Review the rearranged examination booking and draft proposal.</p>
+        </field>
+    </record>
+    <record id="activity_reception_freya_journey" model="mail.activity">
+        <field name="res_model_id" ref="crm.model_crm_lead"/>
+        <field name="res_id" ref="crm_freya_journey"/>
+        <field name="activity_type_id" ref="activity_type_estimate_discussion"/>
+        <field name="user_id" ref="user_reception_demo"/>
+        <field name="date_deadline" eval="DateTime.today().date()"/>
+        <field name="summary">Freya - reception follow-up</field>
+        <field name="note" type="html">
+            <p>Review the hygiene proposal and collect the existing examination invoice through Settle invoices.</p>
+        </field>
+    </record>
+    <record id="activity_reception_priya_journey" model="mail.activity">
+        <field name="res_model_id" ref="crm.model_crm_lead"/>
+        <field name="res_id" ref="crm_priya_journey"/>
+        <field name="activity_type_id" ref="activity_type_reception_checkout"/>
+        <field name="user_id" ref="user_reception_demo"/>
+        <field name="date_deadline" eval="DateTime.today().date()"/>
+        <field name="summary">Priya - reception follow-up</field>
+        <field name="note" type="html">
+            <p>Review the confirmed order and agreed visit before reception collection.</p>
+        </field>
+    </record>
+    <function model="mail.activity" name="action_done">
+        <value model="ir.model.data" eval="obj().env['calendar.event'].browse(obj().search([
+            ('module', '=', 'dentist_practice'), ('model', '=', 'calendar.event'),
+        ]).mapped('res_id')).filtered(lambda event: event.appointment_status in ('attended', 'no_show')).meeting_activity_ids.ids"/>
+    </function>
+    <function model="mail.activity" name="write">
+        <value model="ir.model.data" eval="obj().env['calendar.event'].browse(obj().search([
+            ('module', '=', 'dentist_practice'), ('model', '=', 'calendar.event'),
+        ]).mapped('res_id')).meeting_activity_ids.ids"/>
+        <value eval="{'user_id': ref('user_reception_demo')}"/>
+    </function>
+</odoo>
