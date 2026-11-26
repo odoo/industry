@@ -1,6 +1,6 @@
 {
     'name': 'Booking',
-    'version': '1.36',
+    'version': '1.37',
     'category': 'Hospitality',
     'author': 'Odoo S.A.',
     'depends': [
@@ -56,7 +56,7 @@
     ],
     'assets': {
         'web.assets_backend': [
-            'booking_engine/static/src/scss/gantt.scss',
+            'booking_engine/static/src/scss/gantt.css',
         ],
         'web.assets_backend_lazy': [
             'booking_engine/static/src/js/patch.js',  # web_gantt/gantt_renderer is lazy so this needs to be lazy too
@@ -68,7 +68,7 @@
         'data/ir_module_module_dependency.xml',
         'data/res_config_settings.xml',
         'data/website_view.xml',
-        'static/src/scss/gantt.scss',
+        'static/src/scss/gantt.css',
         'static/src/xml/gantt_pill_flags.xml',
     ],
     'images': ['images/main.png'],
