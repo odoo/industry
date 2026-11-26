@@ -1,6 +1,12 @@
 {
     'name': 'Excise Management',
+<<<<<<< 481327fab57932a1480509aa3b0372bde09a99e0
     'version': '2.13',
+||||||| 13ff9726c57250f82f1cf9670d40e7fc8d9d73a4
+    'version': '2.8',
+=======
+    'version': '2.9',
+>>>>>>> 0a0206fe8e05fc236feff38278a5b632797c06ea
     'category': 'Supply Chain',
     'author': 'Odoo S.A.',
     'depends': [
