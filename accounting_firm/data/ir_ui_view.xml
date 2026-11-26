@@ -48,8 +48,9 @@
                             <field name="x_mandate_id" decoration-warning="not x_mandate_active"/>
                             <field name="x_status" optional="show"/>
                             <field name="activity_ids" widget="list_activity" optional="show" invisible="not id"/>
-                            <field name="x_expiration_date" optional="show" options="{'warning': 'past'}"/>
-                            <field name="x_mandated" optional="show" widget="many2one_avatar"/>
+                            <field name="x_expiration_date" optional="hide" options="{'warning': 'past'}"/>
+                            <field name="x_mandated" optional="hide" widget="many2one_avatar"/>
+                            <field name="x_type" optional="hide"/>
                             <button string="Send Request" type="action" name="%(action_server_send_mandate_request)d" invisible="x_status in ('4_refused', '5_revoked')"/>
                         </list>
                     </field>
@@ -88,7 +89,8 @@
         <field name="arch" type="xml">
             <list string="Mandates" editable="bottom" multi_edit="1">
                 <field name="x_name"/>
-                <field name="x_mail_template_id"/>
+                <field name="x_mail_template_id" readonly="x_sign_template_id" required="not x_sign_template_id" force_save="1"/>
+                <field name="x_sign_template_id" readonly="x_mail_template_id" required="not x_mail_template_id" force_save="1"/>
                 <field name="x_color" widget="color_picker"/>
             </list>
         </field>
@@ -122,6 +124,7 @@
                 <field name="activity_ids" widget="list_activity" optional="show" invisible="not id"/>
                 <field name="x_expiration_date" optional="show" options="{'warning': 'past'}"/>
                 <field name="x_mandated" optional="show" widget="many2one_avatar" context="{'active_test': True}"/>
+                <field name="x_type" optional="show"/>
             </list>
         </field>
     </record>

@@ -205,6 +205,19 @@
         <field name="help">Online platform mandates you have for this customer</field>
     </record>
 
+    <!-- Sign Template fields -->
+    <record id="x_responsible_count_field_sign_template" model="ir.model.fields">
+        <field name="name">x_responsible_count</field>
+        <field name="model_id" ref="sign.model_sign_template"/>
+        <field name="field_description">Responsible Count (stored)</field>
+        <field name="ttype">integer</field>
+        <field name="store" eval="True"/>
+        <field name="depends">sign_item_ids.responsible_id</field>
+        <field name="compute"><![CDATA[
+for rec in self:    rec['x_responsible_count'] = len(rec.sign_item_ids.responsible_id)
+            ]]></field>
+    </record>
+
     <!-- Mandate fields -->
     <record id="x_name_field_x_mandate" model="ir.model.fields">
         <field name="name">x_name</field>
@@ -230,10 +243,19 @@
         <field name="model_id" ref="x_mandate_model"/>
         <field name="ttype">many2one</field>
         <field name="relation">mail.template</field>
-        <field name="required" eval="True"/>
         <field name="domain">[('model', '=', 'x_customer_mandate')]</field>
         <field name="on_delete">restrict</field>
         <field name="help">Email sent to the customer when requesting this mandate</field>
+    </record>
+    <record id="x_sign_template_id_field_x_mandate" model="ir.model.fields">
+        <field name="name">x_sign_template_id</field>
+        <field name="field_description">Sign Template</field>
+        <field name="model_id" ref="x_mandate_model"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">sign.template</field>
+        <field name="domain">[('x_responsible_count', '=', 1)]</field>
+        <field name="on_delete">restrict</field>
+        <field name="help">When set, the customer mandate request is a sign request leveraging this template</field>
     </record>
 
     <!-- Customer Mandate fields -->
@@ -325,6 +347,29 @@
         <field name="ttype">one2many</field>
         <field name="relation">x_customer_mandate</field>
         <field name="relation_field">x_partner_id</field>
+    </record>
+    <record id="x_type_field_x_customer_mandate" model="ir.model.fields">
+        <field name="name">x_type</field>
+        <field name="field_description">Type</field>
+        <field name="model_id" ref="x_customer_mandate_model"/>
+        <field name="ttype">selection</field>
+    </record>
+    <record id="x_type_customer_mandate_field_selection_email" model="ir.model.fields.selection">
+        <field name="name">Email</field>
+        <field name="field_id" ref="x_type_field_x_customer_mandate"/>
+        <field name="value">email</field>
+    </record>
+    <record id="x_type_customer_mandate_field_selection_sign_request" model="ir.model.fields.selection">
+        <field name="name">Sign Request</field>
+        <field name="field_id" ref="x_type_field_x_customer_mandate"/>
+        <field name="value">sign_request</field>
+    </record>
+    <record id="x_type_field_x_customer_mandate" model="ir.model.fields">
+        <field name="depends">x_mandate_id, x_mandate_id.x_mail_template_id, x_mandate_id.x_sign_template_id</field>
+        <field name="compute"><![CDATA[
+for record in self:
+    record['x_type'] = 'sign_request' if record.x_mandate_id and record.x_mandate_id.x_sign_template_id else 'email'
+        ]]></field>
     </record>
 
 
