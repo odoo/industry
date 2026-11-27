@@ -1,6 +1,6 @@
 {
     'name': 'Accounting Firm',
-    'version': '1.8',
+    'version': '1.9',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
@@ -53,8 +53,14 @@
     ],
     'demo': [
         'demo/res_company.xml',
+        'demo/ir_attachment_post.xml',
+        'demo/sign_item_role.xml',
+        'demo/sign_template.xml',
+        'demo/sign_document.xml',
+        'demo/sign_item.xml',
         'demo/x_mandate.xml',
         'demo/res_partner.xml',
+        'demo/x_customer_mandate.xml',
         'demo/crm_lead.xml',
         'demo/equity_ubo.xml',
         'demo/hr_department.xml',

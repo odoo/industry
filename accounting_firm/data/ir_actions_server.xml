@@ -68,13 +68,31 @@ action.update({'view_mode': 'form', 'res_id': records.partner_id.id}) if len(rec
 ]]></field>
     </record>
     <record id="action_server_send_mandate_request" model="ir.actions.server">
-        <field name="name">Accounting Firm: Send Mandate Request Email</field>
+        <field name="name">Accounting Firm: Send Mandate Request</field>
         <field name="model_id" ref="x_customer_mandate_model"/>
         <field name="state">code</field>
         <field name="code"><![CDATA[
 for customer_mandate in records:
-    message = customer_mandate.message_post_with_source(customer_mandate.x_mandate_id.x_mail_template_id, message_type='auto_comment', subtype_xmlid='mail.mt_comment', partner_ids=customer_mandate.x_mandated.partner_id.ids)
-    customer_mandate.x_partner_id.message_post(body=message.body, subject=message.subject, message_type='auto_comment', subtype_xmlid='mail.mt_comment', notify_skip_followers=True)
+    if customer_mandate.x_type == 'sign_request':
+        template = customer_mandate.x_mandate_id.x_sign_template_id
+        request = env['sign.request'].create({
+            'template_id': template.id,
+            'reference': customer_mandate.x_mandate_id.x_name,
+            'request_item_ids': [Command.create({
+                'partner_id': customer_mandate.x_partner_id.id,
+                'role_id': role.id,
+            }) for role in template.sign_item_role_ids]
+        })
+        env['mail.activity'].create({
+            'res_model_id': env['ir.model']._get_id('res.partner'),
+            'res_id':  customer_mandate.x_partner_id.id,
+            'activity_type_id': env.ref('sign.mail_activity_data_signature_request').id,
+            'sign_request_id': request.id,
+        })
+    else:
+        message = customer_mandate.message_post_with_source(customer_mandate.x_mandate_id.x_mail_template_id, message_type='auto_comment', subtype_xmlid='mail.mt_comment', partner_ids=customer_mandate.x_mandated.partner_id.ids)
+        customer_mandate.x_partner_id.message_post(body=message.body, subject=message.subject, message_type='auto_comment', subtype_xmlid='mail.mt_comment', notify_skip_followers=True)
+    customer_mandate['x_status'] = '2_requested'
 ]]></field>
     </record>
 </odoo>
