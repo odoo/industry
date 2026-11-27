@@ -19,4 +19,18 @@ for i in range(0, len(contacts_to_request), 50):
         break
 ]]></field>
     </record>
+    <record id="ir_cron_update_deadline_status" model="ir.cron">
+        <field name="name">Accounting Firm: update Deadline Status</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+now = datetime.datetime.now()
+env['project.task'].search([
+    ('x_deadline_status', '=', 'pending'),
+    ('date_deadline', '<=', now),
+]).write({'x_deadline_status': 'late'})
+]]></field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+    </record>
 </odoo>

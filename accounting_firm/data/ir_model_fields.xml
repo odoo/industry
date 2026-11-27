@@ -400,4 +400,65 @@ for record in self:
         <field name="related">task_id.state</field>
         <field name="store" eval="False"/>
     </record>
+
+    <record id="x_deadline_status_field_project_task_model" model="ir.model.fields">
+        <field name="name">x_deadline_status</field>
+        <field name="field_description">Deadline Status</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">selection</field>
+    </record>
+     <record id="x_deadline_status_field_selection_pending" model="ir.model.fields.selection">
+        <field name="name">Pending</field>
+        <field name="field_id" ref="x_deadline_status_field_project_task_model" />
+        <field name="value">pending</field>
+    </record>
+    <record id="x_deadline_status_field_selection_late" model="ir.model.fields.selection">
+        <field name="name">Late</field>
+        <field name="field_id" ref="x_deadline_status_field_project_task_model" />
+        <field name="value">late</field>
+    </record>
+    <record id="x_deadline_status_field_selection_done" model="ir.model.fields.selection">
+        <field name="name">Done</field>
+        <field name="field_id" ref="x_deadline_status_field_project_task_model" />
+        <field name="value">done</field>
+    </record>
+    <record id="x_deadline_status_field_project_task_model" model="ir.model.fields">
+        <field name="depends">date_deadline, state</field>
+        <field name="compute"><![CDATA[
+now = datetime.datetime.now()
+for record in self:
+    if record.state in ('1_done', '1_canceled'):
+        record['x_deadline_status'] = 'done'
+    elif record.date_deadline and record.date_deadline <= now:
+        record['x_deadline_status'] = 'late'
+    else:
+        record['x_deadline_status'] = 'pending'
+]]></field>
+    </record>
+    <record id="x_project_manager_id_field_project_task" model="ir.model.fields">
+        <field name="name">x_project_manager_id</field>
+        <field name="field_description">Project Manager</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">many2one</field>
+        <field name="relation">res.users</field>
+        <field name="related">project_id.user_id</field>
+    </record>
+    <record id="x_project_reviewer_ids_field_project_task" model="ir.model.fields">
+        <field name="name">x_project_reviewer_ids</field>
+        <field name="field_description">Project Reviewers</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">many2many</field>
+        <field name="relation">res.partner</field>
+        <field name="relation_table">x_project_task_res_partner_reviewer_rel</field>
+        <field name="related">project_id.x_reviewer_ids</field>
+    </record>
+    <record id="x_project_assistant_ids_field_project_task" model="ir.model.fields">
+        <field name="name">x_project_assistant_ids</field>
+        <field name="field_description">Project Assistants</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ttype">many2many</field>
+        <field name="relation">res.partner</field>
+        <field name="relation_table">x_project_task_res_partner_assistant_rel</field>
+        <field name="related">project_id.x_assistant_ids</field>
+    </record>
 </odoo>

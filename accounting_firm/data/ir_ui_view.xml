@@ -271,4 +271,44 @@
             </xpath>
         </field>
     </record>
+    <record id="view_task_form_deadline_status" model="ir.ui.view">
+        <field name="name">project.task.form.deadline.status</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='date_deadline_and_recurring_task']/field[@name='date_deadline']" position="after">
+                <field name="x_deadline_status" widget="badge" class="w-auto ms-2" decoration-danger="x_deadline_status == 'late'" invisible="x_deadline_status != 'late'"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="project_task_view_tree_deadline_status" model="ir.ui.view">
+        <field name="name">project.task.view.list.deadline.status</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.project_task_view_tree_main_base"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_deadline']" position="after">
+                <field name="x_deadline_status" string="Deadline Status" widget="badge" optional="show" decoration-danger="x_deadline_status == 'late'"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_task_search_deadline_status" model="ir.ui.view">
+        <field name="name">project.task.search.deadline.status</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_search_form"/>
+        <field name="active" eval="True"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='date_deadline']" position="after">
+                <filter name="deadline_status_late" string="Late" domain="[('x_deadline_status', '=', 'late')]"/>
+            </xpath>
+            <xpath expr="//filter[@name='user']" position="before">
+                <filter name="group_by_deadline_status" string="Deadline Status" context="{'group_by': 'x_deadline_status'}"/>
+                <filter name="group_by_customer" string="Customer" context="{'group_by': 'partner_id'}"/>
+                <filter name="group_by_project_manager" string="Project Manager" context="{'group_by': 'x_project_manager_id'}"/>
+                <filter name="group_by_project_reviewers" string="Reviewers" context="{'group_by': 'x_project_reviewer_ids'}"/>
+                <filter name="group_by_project_assistants" string="Assistants" context="{'group_by': 'x_project_assistant_ids'}"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>
