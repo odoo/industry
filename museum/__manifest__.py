@@ -18,6 +18,7 @@
     'data': [
         'data/ir_module_module_dependency.xml',
         'data/ir_ui_menu.xml',
+        'data/product_pricelist.xml',
         'data/res_config_settings.xml',
         'data/ir_default.xml',
         'data/ir_attachment_pre.xml',

@@ -41,6 +41,7 @@
         'data/delivery_carrier.xml',
         'data/pos_config.xml',
         'data/res_config_settings.xml',
+        'data/product_pricelist_item.xml',
         'data/knowledge_tour.xml',
     ],
     'demo': [

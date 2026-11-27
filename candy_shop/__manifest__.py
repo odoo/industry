@@ -12,6 +12,7 @@
     ],
     'data': [
         'data/ir_module_module_dependency.xml',
+        'data/product_pricelist.xml',
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/knowledge_cover.xml',
@@ -27,7 +28,6 @@
         'data/product_product.xml',
         'data/pos_config.xml',
         'data/product_image.xml',
-        'data/product_pricelist.xml',
         'data/product_pricelist_item.xml',
         'data/mail_message.xml',
         'data/knowledge_article_favorite.xml',

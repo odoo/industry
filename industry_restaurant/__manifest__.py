@@ -22,6 +22,7 @@
         'data/product_category.xml',
         'data/product_pricelist.xml',
         'data/res_config_settings.xml',
+        'data/product_pricelist_item.xml',
         'data/ir_attachment_pre.xml',
         'data/ir_default_data.xml',
         'data/uom_uom.xml',

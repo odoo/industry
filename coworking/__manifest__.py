@@ -20,6 +20,7 @@
     ],
     'data': [
         'data/ir_module_module_dependency.xml',
+        'data/product_pricelist.xml',
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/crm_stage.xml',
@@ -29,7 +30,6 @@
         'data/knowledge_article.xml',
         'data/planning_role.xml',
         'data/planning_slot_template.xml',
-        'data/product_pricelist.xml',
         'data/res_partner_grade.xml',
         'data/product_product.xml',
         'data/appointment_type.xml',

@@ -24,6 +24,7 @@
     ],
     'data': [
         'data/ir_module_module_dependency.xml',
+        'data/product_pricelist.xml',
         'data/res_config_settings.xml',
         'data/ir_model.xml',
         'data/ir_access.xml',
@@ -45,7 +46,6 @@
         'data/mailing_mailing.xml',
         'data/knowledge_article.xml',
         'data/planning_role.xml',
-        'data/product_pricelist.xml',
         'data/product_pricelist_item.xml',
         'data/project_task_type.xml',
         'data/project_project.xml',

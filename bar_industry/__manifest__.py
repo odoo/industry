@@ -15,9 +15,10 @@
     ],
     'data': [
         'data/ir_module_module_dependency.xml',
-        'data/res_config_settings.xml',
         'data/product_category.xml',
         'data/product_pricelist.xml',
+        'data/res_config_settings.xml',
+        'data/product_pricelist_item.xml',
         'data/ir_attachment_pre.xml',
         'data/project_task_type.xml',
         'data/project_project.xml',

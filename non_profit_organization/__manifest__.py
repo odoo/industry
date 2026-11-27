@@ -40,6 +40,7 @@
         'data/ir_actions_report.xml',
         'data/ir_ui_menu.xml',
         'data/base_automation.xml',
+        'data/product_pricelist.xml',
         'data/res_config_settings.xml',
         'data/ir_access.xml',
         'data/knowledge_cover.xml',
@@ -49,7 +50,6 @@
         'data/planning_role.xml',
         'data/website_theme_apply.xml',
         'data/mail_template.xml',
-        'data/product_pricelist.xml',
         'data/product_pricelist_item.xml',
     ],
     'demo': [

@@ -17,11 +17,11 @@
     'data': [
         'data/ir_module_module_dependency.xml',
         'data/pos_config.xml',
+        'data/product_pricelist.xml',
         'data/res_config_settings.xml',
         'data/knowledge_article.xml',
         'data/product_category.xml',
         'data/product_public_category.xml',
-        'data/product_pricelist.xml',
         'data/res_partner_grade.xml',
         'data/product_product.xml',
         'data/product_pricelist_item.xml',

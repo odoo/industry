@@ -14,10 +14,10 @@
     ],
     'data': [
         'data/ir_module_module_dependency.xml',
+        'data/product_pricelist.xml',
         'data/res_config_settings.xml',
         'data/ir_attachment_pre.xml',
         'data/product_category.xml',
-        'data/product_pricelist.xml',
         'data/res_partner_grade.xml',
         'data/product_product.xml',
         'data/knowledge_cover.xml',
