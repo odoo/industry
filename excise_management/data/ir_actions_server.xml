@@ -21,8 +21,10 @@ if bool(env['ir.module.module'].search_count([('name', '=', 'account_edi_ubl_cii
     common_values['ubl_cii_tax_category_code'] = 'Z'
 sale_tax, purchase_tax = env['account.tax'].create([common_values | {'type_tax_use': 'sale'}, common_values | {'type_tax_use': 'purchase'}])
 record.write({'x_sales_tax_id': sale_tax.id, 'x_purchase_tax_id': purchase_tax.id})
-env.ref('excise_management.no_excise_tax_sale')['original_tax_ids'] = [Command.link(sale_tax.id)]
-env.ref('excise_management.no_excise_tax_purchase')['original_tax_ids'] = [Command.link(purchase_tax.id)]
+if no_excise_tax := env.ref('excise_management.no_excise_tax_sale', raise_if_not_found=False):
+    no_excise_tax['original_tax_ids'] = [Command.link(sale_tax.id)]
+if no_excise_tax := env.ref('excise_management.no_excise_tax_purchase', raise_if_not_found=False):
+    no_excise_tax['original_tax_ids'] = [Command.link(purchase_tax.id)]
 env['account.fiscal.position'].search([('x_is_fiscal_deposit', '=', False)])['tax_ids'] = [Command.link(sale_tax.id), Command.link(purchase_tax.id)]
     ]]></field>
         <field name="model_id" ref="excise_category"/>
@@ -31,7 +33,11 @@ env['account.fiscal.position'].search([('x_is_fiscal_deposit', '=', False)])['ta
     </record>
     <record id="add_excise_taxes_fiscal_position_server_action" model="ir.actions.server">
         <field name="code"><![CDATA[
-no_excises_taxes = env.ref('excise_management.no_excise_tax_sale') | env.ref('excise_management.no_excise_tax_purchase')
+no_excises_taxes = env['account.tax']
+if no_excise_tax := env.ref('excise_management.no_excise_tax_sale', raise_if_not_found=False):
+    no_excises_taxes |= no_excise_tax
+if no_excise_tax := env.ref('excise_management.no_excise_tax_purchase', raise_if_not_found=False):
+    no_excises_taxes |= no_excise_tax
 for fp in records:
     if fp.x_is_fiscal_deposit:
         no_excises_taxes['fiscal_position_ids'] = [Command.link(fp.id)]
