@@ -1,6 +1,6 @@
 {
     'name': 'Accounting Firm',
-    'version': '1.8',
+    'version': '1.9',
     'category': 'Services',
     'author': 'Odoo S.A.',
     'depends': [
@@ -27,6 +27,7 @@
         'data/mail_template.xml',
         'data/ir_default.xml',
         'data/x_mandate.xml',
+        'data/base_automation.xml',
         'data/ir_actions_server.xml',
         'data/ir_cron.xml',
         'data/ir_ui_view.xml',
@@ -50,6 +51,9 @@
         'data/mail_message.xml',
         'data/sale_order_template.xml',
         'data/sale_order_template_line.xml',
+        'data/sign_template_tag.xml',
+        'data/sign_template.xml',
+        'data/sign_item.xml',
     ],
     'demo': [
         'demo/res_company.xml',
